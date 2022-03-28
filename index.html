@@ -34,6 +34,7 @@
 			body {
 				background-image: linear-gradient(180deg, #860100, #fb070c) ;
 				padding: 10px;
+				font-family: Helvetica, sans-serif;
 
 			}
 
@@ -43,8 +44,29 @@
 				margin-right: auto;
 			}
 
+			.navigation {
+				background-color: #a40503;
+				padding: 5px;
+				margin: -20px;
+			}
+
+
+			.navigation a {
+				display: block;
+				font-size: 1.3em;
+				padding: 10px 20px;
+				margin: 5px 10px;
+			}
+
+			@media (min-width: 600px) {
+			  .navigation a {
+			    display: inline-block;
+			  }
+			}
+
+
 			span {
-				color: #ffff00;
+				color: #ffffff;
 			}
 
 
@@ -58,14 +80,28 @@
 				text-decoration: underline;
 			}
 
-			a:hover, span:hover {
-				font-family: Fontdinerdotcom;
+			li a:hover,
+			span:hover {
 				text-decoration: underline;
+				background-color: rgba(204, 93, 92, 0.50);
+				padding: 1px;
 			}
 
-			header h1, 
-			header a {
-				font-size: 50px;
+			.landing h1, 
+			.landing h1 a {
+				font-size: 10vw;
+			}
+
+			
+
+			.landing p {
+				background-color: indianred;
+				padding: 15px;
+				font-size: 0.9em;
+				font-weight: 350;
+				line-height: 1.20;
+				letter-spacing: 0.08em;
+				margin-bottom: 40px;
 			}
 
 			h2 {
@@ -89,14 +125,13 @@
 			}
 
 
-			nav {
-				padding: 5px;
-			}
+			
 
-			section {
+			.project-list {
 				background-color: #860100;
 				padding: 5px;
 				padding-bottom: 1%;
+				margin: -20px;
 			}
 
 
@@ -105,11 +140,12 @@
 
 
 
-			footer {
+			.matelist {
 				background-color: black;
+				margin: -20px;
+
 
 			}
-
 			.matelist {
 				color: white;
 				font-family: expose;
@@ -132,99 +168,107 @@
 			}
 			.matelist ul a {
 				color: white;
-				background-color: indianred;
 			}
-
-
-
-
 		</style>
-
-
-
 	</head>
 	<body>
 
-		<header>
+		<header class="navigation">
 			<div class="inner-column">
-			<h1>
-				I'm becoming a <a href="#list">Web Designer!!</a> 🏗
-			</h1>	
-
-			<p>
-				Heya! Burooj Here. I’m excited about web design. This the place where I get to share my Journey about my adventures with the DFTW ship, Captained by our mentor Derek! Im not exactly sure where I will disembark yet, but the Web is Wide and as I explore this World I hope to figure out the X that marks where my talents and interests intersect!. Do you like distinct, and bold vibrancy or dark-nerdy-indie stained glass windows? Email me if you do! I'd love to talk about it!
-			</p>
+				<nav>
+					<a href="projects/index.html">Projects</a>
+					<a href="contact/contact.html">Contact</a>
+					<a href="about/about.html">About</a>
+				</nav>
 			</div>
 		</header>
 
+		<main>
+			<section class="landing">
+				<div class="inner-column">
 
-		<section>
+				<h1>
+					I'm becoming a <a href="#list">Web Designer!!</a>
+				</h1>	
 
-			<div class="inner-column">
-
-			<h2 id="list">Journey through my Projects</h2>
-
-			<nav>
-
-				<ul>
-					<li>
-						<a href="fav-things/fav-things.html" target="fav-things">Favorite Things</a>
-					</li>
-					<li>
-						<a href="four-page/welcome.html" target="four-page">Four Page Home</a>
-					</li>
-					<li><a href="web-portal/homepage.html" target="portal">Web Portal</a>
-					</li>
-					<li>
-						<a href="challenge-1">Challenge 1</a>
-					</li>
-					<li class="uncle-ben">
-						Uncle Ben <a href="https://codepen.io/boroujr/full/MWrydeL">v1.0</a>, <a href="https://codepen.io/boroujr/full/XWVjMBE">v2.0</a>, <a href="https://codepen.io/boroujr/full/xxpgYLy">v3.0</a>
-					</li>
-					<li>
-						
-					</li>
-					<li>
-						
-					</li>
-				</ul>
-			</nav>
-			</div>
+				<p>
+					Hey, <span>Burooj here</span> and excited about <span>Web Design!</span> This is where I share my journey on the <span>DFTW</span>, captained by Derek! Im not sure yet where I will disembark, but the World is Wide and as I explore this Web I hope to find where my talents and interests <span>intersect!</span> Do you like distinct, and bold vibrancy or dark-nerdy-indie stained glass windows? <span>Email me if you do! I'd love to talk about it!</span>
+				</p>
+				</div>
 			</section>
+		
+
+
+<!-- 			<section class="project-list">
+				<div class="inner-column">
+
+				<h2 id="list">Journey through my Work</h2>
+					<ul>
+						<li>
+							<a href="fav-things/fav-things.html" target="fav-things">Favorite Things</a>
+						</li>
+						<li>
+							<a href="web-portal/homepage.html" target="portal">Web Portal</a>
+						</li>
+						<li>
+							<a href="challenge-1">Challenge 1</a>
+						</li>
+						<li>
+							 <a href="https://codepen.io/boroujr/full/xxpgYLy">Uncle Ben</a>
+						</li>
+						<li>
+							
+						</li>
+						<li>
+							
+						</li>
+					</ul>
+				</div>
+			</section> -->
+		
 
 
 
-		<footer>
-			<div class="inner-column matelist">
-			<h2 id="mates">
-				<a href="#mates">
-					Wanted List
-				</a>
-				<sup>
-				 aka ppl that you should also check out
-				</sup>
-			</h2>
+			<section class="matelist">
+				<div class="inner-column">
+				<h2 id="mates">
+					<a href="#mates">
+						Wanted List
+					</a>
+					<sup>
+					 AKA <br> Classmates that you should also check out
+					</sup>
+				</h2>
+					<ul>
+						<li>
+							<a href="../andy" target="andy">Andy</a>
+						</li>
+						<li>
+							<a href="../john" target="john">John</a>
+						</li>
+						<li>
+							<a href="../kriston" target="kriston">Kriston</a>
+						</li>
+						<li>
+							<a href="../ned" target="ned">Ned</a>
+						</li>
+						<li>
+							<a href="../steve" target="steve">Steve</a>
+						</li>
 
-			<nav>
-				<ul>
-					<li>
-						<a href="../andy" target="andy">Andy</a>
-					</li>
-					<li>
-						<a href="../john" target="john">John</a>
-					</li>
-					<li>
-						<a href="../kriston" target="kriston">Kriston</a>
-					</li>
-					<li>
-						<a href="../ned" target="ned">Ned</a>
-					</li>
-					<li>
-						<a href="../steve" target="steve">Steve</a>
-					</li>
+					</ul>
+				</div>
+			</section>
+		</main>	
 
-				</ul>
-			</nav>
+
+		<footer class="navigation">
+			<div class="inner-column">
+				<nav>
+					<a href="projects/index.html">Projects</a>
+					<a href="contact/contact.html">Contact</a>
+					<a href="about/about.html">About</a>
+				</nav>
 			</div>
 		</footer>
 

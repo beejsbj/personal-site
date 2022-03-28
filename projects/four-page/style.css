@@ -44,16 +44,6 @@ img {
 
 
 
-
-
-
-
-
-
-
-
-
-
 /*************favthings***************/
 
 
@@ -69,24 +59,6 @@ img {
   max-width: 80ch;
   margin-right:auto;
   margin-left:auto;
-}
-
-
-.favthings p {
-   color: black;
-  font-size: 16px;
-  font-weight: 350;
-  line-height: 1.75;
-  letter-spacing: 0.08em;
-}
-
-.favthings blockquote {
-  background-color: rgba(243, 183, 171, 0.25);
-  padding: 20px;
-}
-
-.favthings em {
-  font-style: italic;
 }
 
 .favthings h1 {
@@ -116,6 +88,19 @@ img {
   margin-top: 30px;
 }
 
+.favthings p {
+   color: black;
+  font-size: 16px;
+  font-weight: 350;
+  line-height: 1.75;
+  letter-spacing: 0.08em;
+}
+
+.favthings blockquote {
+  background-color: rgba(243, 183, 171, 0.25);
+  padding: 20px;
+}
+
 .favthings ul {
   margin-top: 30px;
   list-style-type: disc;
@@ -143,4 +128,12 @@ img {
    font-size: 30px;
 
 }
+
+.favthings em {
+  font-style: italic;
+}
+
+
+
+
 
