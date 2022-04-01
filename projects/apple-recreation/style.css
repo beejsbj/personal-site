@@ -95,31 +95,21 @@ main {
 
 /*HEADER******/
 
-header {
+.site-header {
 	padding: 10px;
 	background-color: rgba(49, 49, 50, 1.00);
 	min-height: 42pt;
 	font-size: 0.75em;
 	text-align: center;
 	margin-bottom: 10px;
+}
 
-
+.header-nav {
+	display: none;
 }
 
 header li {
 	padding: 10px;
-}
-
-@media (min-width: 700px) {
-  header li {
-    display: inline-block;
-    padding: 10px;
-  }
-  header {
-    position: fixed;
-    width: 100%;
-    top: 0px;
-  }
 }
 
 header img {
@@ -136,7 +126,49 @@ header a:hover {
 	color: white;
 }
 
+header .menu-toggle {
+	display: block;
+	border: 4px solid black;
+	border-radius: 15px;
+	font-size: 2em;
+	font-weight: 400;
+	padding: 4px;
+	background-image: linear-gradient(0deg, #b3b3b5, #dddfe1);
+	color: black;
 
+}
+
+header .menu-toggle:hover {
+	background-image: linear-gradient(180deg, #b3b3b5, #dddfe1);
+}
+
+@media (min-width: 700px) {
+  .site-header {
+    position: fixed;
+    width: 100%;
+    top: 0px;
+  }
+  header li {
+    display: inline-block;
+    padding: 10px;
+  }
+
+  .header-nav {
+  	display: block;
+  }
+
+  header .menu-toggle {
+  	display: none;
+  }
+}
+
+
+
+
+
+
+
+  
 
 
 
@@ -197,14 +229,20 @@ header a:hover {
 
 /**coda image**/
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .coda .inner-column {
 	background-image: url("https://www.movienco.co.uk/carteles/17000/17001/001.jpg");
 	background-size: cover;
+	min-height: 700px;
 
 }
 	.coda img {
+		
 		opacity: 0;
+	}
+
+	.card img {
+		width: 100%;
 	}
 }
 
@@ -212,6 +250,8 @@ header a:hover {
 		display: block;
 	margin-left: auto;		
 	margin-right: auto;
+	width: 100%;
+	
 }
 
 
@@ -228,6 +268,7 @@ and uniform in size*/
 }
 
 
+
 /*footer stuff*/
 
 .bottom-text .inner-column {
@@ -241,3 +282,49 @@ and uniform in size*/
 	margin: 15px 10px;
 	padding: 2px;
 }
+
+
+
+
+
+
+footer {
+	padding: 10px;
+	background-color: rgba(49, 49, 50, 1.00);
+	min-height: 42pt;
+	font-size: 0.75em;
+	text-align: center;
+	margin-bottom: 10px;
+
+
+}
+
+footer li {
+	padding: 10px;
+}
+
+@media (min-width: 700px) {
+  footer li {
+    display: inline-block;
+    padding: 10px;
+  }
+}
+
+footer img {
+	width: 20px;
+}
+
+footer a {
+	color: rgba(214, 214, 214, 1.00);
+	margin: 0px 18px;
+	
+}
+
+footer a:hover {
+	color: white;
+}
+
+
+
+
+
