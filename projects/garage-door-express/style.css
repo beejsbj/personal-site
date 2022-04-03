@@ -62,8 +62,8 @@ body * {
 body {
 	font-family: sans-serif;
 	background-image: url(https://www.wcmanet.org/wp-content/uploads/2020/06/Top-19-Best-Garage-Door-Brands-Garage-Door-Manufacturer-Reviews.jpg);
-	background-size: cover;
-	margin: 20px;
+	background-size: contain;
+	margin: 5px;
 }
 .inner-column {
 	margin-left: auto;
@@ -93,6 +93,7 @@ span {
 
 em {
 	font-style: italic;
+	text-decoration: underline;
 }
 
 h2 {
@@ -105,7 +106,7 @@ h1 span {
 }
 
 h3 {
-	font-size: 1.5em;
+	font-size: 1.3em;
 	text-decoration: underline;
 }
 
@@ -113,23 +114,38 @@ h3 {
 
 .site-header {
 	background-color: wheat;
+	background-image: url(../../assets/images/garage-door-bg.jpg);
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center center;
 }
 
 .site-header h1 {
 	font-size: 3em;
 	margin: 10px 0;
 	padding: 20px 0;
+	color: ghostwhite;
 }
 
 
 .site-header li {
 	display: inline-block;
+	padding: 20px;
+	margin: 5px;
+	
+	border-radius: 3px;
+}
+
+.site-header li:hover {
+	background-color: #D7A955;
+	transition: 0.3s;
 }
 
 .site-header a {
 	font-size: 1.2em;
-	padding: 20px;
-	margin: 5px;
+	color: white;
+	
+	
 }
 
 
@@ -137,7 +153,8 @@ h3 {
 
 
 .landing {
-	background-color: ghostwhite;
+	background-color: wheat;
+
 }
 
 
@@ -147,7 +164,8 @@ h3 {
 }
 
 .landing img {
-	width: 250px;
+	width: clamp(150px, 15vw, 250px);
+
 }
 
 /*****about******/
@@ -155,6 +173,7 @@ h3 {
 
 .about {
 	background-color: #9f5231;
+
 
 }
 
@@ -166,8 +185,8 @@ h3 {
 }
 
 .about img {
-	width: 300px;
-	object-position: right top;
+	width: clamp(150px, 15vw, 250px);
+
 }
 
 /*****contact******/
