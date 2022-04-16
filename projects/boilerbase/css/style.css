@@ -1,0 +1,27 @@
+@import 'meyers-reset.css';
+@import 'setup.css';
+
+body * {
+	/*border: 2px solid blue;*/
+}
+
+/**STRUCTURE******/
+
+body {
+	background-color: wheat;
+	padding: 15px;
+}
+
+
+.inner-column {
+	max-width: 80ch;
+	margin: 0 auto;
+}
+
+/**TYPOGRAPHY******/
+
+
+
+
+
+/**Sections******/

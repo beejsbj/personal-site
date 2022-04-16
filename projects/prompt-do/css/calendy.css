@@ -1,0 +1,103 @@
+
+.calendy-module {
+	padding-bottom: 200px;
+}
+calendy,
+description,
+stuff,
+calender {
+	display: block;
+}
+
+calendy {
+	background-color: wheat;
+
+}
+
+calendy * {
+	/* 	border: 5px solid black; */
+	padding: 5px;
+	margin: 3px;
+}
+
+
+
+/*BKG COlors*/
+calendy header {
+	background-color: palegreen;
+}
+
+calendy calender {
+	background-color: red;
+}
+
+calendy p {
+	background-color: pink;
+}
+
+calendy description h2 {
+	background-color: cyan;
+}
+
+calendy description nav section {
+	background-color: indigo;
+}
+calendy .logo {
+	font-size: 40px;
+}
+
+calendy calender p {
+	height: 400px;
+}
+
+/*small screen setup*/
+
+calendy description {
+	background-color: #abdfeb;
+	display: flex;
+	flex-direction: column;
+}
+
+calendy .all {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	border: 1px solid yellow;
+	background-color: floralwhite;
+}
+
+calendy nav,
+calendy {
+	display: flex;
+	flex-direction: column;
+}
+
+/*breakpoint 1*/
+
+@media (min-width: 500px) {
+	calendy .all {
+		flex-direction: row;
+	}
+
+	calendy calender,
+	calendy description {
+		width: 50%;
+	}
+}
+
+/*breakpoint 2*/
+@media (min-width: 750px) {
+	calendy nav,
+	calendy {
+		flex-direction: row;
+	}
+
+	calendy nav section {
+		/* 		width: 50%; */
+	}
+
+	calendy description {
+		flex-direction: column;
+		align-items: center;
+	}
+}
