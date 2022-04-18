@@ -12,8 +12,6 @@ body {
 	/*padding: 15px;*/
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh;
-	flex-grow: 1;
 }
 
 
@@ -43,7 +41,6 @@ flex-container {
 .loud-voice {
 	font-family: monospace;
 	font-size: 30px;
-	margin: 0.5em 0;
 }
 
 .attention-voice {
@@ -61,12 +58,14 @@ flex-container {
 
 .calm-voice {
 	font-family: sans-serif;
-	font-size: 1rem;
-	margin: 0.5em 0;
+	font-size: 1.2rem;
+	margin: 1em 0;
+	line-height: 1.3;
 }
 
 a {
 	text-decoration: underline;
+	font-size: 1.2rem;
 }
 /**Sections******/
 
@@ -118,7 +117,11 @@ a {
 }
 
 flex-container picture {
-	width: 80%
+	width: 80%;
+}
+
+.header-landing flex-container {
+	align-items: flex-start;
 }
 
 
@@ -139,7 +142,7 @@ flex-container picture {
 }
 
 .site-main flex-container picture {
-	width: 80px;
+	width: 120px;
 	border-radius: 50%;
 	border: 2px solid black;
 	margin: 0.5em;
@@ -156,6 +159,7 @@ flex-container picture {
 	padding: 20px 12px;
 	padding-bottom: 180px;
 	color: white;
+
 }
 
 
@@ -169,18 +173,32 @@ flex-container picture {
 @media (min-width: 600px){
 	flex-container {
 		flex-direction: row;
+		align-items: center;
+	}
+
+	.loud-voice {
+		font-size: 40px;
+	}
+
+
+	.attention-voice {
+		font-size: 30px;
+	}
+
+	.attention-voice + .calm-voice {
+		margin-top: 1em;
 	}
 
 	.description {
-		margin: 1em;
+		margin-left: 1em;
 	}
 
 	.header-landing picture {
-	width: 1500px
+		width: 1500px;
 	}
 
 	.site-main flex-container picture {
-	width: 600px;
+		width: 600px;
 	}
 
 	.site-main {
@@ -195,6 +213,11 @@ flex-container picture {
 		bottom: -90px;
 		right: -50px;
 		opacity: 0.5;
+	}
+
+	.site-main a:hover {
+		text-decoration: none;
+		color: black;
 	}
 
 
@@ -215,28 +238,25 @@ flex-container picture {
 
 @media (min-width: 900px){
 	.inner-column {
-		max-width: 60%;
+		max-width: 70%;
 	}
 
-	.loud-voice {
-		font-size: 40px;
-	}
-	.header-landing .calm-voice {
-		font-size: 1.3rem;
-	}
+
+
+	
 
 	.header-nav {
 	padding: 15px 15px;
 	}
 
 
-
-
-	.header-landing picture {
-	width: 20%
-	height:  auto;
-
+	.header-landing flex-container {
+	align-items: center;
 	}
+
+
+
+
 
 	.site-main flex-container picture {
 	width: 150px;
@@ -252,7 +272,6 @@ flex-container picture {
 		flex-direction: column;
 		align-items: center;
 		text-align: center;
-		margin:;
 	}
 
 	.header-landing {
@@ -293,7 +312,14 @@ flex-container picture {
 		color: white;
 		border-radius: 30px;
 		background-color: black;
-		padding: 5px 20px;
+		padding: 10px 40px;
+		text-decoration: none;
+		margin: 1em 0;
+	}
+
+	.site-main a:hover {
+		background-color: rgba(0, 0, 0, 0.30);
+		color: black;
 	}
 
 
