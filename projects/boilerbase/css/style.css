@@ -1,9 +1,31 @@
 @import 'meyers-reset.css';
 @import 'setup.css';
 
-body * {
-	/*border: 2px solid blue;*/
+/**Clarity**/
+
+/*body {
+	border: 5px solid red;
 }
+
+body * {
+	border: 5px solid black;
+	margin: 5px;
+}
+
+body > * {
+	border-color: blue;
+}
+
+body > * > * {
+	border-color: forestgreen;
+
+}*/
+
+
+
+
+
+
 
 /**STRUCTURE******/
 

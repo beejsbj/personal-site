@@ -1,17 +1,35 @@
 @import 'meyers-reset.css';
 @import 'setup.css';
 
-body * {
-	/*border: 2px solid blue;*/
+
+/**Clarity**/
+
+/*body {
+	border: 5px solid red;
 }
+
+body * {
+	border: 5px solid black;
+	margin: 5px;
+}
+
+body > * {
+	border-color: blue;
+}
+
+body > * > * {
+	border-color: forestgreen;
+
+}*/
 
 /**STRUCTURE******/
 
 body {
-	background-color: #f5dc08;
+	background-color: palegreen;
 	/*padding: 15px;*/
 	display: flex;
 	flex-direction: column;
+	height: 100vh;
 }
 
 
@@ -31,10 +49,23 @@ flex-container {
 }
 
 
+.site-main {
+	flex-grow: 1;
+	/*border: 5px solid black;*/
+	display: flex;
+}
+
+.main-block {
+	/*border: 5px solid black;*/
+	flex-grow: 1;
+	padding: 30px 12px;
+}
+
 .site-main .inner-column {
 	display: flex;
 	flex-direction: column;
 	gap: 4em;
+
 }
 
 
@@ -68,6 +99,13 @@ flex-container {
 a {
 	text-decoration: underline;
 	font-size: 1.2rem;
+
+}
+
+a:hover {
+	text-decoration-style: double;
+	text-decoration-thickness: 3px;
+
 }
 /**Sections******/
 
@@ -136,7 +174,6 @@ flex-container picture {
 
 .site-main {
 	background-color: rgba(255, 255, 255, 0.70);
-	padding: 20px 10px;	
 }
 
 
@@ -156,12 +193,11 @@ flex-container picture {
 .site-footer {
 	background-color: rgba(0, 0, 0, 0.70);
 	padding: 20px 12px;
-	padding-bottom: 180px;
+	padding-bottom: 100px;
 	color: white;
+	position: static;
 
-/*	position: absolute;
-	bottom: 0;
-	width: 100%;*/
+
 
 }
 
@@ -198,6 +234,8 @@ flex-container picture {
 		width: 1500px;
 	}
 
+
+
 	.site-main flex-container picture {
 		width: 200px;
 	}
@@ -206,7 +244,7 @@ flex-container picture {
 		flex-basis: 75%;
 	}
 
-	.site-main {
+	.main-block {
 		position: relative;
 		overflow: hidden;
 	}
@@ -220,18 +258,7 @@ flex-container picture {
 		opacity: 0.5;
 	}
 
-	.site-main a:hover {
-		text-decoration: none;
-		color: black;
-	}
 
-
-
-	/*.site-footer {
-		position: fixed;
-		bottom: 0;
-		width: 100%;
-	}*/
 }
 
 
@@ -241,7 +268,7 @@ flex-container picture {
 
 
 
-@media (min-width: 900px){
+@media (min-width: 1000px){
 
 	.site-main {
 		padding-top: 30px;
@@ -275,6 +302,7 @@ flex-container picture {
 		flex-direction: column;
 		align-items: center;
 		text-align: center;
+		width: 33%;
 	}
 
 	.header-landing {
@@ -284,19 +312,19 @@ flex-container picture {
 
 	.header-landing .cog {
 		display: block;
-		width: 200px;
+		width: 300px;
 		position: absolute;
-		bottom: -30px;
-		left: -50px;
+		bottom: -120px;
+		left: -100px;
 		opacity: 0.5;
 	}
 
 	.header-landing .cloud {
 		display: block;
-		width: 200px;
+		width: 700px;
 		position: absolute;
-		bottom: -30px;
-		right: 20%;
+		bottom: -20%;
+		right: 10%;
 		opacity: 0.3;
 	}
 
@@ -325,13 +353,19 @@ flex-container picture {
 	.site-main a:hover {
 		background-color: rgba(0, 0, 0, 0.30);
 		color: black;
+		transition: 0.5s;
 	}
 
+	.site-main:hover .rotate,
+	.header-landing:hover .rotate,
+	.header-nav:hover .rotate {
 
+	transform: rotate(360deg);
+	transition: 1s;
+
+	}
 
 }
-
-
 
 
 
