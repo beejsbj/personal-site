@@ -29,8 +29,43 @@ body * {
 	transition: 1s;
 }
 
+body {
+	background-color: black;
+}
+
+.site-header {
+	opacity: 0;
+	pointer-events: none;
+}
+
+input.menu-toggle { 
+	display:  none;
+}
+
+.toggle-label {
+	display: flex;
+	margin: 5px 5px;
+	width: 5vh;
+	height: 50vh;
+    background-image: url("../images/bar.svg");
+    background-repeat: no-repeat;
+    filter: invert(1);
+}
 
 
+input.menu-toggle:checked ~ .site-header {
+	opacity: 1;
+	pointer-events: initial;
+	transition: 0.2s;
+}
+
+input.menu-toggle:checked ~ .toggle-label {
+	display: none;
+}
+
+.toggle-label:hover {
+	cursor: url("../images/cursor-hand.png") 0 0, auto;
+}
 
 /**STRUCTURE******/
 
@@ -86,11 +121,11 @@ body * {
 
 
 .nav-bar:hover {
-	cursor: url("../images/cursor-pointer.png") 0 0,auto;
+	cursor: url("../images/cursor-pointer.png") 0 0, auto;
 }
 
 .nav-bar a:hover {
-	cursor: url("../images/cursor-hand.png") 0 0,auto;
+	cursor: url("../images/cursor-hand.png") 0 0, auto;
 }
 
 .nav-bar .logo-ram {
