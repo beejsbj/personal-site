@@ -1,0 +1,355 @@
+@import 'meyers-reset.css';
+@import 'setup.css';
+
+
+/**Clarity**/
+
+/*body {
+	border: 5px solid red;
+}*/
+
+/*body * {
+	border: 5px solid black;
+	margin: 5px;
+}*/
+
+/*.site-header > * {
+	border: 5px solid blue;
+}
+*/
+/*.site-header > * > * {
+	border: 5px solid green;
+
+}*/
+
+
+
+
+body * {
+	transition: 1s;
+}
+
+
+
+
+/**STRUCTURE******/
+
+
+
+
+/*.inner-column {
+	max-width: 80ch;
+	margin: 0 auto;
+}*/
+
+
+
+/**Themeing******/
+
+.site-header {
+	background-image: url("../images/back.jpg");
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+	color: white;
+	height: 100vh;
+}
+
+.nav-bar {
+	background-color: white;
+}
+
+/**TYPOGRAPHY******/
+
+
+
+
+/**Sections******/
+
+/*.nav-bar > * {
+	border: 5px solid yellow;
+}*/
+
+
+.nav-bar {
+	display: flex;
+	justify-content: space-between;
+	border-bottom: 4px solid black;
+	align-items: center;
+
+
+	
+
+
+}
+
+
+
+.nav-bar:hover {
+	cursor: url("../images/cursor-pointer.png") 0 0,auto;
+}
+
+.nav-bar a:hover {
+	cursor: url("../images/cursor-hand.png") 0 0,auto;
+}
+
+.nav-bar .logo-ram {
+	width: 70px;
+	border-right: 4px solid black;
+	padding: 10px;
+}
+
+.nav-bar .logo-ram img:hover {
+	transform: scale(0.8);
+}
+
+.nav-bar .site-title {
+	font-family: "TrimPosterWebCondensed", sans-serif;
+	font-weight: 700;
+	text-transform: uppercase;
+	color: black;
+	font-size: clamp(25px, 5vw, 10px);
+
+
+}
+
+
+.nav-bar .menu-toggle {
+	border-left: 4px solid black;
+	width: 70px;
+	padding: 10px;
+}
+
+.nav-bar .menu-toggle img:hover {
+	transform: scale(1.4);
+}
+
+
+
+
+.nav-menu {
+	padding: 40px 30px;
+}
+
+/*.big-nav h2 {
+	border: 5px solid yellow;
+}*/
+
+.nav-menu .big-nav {
+	display: flex;
+	flex-direction: column;
+	align-items:  flex-start;
+}
+
+.nav-menu .big-nav a {
+	margin-bottom: 20px;
+}
+
+.nav-menu .big-nav h2 {
+	font-family: Helvetica;
+	font-size: 3rem;
+	text-transform: uppercase;
+	font-weight: 900;
+	transition: 0.1s;
+}
+
+.nav-menu .big-nav h2:hover {
+	color: #f8384a;
+}
+
+.ghost {
+	display: none;
+}
+
+.nav-menu .big-nav p {
+	display: none;
+}
+
+
+.nav-menu .divider {
+	width: 300px;
+	margin: 40px 0px 20px;
+}
+
+
+
+.nav-menu .small-nav a {
+	margin-bottom: 1rem;
+}
+
+.nav-menu .small-nav p {
+	font-size: 1.25rem;
+	transition: 0.1s;
+
+}
+
+.nav-menu .small-nav p:hover {
+	color: #f8384a;
+}
+
+
+
+
+
+
+@media (min-width: 850px){
+	
+	.site-header {
+		display: flex;
+		gap: 30px;
+	}
+	.nav-bar {
+		flex-direction: column-reverse;
+
+		background-color: transparent;
+		border-right: 4px solid white;
+		width: 80px;
+		justify-content: space-between;
+	}
+
+	.nav-bar .logo-ram {
+		border-right: 0px solid black;
+		filter: invert(1);
+		opacity: 80%;
+
+
+
+	}
+
+
+
+	.nav-bar .site-title-container {
+
+		border-right: 4px solid white;
+		border-left: 4px solid white;
+		transform: rotate(-90deg);
+		width: 350px;
+		height: 80px;
+		font-size: 75px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+	}
+	.nav-bar .site-title {
+		color: white;
+		opacity: 80%;
+	}
+
+	
+	.nav-bar .ghost {
+		display: block;
+		opacity: 0;
+	}
+
+	.nav-bar .menu-toggle {
+		border-left: 0px solid black;
+		filter: invert(1);
+		opacity: 80%;
+		
+
+	}
+
+
+
+
+	.nav-menu .big-nav {
+		margin-top: 25px;
+
+	}
+
+	/*.big-nav h2 {
+		border: 5px solid yellow;
+	}*/
+
+
+
+
+	.nav-menu .big-nav h2 {
+		font-size: 8vh;
+		letter-spacing: -10px;
+		display: inline-block;
+	}
+
+	.nav-menu .big-nav a:hover h2 {
+		transform: skewY(5deg);
+		
+
+
+	}
+
+	.nav-menu .big-nav a {
+		position: relative;
+		margin-bottom: 5px;
+	}
+
+
+	.nav-menu .big-nav p {
+		display: none;
+		font-size: 1.5rem;
+
+		position: absolute;
+		top: 25%;
+		right: -15%;
+	}
+	.nav-menu .big-nav a:hover p {
+		display: inline-block;
+		transform: translateX(40%);
+	}
+
+
+
+	.nav-menu .divider {
+		width: 300px;
+		margin: 40px 0px 30px;
+	}
+
+	.nav-menu .small-nav {
+		/*border: 5px solid yellow;*/
+		width: 500px;
+		display: flex;
+		flex-wrap: wrap;
+		
+		justify-content: space-between;
+	}
+
+	.nav-menu .small-nav a {
+		/*border: 5px solid green;*/
+		/*display: inline-block;*/
+		flex-basis: 50%;
+	}
+
+	.nav-menu .small-nav p {
+		display: inline-block;
+		font-size: 1.5rem;
+
+	}
+
+	.nav-menu .small-nav p:hover {
+
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

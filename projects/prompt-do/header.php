@@ -3,8 +3,8 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Prompted and Doing">
-	<meta property="og:image" content= "[XXXXXXXXX]">
+	<meta name="description" content="Prompted and Doed">
+	<meta property="og:image" content= "https://peprojects.dev/alpha-4/burooj/assets/images/snow-mountain-wide.jpg">
 
 	<link rel="stylesheet" href="css/style.css">
 

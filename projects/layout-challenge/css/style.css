@@ -319,6 +319,14 @@ flex-container picture {
 		opacity: 0.5;
 	}
 
+
+	@keyframes breath {
+	  50% {
+	    transform: scale(1.2);
+		}
+  	}
+
+
 	.header-landing .cloud {
 		display: block;
 		width: 700px;
@@ -326,6 +334,7 @@ flex-container picture {
 		bottom: -20%;
 		right: 10%;
 		opacity: 0.3;
+		animation: 3s breath infinite ease-in-out;
 	}
 
 
@@ -356,14 +365,20 @@ flex-container picture {
 		transition: 0.5s;
 	}
 
+	.rotate {
+		transition: 1s;
+	}
+
 	.site-main:hover .rotate,
 	.header-landing:hover .rotate,
 	.header-nav:hover .rotate {
 
 	transform: rotate(360deg);
-	transition: 1s;
-
+	
 	}
+
+	
+}
 
 }
 
