@@ -33,12 +33,12 @@ body {
 	background-color: black;
 }
 
-.site-header {
-	opacity: 0;
+.black-ram {
+	display: none;
 	pointer-events: none;
 }
 
-input.menu-toggle { 
+input.menu-toggle {
 	display:  none;
 }
 
@@ -46,25 +46,25 @@ input.menu-toggle {
 	display: flex;
 	margin: 5px 5px;
 	width: 5vh;
-	height: 50vh;
+	height: 5vh;
     background-image: url("../images/bar.svg");
     background-repeat: no-repeat;
     filter: invert(1);
 }
 
 
-input.menu-toggle:checked ~ .site-header {
-	opacity: 1;
+input.menu-toggle:checked ~ .black-ram {
+	display: initial;
 	pointer-events: initial;
-	transition: 0.2s;
 }
 
 input.menu-toggle:checked ~ .toggle-label {
 	display: none;
+
 }
 
 .toggle-label:hover {
-	cursor: url("../images/cursor-hand.png") 0 0, auto;
+	cursor: url("../images/cursor-hand.png"), auto;
 }
 
 /**STRUCTURE******/
@@ -81,7 +81,7 @@ input.menu-toggle:checked ~ .toggle-label {
 
 /**Themeing******/
 
-.site-header {
+.black-ram .site-header {
 	background-image: url("../images/back.jpg");
 	background-size: cover;
 	background-repeat: no-repeat;
@@ -90,7 +90,7 @@ input.menu-toggle:checked ~ .toggle-label {
 	height: 100vh;
 }
 
-.nav-bar {
+.black-ram .nav-bar {
 	background-color: white;
 }
 
@@ -106,7 +106,7 @@ input.menu-toggle:checked ~ .toggle-label {
 }*/
 
 
-.nav-bar {
+.black-ram .nav-bar {
 	display: flex;
 	justify-content: space-between;
 	border-bottom: 4px solid black;
@@ -120,25 +120,25 @@ input.menu-toggle:checked ~ .toggle-label {
 
 
 
-.nav-bar:hover {
-	cursor: url("../images/cursor-pointer.png") 0 0, auto;
+.black-ram .nav-bar:hover {
+	cursor: url("../images/cursor-pointer.png"), auto;
 }
 
-.nav-bar a:hover {
-	cursor: url("../images/cursor-hand.png") 0 0, auto;
+.black-ram .nav-bar a:hover {
+	cursor: url("../images/cursor-hand.png"), auto;
 }
 
-.nav-bar .logo-ram {
+.black-ram .nav-bar .logo-ram {
 	width: 70px;
 	border-right: 4px solid black;
 	padding: 10px;
 }
 
-.nav-bar .logo-ram img:hover {
+.black-ram .nav-bar .logo-ram img:hover {
 	transform: scale(0.8);
 }
 
-.nav-bar .site-title {
+.black-ram .nav-bar .site-title {
 	font-family: "TrimPosterWebCondensed", sans-serif;
 	font-weight: 700;
 	text-transform: uppercase;
@@ -149,20 +149,20 @@ input.menu-toggle:checked ~ .toggle-label {
 }
 
 
-.nav-bar .menu-toggle {
+.black-ram .nav-bar .menu-toggle {
 	border-left: 4px solid black;
 	width: 70px;
 	padding: 10px;
 }
 
-.nav-bar .menu-toggle img:hover {
+.black-ram .nav-bar .menu-toggle img:hover {
 	transform: scale(1.4);
 }
 
 
 
 
-.nav-menu {
+.black-ram .nav-menu {
 	padding: 40px 30px;
 }
 
@@ -170,17 +170,17 @@ input.menu-toggle:checked ~ .toggle-label {
 	border: 5px solid yellow;
 }*/
 
-.nav-menu .big-nav {
+.black-ram .nav-menu .big-nav {
 	display: flex;
 	flex-direction: column;
 	align-items:  flex-start;
 }
 
-.nav-menu .big-nav a {
+.black-ram .nav-menu .big-nav a {
 	margin-bottom: 20px;
 }
 
-.nav-menu .big-nav h2 {
+.black-ram .nav-menu .big-nav h2 {
 	font-family: Helvetica;
 	font-size: 3rem;
 	text-transform: uppercase;
@@ -188,37 +188,37 @@ input.menu-toggle:checked ~ .toggle-label {
 	transition: 0.1s;
 }
 
-.nav-menu .big-nav h2:hover {
+.black-ram .nav-menu .big-nav h2:hover {
 	color: #f8384a;
 }
 
-.ghost {
+.black-ram .ghost {
 	display: none;
 }
 
-.nav-menu .big-nav p {
+.black-ram .nav-menu .big-nav p {
 	display: none;
 }
 
 
-.nav-menu .divider {
+.black-ram .nav-menu .divider {
 	width: 300px;
 	margin: 40px 0px 20px;
 }
 
 
 
-.nav-menu .small-nav a {
+.black-ram .nav-menu .small-nav a {
 	margin-bottom: 1rem;
 }
 
-.nav-menu .small-nav p {
+.black-ram .nav-menu .small-nav p {
 	font-size: 1.25rem;
 	transition: 0.1s;
 
 }
 
-.nav-menu .small-nav p:hover {
+.black-ram .nav-menu .small-nav p:hover {
 	color: #f8384a;
 }
 
@@ -229,11 +229,11 @@ input.menu-toggle:checked ~ .toggle-label {
 
 @media (min-width: 850px){
 	
-	.site-header {
+	.black-ram .site-header {
 		display: flex;
 		gap: 30px;
 	}
-	.nav-bar {
+	.black-ram .nav-bar {
 		flex-direction: column-reverse;
 
 		background-color: transparent;
@@ -242,7 +242,7 @@ input.menu-toggle:checked ~ .toggle-label {
 		justify-content: space-between;
 	}
 
-	.nav-bar .logo-ram {
+	.black-ram .nav-bar .logo-ram {
 		border-right: 0px solid black;
 		filter: invert(1);
 		opacity: 80%;
@@ -253,7 +253,7 @@ input.menu-toggle:checked ~ .toggle-label {
 
 
 
-	.nav-bar .site-title-container {
+	.black-ram .nav-bar .site-title-container {
 
 		border-right: 4px solid white;
 		border-left: 4px solid white;
@@ -266,18 +266,18 @@ input.menu-toggle:checked ~ .toggle-label {
 		justify-content: center;
 
 	}
-	.nav-bar .site-title {
+	.black-ram .nav-bar .site-title {
 		color: white;
 		opacity: 80%;
 	}
 
 	
-	.nav-bar .ghost {
+	.black-ram .nav-bar .ghost {
 		display: block;
 		opacity: 0;
 	}
 
-	.nav-bar .menu-toggle {
+	.black-ram .nav-bar .menu-toggle {
 		border-left: 0px solid black;
 		filter: invert(1);
 		opacity: 80%;
@@ -288,7 +288,7 @@ input.menu-toggle:checked ~ .toggle-label {
 
 
 
-	.nav-menu .big-nav {
+	.black-ram .nav-menu .big-nav {
 		margin-top: 25px;
 
 	}
@@ -300,26 +300,26 @@ input.menu-toggle:checked ~ .toggle-label {
 
 
 
-	.nav-menu .big-nav h2 {
+	.black-ram .nav-menu .big-nav h2 {
 		font-size: 8vh;
 		letter-spacing: -10px;
 		display: inline-block;
 	}
 
-	.nav-menu .big-nav a:hover h2 {
+	.black-ram .nav-menu .big-nav a:hover h2 {
 		transform: skewY(5deg);
 		
 
 
 	}
 
-	.nav-menu .big-nav a {
+	.black-ram .nav-menu .big-nav a {
 		position: relative;
 		margin-bottom: 5px;
 	}
 
 
-	.nav-menu .big-nav p {
+	.black-ram .nav-menu .big-nav p {
 		display: none;
 		font-size: 1.5rem;
 
@@ -327,19 +327,19 @@ input.menu-toggle:checked ~ .toggle-label {
 		top: 25%;
 		right: -15%;
 	}
-	.nav-menu .big-nav a:hover p {
+	.black-ram .nav-menu .big-nav a:hover p {
 		display: inline-block;
 		transform: translateX(40%);
 	}
 
 
 
-	.nav-menu .divider {
+	.black-ram .nav-menu .divider {
 		width: 300px;
 		margin: 40px 0px 30px;
 	}
 
-	.nav-menu .small-nav {
+	.black-ram .nav-menu .small-nav {
 		/*border: 5px solid yellow;*/
 		width: 500px;
 		display: flex;
@@ -348,19 +348,19 @@ input.menu-toggle:checked ~ .toggle-label {
 		justify-content: space-between;
 	}
 
-	.nav-menu .small-nav a {
+	.black-ram .nav-menu .small-nav a {
 		/*border: 5px solid green;*/
 		/*display: inline-block;*/
 		flex-basis: 50%;
 	}
 
-	.nav-menu .small-nav p {
+	.black-ram .nav-menu .small-nav p {
 		display: inline-block;
 		font-size: 1.5rem;
 
 	}
 
-	.nav-menu .small-nav p:hover {
+	.black-ram .nav-menu .small-nav p:hover {
 
 	}
 }

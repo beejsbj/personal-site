@@ -23,25 +23,28 @@ body > * > * {
 .inner-column * {
 	/*border: 5px solid black;*/
 }
-
+.logo {
+	width: 60px;
+	padding: 10px 5px;
+}
 
 /*Theme*/
-body {
+.site-main2 {
 	--bgcolor: #ff0066;
 	background-color: var(--bgcolor);
 }
 
 .site-header {
-	background-color: rgba(255, 255, 255, 0.80);
+	background-color: rgba(125, 0, 255, 0.80);
 }
 
-.main-welcome {
-	background-color: rgba(255, 255, 255, 0.50);
+.main2-welcome {
+	background-color: rgba(100, 255, 125, 0.50);
 
 }
 
 .site-footer {
-		background-color: rgba(0, 0, 0, 0.70);
+		background-color: rgba(255, 125, 0, 0.70);
 
 }
 
@@ -51,17 +54,17 @@ body {
 /**STRUCTURE******/
 
 
-body {
+.site-main2 {
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
 }
 
-.site-main {
+.site-main2 {
 	flex-grow: 1;
 }
 
-.inner-column {
+.site-main2 .inner-column {
 	max-width: 80ch;
 	margin: 0 auto;
 }
@@ -82,37 +85,34 @@ body {
 /**Sections******/
 
 
-.logo {
-	width: 60px;
-	padding: 10px 5px;
-}
+
 
 
 
 
 /*Main Welcome*/
 
-.main-welcome {
+.main2-welcome {
 	padding: 40px 10px;
 }
 
-.main-welcome .welcome-flex {
+.main2-welcome .welcome-flex {
 	display: flex;
 	flex-direction: column;
 	gap: 1em;
 }
 
-.main-welcome .bonus {
+.main2-welcome .bonus {
 	margin-top: 50px;
 	display: none;
 }
 
-.main-welcome h1 {
+.main2-welcome h1 {
 	font-family: sans-serif;
 	font-size: 20px;
 }
 
-.main-welcome a {
+.main2-welcome a {
 	display: inline-block;
 	background-color: var(--bgcolor);
 	border-radius: 20px;
@@ -124,44 +124,44 @@ body {
 
 @media (min-width: 500px){
 
-	.main-welcome .welcome-flex {
+	.main2-welcome .welcome-flex {
 		flex-direction: row-reverse;
 		align-items: center;
 		justify-content: space-between;
 	}
 
-	.main-welcome .bonus {
+	.main2-welcome .bonus {
 		display: block;
 		border: 1px solid black;
 		padding: 10px;
 	}
 
-	.main-welcome .welcome-flex picture {
+	.main2-welcome .welcome-flex picture {
 		flex-basis: 50%;
 	} 
 
-	.main-welcome h1 {
+	.main2-welcome h1 {
 	font-size: 35px;
 	}
 }
 
 @media (min-width: 900px){
 
-	.main-welcome .welcome-flex {
+	.main2-welcome .welcome-flex {
 		flex-direction: row;
 		align-items: flex-start;
 		justify-content: initial;
 	}
 
-	.main-welcome .bonus {
+	.main2-welcome .bonus {
 		display: none;
 	}
 
-	.main-welcome .welcome-flex picture {
+	.main2-welcome .welcome-flex picture {
 		flex-basis: 60%;
 	} 
 
-	.main-welcome h1 {
+	.main2-welcome h1 {
 	font-size: 35px;
 	}
 }
@@ -171,52 +171,52 @@ body {
 
 /*main about*/
 
-.main-about {
+.main2-about {
 	padding: 40px 10px;
 }
-.main-about .card picture, .main-about h2 {
+.main2-about .card picture, .main2-about h2 {
 	padding: 5px;
-	background-color: rgba(255, 255, 255, 0.50);
+	background-color: rgba(151, 200, 225, 0.50);
 }
 
-.main-about .inner-column {
+.main2-about .inner-column {
 	display: flex;
 	flex-direction: column;
 	gap: 1em;
 	/*border: 3px solid yellow;*/
 }
 
-.main-about h2 {
+.main2-about h2 {
 	/*margin-top: 0.8em;*/
 	font-family: sans-serif;
 	font-size: 18px;
 }
 
-.main-about .hiddenA {
+.main2-about .hiddenA {
 		display: none;
 }
 
 @media (min-width:  400px){
-	.main-about .card {
+	.main2-about .card {
 		display: flex;
 	}
 
-	.main-about .card > *  {
+	.main2-about .card > *  {
 		width: 50%;
 	}	
 }
 
 @media (min-width: 500px){
 
-	.main-about .card {
+	.main2-about .card {
 		display: block;
 	}
 
-	.main-about .card > *  {
+	.main2-about .card > *  {
 		width: initial;
 	}	
 
-	.main-about .inner-column {
+	.main2-about .inner-column {
 		flex-direction: row;
 	}
 }
@@ -224,13 +224,13 @@ body {
 
 @media (min-width: 900px){
 
-/*	.main-about .card {
+/*	.main2-about .card {
 		position: relative;
 		width: 100%;
 		height: 200px;
 		border: 3px solid yellow;
 	}
-	.main-about .card picture {
+	.main2-about .card picture {
 		width: 300px;
 		position: absolute;
 		left: -100%;
@@ -238,29 +238,29 @@ body {
 	}*/
 
 
-/*	.main-about .card {
+/*	.main2-about .card {
 		width: 100%;
 		border: 3px solid yellow;
 	}
-	.main-about .hiddenA {
+	.main2-about .hiddenA {
 		display: block;
 		border: 3px solid black;
 	}
-	.main-about .card picture {
+	.main2-about .card picture {
 		/*opacity: 0;*/
 
-	.main-about .card {
+	.main2-about .card {
 		display: flex;
 		gap: 0.8em;
 	}
 
-	.main-about .card picture {
+	.main2-about .card picture {
 	padding: 0;
 	width: 50%;
 	}
-	.main-about .card h2 {
+	.main2-about .card h2 {
 	padding-right: 1em;
-	background-color: rgba(255, 255, 255, 0.50);
+	background-color: rgba(151, 200, 225, 0.50);
 	width: 50%;
 	}
 
