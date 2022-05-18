@@ -1,26 +1,12 @@
+
 @import 'meyers-reset.css';
 @import 'setup.css';
+
+/*import font*/
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,200;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600;1,6..72,700;1,6..72,800&display=swap');
 
-/**Clarity**/
 
-/*body {
-	border: 5px solid red;
-}
 
-body * {
-	border: 5px solid black;
-	margin: 5px;
-}
-
-body > * {
-	border-color: blue;
-}
-
-body > * > * {
-	border-color: forestgreen;
-
-}*/
 
 
 html {
@@ -31,8 +17,6 @@ html {
 	--text: rgba(45, 7, 6, 1.00);
 	--highlight1: rgba(229,180,131,1); /*subdued*/
 	--highlight: rgba(233, 159, 85, 1.00); /*louder*/
-	
-
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,122 +25,114 @@ html {
 	--head1: rgba(217, 215, 208, 1.00);
 	--head2: rgba(255, 255, 255, 1.00);
 	--link: rgba(246, 233, 14, 1.00);
-	--text: rgba(45, 7, 6, 1.00);
-	--highlight: rgba(163, 7, 3, 1.00);
+	--text: rgba(217, 215, 208, 1.00);
+	--highlight: rgba(233, 159, 85, 1.00);
+	--highlight1: rgba(163, 7, 3, 1.00);
 
 	}
 }
 
-
-
-/**STRUCTURE******/
-
+/*style, color pallete makoto*/
 body {
 	background-color: var(--paper);
 	color: var(--text);
 	
-	/*position: relative;*/
-
 }
 
 
-main .inner-column {
+.inner-column {
 	max-width: 80ch;
 	margin: 0 auto;
 	padding: 20px;
 	font-family: 'Newsreader';
 }
 
-/**TYPOGRAPHY******/
 
 h1 {
-	font-family: 'Newsreader', serif;
+	color: var(--head1);
+	font-family: 'Newsreader', sans-serif;
 	font-size: 3rem;
 	font-weight: 800;
 	margin: 1em 0;
-	color: var(--head1);
 }
 
+h1 em {
+	color: var(--highlight);
+	text-decoration: underline;
 
-
-
+}
 
 h2 {
-	font-size: 2.2rem;
-	color: var(--head1);
-	margin: 0.5em 0;
+	color: var(--head2);
+	margin-top: 1.5em;
+	margin-bottom: 0.5em;
+	font-family: 'Newsreader', sans-serif;
+	font-size: 2rem;
 	font-weight: 300;
 }
 
+li {
 
-h3 {
-	font-size: 1rem;
-	color: var(--head2);
-	margin: 0.5em 0;
-	font-weight: 500;
+	font-family: 'Newsreader', sans-serif;
+	line-height: 1.25;
+	letter-spacing: 0.02em;
+	background-image: linear-gradient(90deg, var(--highlight1), var(--paper));
+	border-radius: 10px;
+	padding: 10px;
+	margin: 10px 0;
+	font-size: 1.2rem;
 }
-
-h2 + h3 {
-	margin-top: 2em;
-}
-h3 a,
-h2 a,
-.svg-link-container {
-	display: inline;
-	/*border: 5px solid yellow;*/
-}
-
 
 p {
-	font-size: 1rem;
-	margin-top: 1rem;
-	color: var(--head1);
+	/*padding: 1em 0;*/
+	font-family: 'Newsreader';
+	margin: 1em 0;
+	font-size: 1.2rem;
+
 }
 
-span {
-	color: var(--head2);
-}
 
-a, p a {
+
+li a {
 	color: var(--link);
 	text-decoration: none;
-	font-weight: 500;
+	display: inline;
 }
 
-a:hover {
-	text-decoration: underline;
+.svg-link {
+	display: inline;
 }
-/**Sections******/
+
+
+em {
+	color: var(--head2);	
+	font-style: italic;
+}
+
+strong {
+	color: var(--head1);
+	font-weight: 700;
+}
 
 
 
 
 
 
+/*svg*/
 
-
-
-
-
-
-
-
-
-
-
-
-/*SVG*/
 
 svg {
 	pointer-events: none;
 	/*display: none;*/
+
 }
 
 .b-svg {
 	position: fixed;
-	left: -500px;
+	left: -400px;
 	top: -50px;
-	height: 1200px;
+	height: 800px;
 	/*width: 200%;*/
 	fill: var(--paper);
 	/*stroke: var(--highlight);*/
@@ -179,9 +155,9 @@ svg {
 
 .j-svg {
 	position: fixed;
-	right: -175px;
+	right: -375px;
 	top: 0;
-	height: 1000px;
+	height: 800px;
 	fill: var(--highlight);
 	transition: 0.3s;
 	animation: 25s jletter infinite ease-in-out;
@@ -208,13 +184,6 @@ svg {
 
 
 
-#svg-link-goals,
-#svg-link-about,
-#svg-link-projects {
-	fill: var(--highlight);
-	stroke-width: 0px;
-	
-}
 
 
 
@@ -253,31 +222,31 @@ svg {
 
 	.b-svg {
 		position: fixed;
-		left: -550px;
-		top: -150px;
-		height: 1200px;
+		left: -250px;
+		top: 0;
+		height: 800px;
 		/*width: 200%;*/
-		fill-opacity: 1;
+		fill-opacity: 0;
 		fill: var(--highlight);
 
 		/*transform: translateX(-450px);*/
 		animation: 5s bletter infinite ease-in-out;
-		stroke-width: 0px;
+		stroke-width: 0.5px;
 	}
 
 	.j-svg {
 		position: fixed;
-		right: -195px;
-		top: -200px;
-		height: 1300px;
+		right: -305px;
+		top: -20px;
+		height: 800px;
 		fill: var(--highlight);
 		animation: 5s jletter infinite ease-in-out;
 	}
 
 	.j-svg #j-letter {
 		stroke: var(--highlight);
-		stroke-width: 0px;
-		fill-opacity: 1;
+		stroke-width: 0.5px;
+		fill-opacity: 0;
 }
 
 	
@@ -288,9 +257,9 @@ svg {
 
 	.b-svg {
 		position: fixed;
-		left: -900px;
-		top: -150px;
-		height: 2000px;
+		left: -400px;
+		top: 0px;
+		height: 1300px;
 		/*width: 200%;*/
 		fill: var(--highlight);
 		/*transform: translateX(-450px);*/
@@ -301,7 +270,7 @@ svg {
 		position: fixed;
 		right: -190px;
 		top: -200px;
-		height: 2000px;
+		height: 1300px;
 		fill: var(--highlight);
 		/*animation: 5s jletter infinite ease-in-out;*/
 	}
@@ -360,19 +329,5 @@ svg {
 		stroke: var(--highlight);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

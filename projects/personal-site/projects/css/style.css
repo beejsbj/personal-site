@@ -35,7 +35,7 @@ html {
 
 }
 
-@media (prefers-color-scheme: dark) {
+/*@media (prefers-color-scheme: dark) {
 	html {
 	--paper: rgba(0, 0, 0, 1.00);
 	--head1: rgba(217, 215, 208, 1.00);
@@ -45,7 +45,7 @@ html {
 	--highlight: rgba(163, 7, 3, 1.00);
 
 	}
-}
+}*/
 
 
 
@@ -100,10 +100,8 @@ h2 + h3 {
 	margin-top: 2em;
 }
 h3 a,
-h2 a,
-.svg-link-container {
+h2 a {
 	display: inline;
-	/*border: 5px solid yellow;*/
 }
 
 
@@ -130,12 +128,66 @@ a:hover {
 
 
 
+/*project card*/
+
+
+project-list {
+	margin-top: 3rem;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+project-card {
+	display: block;
+	color: var(--head1);
+	line-height: 1.25;
+	letter-spacing: 0.02em;
+	background-image: linear-gradient(180deg, var(--highlight), var(--paper));
+	border-radius: 10px;
+	padding: 10px;
+	max-width: 60ch;
+	/*border-right: 1px solid var(--head1);*/
+	border-top: 1px solid var(--head1);
+	border-left: 1px solid var(--head1);
 
 
 
+}
+
+
+project-card h4 {
+	font-size: 1.2rem;
+	font-weight: 800;
+	padding: 0.5em 0;
+}
+
+
+project-card p {
+	font-size: 0.9rem;
+}
+
+project-card a {
+	margin: 0.5em 2em;
+	padding: 0.5em 0;
+	text-align: center;
+}
+
+project-card a:hover {
+	background-color: var(--highlight);
+	border-radius: 10px;
+	transition: 0.2s;
+}
 
 
 
+@media (min-width: 700px){
+	project-list {
+		flex-direction: row;
+		flex-basis: 30%;
+		justify-content: space-between;
+	}
+}
 
 
 
@@ -147,16 +199,19 @@ a:hover {
 
 /*SVG*/
 
+/*SVG*/
+
 svg {
 	pointer-events: none;
 	/*display: none;*/
+
 }
 
 .b-svg {
 	position: fixed;
-	left: -500px;
+	left: -400px;
 	top: -50px;
-	height: 1200px;
+	height: 800px;
 	/*width: 200%;*/
 	fill: var(--paper);
 	/*stroke: var(--highlight);*/
@@ -179,9 +234,9 @@ svg {
 
 .j-svg {
 	position: fixed;
-	right: -175px;
+	right: -375px;
 	top: 0;
-	height: 1000px;
+	height: 800px;
 	fill: var(--highlight);
 	transition: 0.3s;
 	animation: 25s jletter infinite ease-in-out;
@@ -208,13 +263,6 @@ svg {
 
 
 
-#svg-link-goals,
-#svg-link-about,
-#svg-link-projects {
-	fill: var(--highlight);
-	stroke-width: 0px;
-	
-}
 
 
 
@@ -253,9 +301,9 @@ svg {
 
 	.b-svg {
 		position: fixed;
-		left: -550px;
-		top: -150px;
-		height: 1200px;
+		left: -250px;
+		top: 0;
+		height: 800px;
 		/*width: 200%;*/
 		fill-opacity: 1;
 		fill: var(--highlight);
@@ -267,9 +315,9 @@ svg {
 
 	.j-svg {
 		position: fixed;
-		right: -195px;
-		top: -200px;
-		height: 1300px;
+		right: -120px;
+		top: -20px;
+		height: 600px;
 		fill: var(--highlight);
 		animation: 5s jletter infinite ease-in-out;
 	}
@@ -288,9 +336,9 @@ svg {
 
 	.b-svg {
 		position: fixed;
-		left: -900px;
-		top: -150px;
-		height: 2000px;
+		left: -400px;
+		top: 0px;
+		height: 1300px;
 		/*width: 200%;*/
 		fill: var(--highlight);
 		/*transform: translateX(-450px);*/
@@ -301,7 +349,7 @@ svg {
 		position: fixed;
 		right: -190px;
 		top: -200px;
-		height: 2000px;
+		height: 1300px;
 		fill: var(--highlight);
 		/*animation: 5s jletter infinite ease-in-out;*/
 	}
@@ -360,9 +408,6 @@ svg {
 		stroke: var(--highlight);
 	}
 }
-
-
-
 
 
 

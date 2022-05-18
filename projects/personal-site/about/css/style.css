@@ -41,8 +41,9 @@ html {
 	--head1: rgba(217, 215, 208, 1.00);
 	--head2: rgba(255, 255, 255, 1.00);
 	--link: rgba(246, 233, 14, 1.00);
-	--text: rgba(45, 7, 6, 1.00);
-	--highlight: rgba(163, 7, 3, 1.00);
+	--text: rgba(217, 215, 208, 1.00);
+	--highlight: rgba(233, 159, 85, 1.00);
+	--highlight1: rgba(163, 7, 3, 1.00);
 
 	}
 }
@@ -96,14 +97,13 @@ h3 {
 	font-weight: 500;
 }
 
-h2 + h3 {
+h2 + p,
+p + h3 {
 	margin-top: 2em;
 }
 h3 a,
-h2 a,
-.svg-link-container {
+h2 a {
 	display: inline;
-	/*border: 5px solid yellow;*/
 }
 
 
@@ -111,6 +111,12 @@ p {
 	font-size: 1rem;
 	margin-top: 1rem;
 	color: var(--head1);
+	line-height: 1.25;
+	letter-spacing: 0.02em;
+	background-image: linear-gradient(90deg, var(--highlight1), var(--paper));
+	border-radius: 10px;
+	padding: 10px;
+	max-width: 60ch;
 }
 
 span {
@@ -150,13 +156,14 @@ a:hover {
 svg {
 	pointer-events: none;
 	/*display: none;*/
+
 }
 
 .b-svg {
 	position: fixed;
-	left: -500px;
+	left: -400px;
 	top: -50px;
-	height: 1200px;
+	height: 800px;
 	/*width: 200%;*/
 	fill: var(--paper);
 	/*stroke: var(--highlight);*/
@@ -179,9 +186,9 @@ svg {
 
 .j-svg {
 	position: fixed;
-	right: -175px;
+	right: -375px;
 	top: 0;
-	height: 1000px;
+	height: 800px;
 	fill: var(--highlight);
 	transition: 0.3s;
 	animation: 25s jletter infinite ease-in-out;
@@ -208,13 +215,6 @@ svg {
 
 
 
-#svg-link-goals,
-#svg-link-about,
-#svg-link-projects {
-	fill: var(--highlight);
-	stroke-width: 0px;
-	
-}
 
 
 
@@ -253,12 +253,12 @@ svg {
 
 	.b-svg {
 		position: fixed;
-		left: -550px;
-		top: -150px;
-		height: 1200px;
+		left: -250px;
+		top: 0;
+		height: 800px;
 		/*width: 200%;*/
 		fill-opacity: 1;
-		fill: var(--highlight);
+		fill: var(--highlight1);
 
 		/*transform: translateX(-450px);*/
 		animation: 5s bletter infinite ease-in-out;
@@ -267,10 +267,10 @@ svg {
 
 	.j-svg {
 		position: fixed;
-		right: -195px;
-		top: -200px;
-		height: 1300px;
-		fill: var(--highlight);
+		right: -105px;
+		top: -20px;
+		height: 800px;
+		fill: var(--highlight1);
 		animation: 5s jletter infinite ease-in-out;
 	}
 
@@ -288,9 +288,9 @@ svg {
 
 	.b-svg {
 		position: fixed;
-		left: -900px;
-		top: -150px;
-		height: 2000px;
+		left: -400px;
+		top: 0px;
+		height: 1300px;
 		/*width: 200%;*/
 		fill: var(--highlight);
 		/*transform: translateX(-450px);*/
@@ -301,7 +301,7 @@ svg {
 		position: fixed;
 		right: -190px;
 		top: -200px;
-		height: 2000px;
+		height: 1300px;
 		fill: var(--highlight);
 		/*animation: 5s jletter infinite ease-in-out;*/
 	}
