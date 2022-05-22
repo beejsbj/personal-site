@@ -1,130 +1,21 @@
 @import 'meyers-reset.css';
 @import 'setup.css';
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,200;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600;1,6..72,700;1,6..72,800&display=swap');
-
-/**Clarity**/
-
-/*body {
-	border: 5px solid red;
-}
-
-body * {
-	border: 5px solid black;
-	margin: 5px;
-}
-
-body > * {
-	border-color: blue;
-}
-
-body > * > * {
-	border-color: forestgreen;
-
-}*/
-
-
-html {
-	--paper: rgba(217, 215, 208, 1.00);
-	--head1: rgba(124, 38, 33, 1.00); /*also for bold*/
-	--head2: rgba(180, 94, 89, 1.00); /*//also for italics*/
-	--link: rgba(52, 90, 159, 1.00);
-	--text: rgba(45, 7, 6, 1.00);
-	--highlight1: rgba(229,180,131,1); /*subdued*/
-	--highlight: rgba(233, 159, 85, 1.00); /*louder*/
-	
-
-}
-
-/*@media (prefers-color-scheme: dark) {
-	html {
-	--paper: rgba(0, 0, 0, 1.00);
-	--head1: rgba(217, 215, 208, 1.00);
-	--head2: rgba(255, 255, 255, 1.00);
-	--link: rgba(246, 233, 14, 1.00);
-	--text: rgba(45, 7, 6, 1.00);
-	--highlight: rgba(163, 7, 3, 1.00);
-
-	}
-}*/
-
+@import '../../common-style.css';
 
 
 /**STRUCTURE******/
 
-body {
-	background-color: var(--paper);
-	color: var(--text);
-	
-	/*position: relative;*/
-
-}
-
-
-main .inner-column {
-	max-width: 80ch;
-	margin: 0 auto;
-	padding: 20px;
-	font-family: 'Newsreader';
-}
-
-/**TYPOGRAPHY******/
-
-h1 {
-	font-family: 'Newsreader', serif;
-	font-size: 3rem;
-	font-weight: 800;
-	margin: 1em 0;
-	color: var(--head1);
-}
 
 
 
 
 
-h2 {
-	font-size: 2.2rem;
-	color: var(--head1);
-	margin: 0.5em 0;
-	font-weight: 300;
-}
 
 
-h3 {
-	font-size: 1rem;
-	color: var(--head2);
-	margin: 0.5em 0;
-	font-weight: 500;
-}
-
-h2 + h3 {
-	margin-top: 2em;
-}
-h3 a,
-h2 a {
-	display: inline;
-}
 
 
-p {
-	font-size: 1rem;
-	margin-top: 1rem;
-	color: var(--head1);
-}
 
-span {
-	color: var(--head2);
-}
 
-a, p a {
-	color: var(--link);
-	text-decoration: none;
-	font-weight: 500;
-}
-
-a:hover {
-	text-decoration: underline;
-}
-/**Sections******/
 
 
 
@@ -165,6 +56,7 @@ project-card h4 {
 
 project-card p {
 	font-size: 0.9rem;
+	color: var(--head1);
 }
 
 project-card a {
@@ -192,166 +84,69 @@ project-card a:hover {
 
 
 
-
-
-
-
-
 /*SVG*/
 
-/*SVG*/
 
-svg {
-	pointer-events: none;
-	/*display: none;*/
-
-}
 
 .b-svg {
-	position: fixed;
-	left: -400px;
+
+	left: -300px;
 	top: -50px;
 	height: 800px;
-	/*width: 200%;*/
-	fill: var(--paper);
-	/*stroke: var(--highlight);*/
-	stroke-width: 0.3px;
-	fill-opacity: 0;
-	/*transform: translateX(-450px);*/
-	transition: 0.3s;
-	animation: 25s bletter infinite ease-in-out;
 	
 }
-
-.b-svg #b-letter:hover {
-	fill: var(--head1);
-	transition: 0.3s;
-}
-
-
 
 
 
 .j-svg {
-	position: fixed;
+
 	right: -375px;
 	top: 0;
 	height: 800px;
-	fill: var(--highlight);
-	transition: 0.3s;
-	animation: 25s jletter infinite ease-in-out;
-	
 
 }
 
 
-.j-svg #j-letter {
-	/*stroke: var(--highlight);*/
-	stroke-width: 0.3px;
-	fill-opacity: 0;
-}
 
-.j-svg #j-letter:hover {
-	fill:var(--head1);
-	transition: 0.3s;
-}
-
-#b-letter,
-#j-letter {
-	transition: 0.1s;
-}
-
-
-
-
-
-
-
-
-.j-svg #webdev-word {
-	font-family:'Newsreader';
-	font-size: 19px;
-	
-}
-
-
-#webdev-word {
-	transition: 0.1s;
-	stroke-width: 0px;
-}
-
-.j-svg #j-letter:hover + #webdev-word {
-	font-weight: 900;
-	/*font-style: italic;*/
-
-}
-
-#webdev-word:hover {
-	font-weight: 900;
-	/*font-style: italic;*/
-}
 
 
 @media (min-width: 800px){
 
 
-	svg {
-	pointer-events: auto;
-	}
-
 	.b-svg {
-		position: fixed;
+
 		left: -250px;
 		top: 0;
 		height: 800px;
-		/*width: 200%;*/
-		fill-opacity: 1;
-		fill: var(--highlight);
 
-		/*transform: translateX(-450px);*/
-		animation: 5s bletter infinite ease-in-out;
-		stroke-width: 0px;
 	}
 
 	.j-svg {
-		position: fixed;
+
 		right: -120px;
 		top: -20px;
 		height: 600px;
-		fill: var(--highlight);
-		animation: 5s jletter infinite ease-in-out;
+
 	}
 
-	.j-svg #j-letter {
-		stroke: var(--highlight);
-		stroke-width: 0px;
-		fill-opacity: 1;
-}
-
-	
 
 }
 
 @media (min-width: 1500px){
 
 	.b-svg {
-		position: fixed;
+
 		left: -400px;
 		top: 0px;
 		height: 1300px;
-		/*width: 200%;*/
-		fill: var(--highlight);
-		/*transform: translateX(-450px);*/
-		animation: 5s bletter infinite ease-in-out;
 	}
 
 	.j-svg {
-		position: fixed;
+
 		right: -190px;
 		top: -200px;
 		height: 1300px;
-		fill: var(--highlight);
-		/*animation: 5s jletter infinite ease-in-out;*/
+
 	}
 
 }
