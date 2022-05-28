@@ -1,11 +1,23 @@
 @import 'meyers-reset.css';
 @import 'setup.css';
-@import '../common-style.css';
+@import '../../common-style.css';
 
 
 
 
+h2 + p,
+p + h3 {
+	margin-top: 25px;
+}
 
+
+
+p {
+	background-image: linear-gradient(90deg, var(--highlight1), var(--paper));
+	border-radius: 10px;
+	padding: 10px;
+	max-width: 60ch;
+}
 
 
 
@@ -13,13 +25,35 @@
 
 
 
+@media (min-width: 1500px){
+	p {
+		max-width: 80ch;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*SVG*/
+
 
 
 .b-svg {
 
-	left: -500px;
-	top: -50px;
-	height: 1200px;	
+	left: -200px;
+	top: 50px;
+	height: 800px;
+	
 }
 
 
@@ -29,10 +63,9 @@
 
 
 .j-svg {
-	right: -175px;
-	top: 0;
-	height: 1000px;
-
+	right: -305px;
+	top: -100px;
+	height: 800px;
 	
 
 }
@@ -44,64 +77,37 @@
 
 
 
-#svg-link-goals,
-#svg-link-about,
-#svg-link-projects {
-	fill: var(--highlight);
-	stroke-width: 0px;
-	
-}
 
 
 
 
 
-.j-svg #webdev-word {
-	font-family:'Newsreader';
-	font-size: 19px;
 
-	
-}
-
-
-#webdev-word {
-	transition: 0.1s;
-	stroke-width: 0px;
-}
-
-.j-svg #j-letter:hover + #webdev-word {
-	font-weight: 900;
-	/*font-style: italic;*/
-	fill: var(--highlight1);
-
-
-}
-
-#webdev-word:hover {
-	font-weight: 900;
-	/*font-style: italic;*/
-}
 
 
 @media (min-width: 800px){
 
 
-	
+
 
 	.b-svg {
-		left: -550px;
-		top: -150px;
-		height: 1200px;
+
+		left: -250px;
+		top: 0;
+		height: 800px;
 
 	}
 
 	.j-svg {
 
-		right: -195px;
-		top: -200px;
-		height: 1300px;
-		
+		right: -105px;
+		top: -20px;
+		height: 800px;
+
 	}
+
+
+	
 
 }
 
@@ -109,17 +115,16 @@
 
 	.b-svg {
 
-		left: -900px;
-		top: -150px;
-		height: 2000px;
+		left: -400px;
+		top: 0px;
+		height: 1300px;
 
 	}
 
 	.j-svg {
-		position: fixed;
 		right: -190px;
 		top: -200px;
-		height: 2000px;
+		height: 1300px;
 
 	}
 

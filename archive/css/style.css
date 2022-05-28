@@ -1,0 +1,152 @@
+/*font import*/
+@font-face{
+    font-family: "Fontdinerdotcom";
+    src: url("Fontdinerdotcom.ttf");
+  }
+
+@font-face{
+    font-family: "expose";
+    src: url("expose.otf");
+  }
+
+  * {
+	  box-sizing: border-box;
+	}
+
+	body * {
+		/*border: 2px solid green;*/
+	}
+
+
+
+	/*styles*/
+
+body {
+	background-image: linear-gradient(180deg, #860100, #fb070c) ;
+	padding: 10px;
+	font-family: Helvetica, sans-serif;
+
+}
+
+.inner-column {
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.nav-bar {
+	background-color: #a40503;
+	padding: 5px;
+	margin: -20px;
+}
+
+
+.nav-bar a {
+	display: block;
+	font-size: 1.3em;
+	padding: 10px 20px;
+	margin: 5px 10px;
+}
+
+@media (min-width: 600px) {
+  .nav-bar a {
+    display: inline-block;
+  }
+}
+
+
+span {
+	color: #ffffff;
+}
+
+
+a, ul {
+	font-size: 30px;
+	color: #ffff00;
+	text-decoration: none;
+}
+
+
+li a:hover,
+span:hover {
+	text-decoration: underline;
+	background-color: rgba(204, 93, 92, 0.50);
+	padding: 1px;
+}
+
+.landing h1, 
+.landing h1 a {
+	font-size: clamp(40px, 10vw, 208px);
+
+}
+
+
+
+.landing p {
+	background-color: indianred;
+	padding: 15px;
+	font-size: 0.9em;
+	font-weight: 350;
+	line-height: 1.20;
+	letter-spacing: 0.08em;
+	margin-bottom: 40px;
+}
+
+h2 {
+	font-size: 30px;
+	color: #eedfd7 ;
+}
+
+
+
+sup {
+	color: #878989;
+}
+
+em, h1 {
+	color: whitesmoke;
+}
+
+
+li {
+	margin-top: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+.matelist {
+	background-color: black;
+	margin: -20px;
+
+
+}
+.matelist {
+	color: white;
+	font-family: expose;
+	font-size: 40px;
+	padding-top: 5px;
+	padding-bottom: 30px;
+}
+.matelist h2 {
+	padding: 20px;
+}
+.matelist h2 a {
+	font-size: 80px;
+}
+.matelist h2 sup {
+	display: block;
+	font-size: 25px;
+}
+.matelist ul {
+	list-style-position: inside;
+}
+.matelist ul a {
+	color: white;
+}
