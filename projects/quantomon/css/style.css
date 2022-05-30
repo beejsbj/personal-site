@@ -28,6 +28,31 @@ body > * > * {
 }*/
 
 
+html {
+	/*custom properties */
+	--normal-color: hsla(0, 0%, 60%, 1.00);
+	--fire-color: hsla(30, 95%, 60%, 1.00);
+	--water-color: hsla(200, 95%, 60%, 1.00);
+	--grass-color: hsla(116, 44%, 54%, 1.00);
+	--electric-color: hsla(50, 95%, 60%, 1.00);
+	--ice-color: hsla(170, 95%, 60%, 1.00);
+	--fighting-color: hsla(211, 85%, 42%, 1.00);
+	--poison-color: hsla(290, 95%, 60%, 1.00);
+	--ground-color: hsla(30, 100%, 29%, 1.00);
+	--flying-color: hsla(219, 66%, 78%, 1.00);
+	--psychic-color: hsla(2, 92%, 74%, 1.00);
+	--bug-color: hsla(78, 62%, 46%, 1.00);
+	--rock-color: hsla(46, 36%, 67%, 1.00);
+	--ghost-color: hsla(230, 41%, 55%, 1.00);
+	--dark-color: hsla(257, 11%, 37%, 1.00);
+	--dragon-color: hsla(350, 95%, 60%, 1.00);
+	--steel-color: hsla(191, 32%, 49%, 1.00);
+	--fairy-color: hsla(305, 73%, 75%, 1.00);
+
+
+	
+}
+
 
 
 
@@ -60,23 +85,228 @@ body {
 	padding: 20px 40px;
 }
 
-/**TYPOGRAPHY******/
+
+
+
+info-card {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	padding: 40px;
+	background-color: white;
+	border-radius: 40px;
+	animation: 4s floating infinite ease-in-out;
+	border: 2px solid black;
+}
+
+info-card img {
+	border-radius: 40px;
+}
 
 info-card .card-heading {
-	margin-top: 25px;
+	/*margin-top: 25px;*/
 	font-size: 20px;
 	font-weight: 600;
+	text-align: center;
+
 
 }
 
 
-info-card .card-text {
-	margin-top: 10px;
-	font-size: 14px;
-	font-weight: 400;
-	color: #a0a0a1;
+
+info-card .mon-types {
+	display: flex;
+	justify-content: center;
+	gap: 50px;
+}
+
+
+info-card .mon-type {
+	text-align: center;
+	min-width: 120px;
+	text-transform: uppercase;
+	font-family: monospace;
+	font-size: 16px;
+	font-weight: 700;
+	padding: 5px 20px;
+		border-radius: 5px;
+	background-color: var(--normal-color);
+	box-shadow: 0 0 20px var(--normal-color);
+	color: white;
 
 }
+
+
+info-card .normal {
+
+}
+
+info-card .fire {
+
+	background-color: var(--fire-color);
+	box-shadow: 0 0 20px var(--fire-color);
+
+	
+}
+
+
+info-card .water {
+
+	background-color: var(--water-color);
+	box-shadow: 0 0 20px var(--water-color);
+
+	
+}
+
+
+info-card .grass {
+
+	background-color: var(--grass-color);
+	box-shadow: 0 0 20px var(--grass-color);
+
+	
+}
+
+
+info-card .electric {
+
+	background-color: var(--electric-color);
+	box-shadow: 0 0 20px var(--electric-color);
+
+	
+}
+
+
+info-card .ice {
+
+	background-color: var(--ice-color);
+	box-shadow: 0 0 20px var(--ice-color);
+
+	
+}
+
+
+info-card .ground {
+
+	background-color: var(--ground-color);
+	box-shadow: 0 0 20px var(--ground-color);
+
+	
+}
+
+
+info-card .flying {
+
+	background-color: var(--flying-color);
+	box-shadow: 0 0 20px var(--flying-color);
+
+	
+}
+
+
+info-card .psychic {
+
+	background-color: var(--psychic-color);
+	box-shadow: 0 0 20px var(--psychic-color);
+
+	
+}
+
+
+info-card .bug {
+
+	background-color: var(--bug-color);
+	box-shadow: 0 0 20px var(--bug-color);
+
+	
+}
+
+
+info-card .rock {
+
+	background-color: var(--rock-color);
+	box-shadow: 0 0 20px var(--rock-color);
+
+	
+}
+
+
+info-card .ghost {
+
+	background-color: var(--ghost-color);
+	box-shadow-c: 0 0 20px var(--ghost-color);
+
+	
+}
+
+
+info-card .dark {
+
+	background-color: var(--dark-color);
+	box-shadow: 0 0 20px var(--dark-color);
+
+	
+}
+
+info-card .fighting {
+
+	background-color: var(--fighting-color);
+	box-shadow: 0 0 20px var(--fighting-color);
+
+	
+}
+
+
+info-card .dragon {
+
+	background-color: var(--dragon-color);
+	box-shadow: 0 0 20px var(--dragon-color);
+
+	
+}
+
+
+info-card .steel {
+
+	background-color: var(--steel-color);
+	box-shadow: 0 0 20px var(--steel-color);
+
+	
+}
+
+
+
+info-card .fairy {
+
+		background-color: var(--fairy-color);
+		box-shadow: 0 0 20px var(--fairy-color);
+
+}
+
+
+
+.about-artist info-card .mon-types {
+	/*display: none;*/
+}
+
+
+ info-card:hover {
+	transform: scale(1.2);
+}
+
+
+
+
+
+
+
+
+
+
+
+/*typograhy*/
+
+
 
 .intrigue-voice {
 	text-transform: uppercase;
@@ -199,17 +429,7 @@ main > * {
 
 
 
-info-card {
-	display: block;
-	padding: 20px;
-	background-color: white;
-	border-radius: 40px;
-	animation: 4s floating infinite ease-in-out;
-}
 
-info-card img {
-	border-radius: 40px;
-}
 
 
 
@@ -288,15 +508,23 @@ info-card img {
 }
 
 .about-artist info-card .card-heading {
-	margin-top: 1em;
+
 	font-size: 12px;
 
 }
 
+.about-artist info-card .mon-types {
 
-.about-artist info-card .card-text {
+	justify-content: space-around;
+	gap: 20px;
+}
+
+.about-artist info-card .mon-type {
+
 	margin-top: 1em;
 	font-size: 10px;
+	min-width: 40px;
+	padding: 5px 20px;	
 }
 
 
