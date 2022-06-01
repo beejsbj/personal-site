@@ -1,7 +1,8 @@
 @import 'meyers-reset.css';
 @import 'setup.css';
 @import url('https://fonts.googleapis.com/css2?family=Almendra+Display&family=Finger+Paint&family=Henny+Penny&family=Kumar+One+Outline&family=Love+Ya+Like+A+Sister&family=Press+Start+2P&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Wet+Paint&family=UnifrakturMaguntia&display=swap');
-@import url('http://fonts.cdnfonts.com/css/distressed-ransom-note');
+@import url('../fonts/silkscreen/slkscr.ttf');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Glitch&display=swap');
 
 
 
@@ -29,10 +30,12 @@ body > * > * {
 
 
 html {
+	scroll-behavior: smooth;
+
 	/*custom properties */
 	--normal-color: hsla(0, 0%, 60%, 1.00);
 	--fire-color: hsla(30, 95%, 60%, 1.00);
-	--water-color: hsla(200, 95%, 60%, 1.00);
+	--water-color: hsla(200, 95%, 50%, 1.00);
 	--grass-color: hsla(116, 44%, 54%, 1.00);
 	--electric-color: hsla(50, 95%, 60%, 1.00);
 	--ice-color: hsla(170, 95%, 60%, 1.00);
@@ -53,7 +56,10 @@ html {
 	
 }
 
-
+body * {
+	scroll-padding-top: -100px;
+	;
+}
 
 
 
@@ -67,17 +73,72 @@ body {
 	/*background-image: linear-gradient(45deg, hsla(140, 40%, 96%, 1.00) ,hsla(20, 40%, 95%, 1.00), hsla(280, 41%, 95%, 1.00));*/
 
   background:
-    linear-gradient(217deg, hsla(300, 70%, 95%, 0.80), hsla(300, 70%, 95%, 0) 40.71%),
-    linear-gradient(127deg, hsla(140, 70%, 95%, 0.80), hsla(140, 70%, 95%, 0) 20.71%),
-    linear-gradient(336deg, hsla(20, 70%, 95%, 0.80), hsla(20, 70%, 95%, 0) 70.71%);
+    linear-gradient(217deg, hsla(200, 70%, 70%, 0.80), hsla(200, 70%, 70%, 0) 40.71%),
+    linear-gradient(127deg, hsla(26, 70%, 100%, 0.80), hsla(26, 70%, 100%, 0) 20.71%),
+    linear-gradient(336deg, hsla(25, 70%, 90%, 0.80), hsla(25, 70%, 90%, 0) 70.71%);
+
+    /*linear-gradient(217deg, hsla(200, 70%, 20%, 0.80), hsla(200, 70%, 20%, 0) 40.71%),
+    linear-gradient(127deg, hsla(140, 70%, 20%, 0.80), hsla(140, 70%, 20%, 0) 20.71%),
+    linear-gradient(336deg, hsla(250, 70%, 20%, 0.80), hsla(250, 70%, 20%, 0) 70.71%);*/
 }
 
+
+
+
+
+.main-landing {
+	background-image: url("../images/background-line.svg");
+	background-repeat:;
+
+}
+
+
+.about-artist {
+	background-image: url("../images/background-cruve.svg");
+	background-repeat: no-repeat;
+	background-position: left;
+
+}
+
+
+.collection {
+	background-image: url("../images/background-cruve.svg");
+	background-repeat: no-repeat;
+	background-position: center;
+	/*background-size: 900%;*/
+
+}
 
 
 .header-nav .title-voice {
+	font-family: 'Rubik Glitch', cursive;
 	font-weight: 700;
-	font-size: 28px;
+	font-size: 40px;
+
 }
+
+
+
+
+
+
+
+.title-voice span {
+	color: white;
+	-webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  transition: 0.2s
+}
+
+.title-voice span:hover {
+	filter: invert(100%);
+}
+header nav a:hover {
+	filter: invert(100%);
+	text-decoration: underline;
+}
+
+
 
 .inner-column {
 	max-width: 80ch;
@@ -93,10 +154,13 @@ info-card {
 	flex-direction: column;
 	gap: 30px;
 	padding: 40px;
-	background-color: white;
+	background-color: hsla(191, 32%, 80%, 1.00);
 	border-radius: 40px;
-	animation: 4s floating infinite ease-in-out;
-	border: 2px solid black;
+
+}
+
+.main-landing info-card {
+		animation: 4s floating infinite ease-in-out;
 }
 
 info-card img {
@@ -105,9 +169,15 @@ info-card img {
 
 info-card .card-heading {
 	/*margin-top: 25px;*/
-	font-size: 20px;
+	text-transform: uppercase;
+	font-size: 25px;
 	font-weight: 600;
 	text-align: center;
+	font-family: "Silkscreen", monospace;
+	background-color: var(--dragon-color);
+	padding: 5px 20px;
+	border-radius: 5px;
+	color: white;
 
 
 }
@@ -116,16 +186,16 @@ info-card .card-heading {
 
 info-card .mon-types {
 	display: flex;
-	justify-content: center;
-	gap: 50px;
+	justify-content: space-between;
+
 }
 
 
 info-card .mon-type {
 	text-align: center;
-	min-width: 120px;
+	min-width: 100px;
 	text-transform: uppercase;
-	font-family: monospace;
+	font-family: "Silkscreen", monospace;
 	font-size: 16px;
 	font-weight: 700;
 	padding: 5px 20px;
@@ -290,12 +360,6 @@ info-card .fairy {
 }
 
 
- info-card:hover {
-	transform: scale(1.2);
-}
-
-
-
 
 
 
@@ -310,7 +374,7 @@ info-card .fairy {
 
 .intrigue-voice {
 	text-transform: uppercase;
-	color: #e73dd2;
+	color: hsla(351, 78%, 57%, 1.00);
 	letter-spacing: 3px;
 	font-size: 14px;
 	font-weight: 700;
@@ -331,7 +395,7 @@ info-card .fairy {
 
 .calm-voice {
 	font-size: 15px;
-	color: #636363;
+	color: hsla(0, 0%, 39%, 1.00);
 	margin-top: 25px;
 	line-height: 1.7em;
 }
@@ -340,10 +404,15 @@ info-card .fairy {
 .bid-button {
 	margin-top: 25px;
 	padding: 15px 50px;
-	background-color: #1100ff;
+	background-color: black;
 	border-radius: 10px;
 	color: white;
 	font-size: 18px;
+	transition: 0.2s;
+}
+
+.bid-button:hover {
+	filter: invert(100%);
 }
 
 .bid-button picture {
@@ -384,7 +453,18 @@ main > * {
 .header-nav {
 	text-align: center;
 	padding: 20px;
+	/*color: white;*/
 /*	*/
+
+
+}
+
+@media (min-width: 1400px){
+	
+	.header-nav {
+		max-width: 1500px;
+		margin: 0 auto;
+	}
 
 
 }
@@ -405,6 +485,7 @@ main > * {
 
 	padding: 0 10px;
 	margin:  0 10px;
+	transition: 0.2s
 
 }
 
@@ -470,7 +551,7 @@ main > * {
 
 .carousel-cell {
 	width: 25%;
-	opacity: .5;
+	opacity: .7;
 }
 
 
@@ -480,7 +561,7 @@ main > * {
 
 
 .about-artist {
-	padding-top: 100px;
+	/*padding-top: 50px;*/
 
 }
 
@@ -495,17 +576,26 @@ main > * {
 	border-radius: 40px;
 }
 
+
+
+
+
 .about-artist info-card {
 	position: absolute;
 	width: 150px;
 	border-radius: 20px;
 	padding: 15px;
 	box-shadow: 0px 0px 60px 0px rgb(0 0 0 / 3%);
+	gap: 15px;
+	border-width: 3px;
 }
 
 .about-artist info-card img {
 	border-radius: 20px;
 }
+
+
+
 
 .about-artist info-card .card-heading {
 
@@ -513,39 +603,72 @@ main > * {
 
 }
 
+
+
+
 .about-artist info-card .mon-types {
 
 	justify-content: space-around;
-	gap: 20px;
+
 }
+
+
+
 
 .about-artist info-card .mon-type {
 
-	margin-top: 1em;
-	font-size: 10px;
-	min-width: 40px;
-	padding: 5px 20px;	
+	/*margin-top: 1em;*/
+	font-size: 8px;
+	min-width: 10px;
+	padding: 5px 15px;	
 }
+
+
+.about-artist .arist-image-a .card-heading {
+
+}
+
+
+
+
+
+
+
 
 
 .arist-image-a {
-	top: -80px;
+	top: -130px;
 	left: -20px;
 	animation: 4s floating infinite ease-in-out;
+
 }
 
 .arist-image-b {
-	bottom: -30px;
+	bottom: -110px;
 	left: -20px;
 	animation: 4s floating infinite ease-in-out;
-	animation-delay: -2s;
+	animation-delay: -1s;
+	background-color: hsla(115, 44%, 84%, 1.00);
 }
+
+
+.arist-image-b .card-heading {
+	background-color: var(--flying-color);
+}
+
+
+
 
 .arist-image-c {
 	bottom: 60px;
-	right: -40px;
+	right: -60px;
 	animation: 8s floating infinite ease-in-out;
 	animation-delay: -1s;
+	background-color: hsla(201, 95%, 80%, 1.00);
+}
+
+.arist-image-c .card-heading {
+	background-color: var(--fairy-color);
 }
 
 
@@ -588,8 +711,9 @@ main > * {
 
 
 .about-item {
-	padding-bottom: 1000px;
 	background-image: linear-gradient(90deg, hsla(285, 49%, 97%, 1.00), hsla(43, 99%, 96%, 1.00));
+
+
 }
 
 
@@ -651,6 +775,13 @@ main > * {
 	}
 
 
+	info-card .mon-types {
+		display: flex;
+		justify-content: space-evenly;
+
+	}
+
+
 
 
 
@@ -670,6 +801,7 @@ main > * {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
+
 	}
 
 	.main-landing .attention-voice {
@@ -690,7 +822,9 @@ main > * {
 	}
 
 
-
+	.about-item .text-flex .bid-button {
+		margin-top: 60px;
+	}
 
 
 
@@ -736,6 +870,19 @@ main > * {
 
 
 
+}
+
+
+
+
+
+
+
+/*COllections*/
+
+.collection {
+	background:
+    	background-image: linear-gradient(90deg, hsla(285, 49%, 97%, 1.00), hsla(43, 99%, 96%, 1.00));
 
 }
 
@@ -743,12 +890,227 @@ main > * {
 
 
 
-@media (min-width: 1400px){
+.collection-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	padding: 60px 0;
+	/*justify-content: space-between;*/
+}
+
+.collection-grid > * {
+	display: flex;
+
+	flex-direction: column;
+	gap: 20px;
+
+}
+
+
+
+.collection-grid .left-side {
+	width: 100%;
+}
+
+
+
+
+.collection-grid .right-bottom {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	justify-content: space-between;
+}
+
+
+.collection-grid info-card .mon-type {
+	font-size: 14px;
+	/*min-width: 50px;*/
+}
+
+
+
+
+
+
+.collection-grid .fight-dragon {
+	background-color: hsla(351, 94%, 85%, 1.00);
+}
+
+.collection-grid .fight-dragon .card-heading {
+	background-color: var(--fighting-color);
+}
+
+
+
+
+.collection-grid .normal-bug {
+	background-color: hsla(79, 61%, 76%, 1.00);
+}
+
+.collection-grid .normal-bug .card-heading {
+	background-color: var(--normal-color);
+}
+
+
+
+
+.collection-grid .ice-grass {
+	background-color: hsla(115, 44%, 84%, 1.00);
+}
+
+.collection-grid .ice-grass .card-heading {
+	background-color: var(--ice-color);
+}
+
+
+
+
+.collection-grid .dark-fighing {
+	background-color: hsla(258, 10%, 67%, 1.00);
+}
+
+.collection-grid .dark-fighing .card-heading {
+	background-color: var(--fighting-color);
+}
+
+
+
+
+.collection-grid .flying-ghost {
+	background-color: hsla(229, 41%, 65%, 1.00);
+}
+
+
+.collection-grid .flying-ghost .card-heading {
+	background-color: var(--flying-color);
+}
+
+
+.footer-block2 {
+	padding: 50px 0;
+	background-image: linear-gradient(90deg, hsla(32, 62%, 94%, 1.00), hsla(25, 99%, 86%, 1.00));
+
+}
+
+
+
+
+
+.footer-block2 .inner-column {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+}
+
+.flex-child {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	/*width: 20%;*/
+	text-align: right;
+}
+
+.footer-block2 p {
+	font-size: 12px;
+}
+
+.footer-block2 .flex-text p {
+	margin-top: 10px;
+}
+
+.footer-block2 .flex-text .dev-name {
+	font-size: 14px;
+}
+
+
+
+
+@media (min-width:  800px){
 	
-	.header-nav {
-		max-width: 1500px;
-		margin: 0 auto;
+	
+	.collection .attention-voice {
+	font-size: 42px;
+	}
+
+	.collection-grid .mon-type {
+		font-size: 16px;
 	}
 
 
+	.collection-grid .ice-grass .mon-type {
+		min-width: 150px;
+	}
+
+
+	.collection-grid {
+		display: flex;
+		flex-direction: row;
+		gap: 30px;
+		padding: 60px 0;
+		justify-content: space-between;
+		align-items: stretch;
+	}
+
+	.collection-grid > * {
+		display: flex;
+		flex-direction: column;
+		gap: 30px;
+
+	}
+
+	.collection-grid .left-side {
+
+		width: 75%;
+
+	}
+
+	.collection-grid .right-side {
+		width: 100%;
+	}
+
+	.collection-grid .right-side > info-card {
+		/*width: 100%;*/
+	}
+
+
+
+
+	.collection-grid .right-bottom {
+		display: flex;
+		flex-direction: row;
+		gap: 10px;
+		justify-content: space-between;
+	}
+
+	.footer-block2 p {
+		font-size: 1rem;
+	}
 }
+
+
+
+
+
+
+
+
+@media (max-width: 600px) {
+
+	.about-artist .text-flex {
+		
+		margin-top: 120px;
+
+	}
+
+	.arist-image-c {
+		right: -30px;
+	}
+}
+
+
+
+
+
+
+
