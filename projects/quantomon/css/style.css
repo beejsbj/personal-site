@@ -2,9 +2,7 @@
 @import 'setup.css';
 @import url('https://fonts.googleapis.com/css2?family=Almendra+Display&family=Finger+Paint&family=Henny+Penny&family=Kumar+One+Outline&family=Love+Ya+Like+A+Sister&family=Press+Start+2P&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Wet+Paint&family=UnifrakturMaguntia&display=swap');
 @import url('../fonts/silkscreen/slkscr.ttf');
-@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Glitch&display=swap');
-
-
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Glitch&family=Slackey&display=swap');
 
 
 
@@ -120,6 +118,10 @@ body {
 
 
 
+a span {
+	font-family: "Slackey", sans-serif;
+}
+
 
 
 
@@ -170,12 +172,12 @@ info-card img {
 info-card .card-heading {
 	/*margin-top: 25px;*/
 	text-transform: uppercase;
-	font-size: 25px;
+	font-size: 20px;
 	font-weight: 600;
 	text-align: center;
-	font-family: "Silkscreen", monospace;
+	font-family: "Slackey", monospace;
 	background-color: var(--dragon-color);
-	padding: 5px 20px;
+	padding: 7px 20px;
 	border-radius: 5px;
 	color: white;
 
@@ -195,8 +197,8 @@ info-card .mon-type {
 	text-align: center;
 	min-width: 100px;
 	text-transform: uppercase;
-	font-family: "Silkscreen", monospace;
-	font-size: 16px;
+	font-family: "Slackey", monospace;
+	font-size: 14px;
 	font-weight: 700;
 	padding: 5px 20px;
 		border-radius: 5px;
@@ -373,10 +375,11 @@ info-card .fairy {
 
 
 .intrigue-voice {
+	font-family: "Slackey", sans-serif;
 	text-transform: uppercase;
 	color: hsla(351, 78%, 57%, 1.00);
 	letter-spacing: 3px;
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: 700;
 	margin-top: 30px;
 
@@ -384,7 +387,7 @@ info-card .fairy {
 
 
 .attention-voice {
-
+	font-family: "Slackey", sans-serif;
 	font-size: 2rem;
 	font-weight: 600;
 	margin-top: 25px;
@@ -805,7 +808,7 @@ main > * {
 	}
 
 	.main-landing .attention-voice {
-		font-size: 72px;
+		font-size: 56px;
 	}
 	.main-landing .inner-column info-card,
 	.about-item .inner-column picture {
@@ -813,7 +816,7 @@ main > * {
 	}
 
 	.about-item .attention-voice {
-		font-size: 42px;
+		font-size: 40px;
 	}
 	.about-item .details {
 		align-self: stretch;
