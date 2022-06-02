@@ -12,11 +12,48 @@
 </head>
 <body>
 
+	<script>
+		console.clear();
+
+		var colorPicker = document.document.getElementById('color-picker');
+		// <input>
+
+		// colorPicker.type = 'range';
+		// <input type='range'>
+
+		colorPicker.max = 720; /* 2x 360 for fun... with hsl - it could go on forever */
+		// <input type='range' max='720'>
+
+		// colorPicker.style.marginTop = '30px';
+		// // <input type='range' max='720' style='margin-top: 30px'>
+		// colorPicker.style.width = '100%';
+		// // get it? It's just HTML and CSS... (don't tell anyone...)
+		// colorPicker.style.width = '300px';
+
+
+		// document.querySelector('body').append(colorPicker);
+		// get the body - and put the thing at the bottom of it
+		var html = document.querySelector('html');
+
+		// we could set this to change the hue or something... 
+
+		function updateHue(input) {
+		  // console.clear();
+		  // console.log(input);
+		  html.style.setProperty('--hue', this.value);
+		}
+
+		colorPicker.addEventListener('input', updateHue);
+		// any time there's any user input... update the --custom-property value
+
+	</script>
+
 	<header class="site-header">
 
 		<section class="header-nav">
 			<div class="inner-column">
-				<picture>
+				<div class="flex-child">
+					<picture>
 					<img class="rotate" src="https://www.astrology-zodiac-signs.com/images/Wheel.png" alt="">
 				</picture>
 				<nav class="main-nav"id="nav-name">
@@ -25,42 +62,9 @@
 					<a href="#module-3">Module 3</a>
 					<a href="#module-4">Module 4 <span>[NEW]</span></a>
 					<!-- <a href="#module-5">Module 5 [NEW]</a> -->
-						<script>
-							console.clear();
 
-							var colorPicker = document.document.getElementById('color-picker');
-							// <input>
-
-							// colorPicker.type = 'range';
-							// <input type='range'>
-
-							colorPicker.max = 720; /* 2x 360 for fun... with hsl - it could go on forever */
-							// <input type='range' max='720'>
-
-							// colorPicker.style.marginTop = '30px';
-							// // <input type='range' max='720' style='margin-top: 30px'>
-							// colorPicker.style.width = '100%';
-							// // get it? It's just HTML and CSS... (don't tell anyone...)
-							// colorPicker.style.width = '300px';
-
-
-							// document.querySelector('body').append(colorPicker);
-							// get the body - and put the thing at the bottom of it
-							var html = document.querySelector('html');
-
-							// we could set this to change the hue or something... 
-
-							function updateHue(input) {
-							  // console.clear();
-							  // console.log(input);
-							  html.style.setProperty('--hue', this.value);
-							}
-
-							colorPicker.addEventListener('input', updateHue);
-							// any time there's any user input... update the --custom-property value
-
-						</script>
 				</nav>
+				</div>
 
 				<input type="range" id="color-picker">
 

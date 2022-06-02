@@ -42,6 +42,17 @@ html {
 	width: 300px;
 }
 
+.header-nav .inner-column {
+	display: flex;
+	justify-content: space-between	;
+}
+
+.header-nav .inner-column .flex-child {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
 
 
 body {
