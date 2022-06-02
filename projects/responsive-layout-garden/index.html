@@ -8,7 +8,7 @@
 
 	<link rel="stylesheet" href="css/style.css">
 
-	<title>Layout Challenge</title>
+	<title>Responsive Garden</title>
 </head>
 <body>
 	<header class="site-header">
@@ -19,8 +19,12 @@
 					<img class="rotate" src="https://www.astrology-zodiac-signs.com/images/Wheel.png" alt="">
 				</picture>
 				<nav>
-					<a href="https://en.wikipedia.org/wiki/Jungian_archetypes">About</a>
-					<a href="https://en.wikipedia.org/wiki/Carl_Jung">Contact</a>
+					<a href="#module-1">Module 1</a>
+					<a href="#module-2">Module 2</a>
+					<a href="#module-3">Module 3</a>
+					<a href="#module-4">Module 4 <span>[NEW]</span></a>
+					<!-- <a href="#module-5">Module 5 [NEW]</a> -->
+
 				</nav>
 			</div>
 		</section>
@@ -32,7 +36,7 @@
 						<img src="https://www.klarsynte-spådamer-spåkoner-spåtjenester.no/wp-content/gallery/tarotkort/tarot-spa-8.jpg" alt="">
 					</picture>
 					<div class="description">
-						<h1 class="loud-voice">Jungian archetypes</h1>
+						<h1 class="loud-voice">Responsive Garden</h1>
 						<p class="calm-voice">Jungian archetypes are defined as universal, primal symbols and images that derive from the collective unconscious. It is described as a kind of innate unspecific knowledge, derived from the sum total of human history, which prefigures and directs conscious behavior. They are underlying base forms from which emerge motifs.</p>
 					</div>
 					
@@ -90,8 +94,50 @@
 		</div>
 
 		
-		<module-2>
-			<div class="inner-column">
+		
+
+		<div class="site-main2">
+
+			<section class="main2-welcome">
+				<div class="inner-column">
+					<div class="welcome-flex">
+						<picture>
+							<img src="https://peprojects.dev/images/landscape.jpg" alt="">
+						</picture>
+						<div class="text">
+							<h1>Heading level</h1>
+							<a href="#">Click here</a>
+						</div>
+					</div>
+					<p class="bonus">Some Bonus Thing</p>
+				</div>
+			</section>
+
+			<section class="main2-about">
+				<div class="inner-column">
+					<picture class="hiddenA">
+							<img src="https://peprojects.dev/images/landscape.jpg" alt="">
+						</picture>
+					<div class="card">
+						<picture>
+							<img src="https://peprojects.dev/images/landscape.jpg" alt="">
+						</picture>
+						<h2>heading here</h2>
+					</div>
+
+					<div class="card">
+						<picture>
+							<img src="https://peprojects.dev/images/landscape.jpg" alt="">
+						</picture>
+						<h2>heading here</h2>
+					</div>
+				</div>
+			</section>
+		</div>	
+
+		
+		<module-1 id="module-1">
+			<div class="inner-column" >
 				<div class="landing">
 					<h1 class="category-head">transactions</h1>
 					<h2 class="tagline">A better way to send money</h2>
@@ -140,48 +186,9 @@
 				</ul>
 			</div>
 
-		</module-2>
+		</module-1>
 
-		<div class="site-main2">
-
-			<section class="main2-welcome">
-				<div class="inner-column">
-					<div class="welcome-flex">
-						<picture>
-							<img src="https://peprojects.dev/images/landscape.jpg" alt="">
-						</picture>
-						<div class="text">
-							<h1>Heading level</h1>
-							<a href="#">Click here</a>
-						</div>
-					</div>
-					<p class="bonus">Some Bonus Thing</p>
-				</div>
-			</section>
-
-			<section class="main2-about">
-				<div class="inner-column">
-					<picture class="hiddenA">
-							<img src="https://peprojects.dev/images/landscape.jpg" alt="">
-						</picture>
-					<div class="card">
-						<picture>
-							<img src="https://peprojects.dev/images/landscape.jpg" alt="">
-						</picture>
-						<h2>heading here</h2>
-					</div>
-
-					<div class="card">
-						<picture>
-							<img src="https://peprojects.dev/images/landscape.jpg" alt="">
-						</picture>
-						<h2>heading here</h2>
-					</div>
-				</div>
-			</section>
-		</div>	
-
-		<section class="module-1">
+		<section class="module-2" id="module-2">
 			<div class="inner-column">
 				<figure>
 				    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Elephas_maximus_%28Bandipur%29.jpg/1280px-Elephas_maximus_%28Bandipur%29.jpg"
@@ -201,7 +208,7 @@
 			</div>
 		</section>
 
-		<section class="module-3">
+		<section class="module-3" id="module-3">
 			<div class="inner-column">
 				<div class="flex-container">
 					<div class="text">
@@ -251,7 +258,7 @@
 				</div>
 			</div>
 		</section>
-		<section class="calendy-module">
+		<section class="calendy-module" id="module-4">
 			<div class="inner-column">
 				<h2 class="attention-voice">calendy module</h2>
 				<calendy>

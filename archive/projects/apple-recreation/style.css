@@ -1,0 +1,330 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+
+*/
+
+	html, body, div, span, applet, object, iframe,
+	h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+	a, abbr, acronym, address, big, cite, code,
+	del, dfn, em, img, ins, kbd, q, s, samp,
+	small, strike, strong, sub, sup, tt, var,
+	b, u, i, center,
+	dl, dt, dd, ol, ul, li,
+	fieldset, form, label, legend,
+	table, caption, tbody, tfoot, thead, tr, th, td,
+	article, aside, canvas, details, embed, 
+	figure, figcaption, footer, header, hgroup, 
+	menu, nav, output, ruby, section, summary,
+	time, mark, audio, video {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		font-size: 100%;
+		font: inherit;
+		vertical-align: baseline;
+	}
+	/* HTML5 display-role reset for older browsers */
+	article, aside, details, figcaption, figure, 
+	footer, header, hgroup, menu, nav, section {
+		display: block;
+	}
+	body {
+		line-height: 1;
+	}
+	ol, ul {
+		list-style: none;
+	}
+	blockquote, q {
+		quotes: none;
+	}
+	blockquote:before, blockquote:after,
+	q:before, q:after {
+		content: '';
+		content: none;
+	}
+	table {
+		border-collapse: collapse;
+		border-spacing: 0;
+	}
+
+/**rando one-offs**/
+
+body * {
+	/*border: 1px solid red;*/
+/*	margin: 5px;*/
+	font-family: sans-serif;
+}
+
+
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background-color: rgba(245, 245, 247, 1.00);
+}
+
+
+
+.inner-column {
+	margin-right: auto;
+	margin-left: auto;
+
+}
+
+
+a {
+	text-decoration: none;
+}
+
+section {
+	margin-top: 10px;
+
+}
+
+span {
+	font-family: cursive;
+	color: rgba(129, 109, 223, 1.00);
+}
+
+main {
+	margin-top: 40px;
+}
+
+/*HEADER******/
+
+.site-header {
+	padding: 10px;
+	background-color: rgba(49, 49, 50, 1.00);
+	min-height: 42pt;
+	font-size: 0.75em;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.header-nav {
+	display: none;
+}
+
+header li {
+	padding: 10px;
+}
+
+header img {
+	width: 20px;
+}
+
+header a {
+	color: rgba(214, 214, 214, 1.00);
+	margin: 0px 18px;
+	
+}
+
+header a:hover {
+	color: white;
+}
+
+header .menu-toggle {
+	display: block;
+	border: 4px solid black;
+	border-radius: 15px;
+	font-size: 2em;
+	font-weight: 400;
+	padding: 4px;
+	background-image: linear-gradient(0deg, #b3b3b5, #dddfe1);
+	color: black;
+
+}
+
+header .menu-toggle:hover {
+	background-image: linear-gradient(180deg, #b3b3b5, #dddfe1);
+}
+
+@media (min-width: 700px) {
+  .site-header {
+    position: fixed;
+    width: 100%;
+    top: 0px;
+  }
+  header li {
+    display: inline-block;
+    padding: 10px;
+  }
+
+  .header-nav {
+  	display: block;
+  }
+
+  header .menu-toggle {
+  	display: none;
+  }
+}
+
+
+
+
+
+
+
+  
+
+
+
+
+/*card********/
+
+.card {
+	text-align: center;
+	background-color: rgba(250, 250, 250, 1.00);
+}
+
+
+.card h1 {
+	font-size: 2.9em;
+	margin-top: 40px;
+	padding: 20px;
+	font-weight: 600;
+	color: black;
+}
+
+.card h2 {
+	font-size: 1.5em;
+		padding-top: 5px;
+		padding-bottom: 20px;
+		color: black;
+
+}
+
+.card a {
+	padding: 10px 30px;
+}
+
+
+.card img {
+	margin-top: 20px;
+	display: block;
+	margin-left: auto;		
+	margin-right: auto;
+	width: 50%;
+}
+
+.card h3 {
+	padding-top: 40px;
+	margin-bottom: -50px;
+	font-size: 1.1em;
+	color: black;
+}
+
+.card sup {
+	border: 4px solid black;
+	border-radius: 15px;
+	font-size: 0.5em;
+	font-weight: 400;
+	padding: 4px;
+	vertical-align: middle;
+}
+
+
+/**coda image**/
+
+@media (max-width: 700px) {
+  .coda .inner-column {
+	background-image: url("https://www.movienco.co.uk/carteles/17000/17001/001.jpg");
+	background-size: cover;
+	min-height: 700px;
+
+}
+	.coda img {
+		
+		opacity: 0;
+	}
+
+	.card img {
+		width: 100%;
+	}
+}
+
+.coda img {
+		display: block;
+	margin-left: auto;		
+	margin-right: auto;
+	width: 100%;
+	
+}
+
+
+/*grid
+needs to be flex?
+and uniform in size*/
+
+.grid {
+	background-color: white;
+}
+
+.grid li {
+	display: inline-block;
+}
+
+
+
+/*footer stuff*/
+
+.bottom-text .inner-column {
+		max-width: 700px;
+}
+
+
+.bottom-text p {
+	color: rgba(118, 118, 124, 1.00);
+	font-size: 0.8em;
+	margin: 15px 10px;
+	padding: 2px;
+}
+
+
+
+
+
+
+footer {
+	padding: 10px;
+	background-color: rgba(49, 49, 50, 1.00);
+	min-height: 42pt;
+	font-size: 0.75em;
+	text-align: center;
+	margin-bottom: 10px;
+
+
+}
+
+footer li {
+	padding: 10px;
+}
+
+@media (min-width: 700px) {
+  footer li {
+    display: inline-block;
+    padding: 10px;
+  }
+}
+
+footer img {
+	width: 20px;
+}
+
+footer a {
+	color: rgba(214, 214, 214, 1.00);
+	margin: 0px 18px;
+	
+}
+
+footer a:hover {
+	color: white;
+}
+
+
+
+
+
