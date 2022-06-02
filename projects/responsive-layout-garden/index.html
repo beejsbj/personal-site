@@ -28,23 +28,23 @@
 						<script>
 							console.clear();
 
-							var colorPicker = document.createElement('input');
+							var colorPicker = document.document.getElementById('color-picker');
 							// <input>
 
-							colorPicker.type = 'range';
+							// colorPicker.type = 'range';
 							// <input type='range'>
 
 							colorPicker.max = 720; /* 2x 360 for fun... with hsl - it could go on forever */
 							// <input type='range' max='720'>
 
-							colorPicker.style.marginTop = '30px';
-							// <input type='range' max='720' style='margin-top: 30px'>
-							colorPicker.style.width = '100%';
-							// get it? It's just HTML and CSS... (don't tell anyone...)
-							colorPicker.style.width = '300px';
+							// colorPicker.style.marginTop = '30px';
+							// // <input type='range' max='720' style='margin-top: 30px'>
+							// colorPicker.style.width = '100%';
+							// // get it? It's just HTML and CSS... (don't tell anyone...)
+							// colorPicker.style.width = '300px';
 
 
-							document.querySelector('body').append(colorPicker);
+							// document.querySelector('body').append(colorPicker);
 							// get the body - and put the thing at the bottom of it
 							var html = document.querySelector('html');
 
@@ -62,7 +62,7 @@
 						</script>
 				</nav>
 
-				<!-- <input type="range"> -->
+				<input type="range" id="color-picker">
 
 
 			</div>
