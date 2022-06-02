@@ -4,6 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:image" content= "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pok%C3%A9mon_logo.svg/1200px-International_Pok%C3%A9mon_logo.svg.png">
 	<title></title>
 	<style>
 	html {
@@ -39,6 +40,7 @@
 	body {
 		margin: 0 auto;
 		max-width: 90%;
+
 	}
 
 
@@ -46,6 +48,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 10px;
+		justify-content: center;
 	}
 
 	pokemon-card {
@@ -55,8 +58,27 @@
 		padding: 10px;
 		border-radius: 10px;
 		background-color: var(--Normal);
+		position: relative;
 
 
+
+	}
+
+	.caught-banner {
+		display: none;
+	}
+
+	.caught .caught-banner {
+		display: block;
+		position: absolute;
+		width: 100%;
+		top: 20px;
+		left: 0px;
+		transform: rotate(45deg);
+		font-family: monospace;
+		font-size: 5rem;
+		font-weight: 700;
+		color: white;
 
 	}
 
@@ -67,6 +89,17 @@
 	.details {
 		display: flex;
 		justify-content: space-around;
+	}
+
+
+	.caught {
+		filter: grayscale(100%);
+		
+	}
+
+	.caught h1,
+	.caught div {
+		filter: blur(2px);
 	}
 
 	
@@ -103,6 +136,18 @@ include 'pocket-monsters.php';
 
 	foreach ($pokemonArr as $pokemon) {
 
+
+		if (rand(1,6) % 6 == 0) {
+			$caught = "caught";
+		} else {
+			$caught = "not-caught";
+		}
+
+
+
+
+
+
 		$id = $pokemon["id"];
 		$name = $pokemon["name"]["english"];
 
@@ -124,7 +169,7 @@ include 'pocket-monsters.php';
 			$type2 = $type1;
 		} ?>
 
-		<pokemon-card id="<?=$id?>" style="background-image: linear-gradient(45deg,var(--<?=$type1?>) 50%, var(--<?=$type2?>))">
+		<pokemon-card id="<?=$id?>" class='<?=$caught?>' style="background-image: linear-gradient(45deg,var(--<?=$type1?>) 50%, var(--<?=$type2?>))">
 		<?php
 
 
@@ -149,6 +194,8 @@ include 'pocket-monsters.php';
 				</div>
 
 			</div>
+
+			<p class="caught-banner">CAUGHT</p>
 		</pokemon-card>
 
 		
