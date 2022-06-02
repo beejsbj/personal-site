@@ -12,41 +12,7 @@
 </head>
 <body>
 
-	<script>
-		console.clear();
 
-		var colorPicker = document.document.getElementById('color-picker');
-		// <input>
-
-		// colorPicker.type = 'range';
-		// <input type='range'>
-
-		colorPicker.max = 720; /* 2x 360 for fun... with hsl - it could go on forever */
-		// <input type='range' max='720'>
-
-		// colorPicker.style.marginTop = '30px';
-		// // <input type='range' max='720' style='margin-top: 30px'>
-		// colorPicker.style.width = '100%';
-		// // get it? It's just HTML and CSS... (don't tell anyone...)
-		// colorPicker.style.width = '300px';
-
-
-		// document.querySelector('body').append(colorPicker);
-		// get the body - and put the thing at the bottom of it
-		var html = document.querySelector('html');
-
-		// we could set this to change the hue or something... 
-
-		function updateHue(input) {
-		  // console.clear();
-		  // console.log(input);
-		  html.style.setProperty('--hue', this.value);
-		}
-
-		colorPicker.addEventListener('input', updateHue);
-		// any time there's any user input... update the --custom-property value
-
-	</script>
 
 	<header class="site-header">
 
@@ -76,7 +42,7 @@
 			<div class="inner-column">
 				<flex-container>
 					<picture>
-						<img src="https://www.klarsynte-spådamer-spåkoner-spåtjenester.no/wp-content/gallery/tarotkort/tarot-spa-8.jpg" alt="">
+						<img src="images/logo.jpg" alt="">
 					</picture>
 					<div class="description">
 						<h1 class="loud-voice">Responsive Garden</h1>
@@ -101,7 +67,7 @@
 				<div class="inner-column">
 					<flex-container>
 						<picture>
-							<img src="https://static01.nyt.com/images/2022/02/06/books/review/17Armstrong/17Armstrong-mediumSquareAt3X.jpg" alt="">
+							<img src="images/logo.jpg" alt="">
 						</picture>
 						<div class="description">
 							<h2 class="attention-voice">The Father</h2>
@@ -111,7 +77,7 @@
 					</flex-container>
 					<flex-container>
 						<picture>
-							<img src="../../assets/images/mother.jpg" alt="">
+							<img src="images/logo.jpg" alt="">
 						</picture>
 						<div class="description">
 							<h2 class="attention-voice">The Mother</h2>
@@ -121,7 +87,7 @@
 					</flex-container>
 					<flex-container>
 						<picture>
-							<img src="../../assets/images/mother.jpg" alt="">
+							<img src="images/logo.jpg" alt="">
 						</picture>
 						<div class="description">
 							<h2 class="attention-voice">The Child</h2>
@@ -357,4 +323,39 @@
 
 	</footer>
 </body>
+	<script>
+		console.clear();
+
+		var colorPicker = document.getElementById('color-picker');
+		// <input>
+
+		// colorPicker.type = 'range';
+		// <input type='range'>
+
+		colorPicker.max = 720; /* 2x 360 for fun... with hsl - it could go on forever */
+		// <input type='range' max='720'>
+
+		// colorPicker.style.marginTop = '30px';
+		// // <input type='range' max='720' style='margin-top: 30px'>
+		// colorPicker.style.width = '100%';
+		// // get it? It's just HTML and CSS... (don't tell anyone...)
+		// colorPicker.style.width = '300px';
+
+
+		// document.querySelector('body').append(colorPicker);
+		// get the body - and put the thing at the bottom of it
+		var html = document.querySelector('html');
+
+		// we could set this to change the hue or something... 
+
+		function updateHue(input) {
+		  // console.clear();
+		  // console.log(input);
+		  html.style.setProperty('--hue', this.value);
+		}
+
+		colorPicker.addEventListener('input', updateHue);
+		// any time there's any user input... update the --custom-property value
+
+	</script>
 </html>
