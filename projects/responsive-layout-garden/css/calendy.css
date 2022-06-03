@@ -140,7 +140,7 @@ calendy {
 	}
 
 	calendy > header:hover,
-		.all *:hover {
+		.all > *:hover {
 			transform: scale(1.2);
 
 		}
