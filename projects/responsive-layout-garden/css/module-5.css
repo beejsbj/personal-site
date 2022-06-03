@@ -221,7 +221,7 @@
 
 
 
-@media (min-width: 1280px){
+@media (min-width: 1350px){
 
 	.module-5 {
 
@@ -291,12 +291,12 @@
 	.module-5 .skew-box {
 		display: block;
 		background-color: hsla(105, 100%, 98%, 1.00);
-		min-height: 900px;
-		min-width: 1200px;
+		min-height: 1500px;
+		min-width: 1500px;
 
 		position: absolute;
-		left: -50px;
-		top: -200px;
+		left: -200px;
+		top: -50%;
 
 		
 
