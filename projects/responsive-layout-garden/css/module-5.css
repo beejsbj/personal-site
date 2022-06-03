@@ -1,0 +1,437 @@
+.module-5 {
+	background-color: hsla(0, 0%, 100%, 0.95);
+
+	
+	font-family: sans-serif;
+	padding-bottom: 70px;
+}
+
+.module-5 .main-content {
+	padding: 50px 15px;
+
+}
+
+
+
+.module-5 * {
+	transition: .1s;
+}
+
+
+
+
+.mod-5-header .logo-icon,
+.mod-5-header .menu-icon {
+	width: 40px;
+
+}
+
+.mod-5-header .logo-icon:hover {
+	transform: rotate(90deg);
+	/*filter: invert(100%);*/
+}
+
+
+.mod-5-header .menu-icon:hover {
+	border: 2px solid hsla(244, 75%, 58%, 0.95);
+	border-radius: 5px;
+	background-color: hsla(229, 38%, 97%, 0.95);
+	padding: 5px;
+}
+
+
+.mod-5-header {
+	display: flex;
+	justify-content: space-between;
+}
+
+
+.mod-5-header nav {
+	display: none;
+
+}
+
+
+
+.module-5 .landing-column {
+	margin-top: 40px;
+}
+
+
+.module-5 .landing h1 {
+	font-size: 1.8rem;
+	font-weight: 700;
+	line-height: 1.1em;
+}
+
+.module-5 span {
+	color: hsla(244, 75%, 58%, 0.95);
+	display: block;
+}
+
+.module-5 span:hover {
+	color: hsla(244, 75%, 70%, 0.95)
+}
+
+
+.module-5 .landing p {
+	margin-top: 15px;
+	font-size: 0.9rem;
+	line-height: 1.6em;
+	color: hsla(274, 1%, 55%, 0.95);
+}
+
+
+.module-5 .landing nav {
+	display: flex;
+	margin-top: 30px;
+	flex-direction: column;
+	text-align: center;
+	gap: 10px;
+}
+
+
+
+
+
+
+
+
+
+.module-5 .landing nav a {
+	padding: 20px 35px;
+	border-radius: 5px;
+	color: white;
+	background-color:  hsla(244, 75%, 58%, 0.95);
+}
+
+.module-5 .landing nav a:hover {
+	background-color: hsla(245, 59%, 50%, 0.95);
+}
+
+.module-5 .landing nav .live-demo-button {
+	background-color: hsla(227, 100%, 94%, 0.95);
+	color: hsla(244, 75%, 58%, 0.95);
+}
+
+
+
+
+.module-5 .landing nav .live-demo-button:hover {
+	background-color: hsla(228, 91%, 89%, 0.95);
+}
+
+
+.module-5 .bg-image {
+	margin-top: 30px;
+	background-image: url("../images/working-guy.jpg");
+	background-size: cover;
+	min-height: 400px;
+	width: auto;
+
+	background-position: center center;
+	
+
+
+}
+
+.module-5 .skew-box,
+.module-5 .big {
+	display: none;
+}
+
+
+
+
+
+
+
+@media (min-width: 600px){
+
+
+	.module-5 .landing {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.module-5 .mod-5-header {
+		align-items: center;
+	}
+
+	.module-5 .landing h1 {
+		font-size: 3.5rem;
+		text-align: center;
+
+
+	}
+
+	.module-5 .landing p {
+
+		font-size: 1.2rem;
+		text-align: center;
+
+
+
+
+	}
+
+
+	.module-5 .landing nav {
+		flex-direction: row;
+		justify-content: center;
+	}
+	.module-5 .landing nav a {
+
+	}
+
+
+	.module-5 .bg-image {
+		margin-top: 70px;
+		min-height: 500px;
+	}
+
+
+}
+
+
+@media (min-width: 800px){
+	.module-5 .mod-5-header .menu-icon{
+		display: none;
+	}
+	.module-5 .mod-5-header nav {
+		display: flex;
+		gap: 35px;
+
+	}
+
+	.mod-5-header nav a {
+		font-size: 1rem;
+		color: hsla(274, 1%, 55%, 0.95);
+	}
+	.mod-5-header nav a:hover {
+		color: hsla(274, 1%, 0%, 0.95)
+	}
+
+	.module-5 .inner-column.nav-bar {
+		max-width: 80%;
+	}
+}
+
+
+
+
+@media (min-width: 1280px){
+
+	.module-5 {
+
+		padding-bottom: 0;
+
+		position: relative;
+		overflow: hidden;
+		min-height: 600px;
+
+
+
+
+
+
+
+		
+
+	}
+
+
+	.module-5 .inner-column.nav-bar,
+	.module-5 .inner-column.landing-column {
+		max-width: 100%;
+
+	}
+
+
+	.module-5 .main-content {
+		max-width: 70%;
+		margin: 0 auto;
+		position: relative;
+		/*min-height: 600px;*/
+
+/*		display: flex;
+		justify-content: space-between;*/
+
+	}
+
+
+
+
+	.module-5 .landing {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		max-width: 60ch;
+
+	}
+
+
+	.module-5 .mod-5-header {
+		justify-content: flex-start;
+		gap: 35px;
+
+	}
+
+	.module-5 > .bg-image {
+
+		display: none;
+
+
+	}
+
+
+
+
+	.module-5 .skew-box {
+		display: block;
+		background-color: hsla(105, 100%, 98%, 1.00);
+		min-height: 900px;
+		min-width: 1200px;
+
+		position: absolute;
+		left: -50px;
+		top: -200px;
+
+		
+
+
+		transform: rotate(15deg);
+
+	}
+
+	.module-5 .big {
+		display: block;
+		margin-top: 0;
+
+
+		min-height: 600px;
+		min-width: 900px;
+
+
+		background-position: center center;
+		overflow: hidden;
+
+		position: absolute;
+		right: 15%;
+		top: 0px;
+		
+
+
+	}
+
+	.module-5 .mod-5-header {
+		align-items: left;
+	}
+
+	.module-5 .landing h1 {
+		font-size: 3.5rem;
+
+		text-align: left;
+	}
+
+	.module-5 .landing p {
+
+		text-align: left;
+
+
+
+	}
+
+
+	.module-5 .landing nav {
+		flex-direction: row;
+		justify-content: flex-start;
+	}
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+/*@media (min-width: 1450px){
+	.module-5 .skew-box {
+
+
+
+
+		left: -300px;
+		top: -200px;
+
+		
+
+
+
+
+	}
+}
+
+
+@media (min-width: 1950px){
+	.module-5 .skew-box {
+
+
+
+
+		left: -50px;
+		top: -200px;
+
+		
+
+
+
+
+	}
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

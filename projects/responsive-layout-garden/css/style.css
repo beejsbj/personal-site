@@ -1,6 +1,7 @@
 @import 'meyers-reset.css';
 @import 'setup.css';
 @import 'calendy.css';
+@import 'module-5.css';
 
 
 /**Clarity**/
@@ -36,33 +37,32 @@ html {
 	min-height: 100vh;
 }
 
-#color-picker {
+.input-container {
 	margin-top: 20px 0;
-	width: 100%;
-	width: 300px;
+	min-width: 200px;
+	
 
 }
 
-.header-nav .inner-column {
-	display: flex;
-	justify-content: space-between	;
-}
-
-.header-nav .inner-column .flex-child {
-	display: flex;
-	align-items: center;
-	gap: 20px;
+#color-picker {
+	width: 200px;
+	margin: 0;
 }
 
 
-
-body {
-	/*background-color: yellow;*/
-	/*padding: 15px;*/
-	/*display: flex;
-	flex-direction: column;*/
-	/*height: 100vh;*/
+@media(max-width: 600px){
+	.input-container {
+		display: none;
+	}
 }
+
+
+
+
+
+
+
+
 
 
 .inner-column {
@@ -81,17 +81,12 @@ flex-container {
 }
 
 
-.site-main {
-	/*flex-grow: 1;*/
-	/*border: 5px solid black;*/
-	/*display: flex;*/
-	/*flex-direction: column;*/
-}
+
 
 .main-block {
-	/*border: 5px solid black;*/
+
 	flex-grow: 1;
-	padding: 30px 12px;
+	padding: 50px 15px;
 }
 
 .site-main .inner-column {
@@ -151,10 +146,17 @@ a {
 	padding: 5px 15px;
 }
 
-.header-nav .inner-column {
+.header-nav .flex-container  {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+}
+
+.header-nav .flex-container .flex-child {
 	display: flex;
 	align-items: center;
-	gap: 1.5em;
+	gap: 20px;
 }
 
 
@@ -162,15 +164,19 @@ a {
 	width: 35px;
 }
 
-.header-nav a, img, picture, nav {
+.site-header .header-nav nav {
 	display: flex;
+	justify-content: space-between;
 
 }
 
 
 .header-nav a {
-	padding: 0 10px;
+	padding: 5px;
 	margin: 0 5px;
+	font-family: sans-serif;
+	font-size: 14px;
+
 	/*text-decoration: none;*/
 }
 
@@ -199,7 +205,7 @@ a {
 /*Header Landing*/
 
 .header-landing {
-	padding: 50px 12px;
+	padding: 50px 15px;
 	background-color: hsla(152, 20%, 74%, 0.70);
 }
 
@@ -239,7 +245,7 @@ flex-container picture {
 
 .site-footer {
 	background-color: hsla(46, 93%, 24%, 0.70);
-	padding: 20px 12px;
+	padding: 50px 15px;
 	padding-bottom: 100px;
 	color: white;
 	position: static;
@@ -317,9 +323,7 @@ flex-container picture {
 
 @media (min-width: 1000px){
 
-	.site-main {
-		padding-top: 30px;
-	}
+
 
 	.inner-column {
 		max-width: 70%;
@@ -327,6 +331,10 @@ flex-container picture {
 
 	.header-nav {
 		padding: 15px 15px;
+	}
+
+	.header-nav .inner-column {
+		max-width: 80%;
 	}
 
 
@@ -500,7 +508,7 @@ flex-container picture {
 /*Main Welcome*/
 
 .main2-welcome {
-	padding: 40px 10px;
+	padding: 50px 15px;
 }
 
 .main2-welcome .welcome-flex {
@@ -579,7 +587,7 @@ flex-container picture {
 /*main about*/
 
 .main2-about {
-	padding: 40px 10px;
+	padding: 50px 15px;
 }
 .main2-about .card picture, .main2-about h2 {
 	padding: 5px;
@@ -665,12 +673,11 @@ flex-container picture {
 module-1 {
 
 	background-color: rgba(255, 255, 255, 0.92);
-	padding: 20px 15px;
+	padding: 50px 15px;
 	font-family: sans-serif;
-	padding-bottom: 10rem;
 	display: flex;
 	flex-direction: column;
-	padding-top: 100px;
+
 
 }
 
@@ -803,7 +810,7 @@ module-1 .features p {
 
 .module-2 {
 	background-color: rgba(140, 123, 105, 0.50);
-	padding: 70px 30px;
+	padding: 50px 15px;
 }
 
 
@@ -900,8 +907,8 @@ module-1 .features p {
 
 
 .module-3 {
-	background-color: hsla(0, 0%, 100%, 0.93);
-	padding: 100px 15px;
+	background-color: hsla(0, 0%, 100%, 0.80);
+	padding: 50px 15px;
 
 	font-family: sans-serif;
 }
