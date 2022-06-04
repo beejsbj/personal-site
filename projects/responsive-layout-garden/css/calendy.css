@@ -2,13 +2,15 @@
 
 
 .calendy-module {
-	padding: 80px 15px;
+	padding: 50px 15px;
+	overflow-x: hidden;
 }
 calendy,
 description,
 stuff,
 calender {
 	display: block;
+
 }
 
 
@@ -36,6 +38,7 @@ calendy {
 	/*background-color: hsla(194, 35%, 59%, 0.95);*/
 	background-image: url("../images/snow-mountain-wide.jpg");
 	background-position: center;
+
 
 }
 
@@ -127,6 +130,11 @@ calendy {
 
 }
 
+
+.breathe-box-outer-c {
+	display: none;
+}
+
 /*breakpoint 1*/
 
 @media (min-width: 500px) {
@@ -139,11 +147,11 @@ calendy {
 		width: 50%;
 	}
 
-	calendy > header:hover,
-		.all > *:hover {
-			transform: scale(1.2);
+	.breathe-box-outer-c {
+		display: block;
+	}
 
-		}
+	
 }
 
 /*breakpoint 2*/
@@ -160,6 +168,11 @@ calendy {
 	calendy description {
 		flex-direction: column;
 		align-items: center;
+	}
+	calendy > header:hover,
+	.all > *:hover {
+		transform: scale(1.2);
+
 	}
 }
 
