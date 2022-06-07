@@ -134,7 +134,7 @@ include 'pocket-monsters.php';
 
 
 
-	foreach ($pokemonArr as $pokemon) {
+	foreach ($pokemonArr as $pokemon) {	
 
 
 		if (rand(1,6) % 6 == 0) {

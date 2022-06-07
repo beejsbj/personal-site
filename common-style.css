@@ -16,7 +16,7 @@ html {
 
 }
 
-/*@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
 	html {
 	--paper: rgba(0, 0, 0, 1.00);
 	--head1: rgba(217, 215, 208, 1.00);
@@ -27,7 +27,7 @@ html {
 	--highlight1: rgba(163, 7, 3, 1.00);
 
 	}
-}*/
+}
 
 
 

@@ -389,6 +389,7 @@ flex-container picture {
 		right: 10%;
 		opacity: 0.3;
 		animation: 3s breath infinite ease-in-out;
+		pointer-events: none;
 	}
 
 
