@@ -93,7 +93,7 @@ form {
     align-content: center;
     display: flex;
     flex-direction: column-reverse;
-    /*gap: 1em;*/
+    gap: 1em;
     /*position: relative;*/
     /*border: 2px solid yellow;*/
 }
@@ -109,7 +109,7 @@ label {
     position: relative;
     /*left: 40%;*/
     /*bottom: -50%;*/
-    top: 1.2rem;
+    top: 3rem;
     opacity: 0.6;
 
     pointer-events: none;
@@ -159,7 +159,8 @@ input:focus::placeholder{
 }
 
 input:focus + label {
-    display: none;
+    /*display: none;*/
+    position: static;
 }
 
 
@@ -236,6 +237,10 @@ button:active {
 .output-field span {
     font-weight: 700;
     color: hsla(60, 100%, 70%, 1.00);
+}
+
+.output-field em {
+    font-style: italic;
 }
 
 

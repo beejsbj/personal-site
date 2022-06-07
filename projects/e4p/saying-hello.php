@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href="css/style.css">
 
-    <title>Saying Hello</title>
+    <title>Hello!</title>
 
 
 
@@ -37,10 +37,10 @@ $greetings = [
     "burooj" => "Welcome back, Sir",
     "ivy" => "your glasses are cool",
     "steve" => "Excited for Love and Thunder!?",
-    "jesse" => "Merry Go!!",
+    "jesse" => "Go to the Merry!!",
     "brian" => "that slant gave me nightmares",
     "andy" => "How're Woody and Buzz doing?",
-    "derek" => "Bzzzzz bzzz",
+    "derek" => "Sheriffff, we need your help!!",
     "joshua" => "does Josh work too?",
     "josh" => "Uaa! it does!!",
     "john" => "the Everything welcomes you Mr Miyao",

@@ -74,7 +74,6 @@
                 }
 
 
-
                 foreach ($exercises as $exercise) { 
                     $fileName = dasher($exercise) . ".php";
 
