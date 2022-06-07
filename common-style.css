@@ -23,8 +23,8 @@ html {
 	--head2: rgba(255, 255, 255, 1.00);
 	--link: rgba(246, 233, 14, 1.00);
 	--text: rgba(217, 215, 208, 1.00);
-	--highlight: rgba(233, 159, 85, 1.00);
-	--highlight1: rgba(163, 7, 3, 1.00);
+	--highlight: rgba(163, 7, 3, 1.00);
+	--highlight1: rgba(233, 159, 85, 1.00);
 
 	}
 }
