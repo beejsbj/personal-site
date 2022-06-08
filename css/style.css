@@ -89,7 +89,7 @@
 	
 
 	.b-svg {
-		left: -450px;
+		left: -550px;
 		top: -150px;
 		height: 1200px;
 
@@ -105,11 +105,11 @@
 
 }
 
-@media (min-width: 1500px){
+@media (min-width: 1700px){
 
 	.b-svg {
 
-		left: -800px;
+		left: -880px;
 		top: -150px;
 		height: 2000px;
 
