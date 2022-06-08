@@ -45,6 +45,10 @@ body > * > * {
 
 }
 
+.inner-column * {
+    transition-duration: 0.2s;
+}
+
 /**TYPOGRAPHY******/
 
 
@@ -76,6 +80,17 @@ h1:hover {
 }
 
 
+header a {
+    background-color: black;
+    color: white;
+    border-radius: 50%;
+    padding: 20px;
+    position: fixed;
+    left: 1%;
+    top: 1%;
+}
+
+
 
 
 
@@ -94,8 +109,9 @@ form {
     display: flex;
     flex-direction: column-reverse;
     gap: 1em;
-    /*position: relative;*/
+    position: relative;
     /*border: 2px solid yellow;*/
+
 }
 
 
@@ -106,13 +122,16 @@ label {
     color: white;
     text-align: center;
     font-size: 1.2rem;
-    position: relative;
+    position: absolute;
     /*left: 40%;*/
     /*bottom: -50%;*/
-    top: 3rem;
+    width: 100%;
+    top: 1rem;
+    /*left: 40%;*/
     opacity: 0.6;
 
     pointer-events: none;
+    transition-duration: 0.2s;
 
 }
 

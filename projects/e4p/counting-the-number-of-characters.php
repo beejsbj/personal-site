@@ -26,7 +26,7 @@
 
     <style>
     	h1 {
-    		font-size: clamp(70px, 9vw, 150px);
+    		font-size: clamp(70px, 8vw, 150px);
     	}
     </style>
 
@@ -45,7 +45,7 @@ function showPageErrors() {
 
 
 
-showPageErrors();
+// showPageErrors();
 
 
 
@@ -61,11 +61,11 @@ $count = 0;
 function charCounter($string) {
 	$counter = 0;
 
-	for ($i = 0; $i < strlen($string); $i++) { 
+	for ($i = 0; $i < strlen($string); $i++) {  //tara dog
 
-		$char = $string[$i];
+		$char = $string[$i]; // 
 
-		if ($char != ' ') {
+		if ($char != ' ') { 
 			$counter++;
 		}
 	}
@@ -86,7 +86,7 @@ if (isset($_POST['submitted'])) {
 
 			$count = charCounter($inputString);
 
-			$message = "<span><em>$inputString</em></span> has <span>$count</span> characters.";
+			$message = "<span>'$inputString'</span> has <span>$count</span> characters.";
 
 
 
@@ -112,7 +112,8 @@ if (isset($_POST['submitted'])) {
 <body>
     <header>
         <div class="inner-column">
-            <h1>Counting the Number of Characters</h1>
+            <a href="index.php">⬅</a>
+            <h1>Counting&nbspthe&nbspNumber of Characters</h1>
         </div>
     </header>
     <main>

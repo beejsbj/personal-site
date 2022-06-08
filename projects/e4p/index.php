@@ -13,15 +13,20 @@
     <style>
 
         /*Links*********************************************/
+        ol {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
         li {
-        /*width: 100%;*/
+        width: 100%;
         font-family: monospace;
         background-color: #000000;
         color: white;
         padding: 15px;
         text-align: center;
         text-decoration: none;
-        margin-bottom: 2px;
+        /*margin-bottom: 2px;*/
         font-size: 1.5rem;
 
         transition-duration: 0.2s;
@@ -42,9 +47,33 @@
             color: white;
             /*font-weight: bold;*/
             text-transform: uppercase;
-            font-size: 30px;
+            /*font-size: 30px;*/
+
+
+
 
         }
+
+
+        span {
+            display: none;
+
+        }
+        li:hover a {
+            display: flex;
+            justify-content: space-between;
+        }
+
+
+
+        li:hover span {
+            display: block;
+
+            opacity: 0.3;
+            font-family: expose;
+        }
+
+        
 
     </style>
 </head>
@@ -73,15 +102,16 @@
                     return strtolower($finalString);
                 }
 
-
+                $i = 0;
                 foreach ($exercises as $exercise) { 
                     $fileName = dasher($exercise) . ".php";
+                    $i++;
 
                     if (file_exists($fileName)) {
                         
                     
                 ?>
-                    <li><a href="<?=$fileName?>"><?=$exercise?></a></li>
+                    <li><a href="<?=$fileName?>"><span><?=$i?></span><?=$exercise?><span><?=$i?></span></a></li>
 
                 <?php }} ?>
                     

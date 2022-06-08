@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +9,7 @@
 
     <link rel="stylesheet" href="css/style.css">
 
-    <title></title>
+    <title>Quote Printer</title>
 
 
 
@@ -31,24 +32,35 @@ function showPageErrors() {
 
 
 
-
-
-
-
 $class = "hide";
- // $class = "output-field";
+
+$quote = '';
+$author = '';
+$output = '';
+
+
+if (isset($_POST['submitted'])) {
+    // code...
+
+    if ((isset($_POST['quote'])) && (isset($_POST['author']))) {
+        // code...
+    if (($_POST['quote'] != '') && ($_POST['author'] != '')) {
+            // code...
+
+            $quote = $_POST['quote'];
+            $author = $_POST['author'];
+
+            $output = "<span>" . "$author" . "</span> says, <em>'" . "$quote" . "'</em>";
 
 
 
 
-if (isset($_POST['submitted'])){
-    
 
 
-           
-           
 
-
+            $class = "output-field";
+        }
+    }
 }
 
 
@@ -65,9 +77,10 @@ if (isset($_POST['submitted'])){
 
 <body>
     <header>
+
         <div class="inner-column">
             <a href="index.php">⬅</a>
-            <h1></h1>
+            <h1>Printing Quotes</h1>
         </div>
     </header>
     <main>
@@ -76,19 +89,23 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="text" name="" placeholder="" value="">
-                    <label for=""></label>
+                    <input type="text" name="quote" placeholder="What is the Quote?" value="">
+                    <label for="">What is the Quote?</label>
+                </div>
+                <div class="input-field">
+                    <input type="text" name="author" placeholder="Who said it?" value="">
+                    <label for="">Who said it?</label>
                 </div>
 
 
                 <button type="submit" name="submitted">
-
+                    Print
                 </button>
 
 
                 <div class="<?=$class?>">
                     <p>
-                        <?=$message?>
+                        <?=$output?>
                     </p>
                 </div>
                 
@@ -99,6 +116,4 @@ if (isset($_POST['submitted'])){
 
 </body>
 </html>
-
-
 

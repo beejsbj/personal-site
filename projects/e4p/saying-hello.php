@@ -67,7 +67,7 @@ if (isset($_POST['submitted'])){
 
             if ($greetings[strtolower($userName)]) {
 
-                $message = $greetings[$userName];
+                $message = $greetings[strtolower($userName)];
 
             } 
         }
@@ -90,6 +90,7 @@ if (isset($_POST['submitted'])){
 <body>
     <header>
         <div class="inner-column">
+            <a href="index.php">⬅</a>
             <h1>Saying Hello</h1>
         </div>
     </header>
