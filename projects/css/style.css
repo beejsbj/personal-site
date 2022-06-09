@@ -148,6 +148,25 @@ project-card a:hover {
 
 	.b-svg {
 
+		left: -600px;
+		top: 0px;
+		height: 1300px;
+	}
+
+	.j-svg {
+
+		right: -550px;
+		top: -200px;
+		height: 1300px;
+
+	}
+
+}
+
+@media (min-width: 2100px){
+
+	.b-svg {
+
 		left: -400px;
 		top: 0px;
 		height: 1300px;
@@ -155,7 +174,7 @@ project-card a:hover {
 
 	.j-svg {
 
-		right: -190px;
+		right: -250px;
 		top: -200px;
 		height: 1300px;
 
