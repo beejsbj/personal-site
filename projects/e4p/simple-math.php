@@ -154,7 +154,7 @@ if (isset($_POST['submitted'])){
                     <label for="">What is the first number?</label>
                 </div>
                 <div class="input-field">
-                    <input type="number" name="second" placeholder="second number?" value="">
+                    <input type="number" name="second" placeholder="second number?" value="" step="0.01">
                     <label for="">What is the second number?</label>
                 </div>
 

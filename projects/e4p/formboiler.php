@@ -88,7 +88,7 @@ if (isset($_POST['submitted'])){
 
                 <div class="<?=$class?>">
                     <p>
-                        <?=$message?>
+                        <?=$output?>
                     </p>
                 </div>
                 
@@ -99,6 +99,52 @@ if (isset($_POST['submitted'])){
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
