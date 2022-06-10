@@ -1,43 +1,43 @@
 ## Andy
 
 
-	### Index
-		* Could you find them? Was it difficult? Easy? Was it at user/projects/e4p ?
-			* yes, easy and yes.
+### Index
+	* Could you find them? Was it difficult? Easy? Was it at user/projects/e4p ?
+		* yes, easy and yes.
 
-		* How is the index page? Is it clear what the page is for a first-time visitor? Are the links clear?
-		    * the index page is clean. i like the description. im not sure about the boxes, them being different sizes is somewhat awkward.
-		    * its also all the way to the left when on a big screen. centering with an inner-column would help out with that.
-		    * i like the hover, the color is pleasant, remimnds me of his main site. the text becomes somewhat of a cutout cause its the same color as bkground which is pretty cool 
-
-
+	* How is the index page? Is it clear what the page is for a first-time visitor? Are the links clear?
+	    * the index page is clean. i like the description. im not sure about the boxes, them being different sizes is somewhat awkward.
+	    * its also all the way to the left when on a big screen. centering with an inner-column would help out with that.
+	    * i like the hover, the color is pleasant, remimnds me of his main site. the text becomes somewhat of a cutout cause its the same color as bkground which is pretty cool 
 
 
-	### Forms
 
-		* How is the storytelling? Is it clear what the forms are supposed to do?
-		    * i like the descrptions. its pretty clear even without it for the simple ones imo. but it a good idea for when it gets more complex.
-		
-		* Are the inputs and buttons legible? Do they have labels?
-		    * legible and clear, the buttons styling could be better, the rest of the design is flat compared to the button. maybe  the buttons from the main page could fit in.
-		
-		* Does the form work? Can you break it?
-		    * yes they do. no. 
-		
-		* Do things jump around when you interact with them?
-		    * no
-		
-		* Is the outcome clear?
-		    * yes
-		
-		* Do the form styles match across all forms?
-		    * yep
-		
-		* Is it a pleasure to use?
-		    * other than everything being aligned left its nice. i enjoy the colors.
-		
-		* What could be improved?
-			* im not sure about the black box at the top. i first though that was the output region, which would have been a cool idea. but it seems like leftover code from testing.
+
+### Forms
+
+	* How is the storytelling? Is it clear what the forms are supposed to do?
+	    * i like the descrptions. its pretty clear even without it for the simple ones imo. but it a good idea for when it gets more complex.
+
+	* Are the inputs and buttons legible? Do they have labels?
+	    * legible and clear, the buttons styling could be better, the rest of the design is flat compared to the button. maybe  the buttons from the main page could fit in.
+
+	* Does the form work? Can you break it?
+	    * yes they do. no. 
+
+	* Do things jump around when you interact with them?
+	    * no
+
+	* Is the outcome clear?
+	    * yes
+
+	* Do the form styles match across all forms?
+	    * yep
+
+	* Is it a pleasure to use?
+	    * other than everything being aligned left its nice. i enjoy the colors.
+
+	* What could be improved?
+		* im not sure about the black box at the top. i first though that was the output region, which would have been a cool idea. but it seems like leftover code from testing.
 
 
 
