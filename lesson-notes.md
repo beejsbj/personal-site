@@ -27,4 +27,5 @@
 # Git Workflows
 
 
-	*
+	* personal-fork-repo and org-repo are my prefrences since github is like a name name.
+	
