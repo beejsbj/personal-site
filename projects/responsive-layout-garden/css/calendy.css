@@ -169,11 +169,7 @@ calendy {
 		flex-direction: column;
 		align-items: center;
 	}
-	calendy > header:hover,
-	.all > *:hover {
-		transform: scale(1.2);
-
-	}
+	
 }
 
 
