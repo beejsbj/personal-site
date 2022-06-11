@@ -1,0 +1,102 @@
+{
+	"education" : [
+		{
+			"role" : "major",
+			"place" : "school name",
+			"dates" : [2010, 2020],
+			"duties" : [
+				"duty1",
+				"duty2",
+				"duty3"
+			],
+			"skills" : [
+				"skill1",
+				"skill2",
+				"skill3"
+			],
+			"specialNote" : "best boy award"
+		},
+		{
+			"role" : "major",
+			"place" : "school name",
+			"dates" : [2010, 2020],
+			"duties" : [
+				"duty1",
+				"duty2",
+				"duty3"
+			],
+			"skills" : [
+				"skill1",
+				"skill2",
+				"skill3"
+			],
+			"specialNote" : "best boy award"
+		},
+		{
+			"role" : "major",
+			"place" : "school name",
+			"dates" : [2010, 2020],
+			"duties" : [
+				"duty1",
+				"duty2",
+				"duty3"
+			],
+			"skills" : [
+				"skill1",
+				"skill2",
+				"skill3"
+			],
+			"specialNote" : "best boy award"
+		}
+	],
+	"work" : [
+		{
+			"role" : "job title/name/position",
+			"place" : "PLACE",
+			"dates" : [2010, 2020],
+			"duties" : [
+				"duty1",
+				"duty2",
+				"duty3"
+			],
+			"skills" : [
+				"skill1",
+				"skill2",
+				"skill3"
+			],
+			"specialNote" : "best boy award"
+		},
+		{
+			"role" : "job title/name/position",
+			"place" : "PLACE",
+			"dates" : [2010, 2020],
+			"duties" : [
+				"duty1",
+				"duty2",
+				"duty3"
+			],
+			"skills" : [
+				"skill1",
+				"skill2",
+				"skill3"
+			],
+			"specialNote" : "best boy award"
+		},
+		{
+			"role" : "job title/name/position",
+			"place" : "PLACE",
+			"dates" : [2010, 2020],
+			"duties" : [
+				"duty1",
+				"duty2",
+				"duty3"
+			],
+			"skills" : [
+				"skill1",
+				"skill2",
+				"skill3"
+			],
+			"specialNote" : "best boy award"
+		}
+	]
+}

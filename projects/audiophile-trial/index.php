@@ -104,6 +104,7 @@ $products = $audiophileData["products"];
 					 ?>
 
 					<product-card>
+		
 						<p class="<?=$saleTag?>">SALE</p>
 						<picture>
 							

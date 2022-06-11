@@ -46,91 +46,35 @@
                But <em>pretending</em> things are perfect and <em>I</em> am perfect:
             </p>
 
-            <section class="five-year">
-               <h2>
-                     5-year vision
-               </h2>
+            <?php
 
-               <ol class='innerlist'>
-                  <li>
-                     <em>In 5 years I'll be <strong>30</strong></em> 🤢
-                  </li>
-                  <li>
-                     Working a job I <em>enjoy</em>
-                  </li>
-                  <li>
-                     Be making <em>atleast</em> 70k anually.
-                  </li>
-                  <li>
-                     <strong>REMOTE.</strong> It needs to be remote. hence the lowball.
-                  </li>
-                  <li>
-                     Live as a Digital Nomad for while till i find myself.
-                  </li>
-                  <li>
-                     Homebases setup in Vancouver, Srinagar and Dubai. or whereever I grow to enjoy.
-                  </li>
-                  <li>
-                     own an apartment, on a high floor so I dont have to deal with <strong>spiders and centipedes</strong>
-                  </li>
-                  <li>
-                     learnt to play <a href="https://www.youtube.com/watch?v=HV1CMDhemt0">this!</a>
-                  </li>
-                  <li>
-                     Half-way to retirement, or part timing. So thatd include having a handful passive income streams set up. 
-                  </li>
-                  <li>
-                     My blog will be thriving.
-                  </li>
-               </ol>
-            </section>
-      
-            <section class="course">
-               <h2>End of course vision</h2>
-               <ol class='innerlist'>
-                  <li>
-                     Be skilled enough for an entry level job as a developer. Id still <em>prefer to be a developer than a designer</em> even though my interest in design is growing.
-                  </li>
-                  <li>
-                     Be <em>confident</em> in those skills
-                  </li>
-                  <li>
-                     Have a <strong>healthy and attractive</strong> portfolio.
-                  </li>
-                  <li>
-                     become more consistent and disciplined due to the courses nature. <em>its already feeling that, so yay</em>
-                  </li>
 
-                  <li>
-                     50k is my floor for the pay to <em>start off</em> with.
-                  </li>
-                  <li>
-                     ideally <em>non-corporate-y. medium-small, people <em>know</em> eachother</em> workplace.
-                     but willing to try being a cog ⚙️
-                  </li>
-                  <li>
-                     Debt free
-                  </li>
+            $json = file_get_contents("goals.json");
+			$goalsData = json_decode($json, true);
 
-               </ol>
-            </section>
+			foreach ($goalsData as $goalSection => $goals) {
 
-            <section class="month">
-               <h2>
-                  End of the month
-               </h2>
-               <ol>
-                  <li>
-                     Meet with Derek more and consistently lest I face Ivy'sw Wrath.
-                  </li>
-                  <li>
-                     Be more consistent with my Blog, which ive fallen behind on.
-                  </li>
-                  <li>
-                     Do more Study Hall
-                  </li>
-               </ol>
-            </section>
+				echo "<section class='$goalSection'>";
+				echo "<h2>$goalSection</h2>";
+				echo "<ol class='innerlist'>";
+
+				foreach ($goals as $goal) {
+					// code...
+					echo "<li>$goal</li>";
+				}
+
+				echo "</ol>";
+				echo "</section>";
+
+
+
+			}
+
+
+
+
+
+            ?>
 
          </div>
       </article>
