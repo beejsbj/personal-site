@@ -17,13 +17,13 @@
 					},
 					"63": {
 						
-						"image" : "https://images.samsung.com/is/image/samsung/p6pim/ca/sm-r190nzkaxac/gallery/ca-galaxy-buds-pro-r190-sm-r190nzkaxac-530313778?$730_584_PNG$",
+						"image" : "https://images.samsung.com/is/image/samsung/p6pim/ca_fr/galaxy-s21/gallery/ca-fr-galaxy-buds-pro-r190-sm-r190nzkaxac-363169117?$2160_1728_PNG$",
 						"brand" : "Samsung",
 						"name" : "Galaxy Buds Pro",
 						"color" : "Phantom Black",
 						"category" : "wireless earbuds",
 						"tagline" : "Tunes out noises, tunes in voices",
-						"description" : "Truly wireless earbuds, with pro-grade technology for immersive sound like never before from Galaxy. Use Intelligent ANC to seamlessly switch between noise canceling and adjustable ambient sound so you can let the outside in — or keep it out. It’s your world. Galaxy Buds Pro lets you hear more of what you want.",
+						"description" : "Truly wireless earbuds, with pro-grade technology for immersive sound like never before from Galaxy. Use Intelligent ANC to seamlessly switch between noise canceling and adjustable ambient sound so you can let the outside in — or keep it out.",
 						"price" : 189.99,
 						"features" : ["true wireless", "bluetooth 5.0", "IPX7 dust and water resistant", "360 audio"],
 						"on-sale" : false,
@@ -31,7 +31,7 @@
 					},
 					"634": {
 
-						"image" : "https://www.sony.ca/image/5d02da5df552836db894cead8a68f5f3?fmt=pjpeg&wid=165&bgcolor=FFFFFF&bgc=FFFFFF",
+						"image" : "https://www.sony.com/image/5d02da5df552836db894cead8a68f5f3?fmt=png-alpha&wid=440",
 						"brand" : "Sony",
 						"name" : "WH-1000XM4",
 						"color" : "silver",
@@ -179,7 +179,7 @@
 						"stock": 9
 					},
 					"6366": {	
-						"image": "https://m.media-amazon.com/images/I/51caOANCJAS._AC_SX425_.jpg",
+						"image": "https://cdn.shopify.com/s/files/1/1659/9697/products/greenfront_800x.png?v=1608403622",
 						"brand": "KEF",
 						"name": "LSX Wireless Music System",
 						"color": "olive",
