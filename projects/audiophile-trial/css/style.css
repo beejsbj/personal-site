@@ -128,14 +128,17 @@ product-brand {
 }
 
 product-tagline {
-	font-size: 1rem;
-	margin-top: 20px;
+	font-size: 0.9rem;
+	margin-top: 15px;
 	font-style: italic;
+	font-weight: 100;
+	color: hsla(40, 74%, 25%, 1.00);
 }
 
 product-description {
 	font-size: 0.8rem;
 	margin-top: 20px;
+	line-height: 1.3em;
 }
 
 
