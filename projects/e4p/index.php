@@ -11,6 +11,9 @@
     <title>57 Exercises</title>
 
     <style>
+        body {
+            padding-bottom: 500px;
+        }
 
         /*Links*********************************************/
         ol {
@@ -19,18 +22,22 @@
             gap: 5px;
         }
         li {
-        width: 100%;
-        font-family: monospace;
-        background-color: #000000;
-        color: white;
-        padding: 15px;
-        text-align: center;
-        text-decoration: none;
-        /*margin-bottom: 2px;*/
-        font-size: 1.5rem;
+            width: 100%;
+            font-family: monospace;
+            background-color: #000000;
+            color: white;
+            
+            text-align: center;
+            text-decoration: none;
+            /*margin-bottom: 2px;*/
+            font-size: 1.5rem;
 
-        transition-duration: 0.2s;
-      }
+            transition-duration: 0.2s;
+        }
+
+        a {
+            padding: 15px;
+        }
 
         a:visited {
 
