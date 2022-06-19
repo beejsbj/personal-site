@@ -11,7 +11,7 @@
 
 /* Should we pull in @fonts here? */
 
-body {
+body * {
 	font-family: 'Lato', sans-serif;
 }
 
