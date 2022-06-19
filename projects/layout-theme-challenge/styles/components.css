@@ -6,14 +6,13 @@
 
 	border-radius: 30px;
 	border: 2px solid var(--weed-secondary-color);
-	padding: .4em 1em;
+	padding: .5em 1em;
 	background-color: var(--ink); /*using opposite colors*/
-	min-width: 100px;
+	/*min-width: 100px;*/
 
 	font-family: 'Lato', sans-serif;
 	font-size: 1rem;
 	color: var(--paper); /*using opposite colors*/
-	line-height: 1.4;
 	text-transform: uppercase;
 	text-align: center;
 
@@ -57,6 +56,8 @@ a:not(.home, .button):hover {
 
 picture {
 	background-color: var(--weed-white);
+	border-radius: 30px;
+	overflow: hidden;
 }
 
 .blend {

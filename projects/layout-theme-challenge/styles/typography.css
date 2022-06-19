@@ -1,7 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 @import url('../font/PotLand.ttf');
+@font-face {
+    font-family: 'PotLand';
+    src: url('../font/PotLand.woff2') format('woff2'),
+        url('../font/PotLand.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
 
 /* Should we pull in @fonts here? */
+
+body {
+	font-family: 'Lato', sans-serif;
+}
 
 .loud-voice	{
 	font-family: 'Lato', sans-serif;
@@ -47,7 +59,9 @@
 
 
 .teaser {
+	font-family: 'Lato', sans-serif;
 	font-size: 0.9rem;
+	line-height: 1.4em;
 }
 
 

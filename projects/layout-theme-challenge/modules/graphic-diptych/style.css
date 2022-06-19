@@ -50,8 +50,9 @@ graphic-diptych p {
 	}
 }
 
-graphic-diptych picture {
+graphic-diptych picture{
 	/*align-self: flex-start;*/
+	position: relative;
 }
 
 graphic-diptych text-content {
@@ -64,4 +65,15 @@ graphic-diptych text-content {
 	background-repeat: no-repeat;
 */
 	/*align-self: end;*/
+}
+
+
+
+
+@media (min-width:  1500px) {
+
+	
+
+
+
 }

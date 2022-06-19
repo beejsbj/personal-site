@@ -71,8 +71,9 @@ section.welcome {
 
 
 section.sign-up {
-	background-color: var(--color);
 	/*min-height: 300px;*/
+	/*color: var(--weed-white);*/
+
 	background-color: var(--weed-secondary-color);
 	background-image: url('../images/mug.jpg');
 	background-position: 80% 0%;
@@ -108,13 +109,13 @@ section.get-involved .button {
 
 
 @media (prefers-color-scheme: dark) {
-	header {
+	/*header {
 		background-color: var(--weed-primary-color-dark);
-	}
+	}*/
 
 	section.sign-up {
-		background-color: var(--color);
-		color: var(--black);
+
+		mix-blend-mode: normal;
 	}
 
 	/*section.sign-up .button {
@@ -124,6 +125,6 @@ section.get-involved .button {
 
 	section.get-involved {
 		background-color: var(--highlight);
-		color: var(--black);
+		color: var(--weed-black);
 	}
 }

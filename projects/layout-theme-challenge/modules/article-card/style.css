@@ -15,8 +15,12 @@
 	/*box-shadow: 5px 5px 3px var(--weed-secondary-color);*/
 }
 
+.article-card picture {
+	border-radius: 0px;
+}
+
 .article-card text-content {
-	padding: 1em 0.5em;
+	padding: 1em 1em;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -30,3 +34,10 @@
 }
 
 
+.article-card .button {
+	/*transform: scale(0.8);*/
+	min-width: 80px;
+	font-size: 0.8rem;
+	font-weight: 700;
+	padding: .5em 1em;
+}
