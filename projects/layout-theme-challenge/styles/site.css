@@ -78,17 +78,13 @@ section.sign-up {
 	background-position: 80% 0%;
 	background-size: cover;
 	background-repeat: no-repeat;
+	mix-blend-mode: darken;
 }
 
 @media (min-width: 1000px) {
 	section.sign-up {
-		background-color: var(--color);
-		/*min-height: 300px;*/
-		background-color: var(--weed-secondary-color);
-		background-image: url('../images/mug.jpg');
-		background-position: 80% 0%;
-		background-size: clamp(1080px, 100%, 100px);
-		background-repeat: no-repeat;
+		background-size: 1200px;
+
 	}
 }
 
