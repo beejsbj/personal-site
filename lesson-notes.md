@@ -24,8 +24,5 @@
 		could use flex and space-between, while applying width with the parent. and swtching all to column when the largest label gets close. -ey the example ahs this.
 
 
-# Git Workflows
 
-
-	* personal-fork-repo and org-repo are my prefrences since github is like a name name.
 	

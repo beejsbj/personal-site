@@ -6,7 +6,7 @@
 	</picture>
 	
 	<text-content>
-		<h1 class='loud-voice'>High Five</h1>
+		<h1 class='loud-voice'>Welcome the High</h1>
 
 		<p>What a fun thing that we have here</p>
 	</text-content>
