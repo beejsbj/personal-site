@@ -8,7 +8,7 @@ site-map {
 	grid-gap: 20px;
 
 	padding: 10vh 0 15vh;
-	color: var(--weed-white);
+	/*color: var(--weed-white);*/
 }
 
 site-map .logo {
@@ -19,7 +19,7 @@ site-map .logo {
 }
 
 site-map .logo * {
-	fill: var(--weed-white);
+	fill: var(--ink);
 }
 
 site-map h3 {
