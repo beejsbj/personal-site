@@ -1,0 +1,75 @@
+
+graphic-diptych {
+	display: block;
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	
+
+	align-items: center;
+	justify-content: center;
+
+
+	position: relative;
+
+}
+
+
+
+
+
+graphic-diptych p {
+	margin-top: 20px;
+}
+
+@media (min-width:  800px) {
+	graphic-diptych {
+		flex-direction: row;
+		align-items: center;
+		/*background-image: url('../leaf.svg');*/
+/*		background-size: 80%;
+		background-position: 50% 40%;
+		background-repeat: no-repeat;*/
+
+		/*margin-bottom: 15vh;*/
+
+		
+	}
+
+
+	graphic-diptych text-content {
+	}
+
+	graphic-diptych :is(picture, text-content) {
+		/*flex-basis: 50%;*/
+	}
+
+	/*graphic-diptych h1 {
+		color: var(--paper);
+		-webkit-text-stroke: 2px var(--ink);
+	}*/
+
+	
+}
+
+graphic-diptych picture{
+	/*align-self: flex-start;*/
+	position: relative;
+	display: none;
+}
+
+graphic-diptych text-content {
+	color: var(--weed-white);
+	text-align: center;
+	
+}
+
+
+
+@media (min-width:  1500px) {
+
+	
+
+
+
+}

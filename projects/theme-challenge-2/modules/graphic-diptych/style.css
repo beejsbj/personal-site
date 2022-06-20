@@ -1,0 +1,65 @@
+
+graphic-diptych {
+	display: block;
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	padding: 10vh 0;
+	
+
+
+	position: relative;
+
+}
+
+
+
+
+
+graphic-diptych p {
+	margin-top: 20px;
+}
+
+@media (min-width:  800px) {
+	graphic-diptych {
+		flex-direction: row;
+		align-items: center;
+		background-image: url('../leaf.svg');
+		background-size: 80%;
+		background-position: 50% 40%;
+		background-repeat: no-repeat;
+
+		padding-bottom: 20vh;
+	}
+
+	graphic-diptych :is(picture, text-content) {
+		/*flex-basis: 50%;*/
+	}
+
+	/*graphic-diptych h1 {
+		color: var(--paper);
+		-webkit-text-stroke: 2px var(--ink);
+	}*/
+
+	graphic-diptych text-content {
+		position: absolute;
+		bottom: 9vh;
+	}
+}
+
+graphic-diptych picture{
+	/*align-self: flex-start;*/
+	position: relative;
+}
+
+
+
+
+
+@media (min-width:  1500px) {
+
+	
+
+
+
+}

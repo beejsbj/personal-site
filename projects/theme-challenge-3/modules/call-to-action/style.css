@@ -1,0 +1,21 @@
+
+call-to-action {
+	display: block;
+	/*border: 4px solid orange;*/
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 10vh 0;
+
+	color: var(--ink);
+
+}
+
+call-to-action .button {
+	margin-top: 20px;
+}
+
+
+.sign-up call-to-action {
+	color: var(--weed-white);
+}

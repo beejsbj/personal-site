@@ -1,0 +1,132 @@
+/* 
+	BTW in case it isn't obvious... the whole PSSST-CSS idea is a joke 
+	like... (it's just CSS).
+*/
+@import 'typography.css';
+
+
+
+
+
+/* P reset */
+@import 'preset.css';
+
+/* S etup */
+@import 'setup.css';
+
+/* S setings */
+@import 'settings.css';
+/*@import 'developer-styles.css';*/
+
+/* S tructure */
+@import 'structure.css';
+
+/* T ypography */
+/*@import 'typography.css';*/
+
+/* C omponents */
+@import 'components.css';
+
+/* S tuff (modules) */
+@import 'modules.css';
+
+/* S ections and more stuff */
+
+/* then other contextual styles */
+body {
+	background-image: url('../images/lines.svg');
+	background-size: contain;
+	background-repeat: repeat-y;
+	background-position: 95% 0%;
+	background-color: var(--paper);
+	color: var(--ink);
+}
+
+body > header {
+	background-color: var(--color);
+	border-top: 30px solid var(--weed-primary-color);
+}
+
+/*section:nth-child(odd) {
+    background-image: url('../images/leaf.svg');
+
+   Center and scale the image nicely 
+	  background-position: center center;
+	  background-repeat: no-repeat;
+	  background-size: cover;
+}*/
+
+
+section, header, footer {
+	padding: 0 10px;
+}
+
+
+
+section.welcome {
+	/*background-image: url('../images/lines.svg');*/
+/*	background-size: 90%;
+	background-repeat: no-repeat;
+	background-position: 90% 90%;*/
+}
+
+
+section.sign-up {
+	/*min-height: 300px;*/
+	/*color: var(--weed-white);*/
+
+	background-color: var(--weed-secondary-color);
+	background-image: url('../images/mug.jpg');
+	background-position: 80% 0%;
+	background-size: cover;
+	background-repeat: no-repeat;
+	mix-blend-mode: darken;
+}
+
+@media (min-width: 1000px) {
+	section.sign-up {
+		background-size: 1200px;
+
+	}
+}
+
+
+section:is(.sign-up, .get-involved) inner-column {
+	max-width: var(--tight);
+}
+
+section.get-involved {
+	background-color: var(--color);
+}
+
+footer {
+	
+	background-color: var(--weed-black);
+}
+
+section.get-involved .button {
+	background-color: black;
+	color: white;
+}
+
+
+@media (prefers-color-scheme: dark) {
+	/*header {
+		background-color: var(--weed-primary-color-dark);
+	}*/
+
+	section.sign-up {
+
+		mix-blend-mode: normal;
+	}
+
+	/*section.sign-up .button {
+		background-color: var(--black);
+		color: var(--white);
+	}*/
+
+	section.get-involved {
+		background-color: var(--highlight);
+		color: var(--weed-black);
+	}
+}
