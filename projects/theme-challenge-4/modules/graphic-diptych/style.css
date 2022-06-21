@@ -12,8 +12,15 @@ graphic-diptych {
 
 	position: relative;
 
+
+
 }
 
+@media (min-width:  700px) {
+	graphic-diptych {
+		padding: 150px 0;
+	}
+}
 
 
 

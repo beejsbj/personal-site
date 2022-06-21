@@ -13,9 +13,10 @@ site-map {
 
 site-map .logo {
 	max-width: 180px;
-	margin-bottom: 13px;
+	/*margin-bottom: 13px;*/
 	position: relative;
 	bottom: 5px;
+	margin-bottom: 5px;
 }
 
 site-map .logo * {
@@ -36,3 +37,10 @@ site-map .site-menu li:not(:first-of-type) {
 site-map .x-menu {
 	padding: 15px 10px;
 }
+
+
+site-map .x-menu a,
+site-map .site-menu a {
+	padding: 5px 0;
+}
+

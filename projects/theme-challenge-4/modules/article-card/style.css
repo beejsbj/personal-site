@@ -2,7 +2,7 @@
 .article-card {
 	display: block;
 	/*border: 2px solid var(--weed-secondary-color);*/
-	/*border-radius: 30px;*/
+	border-radius: 2px;
 	overflow: hidden;
 	
 	display: flex;
@@ -65,12 +65,12 @@
 @media (min-width:  1200px) {
 	article-grid ul li {
 		position: relative;
-		/*min-height: 300px;
-		max-height: 300px;*/
-		background-color: var(--weed-gray);
+
 
 
 	}
+
+
 
 	.article-card picture {
 		background-color: var(--weed-gray);
@@ -84,7 +84,7 @@
 		
 
 		/*max-height: 450px;*/
-
+		transition: 0.2s;
 	}
 
 
@@ -94,8 +94,38 @@
 		left: 0;
 		bottom: 0;
 		background-color: initial;
+		display: none;
+		transition: 0.2s;
+		max-width: 300px;
 	}
-	
+
+
+	.article-card:hover picture {
+		position: relative;
+		z-index: 1;
+		background-color: initial;
+		transform: scale(1.1);
+
+	}
+
+	.article-card:hover picture::before {
+		content: "";
+		height: 100%;
+		width: 100%;
+		position: absolute;
+		background-color: hsla(105, 20%, 10%, 1.00);
+		opacity: 0.6;
+		top: 0;
+		left: 0;
+		z-index: -1;
+	}
+
+	.article-card:hover text-content {
+		display: flex;
+		z-index: 1;
+		color: var(--weed-white);
+	}
+
 }
 
 

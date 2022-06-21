@@ -7,7 +7,7 @@ mast-head {
 	align-items: center;
 	justify-content: space-between;
 	flex-wrap: wrap;
-	color: var(--ink);
+	color: var(--weed-white);
 	
 }
 mast-head .site-menu {
@@ -28,12 +28,22 @@ mast-head .logo {
 }
 
 mast-head .logo * {
-	fill: var(--ink);
+	fill: var(--weed-white);
+}
+
+.logo:hover .leaf {
+	fill: red;   /* todo*/
 }
 
 .logo .word {
 	transform: translate(-36px 45.5px);
 }
+
+
+
+
+
+
 
 mast-head nav ul {
 	display: flex;
