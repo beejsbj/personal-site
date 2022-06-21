@@ -10,7 +10,7 @@ articles-intro {
 
 @media(min-width: 800px ){
 	articles-intro {
-		background-image: url('../leaf.svg');
+		/*background-image: url('../leaf.svg');*/
 		background-size: 90%;
 		background-position: center center;
 		background-repeat: no-repeat;
@@ -51,7 +51,7 @@ article-grid ul {
 	article-grid ul {
 		display: grid;
 		grid-template-columns: repeat(8, 1fr);
-	    grid-template-rows: repeat(8, 1fr);
+	    grid-template-rows: repeat(7, 1fr);
 	    grid-gap: 15px;
 
 	    /*display: grid;
