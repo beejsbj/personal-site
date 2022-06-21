@@ -39,6 +39,14 @@
 			</inner-column>
 			</section>
 
+			<section class='welcome-peek' id='welcome-peek'>
+			<inner-column>
+
+				<?php include('modules/carousel/template.php'); ?>
+
+			</inner-column>
+			</section>
+
 
 			<section class='sign-up' id='sign-up'>
 			<inner-column>

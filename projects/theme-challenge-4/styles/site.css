@@ -34,12 +34,19 @@
 
 /* then other contextual styles */
 body {
-	background-image: url('../images/leaf-art.jpg'), url('../images/flower.jpg');
-	background-size: 100vw 800px, 450px;
-	background-repeat: no-repeat, repeat-x;
-	background-position: center 30px, 50% 25%;
+	background-image: url('../images/leaf-art.jpg');
+	background-size: 1500px;
+	background-attachment: attached;
+	background-position: center 0;
+	background-repeat: no-repeat;
 	background-color: var(--paper);
 	color: var(--ink);
+}
+
+@media (min-width:  1530px) {
+	body {
+		background-size: contain;
+	}
 }
 
 body > header {
@@ -48,14 +55,7 @@ body > header {
 	/*background-color: var(--paper);*/
 }
 
-/*section:nth-child(odd) {
-    background-image: url('../images/leaf.svg');
 
-   Center and scale the image nicely 
-	  background-position: center center;
-	  background-repeat: no-repeat;
-	  background-size: cover;
-}*/
 
 
 section, header, footer {
@@ -67,11 +67,11 @@ section, header, footer {
 
 section.welcome {
 /*	background-image: url('../images/store.jpg');
-	background-image: url('../images/flower-wide.jpg');*/
-	/*background-image: url('../images/leaf-art.jpg');*/
+	background-image: url('../images/flower-wide.jpg');
+	background-image: url('../images/leaf-art.jpg');
 	background-size: cover;
 	background-repeat: no-repeat;
-	background-position: center center;
+	background-position: center center;*/
 
 	padding: 15vh 0;
 
@@ -87,7 +87,7 @@ section.sign-up {
 	background-position: 80% 0%;
 	background-size: cover;
 	background-repeat: no-repeat;
-	mix-blend-mode: multiply;
+
 }
 
 @media (min-width: 1000px) {

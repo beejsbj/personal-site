@@ -1,4 +1,16 @@
 
+
+
+footer {
+	background-image: url('../../images/outline-leaf.svg');
+	background-size: cover;
+	background-position: 0;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+
+
 site-map {
 	display: block;
 	/*border: 4px solid green;*/

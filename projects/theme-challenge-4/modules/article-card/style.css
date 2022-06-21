@@ -73,7 +73,7 @@
 
 
 	.article-card picture {
-		background-color: var(--weed-gray);
+		background-color: hsla(105, 20%, 90%, 1.00);
 
 
 		max-height: initial;

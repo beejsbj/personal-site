@@ -31,7 +31,7 @@
 	max-width: 40px;
 	top: -1.1em;
 	right: -1.2em;
-	fill: var(--color);
+	fill:  var(--weed-secondary-color);
 	transform: rotate(20deg);
 }
 

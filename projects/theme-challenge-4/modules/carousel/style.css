@@ -1,0 +1,39 @@
+
+.welcome-peek {
+	background-color: var(--paper);
+}
+
+.welcome-peek .inner-column {
+	max-width: 100%;
+}
+carousel-test {
+
+	display: flex;
+	flex-direction: row;
+	gap: 30px;
+	
+
+
+	padding: 50px 0;
+
+
+
+
+
+}
+
+
+carousel-test picture {
+	max-width: 350px;
+}
+
+
+
+@media (min-width:  700px) {
+	carousel-test {
+		padding: 100px 0;
+	}
+}
+
+
+
