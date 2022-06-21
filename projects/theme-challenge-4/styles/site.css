@@ -44,11 +44,8 @@ body {
 
 body > header {
 	/*background-color: var(--color);*/
-	border-top: 30px solid var(--highlight);
-	background-image: url('../images/leaf-art.jpg');
-	background-size: 100%;
-	background-repeat: no-repeat;
-	background-position: 90% 0%;
+	border-top: 30px solid var(--color);
+	background-color: var(--paper);
 }
 
 /*section:nth-child(odd) {
@@ -105,7 +102,7 @@ section:is(.sign-up, .get-involved) inner-column {
 }
 
 section.get-involved {
-	background-color: var(--color);
+	background-color: var(--weed-primary-color-dark);
 }
 
 footer {
@@ -113,10 +110,7 @@ footer {
 
 }
 
-section.get-involved .button {
-	background-color: black;
-	color: white;
-}
+
 
 
 @media (prefers-color-scheme: dark) {
@@ -134,8 +128,5 @@ section.get-involved .button {
 		color: var(--white);
 	}*/
 
-	section.get-involved {
-		background-color: var(--highlight);
-		color: var(--weed-black);
-	}
+	
 }

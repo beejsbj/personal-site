@@ -7,7 +7,7 @@ mast-head {
 	align-items: center;
 	justify-content: space-between;
 	flex-wrap: wrap;
-	color: var(--weed-white);
+	color: var(--ink);
 	
 }
 mast-head .site-menu {
@@ -22,10 +22,13 @@ mast-head .logo {
 	min-width: 150px;
 	max-width: 150px;
 
+	position: relative;
+	bottom: 2px;
+
 }
 
 mast-head .logo * {
-	fill: var(--weed-white);
+	fill: var(--ink);
 }
 
 .logo .word {

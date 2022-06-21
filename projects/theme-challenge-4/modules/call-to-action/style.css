@@ -16,6 +16,25 @@ call-to-action .button {
 }
 
 
-.sign-up call-to-action {
+call-to-action {
 	color: var(--weed-white);
+}
+
+
+
+.sign-up {
+	position: relative;
+	z-index: 1;
+}
+
+.sign-up::before {
+	content: "";
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	background-color: black;
+	opacity: 0.5;
+	top: 0;
+	left: 0;
+	z-index: -1;
 }

@@ -26,10 +26,11 @@ html {
 
 	/*marijuana colors*/
 	--weed-black: hsla(30, 3%, 13%, 1.00);
-	--weed-white: hsla(30, 3%, 98%, 1.00);
-	--weed-primary-color: hsla(81, 36%, 31%, 1.00);
-	--weed-primary-color-dark: hsla(105, 18%, 31%, 1.00);
+	--weed-white: hsla(105, 20%, 97%, 1.00);
+	--weed-primary-color: hsla(68, 45%, 40%, 1.00);
+	--weed-primary-color-dark: hsla(71, 47%, 19%, 1.00);
 	--weed-secondary-color: hsla(68, 45%, 40%, 1.00);
+	--weed-gray: hsla(105, 20%, 90%, 1.00);
 
 
 	--paper: var(--weed-white);
@@ -44,5 +45,8 @@ html {
 		--ink: var(--weed-white);
 		--color: var(--weed-primary-color-dark);
 		--highlight: var(--weed-primary-color);
+
+
+		--weed-gray: hsla(105, 20%, 10%, 1.00);
 	}
 }
