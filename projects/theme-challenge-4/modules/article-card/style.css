@@ -62,12 +62,12 @@
 /*gallerybreakpoint*/
 
 
-@media (min-width:  12000000px) {
-
-	.article-card {
+@media (min-width:  1200px) {
+	article-grid ul li {
 		position: relative;
 		/*min-height: 300px;
 		max-height: 300px;*/
+		background-color: var(--weed-gray);
 
 
 	}
@@ -76,7 +76,7 @@
 		background-color: var(--weed-gray);
 
 
-		
+		max-height: initial;
 
 
 		/*align-items: flex-end; */
