@@ -3,9 +3,15 @@
 
 <articles-intro>
 	<header>
-		<h2 class='attention-voice'>Heading for this section here</h2>
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/11/YLC-Icon-Dark-Green-copy-1.png" alt="">
+		</picture>
+		<h2 class='attention-voice'>Shop Local Cannabis Favourites
+		</h2>
 
-		<p>A short introduction explaining why these articles are here to help you understand if you want to read them.</p>
+		<p>Say high to our favourite deep roots and desirable flowers.</p>
+		<p>Shop our wide range of dry flower, vaporizers, edibles and CBD products
+online or in-person. We carry the most popular picks in the GTA.</p>
 	</header>
 
 	<article-grid>

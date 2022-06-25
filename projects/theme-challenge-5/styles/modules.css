@@ -4,6 +4,10 @@
 
 @import '../modules/carousel/style.css';
 
+@import '../modules/feature/style.css';
+
+@import '../modules/media/style.css';
+
 @import '../modules/call-to-action/style.css';
 @import '../modules/articles-intro/style.css';
 @import '../modules/article-card/style.css';

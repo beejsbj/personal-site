@@ -51,7 +51,7 @@ body {
 
 body > header {
 	/*background-color: var(--color);*/
-	border-top: 30px solid var(--color);
+
 	/*background-color: var(--paper);*/
 }
 
@@ -73,23 +73,12 @@ section.welcome {
 	background-repeat: no-repeat;
 	background-position: center center;*/
 
-	padding: 10vh 0;
+	padding: 7vh 0;
 
 }
 
 
-section.sign-up {
-	/*min-height: 300px;*/
-	/*color: var(--weed-white);*/
 
-	background-color: hsla(70, 46%, 39%, 1.00);
-	background-image: url('../images/mug.jpg');
-	background-image: url('https://source.unsplash.com/random/?marijuana,weed');
-	background-position: center center;
-	background-size: cover;
-	background-repeat: no-repeat;
-
-}
 
 @media (min-width: 1000px) {
 	section.sign-up {
@@ -99,13 +88,9 @@ section.sign-up {
 }
 
 
-section:is(.sign-up, .get-involved) inner-column {
-	max-width: var(--tight);
-}
 
-section.get-involved {
-	background-color: var(--weed-primary-color-dark);
-}
+
+
 
 footer {
 	

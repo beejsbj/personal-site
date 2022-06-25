@@ -1,5 +1,8 @@
 
 .latest {
+
+	background-color: var(--paper);
+
 	background-image: url('../../images/outline-leaf.svg');
 	background-size: cover;
 	background-position: 0;
@@ -10,7 +13,7 @@
 articles-intro {
 	display: block;
 	/*border: 4px solid purple;*/
-	padding: 10vh 0;
+	padding: 3vh 0;
 	
 }
 
@@ -24,7 +27,18 @@ articles-intro {
 }
 
 articles-intro header {
-	
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	align-items: center;
+	/*gap: 25px;*/
+}
+articles-intro header > picture {
+	width: 50px;
+}
+
+articles-intro header .attention-voice {
+	margin-top: 30px;
 }
 
 article-grid {
@@ -36,11 +50,23 @@ article-grid {
 
 article-grid ul {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 	grid-gap: 60px 20px;
 }
 
 
+media-item  {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+
+media-item article-grid ul {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	grid-gap: 40px;
+}
 
 /*gallerybreakpoint*/
 

@@ -14,6 +14,8 @@ mast-head {
 	justify-content: space-between;
 	flex-wrap: wrap;
 	color: var(--weed-white);
+	padding: 0 20px;
+	padding-top: 30px;
 	
 }
 mast-head .site-menu {
@@ -46,7 +48,9 @@ mast-head .logo * {
 }
 
 
-
+mast-head .button{
+	margin-left: 70px;
+}
 
 
 
@@ -61,13 +65,44 @@ mast-head nav .home {
 	padding: 15px 0;
 }
 
-mast-head nav a:not(.home, .button) {
+mast-head nav a:not(.home, .button, .icon-link) {
 	/*padding: .5em 1em;*/
 	display: none;
 }
 
+
+
+
+mast-head .icon-list {
+	display: flex;
+	gap: 5px;
+	margin-left: 50px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @media (min-width:  500px) {
-	mast-head nav a:not(.home, .button) {
+	mast-head nav a:not(.home, .button, .icon-link) {
 		padding: .2em 0.5em;
 		display: block;
 		font-weight: 700;
@@ -82,7 +117,7 @@ mast-head nav a:not(.home, .button) {
 		justify-content: space-between;
 		align-items: center;
 	}
-	mast-head nav a:not(.home, .button) {
+	mast-head nav a:not(.home, .button, .icon-link) {
 		padding: .5em 1em;
 
 	}

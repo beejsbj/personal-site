@@ -21,6 +21,10 @@ inner-column.tight {
 	max-width: var(--tight);
 }
 
+inner-column.less-tight {
+	max-width: var(--less-tight);
+}
+
 /*.site-header {
 	position: sticky;
 	top: 0;

@@ -39,13 +39,14 @@
 			</inner-column>
 			</section>
 
-			<section class='welcome-peek' id='welcome-peek'>
+			<section class='latest' id='latest'>
 			<inner-column>
 
-				<?php include('modules/carousel/template.php'); ?>
+				<?php include('modules/articles-intro/template.php'); ?>
 
 			</inner-column>
 			</section>
+
 
 
 			<section class='sign-up' id='sign-up'>
@@ -57,13 +58,14 @@
 			</section>
 
 
-			<section class='latest' id='latest'>
-			<inner-column>
+			<section class='feature' id='feature'>
+			<inner-column class="tight">
 
-				<?php include('modules/articles-intro/template.php'); ?>
+				<?php include('modules/feature/template.php'); ?>
 
 			</inner-column>
 			</section>
+
 
 
 			<section class='get-involved' id='get-involved'>
@@ -74,10 +76,26 @@
 			</inner-column>
 			</section>
 
+			<section class='media' id='media'>
+			<inner-column >
+
+				<?php include('modules/media/template.php'); ?>
+
+			</inner-column>
+			</section>
+
+			<section class='third-cta' id='third-cta'>
+			<inner-column>
+
+				<?php include('modules/call-to-action/template.php'); ?>
+
+			</inner-column>
+			</section>
+
 		</main>
 
 		<footer>
-		<inner-column>
+		<inner-column class="less-tight">
 			
 			<?php include('modules/site-map/template.php'); ?>
 

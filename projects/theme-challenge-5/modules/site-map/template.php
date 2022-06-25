@@ -10,81 +10,54 @@
 				</a>
 			</li>
 
-			<li>
-				<a href='#'>Some page</a>
-			</li>
-
-			<li>
-				<a href='#'>Some other page</a>
-			</li>
 		</ul>
 	</nav>
 
 
 	<nav class='x-menu'>
-		<h3 class='strong-voice'>Menu heading here</h3>
+		<h3 class='strong-voice'>Find your way	</h3>
 
 		<ul>
 			<li>
-				<a href='#'>Some page</a>
+				<a href='#'>Home</a>
 			</li>
 
 			<li>
-				<a href='#'>Some page</a>
+				<a href='#'>About</a>
 			</li>
 
 			<li>
-				<a href='#'>Some other page</a>
+				<a href='#'>Shop</a>
 			</li>
 
 			<li>
-				<a href='#'>Some page</a>
+				<a href='#'>Media</a>
 			</li>
 		</ul>
 	</nav>
 
 	<nav class='x-menu'>
-		<h3 class='strong-voice'>Menu heading here</h3>
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2022/05/Ontario_Cannabis_Seal.png" alt="">
+		</picture>
+	</nav>
+
+	<nav class='x-menu'>
 		
-		<ul>
-			<li>
-				<a href='#'>Some page</a>
-			</li>
+		<li class="icon-list">
+				<a class='icon-link' href='#'>
 
-			<li>
-				<a href='#'>Some page</a>
-			</li>
+				<?php include('images/facebook.php'); ?>
+					
+				</a>
 
-			<li>
-				<a href='#'>Some other page</a>
-			</li>
+				<a class='icon-link' href='#'>
 
-			<li>
-				<a href='#'>Some page</a>
+				<?php include('images/instagram.php'); ?>
+					
+				</a>
+				
 			</li>
-		</ul>
-	</nav>
-
-	<nav class='x-menu'>
-		<h3 class='strong-voice'>Menu heading here</h3>
-		
-		<ul>
-			<li>
-				<a href='#'>Some page</a>
-			</li>
-
-			<li>
-				<a href='#'>Some page</a>
-			</li>
-
-			<li>
-				<a href='#'>Some other page</a>
-			</li>
-
-			<li>
-				<a href='#'>Some page</a>
-			</li>
-		</ul>
 	</nav>
 
 

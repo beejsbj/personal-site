@@ -42,7 +42,7 @@ body * {
 }
 
 .article-card .strong-voice {
-	font-size: 1.1rem;
+	font-size: 1rem;
 	font-weight: 700;
 }
 
@@ -83,6 +83,7 @@ graphic-diptych p {
 	font-family: 'Lato', sans-serif;
 	font-size: 0.9rem;
 	line-height: 1.4em;
+	color: hsla(110, 6%, 40%, 1.00);
 }
 
 

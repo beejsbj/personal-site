@@ -14,8 +14,9 @@ html {
 
 	
 
-	--standard: 1140px;
-	--tight: 800px;
+	--standard: 2000px;
+	--less-tight: 1200px;
+	--tight: 900px;
 
 
 
@@ -26,7 +27,7 @@ html {
 
 	/*marijuana colors*/
 	--weed-black: hsla(65, 10%, 10%, 1.00);
-	--weed-white: hsla(105, 20%, 97%, 1.00);
+	--weed-white: hsla(54, 100%, 96%, 1.00);
 	--weed-primary-color: hsla(68, 45%, 40%, 1.00);
 	--weed-primary-color-dark: hsla(71, 47%, 19%, 1.00);
 	--weed-secondary-color: hsla(68, 45%, 40%, 1.00);

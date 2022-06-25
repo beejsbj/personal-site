@@ -1,11 +1,46 @@
 
 <call-to-action>
-	<h2 class='heading attention-voice'>High! Join us on the Journey to Buzztown...</h2>
+	<picture class="first-cta">
+		<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Web-Image-1-scaled-1.jpg" alt="">
+	</picture>
+	<div class="image-grid">
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Social-Post-Samples-8.png" alt="">
+		</picture>
 
-	<p class='story'>If they want to take some type of action. Maybe it's to tell them about something they can do.</p>
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Social-Post-Samples-7.png" alt="">
+		</picture>
 
-	<a class='arrow-link' href='#'>
-		Call to Action <?php include('modules/leaf.php'); ?>
-			
-		</a>
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Social-Post-Samples-6-1.png" alt="">
+		</picture>
+
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Social-Post-Samples-5-1.png" alt="">
+		</picture>
+
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Social-Post-Samples-3-1.png" alt="">
+		</picture>
+
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Social-Post-Samples-4-1.png" alt="">
+		</picture>
+
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Social-Post-Samples-2-1.png" alt="">
+		</picture>
+
+		<picture>
+			<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Social-Post-Samples-1-1.png" alt="">
+		</picture>
+
+
+
+	</div>
+
+	<picture class="third-cta-img">
+		<img src="https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Web-Image-2.png" alt="">
+	</picture>
 </call-to-action>

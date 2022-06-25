@@ -2,33 +2,53 @@
 
 $articles = [
 	[
-		"heading" => "Article or product",
-		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
+		"heading" => "CANN Tonic",
+		"description" => "$32.99",
 		"thumbnail" => "drinks.png",
 	],
 	[
-		"heading" => "Destination or option",
-		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
+		"heading" => "Afghan Kush",
+		"description" => "$25.99",
 		"thumbnail" => "flower.jpg",
 	],
 	[
-		"heading" => "Story or something",
-		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
+		"heading" => "CBD Carts",
+		"description" => "$7.99",
 		"thumbnail" => "carts.jpg",
 	],
 	[
-		"heading" => "Banana tandori",
-		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
+		"heading" => "Shipwreck Edibles",
+		"description" => "$12.99",
 		"thumbnail" => "edible.jpg",
 	],
 	[
-		"heading" => "Bar B Q",
-		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
+		"heading" => "Mary's Low THC Oil",
+		"description" => "$32.99",
 		"thumbnail" => "oil.jpg",
 	],
 	[
-		"heading" => "Marsala",
-		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
+		"heading" => "Shatter",
+		"description" => "$11.99",
 		"thumbnail" => "concentrate.jpeg",
 	],
+];
+
+
+$media = [
+	[
+		"heading" => "Best Cannabis Recipes to Cook on 4/20",
+		"description" => "April 20th is one of the most anticipated days for the cannabis community to celebrate all things cannabis. People worldwide attend cannabis-themed...",
+		"thumbnail" => "media1.png",
+	],
+	[
+		"heading" => "9 Reasons to Buy Edibles: Why You Should Consider Edibles Now?",
+		"description" => "Edibles are becoming increasingly popular for a good reason. They're discreet and delicious, and they're perfect for those who prefer not to...",
+		"thumbnail" => "media2.jpeg",
+	],
+	[
+		"heading" => "How to Find the Best Weed Vape Pens in Scarborough",
+		"description" => "Whether you’re new to the world of weed or not, you may have seen vape pens before. They might have even caught your curiosity.  Are you looking for...",
+		"thumbnail" => "vapepen.jpg",
+	],
+
 ];
