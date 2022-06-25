@@ -8,7 +8,7 @@
 		<h2 class='attention-voice'>Featured Cannabis Products
 		</h2>
 
-		<p>High neighbour! We keep up with the fast-paced changes in the
+		<p class="calm-voice">High neighbour! We keep up with the fast-paced changes in the
 			cannabis industry, allowing us to provide you with the latest and
 			highest quality local products. Stop by one of our retail stores or
 			check out our new and local bud online.</p>

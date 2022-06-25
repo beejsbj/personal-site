@@ -70,7 +70,7 @@
 .icon-link {
 	
 
-	background-color: var(--weed-white);
+	background-color: hsla(8, 71%, 58%, 1.00);
 
 	border-radius: 5px;
 	max-width: 32px;
@@ -82,7 +82,7 @@
 .icon-link svg {
 	width: 100%;
 	height: auto;
-	fill: var(--color);
+	fill: var(--weed-white);
 	font-size: 0px;
 }
 
