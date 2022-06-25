@@ -7,7 +7,7 @@ call-to-action {
 	align-items: center;
 	padding: 12vh 0;
 
-	color: var(--paper);
+	color: var(--weed-white);
 
 
 	text-align: center;
@@ -32,7 +32,7 @@ call-to-action .button .leaf {
 .sign-up,
 .get-involved {
 
-	mix-blend-mode: darken;
+
 	position: relative;
 	z-index: 1;
 }
