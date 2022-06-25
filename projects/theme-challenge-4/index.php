@@ -6,9 +6,9 @@
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 
-		<title>Layout Theme Challenge</title>
+		<title>Theme Challenge</title>
 		<meta name='description' content='Applying themes to given html'>
-		<meta property='og:image' content=''>
+		<meta property='og:image' content='https://yourlocalcannabis.com/wp-content/uploads/2020/12/YLC-Social-Post-Samples-3-1.png'>
 
 		<link rel='stylesheet' href='styles/site.css'>
 		<link rel="preconnect" href="https://fonts.googleapis.com">

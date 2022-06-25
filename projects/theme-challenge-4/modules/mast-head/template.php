@@ -11,11 +11,11 @@
 			</li>
 
 			<li>
-				<a href='../theme-challenge-1'>Version 1</a>
+				<a href='../theme-challenge-1'>Home</a>
 			</li>
 
 			<li>
-				<a href='#'>Final</a>
+				<a href='#'>About</a>
 			</li>
 		</ul>
 	</nav>

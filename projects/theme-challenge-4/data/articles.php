@@ -2,33 +2,35 @@
 
 $articles = [
 	[
-		"heading" => "Article or product",
+		"heading" => "CANN Tonic",
 		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
 		"thumbnail" => "drinks.png",
 	],
 	[
-		"heading" => "Destination or option",
+		"heading" => "Afghan Kush",
 		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
 		"thumbnail" => "flower.jpg",
 	],
 	[
-		"heading" => "Story or something",
+		"heading" => "CBD Carts",
 		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
 		"thumbnail" => "carts.jpg",
 	],
 	[
-		"heading" => "Banana tandori",
+		"heading" => "Shipwreck Edibles",
 		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
 		"thumbnail" => "edible.jpg",
 	],
 	[
-		"heading" => "Bar B Q",
+		"heading" => "Mary's Low THC Oil",
 		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
 		"thumbnail" => "oil.jpg",
 	],
 	[
-		"heading" => "Marsala",
+		"heading" => "Shatter",
 		"description" => "Here's a little info to help you understand if this is a thing you want to know about.",
 		"thumbnail" => "concentrate.jpeg",
 	],
 ];
+
+
