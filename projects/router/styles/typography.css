@@ -44,3 +44,13 @@ code {
 	font-size: 1.1em;
 	color: green;
 }
+
+
+p {
+	font-size: 100px;
+}
+
+a {
+	font-size: 40px;
+	color: var(--ink);
+}

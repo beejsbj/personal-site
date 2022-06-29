@@ -1,0 +1,12 @@
+
+jolly-grid {
+	display: block;
+	border: 1px solid red;
+	display: flex;
+	flex-wrap: wrap;
+
+}
+
+jolly-grid picture {
+	max-width: 300px;
+}

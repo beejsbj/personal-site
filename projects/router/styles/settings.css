@@ -12,8 +12,8 @@ html {
 
 	--corners: 10px; /* or whatevers */
 
-	--paper: var(--white);
-	--ink: var(--black);
+	--paper: hsla(48, 60%, 53%, 1.00);
+	--ink: hsla(356, 60%, 48%, 1.00);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,8 +29,8 @@ html {
 		--shadow: rgba(0,0,0,.8);
 
 		--corners: 10px; /* or whatevers */
-
+/*
 		--paper: red;
-		--ink: yellow;
+		--ink: yellow;*/
 	}
 }
