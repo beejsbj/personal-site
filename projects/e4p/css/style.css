@@ -122,7 +122,7 @@ form {
     color: white;
     text-align: center;
     font-size: 1.2rem;
-    position: absolute;
+    /*position: absolute;*/
     /*left: 40%;*/
     /*bottom: -50%;*/
     width: 100%;
@@ -168,7 +168,7 @@ input{
     padding: 10px;
 
     /* style */
-    font-size: large;
+    font-size: 25px;
     background-color: hsla(360, 88%, 30%, 1.00);
     text-align: center;
 
@@ -184,7 +184,7 @@ input:focus:not(input[type="radio"]) {
     border: none;
     color: white;
     background-color: black;
-    font-size: 25px;
+    /*font-size: 25px;*/
     line-height: 2;
 }
 ::placeholder {
@@ -237,20 +237,13 @@ button:hover {
 
     color: white;
     font-family: expose;
-    font-size: 70px;
+    /*font-size: 70px;*/
 
     border: none;
     background-color: black;
     box-shadow:  0px 20px 30px black;
 }
-button:active {
-    
 
-    color: black;
-    background-color: hsla(244, 100%, 50%, 1.00);
-    box-shadow:  0px 40px 100px hsla(244, 100%, 50%, 1.00);
-    transform: translateY(15px)
-  }
 
 
 
