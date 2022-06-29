@@ -24,6 +24,17 @@ if (isset($_GET["page"])) {
 		<meta property='og:image' content='A CSS methodology so great, it needed a name.'>
 
 		<link rel='stylesheet' href='styles/site.css'>
+
+		<style>
+			p {
+				font-size: 100px;
+			}
+
+			a {
+				font-size: 40px;
+				color: blue;
+			}
+		</style>
 	</head>
 
 
