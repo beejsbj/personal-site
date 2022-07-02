@@ -1,76 +1,89 @@
 image-grid {
 	display: block;
-	border: 1px solid red;
+	/*border: 1px solid red;*/
 	display: flex;
 	flex-wrap: wrap;
-
-	gap: 20px;
-
-
-
+	gap: 30px;
 }
 
 image-grid picture {
 	max-width: 300px;
+	max-height: 200px;
+	display: flex;
+	align-items: center;
+	transform: skewY(2deg);
 }
-
-flag-grid {
-	display: block;
-	flex-wrap: wrap;
-	gap: 50px;
-	padding: 10px;
-}
-
-
-.flex-cont {}
-
-.flag-container {
-	/* 	position: relative; */
-}
-
-flag-grid a {}
 
 .flag {
-	width: 300px;
-	height: 200px;
-	/* 	position:absolute; */
-	/* 	left:100px; top:100px; */
-	/*background-size: 300px auto;*/
-	/*background-position: center center;*/
-	/*overflow: hidden;*/
-}
-
-.flag-element {
-	width: 2px;
-	height: 100%;
-	display: inline-block;
 	position: relative;
-	background-size: 300px auto;
-	/*background-position: center center;*/
-	box-shadow: 0 1px grey, 0 -1px gray;
-	-webkit-animation: wave 3s ease-in-out infinite alternate;
-	animation: wave 2s ease-in-out infinite alternate;
+	/*margin: 50px auto;*/
+	box-shadow: 0 0 15px 0 rgba(0, 0, 0, .15)
 }
 
-
-@webkit-keyframes wave {
-	0% {
-		-webkit-transform: translate3d(0, 5%, 0);
-	}
-
-	100% {
-		-webkit-transform: translate3d(0, -5%, 0);
-	}
+.flag img {
+	/*  width: 400px;
+  height: 250px*/
 }
 
-@keyframes wave {
-	0% {
-		transform: translate3d(0, 5%, 0);
-		-webkit-transform: translate3d(0, 5%, 0);
+.flag::after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(45deg, rgba(0, 0, 0, .25) 0%, rgba(255, 255, 255, .25) 15%, rgba(0, 0, 0, .25) 30%, rgba(255, 255, 255, .25) 45%, rgba(0, 0, 0, .25) 60%, rgba(255, 255, 255, .25) 75%, rgba(0, 0, 0, .25) 90%);
+}
+
+/****************** Wobble Top */
+
+
+@keyframes hvr-wobble-top {
+	16.65% {
+		-webkit-transform: skewY(-12deg);
+		transform: skewY(-10deg);
 	}
 
-	100% {
-		transform: translate3d(0, -5%, 0);
-		-webkit-transform: translate3d(0, -5%, 0);
+	33.3% {
+		-webkit-transform: skewY(10deg);
+		transform: skewY(8deg);
 	}
+
+	49.95% {
+		-webkit-transform: skewY(-6deg);
+		transform: skewY(-4deg);
+	}
+
+	66.6% {
+		-webkit-transform: skewY(4deg);
+		transform: skewY(2deg);
+	}
+
+	83.25% {
+		-webkit-transform: skewY(-2deg);
+		transform: skewY(-1deg);
+	}
+
+}
+
+.hvr-wobble-top {
+
+
+
+
+	transform-origin: 5% 100% ;
+}
+
+.hvr-wobble-top:hover,
+.hvr-wobble-top:focus,
+.hvr-wobble-top:active {
+	-webkit-animation-name: hvr-wobble-top;
+	animation-name: hvr-wobble-top;
+	-webkit-animation-duration: 1s;
+	animation-duration: 2s;
+	-webkit-animation-timing-function: ease-in-out;
+	animation-timing-function: ease-in-out;
+	-webkit-animation-iteration-count: 1;
+	animation-iteration-count: 1;
 }

@@ -1,8 +1,12 @@
 /* Should we pull in @fonts here? */
-
+body {
+	font-family: sans-serif;
+}
 .loud-voice	{
 	font-family: sans-serif;
 	font-size: clamp(36px, 5vw, 60px);
+	margin-bottom: 40px;
+
 }
 @media (min-width: 600px) {
 	.loud-voice {

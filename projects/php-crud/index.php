@@ -1,12 +1,8 @@
 <!doctype html>
 <?php
 include('functions.php');
-
-
-
 session_start();
 
-$_SESSION['name'] = 'password';
 
 // echo $_SESSION['name'];
 
@@ -23,32 +19,26 @@ if (isset($_GET["page"])) {
 }
 
 
-if (isset($_GET["jollyroger"])) {
-	$pageName = "Jolly Roger Day " . $_GET["jollyroger"];
-
-	
-}
-
 
 
 
 ?>
 <html lang='en' class='special-magic no-js'>
+	<?php include('head.php') ?>
 
-<?php include('head.php') ?>
-
-<body>
-
-	<header>
+	<body>
 		<?php include('modules/header/index.php') ?>
-	</header>
+		<main class="page-content">
+			<inner-column>
+				<?php 	getTemplate($page);	  ?>
+			</inner-column>
+		</main>
+		<div class="ocean">
+			
+			<div class="wave"><?php include('images/ship.php') ?></div>
+			<div class="wave"></div>
 
-	<main class="page-content">
-		<inner-column>
-			<?php 	getTemplate($page);	  ?>
-		</inner-column>
-	</main>
-
-</body>
+		</div>
+	</body>
 
 </html>

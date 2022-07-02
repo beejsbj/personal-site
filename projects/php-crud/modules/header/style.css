@@ -1,12 +1,13 @@
 .nav-bar {
-	background-color: hsla(200, 100%, 50%, 1.00);
-	color: white;
+	background-color: hsla(188, 35%, 58%, 1.00);
+	/*color: white;*/
 
 }
 
 .nav-bar nav {
 	display: flex;
 	gap: 10px;
+	justify-content: center;
 }
 
 
@@ -27,5 +28,6 @@ header {
 
 
 header nav .active {
-	background-color: darkgreen;
+	background-color: hsla(211, 100%, 35%, 1.00);;
+	color: white;
 }

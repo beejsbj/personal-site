@@ -1,39 +1,122 @@
 /* P reset */
 @import 'preset.css';
-
 /* S etup */
 @import 'setup.css';
-
 /* S setings */
 @import 'settings.css';
 @import 'developer-styles.css';
-
 /* S tructure */
 @import 'structure.css';
-
 /* T ypography */
 @import 'typography.css';
-
 /* C omponents */
 @import 'components.css';
 @import 'forms.css';
-
 /* S tuff (modules) */
 @import 'modules.css';
 
 /* S ections and more stuff */
-
 /* then other contextual styles */
 body {
-	/*background-color: var(--paper);*/
-	color: black;
+  /*background-color: var(--paper);*/
+  color: black;
 }
 
 .page-content {
-	background-color: hsla(211, 100%, 35%, 1.00);
+  /*background-color: hsla(211, 100%, 35%, 1.00);*/
+  overflow: hidden;
 }
 
 .my-fantastic-image {
-	max-width: 300px;
-	border-bottom-right-radius: 30px;
+  max-width: 300px;
+  border-bottom-right-radius: 30px;
+}
+
+.ship {
+  width: 800px;
+  height: auto;
+  position: absolute;
+  top: -520px;
+  left: 55%;
+  animation: rock-boat 9s ease-in-out infinite;
+}
+
+@media(max-width: 800px) {
+  .ship {
+    width: 450px;
+    height: auto;
+    position: absolute;
+    top: -250px;
+    left: 35%;
+    animation: rock-boat 9s ease-in-out infinite;
+  }
+}
+
+@media(max-width: 400px) {
+  .ship {
+
+    left: 15%;
+
+  }
+}
+
+@keyframes rock-boat {
+  25% {
+    transform: rotate(-5deg);
+  }
+
+  50% {
+    transform: rotate(5deg);
+  }
+
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+.ocean {
+  height: 5%;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #015871;
+}
+
+.wave {
+  background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/85486/wave.svg) repeat-x;
+  position: absolute;
+  top: -198px;
+  width: 100%;
+  height: 198px;
+  animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+  transform: translate3d(0, 0, 0);
+}
+
+.wave:nth-of-type(2) {
+  top: -175px;
+  animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) -.125s infinite, swell 7s ease -1.25s infinite;
+  opacity: 1;
+}
+
+@keyframes wave {
+  0% {
+    background-position-x: 0;
+  }
+
+  100% {
+    background-position-x: -1600px;
+  }
+}
+
+@keyframes swell {
+
+  0%,
+  100% {
+    transform: translate3d(0, -25px, 0);
+  }
+
+  50% {
+    transform: translate3d(0, 5px, 0);
+  }
 }

@@ -1,8 +1,28 @@
 
 jolly-roger {
 	display: block;
-	max-width: 600px;
+	/*max-width: 600px;*/
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
 
 }
 
+@media(min-width: 800px){
+	jolly-roger {
+		flex-direction: row;
+		/*align-items: center;*/
+	}
 
+	jolly-roger > * {
+		flex-basis: 50%;
+	}
+}
+
+
+text-content {
+	display: block;
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+}
