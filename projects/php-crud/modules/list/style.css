@@ -4,6 +4,7 @@ image-grid {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 30px;
+	margin-bottom: 200px;
 }
 
 image-grid picture {
