@@ -79,13 +79,13 @@
         </picture> -->
 	<div class="image-input-container">
 		<field>
-			<label>Upload the Image</label>
+			<label>Link to image</label>
 			<input id="ff" type="text" name="imageLink">
 		</field>
 		<h3 class="attention-voice"> OR </h3>
 		<field>
 			<label>Upload the Image</label>
-			<input id="ff" type="file" name="imageUpload" accept="image/*">
+			<input id="ff" type="file" name="imageUpload" accept="image/.jpg, image/.png, image/.jpeg">
 		</field>
 	</div>
 	<field>

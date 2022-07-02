@@ -41,13 +41,13 @@ body {
   animation: rock-boat 9s ease-in-out infinite;
 }
 
-@media(max-width: 800px) {
+@media(max-width: 2000px) {
   .ship {
-    width: 450px;
+    width: 480px;
     height: auto;
     position: absolute;
-    top: -250px;
-    left: 35%;
+    top: -260px;
+    left: 65%;
     animation: rock-boat 9s ease-in-out infinite;
   }
 }
