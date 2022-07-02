@@ -25,4 +25,6 @@
 
 
 
-	
+# Using route-based info for styling
+	adding a class, to a link changing its style based on the rputed page.
+		used to make the current link highlighted	

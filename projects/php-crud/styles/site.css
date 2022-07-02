@@ -25,8 +25,12 @@
 
 /* then other contextual styles */
 body {
-	background-color: var(--paper);
-	color: var(--ink);
+	/*background-color: var(--paper);*/
+	color: black;
+}
+
+.page-content {
+	background-color: hsla(211, 100%, 35%, 1.00);
 }
 
 .my-fantastic-image {
