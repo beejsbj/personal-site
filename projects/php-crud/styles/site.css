@@ -28,6 +28,14 @@ body {
   
 }
 
+
+
+
+
+
+
+
+
 .my-fantastic-image {
   max-width: 300px;
   border-bottom-right-radius: 30px;
@@ -111,9 +119,24 @@ body {
   }
 
   100% {
-    background-position-x: -1600px;
+    background-position-x: 1600px;
   }
 }
+
+svg :is(#flags) {
+  animation: flagWave ease-in-out 1s infinite;
+
+}
+
+@keyframes flagWave {
+  55% {
+    transform: rotateY(2deg);
+    transform: translateY(2px);
+    /*transform: skew(1deg);*/
+  }
+}
+
+
 /*
 @keyframes swell {
 
