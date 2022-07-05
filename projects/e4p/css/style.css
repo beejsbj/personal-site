@@ -1,15 +1,12 @@
 @import 'meyers-reset.css';
 @import 'setup.css';
-@font-face{
+
+@font-face {
     font-family: "expose";
     src: url("expose.otf");
-  }
-
-
-  
+}
 
 /**Clarity**/
-
 /*body {
     border: 5px solid red;
 }
@@ -27,22 +24,10 @@ body > * > * {
     border-color: forestgreen;
 
 }*/
-
-
-
-
-
-
-
 /**STRUCTURE******/
-
-
-
-
 .inner-column {
     max-width: clamp(70ch, 50vw, 120ch);
     margin: 0 auto;
-
 }
 
 .inner-column * {
@@ -50,14 +35,7 @@ body > * > * {
 }
 
 /**TYPOGRAPHY******/
-
-
-
-
-
 /**Sections******/
-
-
 body {
     background-color: hsla(360, 88%, 30%, 1.00);
 }
@@ -66,19 +44,16 @@ h1 {
     text-align: center;
     margin-top: 10%;
     margin-bottom: 125px;
-
     color: white;
     font-family: expose;
     font-size: clamp(100px, 10vw, 200px);
     background-color: hsla(360, 88%, 30%, 1.00);
-
     transition-duration: 0.2s;
 }
 
 h1:hover {
     color: black;
 }
-
 
 header a {
     background-color: black;
@@ -90,18 +65,11 @@ header a {
     top: 1%;
 }
 
-
-
-
-
-
-
 form {
     display: flex;
     flex-direction: column;
     gap: 40px;
 }
-
 
 /* Input ************************************************/
 .input-field {
@@ -111,14 +79,10 @@ form {
     gap: 1em;
     position: relative;
     /*border: 2px solid yellow;*/
-
 }
 
-
 .input-field label {
-
     font-family: monospace;
-
     color: white;
     text-align: center;
     font-size: 1.2rem;
@@ -129,10 +93,14 @@ form {
     top: 1rem;
     /*left: 40%;*/
     opacity: 0.6;
-
     pointer-events: none;
     transition-duration: 0.2s;
-
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    color: #9b9b9b;
 }
 
 .radio-list label {
@@ -146,7 +114,7 @@ form {
     gap: 3rem;
 }
 
-.radio-list > .input-field {
+.radio-list>.input-field {
     flex-direction: row;
     justify-content: flex-start;
     width: 100px;
@@ -161,25 +129,22 @@ form {
     /*background-color: black;*/
 }
 
-
-input{
+input {
     /* position */
     width: 100%;
     padding: 10px;
-
     /* style */
     font-size: 25px;
     background-color: hsla(360, 88%, 30%, 1.00);
     text-align: center;
-
     /* border */
     border: none;
     border-bottom: 5px solid black;
     border-radius: 5px;
-
     /* animation */
     transition-duration: 0.2s;
 }
+
 input:focus:not(input[type="radio"]) {
     border: none;
     color: white;
@@ -187,34 +152,32 @@ input:focus:not(input[type="radio"]) {
     /*font-size: 25px;*/
     line-height: 2;
 }
-::placeholder {
 
+::placeholder {
     color: white;
     opacity: 0.5;
     opacity: 0;
     font-style: italic;
     font-weight: bold;
 }
-input:focus::placeholder{
+
+input:focus::placeholder {
     font-style: normal;
     font-family: Expose;
     opacity: 0.15;
     font-size: 70px;
 }
 
-input:focus + label {
+input:focus+label {
     /*display: none;*/
     position: static;
 }
 
-
-
-
 /* button *****************************************************/
 .buttonWrapper {
     /*Positions*/
-    
 }
+
 button {
     /* styles */
     /*margin-top: 40px;*/
@@ -223,37 +186,25 @@ button {
     color: white;
     font-size: 1.8rem;
     font-weight: bolder;
-    padding:16px;
+    padding: 16px;
     border: none;
     border-radius: 5px;
     background-color: hsla(360, 88%, 35%, 1.00);
-
-
     transition-duration: 0.2s;
-
 }
+
 button:hover {
     /*transition-duration: 0.25s;*/
-
     color: white;
     font-family: expose;
     /*font-size: 70px;*/
-
     border: none;
     background-color: black;
-    box-shadow:  0px 20px 30px black;
+    box-shadow: 0px 20px 30px black;
 }
-
-
-
-
-
-
-
 
 .output-field {
     font-family: monospace;
-
     padding: 30px;
     display: flex;
     align-items: center;
@@ -261,15 +212,10 @@ button:hover {
     border-radius: 5px;
     background-color: black;
     color: white;
-
-
-
     text-align: center;
     font-size: 1.5rem;
     line-height: 1.2em;
-    
 }
-
 
 .output-field span {
     font-weight: 700;
@@ -280,18 +226,6 @@ button:hover {
     font-style: italic;
 }
 
-
-
-
-
-
-
 .hide {
     display: none;
 }
-
-
-
-
-
-

@@ -28,6 +28,6 @@ header {
 
 
 header nav .active {
-	background-color: hsla(211, 100%, 35%, 1.00);;
+	background-color: dodgerblue;
 	color: white;
 }

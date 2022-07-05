@@ -1,5 +1,49 @@
-
 /* buttons and icons and smaller reusable bits here */
+.inputfile {
+	/*  height: 0;
+  overflow: hidden;
+  width: 0;*/
+	display: none;
+	cursor: pointer;
+}
 
+.btn-1 span {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
 
+.btn-1 {
+	padding: 10px 15px;
+	border: none;
+	border-radius: 5px;
+	color: #fff;
+	cursor: pointer;
+	display: inline-block;
+	font-family: "Rubik", sans-serif;
+	font-size: inherit;
+	font-weight: 500;
+	margin-bottom: 1rem;
+	outline: none;
+	position: relative;
+	transition: all 0.3s;
+	vertical-align: middle;
+}
 
+.uploadField .btn-1 {
+	padding: 20px;
+}
+
+.btn-1 {
+	background-color: dodgerblue;
+	box-shadow: 0 6px hsla(210, 100%, 35%, 1.00);
+	transition: 0.2s;
+}
+
+.btn-1:hover {
+	background-color: hsla(210, 100%, 35%, 1.00);
+	transform: translateY(6px);
+	border-color: dodgerBlue;
+	box-shadow: 0 0 10px 0 dodgerBlue;
+}

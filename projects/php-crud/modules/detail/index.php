@@ -26,7 +26,7 @@
 		</p>
 
 		<form method="POST">
-			<button class="button-21" type="submit" name="deleted"> delete flag </button>
+			<button class="btn-1" type="submit" name="deleted"> delete flag </button>
 		</form>
 	</text-content>
 </jolly-roger>
