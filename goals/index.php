@@ -36,13 +36,13 @@
 
    
             <h1>My Goals..<em>ish</em></h1>
-            <p>
+            <p class="lato-class">
                 I'm supposed to be <em>selfish</em> here.
             </p>
-            <p>
+            <p class="lato-class">
                Honestly, when I think back to just 5 years ago, things were <em>incredibly</em> different. its crazy, crazy how much and how little things can change. Not enough people talk about how time <em>feels</em>.
             </p>
-            <p>
+            <p class="lato-class">
                But <em>pretending</em> things are perfect and <em>I</em> am perfect:
             </p>
 
@@ -60,7 +60,7 @@
 
 				foreach ($goals as $goal) {
 					// code...
-					echo "<li>$goal</li>";
+					echo "<li class='lato-class'>$goal</li>";
 				}
 
 				echo "</ol>";

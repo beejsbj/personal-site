@@ -75,16 +75,6 @@ if (isset($_POST['submitted'])){
 
 
 }
-
-
-
-
-    
-
-
-
-
-
 ?>
 
 <body>
@@ -100,8 +90,8 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="text" name="userName" placeholder="What is your name?" value="">
-                    <label for="">What is your name?</label>
+                    <input id="nme" type="text" name="userName" placeholder="What is your name?">
+                    <label for="nme"><span>What is your name?</span></label>
                 </div>
 
 

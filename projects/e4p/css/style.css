@@ -1,6 +1,6 @@
 @import 'meyers-reset.css';
 @import 'setup.css';
-
+@import 'animation.css';
 @font-face {
     font-family: "expose";
     src: url("expose.otf");
@@ -8,20 +8,20 @@
 
 /**Clarity**/
 /*body {
-    border: 5px solid red;
+    outline: 1px solid red;
 }
 
 body * {
-    border: 5px solid black;
-    margin: 5px;
+    outline: 1px solid black;
+    margin: 1px;
 }
 
 body > * {
-    border-color: blue;
+    outline-color: blue;
 }
 
 body > * > * {
-    border-color: forestgreen;
+    outline-color: forestgreen;
 
 }*/
 /**STRUCTURE******/
@@ -77,30 +77,44 @@ form {
     display: flex;
     flex-direction: column-reverse;
     gap: 1em;
-    position: relative;
+    /*position: relative;*/
     /*border: 2px solid yellow;*/
 }
 
-.input-field label {
+.input-field {
     font-family: monospace;
-    color: white;
     text-align: center;
-    font-size: 1.2rem;
-    /*position: absolute;*/
+    position: relative;
     /*left: 40%;*/
     /*bottom: -50%;*/
-    width: 100%;
-    top: 1rem;
     /*left: 40%;*/
-    opacity: 0.6;
-    pointer-events: none;
-    transition-duration: 0.2s;
-    position: absolute;
-    top: 0;
     display: block;
     transition: 0.2s;
-    font-size: 1rem;
     color: #9b9b9b;
+}
+
+.input-field label {
+    opacity: 0.6;
+    font-weight: 300;
+    margin: 0;
+    position: absolute;
+    /*color: #8F8F8F;*/
+    font-size: 1.2rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /*z-index: 11;*/
+    transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease;
+}
+
+
+
+
+.input-field input:focus + label,
+.input-field input:valid + label {
+    top: -30px;
+    /*color: #333;*/
+    opacity: 1;
 }
 
 .radio-list label {
@@ -114,7 +128,7 @@ form {
     gap: 3rem;
 }
 
-.radio-list>.input-field {
+.radio-list > .input-field {
     flex-direction: row;
     justify-content: flex-start;
     width: 100px;
@@ -132,7 +146,7 @@ form {
 input {
     /* position */
     width: 100%;
-    padding: 10px;
+    /*padding: 10px;*/
     /* style */
     font-size: 25px;
     background-color: hsla(360, 88%, 30%, 1.00);
@@ -142,15 +156,19 @@ input {
     border-bottom: 5px solid black;
     border-radius: 5px;
     /* animation */
-    transition-duration: 0.2s;
+    transition: 0.5s;
+    /*transform: rotate(3deg);*/
 }
 
 input:focus:not(input[type="radio"]) {
-    border: none;
+    /*border: none;*/
     color: white;
-    background-color: black;
+    /*background-color: black;*/
     /*font-size: 25px;*/
     line-height: 2;
+    outline: 0;
+    padding: 20px;
+    /*transform: rotate(-3deg);*/
 }
 
 ::placeholder {
@@ -170,7 +188,6 @@ input:focus::placeholder {
 
 input:focus+label {
     /*display: none;*/
-    position: static;
 }
 
 /* button *****************************************************/
@@ -191,6 +208,7 @@ button {
     border-radius: 5px;
     background-color: hsla(360, 88%, 35%, 1.00);
     transition-duration: 0.2s;
+    /*transform: rotate(3deg);*/
 }
 
 button:hover {

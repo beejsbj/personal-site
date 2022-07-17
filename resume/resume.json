@@ -1,100 +1,27 @@
 {
-	"education" : [
+	"Education" : [
 		{
-			"role" : "major",
-			"place" : "school name",
-			"dates" : [2010, 2020],
-			"duties" : [
-				"duty1",
-				"duty2",
-				"duty3"
-			],
-			"skills" : [
-				"skill1",
-				"skill2",
-				"skill3"
-			],
+			"role" : "Bacelor of Computer Science",
+			"place" : "Ontario Tech University",
+			"dates" : ["Sep 2021", "Present"],
 			"specialNote" : "best boy award"
 		},
 		{
-			"role" : "major",
-			"place" : "school name",
-			"dates" : [2010, 2020],
-			"duties" : [
-				"duty1",
-				"duty2",
-				"duty3"
-			],
-			"skills" : [
-				"skill1",
-				"skill2",
-				"skill3"
-			],
-			"specialNote" : "best boy award"
-		},
-		{
-			"role" : "major",
-			"place" : "school name",
-			"dates" : [2010, 2020],
-			"duties" : [
-				"duty1",
-				"duty2",
-				"duty3"
-			],
-			"skills" : [
-				"skill1",
-				"skill2",
-				"skill3"
-			],
-			"specialNote" : "best boy award"
+			"role" : "Junior IT Analyst Program",
+			"place" : "NPower Canada",
+			"dates" : ["Sep 2020", "Dec 2020"],
+			"specialNote" : "14-week intensive online class training on the fundamentals of computer technology, and project management essentials"
 		}
 	],
-	"work" : [
+	"Work" : [
 		{
-			"role" : "job title/name/position",
-			"place" : "PLACE",
-			"dates" : [2010, 2020],
+			"role" : "Customer Support Agent (Rogers)",
+			"place" : "HGS Canada",
+			"dates" : ["Jan 2021", "Oct 2021"],
 			"duties" : [
-				"duty1",
-				"duty2",
-				"duty3"
-			],
-			"skills" : [
-				"skill1",
-				"skill2",
-				"skill3"
-			],
-			"specialNote" : "best boy award"
-		},
-		{
-			"role" : "job title/name/position",
-			"place" : "PLACE",
-			"dates" : [2010, 2020],
-			"duties" : [
-				"duty1",
-				"duty2",
-				"duty3"
-			],
-			"skills" : [
-				"skill1",
-				"skill2",
-				"skill3"
-			],
-			"specialNote" : "best boy award"
-		},
-		{
-			"role" : "job title/name/position",
-			"place" : "PLACE",
-			"dates" : [2010, 2020],
-			"duties" : [
-				"duty1",
-				"duty2",
-				"duty3"
-			],
-			"skills" : [
-				"skill1",
-				"skill2",
-				"skill3"
+				"Handled nonstop barrage of back-to-back calls and dealt with Customers to satisfaction. Recognized multiple times for my work through internal scorecard rewards",
+				"This experience greatly helped me cultivate the ability to deal with varying types of personalities and taught me to deescalate them if need be while maintaining professional decorum",
+				"Maintained an amicable work relationship with my colleagues even while working through home, helping them out anytime they might have needed additional support."
 			],
 			"specialNote" : "best boy award"
 		}

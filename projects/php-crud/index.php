@@ -33,14 +33,14 @@ if (isset($_GET["page"])) {
 				<?php 	getTemplate($page);	  ?>
 			</inner-column>
 		</main>
-		<div class="ocean-container">
+		<footer class="ocean-container">
 			<div class="ocean">
 				<div class="wave">
 					<?php include('images/ship.php') ?>
 				</div>
 				<div class="wave"></div>
 			</div>
-		</div>
+		</footer>
 	</body>
 
 </html>

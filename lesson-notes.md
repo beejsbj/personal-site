@@ -25,6 +25,37 @@
 
 
 
-# Using route-based info for styling
-	adding a class, to a link changing its style based on the rputed page.
-		used to make the current link highlighted	
+# Using ACFs in templates and creating custom post types
+
+	describe what weve done in the last 5 mins?
+		so we created a category of fields, and added two fields to it. name and tagline. made it so these only show up on the recipies post type and hide the defaut content editor. 
+		
+		im wondering if i should make all the fields within the recipie fields or create
+
+
+
+
+
+
+# WP recap and menus
+	no date cause of mustache? HYPOCRITE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

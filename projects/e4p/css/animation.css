@@ -1,0 +1,125 @@
+.link-wrapper {
+	position: relative;
+	/*mix-blend-mode: darken;*/
+}
+
+.ex-name {
+	animation: tiltBounce 0.15s ease;
+	animation-fill-mode: forwards;
+	/*position: absolute;*/
+	z-index: 9999;
+}
+
+.link-wrapper .shape-wrapper {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
+.link-wrapper:hover .ex-name {
+	z-index: 9999;
+}
+
+.link-wrapper:hover .shape-wrapper {
+	transform: rotate(-6deg);
+	display: block;
+	z-index: 12;
+}
+
+.link-wrapper:hover .shape-wrapper .shape.cyan-fill {
+	transform: scale(3, 0.1);
+}
+
+.link-wrapper:nth-child(even):hover .shape-wrapper {
+	transform: rotate(11deg);
+}
+
+.shape-wrapper {
+	filter: sepia(50%) saturate(3);
+}
+
+.shape-wrapper .shape {
+	transition: all 0.1s linear;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 35px;
+	overflow: hidden;
+}
+
+.shape-wrapper .shape svg {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.shape-wrapper .shape.cyan-fill {
+	mix-blend-mode: screen;
+	animation-delay: 0.05s;
+	animation-duration: 0.4s;
+}
+
+.shape-wrapper .shape.red-fill {
+	animation-duration: 0.45s;
+	animation-delay: 0.08s;
+	opacity: 0.8;
+}
+
+.jelly {
+	-webkit-animation-name: jelly;
+	animation-name: jelly;
+	-webkit-transform-origin: center;
+	transform-origin: center;
+	-webkit-animation-iteration-count: infinite;
+	animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+}
+
+@keyframes tiltBounce {
+	0% {
+		transform: scale(1) rotate(-7deg);
+	}
+
+	50% {
+		transform: scale(1.5) rotate(-7deg);
+	}
+
+	100% {
+		transform: scale(1.15) rotate(-7deg);
+	}
+}
+
+@keyframes tiltBounceAlt {
+	0% {
+		transform: scale(1) rotate(7deg);
+	}
+
+	50% {
+		transform: scale(1.5) rotate(7deg);
+	}
+
+	100% {
+		transform: scale(1.15) rotate(7deg);
+	}
+}
+
+@keyframes jelly {
+	0% {
+		width: 100%;
+		transform: scale(1.25, 1) skewX(20deg) translateY(3px) rotateX(40deg) rotateY(10deg) rotateZ(-10deg);
+	}
+
+	50% {
+		width: 100%;
+		transform: scale(1.25, 1.1) skewX(-15deg) translateY(-2px) translateZ(-30px);
+	}
+
+	100% {
+		width: 100%;
+		transform: scale(1.25, 1) skewX(20deg) translateY(3px) rotateX(-40deg) rotateY(-10deg) rotateZ(-15deg);
+	}
+}
