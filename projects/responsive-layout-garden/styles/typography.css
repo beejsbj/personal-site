@@ -2,25 +2,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,200;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600;1,6..72,700;1,6..72,800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 
-.loud-voice	{
+
+.title-voice {
 	font-family: 'Newsreader', serif;
 	font-size: clamp(43px, 5vw, 70px);
-}
-@media (min-width: 600px) {
-	.loud-voice {
-		font-weight: 100; /* or variable font */
-	}
+	font-weight: 100;
 }
 
-.attention-voice	{
-	font-family: 'Newsreader', serif;
-	font-size: clamp(1.88rem, calc(1.51rem + 1.83vw), 2.81rem);;
+
+.loud-voice {
+	font-size: clamp(2.19rem, calc(1.70rem + 2.44vw), 3.2rem);;
 	color: var(--head1);
 }
 
-.calm-voice, p, li {
+@media (min-width: 600px) {
+	.loud-voice {
+		font-weight: 100;
+		/* or variable font */
+	}
+}
+
+.attention-voice {
+	font-family: 'Newsreader', serif;
+	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);
+	;
+	color: var(--head2);
+}
+
+.calm-voice,
+p,
+li {
 	font-family: 'Lato', sans-serif;
-	font-size: 1.1rem;
+	font-size: 1rem;
+	line-height: 1.4;
+}
+
+.intro-voice {
+	font-family: 'Lato', sans-serif;
+	font-size: 1.2rem;
 	line-height: 1.4;
 }
 
@@ -36,11 +55,11 @@
 
 /* these would be scoped to section or to an article element */
 /* this is just a loose setting for now */
-p + p {
+p+p {
 	margin-top: 1em;
 }
 
-h2 + p {
+h2+p {
 	margin-top: 20px;
 }
 
@@ -50,18 +69,7 @@ code {
 	color: green;
 }
 
-
 a {
 	color: var(--link);
 }
 
-
-
-layout-card .attention-voice {
-	font-size: clamp(1.30rem, calc(1.11rem + 0.97vw), 1.70rem);;
-	color: var(--head2);
-}
-
-layout-card .calm-voice {
-	font-size: 0.9rem;
-}

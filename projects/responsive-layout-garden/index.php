@@ -17,7 +17,7 @@
 	<body>
 		<header>
 			<inner-column>
-				<h1 class='loud-voice'>Layout Garden</h1>
+				<h1 class='title-voice'>Layout Garden</h1>
 			</inner-column>
 		</header>
 
