@@ -13,10 +13,13 @@
 .link-wrapper .shape-wrapper {
 	display: none;
 	position: absolute;
-	top: 0;
+	top: 50%;
 	left: 0;
 	right: 0;
+	transform: translate(-50%, -50%);
+	max-width: 15%;
 }
+
 
 .link-wrapper:hover .ex-name {
 	z-index: 9999;
@@ -26,6 +29,7 @@
 	transform: rotate(-6deg);
 	display: block;
 	z-index: 12;
+	max-width: 70%;
 }
 
 .link-wrapper:hover .shape-wrapper .shape.cyan-fill {

@@ -36,7 +36,7 @@ display both area in feet and area in meters
 
     <style>
         h1 {
-            font-size: clamp(70px, 8vw, 150px);
+            font-size: clamp(3.13rem, calc(1.81rem + 6.58vw), 9.38rem);
         }
 
         .output-field p {
@@ -61,7 +61,7 @@ function showPageErrors() {
 
 
 
-showPageErrors();
+// showPageErrors();
 
 $class = "hide";
  // $class = "output-field";

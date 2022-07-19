@@ -31,7 +31,7 @@ body > * > * {
 }
 
 .inner-column * {
-    transition-duration: 0.2s;
+    /*transition-duration: 0.2s;*/
 }
 
 /**TYPOGRAPHY******/
@@ -68,7 +68,7 @@ header a {
 form {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 60px;
 }
 
 /* Input ************************************************/
@@ -93,13 +93,14 @@ form {
     color: #9b9b9b;
 }
 
-.input-field label {
+.input-field input:not(input[type="radio"]) + label {
+    width: 100%;
     opacity: 0.6;
     font-weight: 300;
+     font-size: 1.8rem;
     margin: 0;
     position: absolute;
     /*color: #8F8F8F;*/
-    font-size: 1.2rem;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -110,48 +111,24 @@ form {
 
 
 
-.input-field input:focus + label,
-.input-field input:valid + label {
-    top: -30px;
+
+
+/*.input-field input:valid + label,*/
+.input-field input:not(input[type="radio"]):focus + label {
+    top: -20px;
     /*color: #333;*/
     opacity: 1;
+    font-size: 1.2rem;
 }
 
-.radio-list label {
-    position: static;
-}
-
-.radio-list {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 3rem;
-}
-
-.radio-list > .input-field {
-    flex-direction: row;
-    justify-content: flex-start;
-    width: 100px;
-    gap: 0;
-}
-
-.radio-list input[type="radio"] {
-    width: 1em;
-    height: 1em;
-    border-radius: 50%;
-    margin: 0;
-    /*background-color: black;*/
-}
 
 input {
     /* position */
     width: 100%;
-    /*padding: 10px;*/
-    /* style */
+
     font-size: 25px;
     background-color: hsla(360, 88%, 30%, 1.00);
     text-align: center;
-    /* border */
     border: none;
     border-bottom: 5px solid black;
     border-radius: 5px;
@@ -161,33 +138,73 @@ input {
 }
 
 input:focus:not(input[type="radio"]) {
-    /*border: none;*/
+    border: none;
     color: white;
-    /*background-color: black;*/
+    background-color: black;
     /*font-size: 25px;*/
-    line-height: 2;
+    /*line-height: 2;*/
     outline: 0;
-    padding: 20px;
+
     /*transform: rotate(-3deg);*/
+}
+
+input:not(input[type="radio"]) {
+    padding: 20px;
+
 }
 
 ::placeholder {
     color: white;
     opacity: 0.5;
     opacity: 0;
-    font-style: italic;
     font-weight: bold;
+    font-size: 70px;
+    font-family: Expose;
+
 }
 
 input:focus::placeholder {
-    font-style: normal;
-    font-family: Expose;
+    
     opacity: 0.15;
-    font-size: 70px;
 }
 
-input:focus+label {
-    /*display: none;*/
+
+
+/*Radio*/
+
+.input-field input[type="radio"] + label {
+    width: 100%;
+    opacity: 0.6;
+    font-weight: 300;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.input-field input[type="radio"]:focus + label {
+    opacity: 1;
+}
+
+.radio-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+}
+
+.radio-list > .input-field {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.radio-list input[type="radio"] {
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    margin: 0;
+    /*background-color: black;*/
 }
 
 /* button *****************************************************/
@@ -208,6 +225,7 @@ button {
     border-radius: 5px;
     background-color: hsla(360, 88%, 35%, 1.00);
     transition-duration: 0.2s;
+    margin- top
     /*transform: rotate(3deg);*/
 }
 

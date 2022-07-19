@@ -29,11 +29,11 @@
             text-decoration: none;
             /*margin-bottom: 2px;*/
             font-size: 1.5rem;
-            transition-duration: 0.2s;
+            transition-duration: 0.1s;
         }
 
         a {
-            padding: 15px;
+            padding: 25px;
         }
 
         a:visited {
@@ -43,7 +43,7 @@
         li:hover {
             background-color: hsla(358, 92%, 30%, 0);
             font-family: expose;
-            color: white;
+            color: black;
             /*font-weight: bold;*/
             text-transform: uppercase;
             /*font-size: 30px;*/
