@@ -5,11 +5,11 @@ body * {
 }
 
 section:nth-of-type(odd) {
-	background-color: rgba(0,0,0,.03);
+	background-color: rgba(0,0,0,.2);
 }
 
 picture img {
-	opacity: 0;
+	/*opacity: 0;*/
 }
 
 picture {

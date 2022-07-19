@@ -12,7 +12,7 @@ main {
 inner-column {
 	display: block;
 	width: 98%;
-	max-width: 1100px; /* could be a variable in settings */
+	max-width: var(--standard); /* could be a variable in settings */
 	margin-right: auto;
 	margin-left: auto;
 	padding: 30px 14px; /* a loose default */
@@ -23,3 +23,13 @@ inner-column {
 	top: 0;
 	z-index: 5;
 }*/
+
+
+inner-column.tight {
+	max-width: var(--tight);
+}
+
+
+inner-column.wide {
+	max-width: var(--wide);
+}

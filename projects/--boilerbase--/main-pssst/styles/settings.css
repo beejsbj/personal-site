@@ -1,5 +1,11 @@
 
 html {
+
+	--standard: 1140px;
+	--tight: 800px;
+	--wide: 1400px;
+
+
 	--black: #111111;
 	--white: #efefef;
 
@@ -14,6 +20,7 @@ html {
 
 	--paper: var(--white);
 	--ink: var(--black);
+
 }
 
 @media (prefers-color-scheme: dark) {

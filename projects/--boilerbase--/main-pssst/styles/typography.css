@@ -1,21 +1,38 @@
 /* Should we pull in @fonts here? */
-
-.loud-voice	{
-	font-family: sans-serif;
-	font-size: clamp(36px, 5vw, 60px);
+.title-voice {
+	
 }
+
+.loud-voice {
+	font-family: sans-serif;
+	font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
+}
+
 @media (min-width: 600px) {
 	.loud-voice {
-		font-weight: 700; /* or variable font */
+		font-weight: 700;
+		/* or variable font */
 	}
 }
 
-.attention-voice	{
+.attention-voice {
 	font-family: sans-serif;
-	font-size: 30px;
+	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);
 }
 
-.calm-voice, p, li {
+.solid-voice {
+	font-family: sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+}
+
+
+
+
+
+.calm-voice,
+p,
+li {
 	font-family: sans-serif;
 	font-size: 1rem;
 	line-height: 1.4;
@@ -29,13 +46,23 @@
 	font-weight: 700;
 }
 
+.whisper-voice {
+	font-family: sans-serif;
+	font-size: 0.9rem;
+	color: gray;
+}
+
+.teaser-voice {
+	
+}
+
 /* these would be scoped to section or to an article element */
 /* this is just a loose setting for now */
-p + p {
+p+p {
 	margin-top: 1em;
 }
 
-h2 + p {
+h2+p {
 	margin-top: 20px;
 }
 
