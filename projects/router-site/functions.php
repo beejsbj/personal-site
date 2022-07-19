@@ -3,9 +3,7 @@
 // show error verbosely.
 function showErrors() {
   error_reporting(E_ALL);
-
-  		ini_set('display_errors', '1');
-
+	ini_set('display_errors', '1');
 }
 showErrors();
 
@@ -14,7 +12,7 @@ showErrors();
   function format($variable) {
     echo "<pre>";
       echo "<code>";
-        echo print_r( $variable );
+      	print_r( $variable );
       echo "</code>";
     echo "</pre>";
   }

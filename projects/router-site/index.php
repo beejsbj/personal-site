@@ -1,13 +1,7 @@
 <?php include('functions.php'); ?>
 <?=format(queryString())?>
 <?php include('templates/modules/header/header.php'); ?>
-<?php
-
-	
-
-	
-
-?>
+<?php format($pageData);?>
 
 
 <main class="page-content">
