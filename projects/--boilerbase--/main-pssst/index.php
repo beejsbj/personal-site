@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <?php include('templates/modules/header/header.php'); ?>
 
 		<main class="page-content">

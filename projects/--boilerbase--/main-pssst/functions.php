@@ -25,18 +25,23 @@ function queryString(){
 
 
 
+function currentPage(){
+	if (isset($_GET['page'])) {
+	 	return $_GET['page'];
+	 } else {
+	 	return 'home';
+	 }
+}
+
+//get page
 function getPage () {
-	$page = $_GET['page'];
+	$page = currentPage();
 
-	if (isset($_GET['page']) && file_get_contents("templates/pages/$page/$page.php")) {
-
-		include("templates/pages/$page/$page.php");
-				
+	if (file_get_contents("templates/pages/$page/$page.php")) {
+		include("templates/pages/$page/$page.php");			
 	}
-
 	else {
 		include("templates/pages/pageNotFound.php");
-
 	}
 
 	

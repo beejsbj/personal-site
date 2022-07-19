@@ -3,11 +3,9 @@
 // show error verbosely.
 function showErrors() {
   error_reporting(E_ALL);
-  	echo "<pre>";
-  	echo "<code>";
+
   		ini_set('display_errors', '1');
-  	echo "</code>";
-    echo "</pre>";
+
 }
 showErrors();
 
@@ -37,7 +35,8 @@ function currentPage(){
 }
 
 //get page
-function getPage () {
+function renderPage ($data) {
+	$pageData = $data;
 	$page = currentPage();
 
 	if (file_get_contents("templates/pages/$page/$page.php")) {
@@ -49,3 +48,30 @@ function getPage () {
 
 	
 }
+
+
+
+function renderPageData(){
+	$page = currentPage();
+  	$json = file_get_contents("data/$page.json");
+  	return json_decode($json, true);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
