@@ -14,8 +14,13 @@
     <style>
         item-field {
             display: flex;
-            gap: 20px;
+            gap: 25px;
             align-items: center;
+            justify-content: space-between;
+        }
+
+        item-field > .input-field {
+            flex-basis: 80%;
         }
 
         h2 {
