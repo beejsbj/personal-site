@@ -7,8 +7,8 @@
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 
 		<title>PSSST (CSS)</title>
-		<meta name='description' content='PSSST (CSS)'>
-		<meta property='og:image' content='A CSS methodology so great, it needed a name.'>
+		<meta name='description' content='Garden'>
+		<meta property='og:image' content='https://www.ugaoo.com/knowledge-center/wp-content/uploads/2016/03/shutterstock_193618733-850x525.jpg'>
 
 		<link rel='stylesheet' href='styles/site.css'>
 	</head>
