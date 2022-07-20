@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href="css/style.css">
 
-    <title>Simple Interest</title>
+    <title>Compound Interest</title>
 
 
 
@@ -32,6 +32,9 @@
     $principal = 0;
     $rate = 0;
     $time = 0;
+    $number = 0;
+
+
     $amount = 0;
 
 
@@ -50,23 +53,25 @@ $class = "hide";
 
 
 if (isset($_POST['submitted'])){
-        if ((isset($_POST['principal'])) && (isset($_POST['rate'])) && (isset($_POST['time'])) ) {
+        if ((isset($_POST['principal'])) && (isset($_POST['rate'])) && (isset($_POST['time'])) && (isset($_POST['number'])) ) {
         
 
 
-        if (($_POST['principal'] != '') && ($_POST['rate'] != '') && ($_POST['time'] != '')) {
+        if (($_POST['principal'] != '') && ($_POST['rate'] != '') && ($_POST['time'] != '')&& ($_POST['number'] != '')) {
 
             $principal = floatval($_POST['principal']);
             $rate = floatval($_POST['rate']);
             $time = floatval($_POST['time']);
-
-
-            $amount = round(($principal * (1 + (($rate / 100) * $time))), 2);
-
+            $number = floatval($_POST['number']);
 
 
 
-            $output = "After <span>$time</span> years at <span>$rate%</span>, the investment will be worth <span>$$amount</span>.";
+            $amount = round(($principal * pow((1 + (($rate / (100 * $number)))), ($number * $time))), 2);
+
+
+
+
+            $output = "<span>$$principal</span> invested at <span>$rate%</span> for <span>$time</span> years compounded <span>$number</span> times per year is <span>$$amount</span>.";
 
             $class = "output-field";
 
@@ -106,15 +111,19 @@ if (isset($_POST['submitted'])){
 
                 <div class="input-field">
                     <input id="principal-ID" type="number" name="principal" placeholder="principal?" value="" min="0.01" step="0.01">
-                    <label for="principal-ID">Enter the principal</label>
+                    <label for="principal-ID">What is the principal amount?</label>
                 </div>
                 <div class="input-field">
                     <input id="rate-ID" type="number" name="rate" placeholder="rate?" value="" min="0.01" step="0.01">
-                    <label for="rate-ID">Enter the rate of interest</label>
+                    <label for="rate-ID">What is the rate?</label>
                 </div>
                 <div class="input-field">
                     <input id="time-ID" type="number" name="time" placeholder="time?" value="" min="1" step="1">
-                    <label for="time-ID">Enter the number of years</label>
+                    <label for="time-ID">What is the number of years?</label>
+                </div>
+                <div class="input-field">
+                    <input id="number-ID" type="number" name="number" placeholder="Compound number?" value="" min="1" step="1">
+                    <label for="number-ID">Times interest is compounded per year?</label>
                 </div>
 
 
