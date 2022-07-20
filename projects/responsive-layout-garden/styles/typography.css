@@ -12,7 +12,7 @@
 
 .loud-voice {
 	font-size: clamp(2.19rem, calc(1.70rem + 2.44vw), 3.2rem);;
-	color: var(--head1);
+	color: var(--color-dark);
 }
 
 @media (min-width: 600px) {
@@ -26,14 +26,14 @@
 	font-family: 'Newsreader', serif;
 	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 1.65rem);
 	;
-	color: var(--head2);
+	color: var(--highlight-dark);
 }
 
 
 .teaser-voice {
 	font-family: 'Newsreader', serif;
 	font-weight: 700;
-	color: var(--highlight);
+	color: var(--highlight-light);
 	text-transform: uppercase;
 	margin-bottom: 10px;
 }
@@ -56,12 +56,12 @@ li {
 
 :is(.calm-voice, p, li) em {
 	font-style: italic;
-	color: var(--head2);
+	color: var(--highlight-dark);
 }
 
 :is(.calm-voice, p, li) strong {
 	font-weight: 700;
-	color: var(--head1);
+	color: var(--color-dark);
 }
 
 /* these would be scoped to section or to an article element */

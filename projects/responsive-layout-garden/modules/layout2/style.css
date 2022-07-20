@@ -1,5 +1,5 @@
 .layout2 {
-	border-bottom: 3px solid var(--head1);
+	border-bottom: 3px solid var(--color-dark);
 }
 
 .layout2 layout-module {
@@ -37,7 +37,7 @@
 	left: 0;
 	width: 60%;
 	height: 3px;
-	background-color: var(--color);
+	background-color: var(--color-light);
 	z-index: -1;
 	border-radius: var(--corners);
 

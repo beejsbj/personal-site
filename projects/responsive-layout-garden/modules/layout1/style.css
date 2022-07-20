@@ -1,6 +1,6 @@
 .layout1 {
-	border-top: 3px solid var(--head1);
-	border-bottom: 3px solid var(--head1);
+	border-top: 3px solid var(--color-dark);
+	border-bottom: 3px solid var(--color-dark);
 }
 
 .layout1 layout-module {

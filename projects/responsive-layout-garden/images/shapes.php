@@ -3,10 +3,10 @@
         <g transform="matrix(1,0,0,1,-385,-225)">
             <g>
                 <g id="circle" transform="matrix(1,0,0,1,-3.5,4)">
-                    <circle cx="418" cy="255" r="16" style="fill:rgb(255,0,162);stroke:black;stroke-width:2px;"/>
+                    <circle cx="418" cy="255" r="16" style=""/>
                 </g>
                 <g id="rectangle" transform="matrix(0.913043,0,0,1.05,32.8478,-7.7)">
-                    <rect x="418" y="234" width="23" height="20" style="fill:rgb(0,135,255);stroke:black;stroke-width:2.03px;"/>
+                    <rect x="418" y="234" width="23" height="20" style=""/>
                 </g>
             </g>
         </g>

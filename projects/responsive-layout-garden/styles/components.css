@@ -6,3 +6,14 @@ layout-module {
 
 
 
+.shapes #circle {
+	fill:var(--color-dark);
+	stroke:black;
+	stroke-width:2px;
+}
+
+.shapes #rectangle {
+	fill:var(--color-light);
+	stroke:black;
+	stroke-width:2.03px;
+}
