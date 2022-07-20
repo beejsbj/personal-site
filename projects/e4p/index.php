@@ -60,8 +60,9 @@
 
         li:hover .ex-number {
             display: block;
-            opacity: 0.3;
+            opacity: 0.4;
             font-family: expose;
+            color: white;
         }
         </style>
     </head>
