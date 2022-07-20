@@ -3,7 +3,7 @@
 // show error verbosely.
 function showErrors() {
   error_reporting(E_ALL);
-  ini_set('display_errors', '1');
+	ini_set('display_errors', '1');
 }
 showErrors();
 
@@ -12,17 +12,16 @@ showErrors();
   function format($variable) {
     echo "<pre>";
       echo "<code>";
-        echo print_r( $variable );
+      	print_r( $variable );
       echo "</code>";
     echo "</pre>";
   }
 
 
-  
+  //show query string
 function queryString(){
 	return $_SERVER['QUERY_STRING'];
 }
-
 
 
 function currentPage(){
@@ -34,7 +33,8 @@ function currentPage(){
 }
 
 //get page
-function getPage () {
+function renderPage ($data) {
+	$pageData = $data;
 	$page = currentPage();
 
 	if (file_get_contents("templates/pages/$page/$page.php")) {
@@ -46,3 +46,30 @@ function getPage () {
 
 	
 }
+
+
+
+function renderPageData(){
+	$page = currentPage();
+  	$json = file_get_contents("data/$page.json");
+  	return json_decode($json, true);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

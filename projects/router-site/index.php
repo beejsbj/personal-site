@@ -4,8 +4,9 @@
 <?php format($pageData);?>
 
 
-<main class="page-content">
+<main class="page-content dynamic-section">
 
+<!-- dynamic page rending -->
 	<?php renderPage($pageData); ?>
 
 
