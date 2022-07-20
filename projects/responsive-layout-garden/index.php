@@ -24,12 +24,13 @@
 		<main class="page-content">
 
 			<?php include('modules/layout1/layout1.php'); ?>
+			<?php include('modules/layout2/layout2.php'); ?>
 
 		</main>
 
 		<footer>
 			<inner-column>
-				<h2>Zee footah</h2>
+				<h2 class="loud-voice">Zee footah</h2>
 			</inner-column>
 		</footer>
 	</body>

@@ -24,10 +24,21 @@
 
 .attention-voice {
 	font-family: 'Newsreader', serif;
-	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);
+	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 1.65rem);
 	;
 	color: var(--head2);
 }
+
+
+.teaser-voice {
+	font-family: 'Newsreader', serif;
+	font-weight: 700;
+	color: var(--highlight);
+	text-transform: uppercase;
+	margin-bottom: 10px;
+}
+
+
 
 .calm-voice,
 p,

@@ -1,0 +1,112 @@
+.layout2 {
+	border-bottom: 3px solid var(--head1);
+}
+
+.layout2 layout-module {
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
+}
+
+.layout2 layout-header {
+	max-width: 70ch;
+}
+
+
+.layout2 layout-card {
+	padding: 20px 0;
+}
+
+.layout2 layout-card picture {
+	max-width: 30px;
+	margin-bottom: 10px;
+}
+
+.layout2 special-block { /*todo, change name*/
+	display: block;
+	position: relative;
+	padding: 20px 0;
+	max-width: 50ch;
+
+}
+
+.layout2 special-block::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 60%;
+	height: 3px;
+	background-color: var(--color);
+	z-index: -1;
+	border-radius: var(--corners);
+
+}
+
+
+
+
+
+
+/*break point 1 - medium*/
+@media (min-width: 650px) {
+	.layout2 .card-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 15px;
+	}
+
+	.layout2 .card-list>* {
+		flex-basis: 48%;
+	}
+
+	.layout2 layout-card {
+		border: solid 3px black;
+		border-radius: var(--corners);
+		padding: 30px;
+
+	}
+
+	.layout2 layout-card p {
+		max-width: 50ch;
+	}
+
+	.layout2 special-block {
+		padding: 30px;
+
+	}
+
+	.layout2 special-block::before {
+		width: 65ch;
+		height: 100%;
+	}
+
+}
+
+/*breakpoint 2 - large*/
+@media (min-width: 1155px) {
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -101,7 +101,7 @@ if (isset($_POST['submitted'])){
     <header>
         <div class="inner-column">
             <a href="index.php">⬅</a>
-            <h1>Computing Simple Interest</h1>
+            <h1>Determining Compound Interest</h1>
         </div>
     </header>
     <main>

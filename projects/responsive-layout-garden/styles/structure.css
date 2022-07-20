@@ -16,7 +16,12 @@ inner-column {
 	margin-right: auto;
 	margin-left: auto;
 	padding: 60px 15px; /* a loose default */
+
 }
+.page-section inner-column {
+	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
 
 /*.site-header {
 	position: sticky;
