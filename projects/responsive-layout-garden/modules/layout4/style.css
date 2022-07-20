@@ -1,0 +1,116 @@
+.layout4 {
+	
+}
+
+.layout4 :is(detail-section, details, summary){
+	display: block;
+}
+
+.layout4 layout-module,
+.layout4 .flex-container {
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
+}
+
+.layout4 layout-header {
+	max-width: 70ch;
+	margin-bottom: 40px;
+}
+
+
+.layout4 layout-card {
+	padding: 20px 0;
+}
+
+.layout4 layout-card summary {
+	border-bottom: 3px solid black;
+	margin-bottom: 15px;
+	cursor: pointer;
+	position: relative;
+}
+
+.layout4 details summary:after {
+	content: "＋";
+	color: var(--color-dark);
+	font-size: 2.5rem;
+	font-weight: 400;	
+
+	position: absolute;
+	top: 50%;
+	right: 0;
+	transform: translateY(-50%);
+
+	
+	transform-origin: center;
+	transition: 0.5s ease-out;
+}
+.layout4 details[open] summary:after {
+ 	transform: translateY(-50%) rotate(315deg);
+}
+
+
+
+
+
+/*break point 1 - medium*/
+@media (min-width: 650px) {
+
+	.layout4 layout-card {
+		border-radius: var(--corners);
+
+	}
+
+	.layout4 layout-card p {
+		max-width: 50ch;
+	}
+
+	.layout4 special-block {
+		padding: 30px;
+
+	}
+
+	.layout4 special-block::before {
+		width: 65ch;
+		height: 100%;
+	}
+
+}
+
+/*breakpoint 2 - large*/
+@media (min-width: 1155px) {
+
+	.layout4 layout-module {
+		flex-direction: row;
+		align-items: flex-start;
+		gap: 10%;
+	}
+	.layout4 layout-module > * {
+		flex-basis: 100%;
+
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
