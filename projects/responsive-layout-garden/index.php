@@ -6,7 +6,7 @@
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 
-		<title>PSSST (CSS)</title>
+		<title>Garden</title>
 		<meta name='description' content='Garden'>
 		<meta property='og:image' content='https://www.ugaoo.com/knowledge-center/wp-content/uploads/2016/03/shutterstock_193618733-850x525.jpg'>
 
