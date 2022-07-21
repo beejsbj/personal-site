@@ -1,6 +1,3 @@
-<?php
-	$pageData = renderPageData();
-?>
 <!doctype html>
 <html lang='en' class='special-magic no-js'>
 
@@ -16,7 +13,7 @@
 	<body>
 		<header>
 			<inner-column>
-				<h1 class='loud-voice'><em>PSSST</em> (CSS)</h1>
+				<h1 class='loud-voice'><em>Dynamic</em> portfolio adventure</h1>
 				<?php include('templates/modules/site-menu/site-menu.php'); ?>
 			</inner-column>
 		</header>

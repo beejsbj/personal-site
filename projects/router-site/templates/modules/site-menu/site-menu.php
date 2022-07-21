@@ -1,4 +1,4 @@
-<nav>
+<nav class="site-menu">
 	<ul>
 		<li>
 			<a href='?page=home'>Home</a>
