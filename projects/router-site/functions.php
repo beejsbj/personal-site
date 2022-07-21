@@ -58,13 +58,16 @@ function renderPageData(){
 function renderPage ($data) {
 	$pageData = $data;
 	$page = currentPage();
+	include("templates/pages/standard.php");
 
 
 	if (file_exists("templates/pages/$page/$page.php")) {
-		include("templates/pages/$page/$page.php");			
+		// include("templates/pages/$page/$page.php");
+			
+
 	}
 	else {
-		include("templates/pages/pageNotFound.php");
+		// include("templates/pages/pageNotFound.php");
 	}
 }
 
