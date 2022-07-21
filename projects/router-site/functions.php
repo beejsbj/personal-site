@@ -11,16 +11,22 @@ showErrors();
 // to print formatted arrays that are legible.
   function format($variable) {
     echo "<pre>";
+
       echo "<code>";
+
       	print_r( $variable );
+
       echo "</code>";
     echo "</pre>";
   }
 
 
   //show query string
-function queryString(){
+function queryString()
+{
 	return $_SERVER['QUERY_STRING'];
+
+
 }
 
 
