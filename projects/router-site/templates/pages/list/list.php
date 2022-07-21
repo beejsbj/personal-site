@@ -12,7 +12,8 @@
 	foreach ($sectionsArr as $section) {
 		$heading = $section['heading'];
 		$id = $section['id'];
-		$items = $section['items'];
+		
+
 
 		
 			
@@ -24,7 +25,11 @@
 		<h2 class="attention-voice">
 			<?=$heading?>
 		</h2>
-		<?php include('templates/modules/things-grid/things-grid.php'); ?>
+		<?php
+			if ($id == "things-grid") {
+				include('templates/modules/things-grid/things-grid.php');
+			}
+ 		 ?>
 	</inner-column>
 </section>
 <?php } ?>

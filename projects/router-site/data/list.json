@@ -18,22 +18,29 @@
 				{
 					"title": "thing 3",
 					"copy": "This is copy, copy!"
-				},
+				}
+			]
+		},
+		{
+			"id" : "things-grid",
+			"heading": "grid of things",
+			"items" : [
 				{
-					"title": "thing 4",
+					"title": "thing 1",
 					"copy": "This is copy, copy!"
 				},
 				{
-					"title": "thing 5",
+					"title": "thing 2",
 					"copy": "This is copy, copy!"
 				},
 				{
-					"title": "thing 6",
+					"title": "thing 3",
 					"copy": "This is copy, copy!"
 				}
 			]
 		},
 		{
+			"id" : "list-section",
 			"heading": "list page section"
 		}
 	]

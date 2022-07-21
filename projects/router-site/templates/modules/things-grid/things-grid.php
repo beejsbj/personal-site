@@ -1,5 +1,8 @@
 <ul class="<?=$id?>">
-	<?php foreach ($items as $item) {
+
+	<?php
+		$items = $section['items'];
+	 	foreach ($items as $item) {
 		$itemTitle = $item['title'];
 		$itemCopy = $item['copy'];
 		echo "<li>";

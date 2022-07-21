@@ -37,10 +37,11 @@
 
 
 
-# WP recap and menus
-	no date cause of mustache? HYPOCRITE
+# Medley day 4/6
 
+	how to take notes?
 
+	
 
 
 
