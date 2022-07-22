@@ -48,13 +48,12 @@
 }
 
 /*breakpoint 2 - large*/
-@media (min-width: 1155px) {
+@media (min-width: 1100px) {
 	.layout1 layout-module {
 		display: grid;
 		grid-template-columns: repeat(12, 1fr);
 		grid-template-rows: repeat(12, 1fr);
-		grid-column-gap: 15px;
-		grid-row-gap: 15px;
+		gap: 15px;
 	}
 
 	.layout1 layout-header {
@@ -67,5 +66,6 @@
 
 	.layout1 .image-grid {
 		grid-area: 3 / 7 / 11 / 13;
+		align-self: start;
 	}
 }
