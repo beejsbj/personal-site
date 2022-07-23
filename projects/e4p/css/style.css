@@ -114,7 +114,7 @@ form {
 
 
 
-/*.input-field input:valid + label,*/
+/*.input-field input:not(input[type="radio"]):valid + label,*/
 .input-field input:not(input[type="radio"]):focus + label {
     top: -20px;
     /*color: #333;*/

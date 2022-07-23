@@ -8,8 +8,7 @@
 
 .layout4 layout-module,
 .layout4 .flex-container {
-	display: flex;
-	flex-direction: column;
+	display: grid;
 	gap: 40px;
 }
 
@@ -81,12 +80,12 @@
 @media (min-width: 1155px) {
 
 	.layout4 layout-module {
-		flex-direction: row;
-		align-items: flex-start;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
 		gap: 10%;
 	}
-	.layout4 layout-module > * {
-		flex-basis: 100%;
+	.layout4 layout-module detail-section {
+		grid-column: 2 / 4;
 
 	}
 	

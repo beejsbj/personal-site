@@ -6,7 +6,6 @@
 				<h2 class="loud-voice"> Heading level 2 small </h2>
 				<p class="intro-voice"> This is some body text. This is some body text. This is some body text. This is some body text. This is some body fellow. This is some body text. </p>
 			</layout-header>
-			<div class="flex-container">
 				<detail-section>
 				<h1 class="teaser-voice">Little teaser</h1>
 				<ul class="card-list">
@@ -27,7 +26,6 @@
 				<?php } ?>
 			</ul>
 			</detail-section>
-			</div>
 		</layout-module>
 	</inner-column>
 </section>

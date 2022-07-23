@@ -27,7 +27,7 @@
 
 
 
-    // showPageErrors();
+    
 
     $principal = 0;
     $rate = 0;

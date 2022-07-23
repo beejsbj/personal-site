@@ -19,15 +19,10 @@
 
     
 <?php
-function showPageErrors() {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-}
+ 
 
 
 
-// showPageErrors();
 
 $amount = 0;
 $state = '';
@@ -80,30 +75,11 @@ if (isset($_POST['submitted'])){
 						       The tax is <span>$$tax</span>. <br>
 						       The total is <span>$$total</span>.";
 
-	        	}
-
-
+        		}
 	        	$class = "output-field";
-
         }
     }
-
-           
-           
-
-
 }
-
-
-
-
-
-    
-
-
-
-
-
 ?>
 
 <body>
@@ -115,7 +91,6 @@ if (isset($_POST['submitted'])){
     </header>
     <main>
         <div class="inner-column">
-
             <form method="POST">
             	<div class="input-field">
                     <input id="amount-ID" type="number" name="amount" placeholder="amount??" min="0.01" step="0.01">
@@ -125,13 +100,9 @@ if (isset($_POST['submitted'])){
                     <input id="state-ID" type="text" name="state" placeholder="state??" value="">
                     <label for="state-ID">What is the state?</label>
                 </div>
-
-
                 <button type="submit" name="submitted">
                 	Taxify
                 </button>
-
-
                 <div class="<?=$class?>">
                     <p>
                         <?=$output?>

@@ -16,5 +16,12 @@ $exercises = [
                     "Tax Calculator",
                     "Password Validation",
                     "Legal Driving Age",
+                    "Blood Alcohol Calculator",
+                    "Temperature Converter",
+                    "BMI Calculator",
+                    "Multistate Sales Tax Calculator",
+                    "Numbers to Names",
+                    "Comparing Numbers",
+                    "Troubleshooting Car Issues",
                     
              ];

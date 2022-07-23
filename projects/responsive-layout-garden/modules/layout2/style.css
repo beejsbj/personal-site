@@ -3,8 +3,7 @@
 }
 
 .layout2 layout-module {
-	display: flex;
-	flex-direction: column;
+	display: grid;
 	gap: 40px;
 }
 
@@ -51,14 +50,11 @@
 /*break point 1 - medium*/
 @media (min-width: 650px) {
 	.layout2 .card-list {
-		display: flex;
-		flex-wrap: wrap;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
 		gap: 15px;
 	}
 
-	.layout2 .card-list>* {
-		flex-basis: 48%;
-	}
 
 	.layout2 layout-card {
 		border: solid 3px black;
