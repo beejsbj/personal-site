@@ -1,3 +1,5 @@
+<?php include('functions.php'); ?>
+
 <!doctype html>
 
 <html lang='en' class='special-magic no-js'>
@@ -18,15 +20,21 @@
 		<header>
 			<inner-column>
 				<h1 class='title-voice'>Layout Garden</h1>
+				<site-menu>
+				<nav>
+					<a href="?page=home">Home</a>
+					<a href="?page=layout1">Layout 1</a>
+					<a href="?page=layout2">Layout 2</a>
+					<a href="?page=layout3">Layout 3</a>
+					<a href="?page=layout4">Layout 4</a>
+				</nav>
+			</site-menu>
 			</inner-column>
 		</header>
 
 		<main class="page-content">
 
-			<?php //include('modules/layout1/layout1.php'); ?>
-			<?php //include('modules/layout2/layout2.php'); ?>
-			<?php //include('modules/layout3/layout3.php'); ?>
-			<?php include('modules/layout4/layout4.php'); ?>
+			<?php renderPage (); ?>
 		</main>
 
 		<footer>

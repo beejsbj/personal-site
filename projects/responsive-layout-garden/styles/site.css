@@ -33,3 +33,14 @@ body {
 	max-width: 300px;
 	border-bottom-right-radius: 30px;
 }
+
+site-menu {
+	display: block;
+	padding-top: 2vh;
+}
+
+site-menu nav {
+	display:  flex;
+	gap: 20px;
+}
+

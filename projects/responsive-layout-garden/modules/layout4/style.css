@@ -1,5 +1,5 @@
 .layout4 {
-	
+	padding-bottom: 10vh;
 }
 
 .layout4 :is(detail-section, details, summary){
