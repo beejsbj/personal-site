@@ -11,4 +11,8 @@
 
 
 
-	
+	function isChecked($name, $value){
+  		if ($name == $value){
+    		return 'checked';
+  		}
+}

@@ -22,6 +22,7 @@ display both area in feet and area in meters
 
 
 
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,8 +64,8 @@ $class = "hide";
  // $class = "output-field";
 
 
-$length = 0;
-$width = 0;
+$length = '';
+$width = '';
 
 $areaInFeet = 0;
 $areaInMeter = 0;
@@ -162,11 +163,11 @@ if (isset($_POST['submitted'])){
                     </div>
                 </div>
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="length" placeholder="length??" value="" step="0.01" min="1">
+                    <input type="text" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.01" min="1">
                     <label for=""> What is the length of the room?</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="width" placeholder="width??" value="" step="0.01"  min="1">
+                    <input type="text" class="text-number-input" required name="width" placeholder="width??" value="<?=$width?>" step="0.01"  min="1">
                     <label for=""> What is the width of the room?</label>
                 </div>
                 

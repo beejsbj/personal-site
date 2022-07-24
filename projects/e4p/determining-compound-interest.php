@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,20 +20,15 @@
 
     
 <?php
-    function showPageErrors() {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-    }
-
+ 
 
 
     
 
-    $principal = 0;
-    $rate = 0;
-    $time = 0;
-    $number = 0;
+    $principal = '';
+    $rate = '';
+    $time = '';
+    $number = '';
 
 
     $amount = 0;
@@ -110,19 +106,19 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <div class="input-field">
-                    <input id="principal-ID" type="text" class="text-number-input" required name="principal" placeholder="principal?" value="" min="0.01" step="0.01">
+                    <input id="principal-ID" type="text" class="text-number-input" required name="principal" placeholder="principal?" value="<?=$principal?>" min="0.01" step="0.01">
                     <label for="principal-ID">What is the principal amount?</label>
                 </div>
                 <div class="input-field">
-                    <input id="rate-ID" type="text" class="text-number-input" required name="rate" placeholder="rate?" value="" min="0.01" step="0.01">
+                    <input id="rate-ID" type="text" class="text-number-input" required name="rate" placeholder="rate?" value="<?=$rate?>" min="0.01" step="0.01">
                     <label for="rate-ID">What is the rate?</label>
                 </div>
                 <div class="input-field">
-                    <input id="time-ID" type="text" class="text-number-input" required name="time" placeholder="time?" value="" min="1" step="1">
+                    <input id="time-ID" type="text" class="text-number-input" required name="time" placeholder="time?" value="<?=$time?>" min="1" step="1">
                     <label for="time-ID">What is the number of years?</label>
                 </div>
                 <div class="input-field">
-                    <input id="number-ID" type="text" class="text-number-input" required name="number" placeholder="Compound number?" value="" min="1" step="1">
+                    <input id="number-ID" type="text" class="text-number-input" required name="number" placeholder="Compound number?" value="<?=$number?>" min="1" step="1">
                     <label for="number-ID">Times interest is compounded per year?</label>
                 </div>
 

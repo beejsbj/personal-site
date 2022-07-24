@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +47,7 @@ $legalAges = [
                 "usa" => 16,
             ];
 
-$age = 0;
+$age = '';
 
 $legalInCountryArr = [];
 $countryOutput = '';
@@ -74,12 +75,22 @@ if (
     foreach ($legalAges as $country => $countryAge) {
         if ($age >= $countryAge) {
             array_push($legalInCountryArr, $country);
+        } else {
+
         }
     }
-    $countryOutput = '';
-    foreach ($legalInCountryArr as $country) {
-        $countryOutput = $countryOutput . "<li><span>" . ucfirst($country) . "</span></li>";
+
+    if (empty($legalInCountryArr)) {
+        $countryOutput = "<li><span>No where</span></li>";
+    } else {
+
+        foreach ($legalInCountryArr as $country) {
+            $countryOutput = $countryOutput . "<li><span>" . ucfirst($country) . "</span></li>";
+         }
     }
+
+    
+
     $output = "You are old enough to legally drive in: ";
 
 
@@ -105,7 +116,7 @@ if (
             <form method="POST">
 
                 <div class="input-field">
-                    <input id="age-ID" type="text" class="text-number-input" required name="age" placeholder="aGe??!!?" min="1" step="1" value="">
+                    <input id="age-ID" type="text" class="text-number-input" required name="age" placeholder="aGe??!!?" min="1" step="1" value="<?=$age?>">
                     <label for="age-ID">What is your age?</label>
                 </div>
 

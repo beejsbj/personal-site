@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +25,7 @@
 
 
 
-$amount = 0;
+$amount = '';
 $state = '';
 $county = '';
 $countyTax = 0;
@@ -102,15 +103,15 @@ if (isset($_POST['submitted'])){
         <div class="inner-column">
             <form method="POST">
             	<div class="input-field">
-                    <input id="amount-ID" type="number" class="text-number-input" required required name="amount" placeholder="amount??" min="0.01" step="0.01">
+                    <input id="amount-ID" type="number" class="text-number-input" required required name="amount" placeholder="amount??" min="0.01" step="0.01" value="<?=$amount?>">
                     <label for="amount-ID">What is the order amount?</label>
                 </div>
                 <div class="input-field">
-                    <input id="state-ID" type="text" class="text-number-input" required name="state" placeholder="state??" value="">
+                    <input id="state-ID" type="text" class="text-number-input" required name="state" placeholder="state??" value="<?=$state?>">
                     <label for="state-ID">What is the state?</label>
                 </div>
                 <div class="input-field">
-                    <input id="county-ID" type="text" class="text-number-input" required name="county" placeholder="county??" value="">
+                    <input id="county-ID" type="text" class="text-number-input" required name="county" placeholder="county??" value="<?=$county?>">
                     <label for="county-ID">if WI, enter county?</label>
                 </div>
                 <button type="submit" name="submitted">

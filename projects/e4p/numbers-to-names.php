@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -110,7 +111,7 @@ function numToName ($number, $language, $array){
 	return $array[$number][$language];
 } 
 
-$number = 0;
+$number = '';
 $name = '';
 $language = '';
 
@@ -175,7 +176,7 @@ if (
                     <label for="language-ID">Choose a language</label>
                 </div>
                 <div class="input-field">
-                    <input id="number-ID" type="number" min="1" max="12" step="1" class="text-number-input" class="text-number-input" required name="number" placeholder="number??" value="">
+                    <input id="number-ID" type="number" min="1" max="12" step="1" class="text-number-input" class="text-number-input" required name="number" placeholder="number??" value="<?=$number?>">
                     <label for="number-ID">Enter number of month</label>
                 </div>
 

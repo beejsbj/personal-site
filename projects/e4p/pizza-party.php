@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,9 +35,9 @@
 $class = "hide";
  // $class = "output-field";
 
-$people = 0;
-$pizza = 0;
-$slicesPerPizza = 0;
+$people = '';
+$pizza = '';
+$slicesPerPizza = '';
 $totalSlices = 0;
 $slicesPerPerson = 0;
 
@@ -144,15 +145,15 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="people" placeholder="How many people?" value="">
+                    <input type="text" class="text-number-input" required name="people" placeholder="How many people?" value="<?=$people?>">
                     <label for="">How many people?</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="pizza" placeholder="How many pizzas?" value="">
+                    <input type="text" class="text-number-input" required name="pizza" placeholder="How many pizzas?" value="<?=$pizza?>">
                     <label for="">How many pizzas do you have?</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="slicesPerPizza" placeholder="How many slices?" value="">
+                    <input type="text" class="text-number-input" required name="slicesPerPizza" placeholder="How many slices?" value="<?=$slicesPerPizza?>">
                     <label for="">How many slices does each pizza have?</label>
                 </div>
 

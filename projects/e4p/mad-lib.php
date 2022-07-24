@@ -1,4 +1,5 @@
 
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,8 +31,8 @@
 $class = "hide";
 $output = '';
 
-$quote = '';
-$author = '';
+$noun = '';
+$verb = '';
 $adjective = '';
 $adverb = '';
 
@@ -97,19 +98,19 @@ if (isset($_POST['submitted'])) {
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="noun" placeholder="noun" value="">
+                    <input type="text" class="text-number-input" required name="noun" placeholder="noun" value="<?=$noun?>">
                     <label for="">Enter a noun</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="verb" placeholder="verb" value="">
+                    <input type="text" class="text-number-input" required name="verb" placeholder="verb" value="<?=$verb?>">
                     <label for="">Enter a verb</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="adjective" placeholder="adjective" value="">
+                    <input type="text" class="text-number-input" required name="adjective" placeholder="adjective" value="<?=$adjective?>">
                     <label for="">Enter an adjective</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="adverb" placeholder="adverb" value="">
+                    <input type="text" class="text-number-input" required name="adverb" placeholder="adverb" value="<?=$adverb?>">
                     <label for="">Enter an adverb</label>
                 </div>
 

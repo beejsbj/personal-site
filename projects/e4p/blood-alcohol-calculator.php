@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,9 +34,9 @@ function BACalc($gender, $weight, $number, $time){
 
 
 $gender = ''; //selected gender
-$weight = 0; //weight in pounds
-$number = 0; // number of drinks
-$time = 0; //time since last drink
+$weight = ''; //weight in pounds
+$number = ''; // number of drinks
+$time = ''; //time since last drink
 
 
 
@@ -90,25 +91,25 @@ if (
 
                 <div class="radio-list">
                     <div class="input-field">
-                        <input id="male-ID" type="radio" name="gender" value="male">
+                        <input id="male-ID" type="radio" <?=isChecked($gender, 'male')?> name="gender" value="male">
                         <label for="male-ID">Male</label>
                     </div> 
                     <div class="input-field">
-                        <input id="female-ID" type="radio" name="gender" value="female">
+                        <input id="female-ID" type="radio" <?=isChecked($gender, 'female')?> name="gender" value="female">
                         <label for="female-ID">Female</label>
                     </div>   
                 </div>
 
                 <div class="input-field">
-                    <input id="weight-ID" type="number" class="text-number-input" required name="weight" placeholder="weight??" value="">
+                    <input id="weight-ID" type="number" class="text-number-input" required name="weight" placeholder="weight??" value="<?=$weight?>">
                     <label for="weight-ID">Enter your weight in pounds</label>
                 </div>
                 <div class="input-field">
-                    <input id="number-ID" type="number" class="text-number-input" required name="number" placeholder="how many drinks??" value="">
+                    <input id="number-ID" type="number" class="text-number-input" required name="number" placeholder="how many drinks??" value="<?=$number?>">
                     <label for="number-ID">Enter number of drinks</label>
                 </div>
                 <div class="input-field">
-                    <input id="time-ID" type="number" class="text-number-input" required name="time" placeholder="time??" value="">
+                    <input id="time-ID" type="number" class="text-number-input" required name="time" placeholder="time??" value="<?=$time?>">
                     <label for="time-ID">how many hours since last drink?</label>
                 </div>
 

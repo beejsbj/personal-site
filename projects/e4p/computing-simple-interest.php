@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,19 +20,15 @@
 
     
 <?php
-    function showPageErrors() {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-    }
+
 
 
 
     
 
-    $principal = 0;
-    $rate = 0;
-    $time = 0;
+    $principal = '';
+    $rate = '';
+    $time = '';
     $amount = 0;
 
 
@@ -96,7 +93,7 @@ if (isset($_POST['submitted'])){
     <header>
         <div class="inner-column">
             <a href="index.php">⬅</a>
-            <h1>Computing Simple Interest</h1>
+            <h1>Simple Interest</h1>
         </div>
     </header>
     <main>
@@ -105,15 +102,15 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <div class="input-field">
-                    <input id="principal-ID" type="text" class="text-number-input" required name="principal" placeholder="principal?" value="" min="0.01" step="0.01">
+                    <input id="principal-ID" type="text" class="text-number-input" required name="principal" placeholder="principal?" value="<?=$principal?>" min="0.01" step="0.01">
                     <label for="principal-ID">Enter the principal</label>
                 </div>
                 <div class="input-field">
-                    <input id="rate-ID" type="text" class="text-number-input" required name="rate" placeholder="rate?" value="" min="0.01" step="0.01">
+                    <input id="rate-ID" type="text" class="text-number-input" required name="rate" placeholder="rate?" value="<?=$rate?>" min="0.01" step="0.01">
                     <label for="rate-ID">Enter the rate of interest</label>
                 </div>
                 <div class="input-field">
-                    <input id="time-ID" type="text" class="text-number-input" required name="time" placeholder="time?" value="" min="1" step="1">
+                    <input id="time-ID" type="text" class="text-number-input" required name="time" placeholder="time?" value="<?=$time?>" min="1" step="1">
                     <label for="time-ID">Enter the number of years</label>
                 </div>
 

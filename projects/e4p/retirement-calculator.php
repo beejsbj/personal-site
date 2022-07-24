@@ -16,6 +16,7 @@
 
 
 
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,8 +50,8 @@ $class = "hide";
 
 
 $currentYear = date("Y");
-$currentAge = 0;
-$retireAge = 0;
+$currentAge = '';
+$retireAge = '';
 $ageDifference = 0;
 $retireYear = 0;
 
@@ -130,11 +131,11 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="currentAge" placeholder="current age?" value="" min="0">
+                    <input type="text" class="text-number-input" required name="currentAge" placeholder="current age?" value="<?=$currentAge?>" min="0">
                     <label for="">What is your current age?</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="retireAge" placeholder="age to retire?" value="" min="0">
+                    <input type="text" class="text-number-input" required name="retireAge" placeholder="age to retire?" value="<?=$retireAge?>" min="0">
                     <label for="">At what age would you like to retire?</label>
                 </div>
 

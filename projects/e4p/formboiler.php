@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,7 +66,7 @@ if (
             <form method="POST">
 
                 <div class="input-field">
-                    <input id="input1-ID" type="text" class="text-number-input" class="text-number-input" required name="input1" placeholder="input1??" value="">
+                    <input id="input1-ID" type="text" class="text-number-input" class="text-number-input" required name="input1" placeholder="input1??" value="<?=$  ?>">
                     <label for="input1-ID"></label>
                 </div>
 

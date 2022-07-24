@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,7 +22,7 @@
 <?php
  
 $unit = '';
-$temperature = 0;
+$temperature = '';
 $f = 0;
 $c = 0;
 $k = 0;
@@ -57,7 +58,7 @@ if (
         $output = "The temperature in Farenheit is <span>$f</span><br>The temperature in Kelvin is <span>$k</span>";
     }
     if ($unit == 'farenheit') {
-        $c = ($temperature - 32) * 5 / 9;
+        $c = round(($temperature - 32) * 5 / 9, 2);
         $k = $c + 273.15;
         $output = "The temperature in Celcius is <span>$c</span><br>The temperature in Kelvin is <span>$k</span>";
     }
@@ -89,21 +90,21 @@ if (
 
                 <div class="radio-list">
                     <div class="input-field">
-                        <input id="celcius-ID" type="radio" name="unit" value="celcius">
+                        <input id="celcius-ID" type="radio" <?=isChecked($unit, 'celcius')?> name="unit" value="celcius">
                         <label for="celcius-ID">Celcius</label>
                     </div>
                     <div class="input-field">
-                        <input id="farenheit-ID" type="radio" name="unit" value="farenheit">
+                        <input id="farenheit-ID" type="radio" <?=isChecked($unit, 'farenheit')?> name="unit" value="farenheit">
                         <label for="farenheit-ID">Farenheit</label>
                     </div>
                     <div class="input-field">
-                        <input id="kelvin-ID" type="radio" name="unit" value="kelvin">
+                        <input id="kelvin-ID" type="radio" <?=isChecked($unit, 'kelvin')?> name="unit" value="kelvin">
                         <label for="kelvin-ID">Kelvin</label>
                     </div>
                 </div>
 
                 <div class="input-field">
-                    <input id="temperature-ID" type="text" class="text-number-input" required step="0.1" name="temperature" placeholder="temperature??" value="">
+                    <input id="temperature-ID" type="text" class="text-number-input" required step="0.1" name="temperature" placeholder="temperature??" value="<?=$temperature?>">
                     <label for="temperature-ID">temperature in selected unit?</label>
                 </div>
 

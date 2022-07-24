@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -87,11 +88,11 @@ if (
             <form method="POST">
 
                 <div class="input-field">
-                    <input id="username-ID" type="text" class="text-number-input" required name="username" placeholder="username??" value="">
+                    <input id="username-ID" type="text" class="text-number-input" required name="username" placeholder="username??" value="<?=$username?>">
                     <label for="username-ID">Username</label>
                 </div>
                 <div class="input-field">
-                    <input required class="text-number-input" id="password-ID" type="password" name="password" placeholder="password?!" value="">
+                    <input required class="text-number-input" id="password-ID" type="password" name="password" placeholder="password?!" value="<?=$password?>">
                     <label for="password-ID">password</label>
                 </div>
 

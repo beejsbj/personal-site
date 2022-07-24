@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,8 +13,8 @@
     <?php
  
 
-$height = 0;
-$weight = 0;
+$height = '';
+$weight = '';
 $bmi = 0;
 
 
@@ -68,25 +69,17 @@ if (
             <div class="inner-column">
                 <form method="POST">
                     <div class="input-field range-field">
-                        <input id="height-ID" type="range" min="1" max="120" step="1" required name="height" placeholder="height??" value="">
+                        <input id="height-ID" type="range" min="1" max="120" step="1" required name="height" placeholder="height??" value="<?=$height?>">
                         <label for="height-ID">
                             Height: <span></span>
                         </label>
                     </div>
                     <div class="input-field range-field">
-                        <input id="weight-ID" type="range" min="1" max="300" step="1" required name="weight" placeholder="weight??" value="">
+                        <input id="weight-ID" type="range" min="1" max="300" step="1" required name="weight" placeholder="weight??" value="<?=$weight?>">
                         <label for="weight-ID">
                             Weight: <span></span>
                         </label>
                     </div>
-                   <!--  <div class="input-field">
-                        <input id="height-ID" type="text" class="text-number-input" min="1" step="0.1" required name="height" placeholder="height??" value="">
-                        <label for="height-ID">Enter your height in inches</label>
-                    </div>
-                    <div class="input-field">
-                        <input id="weight-ID" type="text" class="text-number-input" min="1" step="0.1" required name="weight" placeholder="weight??" value="">
-                        <label for="weight-ID">Enter your weight in pounds</label>
-                    </div> -->
                     <button type="submit" name="submitted"> BMIBMI </button>
                     <div class="<?=$class?>">
                         <p>

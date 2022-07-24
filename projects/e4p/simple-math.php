@@ -24,6 +24,7 @@
             "$first * $second = $product"
             "$first / $second = $quotient" -->
 
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,8 +70,8 @@ $class = "hide";
  // $class = "output-field";
 
 
-$first = 0;
-$second = 0;
+$first = '';
+$second = '';
 $sum = 0;
 $difference = 0;
 $product = 0;
@@ -146,12 +147,12 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="first" placeholder="first number?" value="" step="0.01">
-                    <label for="">What is the first number?</label>
+                    <input id="first-id" type="text" class="text-number-input" required name="first" placeholder="first number?" value="<?=$first?>" step="0.01">
+                    <label for="first-id">What is the first number?</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="second" placeholder="second number?" value="" step="0.01">
-                    <label for="">What is the second number?</label>
+                    <input id="second-id" type="text" class="text-number-input" required name="second" placeholder="second number?" value="<?=$second?>" step="0.01">
+                    <label for="second-id">What is the second number?</label>
                 </div>
 
 

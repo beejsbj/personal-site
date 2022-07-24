@@ -1,3 +1,4 @@
+<?php include('functions.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,8 +38,8 @@ $class = "hide";
 
 
 
-$length = 0;
-$width = 0;
+$length = '';
+$width = '';
 $area = 0;
 $gallons = 0;
 
@@ -111,12 +112,12 @@ if (isset($_POST['submitted'])){
                     </div>
                 </div> -->
                 <div class="input-field">
-                    <input id="lengthid" type="text" class="text-number-input" required name="length" placeholder="length??" value="" step="0.1" min="1">
+                    <input id="lengthid" type="text" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.1" min="1">
                     <label for="lengthid"> What is the length?</label>
                 </div>
 
                 <div class="input-field">
-                    <input id="widthid" type="text" class="text-number-input" required name="width" placeholder="width??" value="" step="0.1"  min="1">
+                    <input id="widthid" type="text" class="text-number-input" required name="width" placeholder="width??" value="<?=$width?>" step="0.1"  min="1">
                     <label for="widthid"> What is the width?</label>
                 </div>
 
