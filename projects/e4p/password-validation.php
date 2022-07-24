@@ -91,7 +91,7 @@ if (
                     <label for="username-ID">Username</label>
                 </div>
                 <div class="input-field">
-                    <input id="password-ID" type="password" name="password" placeholder="password?!" value="">
+                    <input class="text-number-input" id="password-ID" type="password" name="password" placeholder="password?!" value="">
                     <label for="password-ID">password</label>
                 </div>
 
