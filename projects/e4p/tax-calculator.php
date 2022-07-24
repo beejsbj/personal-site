@@ -93,11 +93,11 @@ if (isset($_POST['submitted'])){
         <div class="inner-column">
             <form method="POST">
             	<div class="input-field">
-                    <input id="amount-ID" type="number" name="amount" placeholder="amount??" min="0.01" step="0.01">
+                    <input id="amount-ID" type="text" class="text-number-input" required required name="amount" placeholder="amount??" min="0.01" step="0.01">
                     <label for="amount-ID">What is the order amount?</label>
                 </div>
                 <div class="input-field">
-                    <input id="state-ID" type="text" name="state" placeholder="state??" value="">
+                    <input id="state-ID" type="text" class="text-number-input" required name="state" placeholder="state??" value="">
                     <label for="state-ID">What is the state?</label>
                 </div>
                 <button type="submit" name="submitted">

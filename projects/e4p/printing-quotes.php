@@ -85,11 +85,11 @@ if (isset($_POST['submitted'])) {
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="text" name="quote" placeholder="What is the Quote?" value="">
+                    <input type="text" class="text-number-input" required name="quote" placeholder="What is the Quote?" value="">
                     <label for="">What is the Quote?</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" name="author" placeholder="Who said it?" value="">
+                    <input type="text" class="text-number-input" required name="author" placeholder="Who said it?" value="">
                     <label for="">Who said it?</label>
                 </div>
 

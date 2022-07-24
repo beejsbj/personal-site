@@ -80,7 +80,7 @@ if (
     foreach ($legalInCountryArr as $country) {
         $countryOutput = $countryOutput . "<li><span>" . ucfirst($country) . "</span></li>";
     }
-    $output = "You are old enough to legally drive in: <ul class='country-list'>$countryOutput</ul>";
+    $output = "You are old enough to legally drive in: ";
 
 
 
@@ -105,7 +105,7 @@ if (
             <form method="POST">
 
                 <div class="input-field">
-                    <input id="age-ID" type="number" name="age" placeholder="aGe??!!?" min="1" step="1" value="">
+                    <input id="age-ID" type="text" class="text-number-input" required name="age" placeholder="aGe??!!?" min="1" step="1" value="">
                     <label for="age-ID">What is your age?</label>
                 </div>
 
@@ -119,6 +119,9 @@ if (
                     <p>
                         <?=$output?>
                     </p>
+                    <ul class='country-list'>
+                        <?=$countryOutput?>
+                    </ul>
                 </div>
                 
             </form>

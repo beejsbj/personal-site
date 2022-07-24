@@ -5,25 +5,14 @@
     font-family: "expose";
     src: url("expose.otf");
 }
-
-/**Clarity**/
-/*body {
-    outline: 1px solid red;
+html {
+    --delay: 2s;
 }
 
-body * {
-    outline: 1px solid black;
-    margin: 1px;
-}
 
-body > * {
-    outline-color: blue;
-}
 
-body > * > * {
-    outline-color: forestgreen;
 
-}*/
+
 /**STRUCTURE******/
 .inner-column {
     max-width: clamp(70ch, 50vw, 120ch);
@@ -37,23 +26,48 @@ body > * > * {
 /**TYPOGRAPHY******/
 /**Sections******/
 body {
+    padding-bottom: 30vh;
     background-color: hsla(360, 88%, 30%, 1.00);
 }
 
 h1 {
     text-align: center;
     margin-top: 10%;
-    margin-bottom: 125px;
+    margin-bottom: 100px;
     color: white;
     font-family: expose;
-    font-size: clamp(100px, 10vw, 200px);
+    font-size: clamp(4.38rem, calc(3.78rem + 2.98vw), 7.50rem);
     background-color: hsla(360, 88%, 30%, 1.00);
     transition-duration: 0.2s;
+    /*position: relative;*/
 }
 
-h1:hover {
-    color: black;
+/*h1:after {
+    content: "";
+    display: block;
+    height: 100%;
+    left: 0;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    --slice-0: inset(50% 50% 50% 50%);
+    --slice-1: inset(80% -6px 0 0);
+    --slice-2: inset(50% -6px 30% 0);
+    --slice-3: inset(10% -6px 85% 0);
+    --slice-4: inset(40% -6px 43% 0);
+    --slice-5: inset(80% -6px 5% 0);
+    z-index: -1;
 }
+
+h1:hover:after {
+    animation: 1s glitch;
+    animation-delay: var(--delay);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+
+    animation-timing-function: steps(2, start);
+}*/
 
 header a {
     background-color: black;
@@ -68,7 +82,7 @@ header a {
 form {
     display: flex;
     flex-direction: column;
-    gap: 60px;
+    gap: 80px;
 }
 
 /* Input ************************************************/
@@ -93,7 +107,7 @@ form {
     color: #9b9b9b;
 }
 
-.input-field input:not(input[type="radio"]) + label {
+.input-field .text-number-input + label {
     width: 100%;
     opacity: 0.6;
     font-weight: 300;
@@ -114,11 +128,12 @@ form {
 
 
 
-/*.input-field input:not(input[type="radio"]):valid + label,*/
-.input-field input:not(input[type="radio"]):focus + label {
+.input-field .text-number-input:valid + label,
+.input-field .text-number-input:focus + label {
     top: -20px;
     /*color: #333;*/
     opacity: 1;
+    color: white;
     font-size: 1.2rem;
 }
 
@@ -131,15 +146,52 @@ input {
     background-color: hsla(360, 88%, 30%, 1.00);
     text-align: center;
     border: none;
-    border-bottom: 5px solid black;
     border-radius: 5px;
     /* animation */
     transition: 0.5s;
     /*transform: rotate(3deg);*/
 }
 
-input:focus:not(input[type="radio"]) {
-    border: none;
+.text-number-input {
+    padding: 20px;
+    border-bottom: 5px solid black;
+}
+/*.input-field:after {
+    content: "";
+    position: absolute;
+    background-color: black;
+    border-radius: 5px;
+    bottom: 0;
+    left: 0;
+    width: 5px;
+    height: 0px;
+    z-index: 111;
+    transform: bottom left;
+    transition-duration: 0.3s;
+    pointer-events: none;
+}
+.input-field:before {
+    content: "";
+    position: absolute;
+    background-color: black;
+    border-radius: 5px;
+    bottom: 0;
+    right: 0;
+    width: 5px;
+    height: 0px;
+    z-index: 111;
+    transform: bottom right;
+    transition-duration: 0.3s;
+    pointer-events: none;
+}
+
+.input-field:hover:after,
+.input-field:hover:before {
+    height: 100%;
+
+}*/
+
+.text-number-input:focus {
     color: white;
     background-color: black;
     /*font-size: 25px;*/
@@ -149,10 +201,7 @@ input:focus:not(input[type="radio"]) {
     /*transform: rotate(-3deg);*/
 }
 
-input:not(input[type="radio"]) {
-    padding: 20px;
 
-}
 
 ::placeholder {
     color: white;
@@ -173,19 +222,6 @@ input:focus::placeholder {
 
 /*Radio*/
 
-.input-field input[type="radio"] + label {
-    width: 100%;
-    opacity: 0.6;
-    font-weight: 300;
-    font-size: 1.2rem;
-    margin: 0;
-
-}
-
-.input-field input[type="radio"]:focus + label {
-    opacity: 1;
-}
-
 .radio-list {
     display: flex;
     flex-direction: row;
@@ -201,45 +237,251 @@ input:focus::placeholder {
     justify-content: center;
 }
 
+
+
 .radio-list input[type="radio"] {
     width: 1em;
     height: 1em;
     border-radius: 50%;
     margin: 0;
     /*background-color: black;*/
+    display: none;
 }
+.input-field input[type="radio"] + label {
+    width: 100%;
+    opacity: 0.6;
+    font-weight: 300;
+    font-size: 1.2rem;
+    margin: 0;
+    border: 3px solid black;
+    padding: 5px;
+    border-radius: 5px;
+    animation: 0.3s pickmeBounce infinite;
+    cursor: pointer;
+
+}
+
+.input-field input[type="radio"] + label:hover {
+    animation: none;
+    transform: rotate(-4deg) scale(1.5);
+    opacity: 1;
+    color: white;
+}
+
+.input-field input[type="radio"]:checked + label {
+    opacity: 1;
+    color: white;
+    /*font-family: 'Expose';*/
+    font-size: 1.8rem;
+    position: relative;
+    transform: rotate(-4deg);
+    border: 0px;
+    animation: 5s pickmeBounce infinite;
+}
+
+.input-field input[type="radio"] + label {
+    /*animation: none;*/
+}
+
+.input-field input[type="radio"]:checked + label:after {
+    content: "SELECTED";
+    opacity: 1;
+    color: white;
+    font-family: 'Expose';
+    font-size: 1.8rem;
+    background-color: black;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(30deg);
+
+}
+
+
+
+
+
+
+
+/*range-slider  */
+
+.range-field {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 30px;
+}
+
+input[type="range"] + label {
+    width: 100%;
+    opacity: 1;
+    font-weight: 300;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  background: white;
+  outline: none;
+  border: 0px solid white;
+  border-radius: 5px;
+}
+
+
+/* for chrome/safari */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 35px;
+  background: #000;
+  cursor: pointer;
+  border: 5px solid white;
+  border-radius: 4px;
+}
+
+/* for firefox */
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #000;
+  cursor: pointer;
+  border: 5px solid white;
+  border-radius: 4px;
+}
+
+
+
+
+
+/*select dropdown list*/
+.select-list {
+    display: flex;
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* button *****************************************************/
 .buttonWrapper {
     /*Positions*/
 }
 
-button {
-    /* styles */
-    /*margin-top: 40px;*/
-    font-family: monospace;
+
+
+/* CSS */
+button,
+button:after {
     width: 100%;
+    font-family: monospace;
     color: white;
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: bolder;
-    padding: 16px;
+    padding: 38px;
     border: none;
     border-radius: 5px;
     background-color: hsla(360, 88%, 35%, 1.00);
-    transition-duration: 0.2s;
-    margin- top
-    /*transform: rotate(3deg);*/
+    /*transition-duration: 0.2s;*/
+    position: relative;
+    /*overflow: hidden;*/
+    touch-action: manipulation;
+    cursor: pointer;
+}
+
+button:after {
+    /*height: 200%;*/
+    width: 90%;
+    --slice-0: inset(50% 50% 50% 50%);
+    --slice-1: inset(80% -6px 0 0);
+    --slice-2: inset(50% -6px 30% 0);
+    --slice-3: inset(10% -6px 85% 0);
+    --slice-4: inset(40% -6px 43% 0);
+    --slice-5: inset(80% -6px 5% 0);
+    content: 'PUSH ME';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    text-shadow: -3px -3px 0px #F8F005, 3px 3px 0px #00E6F6;
+    clip-path: var(--slice-0);
+}
+
+button:hover:after {
+
+    animation: 1s glitch;
+    animation-delay: var(--delay);
+
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+
+    animation-timing-function: steps(2, start);
+}
+
+button:before {
+    background-color: #111;
+    border-radius: 8px;
+    content: "";
+    display: block;
+    height: 100%;
+    left: 0;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    transform: translate(15px, 15px);
+    transition: transform .2s ease-out;
+    z-index: -1;
+}
+
+button:hover:before {
+    transform: translate(-15px, -15px);
+}
+
+button:hover:before {
+    --slice-0: inset(50% 50% 50% 50%);
+    --slice-1: inset(80% -6px 0 0);
+    --slice-2: inset(50% -6px 30% 0);
+    --slice-3: inset(10% -6px 85% 0);
+    --slice-4: inset(40% -6px 43% 0);
+    --slice-5: inset(80% -6px 5% 0);
+    animation: 2s glitch;
+    animation-delay: var(--delay);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+
+    animation-timing-function: steps(1, start);
+}
+
+button:active:before {
+    transform: translate(0, 0);
 }
 
 button:hover {
-    /*transition-duration: 0.25s;*/
-    color: white;
-    font-family: expose;
-    /*font-size: 70px;*/
-    border: none;
-    background-color: black;
-    box-shadow: 0px 20px 30px black;
+    outline: 0;
 }
+
+
+
+
+/*output-field*/
 
 .output-field {
     font-family: monospace;
@@ -255,8 +497,9 @@ button:hover {
     line-height: 1.2em;
 }
 
-.output-field span {
-    font-weight: 700;
+.output-field span,
+.input-field label span {
+    /*font-weight: 700;*/
     color: hsla(60, 100%, 70%, 1.00);
 }
 

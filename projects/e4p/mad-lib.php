@@ -97,19 +97,19 @@ if (isset($_POST['submitted'])) {
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="text" name="noun" placeholder="noun" value="">
+                    <input type="text" class="text-number-input" required name="noun" placeholder="noun" value="">
                     <label for="">Enter a noun</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" name="verb" placeholder="verb" value="">
+                    <input type="text" class="text-number-input" required name="verb" placeholder="verb" value="">
                     <label for="">Enter a verb</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" name="adjective" placeholder="adjective" value="">
+                    <input type="text" class="text-number-input" required name="adjective" placeholder="adjective" value="">
                     <label for="">Enter an adjective</label>
                 </div>
                 <div class="input-field">
-                    <input type="text" name="adverb" placeholder="adverb" value="">
+                    <input type="text" class="text-number-input" required name="adverb" placeholder="adverb" value="">
                     <label for="">Enter an adverb</label>
                 </div>
 

@@ -19,31 +19,55 @@
 
     
 <?php
- 
-
-
-
-
-
-
-
-
-
-
-
 $class = "hide";
- // $class = "output-field";
+
+function BACalc($gender, $weight, $number, $time){
+     $ratios = [
+        "male" => 0.73,
+        "female" => 0.66,
+    ];
+    $amount = $number * 12; //12 ounces
+    return ($amount * 5.14 / $weight * $ratios[$gender]) - (.015 * $time);
+}
+
+
+
+$gender = ''; //selected gender
+$weight = 0; //weight in pounds
+$number = 0; // number of drinks
+$time = 0; //time since last drink
 
 
 
 
 if (
     isset($_POST['submitted']) &&
-    (isset($_POST['input1']))  && 
-    ($_POST['input1'] != '')   && 
-    (isset($_POST['input2']))  && 
-    ($_POST['input2'] != '')
+    (isset($_POST['gender']))  && 
+    ($_POST['gender'] != '')   && 
+    (isset($_POST['weight']))  && 
+    ($_POST['weight'] != '')   &&
+    (isset($_POST['number']))  && 
+    ($_POST['number'] != '')   &&
+    (isset($_POST['time']))    && 
+    ($_POST['time'] != '')
 ) {
+    $gender = $_POST['gender'];
+    $weight = $_POST['weight'];
+    $number = $_POST['number'];
+    $time = $_POST['time'];
+
+    $result = round(BACalc($gender, $weight, $number, $time), 2);
+    // $result = 0.01;
+
+
+    if ($result >= 0.08) {
+        $output = "Your BAC is <span>$result</span><br>
+                    It is not legal for you to drive.";
+    } else {
+        $output = "Your BAC is <span>$result</span><br>
+                    You are good to drive.";
+    }
+
 
 
     $class = "output-field"; 
@@ -56,7 +80,7 @@ if (
     <header>
         <div class="inner-column">
             <a href="index.php">⬅</a>
-            <h1></h1>
+            <h1>Blood&nbspAlcohol Calculator</h1>
         </div>
     </header>
     <main>
@@ -64,14 +88,33 @@ if (
 
             <form method="POST">
 
+                <div class="radio-list">
+                    <div class="input-field">
+                        <input id="male-ID" type="radio" name="gender" value="male">
+                        <label for="male-ID">Male</label>
+                    </div> 
+                    <div class="input-field">
+                        <input id="female-ID" type="radio" name="gender" value="female">
+                        <label for="female-ID">Female</label>
+                    </div>   
+                </div>
+
                 <div class="input-field">
-                    <input id="input1-ID" type="text" name="input1" placeholder="input1??" value="">
-                    <label for="input1-ID"></label>
+                    <input id="weight-ID" type="number" class="text-number-input" required name="weight" placeholder="weight??" value="">
+                    <label for="weight-ID">Enter your weight in pounds</label>
+                </div>
+                <div class="input-field">
+                    <input id="number-ID" type="number" class="text-number-input" required name="number" placeholder="how many drinks??" value="">
+                    <label for="number-ID">Enter number of drinks</label>
+                </div>
+                <div class="input-field">
+                    <input id="time-ID" type="number" class="text-number-input" required name="time" placeholder="time??" value="">
+                    <label for="time-ID">how many hours since last drink?</label>
                 </div>
 
 
-                <button type="submit" name="submitted">
-
+                <button class="button-49" type="submit" name="submitted">
+                    BACBAC
                 </button>
 
 

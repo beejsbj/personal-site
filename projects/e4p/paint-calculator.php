@@ -111,12 +111,12 @@ if (isset($_POST['submitted'])){
                     </div>
                 </div> -->
                 <div class="input-field">
-                    <input id="lengthid" type="number" name="length" placeholder="length??" value="" step="0.1" min="1">
+                    <input id="lengthid" type="text" class="text-number-input" required name="length" placeholder="length??" value="" step="0.1" min="1">
                     <label for="lengthid"> What is the length?</label>
                 </div>
 
                 <div class="input-field">
-                    <input id="widthid" type="number" name="width" placeholder="width??" value="" step="0.1"  min="1">
+                    <input id="widthid" type="text" class="text-number-input" required name="width" placeholder="width??" value="" step="0.1"  min="1">
                     <label for="widthid"> What is the width?</label>
                 </div>
 

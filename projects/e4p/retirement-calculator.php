@@ -130,11 +130,11 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="number" name="currentAge" placeholder="current age?" value="" min="0">
+                    <input type="text" class="text-number-input" required name="currentAge" placeholder="current age?" value="" min="0">
                     <label for="">What is your current age?</label>
                 </div>
                 <div class="input-field">
-                    <input type="number" name="retireAge" placeholder="age to retire?" value="" min="0">
+                    <input type="text" class="text-number-input" required name="retireAge" placeholder="age to retire?" value="" min="0">
                     <label for="">At what age would you like to retire?</label>
                 </div>
 

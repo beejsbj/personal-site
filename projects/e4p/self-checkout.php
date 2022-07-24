@@ -141,33 +141,33 @@ if (isset($_POST['submitted'])){
                 <item-field>
                     <h2>1</h2>
                     <div class="input-field">
-                    <input id="priceid1" type="number" name="price1" placeholder="Price?" value="">
+                    <input id="priceid1" type="text" class="text-number-input" required name="price1" placeholder="Price?" value="">
                     <label for="priceid1">Enter Price</label>
                 </div>
                 <div class="input-field">
-                    <input id="quantityid1" type="number" name="quantity1" placeholder="Quantity??" value="">
+                    <input id="quantityid1" type="text" class="text-number-input" required name="quantity1" placeholder="Quantity??" value="">
                     <label for="quantityid1">Enter Quantity</label>
                 </div>
                 </item-field>
                 <item-field>
                     <h2>2</h2>
                     <div class="input-field">
-                    <input id="priceid2" type="number" name="price2" placeholder="Price?" value="">
+                    <input id="priceid2" type="text" class="text-number-input" required name="price2" placeholder="Price?" value="">
                     <label for="priceid2">Enter Price</label>
                 </div>
                 <div class="input-field">
-                    <input id="quantityid2" type="number" name="quantity2" placeholder="Quantity??" value="">
+                    <input id="quantityid2" type="text" class="text-number-input" required name="quantity2" placeholder="Quantity??" value="">
                     <label for="quantityid2">Enter Quantity</label>
                 </div>
                 </item-field>
                 <item-field>
                     <h2>3</h2>
                     <div class="input-field">
-                    <input id="priceid3" type="number" name="price3" placeholder="Price?" value="">
+                    <input id="priceid3" type="text" class="text-number-input" required name="price3" placeholder="Price?" value="">
                     <label for="priceid3">Enter Price</label>
                 </div>
                 <div class="input-field">
-                    <input id="quantityid3" type="number" name="quantity3" placeholder="Quantity??" value="">
+                    <input id="quantityid3" type="text" class="text-number-input" required name="quantity3" placeholder="Quantity??" value="">
                     <label for="quantityid3">Enter Quantity</label>
                 </div>
                 </item-field>

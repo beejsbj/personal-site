@@ -87,7 +87,7 @@ if (
             <form method="POST">
 
                 <div class="input-field">
-                    <input id="username-ID" type="text" name="username" placeholder="username??" value="">
+                    <input id="username-ID" type="text" class="text-number-input" required name="username" placeholder="username??" value="">
                     <label for="username-ID">Username</label>
                 </div>
                 <div class="input-field">

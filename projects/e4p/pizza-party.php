@@ -144,15 +144,15 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="number" name="people" placeholder="How many people?" value="">
+                    <input type="text" class="text-number-input" required name="people" placeholder="How many people?" value="">
                     <label for="">How many people?</label>
                 </div>
                 <div class="input-field">
-                    <input type="number" name="pizza" placeholder="How many pizzas?" value="">
+                    <input type="text" class="text-number-input" required name="pizza" placeholder="How many pizzas?" value="">
                     <label for="">How many pizzas do you have?</label>
                 </div>
                 <div class="input-field">
-                    <input type="number" name="slicesPerPizza" placeholder="How many slices?" value="">
+                    <input type="text" class="text-number-input" required name="slicesPerPizza" placeholder="How many slices?" value="">
                     <label for="">How many slices does each pizza have?</label>
                 </div>
 

@@ -83,6 +83,28 @@
 	animation-timing-function: linear;
 }
 
+
+
+@keyframes pickmeBounce {
+
+	20% {
+		transform: scale(1.05) translate(1px, 1px);
+	}
+	40% {
+		transform: scale(1.05) translate(-1px, 1px);
+	}
+	60% {
+		transform: scale(1.05) translate(1px, -1px);
+	}
+	80% {
+		transform: scale(1.05) translate(-1px, -1px);
+	}
+
+
+
+	
+}
+
 @keyframes tiltBounce {
 	0% {
 		transform: scale(1) rotate(-7deg);
@@ -126,4 +148,55 @@
 		width: 100%;
 		transform: scale(1.25, 1) skewX(20deg) translateY(3px) rotateX(-40deg) rotateY(-10deg) rotateZ(-15deg);
 	}
+}
+
+
+@keyframes glitch {
+  0% {
+    clip-path: var(--slice-1);
+    transform: translate(-20px, -10px);
+  }
+  10% {
+    clip-path: var(--slice-3);
+    transform: translate(10px, 10px);
+    z-index: 11;
+  }
+  20% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 10px);
+  }
+  30% {
+    clip-path: var(--slice-3);
+    transform: translate(0px, 5px);
+    z-index: -1;
+  }
+  40% {
+    clip-path: var(--slice-2);
+    transform: translate(-5px, 0px);
+  }
+  50% {
+    clip-path: var(--slice-3);
+    transform: translate(5px, 0px);
+  }
+  60% {
+    clip-path: var(--slice-4);
+    transform: translate(5px, 10px);
+  }
+  70% {
+    clip-path: var(--slice-2);
+    transform: translate(-10px, 10px);
+  }
+  80% {
+    clip-path: var(--slice-5);
+    transform: translate(20px, -10px);
+    z-index: 11;
+  }
+  90% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 0px);
+  }
+  100% {
+    clip-path: var(--slice-1);
+    transform: translate(0);
+  }
 }
