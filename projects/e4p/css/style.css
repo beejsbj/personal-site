@@ -361,7 +361,10 @@ input[type="range"]::-moz-range-thumb {
 /*select dropdown list*/
 .select-list {
     display: flex;
-    
+    flex-direction: row-reverse;
+    gap: 20px;
+    justify-content: center;
+
 }
 
 
@@ -396,7 +399,7 @@ button:after {
     color: white;
     font-size: 2rem;
     font-weight: bolder;
-    padding: 38px;
+    padding: 20px;
     border: none;
     border-radius: 5px;
     background-color: hsla(360, 88%, 35%, 1.00);

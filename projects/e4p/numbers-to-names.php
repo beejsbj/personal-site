@@ -106,8 +106,8 @@ $numNameArr = [
 				'spanish' => 'Diciembre',
 			],
 	];
-function numToName ($number, $language){
-	return $numNameArr[$number][$language];
+function numToName ($number, $language, $array){
+	return $array[$number][$language];
 } 
 
 $number = 0;
@@ -132,12 +132,19 @@ $language = '';
 
 if (
     isset($_POST['submitted']) &&
-    (isset($_POST['input1']))  && 
-    ($_POST['input1'] != '')   && 
-    (isset($_POST['input2']))  && 
-    ($_POST['input2'] != '')
+    (isset($_POST['number']))  && 
+    ($_POST['number'] != '')   && 
+    (isset($_POST['language']))  && 
+    ($_POST['language'] != '')
 ) {
+	$number = $_POST['number'];
+	$language = $_POST['language'];
 
+	$name = numToName ($number, $language, $numNameArr);
+
+	$language = ucfirst($language);
+
+	$output = "The name of the month in <span>$language</span> is <span>$name</span>.";
 
     $class = "output-field"; 
 }
