@@ -4,7 +4,7 @@
 	"intro": "Lots and lots of them",
 	"sections": [
 		{
-			"id" : "things-grid",
+			"module" : "things-grid",
 			"heading": "grid of things",
 			"items" : [
 				{
@@ -22,7 +22,7 @@
 			]
 		},
 		{
-			"id" : "things-grid",
+			"module" : "things-grid",
 			"heading": "grid of things",
 			"items" : [
 				{
@@ -40,8 +40,7 @@
 			]
 		},
 		{
-			"id" : "list-section",
-			"heading": "list page section"
+			"module" : "section-test"
 		}
 	]
 }

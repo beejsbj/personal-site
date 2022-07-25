@@ -10,13 +10,12 @@
 	$sectionsArr = $pageData['sections'];
 
 	foreach ($sectionsArr as $section) {
-		$heading = $section['heading'];
-?>
-<section class="page-section">
-	<inner-column>
-		<h2 class="attention-voice">
-			<?=$heading?>
-		</h2>
-	</inner-column>
-</section>
+		$heading = $section['heading'];?>
+		<section class="page-section">
+			<inner-column>
+				<h2 class="attention-voice">
+					<?=$heading?>
+				</h2>
+			</inner-column>
+		</section>
 <?php } ?>

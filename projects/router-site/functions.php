@@ -48,11 +48,11 @@ function renderPageData(){
 	$page = currentPage();
   	
 
-  	if (!file_exists("data/$page.json")) {
-  		$json = file_get_contents("data/pageNotFound.json");
-  		//why isnt this working????? todo
+  	if (!file_exists("data/pages/$page.json")) {
+  		$json = file_get_contents("data/pages/pageNotFound.json");
+
   	} else {
-  		$json = file_get_contents("data/$page.json");
+  		$json = file_get_contents("data/pages/$page.json");
   	}
   	$data = json_decode($json, true);
   	return $data;
@@ -64,16 +64,16 @@ function renderPageData(){
 function renderPage ($data) {
 	$pageData = $data;
 	$page = currentPage();
-	// include("templates/pages/standard.php");
+	include("templates/pages/standard.php");
 
 
 	if (file_exists("templates/pages/$page/$page.php")) {
-		include("templates/pages/$page/$page.php");
+		// include("templates/pages/$page/$page.php");
 			
 
 	}
 	else {
-		include("templates/pages/pageNotFound.php");
+		// include("templates/pages/pageNotFound.php");
 	}
 }
 

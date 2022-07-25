@@ -4,7 +4,7 @@
 <?php format($pageData);?>
 
 <?php include('templates/modules/header/header.php'); ?>
-<main class="page-content dynamic-section">
+<main class="page-content">
 
 <!-- dynamic page rending -->
 	<?php renderPage($pageData); ?>

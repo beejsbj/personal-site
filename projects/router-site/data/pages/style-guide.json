@@ -1,0 +1,12 @@
+{
+	"id": "style-guide",
+	"title": "Style Guide",
+	"intro": "Styles live here",
+
+	"sections": [
+		{
+			"module" : "section-test",
+			"heading": "style section"
+		}
+	]
+}

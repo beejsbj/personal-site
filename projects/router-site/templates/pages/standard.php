@@ -10,13 +10,16 @@
 	$sectionsArr = $pageData['sections'];
 
 	foreach ($sectionsArr as $section) {
-		$heading = $section['heading'];
+		$module = $section['module'];
+
+		// if heading exists condition
+		$sectionHeading = $section['heading'] ?? "Default heading placefholder";
+
+		
 ?>
 <section class="page-section">
 	<inner-column>
-		<h2 class="attention-voice">
-			<?=$heading?>
-		</h2>
+		<?php include("templates/modules/$module/$module.php"); ?>
 	</inner-column>
 </section>
 <?php } ?>
