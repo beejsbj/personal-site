@@ -285,16 +285,18 @@ input:focus::placeholder {
 
 .input-field input[type="radio"]:checked + label:after {
     content: "SELECTED";
+
     opacity: 1;
     color: white;
     font-family: 'Expose';
     font-size: 1.8rem;
     background-color: black;
+    animation: stamp 0.4s ease-in;
 
     position: absolute;
     top: 0;
     left: 0;
-    transform: rotate(30deg);
+    transform: rotate(30deg) scale(0.9);
 
 }
 
