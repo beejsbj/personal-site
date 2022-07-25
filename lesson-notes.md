@@ -56,6 +56,59 @@
 
 
 
+# day 6/6
+	
+	- partials, a new name. modules is better. site menu can be a module
+	
+	- definetly prefer the names for php css files instead of "styles/templates"
+
+	- derek is creating a router boiler plate?
+
+	- where did derek get all the modules from? garden?
+
+	- this standard page thing feels so limiting. 
+
+	- okay, had to rewatch the video. feeling much better about it and the router site.
+		- i dislike how old things feel obsolete when we learn new things.
+		- will we ever use html the way we did near the start?
+		- derek posed this question but really how do we decide when to use the whole framework or when to not?
+		- when will the standard router be limiting?
+			- will i even be aware of it at the time? or will i be so bought into this framework and wont be able to see beyond the box?
+		- pages are now abstracted to data. and that feels kinna sad lol.
+		- i probably need to take a break.
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
