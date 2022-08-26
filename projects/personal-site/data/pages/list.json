@@ -1,0 +1,46 @@
+{
+	"id": "list",
+	"title": "Stuff list",
+	"intro": "Lots and lots of them",
+	"sections": [
+		{
+			"module" : "things-grid",
+			"heading": "grid of things",
+			"items" : [
+				{
+					"title": "thing 1",
+					"copy": "This is copy, copy!"
+				},
+				{
+					"title": "thing 2",
+					"copy": "This is copy, copy!"
+				},
+				{
+					"title": "thing 3",
+					"copy": "This is copy, copy!"
+				}
+			]
+		},
+		{
+			"module" : "things-grid",
+			"heading": "grid of things",
+			"items" : [
+				{
+					"title": "thing 1",
+					"copy": "This is copy, copy!"
+				},
+				{
+					"title": "thing 2",
+					"copy": "This is copy, copy!"
+				},
+				{
+					"title": "thing 3",
+					"copy": "This is copy, copy!"
+				}
+			]
+		},
+		{
+			"module" : "section-test"
+		}
+	]
+}

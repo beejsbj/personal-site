@@ -1,0 +1,16 @@
+{
+	"id": "home",
+	"title": "Welcome",
+	"intro": "You've made it!",
+
+	"sections": [
+		{
+			"module" : "section-test",
+			"heading": "My latest work"
+		},
+		{
+			"module" : "section-test",
+			"heading": "things i like section"
+		}
+	]
+}
