@@ -1,6 +1,6 @@
 <?php 
-	$introPara = $section['intro-paragraph'];
-	$items = $section['items'];
+	$introPara = $section['intro-paragraph'] ?? "This is the intro Paragraph";
+	$items = $section['items'] ?? [1, 2, 3];
 
  ?>
 
@@ -12,9 +12,9 @@
 	<?php 
 
 	 	foreach ($items as $project) {
-	 		$title = $project['title'];
-	 		$description = $project['description'];
-	 		$image = $project['image']; ?>
+	 		$title = $project['title']  ?? "Project Title";
+	 		$description = $project['description'] ?? "this is the Project Descripton";
+	 		$image = $project['image'] ?? "square.jpg"; ?>
 	 		<project-card>
 				<h1>
 					<?=$title?>
@@ -25,6 +25,7 @@
 				<picture>
 					<img src="images/<?=$image?>" alt="">
 				</picture>
+				<a href="projects/<?=dasher($title)?>">LINK</a>
 			</project-card>
 	 	<?php } ?>
 </projects-grid>

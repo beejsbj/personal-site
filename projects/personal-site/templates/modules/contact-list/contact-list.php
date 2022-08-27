@@ -8,10 +8,10 @@
 		<ul>
 			
 			<?php
-			$contacts = $section['contacts']; 
+			$contacts = $section['contacts'] ?? [1, 2, 3]; 
 			foreach ($contacts as $contact) { 
-				$name = $contact['name'];
-				$link = $contact['link'];
+				$name = $contact['name'] ?? "Contact name";
+				$link = $contact['link'] ?? "#";
 				?>
 				<li><a href="<?=$link?>"><?=$name?></a></li>
 			<?php } ?>

@@ -1,3 +1,6 @@
+
+
+
 <goals-module>
 	<h2 class="attention-voice">
 	<?=$sectionHeading?>
@@ -5,7 +8,7 @@
 <ul >
 
 	<?php
-		$items = $section['items'];
+		$items = $section['items'] ?? ["This is a goal", "This is a goal"];
 	 	foreach ($items as $goal) {
 		echo "<li>";
 		echo $goal;

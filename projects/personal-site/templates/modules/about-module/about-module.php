@@ -3,7 +3,7 @@
 	<?=$sectionHeading?>
 </h2>
 	<?php
-	$paragraphs = $section['paragraphs']; 
+	$paragraphs = $section['paragraphs'] ?? ["this is about paragraph"]; 
 	foreach ($paragraphs as $paragraph) { ?>
 		<p class="calm-voice">
 			<?=$paragraph?>
@@ -12,7 +12,7 @@
 
 	<image-grid>
 		<?php
-		$images = $section['images']; 
+		$images = $section['images']  ?? ['square.jpg']; 
 		foreach ($images as $image) { ?>
 			<picture>
 				<img src="images/<?=$image?>" alt="">

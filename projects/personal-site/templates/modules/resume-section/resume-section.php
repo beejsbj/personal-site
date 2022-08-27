@@ -5,12 +5,12 @@
 <ul class="resume-section">
 	<?php
 
-		$items = $section['items'];
+		$items = $section['items'] ?? [1, 2, 3];
 	 	foreach ($items as $experience) {
-	 		$role = $experience['role'];
-            $place = $experience["place"];
+	 		$role = $experience['role'] ?? "Role or Position";
+            $place = $experience["place"]  ?? "Location";
 
-            $startDate = $experience["dates"][0];
+            $startDate = $experience["dates"][0] ?? "start date";
             $endDate = $experience["dates"][1] ?? "present";
 
             echo "<li>";
