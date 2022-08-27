@@ -8,7 +8,7 @@
 		{
 			"module" : "resume-section",
 			"heading": "Education",
-			"items" : [
+			"experiences" : [
 						{
 							"role" : "Bacelor of Computer Science",
 							"place" : "Ontario Tech University",
@@ -26,7 +26,7 @@
 		{
 			"module" : "resume-section",
 			"heading": "Work",
-			"items" : [
+			"experiences" : [
 						{
 							"role" : "Customer Support Agent (Rogers)",
 							"place" : "HGS Canada",

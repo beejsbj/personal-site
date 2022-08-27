@@ -8,7 +8,7 @@
 		{
 			"module" : "goals-list",
 			"heading": "5-year vision",
-			"items" : [
+			"goals" : [
 						" <em>In 5 years I'll be <strong>30</strong></em> 🤢",
 						" Working a job I <em>enjoy</em>",
 						"Be making <em>atleast</em> 70k anually.",
@@ -23,7 +23,7 @@
 		{
 			"module" : "goals-list",
 			"heading": "End of course vision",
-			"items" : [
+			"goals" : [
 						"Be skilled enough for an entry level job as a developer. Id still <em>prefer to be a developer than a designer</em> even though my interest in design is growing.",
 						"Be <em>confident</em> in those skills",
 						"Have a <strong>healthy and attractive</strong> portfolio.",
@@ -36,7 +36,7 @@
 		{
 			"module" : "goals-list",
 			"heading": "End of the month",
-			"items" : [
+			"goals" : [
 						"Be more consistent with my Blog, which ive fallen behind on.",
 						"Do more Study Hall",
 						"build these pages out in php, as im doing right at this moment"
