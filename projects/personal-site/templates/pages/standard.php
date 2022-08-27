@@ -10,7 +10,7 @@
 	$sectionsArr = $pageData['sections'];
 
 	foreach ($sectionsArr as $section) {
-		$module = $section['module'];
+		$module = $section['module'] ?? "generic-text";
 
 		
 		?>
