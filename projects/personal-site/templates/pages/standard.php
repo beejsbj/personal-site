@@ -13,7 +13,7 @@
 		$module = $section['module'];
 
 		// if heading exists condition
-		$sectionHeading = $section['heading'] ?? "Default heading placefholder";
+		$sectionHeading = $section['heading'] ?? "This is the section Heading";
 		?>
 		<section class="page-section">
 			<inner-column>
