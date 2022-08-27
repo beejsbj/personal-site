@@ -1,3 +1,8 @@
+<?php 
+// if heading exists condition
+	$sectionHeading = $section['heading'] ?? "This is the Resume module";
+	$experiences = $section['experiences'] ?? [1, 2, 3];
+?>
 <resume-section>
 	<h2 class="attention-voice">
 	<?=$sectionHeading?>
@@ -5,8 +10,8 @@
 <ul class="resume-section">
 	<?php
 
-		$items = $section['items'] ?? [1, 2, 3];
-	 	foreach ($items as $experience) {
+		
+	 	foreach ($experiences as $experience) {
 	 		$role = $experience['role'] ?? "Role or Position";
             $place = $experience["place"]  ?? "Location";
 

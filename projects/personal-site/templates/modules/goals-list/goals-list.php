@@ -1,4 +1,7 @@
-
+<?php 
+// if heading exists condition
+	$sectionHeading = $section['heading'] ?? "This is the goals module";
+?>
 
 
 <goals-module>
@@ -8,8 +11,8 @@
 <ul >
 
 	<?php
-		$items = $section['items'] ?? ["This is a goal", "This is a goal"];
-	 	foreach ($items as $goal) {
+		$goals = $section['goals'] ?? ["This is a goal", "This is a goal"];
+	 	foreach ($goals as $goal) {
 		echo "<li>";
 		echo $goal;
 		echo "</li>";

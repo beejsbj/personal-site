@@ -1,3 +1,9 @@
+<?php 
+// if heading exists condition
+	$sectionHeading = $section['heading'] ?? "This is the About module";
+?>
+
+
 <about-module>
 	<h2 class="attention-voice">
 	<?=$sectionHeading?>

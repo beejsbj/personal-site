@@ -1,7 +1,6 @@
-<?php
-
-
-
+<?php 
+// if heading exists condition
+	$sectionHeading = $section['heading'] ?? "This is the E4P module";
 ?>
 
 <h2 class="attention-voice">

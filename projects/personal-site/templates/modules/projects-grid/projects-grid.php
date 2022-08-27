@@ -1,6 +1,7 @@
 <?php 
+	$sectionHeading = $section['heading'] ?? "This is the Projects module";
 	$introPara = $section['intro-paragraph'] ?? "This is the intro Paragraph";
-	$items = $section['items'] ?? [1, 2, 3];
+	$projects = $section['projects'] ?? [1, 2, 3];
 
  ?>
 
@@ -11,7 +12,7 @@
 <projects-grid>
 	<?php 
 
-	 	foreach ($items as $project) {
+	 	foreach ($projects as $project) {
 	 		$title = $project['title']  ?? "Project Title";
 	 		$description = $project['description'] ?? "this is the Project Descripton";
 	 		$image = $project['image'] ?? "square.jpg"; ?>
