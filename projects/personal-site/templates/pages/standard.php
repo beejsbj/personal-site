@@ -14,12 +14,10 @@
 
 		// if heading exists condition
 		$sectionHeading = $section['heading'] ?? "Default heading placefholder";
-
-		
-?>
-<section class="page-section">
-	<inner-column>
-		<?php include("templates/modules/$module/$module.php"); ?>
-	</inner-column>
-</section>
-<?php } ?>
+		?>
+		<section class="page-section">
+			<inner-column>
+				<?php include("templates/modules/$module/$module.php"); ?>
+			</inner-column>
+		</section>
+	<?php } ?>
