@@ -1,14 +1,13 @@
 {
 	"id": "pageNotFound",
 	"title": "404",
+	"metaImage" : "",
+	"metaDesc" : "",
 	"intro": "Page not Found.",
-
 	"sections": [
 		{
+			"module" : "section-test",
 			"heading": "You are lost"
-		},
-		{
-			"heading": "or a typo"
-		}	
+		}
 	]
 }

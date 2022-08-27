@@ -1,0 +1,36 @@
+{
+	"id": "projects",
+	"title": "Projects",
+	"metaImage" : "",
+	"metaDesc" : "",
+	"intro": "Projects",
+	"sections": [
+		{
+			"intro-paragraph" : "Here is where you will find the projects i've been involved in, a mix of personal and student projects.",
+			"module" : "projects-grid",
+			"heading": "grid of Projects",
+			"items" : [
+				{
+					"title": "Layout Garden",
+					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+					"image" : "landscape.jpg"
+				},
+				{
+					"title": "Exercises for Programmers",
+					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+					"image" : "landscape.jpg"
+				},
+				{
+					"title": "Quantumania",
+					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+					"image" : "landscape.jpg"
+				},
+				{
+					"title": "Theme Challenge",
+					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+					"image" : "landscape.jpg"
+				}
+			]
+		}
+	]
+}

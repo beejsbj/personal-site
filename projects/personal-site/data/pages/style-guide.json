@@ -1,6 +1,8 @@
 {
 	"id": "style-guide",
 	"title": "Style Guide",
+	"metaImage" : "",
+	"metaDesc" : "",
 	"intro": "Styles live here",
 
 	"sections": [

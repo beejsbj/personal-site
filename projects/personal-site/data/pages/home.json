@@ -1,6 +1,8 @@
 {
 	"id": "home",
 	"title": "Welcome",
+	"metaImage" : "",
+	"metaDesc" : "",
 	"intro": "You've made it!",
 
 	"sections": [

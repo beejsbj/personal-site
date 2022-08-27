@@ -1,6 +1,8 @@
 {
 	"id": "goals",
 	"title": "Goals",
+	"metaImage" : "",
+	"metaDesc" : "",
 	"intro": "Goals",
 	"sections": [
 		{
