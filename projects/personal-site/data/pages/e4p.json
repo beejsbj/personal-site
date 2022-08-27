@@ -1,0 +1,136 @@
+{
+	"id": "e4p",
+	"title": "E for P",
+	"metaImage" : "",
+	"metaDesc" : "",
+	"intro": "Exercises for Programmers",
+	"sections": [
+		{
+			"intro-paragraph" : "Here is where you will find the projects i've been involved in, a mix of personal and student projects.",
+			"module" : "e4p-grid",
+			"chapters" : [
+				{
+					"heading": "Input, Processing, and Output",
+					"svg" : "svg name",
+					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+					"exercises" : [
+						{
+							"number" : "01",
+							"name" : "Saying Hello",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "02",
+							"name" : "Counting the Number of Characters",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "03",
+							"name" : "Printing Quotes",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "04",
+							"name" : "Mad Lib",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Simple Math",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "06",
+							"name" : "Retirement Calculator",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						}
+					]
+				},
+				{
+					"heading": "Calculations",
+					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+					"exercises" : [
+						{
+							"number" : "05",
+							"name" : "Area of a Rectangular Room",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Pizza Party",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Paint Calculator",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Self-Checkout",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Currency Conversion",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "omputing Simple Interest",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Determining Compound Interest",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						}
+					],
+					"svg" : "svg name"
+				},
+				{
+					"heading": "Making Decisions",
+					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+					"exercises" : [
+						{
+							"number" : "05",
+							"name" : "Area of a Rectangular Room",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Pizza Party",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Paint Calculator",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Self-Checkout",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Currency Conversion",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "omputing Simple Interest",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Determining Compound Interest",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						}
+					],
+					"svg" : "svg name"
+				}
+			]
+		}
+	]
+}
