@@ -12,8 +12,7 @@
 	foreach ($sectionsArr as $section) {
 		$module = $section['module'];
 
-		// if heading exists condition
-		$sectionHeading = $section['heading'] ?? "This is the section Heading";
+		
 		?>
 		<section class="page-section">
 			<inner-column>
