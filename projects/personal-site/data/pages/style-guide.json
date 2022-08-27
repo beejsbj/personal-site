@@ -7,8 +7,22 @@
 
 	"sections": [
 		{
-			"module" : "section-test",
-			"heading": "style section"
+			"module" : "about-module"
+		},
+		{
+			"module" : "contact-list"
+		},
+		{
+			"module" : "e4p-grid"
+		},
+		{
+			"module" : "goals-list"
+		},
+		{
+			"module" : "resume-section"
+		},
+		{
+			"module" : "projects-grid"
 		}
 	]
 }
