@@ -37,7 +37,7 @@
 		 		?>
 
 				<li>
-					<a href="?page=e4p&exercise=<?=$exLink?>"><?=$exName?></a>
+					<a href="?page=exercise&exercise=<?=$exLink?>"><?=$exName?></a>
 				</li>
 		<?php } ?>
 		</ul>
