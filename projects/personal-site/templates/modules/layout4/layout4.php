@@ -1,6 +1,5 @@
-<section class="page-section layout4">
-	<inner-column>
-		<layout-module>
+
+		<layout-module class="layout4">
 			<layout-header class="div1">
 				<h1 class="teaser-voice">Little teaser</h1>
 				<h2 class="loud-voice"> Heading level 2 small </h2>
@@ -27,5 +26,3 @@
 			</ul>
 			</detail-section>
 		</layout-module>
-	</inner-column>
-</section>
