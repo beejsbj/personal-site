@@ -1,0 +1,133 @@
+layout-module.layout4 {
+	padding-bottom: 10vh;
+}
+
+layout-module.layout4 :is(detail-section, details, summary){
+	display: block;
+}
+
+layout-module.layout4,
+layout-module.layout4 .flex-container {
+	display: grid;
+	gap: 40px;
+}
+
+layout-module.layout4 layout-header {
+	display: block;
+	max-width: 70ch;
+	margin-bottom: 40px;
+}
+
+
+layout-module.layout4 layout-card {
+	display: block;
+	padding: 20px 0;
+}
+
+layout-module.layout4 layout-card summary {
+	border-bottom: 3px solid black;
+	margin-bottom: 15px;
+	cursor: pointer;
+	position: relative;
+}
+
+layout-module.layout4 details summary:after {
+	content: "＋";
+	color: var(--color-dark);
+	font-size: 2.5rem;
+	font-weight: 400;	
+
+	position: absolute;
+	top: 50%;
+	right: 0;
+	transform: translateY(-50%);
+
+	
+	transform-origin: center;
+	transition: 0.5s ease-out;
+}
+layout-module.layout4 details[open] summary:after {
+ 	transform: translateY(-50%) rotate(315deg);
+}
+
+
+
+
+
+/*break point 1 - medium*/
+@media (min-width: 650px) {
+
+	layout-module.layout4 layout-card {
+		border-radius: var(--corners);
+
+	}
+
+	layout-module.layout4 layout-card p {
+		max-width: 50ch;
+	}
+
+	layout-module.layout4 special-block {
+		padding: 30px;
+
+	}
+
+	layout-module.layout4 special-block::before {
+		width: 65ch;
+		height: 100%;
+	}
+
+}
+
+/*breakpoint 2 - large*/
+@media (min-width: 1155px) {
+
+	layout-module.layout4 {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 10%;
+	}
+	layout-module.layout4 detail-section {
+		grid-column: 2 / 4;
+
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.shapes #circle {
+	fill:var(--color-dark);
+	stroke:black;
+	stroke-width:2px;
+}
+
+.shapes #rectangle {
+	fill:var(--color-light);
+	stroke:black;
+	stroke-width:2.03px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
