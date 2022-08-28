@@ -40,9 +40,6 @@
 					"copy": "This is copy, copy!"
 				}
 			]
-		},
-		{
-			"module" : "section-test"
 		}
 	]
 }
