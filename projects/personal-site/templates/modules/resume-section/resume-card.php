@@ -36,9 +36,7 @@ if (isset($experience["skills"])) {
 
 if (isset($experience["specialNote"])) {
                 $specialNote = $experience["specialNote"];
-                 echo "<blockquote'>
-                    $specialNote
-                </blockquote>";
+                 echo "<blockquote>$specialNote</blockquote>";
             }
 
 ?>

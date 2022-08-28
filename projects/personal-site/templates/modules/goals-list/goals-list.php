@@ -13,9 +13,7 @@
 	<?php
 		$goals = $section['goals'] ?? ["This is a goal", "This is a goal"];
 	 	foreach ($goals as $goal) {
-		echo "<li>";
-		echo $goal;
-		echo "</li>";
-	} ?>
+			echo "<li>$goal</li>";
+		} ?>
 </ul>
 </goals-module>
