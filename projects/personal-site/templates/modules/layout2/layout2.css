@@ -1,27 +1,31 @@
-.layout2 {
+
+
+layout-module.layout2 {
 	
 }
 
-.layout2 layout-module {
+layout-module.layout2 {
 	display: grid;
 	gap: 40px;
 }
 
-.layout2 layout-header {
+layout-module.layout2 layout-header {
+	display: block;
 	max-width: 70ch;
 }
 
 
-.layout2 layout-card {
+layout-module.layout2 layout-card {
+	display: block;
 	padding: 20px 0;
 }
 
-.layout2 layout-card picture {
+layout-module.layout2 layout-card picture {
 	max-width: 30px;
 	margin-bottom: 10px;
 }
 
-.layout2 special-block { /*todo, change name*/
+layout-module.layout2 special-block { /*todo, change name*/
 	display: block;
 	position: relative;
 	padding: 20px 0;
@@ -29,7 +33,7 @@
 
 }
 
-.layout2 special-block::before {
+layout-module.layout2 special-block::before {
 	content: '';
 	position: absolute;
 	top: 0;
@@ -49,30 +53,30 @@
 
 /*break point 1 - medium*/
 @media (min-width: 650px) {
-	.layout2 .card-list {
+	layout-module.layout2 .card-list {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 15px;
 	}
 
 
-	.layout2 layout-card {
+	layout-module.layout2 layout-card {
 		border: solid 3px black;
 		border-radius: var(--corners);
 		padding: 30px;
 
 	}
 
-	.layout2 layout-card p {
+	layout-module.layout2 layout-card p {
 		max-width: 50ch;
 	}
 
-	.layout2 special-block {
+	layout-module.layout2 special-block {
 		padding: 30px;
 
 	}
 
-	.layout2 special-block::before {
+	layout-module.layout2 special-block::before {
 		width: 65ch;
 		height: 100%;
 	}
@@ -93,6 +97,22 @@
 
 
 
+
+
+
+
+
+.shapes #circle {
+	fill:var(--color-dark);
+	stroke:black;
+	stroke-width:2px;
+}
+
+.shapes #rectangle {
+	fill:var(--color-light);
+	stroke:black;
+	stroke-width:2.03px;
+}
 
 
 
