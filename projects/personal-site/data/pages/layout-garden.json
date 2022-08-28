@@ -10,16 +10,20 @@
 			"module" : "layout-garden-menu"
 		},
 		{
-			"module" : "layout1"
+			"module" : "layout-module",
+			"id" : "1"
 		},
 		{
-			"module" : "layout2"
+			"module" : "layout-module",
+			"id" : "2"
 		},
 		{
-			"module" : "layout3"
+			"module" : "layout-module",
+			"id" : "3"
 		},
 		{
-			"module" : "layout4"
+			"module" : "layout-module",
+			"id" : "4"
 		}
 	]
 }
