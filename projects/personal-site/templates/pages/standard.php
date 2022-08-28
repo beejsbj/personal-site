@@ -7,7 +7,7 @@
 </section>
 <?php
 	
-	$sectionsArr = $pageData['sections'];
+	$sectionsArr = $pageData['sections'] ?? [1];
 
 	foreach ($sectionsArr as $section) {
 		$module = $section['module'] ?? "generic-text";
