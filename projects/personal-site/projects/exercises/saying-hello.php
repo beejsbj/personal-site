@@ -45,7 +45,6 @@ if (isset($_POST['submitted'])){
 ?>
 <header>
     <div class="inner-column">
-        <a href="index.php">⬅</a>
         <h1>Saying Hello</h1>
     </div>
 </header>
