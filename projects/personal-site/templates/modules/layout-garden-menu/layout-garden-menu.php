@@ -1,4 +1,4 @@
-	<site-menu>
+<site-menu>
 	<nav>
 		<a href="?page=layout-garden">Home</a>
 		<a href="?page=layout-garden&layout=1">Layout 1</a>
