@@ -16,6 +16,9 @@
 			"module" : "e4p-grid"
 		},
 		{
+			"module" : "exercise-detail"
+		},
+		{
 			"module" : "goals-list"
 		},
 		{
