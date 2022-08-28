@@ -1,0 +1,25 @@
+{
+	"id": "garden",
+	"title": "Welcome",
+	"metaImage" : "",
+	"metaDesc" : "",
+	"intro": "Garden",
+
+	"sections": [
+		{
+			"module" : "layout-garden-menu"
+		},
+		{
+			"module" : "layout1"
+		},
+		{
+			"module" : "layout2"
+		},
+		{
+			"module" : "layout3"
+		},
+		{
+			"module" : "layout4"
+		}
+	]
+}
