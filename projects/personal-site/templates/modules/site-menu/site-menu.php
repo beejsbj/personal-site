@@ -22,6 +22,9 @@
 			<a href='?page=e4p'>e4p</a>
 		</li>
 		<li>
+			<a href='?page=layout-garden'>Garden</a>
+		</li>
+		<li>
 			<a href='?page=style-guide'>Style guide</a>
 		</li>
 		<li>
