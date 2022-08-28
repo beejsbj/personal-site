@@ -1,0 +1,13 @@
+{
+	"id": "exercise",
+	"title": "Welcome",
+	"metaImage" : "",
+	"metaDesc" : "",
+	"intro": "Hey there!",
+	"sections": [
+		{
+			"module" : "exercise-detail",
+			"heading": "My latest work"
+		}
+	]
+}
