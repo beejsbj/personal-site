@@ -6,8 +6,7 @@
 	"page-title": "Page not Found.",
 	"sections": [
 		{
-			"module" : "section-test",
-			"heading": "You are lost"
+			"module" : "section-test"
 		}
 	]
 }
