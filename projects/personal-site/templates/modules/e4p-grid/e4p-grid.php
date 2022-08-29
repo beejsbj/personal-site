@@ -21,7 +21,7 @@
 				<?=$chapterHeading?>
 				</h2>
 
-				<p class="teaser-voice">
+				<p class="whisper-voice">
 				<?=$chapterDesc?>
 				</p>
 
