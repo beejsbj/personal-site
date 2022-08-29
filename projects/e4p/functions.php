@@ -16,3 +16,14 @@
     		return 'checked';
   		}
 }
+
+function dasher($string){
+                    //lowercase the string
+                    //split string at space 
+                    $splitString = explode(" ", $string);
+
+                    //add dashes 
+                    $finalString = implode("-", $splitString);
+
+                    return strtolower($finalString);
+                }

@@ -1,22 +1,4 @@
 
-<?php include('functions.php'); ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="[[XXXXXXXXXXXXXXXXX]]">
-    <meta property="og:image" content= "[XXXXXXXXX]">
-
-    <link rel="stylesheet" href="css/style.css">
-
-    <title>Quote Printer</title>
-
-
-
-</head>
-
-
 
 
     
@@ -72,16 +54,7 @@ if (isset($_POST['submitted'])) {
 
 ?>
 
-<body>
-    <header>
 
-        <div class="inner-column">
-            <a href="index.php">⬅</a>
-            <h1>Printing Quotes</h1>
-        </div>
-    </header>
-    <main>
-        <div class="inner-column">
 
             <form method="POST">
 
@@ -107,10 +80,3 @@ if (isset($_POST['submitted'])) {
                 </div>
                 
             </form>
-        </div>
-    </main>
-
-
-</body>
-</html>
-

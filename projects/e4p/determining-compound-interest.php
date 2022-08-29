@@ -1,24 +1,3 @@
-<?php include('functions.php'); ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="[[XXXXXXXXXXXXXXXXX]]">
-    <meta property="og:image" content= "[XXXXXXXXX]">
-
-    <link rel="stylesheet" href="css/style.css">
-
-    <title>Compound Interest</title>
-
-
-
-</head>
-
-
-
-
-    
 <?php
  
 
@@ -92,100 +71,27 @@ if (isset($_POST['submitted'])){
 
 
 ?>
-
-<body>
-    <header>
-        <div class="inner-column">
-            <a href="index.php">⬅</a>
-            <h1>Compound Interest</h1>
-        </div>
-    </header>
-    <main>
-        <div class="inner-column">
-
-            <form method="POST">
-
-                <div class="input-field">
-                    <input id="principal-ID" type="text" class="text-number-input" required name="principal" placeholder="principal?" value="<?=$principal?>" min="0.01" step="0.01">
-                    <label for="principal-ID">What is the principal amount?</label>
-                </div>
-                <div class="input-field">
-                    <input id="rate-ID" type="text" class="text-number-input" required name="rate" placeholder="rate?" value="<?=$rate?>" min="0.01" step="0.01">
-                    <label for="rate-ID">What is the rate?</label>
-                </div>
-                <div class="input-field">
-                    <input id="time-ID" type="text" class="text-number-input" required name="time" placeholder="time?" value="<?=$time?>" min="1" step="1">
-                    <label for="time-ID">What is the number of years?</label>
-                </div>
-                <div class="input-field">
-                    <input id="number-ID" type="text" class="text-number-input" required name="number" placeholder="Compound number?" value="<?=$number?>" min="1" step="1">
-                    <label for="number-ID">Times interest is compounded per year?</label>
-                </div>
-
-
-                <button type="submit" name="submitted">
-                    Compute
-                </button>
-
-
-                <div class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-            </form>
-        </div>
-    </main>
-
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<form method="POST">
+    <div class="input-field">
+        <input id="principal-ID" type="text" class="text-number-input" required name="principal" placeholder="principal?" value="<?=$principal?>" min="0.01" step="0.01">
+        <label for="principal-ID">What is the principal amount?</label>
+    </div>
+    <div class="input-field">
+        <input id="rate-ID" type="text" class="text-number-input" required name="rate" placeholder="rate?" value="<?=$rate?>" min="0.01" step="0.01">
+        <label for="rate-ID">What is the rate?</label>
+    </div>
+    <div class="input-field">
+        <input id="time-ID" type="text" class="text-number-input" required name="time" placeholder="time?" value="<?=$time?>" min="1" step="1">
+        <label for="time-ID">What is the number of years?</label>
+    </div>
+    <div class="input-field">
+        <input id="number-ID" type="text" class="text-number-input" required name="number" placeholder="Compound number?" value="<?=$number?>" min="1" step="1">
+        <label for="number-ID">Times interest is compounded per year?</label>
+    </div>
+    <button type="submit" name="submitted"> Compute </button>
+    <div class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+</form>

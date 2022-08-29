@@ -11,30 +11,11 @@
 
 	print $message. -->
 
-
-<?php include('functions.php'); ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="[[XXXXXXXXXXXXXXXXX]]">
-    <meta property="og:image" content= "[XXXXXXXXX]">
-
-    <link rel="stylesheet" href="css/style.css">
-
-    <title>Count. Count. Count.</title>
-
     <style>
     	h1 {
     		font-size: clamp(70px, 8vw, 150px);
     	}
     </style>
-
-</head>
-
-
-
 
     
 <?php
@@ -51,7 +32,7 @@ $class = "hide";
 
 
 $inputString = '';
-$message = '';
+$output = '';
 $count = 0;
 
 
@@ -83,7 +64,7 @@ if (isset($_POST['submitted'])) {
 
 			$count = charCounter($inputString);
 
-			$message = "<span>'$inputString'</span> has <span>$count</span> characters.";
+			$output = "<span>'$inputString'</span> has <span>$count</span> characters.";
 
 
 
@@ -106,15 +87,7 @@ if (isset($_POST['submitted'])) {
 
 ?>
 
-<body>
-    <header>
-        <div class="inner-column">
-            <a href="index.php">⬅</a>
-            <h1>Counting&nbspthe&nbspNumber of Characters</h1>
-        </div>
-    </header>
-    <main>
-        <div class="inner-column">
+
 
             <form method="POST">
 
@@ -131,17 +104,10 @@ if (isset($_POST['submitted'])) {
 
                 <div class="<?=$class?>">
                     <p>
-                        <?=$message?>
+                        <?=$output?>
                     </p>
                 </div>
                 
             </form>
-        </div>
-    </main>
-
-
-</body>
-</html>
-
 
 

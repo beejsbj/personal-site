@@ -18,24 +18,7 @@ display both area in feet and area in meters
 
  -->
 
-
-
-
-
-<?php include('functions.php'); ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="[[XXXXXXXXXXXXXXXXX]]">
-    <meta property="og:image" content= "[XXXXXXXXX]">
-
-    <link rel="stylesheet" href="css/style.css">
-
-    <title>Area of a Room</title>
-
-    <style>
+     <style>
         h1 {
             font-size: clamp(3.13rem, calc(1.81rem + 6.58vw), 9.38rem);
         }
@@ -45,14 +28,6 @@ display both area in feet and area in meters
         }
     </style>
 
-
-
-</head>
-
-
-
-
-    
 <?php
  
 
@@ -140,95 +115,29 @@ if (isset($_POST['submitted'])){
 
 
 ?>
-
-<body>
-    <header>
-        <div class="inner-column">
-            <a href="index.php">⬅</a>
-            <h1>Area of a Rectangular&nbspRoom</h1>
+<form method="POST">
+    <div class="input-field radio-list">
+        <div class="input-field">
+            <input type="radio" name="unitChoice" value="feet">
+            <label for="">feet</label>
         </div>
-    </header>
-    <main>
-        <div class="inner-column">
-
-            <form method="POST">
-                <div class="input-field radio-list">
-                    <div class="input-field">
-                        <input type="radio" name="unitChoice" value="feet">
-                        <label for="">feet</label>
-                    </div>
-                    <div class="input-field">
-                        <input type="radio" name="unitChoice" value="meter"> 
-                        <label for="">meter</label>
-                    </div>
-                </div>
-                <div class="input-field">
-                    <input type="text" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.01" min="1">
-                    <label for=""> What is the length of the room?</label>
-                </div>
-                <div class="input-field">
-                    <input type="text" class="text-number-input" required name="width" placeholder="width??" value="<?=$width?>" step="0.01"  min="1">
-                    <label for=""> What is the width of the room?</label>
-                </div>
-                
-
-
-                <button type="submit" name="submitted">
-                    Calculate
-                </button>
-
-
-                <div class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
+        <div class="input-field">
+            <input type="radio" name="unitChoice" value="meter">
+            <label for="">meter</label>
         </div>
-    </main>
-
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    </div>
+    <div class="input-field">
+        <input type="text" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.01" min="1">
+        <label for=""> What is the length of the room?</label>
+    </div>
+    <div class="input-field">
+        <input type="text" class="text-number-input" required name="width" placeholder="width??" value="<?=$width?>" step="0.01" min="1">
+        <label for=""> What is the width of the room?</label>
+    </div>
+    <button type="submit" name="submitted"> Calculate </button>
+    <div class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+</form>

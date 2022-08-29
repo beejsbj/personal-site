@@ -1,21 +1,3 @@
-<?php include('functions.php'); ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="[[XXXXXXXXXXXXXXXXX]]">
-    <meta property="og:image" content= "[XXXXXXXXX]">
-
-    <link rel="stylesheet" href="css/style.css">
-
-    <title>Validate Password</title>
-
-
-
-</head>
-
-
 
 
     
@@ -75,15 +57,6 @@ if (
 
 ?>
 
-<body>
-    <header>
-        <div class="inner-column">
-            <a href="index.php">⬅</a>
-            <h1>Password Validation</h1>
-        </div>
-    </header>
-    <main>
-        <div class="inner-column">
 
             <form method="POST">
 
@@ -109,25 +82,6 @@ if (
                 </div>
                 
             </form>
-        </div>
-    </main>
-
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

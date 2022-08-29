@@ -1,21 +1,3 @@
-<?php include('functions.php'); ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="[[XXXXXXXXXXXXXXXXX]]">
-    <meta property="og:image" content= "[XXXXXXXXX]">
-
-    <link rel="stylesheet" href="css/style.css">
-
-    <title>Calculate Taxes</title>
-
-
-
-</head>
-
-
 
 
     
@@ -83,15 +65,6 @@ if (isset($_POST['submitted'])){
 }
 ?>
 
-<body>
-    <header>
-        <div class="inner-column">
-            <a href="index.php">⬅</a>
-            <h1>Tax Calculator</h1>
-        </div>
-    </header>
-    <main>
-        <div class="inner-column">
             <form method="POST">
             	<div class="input-field">
                     <input id="amount-ID" type="text" class="text-number-input" required required name="amount" placeholder="amount??" min="0.01" step="0.01" value="<?=$amount?>">
@@ -111,58 +84,4 @@ if (isset($_POST['submitted'])){
                 </div>
                 
             </form>
-        </div>
-    </main>
-
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+       
