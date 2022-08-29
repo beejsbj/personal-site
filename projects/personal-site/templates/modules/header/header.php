@@ -2,6 +2,7 @@
 // Exercise detail page title metadata
 if (isset($_GET['exercise'])) {
 	$pageData['title'] = unDasher($_GET['exercise']);
+	$pageData['page-title'] = $pageData['title'];
 }
 ?>
 
