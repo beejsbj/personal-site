@@ -93,6 +93,14 @@ function dasher($string){
 	return strtolower($finalString);
 }
 
+function unDasher($string){
+	$splitString = explode("-", $string);
+
+	$finalString = implode(" ", $splitString);
+
+	return ucwords($finalString);
+}
+
 
 
 
