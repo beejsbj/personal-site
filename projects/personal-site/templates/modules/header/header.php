@@ -1,3 +1,11 @@
+<?php
+// Exercise detail page title metadata
+if (isset($_GET['exercise'])) {
+	$pageData['title'] = unDasher($_GET['exercise']);
+}
+?>
+
+
 <!doctype html>
 <html lang='en' class='special-magic no-js'>
 
