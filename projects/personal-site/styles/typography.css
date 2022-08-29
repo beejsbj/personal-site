@@ -3,41 +3,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 
 .title-voice {
-	
+	font-family: 'Newsreader', serif;
+	font-size: clamp(4.00rem, calc(3.61rem + 1.95vw), 5.00rem);
+	color: var(--dark-color);
 }
 
 .loud-voice {
-	font-family: 'Newsreader', serif;
+	font-family: 'Lato', sans-serif;
 	font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
+	color: var(--dark-color);
 }
 
 @media (min-width: 600px) {
-	.loud-voice {
+	.title-voice {
 		font-weight: 700;
 		/* or variable font */
+	}
+	.loud-voice {
+		font-weight: 100;
 	}
 }
 
 .attention-voice {
 	font-family: 'Newsreader', serif;
+	font-weight: 300;
 	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);
+	color: var(--dark-highlight);
+	font-style: italic;
 }
 
+
+
 .notice-voice {
-	font-family: sans-serif;
+	font-family: 'Lato', sans-serif;
 	font-size: 1.2rem;
-	font-weight: 700;
+	font-weight: 300;
 }
 
 .solid-voice {
 	font-family: 'Lato', sans-serif;
 	font-size: 14px;
-	font-weight: 700;
+	font-weight: 900;
 }
 
 
 
+.firm-voice {
+	font-family: 'Lato', sans-serif;
+	font-size: 0.9rem;
+	line-height: 1.4;
+	text-transform: uppercase;
+	font-weight: 700;
 
+}
 
 .calm-voice,
 p,
@@ -62,7 +80,9 @@ li {
 }
 
 .teaser-voice {
-	
+	font-family: 'Lato', sans-serif;
+	font-size: 12px;
+	color: var(--dark-highlight);
 }
 
 /* these would be scoped to section or to an article element */
