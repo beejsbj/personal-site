@@ -33,7 +33,8 @@ function queryString()
 
 ////////////routing////////////// 
 
-function currentPage(){ //get page name
+//get page name
+function currentPage(){ 
 	if (isset($_GET['page'])) {
 	 	return $_GET['page'];
 	 } else {
@@ -42,8 +43,8 @@ function currentPage(){ //get page name
 }
 
 
-
-function renderPageData(){ //get page data
+//get page data
+function renderPageData(){ 
 
 	$page = currentPage();
   	

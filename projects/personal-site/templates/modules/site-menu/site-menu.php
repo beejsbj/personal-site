@@ -7,9 +7,6 @@
 			<a href='?page=about'>About</a>
 		</li>
 		<li>
-			<a href='?page=list'>List</a>
-		</li>
-		<li>
 			<a href='?page=goals'>goals</a>
 		</li>
 		<li>

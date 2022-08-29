@@ -1,6 +1,6 @@
 <section class="page-section">
 	<inner-column>
-		<h1 class="title-voice">
+		<h1 class="booming-voice">
 			<?=$pageData['page-title']?>
 		</h1>
 	</inner-column>
