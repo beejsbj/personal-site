@@ -25,6 +25,4 @@
 			</picture>
 		<?php } ?>
 	</image-grid>
-
-
 </about-module>
