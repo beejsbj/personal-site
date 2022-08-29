@@ -48,11 +48,11 @@ html {
 	--ink: rgba(45, 7, 6, 1.00);
 	--link: rgba(52, 90, 159, 1.00);
 
-	--color-dark: rgba(124, 38, 33, 1.00); /*also for bold*/
-	--highlight-dark: rgba(180, 94, 89, 1.00); /*//also for italics*/
+	--dark-color: rgba(124, 38, 33, 1.00); /*also for bold*/
+	--dark-highlight: rgba(180, 94, 89, 1.00); /*//also for italics*/
 	
-	--color-light: rgba(229,180,131,1); /*subdued*/
-	--highlight-light: rgba(233, 159, 85, 1.00); /*louder*/
+	--light-color: rgba(229,180,131,1); /*subdued*/
+	--light-highlight: rgba(233, 159, 85, 1.00); /*louder*/
 	
 
 }
@@ -63,11 +63,11 @@ html {
 	--ink: rgba(217, 215, 208, 1.00);
 	--link: hsla(219, 50%, 61%, 1.00);
 
-	--color-dark: rgba(217, 215, 208, 1.00);
-	--highlight-dark: rgba(255, 255, 255, 1.00);
+	--dark-color: rgba(217, 215, 208, 1.00);
+	--dark-highlight: rgba(255, 255, 255, 1.00);
 
-	--color-light: rgba(163, 7, 3, 1.00);
-	--highlight-light: rgba(233, 159, 85, 1.00);
+	--light-color: rgba(163, 7, 3, 1.00);
+	--light-highlight: rgba(233, 159, 85, 1.00);
 
 	}
 }
