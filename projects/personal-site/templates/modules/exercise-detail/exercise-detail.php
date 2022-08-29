@@ -1,12 +1,14 @@
 <?php 
 // if heading exists condition
-	$sectionHeading = $section['heading'] ?? "This is the E4P module";
 	$exLink = $_GET['exercise'] ?? "saying-hello";
-	$exName = unDasher($exLink);
+	$sectionHeading = unDasher($exLink) ?? "This is an exercise";
 ?>
 
+<h2 class="loud-voice">
+	<?=$sectionHeading?>
+</h2>
 <h2 class="attention-voice">
-	<?=$exName?>
+	<?=$sectionHeading?>
 </h2>
 <?php 
 	include("projects/e4p/$exLink.php");
