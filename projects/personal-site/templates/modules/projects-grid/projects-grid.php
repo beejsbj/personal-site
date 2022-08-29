@@ -5,7 +5,7 @@
 
  ?>
 
-<p>
+<p class="notice-voice">
 	<?=$introPara?>
 </p>
 
@@ -17,7 +17,7 @@
 	 		$description = $project['description'] ?? "this is the Project Descripton";
 	 		$image = $project['image'] ?? "square.jpg"; ?>
 	 		<project-card>
-				<h1>
+				<h1 class="attention-voice">
 					<?=$title?>
 				</h1>
 				<p>
