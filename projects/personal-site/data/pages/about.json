@@ -3,7 +3,7 @@
 	"title": "About",
 	"metaImage" : "",
 	"metaDesc" : "",
-	"intro": "About",
+	"page-title": "About",
 	"sections": [
 		{
 			"module" : "about-module",

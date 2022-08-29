@@ -3,7 +3,7 @@
 	"title": "Welcome",
 	"metaImage" : "",
 	"metaDesc" : "",
-	"intro": "Hey there!",
+	"page-title": "Hey there!",
 	"sections": [
 		{
 			"module" : "exercise-detail",

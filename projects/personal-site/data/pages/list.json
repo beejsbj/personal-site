@@ -3,7 +3,7 @@
 	"title": "Stuff list",
 	"metaImage" : "",
 	"metaDesc" : "",
-	"intro": "Lots and lots of them",
+	"page-title": "Lots and lots of them",
 	"sections": [
 		{
 			"module" : "things-grid",

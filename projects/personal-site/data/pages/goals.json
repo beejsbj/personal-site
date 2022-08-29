@@ -3,7 +3,7 @@
 	"title": "Goals",
 	"metaImage" : "",
 	"metaDesc" : "",
-	"intro": "Goals",
+	"page-title": "Goals",
 	"sections": [
 		{
 			"module" : "goals-list",

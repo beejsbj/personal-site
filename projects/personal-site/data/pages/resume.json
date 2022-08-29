@@ -3,7 +3,7 @@
 	"title": "Resume",
 	"metaImage" : "",
 	"metaDesc" : "",
-	"intro": "Resume",
+	"page-title": "Resume",
 	"sections": [
 		{
 			"module" : "resume-section",
@@ -32,9 +32,36 @@
 							"place" : "HGS Canada",
 							"dates" : ["Jan 2021", "Oct 2021"],
 							"duties" : [
-								"Handled nonstop barrage of back-to-back calls and dealt with Customers to satisfaction. Recognized multiple times for my work through internal scorecard rewards",
+								"Handled nonstop barrage of back-to-back calls and dealt with Customers to satisfaction",
 								"This experience greatly helped me cultivate the ability to deal with varying types of personalities and taught me to deescalate them if need be while maintaining professional decorum",
 								"Maintained an amicable work relationship with my colleagues even while working through home, helping them out anytime they might have needed additional support."
+							],
+							"specialNote" : "best boy award"
+						},
+						{
+							"role" : "Customer Support Agent (Rogers)",
+							"place" : "HGS Canada",
+							"dates" : ["Jan 2021", "Oct 2021"],
+							"skills" : [
+								"SKILLS tdndkj d;kngs ;sng",
+								"lorem lore lore lore lore",
+								"support."
+							],
+							"specialNote" : "best boy award"
+						},
+						{
+							"role" : "Customer Support Agent (Rogers)",
+							"place" : "HGS Canada",
+							"dates" : ["Jan 2021", "Oct 2021"],
+							"duties" : [
+								"Handled nonstop barrage of back-to-back calls and dealt with Customers to satisfaction",
+								"This experience greatly helped me cultivate the ability to deal with varying types of personalities and taught me to deescalate them if need be while maintaining professional decorum",
+								"Maintained an amicable work relationship with my colleagues even while working through home, helping them out anytime they might have needed additional support."
+							],
+							"skills" : [
+								"SKILLS tdndkj d;kngs ;sng",
+								"lorem lore lore lore lore",
+								"support."
 							],
 							"specialNote" : "best boy award"
 						}

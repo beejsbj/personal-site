@@ -3,7 +3,7 @@
 	"title": "404",
 	"metaImage" : "",
 	"metaDesc" : "",
-	"intro": "Page not Found.",
+	"page-title": "Page not Found.",
 	"sections": [
 		{
 			"module" : "section-test",
