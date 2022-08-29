@@ -12,13 +12,6 @@
             flex-basis: 80%;
         }
 
-        h2 {
-            font-size: 1.2rem;
-            color: white;
-            font-family: "Expose";
-            opacity: 0.7;
-        }
-
 
         .output-field {
             text-align: left;
@@ -120,7 +113,7 @@ if (isset($_POST['submitted'])){
             <form method="POST">
 
                 <item-field>
-                    <h2>1</h2>
+                    <h2 class="whisper-voice">1</h2>
                     <div class="input-field">
                     <input id="priceid1" type="text" class="text-number-input" required name="price1" placeholder="Price?" value="<?=$price1?>">
                     <label for="priceid1">Enter Price</label>
@@ -131,7 +124,7 @@ if (isset($_POST['submitted'])){
                 </div>
                 </item-field>
                 <item-field>
-                    <h2>2</h2>
+                    <h2 class="whisper-voice">2</h2>
                     <div class="input-field">
                     <input id="priceid2" type="text" class="text-number-input" required name="price2" placeholder="Price?" value="<?=$price2?>">
                     <label for="priceid2">Enter Price</label>
@@ -142,7 +135,7 @@ if (isset($_POST['submitted'])){
                 </div>
                 </item-field>
                 <item-field>
-                    <h2>3</h2>
+                    <h2 class="whisper-voice">3</h2>
                     <div class="input-field">
                     <input id="priceid3" type="text" class="text-number-input" required name="price3" placeholder="Price?" value="<?=$price3?>">
                     <label for="priceid3">Enter Price</label>
