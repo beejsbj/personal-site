@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,200;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600;1,6..72,700;1,6..72,800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 
-.title-voice {
+.booming-voice {
 	font-family: 'Newsreader', serif;
 	font-size: clamp(4.00rem, calc(3.61rem + 1.95vw), 5.00rem);
 	color: var(--dark-color);
@@ -15,7 +15,7 @@
 }
 
 @media (min-width: 600px) {
-	.title-voice {
+	.booming-voice {
 		font-weight: 700;
 		/* or variable font */
 	}
@@ -37,7 +37,7 @@
 .notice-voice {
 	font-family: 'Lato', sans-serif;
 	font-size: 1.2rem;
-	font-weight: 300;
+	line-height: 1.4;
 }
 
 .solid-voice {
@@ -81,8 +81,9 @@ li {
 
 .teaser-voice {
 	font-family: 'Lato', sans-serif;
-	font-size: 12px;
+	font-size: 14px;
 	color: var(--dark-highlight);
+	text-transform: uppercase;
 }
 
 /* these would be scoped to section or to an article element */
