@@ -4,7 +4,7 @@
 	$experiences = $section['experiences'] ?? [1, 2, 3];
 ?>
 <resume-section>
-	<h2 class="attention-voice">
+	<h2 class="loud-voice">
 	<?=$sectionHeading?>
 </h2>
 <ul class="resume-section">

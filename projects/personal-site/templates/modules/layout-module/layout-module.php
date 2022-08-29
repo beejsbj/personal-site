@@ -2,4 +2,4 @@
 
 $id = $section['id'] ?? rand(1, 4);
 
-include("templates/components/layouts/layout$id/layout$id.php");
+include("templates/modules/layout$id/layout$id.php");

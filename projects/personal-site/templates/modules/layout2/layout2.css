@@ -40,7 +40,7 @@ layout-module.layout2 special-block::before {
 	left: 0;
 	width: 60%;
 	height: 3px;
-	background-color: var(--color-light);
+	background-color: var(--light-color);
 	z-index: -1;
 	border-radius: var(--corners);
 
@@ -103,13 +103,13 @@ layout-module.layout2 special-block::before {
 
 
 .shapes #circle {
-	fill:var(--color-dark);
+	fill:var(--dark-color);
 	stroke:black;
 	stroke-width:2px;
 }
 
 .shapes #rectangle {
-	fill:var(--color-light);
+	fill:var(--light-color);
 	stroke:black;
 	stroke-width:2.03px;
 }

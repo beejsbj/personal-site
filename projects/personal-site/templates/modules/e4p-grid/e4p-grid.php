@@ -3,7 +3,7 @@
 	$sectionHeading = $section['heading'] ?? "This is the E4P module";
 ?>
 
-<h2 class="attention-voice">
+<h2 class="loud-voice">
 	<?=$sectionHeading?>
 </h2>
 <e4p-grid>
@@ -21,7 +21,7 @@
 				<?=$chapterHeading?>
 				</h2>
 
-				<p>
+				<p class="teaser-voice">
 				<?=$chapterDesc?>
 				</p>
 

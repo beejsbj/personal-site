@@ -1,7 +1,7 @@
 
 
 .layout1 {
-	/*border-top: 3px solid var(--color-dark);*/
+	/*border-top: 3px solid var(--dark-color);*/
 	
 }
 
@@ -70,13 +70,13 @@ layout-module.layout1 layout-card {
 
 
 .shapes #circle {
-	fill:var(--color-dark);
+	fill:var(--dark-color);
 	stroke:black;
 	stroke-width:2px;
 }
 
 .shapes #rectangle {
-	fill:var(--color-light);
+	fill:var(--light-color);
 	stroke:black;
 	stroke-width:2.03px;
 }

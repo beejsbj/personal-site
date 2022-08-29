@@ -33,7 +33,7 @@ layout-module.layout4 layout-card summary {
 
 layout-module.layout4 details summary:after {
 	content: "＋";
-	color: var(--color-dark);
+	color: var(--dark-color);
 	font-size: 2.5rem;
 	font-weight: 400;	
 
@@ -108,13 +108,13 @@ layout-module.layout4 details[open] summary:after {
 
 
 .shapes #circle {
-	fill:var(--color-dark);
+	fill:var(--dark-color);
 	stroke:black;
 	stroke-width:2px;
 }
 
 .shapes #rectangle {
-	fill:var(--color-light);
+	fill:var(--light-color);
 	stroke:black;
 	stroke-width:2.03px;
 }

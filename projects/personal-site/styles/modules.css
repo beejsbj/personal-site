@@ -6,6 +6,23 @@
 
 
 
+
+
+@import '../templates/modules/projects-grid/projects-grid.css';
+
+@import '../templates/modules/about-module/about-module.css';
+
+
+
+/*layout garden components*/
+@import '../templates/modules/layout1/layout1.css';
+@import '../templates/modules/layout2/layout2.css';
+@import '../templates/modules/layout3/layout3.css';
+@import '../templates/modules/layout4/layout4.css';
+
+
+
+
 /*footer*/
 @import '../templates/modules/footer/footer.css';
 
@@ -15,7 +32,3 @@
 
 
 
-@import '../templates/components/layouts/layout1/layout1.css';
-@import '../templates/components/layouts/layout2/layout2.css';
-@import '../templates/components/layouts/layout3/layout3.css';
-@import '../templates/components/layouts/layout4/layout4.css';

@@ -33,3 +33,7 @@ body {
 	max-width: 300px;
 	border-bottom-right-radius: 30px;
 }
+
+.hide {
+	display: none;
+}

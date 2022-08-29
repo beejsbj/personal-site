@@ -1,7 +1,7 @@
 <section class="page-section">
 	<inner-column>
-		<h1 class="loud-voice">
-			<?=$pageData['intro']?>
+		<h1 class="title-voice">
+			<?=$pageData['page-title']?>
 		</h1>
 	</inner-column>
 </section>
