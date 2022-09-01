@@ -315,14 +315,40 @@ There are ${leftoverSlices} leftover pieces.`
 <!-- Paint Calc -->
 
 <script>
-	var printQuoteButton = document.querySelector('.paint-calculator');
-	printQuoteButton.addEventListener('click', printQuote)// promt for length and width
+	var paintCalcButton = document.querySelector('.paint-calculator');
+	paintCalcButton.addEventListener('click', paintCalc)
 
-	// init constant areapergallon = 350
+	function paintCalc() {
+		// promt for length and width
+		var length = parseInt(prompt('what is the length?'));
+		while (!length) {
+			alert('you have to enter a number');
+			var length = parseInt(prompt('what is the length?'));
+		}
+		var width = parseInt(prompt('what is the width?'));
+		while (!width) {
+			alert('you have to enter a number');
+			var width = parseInt(prompt('what is the width?'));
+		}
 
-	// calculate area of cieling
-	// calculate gallons needed per area
-	// round up gallons to a whole number
+		// init constant areapergallon = 350
+		const areaPerGallon = 350;
+
+		// calculate area of cieling
+		var area = length * width;
+
+		// calculate gallons needed per area
+		var gallons = area / areaPerGallon;
+
+		// round up gallons to a whole number
+		gallons = Math.ceil(gallons);
+
+
+		var output = `You will need to purchase ${gallons} gallons of
+paint to cover ${area} square feet.`;
+		alert(output);
+	}
+		
 </script>
 
 
@@ -330,25 +356,74 @@ There are ${leftoverSlices} leftover pieces.`
 <!-- self checkout -->
 
 <script>
-	var printQuoteButton = document.querySelector('.self-checkout');
-	printQuoteButton.addEventListener('click', printQuote)// init const tax
-	// promtp for price of item 1
-	// promt for quantity of item 1
-	// alert total of item 1
+	var selfCheckoutButton = document.querySelector('.self-checkout');
+	selfCheckoutButton.addEventListener('click', selfCheckout)
 
-	// promtp for price of item 2
-	// promt for quantity of item 2
-	// alert total of item 2
+	function selfCheckout() {
+		// init const tax
+		// promtp for price of item 1
+		var priceItem1 = parseInt(prompt('what is the price of item 1?'));
+		while (!priceItem1) {
+			alert('you have to enter a number');
+			var priceItem1 = parseInt(prompt('what is the price of Item 1?'));
+		}
 
-	// promtp for price of item 3
-	// promt for quantity of item 3
-	// alert total of item 3
+		// promt for quantity of item 1
+		var quantityItem1 = parseInt(prompt('what is the quantity of item 1?'));
+		while (!quantityItem1) {
+			alert('you have to enter a number');
+			var quantityItem1 = parseInt(prompt('what is the quantity of Item 1?'));
+		}
 
-	// calculate subtotal
-	// calculate tax
-	// get total by add tax and subtotal
+		// promtp for price of item 2
+		var priceItem2 = parseInt(prompt('what is the price of item 2?'));
+		while (!priceItem2) {
+			alert('you have to enter a number');
+			var priceItem2 = parseInt(prompt('what is the price of Item 2?'));
+		}
 
-	// alert total
+		// promt for quantity of item 2
+		var quantityItem2 = parseInt(prompt('what is the quantity of item 2?'));
+		while (!quantityItem2) {
+			alert('you have to enter a number');
+			var quantityItem2 = parseInt(prompt('what is the quantity of Item 2?'));
+		}
+
+		// promtp for price of item 3
+		var priceItem3 = parseInt(prompt('what is the price of item 3?'));
+		while (!priceItem3) {
+			alert('you have to enter a number');
+			var priceItem3 = parseInt(prompt('what is the price of Item 3?'));
+		}
+
+		// promt for quantity of item 3
+		var quantityItem3 = parseInt(prompt('what is the quantity of item 3?'));
+		while (!quantityItem3) {
+			alert('you have to enter a number');
+			var quantityItem3 = parseInt(prompt('what is the quantity of Item 3?'));
+		}
+
+
+
+		
+
+
+		// calculate subtotal
+		var subTotal = ((priceItem1 * quantityItem1) + (priceItem2 * quantityItem2) + (priceItem3 * quantityItem3));
+
+		// calculate tax
+		const taxRate = 5.5/100;
+		var tax = (taxRate * subTotal);
+
+		// get total by add tax and subtotal
+		var total = subTotal + tax
+
+		// alert total
+		var output = `Subtotal: ${subTotal.toFixed(2)}
+Tax: ${tax.toFixed(2)}
+Total: ${total.toFixed(2)}`
+		alert(output)
+	}
 </script>
 
 
