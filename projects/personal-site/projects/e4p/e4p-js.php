@@ -237,16 +237,39 @@ It's ${currentYear}, so you can retire in ${retireYear}.`
 <!-- 7 Area of a Rectangular Room -->
 
 <script>
-	var printQuoteButton = document.querySelector('.area-of-a-rectangular-room');
-	printQuoteButton.addEventListener('click', printQuote)
-	// prompt for length and width of room in feet.
+	var rectAreaButton = document.querySelector('.area-of-a-rectangular-room');
+	rectAreaButton.addEventListener('click', rectArea)
+	
+	function rectArea() {
+		// prompt for length and width of room in feet.
+		var length = parseInt(prompt('what is the length?'));
+		while (!length) {
+			alert('you have to enter a number');
+			var length = parseInt(prompt('what is the length?'));
+		}
+		var width = parseInt(prompt('what is the width?'));
+		while (!width) {
+			alert('you have to enter a number');
+			var width = parseInt(prompt('what is the width?'));
+		}
 
-	// concat both into a string variable to alert the input values
+		// calculate the area, point var to it
+		var areaInFt = length * width;
 
-	// calculate the area, point var to it
-	// convert to meters
+		// convert to meters
+		const ftToMeters = 0.09290304;
+		var areaInMeters = areaInFt * ftToMeters;
 
-	// concat area in ft and area in meters to string and alert it
+
+
+		// concat area in ft and area in meters to string and alert it
+		var output = `You entered dimensions of ${width} feet by ${length} feet.
+The area is
+${areaInFt} square feet
+${areaInMeters} square meters`
+		alert(output);
+	}
+
 </script>
 
 
