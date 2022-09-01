@@ -44,7 +44,7 @@ function currentPage(){
 
 
 //get page data
-function renderPageData(){ 
+function getPageData(){ 
 
 	$page = currentPage();
   	
