@@ -277,15 +277,38 @@ ${areaInMeters} square meters`
 <!-- Pizza Party -->
 
 <script>
-	var printQuoteButton = document.querySelector('.pizza-party');
-	printQuoteButton.addEventListener('click', printQuote)// prompt for number of people
-	// prompt for number of pizzas
+	var pizzaPartyButton = document.querySelector('.pizza-party');
+	pizzaPartyButton.addEventListener('click', pizzaParty)
+	
+	function pizzaParty() {
+		// prompt for number of people
+		var people = parseInt(prompt('how many people?'));
+		while (!people) {
+			alert('you have to enter a number');
+			var people = parseInt(prompt('how many people?'));
+		}
 
-	// init var for number of slices in a single pizza, defaut value.
+		// prompt for number of pizzas
+		var pizzas = parseInt(prompt('how many pizzas?'));
+		while (!pizzas) {
+			alert('you have to enter a number');
+			var pizzas = parseInt(prompt('how many pizzas?'));
+		}
 
-	// store the quotient and reminder after dividing the people over pizzas
+		// init var for number of slices in a single pizza, defaut value.
+		const slicesPerPizza = 8;
+		var totalSlices = slicesPerPizza * pizzas
 
-	// concat into string and print
+		// store the quotient and reminder after dividing the people over pizzas
+		var slicesPerPerson = parseInt(totalSlices / people);
+		var leftoverSlices = totalSlices % people;
+
+		// concat into string and print
+		var output = `${people} people with ${pizzas} pizzas
+Each person gets ${slicesPerPerson} pieces of pizza.
+There are ${leftoverSlices} leftover pieces.`
+		alert(output);
+	}
 </script>
 
 
