@@ -1,5 +1,14 @@
 <?php include('functions.php'); ?>
-<?php $pageData = renderPageData();?>
+<?php $pageData = getPageData();?>
+
+
+// Exercise detail page title metadata
+<?php
+if (isset($_GET['exercise'])) {
+	$pageData['title'] = unDasher($_GET['exercise']);
+	$pageData['page-title'] = $pageData['title'];
+}
+?>
 
 
 <?php include('templates/modules/header/header.php'); ?>
