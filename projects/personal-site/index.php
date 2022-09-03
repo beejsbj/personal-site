@@ -1,9 +1,13 @@
-<?php include('functions.php'); ?>
-<?php $pageData = getPageData();?>
+<?php 
+	include('functions.php'); 
+	$currentPage = currentPage();
+	$pageData = getPageData($currentPage);
+?>
 
 
-// Exercise detail page title metadata
+
 <?php
+// Exercise detail page title metadata
 if (isset($_GET['exercise'])) {
 	$pageData['title'] = unDasher($_GET['exercise']);
 	$pageData['page-title'] = $pageData['title'];
