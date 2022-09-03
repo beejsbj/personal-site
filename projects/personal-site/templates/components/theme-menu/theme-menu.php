@@ -7,10 +7,10 @@
 			<a href='?theme=theme2'>theme abc</a>
 		</li>
 		<li>
-			<a href='?theme=theme2'>theme theme</a>
+			<a href='?theme=theme2'>theme</a>
 		</li>
 		<li>
-			<a href='?theme=theme2'>theme</a>
+			<a href='?theme=theme2'>theme thyme</a>
 		</li>
 	</ul>
 </nav>
