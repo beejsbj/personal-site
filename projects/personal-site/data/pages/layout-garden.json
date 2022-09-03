@@ -7,7 +7,7 @@
 
 	"sections": [
 		{
-			"module" : "layout-garden-menu"
+			"module" : "garden-menu"
 		},
 		{
 			"module" : "layout-module",
