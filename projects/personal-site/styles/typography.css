@@ -36,8 +36,13 @@
 
 .notice-voice {
 	font-family: 'Lato', sans-serif;
-	font-size: 1.2rem;
+	font-size: 1rem;
 	line-height: 1.4;
+}
+@media (min-width: 700px) {
+	.notice-voice {
+		font-size: 1.2rem;
+	}
 }
 
 .solid-voice {
