@@ -58,7 +58,7 @@ html {
 }
 
 @media (prefers-color-scheme: dark) {
-	html {
+	/*html {
 	--paper: rgba(45, 7, 2, 1.00);
 	--ink: rgba(217, 215, 208, 1.00);
 	--link: hsla(219, 50%, 61%, 1.00);
@@ -69,5 +69,5 @@ html {
 	--light-color: rgba(163, 7, 3, 1.00);
 	--light-highlight: rgba(233, 159, 85, 1.00);
 
-	}
+	}*/
 }
