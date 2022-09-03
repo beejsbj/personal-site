@@ -1,0 +1,29 @@
+[
+	{
+		"title": "Quantumania",
+		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"image": "landscape.jpg"
+	},
+	{
+		"title": "Theme Challenge",
+		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"image": "landscape.jpg"
+	},
+	{
+		"title": "Theme Challenge",
+		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"image": "landscape.jpg",
+		"feature": true
+	},
+	{
+		"title": "Responsive Layout Garden",
+		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"image": "landscape.jpg"
+	},
+	{
+		"title": "Exercises for Programmers",
+		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"image": "landscape.jpg",
+		"feature": true
+	}
+]
