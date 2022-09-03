@@ -13,8 +13,8 @@
 	</head>
 
 	<body>
-		<header>
+		<header class="hide">
 			<inner-column>
-				<?php //include('templates/modules/site-menu/site-menu.php'); ?>
+				<?php include('templates/modules/site-menu/site-menu.php'); ?>
 			</inner-column>
 		</header>
