@@ -1,8 +1,22 @@
 <?php 
 	$sectionHeading = $section['heading'] ?? "This is the Projects module";
 	$introPara = $section['intro-paragraph'] ?? "This is the intro Paragraph";
-	$projects = $section['projects'] ?? [1, 2, 3];
+	$projects = getPageData('projects-list');
 
+	$currentPage = currentPage();
+
+
+	if ($currentPage != 'projects') {
+		$filtered = [];
+
+		foreach ($projects as $project) {
+			if ( isset($project['feature'])) {
+				array_push($filtered, $project);
+			}
+		}
+		$projects = $filtered;
+	}
+	
  ?>
 
 <p class="notice-voice">
@@ -11,7 +25,6 @@
 
 <projects-grid>
 	<?php 
-
 	 	foreach ($projects as $project) {
 	 		$title = $project['title']  ?? "Project Title";
 	 		$description = $project['description'] ?? "this is the Project Descripton";
@@ -20,7 +33,7 @@
 				<h1 class="attention-voice">
 					<?=$title?>
 				</h1>
-				<p>
+				<p class="whisper-voice">
 					<?=$description?>
 				</p>
 				<picture>
@@ -28,5 +41,5 @@
 				</picture>
 				<a href="projects/<?=dasher($title)?>">LINK</a>
 			</project-card>
-	 	<?php } ?>
+ 	<?php } ?>
 </projects-grid>
