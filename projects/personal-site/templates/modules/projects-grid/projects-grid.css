@@ -17,6 +17,13 @@ project-card a {
 	position: absolute;
 	bottom: 0px;
 	left: 0px;
+
+	padding: 5px 15px;
+
+	background-color: var(--light-color);
+}
+project-card a:hover {
+	background-color: var(--light-highlight);
 }
 
 project-card::after,
@@ -41,5 +48,17 @@ project-card::before {
 }
 
 project-card p {
-	
+	position: relative;
+	left: 10px;
+}
+project-card p::after {
+	content: "";
+	background-color: var(--light-color);
+
+	position: absolute;
+	left: -10px;
+	top: 5px;
+
+	height: 80%;
+	width: 4px;
 }
