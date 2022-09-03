@@ -1,0 +1,16 @@
+header {
+	overflow: hidden;
+
+}
+
+header .circle {
+	position: absolute;
+	fill: var(--dark-color);
+
+	right: -90px;
+	top : -90px;
+	width: 200px;
+
+
+}
+
