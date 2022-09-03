@@ -1,4 +1,45 @@
 projects-grid {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
+	/*grid-template-columns: 1fr 1fr 1fr;*/
+	gap: 40px;
+
+	margin-top: 40px;
+}
+
+
+project-card {
+	display: grid;
+	gap: 10px;
+	position: relative;
+}
+
+project-card a {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+}
+
+project-card::after,
+project-card::before {
+	content: "";
+	background-color: var(--light-color);
+
+	position: absolute;
+	right: -10px;
+	bottom: -10px;
+}
+
+
+project-card::after {
+	height: 40px;
+	width: 3px;
+
+}
+project-card::before {
+	width: 40px;
+	height: 3px;
+}
+
+project-card p {
+	
 }
