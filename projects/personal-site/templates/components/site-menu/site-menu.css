@@ -3,10 +3,10 @@
 	background-color: var(--light-color);
 	position: absolute;
 	border-radius: 50%;
-	left: -10%;
+	left: -5%;
 	top: 10%;
-	padding: 80px;
-	transform: scale(1.2);
+	padding: 100px;
+	transform: scale(1.1 );
 }
 .site-menu ul {
 	display: grid;

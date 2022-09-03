@@ -2,10 +2,10 @@
 	background-color: var(--light-color);
 	position: absolute;
 	border-radius: 50%;
-	right: -12%;
-	bottom: 10%;
+	right: 0%;
+	bottom: 5%;
 	padding: 100px;
-	/*transform: scale(1.1);*/
+	transform: scale(0.95);
 
 
 }
