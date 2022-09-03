@@ -27,7 +27,7 @@
 body {
 	background-color: var(--paper);
 	color: var(--ink);
-
+	padding-top: 50px;
 }
 
 .my-fantastic-image {

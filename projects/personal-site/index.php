@@ -26,4 +26,4 @@ if (isset($_GET['exercise'])) {
 
 
 <?=format(queryString())?>
-<?php format($pageData);?>
+<?php //format($pageData);?>
