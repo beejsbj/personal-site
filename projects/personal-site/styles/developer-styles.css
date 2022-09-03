@@ -1,11 +1,11 @@
 
 body * {
 	/*border: 1px solid hsl(200, 100%, 80;*/
-	padding: 4px;
+	/*padding: 4px;*/
 }
 
 section:nth-of-type(odd) {
-	background-color: var(--light-color);
+	/*background-color: var(--light-color);*/
 }
 
 picture img {

@@ -128,25 +128,25 @@
 	function madLib() {
 		// promt for noun, adj, adv, verb and store them each in a variable
 		var noun = prompt('what is the noun?');
-		while (!noun) {
+		while (noun == "") {
 			alert('you have to enter something');
 			var noun = prompt('what is the noun?');
 		}
 
 		var verb = prompt('what is the verb?');
-		while (!verb) {
+		while (verb  == "") {
 			alert('you have to enter something');
 			var verb = prompt('what is the verb?');
 		}
 
 		var adjective = prompt('what is the adjective?');
-		while (!adjective) {
+		while (adjective  == "") {
 			alert('you have to enter something');
 			var adjective = prompt('what is the adjective?');
 		}
 
 		var adverb = prompt('what is the adverb?');
-		while (!adverb) {
+		while (adverb  == "") {
 			alert('you have to enter something');
 			var adverb = prompt('what is the adverb?');
 		}
@@ -169,12 +169,12 @@
 		// prompt for two numbers, convert to int
 		// 	store them each in a different variable
 		var first = parseInt(prompt('what is the first number?'));
-		while (!first) {
+		while (first == "") {
 			alert('you have to enter a number');
 			var first = parseInt(prompt('what is the first number?'));
 		}
 		var second = parseInt(prompt('what is the second number?'));
-		while (!second) {
+		while (second == "") {
 			alert('you have to enter a number');
 			var second = parseInt(prompt('what is the second number?'));
 		}
@@ -208,14 +208,14 @@ ${first} / ${second} = ${quotient}
 	function retireCalc() {
 		// prompt for current age and store in var
 		var age = parseInt(prompt('what is the age?'));
-		while (!age) {
+		while (age == "") {
 			alert('you have to enter a number');
 			var age = parseInt(prompt('what is the age?'));
 		}
 
 		// promt for desired retirement age and store in var
 		var retireAge = parseInt(prompt('at what age do you wanna retire?'));
-		while (!retireAge) {
+		while (retireAge == "") {
 			alert('you have to enter a number');
 			var retireAge = parseInt(prompt('at what age do you wanna retire?'));
 		}
@@ -243,12 +243,12 @@ It's ${currentYear}, so you can retire in ${retireYear}.`
 	function rectArea() {
 		// prompt for length and width of room in feet.
 		var length = parseInt(prompt('what is the length?'));
-		while (!length) {
+		while (length == "") {
 			alert('you have to enter a number');
 			var length = parseInt(prompt('what is the length?'));
 		}
 		var width = parseInt(prompt('what is the width?'));
-		while (!width) {
+		while (width == "") {
 			alert('you have to enter a number');
 			var width = parseInt(prompt('what is the width?'));
 		}
@@ -283,14 +283,14 @@ ${areaInMeters} square meters`
 	function pizzaParty() {
 		// prompt for number of people
 		var people = parseInt(prompt('how many people?'));
-		while (!people) {
+		while (people == "") {
 			alert('you have to enter a number');
 			var people = parseInt(prompt('how many people?'));
 		}
 
 		// prompt for number of pizzas
 		var pizzas = parseInt(prompt('how many pizzas?'));
-		while (!pizzas) {
+		while (pizzas == "") {
 			alert('you have to enter a number');
 			var pizzas = parseInt(prompt('how many pizzas?'));
 		}
@@ -321,12 +321,12 @@ There are ${leftoverSlices} leftover pieces.`
 	function paintCalc() {
 		// promt for length and width
 		var length = parseInt(prompt('what is the length?'));
-		while (!length) {
+		while (length == "") {
 			alert('you have to enter a number');
 			var length = parseInt(prompt('what is the length?'));
 		}
 		var width = parseInt(prompt('what is the width?'));
-		while (!width) {
+		while (width == "") {
 			alert('you have to enter a number');
 			var width = parseInt(prompt('what is the width?'));
 		}
@@ -363,42 +363,42 @@ paint to cover ${area} square feet.`;
 		// init const tax
 		// promtp for price of item 1
 		var priceItem1 = parseInt(prompt('what is the price of item 1?'));
-		while (!priceItem1) {
+		while (priceItem1 == "") {
 			alert('you have to enter a number');
 			var priceItem1 = parseInt(prompt('what is the price of Item 1?'));
 		}
 
 		// promt for quantity of item 1
 		var quantityItem1 = parseInt(prompt('what is the quantity of item 1?'));
-		while (!quantityItem1) {
+		while (quantityItem1 == "") {
 			alert('you have to enter a number');
 			var quantityItem1 = parseInt(prompt('what is the quantity of Item 1?'));
 		}
 
 		// promtp for price of item 2
 		var priceItem2 = parseInt(prompt('what is the price of item 2?'));
-		while (!priceItem2) {
+		while (priceItem2 == "") {
 			alert('you have to enter a number');
 			var priceItem2 = parseInt(prompt('what is the price of Item 2?'));
 		}
 
 		// promt for quantity of item 2
 		var quantityItem2 = parseInt(prompt('what is the quantity of item 2?'));
-		while (!quantityItem2) {
+		while (quantityItem2 == "") {
 			alert('you have to enter a number');
 			var quantityItem2 = parseInt(prompt('what is the quantity of Item 2?'));
 		}
 
 		// promtp for price of item 3
 		var priceItem3 = parseInt(prompt('what is the price of item 3?'));
-		while (!priceItem3) {
+		while (priceItem3 == "") {
 			alert('you have to enter a number');
 			var priceItem3 = parseInt(prompt('what is the price of Item 3?'));
 		}
 
 		// promt for quantity of item 3
 		var quantityItem3 = parseInt(prompt('what is the quantity of item 3?'));
-		while (!quantityItem3) {
+		while (quantityItem3 == "") {
 			alert('you have to enter a number');
 			var quantityItem3 = parseInt(prompt('what is the quantity of Item 3?'));
 		}
