@@ -1,11 +1,4 @@
-<?php
-// Exercise detail page title metadata
-if (isset($_GET['exercise'])) {
-	$pageData['title'] = unDasher($_GET['exercise']);
-	$pageData['page-title'] = $pageData['title'];
-}
-?>
-
+ 
 
 <!doctype html>
 <html lang='en' class='special-magic no-js'>
@@ -22,6 +15,6 @@ if (isset($_GET['exercise'])) {
 	<body>
 		<header>
 			<inner-column>
-				<?php include('templates/modules/site-menu/site-menu.php'); ?>
+				<?php //include('templates/modules/site-menu/site-menu.php'); ?>
 			</inner-column>
 		</header>
