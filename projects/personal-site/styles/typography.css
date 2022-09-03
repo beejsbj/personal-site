@@ -4,9 +4,11 @@
 
 .booming-voice {
 	font-family: 'Newsreader', serif;
-	font-size: clamp(4.00rem, calc(3.61rem + 1.95vw), 5.00rem);
+	font-size: 40px;
+	font-weight: 700;
 	color: var(--dark-color);
 }
+
 
 .loud-voice {
 	font-family: 'Lato', sans-serif;
@@ -17,6 +19,7 @@
 @media (min-width: 600px) {
 	.booming-voice {
 		font-weight: 700;
+		font-size: clamp(4.00rem, calc(3.61rem + 1.95vw), 5.00rem);
 		/* or variable font */
 	}
 	.loud-voice {
