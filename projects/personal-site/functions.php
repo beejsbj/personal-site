@@ -44,10 +44,7 @@ function currentPage(){
 
 
 //get page data
-function getPageData(){ 
-
-	$page = currentPage();
-  	
+function getPageData($page){ 
 
   	if (!file_exists("data/pages/$page.json")) {
   		$json = file_get_contents("data/pages/pageNotFound.json");
