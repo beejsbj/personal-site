@@ -29,7 +29,8 @@
 	 		$title = $project['title']  ?? "Project Title";
 	 		$description = $project['description'] ?? "this is the Project Descripton";
 	 		$image = $project['image'] ?? "square.jpg"; 
-	 		$url = $project['url'] ?? "?page=layout-garden"; ?>
+	 		$url = $project['url'] ?? "?page=layout-garden";
+	 		$tools = $project['tools'] ?? "['HTML', 'CSS']"; ?>
 
 	 		<project-card>
 				<h1 class="attention-voice">
@@ -41,7 +42,14 @@
 				<picture>
 					<img src="images/<?=$image?>" alt="">
 				</picture>
-				<a href="<?=$url?>">LINK</a>
+				<ul class="tools">
+					<?php
+						foreach ($tools as $tool) {
+							echo "<li>$tool</li>";
+						}
+					?>
+				</ul>
+				<a href="<?=$url?>"><span>LINK</span></a>
 			</project-card>
  	<?php } ?>
 </projects-grid>
