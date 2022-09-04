@@ -15,6 +15,13 @@ header .circle {
 }
 
 @media (min-width: 500px) {
+	header > inner-column {
+		display: grid;
+		grid-template-columns: repeat(12, 1fr);
+	}
+	header > inner-column > h1 {
+		grid-column-start: 2;
+	}
 	header .circle {
 	position: absolute;
 
