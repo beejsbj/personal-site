@@ -16,7 +16,7 @@
 	color: var(--dark-color);
 }
 
-@media (min-width: 600px) {
+@media (min-width: 700px) {
 	.booming-voice {
 		font-weight: 700;
 		font-size: clamp(4.00rem, calc(3.61rem + 1.95vw), 5.00rem);

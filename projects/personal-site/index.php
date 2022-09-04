@@ -25,5 +25,5 @@ if (isset($_GET['exercise'])) {
 <?php include('templates/modules/footer/footer.php'); ?>
 
 
-<?=format(queryString())?>
+<?php//format(queryString())?>
 <?php //format($pageData);?>
