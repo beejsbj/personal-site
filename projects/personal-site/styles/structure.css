@@ -16,6 +16,19 @@ inner-column {
 	margin-right: auto;
 	margin-left: auto;
 	padding: 15px 14px; /* a loose default */
+inner-column.menus {
+	padding: initial;
+}
+
+@media(min-width: 500px) {
+	section > inner-column {
+		display: grid;
+		grid-template-columns: repeat(12, 1fr);
+	}
+
+	section > inner-column > * {
+		grid-column: span 12;
+	}
 }
 
 /*.site-header {
