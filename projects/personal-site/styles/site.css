@@ -22,6 +22,8 @@
 @import 'modules.css';
 
 /* S ections and more stuff */
+@import 'animation.css';
+
 
 /* then other contextual styles */
 body {

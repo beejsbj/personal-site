@@ -1,0 +1,12 @@
+@keyframes blob {
+	0% {
+		transform: rotate(0deg) skew(5deg);
+
+	}
+
+	50% {
+
+		transform: rotate(360deg) skew(10deg) scale(1.13);
+	}
+
+}
