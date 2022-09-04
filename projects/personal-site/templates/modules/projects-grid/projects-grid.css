@@ -75,9 +75,13 @@ project-card p::after {
 	}
 
 	project-card h1 {
-		transform: rotate(-90deg);
+		transform: rotate(180deg);
+		writing-mode: vertical-lr;
+		text-orientation: sideways;
 		order: 1;
-		max-height: 30px;
+		grid-column: span 1;
+
+		/*grid-row: span 2 / -1;*/ /*pushing header down*/
 	}
 
 	project-card picture {
