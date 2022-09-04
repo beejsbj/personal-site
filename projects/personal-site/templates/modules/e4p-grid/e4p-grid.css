@@ -16,11 +16,11 @@ e4p-chapter::before {
 	background-color: var(--light-color);
 	position: absolute;
 	left: 0px;
-	bottom: -10px;
+	bottom: -15px;
 }
 
 e4p-chapter::after {
-	height: 18px;
+	height: 23px;
 	width: 5px;
 }
 
