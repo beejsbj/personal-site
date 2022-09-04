@@ -112,3 +112,10 @@ function activePage($current){
 
 
 
+function currentTheme(){ 
+	if (isset($_GET['theme'])) {
+	 	return $_GET['theme'];
+	 } else {
+	 	return 'default';
+	 }
+}
