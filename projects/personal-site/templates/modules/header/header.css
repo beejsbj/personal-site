@@ -14,3 +14,16 @@ header .circle {
 
 }
 
+@media (min-width: 500px) {
+	header .circle {
+	position: absolute;
+	fill: var(--light-color);
+
+	width: 300px;
+	right: -90px;
+	top : -120px;
+	
+
+
+}
+}
