@@ -18,6 +18,11 @@
 	transform: translate(-50%, -50%);
 }
 
+.site-menu a.active {
+	text-decoration: line-through;
+	text-decoration-style: double;
+}
+
 
 
 @media (min-width: 800px) {
@@ -74,8 +79,18 @@
 		outline: 10px solid var(--light-highlight);
 		color: var(--light-color);
 	}
+
+	.site-menu a.active {
+		background-color: var(--dark-color);
+		outline: 5px solid var(--light-highlight);
+		color: var(--light-color);
+		animation: jelly infinite 2s;
+
+		
+}
 	
 
 
 
 }
+
