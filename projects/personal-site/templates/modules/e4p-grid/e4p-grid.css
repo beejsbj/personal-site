@@ -6,7 +6,7 @@ e4p-grid {
 
 e4p-chapter {
 	display: grid;
-	gap: 10px;
+	gap: 20px;
 	position: relative;
 }
 
@@ -32,6 +32,7 @@ e4p-chapter::before {
 e4p-chapter p {
 	position: relative;
 	left: 10px;
+	max-width: 350px;
 }
 
 e4p-chapter p::after {
@@ -65,6 +66,6 @@ e4p-chapter ul li::after {
 }
 e4p-chapter ul li:hover::after {
 	background-color: var(--dark-highlight);
-	transform: scale(1.2) rotate(500deg);
+	transform: scale(1.2) rotate(270deg);
 
 }

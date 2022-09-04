@@ -54,7 +54,7 @@ project-card p::after {
 	left: -10px;
 	top: 5px;
 	height: 80%;
-	width: 4px;
+	width: 3px;
 }
 
 @media(min-width: 500px) {
