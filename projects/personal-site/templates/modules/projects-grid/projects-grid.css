@@ -127,5 +127,41 @@ project-card p::after {
 	}
 
 }
+
+@media(min-width: 1000px) {
+
+	project-card::after,
+	project-card::before {
+		display: none;
+	}	
+	project-card h1 {
+		grid-row: span 2;
+	}
+	project-card picture {
+		grid-column: span 10;
+		grid-row: span 2;
+	}
+
+	project-card p {
+
+		grid-column: span 1;
+		left: 25px;
+		width: 110px;
+	}
+
+	project-card p::after {
+		left: -25px;
+		top: 0px;
+		height: 50%;
+		width: 20px;
+	}
+
+	project-card a {
+		order: 4;
+		position: initial;
+		grid-column: 12 / 13;
+		align-self: end;
+		text-align: center;
+		padding: 15px 30px;
 	}
 }
