@@ -1,10 +1,4 @@
-<section class="page-section">
-	<inner-column>
-		<h1 class="booming-voice">
-			<?=$pageData['page-title']?>
-		</h1>
-	</inner-column>
-</section>
+
 <?php
 	
 	$sectionsArr = $pageData['sections'] ?? [1];

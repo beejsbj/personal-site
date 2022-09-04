@@ -19,10 +19,16 @@
 			  <circle cx="50" cy="50" r="40" />
 			</svg> 
 
-			<inner-column class="hide">
+			<inner-column class="menus">
 				<?php include('templates/components/site-menu/site-menu.php'); ?>
 			</inner-column>
-			<inner-column class="hide">
+			<inner-column class="menus">
 				<?php include('templates/components/theme-menu/theme-menu.php'); ?>
+			</inner-column>
+
+			<inner-column>
+				<h1 class="booming-voice">
+					<?=$pageData['page-title']?>
+				</h1>
 			</inner-column>
 		</header>
