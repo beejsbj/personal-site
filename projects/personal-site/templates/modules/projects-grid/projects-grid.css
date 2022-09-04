@@ -109,5 +109,23 @@ project-card p::after {
 		top: -10px;
 	}
 }
+@media(min-width: 750px) {
+	project-card:nth-of-type(odd) {
+		grid-column: span 10;
+	}
+	project-card:nth-of-type(even) {
+		grid-column: 3 / span 10;
+		transform: scaleX(-1);
+
+	}
+	project-card:nth-of-type(even) > * {
+		transform: scaleX(-1);
+
+	}
+	project-card:nth-of-type(even) p {
+		left:-10px;
+	}
+
+}
 	}
 }
