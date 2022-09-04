@@ -1,5 +1,5 @@
 header {
-	overflow: hidden;
+
 
 }
 
@@ -17,7 +17,6 @@ header .circle {
 @media (min-width: 500px) {
 	header .circle {
 	position: absolute;
-	fill: var(--light-color);
 
 	width: 300px;
 	right: -90px;
@@ -26,4 +25,22 @@ header .circle {
 
 
 }
+}
+
+@media (min-width: 800px) {
+	header > inner-column.hide {
+		display: block;
+	}
+	header .circle {
+		position: fixed;
+		top:  50%;
+		right: initial;
+		left: -220px;
+		display: none;
+	}
+}
+@media (min-width: 880px) {
+	header .circle {
+		display: block;
+	}
 }
