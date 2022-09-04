@@ -15,7 +15,9 @@ inner-column {
 	max-width: var(--tight); /* could be a variable in settings */
 	margin-right: auto;
 	margin-left: auto;
-	padding: 15px 14px; /* a loose default */
+	padding: 15px 10px; /* a loose default */
+}
+
 inner-column.menus {
 	padding: initial;
 }
@@ -37,7 +39,7 @@ inner-column.menus {
 	z-index: 5;
 }*/
 
-@media (min-width: 1200px){
+@media (min-width: 1140px){
 	inner-column {
 		max-width: var(--standard);
 	}
