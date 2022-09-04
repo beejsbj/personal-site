@@ -80,7 +80,7 @@ layout-module.layout3 layout-card picture #rectangle {
 
 }
 
-@media (min-width: 800px) and (max-width: 1155px) {
+@media (min-width: 750px) and (max-width: 1155px) {
 	layout-module.layout3 .card-list {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr 1fr;
