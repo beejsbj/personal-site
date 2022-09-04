@@ -94,5 +94,11 @@ project-card p::after {
 
 	project-card a {
 		/*display: none;*/
+		bottom: 50px;
+		/*top: 0px;*/
+		left: initial;
+		right: 0px;
+	}
+
 	}
 }
