@@ -3,32 +3,46 @@
 		"title": "Quantumania",
 		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
 		"image": "landscape.jpg",
-		"url" : "projects/quantumania"
-	},
-	{
-		"title": "Theme Challenge",
-		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-		"image": "landscape.jpg",
-		"url" : "projects/quantumania"
+		"url" : "projects/quantumania",
+		"tools" : [
+			"HTML",
+			"CSS"
+		]
 	},
 	{
 		"title": "Theme Challenge",
 		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
 		"image": "landscape.jpg",
 		"url" : "projects/quantumania",
+		"tools" : [
+			"HTML",
+			"CSS",
+			"PHP"
+		]
+	},
+	{
+		"title": "Responsive Layout&nbspGarden",
+		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"image": "landscape.jpg",
+		"url" : "?page=layout-garden",
+		"tools" : [
+			"HTML",
+			"CSS",
+			"PHP"
+		],
 		"feature": true
 	},
 	{
-		"title": "Responsive Layout Garden",
-		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-		"image": "landscape.jpg",
-		"url" : "?page=layout-garden"
-	},
-	{
-		"title": "Exercises for Programmers",
+		"title": "Exercises&nbspfor Programmers",
 		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
 		"image": "landscape.jpg",
 		"url" : "?page=e4p",
+		"tools" : [
+			"HTML",
+			"CSS",
+			"PHP",
+			"JS"
+		],
 		"feature": true
 	}
 ]
