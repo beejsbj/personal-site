@@ -28,3 +28,14 @@
 	}
 
 }
+
+@media (min-width: 800px) {
+	.theme-menu {
+		position: fixed;
+		right: initial;
+		left: -40px;
+		top: -40px;	
+		bottom: initial;
+		transform: scale(0.95);
+	}
+}
