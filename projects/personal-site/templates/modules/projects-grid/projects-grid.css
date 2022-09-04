@@ -2,10 +2,8 @@ projects-grid {
 	display: grid;
 	/*grid-template-columns: 1fr 1fr 1fr;*/
 	gap: 60px;
-
 	margin-top: 80px;
 }
-
 
 project-card {
 	display: grid;
@@ -17,11 +15,10 @@ project-card a {
 	position: absolute;
 	bottom: 0px;
 	left: 0px;
-
 	padding: 5px 15px;
-
 	background-color: var(--light-color);
 }
+
 project-card a:hover {
 	background-color: var(--light-highlight);
 }
@@ -30,18 +27,16 @@ project-card::after,
 project-card::before {
 	content: "";
 	background-color: var(--light-color);
-
 	position: absolute;
 	right: -10px;
 	bottom: -10px;
 }
 
-
 project-card::after {
 	height: 80px;
 	width: 3px;
-
 }
+
 project-card::before {
 	width: 80px;
 	height: 3px;
@@ -51,14 +46,42 @@ project-card p {
 	position: relative;
 	left: 10px;
 }
+
 project-card p::after {
 	content: "";
 	background-color: var(--light-color);
-
 	position: absolute;
 	left: -10px;
 	top: 5px;
-
 	height: 80%;
 	width: 4px;
+}
+
+@media(min-width: 500px) {
+	.projects-grid .notice-voice {
+		max-width: 300px;
+	}
+
+	project-card {
+		display: grid;
+		grid-template-columns: 0.1fr 1fr 0.3fr;
+	}
+
+	project-card h1 {
+		transform: rotate(-90deg);
+		order: 1;
+		max-height: 30px;
+	}
+
+	project-card picture {
+		order: 2;
+	}
+
+	project-card p {
+		order: 3;
+	}
+
+	project-card a {
+		/*display: none;*/
+	}
 }
