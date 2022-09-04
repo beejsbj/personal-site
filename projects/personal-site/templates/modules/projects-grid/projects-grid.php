@@ -28,7 +28,9 @@
 	 	foreach ($projects as $project) {
 	 		$title = $project['title']  ?? "Project Title";
 	 		$description = $project['description'] ?? "this is the Project Descripton";
-	 		$image = $project['image'] ?? "square.jpg"; ?>
+	 		$image = $project['image'] ?? "square.jpg"; 
+	 		$url = $project['url'] ?? "?page=layout-garden"; ?>
+
 	 		<project-card>
 				<h1 class="attention-voice">
 					<?=$title?>
@@ -39,7 +41,7 @@
 				<picture>
 					<img src="images/<?=$image?>" alt="">
 				</picture>
-				<a href="projects/<?=dasher($title)?>">LINK</a>
+				<a href="<?=$url?>">LINK</a>
 			</project-card>
  	<?php } ?>
 </projects-grid>
