@@ -15,9 +15,9 @@
 	<body>
 		<header>
 
-				<svg class="circle" viewBox="0 0 100 100">
-				  <circle cx="50" cy="50" r="40" />
-				</svg> 
+			<svg class="circle" viewBox="0 0 100 100">
+			  <circle cx="50" cy="50" r="40" />
+			</svg> 
 
 			<inner-column class="hide">
 				<?php include('templates/components/site-menu/site-menu.php'); ?>
