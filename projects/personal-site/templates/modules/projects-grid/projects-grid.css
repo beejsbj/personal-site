@@ -21,7 +21,8 @@ project-card a {
 	position: absolute;
 	bottom: 0px;
 	left: 0px;
-	padding: 5px 15px;	background-color: var(--light-color);
+	padding: 5px 15px;
+	background-color: var(--light-color);
 }
 
 project-card a:hover {
@@ -63,13 +64,14 @@ project-card p::after {
 }
 
 @media(min-width: 500px) {
-	.projects-grid .notice-voice {
+	section.projects-grid .notice-voice {
 		max-width: 300px;
+		/*grid-column: 2 / end;*/
 	}
+
 
 	project-card {
 		display: grid;
-		grid-template-columns: 0.1fr 1fr 0.3fr;
 		grid-template-columns: repeat(12, 1fr);
 
 	}
@@ -109,6 +111,8 @@ project-card p::after {
 		top: -10px;
 	}
 }
+
+
 @media(min-width: 750px) {
 	project-card:nth-of-type(odd) {
 		grid-column: span 10;
