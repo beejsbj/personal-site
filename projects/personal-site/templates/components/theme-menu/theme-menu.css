@@ -6,6 +6,7 @@
 	bottom: 5%;
 	padding: 100px;
 	transform: scale(0.95);
+	transition: 0.2s;
 
 
 }
@@ -55,13 +56,26 @@
 
 }
 
-@media (min-width: 800px) {
+@media (min-width: 750px) {
 	.theme-menu {
-		position: fixed;
+		position: absolute;
+		right: initial;
+		right: 130px;
+		top: -30px;	
+		bottom: initial;
+		transform: scale(0.9);
+	}
+	footer .theme-menu {
+		top: 20px;
+	}
+
+
+}
+
+@media (min-width: 1000px) {
+	.theme-menu {
 		right: initial;
 		left: -40px;
-		top: -40px;	
-		bottom: initial;
-		transform: scale(0.95);
+		top: -40px;
 	}
 }
