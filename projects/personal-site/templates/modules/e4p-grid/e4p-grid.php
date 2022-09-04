@@ -17,9 +17,9 @@
 			$chapterExercises = $chapter['exercises'] ?? [1, 2, 3, 4];?>
 
 			<e4p-chapter>
-				<h2 class='attention-voice'>
+				<h1 class='attention-voice'>
 				<?=$chapterHeading?>
-				</h2>
+				</h1>
 
 				<p class="whisper-voice">
 				<?=$chapterDesc?>
