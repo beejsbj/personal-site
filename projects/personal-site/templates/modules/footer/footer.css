@@ -2,3 +2,9 @@ footer {
 	padding-bottom: 300px;
 	position: relative;
 }
+
+@media (min-width: 800px) {
+	footer {
+		display: none;
+	}
+}
