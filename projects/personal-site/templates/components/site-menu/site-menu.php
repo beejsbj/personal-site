@@ -1,16 +1,16 @@
 <nav class="site-menu">
 	<ul>
 		<li>
-			<a href='?page=home'>home</a>
+			<a href='?page=home'><span>home</span></a>
 		</li>
 		<li>
-			<a href='?page=about'>about</a>
+			<a href='?page=about'><span>about</span></a>
 		</li>
 		<li>
-			<a href='?page=projects'>projects</a>
+			<a href='?page=projects'><span>projects</span></a>
 		</li>
 		<li>
-			<a href='?page=style-guide'>style guide</a>
+			<a href='?page=style-guide'><span>style guide</span></a>
 		</li>
 		<!-- <li>
 			<a href='?page=goals'>goals</a>
