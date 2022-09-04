@@ -86,10 +86,12 @@ project-card p::after {
 
 	project-card picture {
 		order: 2;
+		grid-column: span 12;
 	}
 
 	project-card p {
 		order: 3;
+		grid-column: 2 / end;
 	}
 
 	project-card a {
@@ -100,5 +102,12 @@ project-card p::after {
 		right: 0px;
 	}
 
+	project-card::after,
+	project-card::before {
+		right: -10px;
+		bottom: initial;
+		top: -10px;
+	}
+}
 	}
 }
