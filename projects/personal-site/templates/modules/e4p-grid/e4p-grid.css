@@ -16,7 +16,8 @@ e4p-chapter::after,
 e4p-chapter::before {
 	content: "";
 	background-color: var(--light-color);
-	position: absolute;	left: 0px;
+	position: absolute;
+	left: 0px;
 	bottom: -15px;
 }
 
@@ -42,7 +43,7 @@ e4p-chapter p::after {
 	position: absolute;
 	left: -10px;
 	top: 5px;
-	height: 80%;
+	height: 50%;
 	width: 5px;
 }
 e4p-chapter a {
@@ -68,6 +69,9 @@ e4p-chapter ul li::after {
 e4p-chapter ul li:hover::after {
 	background-color: var(--dark-highlight);
 	transform: scale(1.2) rotate(270deg);
+
+}
+
 
 @media(min-width: 500px) {
 	section.e4p-grid .notice-voice {
