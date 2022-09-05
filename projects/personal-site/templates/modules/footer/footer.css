@@ -22,3 +22,16 @@ footer .circle {
 		width: 800px;
 	}
 }
+@media(min-width: 2000px) {
+
+	footer .circle {
+
+		top:  initial;
+		bottom: 0px;
+		right: -200px;
+		left: initial;
+		display: block;
+		width: 600px;
+		z-index: -99;
+	}
+}
