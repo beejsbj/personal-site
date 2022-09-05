@@ -39,11 +39,27 @@ header .circle {
 		top:  55%;
 		right: initial;
 		width: 40vw;
-		left: -25vw;
+		left: -300px;
 		display: block;
 	}
 }
 
 @media (min-width:  1000px) {
-	
+
+}
+
+@media(min-width: 1320px) {
+	header .circle {
+
+
+		width: 650px;
+	}
+}
+@media(min-width: 2000px) {
+
+	header .circle {
+
+		left: -600px;
+		width: 1200px;
+	}
 }
