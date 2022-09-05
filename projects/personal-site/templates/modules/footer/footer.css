@@ -1,7 +1,7 @@
 footer {
 	padding-bottom: 300px;
 	position: relative;
-	overflow: hidden;
+
 }
 footer .circle {
 		fill: var(--dark-color);
@@ -11,7 +11,8 @@ footer .circle {
 		left: -200px;
 		display: block;
 	}
-	foot
+
+
 @media(min-width: 1320px) {
 	footer .circle {
 
