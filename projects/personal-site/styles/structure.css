@@ -39,7 +39,7 @@ inner-column.menus {
 	z-index: 5;
 }*/
 
-@media (min-width: 1140px){
+@media (min-width: 1500px){
 	inner-column {
 		max-width: var(--standard);
 	}
