@@ -1,6 +1,7 @@
 footer {
-	padding-bottom: 300px;
+	padding: 200px 0;
 	position: relative;
+	overflow: hidden;
 
 }
 footer .circle {
