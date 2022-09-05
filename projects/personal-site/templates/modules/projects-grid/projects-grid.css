@@ -1,4 +1,3 @@
-
 projects-grid {
 	display: grid;
 	grid-template-columns: repeat(12, 1fr);
@@ -69,11 +68,9 @@ project-card p::after {
 		/*grid-column: 2 / end;*/
 	}
 
-
 	project-card {
 		display: grid;
 		grid-template-columns: repeat(12, 1fr);
-
 	}
 
 	project-card h1 {
@@ -82,8 +79,8 @@ project-card p::after {
 		text-orientation: sideways;
 		order: 1;
 		grid-column: span 1;
-
-		/*grid-row: span 2 / -1;*/ /*pushing header down*/
+		/*grid-row: span 2 / -1;*/
+		/*pushing header down*/
 	}
 
 	project-card picture {
@@ -112,52 +109,54 @@ project-card p::after {
 	}
 }
 
-
 @media(min-width: 750px) {
 	project-card:nth-of-type(odd) {
 		grid-column: span 10;
 	}
+
 	project-card:nth-of-type(even) {
 		grid-column: 3 / span 10;
 		transform: scaleX(-1);
-
 	}
-	project-card:nth-of-type(even) > * {
+
+	project-card:nth-of-type(even)>* {
 		transform: scaleX(-1);
-
 	}
+
 	project-card:nth-of-type(even) p {
-		left:-10px;
+		left: -10px;
 	}
-
 }
 
 @media(min-width: 1000px) {
 
 	project-card::after,
 	project-card::before {
-		display: none;
-	}	
+		/*display: none;*/
+	}
+
 	project-card h1 {
 		grid-row: span 2;
 	}
+
 	project-card picture {
 		grid-column: span 10;
 		grid-row: span 2;
 	}
 
-	project-card p {
+	project-card:nth-of-type(odd) p {
+		text-align: right;
+	}
 
+	project-card p {
+		position: static;
 		grid-column: span 1;
-		left: 25px;
-		width: 110px;
+		width: 100px;
+		/*text-align: justify;*/
 	}
 
 	project-card p::after {
-		left: -25px;
-		top: 0px;
-		height: 50%;
-		width: 20px;
+		display: none;
 	}
 
 	project-card a {
@@ -166,7 +165,11 @@ project-card p::after {
 		grid-column: 12 / 13;
 		align-self: end;
 		text-align: center;
-		padding: 15px 30px;
+		padding: 15px 20px;
+		width: 100px;
+	}
+}
+
 @media (min-width: 1500px) {
 	project-card {
 		grid-template-rows: 0.1fr 1fr;
