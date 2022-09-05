@@ -12,3 +12,13 @@ footer .circle {
 		display: block;
 	}
 	foot
+@media(min-width: 1320px) {
+	footer .circle {
+
+		top:  0px;
+		right: -200px;
+		left: initial;
+		display: block;
+		width: 800px;
+	}
+}
