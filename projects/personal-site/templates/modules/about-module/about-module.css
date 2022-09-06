@@ -1,4 +1,37 @@
+about-module {
+	display: grid;
+	gap:  20px;
+}
 image-grid {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	position: relative;
 }
+
+image-grid picture {
+	position: absolute;
+	border-radius: 50%;
+	top: 0;
+	left: 0;
+	padding: 100px;
+	overflow: hidden;
+}
+image-grid picture:nth-of-type(1) {
+	grid-column: 2 / span 2;
+}
+image-grid picture:nth-of-type(2) {
+	grid-column: span 2;
+	grid-row-start: 2;
+}
+image-grid picture:nth-of-type(3) {
+	grid-column: span 2;
+}
+image-grid picture img {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+
+
