@@ -42,3 +42,9 @@ body {
 .hide {
 	display: none;
 }
+
+
+body main {
+	display: grid;
+	gap: 30px;
+}
