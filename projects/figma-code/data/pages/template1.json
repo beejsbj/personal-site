@@ -172,7 +172,6 @@
 			}
 		},
 		{
-			"module" : "call-to-action"
 			"module" : "faq-module",
 			"components" : {
 				"text-content" : [
@@ -216,7 +215,6 @@
 			}
 		},
 		{
-			"module" : "footer"
 			"module" : "cta-module",
 			"components" : {
 				"text-content" : [
