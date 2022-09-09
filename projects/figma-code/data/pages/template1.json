@@ -217,6 +217,36 @@
 		},
 		{
 			"module" : "footer"
+			"module" : "cta-module",
+			"components" : {
+				"text-content" : [
+					{
+						"element" : "h1",
+						"content" : "Call to action",
+						"classes" : [
+							"teaser-voice"
+						]
+					},
+					{
+						"element" : "h2",
+						"content" : "Hear the Universe calling you to push forward.",
+						"classes" : [
+							"attention-voice"
+						]
+					}
+				],
+				"buttons" : [
+					{
+						"right-icon": "right-arrow",
+						"name" : "Get free quote",
+						"type" : "link-button",
+						"classes" : [
+							"large",
+							"contained"
+						]
+					}
+				]
+			}
 		}
 	]
 }
