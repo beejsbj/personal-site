@@ -1,0 +1,13 @@
+mast-head {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+mast-head .site-menu {
+	display: flex;
+	gap: 20px;
+	justify-content: center;
+}
+
