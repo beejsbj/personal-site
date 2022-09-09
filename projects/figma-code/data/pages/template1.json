@@ -173,6 +173,47 @@
 		},
 		{
 			"module" : "call-to-action"
+			"module" : "faq-module",
+			"components" : {
+				"text-content" : [
+					{
+						"element" : "h1",
+						"content" : "Frequent ask qustions",
+						"classes" : [
+							"attention-voice"
+						]
+					},
+					{
+						"element" : "h2",
+						"content" : "Pellentesque cras adipiscing tempus libero vel nullam mauris tellus. Aliquam ultrices tellus consequat amet, lectus aliquam est in neque.",
+						"classes" : [
+							"teaser-voice"
+						]
+					}
+				],
+				"details-content" : [
+					{
+						"summary" : "How soon will my order ship?",
+						"detail-paragraph": "Elementum ullamcorper felis nulla scelerisque. Nunc enim nunc mattis leo massa."
+					},
+					{
+						"summary" : "Is there any warranty exclusions?",
+						"detail-paragraph": "Venenatis, fames a a, in. Morbi pellentesque lacus, purus in tristique justo, pretium egestas. Commodo leo nisl consectetur nisi, tortor, erat sit at aliquet. Ultrices in aliquam maecenas cursus. Sed enim cursus augue quis risus. Ac donec quisque vitae feugiat dignissim diam."
+					},
+					{
+						"summary" : "Are there any return exclusions?",
+						"detail-paragraph": "Elementum ullamcorper felis nulla scelerisque. Nunc enim nunc mattis leo massa."
+					},
+					{
+						"summary" : "Will I be charged for a replacement item?",
+						"detail-paragraph": "Venenatis, fames a a, in. Morbi pellentesque lacus, purus in tristique justo, pretium egestas. Commodo leo nisl consectetur nisi, tortor, erat sit at aliquet. Ultrices in aliquam maecenas cursus. Sed enim cursus augue quis risus. Ac donec quisque vitae feugiat dignissim diam."
+					},
+					{
+						"summary" : "How can I track my orders & payment?",
+						"detail-paragraph": "Elementum ullamcorper felis nulla scelerisque. Nunc enim nunc mattis leo massa."
+					}
+				]
+			}
 		},
 		{
 			"module" : "footer"
