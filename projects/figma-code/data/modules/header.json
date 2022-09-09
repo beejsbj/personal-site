@@ -9,11 +9,12 @@
 		],
 		"buttons" : [
 			{
-				"left-icon": "globe",
-				"name" : "EN",
+				"left-icon": "globe.svg",
+				"name" : "En",
 				"type" : "link-button",
 				"classes" : [
-					"text"
+					"text",
+					"icon"
 				]
 			},
 			{
