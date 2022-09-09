@@ -1,14 +1,15 @@
-
 @import '../templates/components/text-content/text-content.css';
 /* buttons and icons and smaller reusable bits here */
 
 .buttons ul {
 	display: flex;
-	gap: 20px;
-	/*justify-content: center;*/
+	gap: 5px;
+	/*justify-content: space-between;*/
 }
 
+
 .button {
+	
 	--h: 10;
 	background-color: var(--color);
 
@@ -23,8 +24,18 @@
 	transition: 0.3s;
 
 	display: flex;
+	gap: 2px;
 	align-items: center;
+	justify-content: center;
 
+}
+
+.button span {
+/*	position: relative;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 50;*/
 }
 
 .button.small {
@@ -33,17 +44,25 @@
 }
 .button.medium {
 	font-size: 14px;
+	padding: 10px 20px;
 
 }
 .button.large {
 	font-size: 16px;
+	padding: 10px 20px;
+}
+@media (min-width:  600px) {
+	.button.large {
+		padding: 10px 40px;
+	}
 }
 
 .button.rounded {
 	border-radius: 5px;
 }
 
-.button.outline {	background-color: transparent;
+.button.outline {
+	background-color: transparent;
 	border: 1px solid var(--color);
 	color: var(--color);
 }
@@ -51,11 +70,9 @@
 .button.text {
 	background-color: transparent;
 	color: var(--color);
+	padding: 10px;
 }
-.button:hover span {
-	position: relative;
-	z-index: 50;
-}
+
 .button:not(.outline, .text):hover {
 	background-color: var(--shade);
 }
@@ -84,6 +101,13 @@
 
 }
 
-.button.icon  {
-	/*min-width: 10px;*/
+.button.icon picture {
+	min-width: 16px;
 }
+
+
+
+
+
+
+text-content 
