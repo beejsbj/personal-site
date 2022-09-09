@@ -1,14 +1,68 @@
+client-says {
+	display: grid;
+	text-align: center;
+	justify-items: center;
+	gap: 60px;
+	padding: 0px 20px;
+}
+
+
 
 client-says review-grid {
-	display: flex;
+	display: grid;
+	gap: 30px;
+}
+client-says review-grid > picture {
+	display: none;
 }
 
 client-says avatar-card picture {
-	max-width: 20px;
+	max-width: 30px;
 }
 
 client-says star-rating {
+	display: none;
 	display: flex;
 	/*gap: 5px;*/
 	align-items: center;
+}
+client-says star-rating picture {
+	max-width: 20px;
+}
+client-says review-card {
+	display: grid;
+	justify-items: center;
+	gap: 20px;
+}
+.template1 client-says avatar-card {
+	display: grid;
+	justify-items: center;
+	order: 3;
+	gap: 10px;
+}
+.template1 client-says avatar-card h1 {
+	color: var(--neutral-stuffs);
+}
+.template1 client-says avatar-card h2 {
+	display: none;
+}
+.template1 client-says blockquote {
+	order: 2;
+}
+.template1 client-says star-rating {
+	order: 1;
+
+}
+
+@media (min-width:  750px) {
+	.template1 client-says review-grid {
+		grid-template-columns: 0.1fr 1fr 1fr 0.1fr;
+		align-items: center;
+	}
+	.template1 client-says review-grid > picture {
+		display: block;
+	}
+	.template1 client-says review-grid > picture:nth-of-type(2) {
+		transform: scale(-1);
+	}
 }

@@ -22,6 +22,7 @@
 .attention-voice {
 	font-family: 'Inter', sans-serif;
 	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);
+	text-transform: capitalize;
 }
 
 .notice-voice {
