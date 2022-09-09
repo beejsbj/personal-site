@@ -13,7 +13,7 @@
 
 	<body>
 		<header>
-			<inner-column>
+			<inner-column class='wide'>
 				<?php include('templates/modules/mast-head/mast-head.php'); ?>
 			</inner-column>
 		</header>
