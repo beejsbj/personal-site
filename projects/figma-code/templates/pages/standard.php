@@ -10,7 +10,7 @@
 
 		
 ?>
-<section class="page-section">
+<section class="page-section <?=$module?>">
 	<inner-column>
 		<?php include("templates/modules/$module/$module.php"); ?>
 	</inner-column>
