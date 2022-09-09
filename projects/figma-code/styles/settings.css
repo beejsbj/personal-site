@@ -9,7 +9,7 @@ html {
 	--black: #111111;
 	--white: hsla(0, 0%, 100%, 1.00);
 
-	--neutral-stuffs: gray;
+	--neutral-stuffs: hsla(0, 0%, 46%, 1.00);
 
 	--h: 215;
 	--s: 100%;

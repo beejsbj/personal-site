@@ -17,7 +17,7 @@
 					},
 					{
 						"element" : "p",
-						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor. Malesuada lobortis tristique tortor.",
 						"classes" : [
 							"calm-voice"
 						]
@@ -56,21 +56,21 @@
 					},
 					{
 						"element" : "h1",
-						"content" : "Arcu suscipit massa aliquam proin amet",
+						"content" : "Rhoncus, accumsan dictum",
 						"classes" : [
 							"teaser-voice"
 						]
 					},
 					{
 						"element" : "h2",
-						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"content" : "Etiam nulla lectus amet nunc molestie at vulputate.",
 						"classes" : [
 							"loud-voice"
 						]
 					},
 					{
 						"element" : "h3",
-						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"content" : "Neque, pulvinar vestibulum non aliquam.",
 						"classes" : [
 							"teaser-voice"
 						]
@@ -83,15 +83,15 @@
 			"components" : {
 				"text-content" : [
 					{
-						"element" : "h2",
-						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"element" : "h1",
+						"content" : "Etiam nulla lectus molestie at vulputate.",
 						"classes" : [
-							"loud-voice"
+							"attention-voice"
 						]
 					},
 					{
-						"element" : "h3",
-						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"element" : "h2",
+						"content" : "Neque, pulvinar vestibulum non aliquam.",
 						"classes" : [
 							"teaser-voice"
 						]
