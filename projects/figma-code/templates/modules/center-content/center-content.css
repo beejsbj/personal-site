@@ -1,8 +1,22 @@
 .template1 center-content a span {
 	display: none;
 }
-
+.template1 center-content text-content picture {
+	display: none;
+}
 
 .template3 center-content feature-grid picture {
 	display: none;
 }
+
+center-content {
+	text-align: center;
+	display: grid;
+	gap: 40px;
+
+}
+
+center-content .loud-voice {
+	font-weight: 500;
+}
+
