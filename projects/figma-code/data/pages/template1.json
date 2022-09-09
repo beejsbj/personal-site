@@ -1,0 +1,181 @@
+{
+	"id": "template1",
+	"title": "Welcome",
+	"intro": "You've made it!",
+
+	"sections": [
+		{
+			"module" : "hero-module",
+			"components" : {
+				"text-content" : [
+					{
+						"element" : "h1",
+						"content" : "Arcu suscipit massa aliquam proin amet",
+						"classes" : [
+							"loud-voice"
+						]
+					},
+					{
+						"element" : "p",
+						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"classes" : [
+							"calm-voice"
+						]
+					}
+				],
+				"buttons" : [
+					{
+						"name" : "Get Started",
+						"type" : "link-button",
+						"classes" : [
+							"large",
+							"contained"
+						]
+					},
+					{
+						"name" : "Start free trial",
+						"type" : "link-button",
+						"classes" : [
+							"large",
+							"outline"
+						]
+					}
+				]
+			}
+		},
+		{
+			"module" : "center-content",
+			"components" : {
+				"text-content" : [
+					{
+						"element" : "picture",
+						"content" : "<img src='images/Avatar.svg' alt=''>",
+						"classes" : [
+							"teaser-voice"
+						]
+					},
+					{
+						"element" : "h1",
+						"content" : "Arcu suscipit massa aliquam proin amet",
+						"classes" : [
+							"teaser-voice"
+						]
+					},
+					{
+						"element" : "h2",
+						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"classes" : [
+							"loud-voice"
+						]
+					},
+					{
+						"element" : "h3",
+						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"classes" : [
+							"teaser-voice"
+						]
+					}
+				]
+			}
+		},
+		{
+			"module" : "feature-module",
+			"components" : {
+				"text-content" : [
+					{
+						"element" : "h2",
+						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"classes" : [
+							"loud-voice"
+						]
+					},
+					{
+						"element" : "h3",
+						"content" : "Luctus felis sit lectus tristique diam ornare bibendum. Arcu auctor suspendisse luctus amet bibendum pellentesque lorem. Malesuada lobortis tristique tortor.",
+						"classes" : [
+							"teaser-voice"
+						]
+					}
+				],
+				"feature-grid": [
+					{
+						"image" : "Avatar.svg",
+						"heading" : "Et, odio elementum",
+						"paragraph" : "Aliquam vehicula pellentesque id mi quam ipsum. Arcu nisl faucibus mattis etiam."
+					},
+					{
+						"image" : "Avatar.svg",
+						"heading" : "Et, odio elementum",
+						"paragraph" : "Aliquam vehicula pellentesque id mi quam ipsum. Arcu nisl faucibus mattis etiam."
+					},
+					{
+						"image" : "Avatar.svg",
+						"heading" : "Et, odio elementum",
+						"paragraph" : "Aliquam vehicula pellentesque id mi quam ipsum. Arcu nisl faucibus mattis etiam."
+					},
+					{
+						"image" : "Avatar.svg",
+						"heading" : "Et, odio elementum",
+						"paragraph" : "Aliquam vehicula pellentesque id mi quam ipsum. Arcu nisl faucibus mattis etiam."
+					},
+					{
+						"image" : "Avatar.svg",
+						"heading" : "Et, odio elementum",
+						"paragraph" : "Aliquam vehicula pellentesque id mi quam ipsum. Arcu nisl faucibus mattis etiam."
+					},
+					{
+						"image" : "Avatar.svg",
+						"heading" : "Et, odio elementum",
+						"paragraph" : "Aliquam vehicula pellentesque id mi quam ipsum. Arcu nisl faucibus mattis etiam."
+					}
+				]
+			}
+		},
+		{
+			"module" : "client-says",
+			"components" : {
+				"text-content" : [
+					{
+						"element" : "h1",
+						"content" : "what our clients says",
+						"classes" : [
+							"attention-voice"
+						]
+					},
+					{
+						"element" : "h2",
+						"content" : "Neque, pulvinar vestibulum non aliquam.",
+						"classes" : [
+							"teaser-voice"
+						]
+					}
+				],
+				"review-card" : [
+					{
+						"name" : "Courtney Henry",
+						"position" : "Marketing Coordinator",
+						"avatar" : "avatar-face.svg",
+						"quote" : "Tincidunt risus, blandit proin semper. Tellus ac pellentesque convallis vitae. Lorem enim cursus et consequat viverra id justo ullamcorper. Vel.",
+						"rating" : 5,
+						"image" : "landscape.jpg"
+					},
+					{
+						"name" : "Courtney Henry",
+						"position" : "Marketing Coordinator",
+						"avatar" : "avatar-face.svg",
+						"quote" : "Tincidunt risus, blandit proin semper. Tellus ac pellentesque convallis vitae. Lorem enim cursus et consequat viverra id justo ullamcorper. Vel.",
+						"rating" : 5,
+						"image" : "landscape.jpg"
+					}
+
+				]
+			}
+		},
+		{
+			"module" : "call-to-action"
+		},
+		{
+			"module" : "footer"
+		}
+	]
+}

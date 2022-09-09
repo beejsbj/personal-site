@@ -1,0 +1,30 @@
+{
+	"module" : "mast-head",
+	"components" : {
+		"site-menu" : [
+			"home",
+			"template1",
+			"template2",
+			"template3"
+		],
+		"buttons" : [
+			{
+				"left-icon": "globe",
+				"name" : "EN",
+				"type" : "link-button",
+				"classes" : [
+					"text"
+				]
+			},
+			{
+				"name" : "Login",
+				"type" : "button",
+				"classes" : [
+					"small",
+					"contained",
+					"rounded"
+				]
+			}
+		]
+	}
+	}
