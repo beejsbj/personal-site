@@ -1,0 +1,22 @@
+/*header*/
+@import '../templates/modules/header/header.css';
+@import '../templates/modules/mast-head/mast-head.css';
+
+
+@import '../templates/modules/center-content/center-content.css';
+@import '../templates/modules/feature-module/feature-module.css';
+@import '../templates/modules/client-says/client-says.css';
+
+
+
+
+
+/*footer*/
+@import '../templates/modules/footer/footer.css';
+
+
+
+
+
+
+
