@@ -3,9 +3,9 @@
 		<h2 class="attention-voice">Zee footah</h2>
 		<site-map>
 			<nav>
-				<h1 class="solid-voice">
+				<h3 class="solid-voice">
 					Product
-				</h1>
+				</h3>
 				<ul>
 					<li>
 						Diam orci
@@ -28,9 +28,9 @@
 				</ul>
 			</nav>
 			<nav>
-				<h1 class="solid-voice">
+				<h3 class="solid-voice">
 					Information
-				</h1>
+				</h3>
 				<ul>
 					<li>
 						Diam orci
@@ -44,9 +44,9 @@
 				</ul>
 			</nav>
 			<nav>
-				<h1 class="solid-voice">
+				<h3 class="solid-voice">
 					Information
-				</h1>
+				</h3>
 				<ul>
 					<li>
 						Diam orci
@@ -63,9 +63,9 @@
 				</ul>
 			</nav>
 			<subscribe-box>
-				<h1 class="solid-voice">
+				<h3 class="solid-voice">
 					Subscribe
-				</h1>
+				</h3>
 				<?php include('templates/components/email-signup/email-signup.php'); ?>
 				<p class="calm-voice">
 					

@@ -1,6 +1,7 @@
 /*header*/
 @import '../templates/modules/header/header.css';
 @import '../templates/modules/mast-head/mast-head.css';
+@import '../templates/modules/hero-module/hero-module.css';
 
 
 @import '../templates/modules/center-content/center-content.css';
