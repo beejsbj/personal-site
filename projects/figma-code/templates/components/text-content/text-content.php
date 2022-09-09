@@ -1,4 +1,5 @@
-<?php
+<text-content>
+	<?php
 	$textContents = $components['text-content'];
 
 	foreach ($textContents as $textContent) {
@@ -12,3 +13,4 @@
 		</<?=$element?>>
 
 	<?php } ?>
+</text-content>
