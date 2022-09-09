@@ -1,0 +1,46 @@
+section.hero-module {
+	background-image: url("../../../images/slant-lines.png");
+	background-size: cover;
+	background-position: center center;
+}
+hero-module {
+	padding: 30px 0px;
+
+	display: grid;
+	gap:  20px;
+	justify-items: center;
+	text-align: center;
+
+}
+
+hero-module text-content {
+	max-width: 975px;
+	display: grid;
+	justify-items: center;
+}
+hero-module text-content p {
+	max-width: 650px;
+}
+hero-module .loud-voice {
+	color: var(--neutral-stuffs);
+
+}
+@media (min-width: 600px) {
+	hero-module {
+		padding: 100px 0px;
+	}
+	.loud-voice {
+		--neutral-stuffs: #D9D9D9;
+		font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
+		font-weight: 700;
+		/* or variable font */
+		line-height: 77px;
+		color: #D9D9D9;
+			  text-shadow:
+		-1px -1px 0 #000,  
+		1px -1px 0 #000,
+		-1px 1px 0 #000,
+		1px 1px 0 #000;
+
+	}
+}
