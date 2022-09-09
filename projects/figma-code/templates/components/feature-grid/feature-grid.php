@@ -1,4 +1,6 @@
-<?php 
+<feature-grid>
+
+	<?php 
 	$featureGrid = $components['feature-grid'];
 
 	foreach ($featureGrid as $featureCard) {
@@ -8,18 +10,20 @@
 		?>
 
 
-<feature-grid>
+
 	<feature-card>
 		<picture>
 			<img src="images/<?=$image?>" alt="">
 		</picture>
-		<h1>
+		<h1 class="solid-voice">
 			<?=$heading?>
 		</h1>
-		<p>
+		<p class="whisper-voice">
 			<?=$paragraph?>
 		</p>
 	</feature-card>
-</feature-grid>
+
 
 <?php } ?>
+
+</feature-grid>

@@ -1,5 +1,30 @@
-feature-grid picture {
-	max-width: 30px;
+
+
+feature-module {
+	display: grid;
+	gap: 20px;
+}
+
+@media (min-width:  750px) {
+	feature-module {
+		grid-template-columns: 1fr 1fr;
+		justify-content: space-between;
+	}
+}
+
+
+feature-grid {
+	display: grid;
+	gap: 30px;
+}
+feature-card {
+	display: grid;
+	grid-template-columns: 0.15fr 1fr;
+	gap: 10px;
+}
+feature-card picture {
+	/*max-width: 30px;*/
+	grid-row: span 2;
 }
 
 feature-grid h1 {

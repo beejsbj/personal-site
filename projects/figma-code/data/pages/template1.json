@@ -95,6 +95,13 @@
 						"classes" : [
 							"teaser-voice"
 						]
+					},
+					{
+						"element" : "picture",
+						"content" : "<img src='images/square.jpg' alt=''>",
+						"classes" : [
+							"teaser-voice"
+						]
 					}
 				],
 				"feature-grid": [
