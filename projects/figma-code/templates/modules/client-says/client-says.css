@@ -1,0 +1,14 @@
+
+client-says review-grid {
+	display: flex;
+}
+
+client-says avatar-card picture {
+	max-width: 20px;
+}
+
+client-says star-rating {
+	display: flex;
+	/*gap: 5px;*/
+	align-items: center;
+}
