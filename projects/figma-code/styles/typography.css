@@ -27,8 +27,8 @@
 
 .notice-voice {
 	font-family: 'Inter', sans-serif;
-	font-size: 1.1rem;
-	font-weight: 700;
+	font-size: 1rem;
+	/*font-weight: 700;*/
 }
 
 .solid-voice {
@@ -47,6 +47,7 @@ li {
 	font-family: 'Inter', sans-serif;
 	font-size: 1rem;
 	line-height: 1.4;
+	max-width: 700px;
 }
 
 :is(.calm-voice, p, li) em {
@@ -60,7 +61,7 @@ li {
 .whisper-voice {
 	font-family: 'Inter', sans-serif;
 	font-size: 0.9rem;
-	color: gray;
+	color: hsla(217, 94%, 85%, 1.00);
 }
 
 
@@ -70,6 +71,7 @@ li {
 	font-size: 14px;
 	color: var(--neutral-stuffs);
 	text-transform: capitalize;
+	max-width: 700px;
 }
 
 /* these would be scoped to section or to an article element */
@@ -87,3 +89,4 @@ code {
 	font-size: 1.1em;
 	color: green;
 }
+

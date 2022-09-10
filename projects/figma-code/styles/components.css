@@ -3,7 +3,7 @@
 
 .buttons ul {
 	display: flex;
-	gap: 5px;
+	gap: 10px;
 	/*justify-content: space-between;*/
 }
 
@@ -101,8 +101,11 @@
 
 }
 
-.button.icon picture {
+.button.icon {
 	min-width: 16px;
+	border: 1px solid white;
+	border-radius: 50%;
+	padding: 5px;
 }
 
 
