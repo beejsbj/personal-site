@@ -1,3 +1,94 @@
-footer {
-	background-color: lightyellow;
+.template1 footer {
+	background-color: var(--color);
+	color: white;
+	fill: white;
+
+}
+
+footer inner-column {
+	display: grid;
+	gap: 50px;
+}
+
+footer site-map {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 30px;
+}
+
+footer nav,
+footer nav ul {
+	display: grid;
+	gap: 10px;
+	align-content: start;
+}
+
+footer site-map nav li {
+	font-family: 'Inter', sans-serif;
+	font-size: 0.9rem;
+	color: hsla(217, 94%, 85%, 1.00);
+}
+
+footer subscribe-box {
+	background-color: var(--shade);
+	padding: 30px;
+	display: grid;
+	gap: 20px;
+	grid-column: span 2;
+}
+
+
+@media (max-width: 750px){
+	footer mast-foot {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-content: start;
+		row-gap: 10px;
+	}
+	footer mast-foot nav {
+		order: 1;
+		grid-row: span 2;
+	}
+	footer mast-foot picture {
+		order: 2;
+	}
+
+
+	footer mast-foot .buttons {
+		order: 3;
+}
+}
+
+@media (min-width:  750px) {
+	footer site-map {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr 1.5fr;
+		gap: 30px;
+	}
+	footer site-map > * {
+		grid-column: initial;
+	}
+	mast-foot {
+		display: flex;
+		/*gap: 10px;*/
+		align-items: center;
+		justify-content: space-between;
+	}
+
+
+
+	mast-foot .site-menu ul {
+		display: none;
+	}
+	@media (min-width:  600px){
+		mast-foot .site-menu ul {
+			display: flex;
+			gap: 10px;
+			justify-content: center;
+		}
+	}
+
+	mast-foot .buttons .rounded {
+		border-radius: 50px;
+	}
 }
