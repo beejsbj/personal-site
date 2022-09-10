@@ -1,0 +1,21 @@
+.cta-module inner-column {
+	background-color: var(--highlight);
+}
+
+cta-module {
+	
+	text-align: center;
+	display: grid;
+	justify-items: center;
+	gap: 30px;
+	/*padding: 80px;*/
+}
+
+@media (min-width:  750px){
+	cta-module {
+		padding: 80px;
+	}
+	cta-module .loud-voice {
+	font-size: 48px;
+}
+}
