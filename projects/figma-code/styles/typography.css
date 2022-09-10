@@ -61,7 +61,8 @@ li {
 .whisper-voice {
 	font-family: 'Inter', sans-serif;
 	font-size: 0.9rem;
-	color: hsla(217, 94%, 85%, 1.00);
+	font-weight: 300;
+	color: hsla(0, 0%, 44%, 1.00);
 }
 
 

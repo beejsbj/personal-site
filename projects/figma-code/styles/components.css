@@ -7,7 +7,9 @@
 	/*justify-content: space-between;*/
 }
 
-
+.buttons picture {
+	max-width: 20px;
+}
 .button {
 	
 	--h: 10;
@@ -24,7 +26,7 @@
 	transition: 0.3s;
 
 	display: flex;
-	gap: 2px;
+	gap: 10px;
 	align-items: center;
 	justify-content: center;
 
@@ -103,13 +105,52 @@
 
 .button.icon {
 	min-width: 16px;
-	border: 1px solid white;
+	/*border: 1px solid white;*/
 	border-radius: 50%;
 	padding: 5px;
+}
+footer .button.icon {
+	gap: 0;
 }
 
 
 
+.buttons form {
+	width: 100%;
+}
 
+form label {
+	display: none;
+}
 
+form input {
+	background-color: var(--shade);
+	/*height: 100%;*/
+	border-radius: 5px;
+	padding: 10px;
+	width: 100%;
 
+}
+form input::placeholder {
+	color: var(--highlight);
+}
+
+footer form label {
+	display: block;
+	background-color: hsla(215, 100%, 48%, 1.00);
+	color: white;
+	font-size: 20px;
+	padding: 10px 15px;
+	border-radius: 0px 5px 5px 0px;
+}
+footer form {
+	display: flex;
+}
+
+footer form input {
+	background-color: var(--paper);
+	border-radius: 5px 0px 0px 5px;
+}
+footer form input::placeholder {
+	color: gray;
+}
