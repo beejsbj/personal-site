@@ -2,7 +2,6 @@
 	"module" : "mast-head",
 	"components" : {
 		"site-menu" : [
-			"home",
 			"template1",
 			"template2",
 			"template3"
