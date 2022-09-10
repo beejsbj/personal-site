@@ -1,8 +1,17 @@
-.template1 footer {
+html:not(.template2) footer {
 	background-color: var(--color);
 	color: white;
 	fill: white;
 
+}
+
+.template2 footer {
+	color: black;
+	fill: var(--color);
+}
+
+footer inner-column.wide {
+	border-top: 1px solid lightgray;
 }
 
 footer inner-column {
@@ -26,7 +35,13 @@ footer nav ul {
 footer site-map nav li {
 	font-family: 'Inter', sans-serif;
 	font-size: 0.9rem;
-	color: hsla(217, 94%, 85%, 1.00);
+	color: hsla(0, 0%, 56%, 1.00);
+}
+
+html:not(.template2) footer site-map nav li,
+html:not(.template2) footer site-map .whisper-voice {
+
+	color: var(--highlight);
 }
 
 footer subscribe-box {
@@ -36,7 +51,9 @@ footer subscribe-box {
 	gap: 20px;
 	grid-column: span 2;
 }
-
+.template2 footer subscribe-box {
+	background-color: var(--highlight);
+}
 
 @media (max-width: 750px){
 	footer mast-foot {

@@ -42,6 +42,8 @@ $footerJson = file_get_contents("data/modules/footer.json"); $footerData = json_
 				</p>
 			</subscribe-box>
 		</site-map>
+	</inner-column>
+	<inner-column class="wide">
 		<mast-foot>
 			<picture class="logo">
 				<?php include('images/logo.php'); ?>
