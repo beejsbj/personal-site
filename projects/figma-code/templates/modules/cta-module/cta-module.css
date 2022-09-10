@@ -11,11 +11,42 @@ cta-module {
 	/*padding: 80px;*/
 }
 
+
+html:not(.template3) cta-module .square {
+	display: none;
+}
+
+
+
+.template3 cta-module .buttons {
+	width: 100%;
+}
+.template3 cta-module .buttons ul {
+
+	justify-content: space-between;
+	gap: 30px;
+}
 @media (min-width:  750px){
 	cta-module {
 		padding: 80px;
 	}
 	cta-module .loud-voice {
-	font-size: 48px;
+		font-size: 48px;
+	}
+
+	.template3 cta-module {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+		grid-row-gap: 0;
+		text-align: left;
+
+	}
+	.template3 cta-module .square {
+		grid-row: span 2;
+
+	}
+
 }
-}
+
+
