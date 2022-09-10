@@ -2,12 +2,27 @@
 	"module" : "mast-foot",
 	"components" : {
 		"site-menu" : [
-			"home",
 			"template1",
 			"template2",
 			"template3"
 		],
 		"buttons" : [
+			{
+				"left-icon": "facebook-icon.svg",
+				"name" : "",
+				"type" : "link-button",
+				"classes" : [
+					"icon"
+				]
+			},
+			{
+				"left-icon": "facebook-icon.svg",
+				"name" : "",
+				"type" : "link-button",
+				"classes" : [
+					"icon"
+				]
+			},
 			{
 				"left-icon": "facebook-icon.svg",
 				"name" : "",
