@@ -17,7 +17,7 @@
 		<summary class="notice-voice">
 			<?=$summary?>				
 		</summary>
-		<p class="calm-voice">
+		<p class="whisper-voice">
 			<?=$detailParagraph?>
 		</p>
 	</details>

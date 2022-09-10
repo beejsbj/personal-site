@@ -7,7 +7,7 @@ feature-module {
 
 @media (min-width:  750px) {
 	feature-module {
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: 1fr 0.7fr;
 		justify-content: space-between;
 	}
 }
