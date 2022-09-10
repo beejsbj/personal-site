@@ -48,13 +48,6 @@
 			"components" : {
 				"text-content" : [
 					{
-						"element" : "picture",
-						"content" : "<img src='images/Avatar.svg' alt=''>",
-						"classes" : [
-							"teaser-voice"
-						]
-					},
-					{
 						"element" : "h1",
 						"content" : "Rhoncus, accumsan dictum",
 						"classes" : [
@@ -73,6 +66,16 @@
 						"content" : "Neque, pulvinar vestibulum non aliquam.",
 						"classes" : [
 							"teaser-voice"
+						]
+					}
+				],
+				"buttons" : [
+					{
+						"name" : "Learn More",
+						"type" : "picture-link",
+						"classes" : [
+							"large",
+							"text"
 						]
 					}
 				]

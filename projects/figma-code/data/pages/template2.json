@@ -75,7 +75,17 @@
 							"teaser-voice"
 						]
 					}
-				]
+				],
+				"buttons" : [
+					{
+						"right-icon": "blue-right-arrow.svg",
+						"name" : "Learn More",
+						"type" : "link-button",
+						"classes" : [
+							"large",
+							"text"
+						]
+					}				]
 			}
 		},
 		{
@@ -165,14 +175,6 @@
 						"quote" : "Tincidunt risus, blandit proin semper. Tellus ac pellentesque convallis vitae. Lorem enim cursus et consequat viverra id justo ullamcorper. Vel.",
 						"rating" : 5,
 						"image" : "landscape.jpg"
-					},
-					{
-						"name" : "Courtney Henry",
-						"position" : "Marketing Coordinator",
-						"avatar" : "avatar-face.svg",
-						"quote" : "Tincidunt risus, blandit proin semper. Tellus ac pellentesque convallis vitae. Lorem enim cursus et consequat viverra id justo ullamcorper. Vel.",
-						"rating" : 5,
-						"image" : "landscape.jpg"
 					}
 
 				]
@@ -205,6 +207,15 @@
 						"classes" : [
 							"large",
 							"contained"
+						]
+					},
+					{
+						"right-icon": "blue-right-arrow.svg",
+						"name" : "Free Signup",
+						"type" : "link-button",
+						"classes" : [
+							"large",
+							"outline"
 						]
 					}
 				]

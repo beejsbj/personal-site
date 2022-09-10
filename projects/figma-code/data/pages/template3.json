@@ -26,18 +26,19 @@
 				"buttons" : [
 					{
 						"name" : "Get Started",
-						"type" : "link-button",
+						"type" : "email-signup",
 						"classes" : [
 							"large",
 							"contained"
 						]
 					},
 					{
-						"name" : "Start free trial",
-						"type" : "link-button",
+						"name" : "SignUp",
+						"type" : "button",
 						"classes" : [
-							"large",
-							"outline"
+							"medium",
+							"outline",
+							"rounded"
 						]
 					}
 				]
@@ -47,13 +48,6 @@
 			"module" : "center-content",
 			"components" : {
 				"text-content" : [
-					{
-						"element" : "picture",
-						"content" : "<img src='images/Avatar.svg' alt=''>",
-						"classes" : [
-							"teaser-voice"
-						]
-					},
 					{
 						"element" : "h1",
 						"content" : "Rhoncus, accumsan dictum",
@@ -75,6 +69,33 @@
 							"teaser-voice"
 						]
 					}
+				],
+				"feature-grid": [
+					{
+						"image" : "Avatar.svg",
+						"heading" : "Et, odio elementum",
+						"paragraph" : "Aliquam vehicula pellentesque id mi quam ipsum. Arcu nisl faucibus mattis etiam."
+					},
+					{
+						"image" : "Avatar.svg",
+						"heading" : "Et, odio elementum",
+						"paragraph" : "Aliquam vehicula pellentesque id mi quam ipsum. Arcu nisl faucibus mattis etiam."
+					},
+					{
+						"image" : "Avatar.svg",
+						"heading" : "Et, odio elementum",
+						"paragraph" : "Aliquam vehicula pellentesque id mi quam ipsum. Arcu nisl faucibus mattis etiam."
+					}
+				],
+				"buttons" : [
+					{
+						"name" : "See All",
+						"type" : "link-button",
+						"classes" : [
+							"large",
+							"text"
+						]
+					}
 				]
 			}
 		},
@@ -82,6 +103,13 @@
 			"module" : "feature-module",
 			"components" : {
 				"text-content" : [
+					{
+						"element" : "h2",
+						"content" : "Neque, pulvinar vestibulum non aliquam.",
+						"classes" : [
+							"teaser-voice"
+						]
+					},
 					{
 						"element" : "h1",
 						"content" : "Etiam nulla lectus molestie at vulputate.",
@@ -92,13 +120,6 @@
 					{
 						"element" : "h2",
 						"content" : "Neque, pulvinar vestibulum non aliquam.",
-						"classes" : [
-							"teaser-voice"
-						]
-					},
-					{
-						"element" : "picture",
-						"content" : "<img src='images/square.jpg' alt=''>",
 						"classes" : [
 							"teaser-voice"
 						]
@@ -165,48 +186,8 @@
 						"quote" : "Tincidunt risus, blandit proin semper. Tellus ac pellentesque convallis vitae. Lorem enim cursus et consequat viverra id justo ullamcorper. Vel.",
 						"rating" : 5,
 						"image" : "landscape.jpg"
-					},
-					{
-						"name" : "Courtney Henry",
-						"position" : "Marketing Coordinator",
-						"avatar" : "avatar-face.svg",
-						"quote" : "Tincidunt risus, blandit proin semper. Tellus ac pellentesque convallis vitae. Lorem enim cursus et consequat viverra id justo ullamcorper. Vel.",
-						"rating" : 5,
-						"image" : "landscape.jpg"
 					}
 
-				]
-			}
-		},
-		{
-			"module" : "cta-module",
-			"components" : {
-				"text-content" : [
-					{
-						"element" : "h1",
-						"content" : "Call to action",
-						"classes" : [
-							"teaser-voice"
-						]
-					},
-					{
-						"element" : "h2",
-						"content" : "Hear the Universe calling you to push forward.",
-						"classes" : [
-							"attention-voice"
-						]
-					}
-				],
-				"buttons" : [
-					{
-						"right-icon": "right-arrow",
-						"name" : "Get free quote",
-						"type" : "link-button",
-						"classes" : [
-							"large",
-							"contained"
-						]
-					}
 				]
 			}
 		},
@@ -249,6 +230,47 @@
 					{
 						"summary" : "How can I track my orders & payment?",
 						"detail-paragraph": "Elementum ullamcorper felis nulla scelerisque. Nunc enim nunc mattis leo massa."
+					}
+				]
+			}
+		},
+		{
+			"module" : "cta-module",
+			"components" : {
+				"text-content" : [
+					
+					{
+						"element" : "h1",
+						"content" : "Hear the Universe calling you to push forward.",
+						"classes" : [
+							"attention-voice"
+						]
+					},
+					{
+						"element" : "h2",
+						"content" : "Fringilla non proin nec in in lorem amet eget ac. Mauris.",
+						"classes" : [
+							"teaser-voice"
+						]
+					}
+				],
+				"buttons" : [
+					{
+						"name" : "Get Started",
+						"type" : "email-signup",
+						"classes" : [
+							"large",
+							"contained"
+						]
+					},
+					{
+						"name" : "SignUp",
+						"type" : "button",
+						"classes" : [
+							"medium",
+							"outline",
+							"rounded"
+						]
 					}
 				]
 			}
