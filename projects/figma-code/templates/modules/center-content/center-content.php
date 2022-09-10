@@ -1,10 +1,7 @@
 <center-content>
 	<?php include('templates/components/text-content/text-content.php'); ?>
-	<a href="#">
-		<picture>
-			<img src="images/landscape.jpg" alt="">
-		</picture>
-		<span>Learn More -=</span>
-		<span>see All</span>
-	</a>
+	<?php if (isset($components['feature-grid'])) {
+		include('templates/components/feature-grid/feature-grid.php');
+	} ?>
+	<?php include('templates/components/buttons/buttons.php'); ?>
 </center-content>	

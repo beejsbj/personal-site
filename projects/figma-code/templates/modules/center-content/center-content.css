@@ -1,9 +1,12 @@
 .template1 center-content a span {
 	display: none;
 }
-.template1 center-content text-content picture {
+.template2 center-content .picture-link,
+.template3 center-content .picture-link,
+.template2 center-content .buttons a:nth-of-type(2) {
 	display: none;
 }
+
 
 .template3 center-content feature-grid picture {
 	display: none;
@@ -12,7 +15,8 @@
 center-content {
 	text-align: center;
 	display: grid;
-	gap: 40px;
+	gap: 50px;
+	justify-items: center;
 
 }
 
@@ -20,3 +24,21 @@ center-content .loud-voice {
 	font-weight: 500;
 }
 
+.template1 .buttons picture {
+	max-width: initial;
+}
+center-content feature-grid {
+	display: grid;
+	gap: 20px;
+}
+@media (min-width:  750px) {
+	center-content feature-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+}
+
+center-content feature-grid feature-card {
+	display: grid;
+	gap: 10px;
+}
