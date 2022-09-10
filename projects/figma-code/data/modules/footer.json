@@ -12,7 +12,8 @@
 				"name" : "",
 				"type" : "link-button",
 				"classes" : [
-					"icon"
+					"icon",
+					"outline"
 				]
 			},
 			{
@@ -20,7 +21,8 @@
 				"name" : "",
 				"type" : "link-button",
 				"classes" : [
-					"icon"
+					"icon",
+					"outline"
 				]
 			},
 			{
@@ -28,7 +30,8 @@
 				"name" : "",
 				"type" : "link-button",
 				"classes" : [
-					"icon"
+					"icon",
+					"outline"
 				]
 			}
 		]

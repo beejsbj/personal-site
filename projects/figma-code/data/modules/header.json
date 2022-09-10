@@ -19,6 +19,15 @@
 				]
 			},
 			{
+				"name" : "SignUp",
+				"type" : "button",
+				"classes" : [
+					"medium",
+					"outline",
+					"rounded"
+				]
+			},
+			{
 				"name" : "Login",
 				"type" : "button",
 				"classes" : [
