@@ -6,6 +6,11 @@ mast-head {
 	fill: var(--color);
 }
 
+mast-head .button.outline,
+.template3 mast-head .button.text {
+	display: none;
+}
+
 
 
 mast-head .site-menu ul {
@@ -21,4 +26,17 @@ mast-head .site-menu ul {
 
 mast-head .buttons .rounded {
 	border-radius: 50px;
+}
+
+.template2 mast-head {
+	fill: white;
+}
+.template2 mast-head .button.text {
+
+	color: var(--paper);
+
+}
+
+.template3 mast-head .button.outline {
+	display: block;
 }
