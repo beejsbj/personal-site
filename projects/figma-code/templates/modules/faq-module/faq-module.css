@@ -49,12 +49,50 @@ faq-module details summary:after {
 	transform-origin: center;
 	transition: 0.1s ease-out;
 }
-faq-module details[open] summary:after {
- 	transform: translateY(-50%) rotate(90deg);
+.template2 faq-module details summary {
+	left: 40px;
 }
+.template2 faq-module details summary:after {
+	content: "+";
+	color: var(--color);
+	font-size: 2rem;
+	font-weight: 100;	
+
+	position: absolute;
+	top: 50%;
+	left: -30px;
+	transform: translateY(-50%);
+
+	
+	transform-origin: center;
+	transition: 0.1s ease-out;
+}
+faq-module details[open] summary:after {
+	content: "-";
+}
+.template2 faq-module details p {
+	border-left: 3px solid var(--color);
+	padding-left: 10px;
+	position: relative;
+	left: 50px;
+}
+
+
 
 @media (min-width: 750px) {
 	faq-module .notice-voice {
 		font-size: 1.1rem;
+	}
+
+	.template3 faq-module {
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+		gap: 40px;
+	}
+	.template3 faq-module text-content {
+		justify-self: left;
+		text-align: left;
+		justify-items: start;
+		max-width: 400px;
 	}
 }
