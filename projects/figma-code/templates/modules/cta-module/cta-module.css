@@ -1,4 +1,4 @@
-.cta-module inner-column {
+html:not(.template3) .cta-module inner-column {
 	background-color: var(--highlight);
 }
 
@@ -50,3 +50,11 @@ html:not(.template3) cta-module .square {
 }
 
 
+.template3 cta-module input {
+	background-color: var(--paper);
+	border-color: gray;
+} 
+
+.template3 cta-module input::placeholder {
+	color: gray;
+}
