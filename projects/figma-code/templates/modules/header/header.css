@@ -6,3 +6,9 @@ header {
 header inner-column {
 	padding: 15px 10px;
 }
+
+.template2 header {
+	background-color: var(--color);
+	color: white;
+	
+}
