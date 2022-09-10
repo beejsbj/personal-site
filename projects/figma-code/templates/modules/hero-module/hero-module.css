@@ -1,7 +1,18 @@
-section.hero-module {
+.template1 section.hero-module {
 	background-image: url("../../../images/slant-lines.png");
-	background-size: cover;
+	background-size: contain;
 	background-position: center center;
+	background-repeat: no-repeat;
+}
+.template2 section.hero-module {
+	background-image: url("../../../images/slant-lines-2.png");
+	background-size: contain;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+.template3 section.hero-module {
+	background-color: var(--color);
+	color: white;
 }
 hero-module {
 	padding: 30px 0px;
