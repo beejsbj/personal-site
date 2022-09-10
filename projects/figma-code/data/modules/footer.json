@@ -8,7 +8,7 @@
 		],
 		"buttons" : [
 			{
-				"left-icon": "facebook-icon.svg",
+				"left-icon": "face-icon.svg",
 				"name" : "",
 				"type" : "link-button",
 				"classes" : [
@@ -17,7 +17,7 @@
 				]
 			},
 			{
-				"left-icon": "facebook-icon.svg",
+				"left-icon": "face-icon.svg",
 				"name" : "",
 				"type" : "link-button",
 				"classes" : [
@@ -26,7 +26,7 @@
 				]
 			},
 			{
-				"left-icon": "facebook-icon.svg",
+				"left-icon": "face-icon.svg",
 				"name" : "",
 				"type" : "link-button",
 				"classes" : [
