@@ -1,8 +1,11 @@
 <client-says>
 	<?php include('templates/components/text-content/text-content.php'); ?>
 	<review-grid>
-		<picture>
+		<picture class="arrow">
 			<?php include('images/arrow-icon.php'); ?>
+		</picture>
+		<picture class="square">
+			<img src="images/square.jpg" alt="">
 		</picture>
 		<?php 
 		$reviewCards = $components['review-card'];
@@ -42,7 +45,7 @@
 			</star-rating>
 		</review-card>
 		<?php } ?>
-		<picture>
+		<picture class="arrow flip">
 			<?php include('images/arrow-icon.php'); ?>
 		</picture>
 	</review-grid>
