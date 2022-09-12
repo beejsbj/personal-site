@@ -13,13 +13,9 @@
 .button {
 	
 	--h: 10;
-	background-color: var(--color);
-
-
-
-	
+	background-color: black;
 	padding: 10px;
-	font-family: sans-serif;
+	font-family: 'Luckiest Guy', cursive;
 	color: var(--paper);
 	position: relative;
 	overflow: hidden;
@@ -29,35 +25,12 @@
 	gap: 10px;
 	align-items: center;
 	justify-content: center;
-
+	font-size: 2rem;
+}
+.button {
+	font-family: 'expose', 'Luckiest Guy', cursive;
 }
 
-.button span {
-/*	position: relative;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	z-index: 50;*/
-}
-
-.button.small {
-	font-size: 12px;
-
-}
-.button.medium {
-	font-size: 14px;
-	padding: 10px 20px;
-
-}
-.button.large {
-	font-size: 16px;
-	padding: 10px 20px;
-}
-@media (min-width:  600px) {
-	.button.large {
-		padding: 10px 40px;
-	}
-}
 
 .button.rounded {
 	border-radius: 5px;
@@ -65,8 +38,8 @@
 
 .button.outline {
 	background-color: transparent;
-	border: 1px solid var(--color);
-	color: var(--color);
+	border: 1px solid white;
+	color: white;
 }
 
 .button.text {
@@ -139,7 +112,7 @@ form input::placeholder {
 
 footer form label {
 	display: block;
-	background-color: hsla(215, 100%, 48%, 1.00);
+	background-color: white;
 	color: white;
 	font-size: 20px;
 	padding: 10px 15px;
@@ -157,3 +130,11 @@ footer form input::placeholder {
 	color: gray;
 }
 
+
+
+
+.button.roll {
+	/*background-image: linear-gradient(hsla(173, 66%, 37%, 1.00), hsla(95, 77%, 54%, 1.00)) ;*/
+	background-color: hsla(95, 77%, 54%, 1.00) !important;
+	color: black;
+}

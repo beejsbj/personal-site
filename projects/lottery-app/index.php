@@ -15,7 +15,30 @@
 		<!-- dynamic page rending -->
 		<section class="page-section">
 			<inner-column>
+				<h1 class="loud-voice">Lottery. api3</h1>
+				<stats-card>
+					<p>bid</p>
+					<p>past winners</p>
+				</stats-card>
+				<info-card>
+					<h2 class="attention-voice">Rules/How to</h2>
+					<ol>
+						<li>
+							Select 5 numbers or ROLL if Lazy
+						</li>
+						<li>
+							Submit
+						</li>
+						<li>
+							Wait for results
+						</li>
+						<li>
+							Win or Lose
+						</li>
+					</ol>
+				</info-card>
 				<lottery-module>
+
 					<ul>
 						<?php for ($i=1; $i <= 50; $i++) { ?>
 							<li>
@@ -29,7 +52,7 @@
 						<?php }	?>
 					</ul>
 					<nav class="buttons">
-						<button class="roll attention-voice button outline">Roll</button>
+						<button class="roll attention-voice button">ROLL</button>
 						<button class="submit attention-voice button contained">Submit</button>
 					</nav>
 				</lottery-module>
@@ -73,8 +96,14 @@
 					function getRndIntArr(min, max) {
 						numbers = [];
 						for (var i = 0; i < count; i++) {
-							numbers.push(Math.floor(Math.random() * (max - min + 1)) + min)
+							var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+							while (numbers.includes(randomNum)) {
+								randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+							}
+							numbers.push(randomNum);
 						}
+
+						numbers.sort(function(a, b){return a - b});
 						return numbers;
 					}
 					// rollButton
