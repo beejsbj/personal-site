@@ -1,40 +1,39 @@
 <!doctype html>
-<html lang='en' class='special-magic no-js <?=$pageData[' id']?>'>
+<html lang='en' class='special-magic no-js?>'>
 
-	<head>
-		<meta charset='utf-8'>
-		<meta name='viewport' content='width=device-width, initial-scale=1'>
-		<title>
-			<?=$pageData['title']?>
-		</title>
-		<meta name="description" content="Adventureeee">
-		<meta property="og:image" content="https://thumbs.dreamstime.com/b/woman-stands-crossroads-two-forest-roads-girl-choice-path-lost-woods-ways-to-achieve-goal-157422242.jpg">
-		<link rel='stylesheet' href='styles/site.css'>
-	</head>
+<head>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<title> title </title>
+	<meta name="description" content="Adventureeee">
+	<meta property="og:image" content="https://thumbs.dreamstime.com/b/woman-stands-crossroads-two-forest-roads-girl-choice-path-lost-woods-ways-to-achieve-goal-157422242.jpg">
+	<link rel='stylesheet' href='styles/site.css'>
+</head>
 
-	<body>
-		<main class="page-content">
-			<!-- dynamic page rending -->
-			<section class="page-section <?=$module?>">
-				<inner-column>
-					<lottery-module>
-						<ul>
-							<?php
-			for ($i=1; $i <= 50; $i++) {
-				?>
+<body>
+	<main class="page-content">
+		<!-- dynamic page rending -->
+		<section class="page-section">
+			<inner-column>
+				<lottery-module>
+					<ul>
+						<?php for ($i=1; $i <= 50; $i++) { ?>
 							<li>
 								<input type="checkbox" id="dial-<?=$i?>" class="dials" value="<?=$i?>">
-								<label for="dial-<?=$i?>"><span>
-										<?=$i?></span></label>
+								<label for="dial-<?=$i?>">
+									<span>
+										<?=$i?>
+									</span>
+								</label>
 							</li>
-							<?php }	?>
-						</ul>
-						<nav class="buttons">
-							<button class="roll attention-voice button outline">Roll</button>
-							<button class="submit attention-voice button contained">Submit</button>
-						</nav>
-					</lottery-module>
-					<script>
+						<?php }	?>
+					</ul>
+					<nav class="buttons">
+						<button class="roll attention-voice button outline">Roll</button>
+						<button class="submit attention-voice button contained">Submit</button>
+					</nav>
+				</lottery-module>
+				<script>
 					var dials = document.querySelectorAll('.dials')
 					var checked = document.querySelectorAll('.dials:checked')
 					var rollButton = document.querySelector('.roll');
@@ -99,10 +98,10 @@
 							alert('You lost');
 						}
 					}
-					</script>
-				</inner-column>
-			</section>
-		</main>
+				</script>
+			</inner-column>
+		</section>
+	</main>
 </body>
 
 </html>
