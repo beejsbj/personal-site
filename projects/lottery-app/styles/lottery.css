@@ -54,7 +54,7 @@ padding: 20px;
 lottery-module {
 
 	display: grid;
-
+	gap: 5px;
 	grid-column: 2 / 4;
 	grid-row: 2 / 5;
 
@@ -80,6 +80,7 @@ lottery-module .buttons button {
 
 lottery-module ul {
 	background-color: black;
+	/*background-color: hsla(360, 89%, 35%, 1.00);*/
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 	justify-items: center;
@@ -185,16 +186,21 @@ lottery-module ul li:nth-of-type(odd) .dials:checked + label {
 	
 	background-color: yellow;
 	transform: scale(1.2) rotate(-15deg);
-	font-family: 'expose';
-	font-size: 1.3rem;
+
 
 }
 lottery-module ul li:nth-of-type(even) .dials:checked + label {
 	
 	background-color: yellow;
 	transform: scale(1.2) rotate(15deg);
+
+	/*background-color: hsla(60, 100%, 100%, 0.50);*/
+
+}
+
+lottery-module .dials:checked + label span {
 	font-family: 'expose';
-	font-size: 1.3rem;
+	font-size: 1.5rem;
 	/*background-color: hsla(60, 100%, 100%, 0.50);*/
 
 }
@@ -258,3 +264,54 @@ lottery-module ul li .dials:checked + label::before {
 		transform: translate(-60%, -40%) skewX(20deg)  rotateX(-40deg) rotateY(-10deg) rotateZ(-15deg);
 	}
 }
+
+
+
+lottery-module button,
+lottery-module ul,
+stats-card,
+info-card {
+	position: relative;
+
+}
+
+lottery-module button:before,
+lottery-module ul:before,
+stats-card:before,
+info-card:before {
+    background-color: inherit;
+    opacity: 0.8;
+    /*border-radius: 8px;*/
+    content: "";
+    display: block;
+    height: 100%;
+    left: 0;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    transform: translate(15px, -15px);
+    transition: transform .2s ease-out;
+    z-index: -1;
+}
+
+stats-card:before {
+	transform: translate(-15px, -15px);
+}
+
+info-card:before {
+	transform: translate(-15px, 15px);
+}
+
+lottery-module button:before {
+	transform: translate(15px, 15px);
+}
+
+/*lottery-module button,
+lottery-module ul,:hover:before {
+    transform: translate(-15px, -15px);
+}
+
+lottery-module button,
+lottery-module ul,:active:before {
+    transform: translate(0, 0);
+}*/

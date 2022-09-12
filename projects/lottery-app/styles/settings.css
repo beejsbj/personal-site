@@ -16,7 +16,7 @@ html {
 	--l: 50%;
 	--color: hsla(359, 90%, 30%, 1.00)
 	--highlight: hsla(var(--h), var(--s), calc(var(--l) + 47%), 1.00);
-	--shade: hsla(var(--h), var(--s), calc(var(--l) - 10%), 1.00);
+	--shade: hsla(215, 100%, 40%, 1.00);
 
 	--shadow: rgba(0,0,0,.8);
 

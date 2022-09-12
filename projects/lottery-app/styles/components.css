@@ -18,7 +18,7 @@
 	font-family: 'Luckiest Guy', cursive;
 	color: var(--paper);
 	position: relative;
-	overflow: hidden;
+	/*overflow: hidden;*/
 	transition: 0.3s;
 
 	display: flex;
@@ -65,7 +65,7 @@
 	background-color: hsla(215, 100%, 88%, 0.30);
 	transition: 0.3s;
 	z-index: 1;
-
+	display: none;
 	
 }
 .button:hover::after {
@@ -135,6 +135,12 @@ footer form input::placeholder {
 
 .button.roll {
 	/*background-image: linear-gradient(hsla(173, 66%, 37%, 1.00), hsla(95, 77%, 54%, 1.00)) ;*/
-	background-color: hsla(95, 77%, 54%, 1.00) !important;
+	background-color: hsla(95, 77%, 54%, 1.00);
 	color: black;
 }
+
+.button.roll:hover {
+	background-color: hsla(135, 74%, 84%, 1.00);
+}
+
+
