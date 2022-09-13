@@ -46,10 +46,10 @@
 						<li class="attention-voice">
 							$335.334
 						</li>
-						<li class="calm-voice">
+						<li class="solid-voice">
 							$235.334
 						</li>
-						<li class="calm-voice">
+						<li class="solid-voice">
 							$335.334
 						</li>
 					</ol>

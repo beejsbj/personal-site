@@ -19,8 +19,14 @@
 
 .attention-voice {
 	font-family: 'expose', sans-serif;
-	font-size: 3rem;
+	font-size: 2rem;
 	text-transform: capitalize;
+}
+
+@media (min-width:  1500px){
+	.attention-voice {
+		font-size: clamp(1.25rem, calc(0.57rem + 3.41vw), 3.00rem);
+	}
 }
 
 .notice-voice {
@@ -31,7 +37,7 @@
 
 .solid-voice {
 	font-family: 'expose', sans-serif;
-	font-size: 14px;
+	font-size: 20px;
 	font-weight: 700;
 }
 
@@ -44,7 +50,7 @@ p,
 li {
 	font-family: 'Luckiest Guy', cursive;
 	font-size: 24px;
-	line-height: 1.4;
+	line-height: 1R;
 	max-width: 700px;
 }
 
