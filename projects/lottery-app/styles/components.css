@@ -104,3 +104,29 @@ footer .button.icon {
 }
 
 
+.button.connect {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.button.connect .metamask-icon {
+	max-width: 20px;
+
+}
+
+@media (min-width:  925px) {
+	.button.connect {
+	transform: rotate(-45deg);
+	font-size: 5rem;
+	position: fixed;
+	top: 5%;
+	left: 0%;
+}
+
+
+
+.button.connect .metamask-icon {
+	max-width: 40px;
+}
+}

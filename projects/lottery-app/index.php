@@ -14,6 +14,12 @@
 	<main class="page-content">
 		<!-- dynamic page rending -->
 		<section class="page-section">
+			<button class="button connect">
+				<picture class="metamask-icon">
+					<img src="metamask-bw.png" alt="">
+				</picture>
+				Connect
+			</button>
 			<inner-column>
 				<h1 class="loud-voice slide-in-top">Lottery. api3</h1>
 				<lottery-module class='slide-in-right'>
