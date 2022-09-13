@@ -1,4 +1,5 @@
-@import '../templates/components/text-content/text-content.css';
+@import 'flipdown.css';
+
 /* buttons and icons and smaller reusable bits here */
 
 .buttons ul {
@@ -49,7 +50,8 @@
 }
 
 .button:not(.outline, .text):hover {
-	background-color: var(--shade);
+	background-color: var(--shade2);
+	color: white;
 }
 .button.outline:hover,
 .button.text:hover {
@@ -89,58 +91,16 @@ footer .button.icon {
 
 
 
-.buttons form {
-	width: 100%;
-}
-
-form label {
-	display: none;
-}
-
-form input {
-	background-color: var(--shade);
-	/*height: 100%;*/
-	border-radius: 5px;
-	padding: 10px;
-	width: 100%;
-	border: 1px solid var(--color);
-
-}
-form input::placeholder {
-	color: var(--highlight);
-}
-
-footer form label {
-	display: block;
-	background-color: white;
-	color: white;
-	font-size: 20px;
-	padding: 10px 15px;
-	border-radius: 0px 5px 5px 0px;
-}
-footer form {
-	display: flex;
-}
-
-footer form input {
-	background-color: var(--paper);
-	border-radius: 5px 0px 0px 5px;
-}
-footer form input::placeholder {
-	color: gray;
-}
-
-
-
 
 .button.roll {
 	/*background-image: linear-gradient(hsla(173, 66%, 37%, 1.00), hsla(95, 77%, 54%, 1.00)) ;*/
-	background-color: hsla(95, 77%, 54%, 1.00);
-	color: black;
+	background-color: hsla(60, 100%, 50%, 1.0);
+	color: var(--color);
 }
 
 .button.roll:hover {
-	background-color: hsla(135, 74%, 84%, 1.00);
+	background-color: hsla(60, 100%, 90%, 1.0);
+	color: black;
 }
 
 

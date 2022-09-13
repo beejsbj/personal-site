@@ -1,66 +1,100 @@
-@font-face {
-    font-family: "expose";
-    src: url("expose.otf");
-}
-
-body {
-	background-color: hsla(359, 90%, 30%, 1.00);
-}
-
 inner-column {
 	display: grid;
-	grid-template-columns: 1.1fr 1fr 1fr;
 	gap: 10px;
-}
-inner-column > h1 {
-	grid-column: span 3;
-	text-align: center;
-	color: white;
-	margin-bottom: 40px;
-}
-info-card {
-	grid-column-start: 1;
-	background-color: hsla(60, 100%, 50%, 1.00);
-	grid-row: 3 / 5;
-	padding: 20px;
-	font-family: 'expose';
-	display: grid;
-	gap: 20px;
-	align-content: start;
+	/*box-shadow: 5px 5px 105px  dimgray;*/
 }
 
-info-card h2 {
+inner-column>h1 {
+
+	text-align: center;
+	color: white;
+	margin-bottom: 60px;
+}
+
+rules-card {
+	display: grid;
+	gap: 20px;
+	background-color: hsla(60, 100%, 100%, 1.00);
+	/*white*/
+	padding: 20px;
+}
+
+rules-card h2 {
 	text-align: center;
 	font-size: 2.5rem;
 }
 
-info-card ol {
+ol {
+	display: grid;
+	gap: 20px;
 	list-style-type: decimal;
 	list-style-position: inside;
 	font-size: 1.5rem;
-	display: grid;
-	gap: 20px;
 }
 
+bid-card,
+past-card {
+	background-color: var(--shade);
+	color: white;
+	/*padding: 20px;*/
+	text-align: center;
+	display: grid;
+	gap: 20px;
+	align-content: start;
+}
+bid-card > h2,
+past-card > h2 {
+	background-color: black;
+	padding: 10px;
+}
 
+past-card ol {
+	list-style-type: none;
+}
 
-stats-card {
-background-color: var(--shade);
-color: white;
-/*outline: 3px solid black;*/
-padding: 20px;
+@media (min-width: 925px) {
+	inner-column {
+		grid-template-columns: repeat(12, 1fr);
+	}
+	inner-column > h1 {
+		grid-column: span 12;
+	}
+	rules-card {
+		grid-column-start: 1;
+		grid-column: 1 / 5;
+		grid-row: 3 / 4;
+	}
+
+	bid-card {
+		grid-row: 2 / 3;
+		grid-column: 1 / 3;
+	}
+
+	past-card {
+		grid-column: 3 / 5;
+		grid-row: 2 / 3;
+	}
+
+	.flipdown {
+		grid-row: 4/5;
+		grid-column: 1 / 5;
+		align-self: stretch;
+	}
+
+	/*lottery module*/
+	lottery-module {
+		grid-column: 5 / 13;
+		grid-row: 2 / 5;
+	}
 }
 
 lottery-module {
-
+	/*mix-blend-mode: color-dodge;*/
 	display: grid;
-	gap: 5px;
-	grid-column: 2 / 4;
-	grid-row: 2 / 5;
-
-
+	gap: 10px;
 }
-lottery-module > * {
+
+lottery-module>* {
 	transition: 0.2s;
 }
 
@@ -69,13 +103,12 @@ lottery-module .buttons {
 	grid-template-columns: 1fr 1fr;
 	/*width: 100%;*/
 }
+
 lottery-module .buttons button {
 	/*display: block;*/
 	padding: 20px;
 	/*color: black;*/
 	width: 100%;
-
-	
 }
 
 lottery-module ul {
@@ -86,32 +119,42 @@ lottery-module ul {
 	justify-items: center;
 	gap: 25px;
 	padding: 40px;
-
 	width: 100%;
 }
+
 lottery-module ul li {
 	/*position: relative;*/
 }
+
 lottery-module ul .dials {
 	/*color: black;*/
 	border-radius: 50%;
 	background-color: var(--shade);
 	display: none;
-
-
 }
-lottery-module ul .dials + label {
+
+lottery-module ul .dials+label {
 	padding: 20px;
 	/*color: black;*/
 	/*border-radius: 50%;*/
 	background-color: white;
 	position: relative;
-
 	cursor: pointer;
 	color: black;
 	transition: 0.2s;
-
 }
+
+lottery-module li:nth-of-type(3n+1) label {
+	animation: passiveSkew infinite 1s;
+}
+
+lottery-module li:nth-of-type(3n+2) label {
+	animation: passiveSkew infinite reverse 1s;
+}
+lottery-module li:nth-of-type(3n+3) label {
+	animation: passiveSkew infinite 1s -0.5s;
+}
+
 lottery-module ul label span {
 	font-family: 'Luckiest Guy', cursive;
 	position: absolute;
@@ -120,7 +163,6 @@ lottery-module ul label span {
 	transform: translate(-50%, -50%);
 	z-index: 1000;
 	/*mix-blend-mode: darken;*/
-
 }
 
 lottery-module label:hover span {
@@ -128,8 +170,8 @@ lottery-module label:hover span {
 	font-size: 1.3rem;
 }
 
-lottery-module ul .dials + label::after,
-lottery-module ul .dials + label::before {
+lottery-module ul .dials+label::after,
+lottery-module ul .dials+label::before {
 	content: "";
 	position: absolute;
 	top: 50%;
@@ -138,180 +180,79 @@ lottery-module ul .dials + label::before {
 	background-color: hsla(0, 100%, 45%, 1.00);
 	transition: 0.3s;
 	z-index: 100;
-	padding: 60%;
+	padding: 50%;
 	/*mix-blend-mode: darken;*/
-
 }
-lottery-module ul .dials + label::before {
+
+lottery-module ul .dials+label::before {
 	background-color: hsla(180, 100%, 50%, 1.00);
 	mix-blend-mode: screen;
 }
 
 lottery-module ul li:nth-of-type(odd) label:hover {
-	
 	transition: 0.01s;
 	filter: sepia(50%) saturate(3);
 	/*background-color: hsla(60, 100%, 50%, 1.00);*/
 	animation: tiltScale 0.1s;
 	transform: scale(1.2) rotate(-15deg);
 	font-family: 'expose';
+	background-color: transparent;
+	color: black;
 }
+
 lottery-module ul li:nth-of-type(even) label:hover {
-	
 	transition: 0.01s;
 	filter: sepia(50%) saturate(3);
-	/*background-color: hsla(60, 100%, 50%, 1.00);*/
 	animation: alttiltScale 0.1s;
 	transform: scale(1.2) rotate(15deg);
-	/*background-color: hsla(60, 100%, 100%, 0.50);*/
-
+	background-color: transparent;
+	color: black;
 }
-lottery-module ul .dials + label:hover::after {
+
+lottery-module ul .dials+label:hover::after {
 	mix-blend-mode: color-burn;
 	transition: 0.01s;
-
-	animation: 
-		jolt 0.15s ease-out, 
+	animation:
+		joltalt 0.15s ease-out,
 		jelly infinite 0.4s 0.2s;
 }
-lottery-module ul .dials + label:hover::before {
+
+lottery-module ul .dials+label:hover::before {
+	mix-blend-mode: difference;
 	transition: 0.01s;
-	z-index: 50;
-	animation: 
-		jolt 0.15s ease-out, 
+	animation:
+		jolt 0.15s ease-out,
 		jelly infinite 0.4s 0.4s;
 }
 
-lottery-module ul li:nth-of-type(odd) .dials:checked + label {
-	
+lottery-module ul li:nth-of-type(odd) .dials:checked+label {
+/*	transition-delay: 1.8s;*/
 	background-color: yellow;
 	transform: scale(1.2) rotate(-15deg);
-
-
+	animation: none;
 }
-lottery-module ul li:nth-of-type(even) .dials:checked + label {
-	
+
+lottery-module ul li:nth-of-type(even) .dials:checked+label {
 	background-color: yellow;
-	transform: scale(1.2) rotate(15deg);
-
+	transform: scale(1.2) rotate(15deg) ;
+	animation: none;
 	/*background-color: hsla(60, 100%, 100%, 0.50);*/
-
 }
 
-lottery-module .dials:checked + label span {
+lottery-module .dials:checked+label span {
 	font-family: 'expose';
 	font-size: 1.5rem;
 	/*background-color: hsla(60, 100%, 100%, 0.50);*/
-
-}
-lottery-module ul li .dials:checked + label::after {
-	transform: translate(-50%, -50%) skew(20deg) scale(1.4, .1);
 }
 
-lottery-module ul li .dials:checked + label::before {
-	transform: translate(-50%, -50%) skew(-20deg) scale(0.1, 1.2);
+lottery-module ul li .dials:checked+label::after {
+	transform: translate(-50%, -50%) skew(20deg) scale(1.4, .1) !important;
+	
 }
 
+lottery-module ul li .dials:checked+label::before {
+	transform: translate(-50%, -50%) skew(-20deg) scale(0.1, 1.2) !important;
 
-
-
-/*animations*/
-
-
-@keyframes tiltScale {
-	50% {
-		transform: scale(1.3) rotate(-15deg);
-	}
-	100% {
-		transform: scale(1.1) rotate(-15deg);
-	}
-}
-@keyframes alttiltScale {
-	50% {
-		transform: scale(1.3) rotate(15deg);
-	}
-	100% {
-		transform: scale(1.1) rotate(15deg);
-	}
 }
 
 
-
-@keyframes jolt {
-	0 {
-		transform: translate(-50%, -50%) skew(20deg) scale(0, .1) rotate(-15deg);
-	}
-	50% {
-		transform: translate(-50%, -50%) skew(20deg) scale(4, .2) rotate(-15deg);
-	}
-	100% {
-		transform: translate(-55%, -49%) skewX(20deg)  rotateX(40deg) rotateY(10deg) rotateZ(-10deg);
-	}
-}
-@keyframes jelly {
-	0% {
-
-		transform: translate(-60%, -40%) skewX(20deg)  rotateX(40deg) rotateY(10deg) rotateZ(-10deg);
-	}
-
-	50% {
-
-		transform: translate(-50%, -50%) skewX(-15deg)  translateZ(-30px) scale(0.9);
-	}
-
-	100% {
-
-		transform: translate(-60%, -40%) skewX(20deg)  rotateX(-40deg) rotateY(-10deg) rotateZ(-15deg);
-	}
-}
-
-
-
-lottery-module button,
-lottery-module ul,
-stats-card,
-info-card {
-	position: relative;
-
-}
-
-lottery-module button:before,
-lottery-module ul:before,
-stats-card:before,
-info-card:before {
-    background-color: inherit;
-    opacity: 0.8;
-    /*border-radius: 8px;*/
-    content: "";
-    display: block;
-    height: 100%;
-    left: 0;
-    width: 100%;
-    position: absolute;
-    top: 0px;
-    transform: translate(15px, -15px);
-    transition: transform .2s ease-out;
-    z-index: -1;
-}
-
-stats-card:before {
-	transform: translate(-15px, -15px);
-}
-
-info-card:before {
-	transform: translate(-15px, 15px);
-}
-
-lottery-module button:before {
-	transform: translate(15px, 15px);
-}
-
-/*lottery-module button,
-lottery-module ul,:hover:before {
-    transform: translate(-15px, -15px);
-}
-
-lottery-module button,
-lottery-module ul,:active:before {
-    transform: translate(0, 0);
-}*/

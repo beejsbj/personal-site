@@ -11,7 +11,7 @@
 
 .loud-voice {
 	font-family: 'expose', sans-serif;
-	font-size: 4rem;
+	font-size: 6rem;
 	text-transform: capitalize;
 }
 
@@ -19,7 +19,7 @@
 
 .attention-voice {
 	font-family: 'expose', sans-serif;
-	/*font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);*/
+	font-size: 3rem;
 	text-transform: capitalize;
 }
 
@@ -43,7 +43,7 @@
 p,
 li {
 	font-family: 'Luckiest Guy', cursive;
-	font-size: 1rem;
+	font-size: 24px;
 	line-height: 1.4;
 	max-width: 700px;
 }
@@ -66,11 +66,9 @@ li {
 
 
 .teaser-voice {
-	font-family: 'Inter', sans-serif;
+	font-family: 'Luckiest Guy', sans-serif;
 	font-size: 14px;
-	color: var(--neutral-stuffs);
 	text-transform: capitalize;
-	max-width: 700px;
 }
 
 /* these would be scoped to section or to an article element */
@@ -80,7 +78,7 @@ p+p {
 }
 
 h2+p {
-	margin-top: 20px;
+	/*margin-top: 20px;*/
 }
 
 code {

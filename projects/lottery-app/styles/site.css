@@ -15,6 +15,7 @@
 @import 'typography.css';
 
 /* C omponents */
+@import 'animation.css';
 @import 'components.css';
 @import 'forms.css';
 
@@ -25,6 +26,14 @@
 
 /* then other contextual styles */
 body {
+	background-color: var(--paper);
+	background-image: url('https://media.discordapp.net/attachments/549703400791605260/1019094503904247828/unknown.png');
+	background-image: url('https://cdnb.artstation.com/p/assets/images/images/013/947/749/original/christophe-mangot-stars-persona5-gif-small.gif');
+	background-size: cover;
+	background-position: center center;
+	background-blend-mode: multiply;
+	overflow: hidden;
+
 
 }
 

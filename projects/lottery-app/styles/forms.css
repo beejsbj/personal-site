@@ -1,4 +1,42 @@
 
-form {
-	
+
+.buttons form {
+	width: 100%;
+}
+
+form label {
+	display: none;
+}
+
+form input {
+	background-color: var(--shade);
+	/*height: 100%;*/
+	border-radius: 5px;
+	padding: 10px;
+	width: 100%;
+	border: 1px solid var(--color);
+
+}
+form input::placeholder {
+	color: var(--highlight);
+}
+
+footer form label {
+	display: block;
+	background-color: white;
+	color: white;
+	font-size: 20px;
+	padding: 10px 15px;
+	border-radius: 0px 5px 5px 0px;
+}
+footer form {
+	display: flex;
+}
+
+footer form input {
+	background-color: var(--paper);
+	border-radius: 5px 0px 0px 5px;
+}
+footer form input::placeholder {
+	color: gray;
 }

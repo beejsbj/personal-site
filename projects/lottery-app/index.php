@@ -15,29 +15,8 @@
 		<!-- dynamic page rending -->
 		<section class="page-section">
 			<inner-column>
-				<h1 class="loud-voice">Lottery. api3</h1>
-				<stats-card>
-					<p>bid</p>
-					<p>past winners</p>
-				</stats-card>
-				<info-card>
-					<h2 class="attention-voice">Rules/How to</h2>
-					<ol>
-						<li>
-							Select 5 numbers or ROLL if Lazy
-						</li>
-						<li>
-							Submit
-						</li>
-						<li>
-							Wait for results
-						</li>
-						<li>
-							Win or Lose
-						</li>
-					</ol>
-				</info-card>
-				<lottery-module>
+				<h1 class="loud-voice slide-in-top">Lottery. api3</h1>
+				<lottery-module class='slide-in-right'>
 
 					<ul>
 						<?php for ($i=1; $i <= 50; $i++) { ?>
@@ -53,84 +32,56 @@
 					</ul>
 					<nav class="buttons">
 						<button class="roll attention-voice button">ROLL</button>
-						<button class="submit attention-voice button contained">Submit</button>
+						<button class="submit attention-voice button contained">SUBMIT</button>
 					</nav>
 				</lottery-module>
-				<script>
-					var dials = document.querySelectorAll('.dials')
-					var checked = document.querySelectorAll('.dials:checked')
-					var rollButton = document.querySelector('.roll');
-					var submitButton = document.querySelector('.submit');
-					const count = 5;
-					const winningNumbers = getRndIntArr(1, 50);
-					dials.forEach(dial => {
-						dial.addEventListener('click', selectionLimit);
-					});
-					submitButton.addEventListener('click', submit);
-					rollButton.addEventListener('click', roll);
-
-					function selectionLimit() {
-						var checked = document.querySelectorAll('.dials:checked')
-						if (checked.length > count) {
-							alert('Only select ' + count);
-							checked[checked.length - 1].checked = false;
-						}
-					}
-
-					function submit() {
-						selectionLimit()
-						var checked = document.querySelectorAll('.dials:checked')
-						var values = [];
-						checked.forEach((dial) => {
-							values.push(dial.value);
-						})
-						checkWinner(values);
-					}
-
-					function resetDials() {
-						dials.forEach((dial) => {
-							dial.checked = false;
-						})
-					}
-
-					function getRndIntArr(min, max) {
-						numbers = [];
-						for (var i = 0; i < count; i++) {
-							var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-							while (numbers.includes(randomNum)) {
-								randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-							}
-							numbers.push(randomNum);
-						}
-
-						numbers.sort(function(a, b){return a - b});
-						return numbers;
-					}
-					// rollButton
-					function roll() {
-						resetDials();
-						var winnerArr = getRndIntArr(1, 50);
-						for (var i = 0; i < winnerArr.length; i++) {
-							dial = '#dial-' + winnerArr[i];
-							var dialElement = document.querySelector(dial);
-							dialElement.checked = true;
-						}
-					}
-
-					function checkWinner(userNumbers) {
-						winningNumbers.join('-')
-						if (userNumbers == winningNumbers) {
-							alert('winningNumbers are: ' + winningNumbers.join('-'))
-							alert('You won!');
-						} else {
-							alert('winningNumbers are: ' + winningNumbers.join('-'))
-							alert('You lost');
-						}
-					}
-				</script>
+				
+				<bid-card class='slide-in-left'>
+					<h2 class="teaser-voice">bid</h2>
+					<p class="attention-voice">$335.334</p>
+				</bid-card>
+				<past-card class='slide-in-left'>
+					<h2 class="teaser-voice">past winners</h2>
+					<ol>
+						<li class="attention-voice">
+							$335.334
+						</li>
+						<li class="calm-voice">
+							$235.334
+						</li>
+						<li class="calm-voice">
+							$335.334
+						</li>
+					</ol>
+				</past-card>
+				<rules-card class='slide-in-left'>
+					<h2 class="attention-voice">RULES</h2>
+					<ol>
+						<li>
+							Select 5 numbers or ROLL if Lazy
+						</li>
+						<li>
+							Submit
+						</li>
+						<li>
+							Wait for results
+						</li>
+						<li>
+							Win or Lose
+						</li>
+					</ol>
+				</rules-card>
+				<div id="flipdown" class="flipdown"></div>
+				
+				
 			</inner-column>
 		</section>
 	</main>
+	
+	<script src="scripts/flipdown.js"></script>
+	<script src="scripts/lottery.js">
+
+	</script>
 </body>
 
 </html>
