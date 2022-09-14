@@ -1,6 +1,10 @@
 var dials = document.querySelectorAll('.dials')
 var checked = document.querySelectorAll('.dials:checked');
 var labels = document.querySelectorAll('label');
+var currentPool = document.querySelector('#current-bid');
+currentPool.value = 0;
+
+
 
 const count = 5;
 
@@ -28,14 +32,29 @@ function selectionLimit() {
 		this.checked = false;
 	}
 }
+
+//checks if number of selection is equal to count
+function selectionLimitLower() {
+	var checked = document.querySelectorAll('.dials:checked')
+	if (checked.length < count) {
+		alert('please select ' + count);
+		return false;
+	}
+}
+
+
 function submit() {
-	selectionLimit()
+	if (!selectionLimitLower() && !getUserBid()) {
+		return;
+	}
+	addUserToPool();
 	var checked = document.querySelectorAll('.dials:checked')
 	var values = [];
 	checked.forEach((dial) => {
 		values.push(dial.value);
 	})
-	checkWinner(values);
+
+	setTimeout(checkWinner, 1200, values);
 }
 
 function resetDials() {
@@ -69,13 +88,14 @@ function roll() {
 }
 
 function checkWinner(userNumbers) {
-	winningNumbers.join('-')
+
 	if (userNumbers.sort(function(a, b) { return a - b }) == winningNumbers.sort(function(a, b) { return a - b })) {
-		alert('winningNumbers are: ' + winningNumbers.join('-'))
-		alert('You won!');
+		renderResult(winningNumbers.join(' '), 'you won');
+
 	} else {
-		alert('winningNumbers are: ' + winningNumbers.join('-'))
-		alert('You lost');
+		renderResult(winningNumbers.join(' '), 'you lost');
+
+
 	}
 }
 
@@ -88,4 +108,39 @@ function removeLabelClass(className) {
 	labels.forEach(label => {
 		label.classList.remove(className);
 	});
+}
+
+
+function getUserBid() {
+	var bidInput = document.querySelector('#user-bid');
+	var bidInputValue = parseFloat(bidInput.value)
+	if (!bidInputValue) {
+		alert('Please enter a bid amount');
+		return false;
+	}
+	return bidInputValue;
+}
+
+function addUserToPool() {
+	currentPool.classList.add('rotate-center');
+	setTimeout(() => {
+		currentPool.innerHTML = `$${getUserBid() + parseFloat(currentPool.innerHTML)}`;
+	}, "600");
+	setTimeout(() => {
+		currentPool.classList.remove('rotate-center');
+	}, "1200");
+	
+}
+
+function resetPool() {
+	currentPool.innerHTML = 0;
+	return currentPool;
+}
+
+function renderResult(winningNumbers, string) {
+	var template = `<h1 class="attention-voice">Winning Numbers: <span>${winningNumbers}</span></h1><p class="attention-voice">${string}</p>`;
+	var finalResult = document.querySelector('.final-result');
+	
+	finalResult.innerHTML = template;
+	finalResult.classList.remove('hide');
 }

@@ -20,7 +20,7 @@
 	color: var(--paper);
 	position: relative;
 	/*overflow: hidden;*/
-	transition: 0.3s;
+	/*transition: 0.3s;*/
 
 	display: flex;
 	gap: 10px;
@@ -62,16 +62,18 @@
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -50%);
-	border-radius: 50%;
-	background-color: hsla(215, 100%, 88%, 0.30);
+	transform: translate(-50%, -50%) skewX(10deg) skewY(-20deg);
+
+	background-color: hsla(215, 100%, 58%, 1.0);
+	filter: sepia(50%) saturate(3);
 	transition: 0.3s;
 	z-index: 1;
+	width: 30%;
+	height: 50%;
 	display: none;
-	
 }
 .button:hover::after {
-	padding: 40%;
+	animation: jelly infinite 0.5s;
 }
 
 .button:visited {
@@ -99,8 +101,8 @@ footer .button.icon {
 }
 
 .button.roll:hover {
-	background-color: hsla(60, 100%, 90%, 1.0);
-	color: black;
+
+
 }
 
 

@@ -43,8 +43,16 @@
 				</lottery-module>
 				
 				<bid-card class='slide-in-left'>
-					<h2 class="teaser-voice">bid</h2>
-					<p class="attention-voice">$335.334</p>
+					<text-content>
+						<h2 class="stamp teaser-voice">current bid</h2>
+						<output for="user-bid" id="current-bid" class="attention-voice heartbeat"></output>
+					</text-content>
+
+					<form class="bid-form" action="POST">
+						<label class="teaser-voice" for="user-bid">make your bid</label>
+						<input id="user-bid" type="number" min="1" placeholder="$$$" step="0.01">
+					</form>
+
 				</bid-card>
 				<past-card class='slide-in-left'>
 					<h2 class="teaser-voice">past winners</h2>
@@ -83,7 +91,7 @@
 			</inner-column>
 		</section>
 	</main>
-	
+	<div class="final-result hide"></div>
 	<script src="scripts/flipdown.js"></script>
 	<script src="scripts/lottery.js">
 
@@ -91,3 +99,6 @@
 </body>
 
 </html>
+
+
+
