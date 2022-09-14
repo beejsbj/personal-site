@@ -5,7 +5,7 @@ var currentPool = document.querySelector('#current-bid');
 currentPool.value = 0;
 
 
-
+// number of numbers to play lottery with
 const count = 5;
 
 // get numbers of the winner
@@ -42,7 +42,7 @@ function selectionLimitLower() {
 	}
 }
 
-
+//runs on submit click
 function submit() {
 	if (!selectionLimitLower() && !getUserBid()) {
 		return;
@@ -57,23 +57,7 @@ function submit() {
 	setTimeout(checkWinner, 1200, values);
 }
 
-function resetDials() {
-	dials.forEach((dial) => {
-		dial.checked = false;
-	})
-}
 
-function getRndIntArr(min, max) {
-	numbers = [];
-	for (var i = 0; i < count; i++) {
-		var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-		while (numbers.includes(randomNum)) {
-			randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-		}
-		numbers.push(randomNum);
-	}
-	return numbers;
-}
 // rollButton
 function roll() {
 	resetDials();
@@ -90,13 +74,37 @@ function roll() {
 function checkWinner(userNumbers) {
 
 	if (userNumbers.sort(function(a, b) { return a - b }) == winningNumbers.sort(function(a, b) { return a - b })) {
-		renderResult(winningNumbers.join(' '), 'you won');
-
+		renderResult(winningNumbers.join(' '), `YOU WON <span>${currentPool.value} !!!</span>`);
 	} else {
 		renderResult(winningNumbers.join(' '), 'you lost');
-
-
 	}
+}
+
+function renderResult(winningNumbers, string) {
+	var template = `<h1 class="attention-voice">Winning Numbers: <span>${winningNumbers}</span></h1><p class="attention-voice">${string}</p>`;
+	var finalResult = document.querySelector('.final-result');
+	
+	finalResult.innerHTML = template;
+	finalResult.classList.remove('hide');
+}
+
+function resetDials() {
+	dials.forEach((dial) => {
+		dial.checked = false;
+	})
+}
+
+// get array of random integers
+function getRndIntArr(min, max) {
+	numbers = [];
+	for (var i = 0; i < count; i++) {
+		var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+		while (numbers.includes(randomNum)) {
+			randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+		numbers.push(randomNum);
+	}
+	return numbers;
 }
 
 function addLabelClass(className) {
@@ -109,7 +117,6 @@ function removeLabelClass(className) {
 		label.classList.remove(className);
 	});
 }
-
 
 function getUserBid() {
 	var bidInput = document.querySelector('#user-bid');
@@ -133,14 +140,7 @@ function addUserToPool() {
 }
 
 function resetPool() {
-	currentPool.innerHTML = 0;
+	currentPool.value = 0;
 	return currentPool;
 }
 
-function renderResult(winningNumbers, string) {
-	var template = `<h1 class="attention-voice">Winning Numbers: <span>${winningNumbers}</span></h1><p class="attention-voice">${string}</p>`;
-	var finalResult = document.querySelector('.final-result');
-	
-	finalResult.innerHTML = template;
-	finalResult.classList.remove('hide');
-}

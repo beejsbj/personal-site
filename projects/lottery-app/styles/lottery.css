@@ -12,11 +12,22 @@ inner-column>h1 {
 	margin-bottom: 40px;
 }
 
+ol {
+	display: grid;
+	gap: 5px;
+	list-style-type: decimal;
+	list-style-position: inside;
+	font-size: 1.5rem;
+}
+
+past-card ol {
+	list-style-type: none;
+}
+
 lottery-module,
 .flipdown {
 	grid-column: span 2;
 }
-
 
 rules-card {
 	display: grid;
@@ -33,15 +44,6 @@ rules-card h2 {
 	font-size: 2.5rem;
 }
 
-ol {
-	display: grid;
-	gap: 5px;
-	list-style-type: decimal;
-	list-style-position: inside;
-	font-size: 1.5rem;
-
-}
-
 bid-card,
 past-card {
 	background-color: var(--shade);
@@ -55,17 +57,6 @@ past-card {
 	grid-column: span 1;
 }
 
-
-bid-card h2,
-bid-card .bid-form label,
-past-card h2 {
-	display: block;
-	background-color: black;
-	padding: 5px;
-	transform: rotate(1deg);
-	
-}
-
 bid-card text-content,
 bid-card .bid-form {
 	display: grid;
@@ -74,21 +65,27 @@ bid-card .bid-form {
 	justify-items: center;
 }
 
-past-card ol {
-	list-style-type: none;
+bid-card h2,
+bid-card .bid-form label,
+past-card h2 {
+	display: block;
+	background-color: black;
+	padding: 5px;
+	transform: rotate(1deg);
 }
 
 @media (min-width: 925px) {
 	inner-column {
 		grid-template-columns: repeat(12, 1fr);
 	}
-	inner-column > h1 {
+
+	inner-column>h1 {
 		grid-column: span 12;
 	}
-	rules-card {
-		grid-column-start: 1;
-		grid-column: 1 / 5;
-		grid-row: 3 / 4;
+
+	lottery-module {
+		grid-column: 5 / 13;
+		grid-row: 2 / 5;
 	}
 
 	bid-card {
@@ -101,32 +98,32 @@ past-card ol {
 		grid-row: 2 / 3;
 	}
 
+	rules-card {
+		grid-column-start: 1;
+		grid-column: 1 / 5;
+		grid-row: 3 / 4;
+	}
+
 	.flipdown {
 		grid-row: 4/5;
 		grid-column: 1 / 5;
 		align-self: stretch;
 	}
-
-	/*lottery module*/
-	lottery-module {
-		grid-column: 5 / 13;
-		grid-row: 2 / 5;
-	}
 }
-@media (min-width:  1500px) {
+
+@media (min-width: 1500px) {
 	lottery-module {
 		grid-row: 2 / 5;
 	}
+
 	lottery-module ul {
-		gap:  30px;
+		gap: 30px;
 	}
 }
 
 lottery-module {
-	/*mix-blend-mode: color-dodge;*/
 	display: grid;
 	gap: 10px;
-	/*grid-template-columns: auto;*/
 }
 
 lottery-module>* {
@@ -136,19 +133,15 @@ lottery-module>* {
 lottery-module .buttons {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	/*width: 100%;*/
 }
 
 lottery-module .buttons button {
-	/*display: block;*/
 	padding: 20px;
-	/*color: black;*/
 	width: 100%;
 }
 
 lottery-module ul {
 	background-color: black;
-	/*background-color: hsla(360, 89%, 35%, 1.00);*/
 	display: grid;
 	grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr 0.5fr;
 	justify-items: center;
@@ -159,21 +152,14 @@ lottery-module ul {
 
 
 
-lottery-module ul li {
-	/*position: relative;*/
-}
-
 lottery-module ul .dials {
-	/*color: black;*/
 	border-radius: 50%;
 	background-color: var(--shade);
 	display: none;
 }
 
-lottery-module ul .dials+label {
+lottery-module ul label {
 	padding: 20px;
-	/*color: black;*/
-	/*border-radius: 50%;*/
 	background-color: white;
 	position: relative;
 	cursor: pointer;
@@ -181,49 +167,16 @@ lottery-module ul .dials+label {
 	transition: 0.2s;
 }
 
-lottery-module li:nth-of-type(3n+1) label {
+lottery-module ul li:nth-of-type(3n+1) label {
 	animation: passiveSkew infinite 1s;
 }
 
-lottery-module li:nth-of-type(3n+2) label {
+lottery-module ul li:nth-of-type(3n+2) label {
 	animation: passiveSkew infinite reverse 1s;
 }
-lottery-module li:nth-of-type(3n+3) label {
+
+lottery-module ul li:nth-of-type(3n+3) label {
 	animation: passiveSkew infinite 1s -0.5s;
-}
-
-lottery-module ul label span {
-	font-family: 'Luckiest Guy', cursive;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	z-index: 1000;
-	/*mix-blend-mode: darken;*/
-}
-
-lottery-module label:hover span {
-	font-family: 'expose';
-	font-size: 1.3rem;
-}
-
-lottery-module ul .dials+label::after,
-lottery-module ul .dials+label::before {
-	content: "";
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%) skew(20deg) scale(0, .2);
-	background-color: hsla(0, 100%, 45%, 1.00);
-	transition: 0.3s;
-	z-index: 100;
-	padding: 50%;
-	/*mix-blend-mode: darken;*/
-}
-
-lottery-module ul .dials+label::before {
-	background-color: hsla(180, 100%, 50%, 1.00);
-	mix-blend-mode: screen;
 }
 
 lottery-module ul li:nth-of-type(odd) label:hover {
@@ -246,6 +199,38 @@ lottery-module ul li:nth-of-type(even) label:hover {
 	color: black;
 }
 
+
+lottery-module ul label span {
+	font-family: 'Luckiest Guy', cursive;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 1000;
+}
+lottery-module label:hover span {
+	font-family: 'expose';
+	font-size: 1.3rem;
+}
+
+/*labels after and before psedo elements*/
+lottery-module ul label::after,
+lottery-module ul label::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) skew(20deg) scale(0, .2);
+	background-color: hsla(0, 100%, 45%, 1.00);
+	transition: 0.3s;
+	z-index: 100;
+	padding: 50%;
+}
+lottery-module ul label::before {
+	background-color: hsla(180, 100%, 50%, 1.00);
+	mix-blend-mode: screen;
+}
+
 lottery-module ul .dials+label:hover::after {
 	mix-blend-mode: color-burn;
 	transition: 0.01s;
@@ -262,8 +247,9 @@ lottery-module ul .dials+label:hover::before {
 		jelly infinite 0.4s 0.4s;
 }
 
+/*checked stuff*/
 lottery-module ul li:nth-of-type(odd) .dials:checked+label {
-/*	transition-delay: 1.8s;*/
+	/*	transition-delay: 1.8s;*/
 	background-color: yellow;
 	transform: scale(1.2) rotate(-15deg);
 	animation: none;
@@ -271,7 +257,7 @@ lottery-module ul li:nth-of-type(odd) .dials:checked+label {
 
 lottery-module ul li:nth-of-type(even) .dials:checked+label {
 	background-color: yellow;
-	transform: scale(1.2) rotate(15deg) ;
+	transform: scale(1.2) rotate(15deg);
 	animation: none;
 	/*background-color: hsla(60, 100%, 100%, 0.50);*/
 }
@@ -284,17 +270,14 @@ lottery-module .dials:checked+label span {
 
 lottery-module ul li .dials:checked+label::after {
 	transform: translate(-50%, -50%) skew(20deg) scale(1.4, .1) !important;
-	
 }
 
 lottery-module ul li .dials:checked+label::before {
 	transform: translate(-50%, -50%) skew(-20deg) scale(0.1, 1.2) !important;
-
 }
 
 
-
-
+/*final result style*/
 .final-result {
 	position: fixed;
 	z-index: 99999999;
@@ -302,17 +285,20 @@ lottery-module ul li .dials:checked+label::before {
 	left: 50%;
 	transform: translate(-50%, -50%) scale(3) rotate(5deg);
 	padding: 20px;
-	background-color: var(--color);
+	background-color: red;
+	background-image: url("../paper.jpg");
+	background-size: cover;
+	background-blend-mode: multiply;
 	color: white;
 	border: 5px solid white;
 	animation: bigStamp 0.4s both;
 	text-align: center;
-
 }
+
 .final-result span {
 	color: black;
 }
 
 .final-result.hide {
-	display: none;
+	/*display: none;*/
 }
