@@ -4,8 +4,8 @@
 <head>
 	<meta charset='utf-8'>
 	<meta name='viewport' content='width=device-width, initial-scale=1'>
-	<title> title </title>
-	<meta name="description" content="Adventureeee">
+	<title>Lottery</title>
+	<meta name="description" content="Lottery Crtpo description">
 	<meta property="og:image" content="https://thumbs.dreamstime.com/b/woman-stands-crossroads-two-forest-roads-girl-choice-path-lost-woods-ways-to-achieve-goal-157422242.jpg">
 	<link rel='stylesheet' href='styles/site.css'>
 </head>
