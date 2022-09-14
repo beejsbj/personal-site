@@ -108,6 +108,7 @@ footer .button.icon {
 	position: absolute;
 	top: 0;
 	left: 0;
+	z-index: 99999;
 }
 
 .button.connect .metamask-icon {
@@ -115,11 +116,11 @@ footer .button.icon {
 
 }
 
-@media (min-width:  925px) {
+@media (min-width:  1300px) {
 	.button.connect {
 	transform: rotate(-45deg);
 	font-size: 5rem;
-	position: fixed;
+
 	top: 5%;
 	left: 0%;
 }

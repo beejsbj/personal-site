@@ -292,7 +292,7 @@
 /*.flipdown {
   background-color: green;
 }*/
-@media (min-width:  925px) {
+@media (min-width:  1180px) {
   .flipdown {
   position: absolute;
   top: 10px;
