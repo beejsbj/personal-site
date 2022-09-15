@@ -75,6 +75,7 @@
   height: 110px;
   display: flex;
   justify-content: center;
+  justify-self: center;
 }
 
 .flipdown .rotor-group {
