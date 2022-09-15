@@ -281,7 +281,7 @@ lottery-module ul li .dials:checked+label::before {
 .final-result {
 	position: fixed;
 	z-index: 99999999;
-	top: 50%;
+	top: 38%;
 	left: 50%;
 	transform: translate(-50%, -50%) scale(3) rotate(5deg);
 	padding: 20px;

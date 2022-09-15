@@ -1,6 +1,7 @@
 var dials = document.querySelectorAll('.dials')
 var checked = document.querySelectorAll('.dials:checked');
 var labels = document.querySelectorAll('label');
+
 var currentPool = document.querySelector('#current-bid');
 currentPool.value = 0;
 
@@ -61,7 +62,8 @@ function submit() {
 // rollButton
 function roll() {
 	resetDials();
-	addLabelClass('rotate-center');
+	addLabelClass('li:nth-of-type(odd) label', 'rotate-center');
+	addLabelClass('li:nth-of-type(even) label', 'rotate-center-reverse');
 	var rolledArr = getRndIntArr(1, 50);
 	for (var i = 0; i < rolledArr.length; i++) {
 		dial = '#dial-' + rolledArr[i];
@@ -69,6 +71,7 @@ function roll() {
 		dialElement.checked = true;
 	}
 	setTimeout(removeLabelClass, 1200, 'rotate-center');
+	setTimeout(removeLabelClass, 1200, 'rotate-center-reverse');
 }
 
 function checkWinner(userNumbers) {
@@ -107,8 +110,8 @@ function getRndIntArr(min, max) {
 	return numbers;
 }
 
-function addLabelClass(className) {
-	labels.forEach(label => {
+function addLabelClass(selector, className) {
+	document.querySelectorAll(selector).forEach(label => {
 		label.classList.add(className);
 	});
 }
