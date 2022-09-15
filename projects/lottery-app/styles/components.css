@@ -111,6 +111,7 @@ footer .button.icon {
 	top: 0;
 	left: 0;
 	z-index: 99999;
+	border-radius: 5px;
 }
 
 .button.connect .metamask-icon {

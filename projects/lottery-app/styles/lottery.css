@@ -27,6 +27,7 @@ past-card ol {
 lottery-module,
 .flipdown {
 	grid-column: span 2;
+
 }
 
 rules-card {
@@ -37,6 +38,7 @@ rules-card {
 	padding: 20px;
 	align-content: start;
 	grid-column: span 2;
+	border-radius: 5px;
 }
 
 rules-card h2 {
@@ -55,6 +57,7 @@ past-card {
 	align-content: start;
 	justify-items: center;
 	grid-column: span 1;
+	border-radius: 5px;
 }
 
 bid-card text-content,
@@ -128,16 +131,20 @@ lottery-module {
 
 lottery-module>* {
 	transition: 0.2s;
+	border-radius: 5px;
 }
 
 lottery-module .buttons {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
+	overflow: hidden;
+
 }
 
 lottery-module .buttons button {
 	padding: 20px;
 	width: 100%;
+
 }
 
 lottery-module ul {
