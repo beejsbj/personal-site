@@ -95,7 +95,7 @@ past-card h2 {
 	lottery-module {
 		grid-column: 5 / 13;
 		grid-row: 2 / 5;
-		transform: rotate(-2deg) !important;
+
 	}
 
 	bid-card {
