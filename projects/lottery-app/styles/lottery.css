@@ -311,7 +311,7 @@ lottery-module ul li .dials:checked+label::before {
 	background-blend-mode: multiply;
 	color: white;
 	border: 5px solid white;
-	animation: bigStamp 0.4s both;
+	animation: bigStamp 0.1s both;
 	text-align: center;
 }
 

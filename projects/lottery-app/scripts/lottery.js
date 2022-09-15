@@ -1,6 +1,7 @@
 var dials = document.querySelectorAll('.dials')
 var checked = document.querySelectorAll('.dials:checked');
 var labels = document.querySelectorAll('label');
+var finalResult = document.querySelector('.final-result');
 
 var currentPool = document.querySelector('#current-bid');
 currentPool.value = 0;
@@ -85,16 +86,22 @@ function checkWinner(userNumbers) {
 
 function renderResult(winningNumbers, string) {
 	var template = `<h1 class="attention-voice">Winning Numbers: <span>${winningNumbers}</span></h1><p class="attention-voice">${string}</p>`;
-	var finalResult = document.querySelector('.final-result');
-	
+	var audio = new Audio('stamp.mp3');
 	finalResult.innerHTML = template;
-	finalResult.classList.remove('hide');
+
+	audio.play();
+	
+	// delay for visual animation so audio plays at same time
+	setTimeout(function () {
+		finalResult.classList.remove('hide');
+	}, 850)
 }
 
 function resetDials() {
 	dials.forEach((dial) => {
 		dial.checked = false;
 	})
+	finalResult.classList.add('hide');
 }
 
 // get array of random integers
