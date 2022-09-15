@@ -5,8 +5,8 @@
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<title>Lottery</title>
-		<meta name="description" content="Lottery Crtpo description">
-		<meta property="og:image" content="https://thumbs.dreamstime.com/b/woman-stands-crossroads-two-forest-roads-girl-choice-path-lost-woods-ways-to-achieve-goal-157422242.jpg">
+		<meta name="description" content="Crypto lottery something something desc">
+		<meta property="og:image" content="https://peprojects.dev/alpha-4/burooj/projects/lottery-app/meta.jpg">
 		<link rel='stylesheet' href='styles/site.css'>
 	</head>
 
