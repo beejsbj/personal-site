@@ -41,7 +41,7 @@
 					</lottery-module>
 					<bid-card class='slide-in-left'>
 						<text-content>
-							<h2 class="stamp teaser-voice">current bid</h2>
+							<h2 class="teaser-voice">current bid</h2>
 							<output for="user-bid" id="current-bid" class="attention-voice heartbeat"></output>
 						</text-content>
 						<form class="bid-form" action="POST">

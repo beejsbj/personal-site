@@ -135,7 +135,7 @@ function addUserToPool() {
 	currentPool.classList.add('rotate-center');
 	setTimeout(() => {
 		currentPool.innerHTML = `$${getUserBid() + parseFloat(currentPool.innerHTML)}`;
-	}, "600");
+	}, "900");
 	setTimeout(() => {
 		currentPool.classList.remove('rotate-center');
 	}, "1200");
@@ -146,4 +146,18 @@ function resetPool() {
 	currentPool.value = 0;
 	return currentPool;
 }
+
+function animationIterationDelay(ele, animation) {
+	var element = document.querySelector(ele);
+	element.classList.add(animation);
+	setTimeout(() => {
+		element.classList.remove(animation);
+	}, "1500");
+}
+function getRndInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) ) + min;
+}
+setInterval(animationIterationDelay, getRndInteger(6000, 12000), 'bid-card h2', 'bounce-top');
+setInterval(animationIterationDelay, getRndInteger(6000, 12000), 'past-card h2', 'bounce-top');
+setInterval(animationIterationDelay, getRndInteger(6000, 12000), 'bid-card label', 'wobble-hor-bottom');
 
