@@ -39,6 +39,7 @@ rules-card {
 	align-content: start;
 	grid-column: span 2;
 	border-radius: 5px;
+
 }
 
 rules-card h2 {
@@ -58,6 +59,11 @@ past-card {
 	justify-items: center;
 	grid-column: span 1;
 	border-radius: 5px;
+
+	
+
+	
+
 }
 
 bid-card text-content,
@@ -89,22 +95,28 @@ past-card h2 {
 	lottery-module {
 		grid-column: 5 / 13;
 		grid-row: 2 / 5;
+		transform: rotate(-2deg) !important;
 	}
 
 	bid-card {
 		grid-row: 2 / 3;
 		grid-column: 1 / 3;
+		transform: rotate(-2deg) !important;
+		box-shadow: -5px -5px black;
 	}
 
 	past-card {
 		grid-column: 3 / 5;
 		grid-row: 2 / 3;
+		transform: rotate(-2deg) !important;
+		box-shadow: -5px -5px black;
 	}
 
 	rules-card {
 		grid-column-start: 1;
 		grid-column: 1 / 5;
 		grid-row: 3 / 4;
+		transform: rotate(2deg) !important;
 	}
 
 	.flipdown {
@@ -127,6 +139,7 @@ past-card h2 {
 lottery-module {
 	display: grid;
 	gap: 10px;
+
 }
 
 lottery-module>* {
