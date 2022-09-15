@@ -310,7 +310,7 @@ lottery-module ul li .dials:checked+label::before {
 	background-size: cover;
 	background-blend-mode: multiply;
 	color: white;
-	border: 5px solid white;
+	border: 5px solid black;
 	animation: bigStamp 0.1s both;
 	text-align: center;
 }
