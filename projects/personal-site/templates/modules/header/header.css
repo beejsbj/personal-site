@@ -1,11 +1,14 @@
 header > inner-column.menus {
 	display: none;
 }
+header {
+	overflow-x: hidden;
+}
 
 header .circle {
 	position: absolute;
 	fill: var(--dark-color);
-
+	/*display: none;*/
 	right: -90px;
 	top : -90px;
 	width: 200px;
