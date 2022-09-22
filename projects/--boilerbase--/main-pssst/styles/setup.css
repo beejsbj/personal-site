@@ -42,3 +42,8 @@ code {
     background-color: black;
     padding: 10px;
 }
+
+:where(:not(:defined)) {
+	/*border: 3px solid blue;*/
+	display: block;
+}

@@ -1,22 +1,16 @@
-<section class="page-section">
-	<inner-column>
-		<h1 class="loud-voice">
-			<?=$pageData['intro']?>
-		</h1>
-	</inner-column>
-</section>
+
 <?php
 	
-	$sectionsArr = $pageData['sections'];
+	$sectionsArr = $pageData['sections'] ?? [1];
 
 	foreach ($sectionsArr as $section) {
-		$heading = $section['heading'];
-?>
-<section class="page-section">
-	<inner-column>
-		<h2 class="attention-voice">
-			<?=$heading?>
-		</h2>
-	</inner-column>
-</section>
-<?php } ?>
+		$module = $section['module'] ?? "generic-text";
+
+		
+		?>
+		<section class="page-section <?=$module?>">
+			<inner-column>
+				<?php include("templates/modules/$module/$module.php"); ?>
+			</inner-column>
+		</section>
+	<?php } ?>

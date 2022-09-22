@@ -1,7 +1,9 @@
-<?php include('functions.php'); ?>
-<?php $pageData = renderPageData();?>
-<?=format(queryString())?>
-<?php format($pageData);?>
+<?php 
+	include('functions.php'); 
+	$currentPage = currentPage();
+	$pageData = getPageData($currentPage);
+?>
+
 
 <?php include('templates/modules/header/header.php'); ?>
 <main class="page-content">
@@ -20,3 +22,7 @@
 
 </main>
 <?php include('templates/modules/footer/footer.php'); ?>
+
+
+<?=format(queryString())?>
+<?php format($pageData);?>

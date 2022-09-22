@@ -1,7 +1,9 @@
 {
 	"id": "home",
 	"title": "Welcome",
-	"intro": "You've made it!",
+	"metaImage" : "",
+	"metaDesc" : "",
+	"page-title": "Hey there!",
 
 	"sections": [
 		{
