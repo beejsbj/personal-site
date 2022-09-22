@@ -104,8 +104,8 @@ function unDasher($string){
 
 
 function activePage($current){
-
-  if ($_GET["page"] == $current) {
+	
+  if (currentPage() == $current) {
     echo "active";
   } 
 }
