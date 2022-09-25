@@ -412,4 +412,11 @@ function appendChildren(parent, children) {
     parent.appendChild(el);
   });
 }
-new FlipDown(1669852800).start();
+
+
+
+const d = new Date(1664064000000);
+d.setUTCDate(d.getUTCDate() + (7 - d.getUTCDay()) % 7 + 7);
+
+
+new FlipDown(d.getTime()).start();
