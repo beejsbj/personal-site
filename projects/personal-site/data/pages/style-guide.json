@@ -10,6 +10,9 @@
 			"module" : "layout-module"
 		},
 		{
+			"module" : "projects-grid"
+		},
+		{
 			"module" : "about-module"
 		},
 		{
@@ -26,9 +29,6 @@
 		},
 		{
 			"module" : "resume-section"
-		},
-		{
-			"module" : "projects-grid"
 		}
 	]
 }
