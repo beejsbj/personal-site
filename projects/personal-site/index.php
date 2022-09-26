@@ -9,7 +9,7 @@
 <?php
 // Exercise detail page title metadata
 if (isset($_GET['exercise'])) {
-	$pageData['title'] = unDasher($_GET['exercise']);
+	$pageData['title'] = "Exercises for Programmers";
 	$pageData['page-title'] = $pageData['title'];
 }
 ?>
