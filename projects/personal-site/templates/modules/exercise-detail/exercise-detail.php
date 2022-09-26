@@ -1,16 +1,14 @@
 <?php 
 // if heading exists condition
 	$exLink = $_GET['exercise'] ?? "saying-hello";
-	$sectionHeading = unDasher($exLink) ?? "This is an exercise";
+	$exerciseName = unDasher($_GET['exercise']);
 ?>
-
-<h2 class="loud-voice">
-	<?=$sectionHeading?>
-</h2>
-<h2 class="attention-voice">
-	<?=$sectionHeading?>
-</h2>
-<?php 
+<exercise-detail>
+	<a href="?page=e4p">BACK</a>
+	<h2 class="loud-voice">
+		<?=$exerciseName?>
+	</h2>
+	<?php 
 	include("projects/e4p/$exLink.php");
 ?>
-
+</exercise-detail>
