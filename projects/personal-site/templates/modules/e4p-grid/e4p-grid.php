@@ -9,7 +9,7 @@
 <e4p-grid>
 
 	<?php
-		$chapters = $section['chapters'] ?? [1, 2, 3];
+		$chapters = $section['chapters'] ?? [1, 2];
 		foreach ($chapters as $chapter) {
 			$chapterHeading = $chapter['heading'] ?? "E4P chapter heading";
 			$chapterDesc = $chapter['description']  ?? "E4P chapter description";

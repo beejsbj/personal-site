@@ -30,7 +30,6 @@ body {
 	background-color: var(--paper);
 	color: var(--ink);
 	padding-top: 100px;
-	position: relative;
 	overflow-x: hidden;
 }
 
