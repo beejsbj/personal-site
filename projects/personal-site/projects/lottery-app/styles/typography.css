@@ -1,0 +1,95 @@
+/* Should we pull in @fonts here? */
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+@font-face {
+    font-family: "expose";
+    src: url("expose.otf");
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+.title-voice {
+	
+}
+
+.loud-voice {
+	font-family: 'expose', sans-serif;
+	font-size: 6rem;
+	text-transform: capitalize;
+}
+
+
+
+.attention-voice {
+	font-family: 'expose', sans-serif;
+	font-size: 2rem;
+	text-transform: capitalize;
+}
+
+@media (min-width:  1500px){
+	.attention-voice {
+		font-size: clamp(1.25rem, calc(0.57rem + 3.41vw), 3.00rem);
+	}
+}
+
+.notice-voice {
+	font-family: 'expose', sans-serif;
+	font-size: 1rem;
+	/*font-weight: 700;*/
+}
+
+.solid-voice {
+	font-family: 'expose', sans-serif;
+	font-size: 20px;
+	font-weight: 700;
+}
+
+
+
+
+
+.calm-voice,
+p,
+li {
+	font-family: 'Luckiest Guy', cursive;
+	font-size: 24px;
+	line-height: 1R;
+	max-width: 700px;
+}
+
+:is(.calm-voice, p, li) em {
+	font-style: italic;
+}
+
+:is(.calm-voice, p, li) strong {
+	font-weight: 700;
+}
+
+.whisper-voice {
+	font-family: 'expose', sans-serif;
+	font-size: 0.9rem;
+	font-weight: 300;
+	color: hsla(0, 0%, 44%, 1.00);
+}
+
+
+
+.teaser-voice {
+	font-family: 'Luckiest Guy', sans-serif;
+	font-size: 14px;
+	text-transform: capitalize;
+}
+
+/* these would be scoped to section or to an article element */
+/* this is just a loose setting for now */
+p+p {
+	margin-top: 1em;
+}
+
+h2+p {
+	/*margin-top: 20px;*/
+}
+
+code {
+	font-family: monospace;
+	font-size: 1.1em;
+	color: green;
+}
+

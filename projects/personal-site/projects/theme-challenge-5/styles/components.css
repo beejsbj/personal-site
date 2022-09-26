@@ -1,0 +1,194 @@
+
+/* buttons and icons and smaller reusable bits here. */
+
+.button {
+	display: block;
+
+	/*border-radius: 30px;*/
+	/*border: 2px solid hsla(49, 98%, 23%, 1.00);*/
+	padding: .5em 1em;
+	background-color: var(--highlight2); /*using opposite colors*/
+	/*min-width: 100px;*/
+
+	font-family: 'Lato', sans-serif;
+	font-size: 1rem;
+	color: var(--paper); /*using opposite colors*/
+	text-transform: uppercase;
+	text-align: center;
+
+	transition: 0.5s;
+
+	position: relative;
+
+	border-radius: 2px;
+	
+}
+
+
+
+.button .leaf {
+	
+	display: block;
+	position: absolute;
+	max-width: 40px;
+	top: -1.1em;
+	right: -1.2em;
+	fill:  var(--highlight3);
+	transform: rotate(30deg) scale(0);
+
+
+	transition: transform 0.25s ease-out;
+	transform-origin: 40% left;
+
+	
+}
+
+
+
+
+.button:hover {
+	background-color: var(--highlight3);
+	transition: 0.3s ease-in-out;
+
+	
+}
+
+.button:hover .leaf {
+	transform: rotate(30deg) scale(1);
+	transition: transform 0.25s ease-out;
+
+}
+
+
+
+
+
+
+
+
+
+.icon-link {
+	
+
+	background-color: hsla(8, 71%, 58%, 1.00);
+
+	border-radius: 5px;
+	max-width: 32px;
+	max-height: 32px;
+	padding: 5px;
+
+}
+
+.icon-link svg {
+	width: 100%;
+	height: auto;
+	fill: var(--weed-white);
+	font-size: 0px;
+}
+
+
+
+
+.arrow-link {
+	font-family: 'Lato', sans-serif;
+	color: var(--weed-white);
+	display: block;
+	font-weight: 700;
+
+	margin-top: 20px;
+	padding: .5em 1em;
+
+	
+	font-size: 1.3rem;
+
+
+
+	position: relative;
+
+}
+
+
+
+.arrow-link:hover {
+	color: var(--highlight2);
+	text-decoration: none;
+}
+
+
+.arrow-link:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 3px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--highlight2);
+  transform-origin: bottom right;
+
+  transition: transform 0.25s ease-out;
+}
+
+.arrow-link:hover:after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+
+
+.arrow-link .leaf {
+	width: 30px;
+	position: absolute;
+	fill: var(--highlight2);
+	right: -5px;
+	bottom: 20px;
+	/*transform: translateY(-50%);*/
+	/*display: none;*/
+	transform: rotate(20deg) scale(0);
+	transition: 0.2s ease-out;
+	transform-origin: bottom right;
+	transition-delay: 0.13s;
+
+	
+
+}
+
+.arrow-link:hover .leaf {
+	transform: rotate(20deg) scale(1);
+	transform-origin: bottom left;
+	transition-delay: 0.13s;
+	
+
+}
+
+
+
+a {
+	transition: 0.5s;
+}
+
+
+a:not(.home, .button, .arrow-link, .icon-link):hover {
+		color: var(--highlight2);
+		text-decoration: underline;
+		
+		/*text-decoration-style: wavy;*/
+	}
+
+
+picture {
+	background-color: var(--weed-white);
+	/*border-radius: 30px;*/
+	overflow: hidden;
+}
+
+.blend {
+	
+	mix-blend-mode: darken;
+}
+
+
+
+
+
+@import 'forms.css';

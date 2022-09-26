@@ -1,0 +1,134 @@
+/* 
+	BTW in case it isn't obvious... the whole PSSST-CSS idea is a joke 
+	like... (it's just CSS).
+*/
+@import 'typography.css';
+
+
+
+
+
+/* P reset */
+@import 'preset.css';
+
+/* S etup */
+@import 'setup.css';
+
+/* S setings */
+@import 'settings.css';
+/*@import 'developer-styles.css';*/
+
+/* S tructure */
+@import 'structure.css';
+
+/* T ypography */
+/*@import 'typography.css';*/
+
+/* C omponents */
+@import 'components.css';
+
+/* S tuff (modules) */
+@import 'modules.css';
+
+/* S ections and more stuff */
+
+/* then other contextual styles */
+body {
+	background-image: url('../images/leaf-art.jpg');
+	background-size: 1500px;
+	background-attachment: attached;
+	background-position: center 0;
+	background-repeat: no-repeat;
+	background-color: var(--paper);
+	color: var(--ink);
+}
+
+@media (min-width:  1530px) {
+	body {
+		background-size: contain;
+	}
+}
+
+body > header {
+	/*background-color: var(--color);*/
+	border-top: 30px solid var(--color);
+	/*background-color: var(--paper);*/
+}
+
+
+
+
+section, header, footer {
+	padding: 0 10px;
+	/*border: 5px solid red;*/
+}
+
+
+
+section.welcome {
+/*	background-image: url('../images/store.jpg');
+	background-image: url('../images/flower-wide.jpg');
+	background-image: url('../images/leaf-art.jpg');
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;*/
+
+	padding: 10vh 0;
+
+}
+
+
+section.sign-up {
+	/*min-height: 300px;*/
+	/*color: var(--weed-white);*/
+
+	background-color: hsla(70, 46%, 39%, 1.00);
+	background-image: url('../images/mug.jpg');
+	background-image: url('https://source.unsplash.com/random/?marijuana,weed,vape');
+	background-position: center center;
+	background-size: cover;
+	background-repeat: no-repeat;
+
+}
+
+@media (min-width: 1000px) {
+	section.sign-up {
+		/*background-size: 1200px;*/
+
+	}
+}
+
+
+section:is(.sign-up, .get-involved) inner-column {
+	max-width: var(--tight);
+}
+
+section.get-involved {
+	background-color: var(--weed-primary-color-dark);
+}
+
+footer {
+	
+
+}
+
+
+
+
+@media (prefers-color-scheme: dark) {
+	/*header {
+		background-color: var(--weed-primary-color-dark);
+	}*/
+
+	section.sign-up {
+
+		mix-blend-mode: normal;
+	}
+
+	/*section.sign-up .button {
+		background-color: var(--black);
+		color: var(--white);
+	}*/
+
+	
+}

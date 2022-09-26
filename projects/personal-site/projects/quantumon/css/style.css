@@ -1,0 +1,1119 @@
+@import 'meyers-reset.css';
+@import 'setup.css';
+@import url('https://fonts.googleapis.com/css2?family=Almendra+Display&family=Finger+Paint&family=Henny+Penny&family=Kumar+One+Outline&family=Love+Ya+Like+A+Sister&family=Press+Start+2P&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Wet+Paint&family=UnifrakturMaguntia&display=swap');
+@import url('../fonts/silkscreen/slkscr.ttf');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Glitch&family=Slackey&display=swap');
+
+
+
+/**Clarity**/
+
+/*body {
+	border: 5px solid red;
+}
+
+body * {
+	border: 5px solid black;
+	margin: 5px;
+}
+
+body > * {
+	border-color: blue;
+}
+
+body > * > * {
+	border-color: forestgreen;
+
+}*/
+
+
+html {
+	scroll-behavior: smooth;
+
+	/*custom properties */
+	--normal-color: hsla(0, 0%, 60%, 1.00);
+	--fire-color: hsla(30, 95%, 60%, 1.00);
+	--water-color: hsla(200, 95%, 50%, 1.00);
+	--grass-color: hsla(116, 44%, 54%, 1.00);
+	--electric-color: hsla(50, 95%, 60%, 1.00);
+	--ice-color: hsla(170, 95%, 60%, 1.00);
+	--fighting-color: hsla(211, 85%, 42%, 1.00);
+	--poison-color: hsla(290, 95%, 60%, 1.00);
+	--ground-color: hsla(30, 100%, 29%, 1.00);
+	--flying-color: hsla(219, 66%, 78%, 1.00);
+	--psychic-color: hsla(2, 92%, 74%, 1.00);
+	--bug-color: hsla(78, 62%, 46%, 1.00);
+	--rock-color: hsla(46, 36%, 67%, 1.00);
+	--ghost-color: hsla(230, 41%, 55%, 1.00);
+	--dark-color: hsla(257, 11%, 37%, 1.00);
+	--dragon-color: hsla(350, 95%, 60%, 1.00);
+	--steel-color: hsla(191, 32%, 49%, 1.00);
+	--fairy-color: hsla(305, 73%, 75%, 1.00);
+
+
+	
+}
+
+body * {
+	scroll-padding-top: -100px;
+	;
+}
+
+
+
+
+/**STRUCTURE******/
+
+body {
+	/*background-color: wheat;*/
+	/*padding: 15px;*/
+	font-family: 'Raleway', sans-serif;
+	/*background-image: linear-gradient(45deg, hsla(140, 40%, 96%, 1.00) ,hsla(20, 40%, 95%, 1.00), hsla(280, 41%, 95%, 1.00));*/
+
+  background:
+    linear-gradient(217deg, hsla(200, 70%, 70%, 0.80), hsla(200, 70%, 70%, 0) 40.71%),
+    linear-gradient(127deg, hsla(26, 70%, 100%, 0.80), hsla(26, 70%, 100%, 0) 20.71%),
+    linear-gradient(336deg, hsla(25, 70%, 90%, 0.80), hsla(25, 70%, 90%, 0) 70.71%);
+
+    /*linear-gradient(217deg, hsla(200, 70%, 20%, 0.80), hsla(200, 70%, 20%, 0) 40.71%),
+    linear-gradient(127deg, hsla(140, 70%, 20%, 0.80), hsla(140, 70%, 20%, 0) 20.71%),
+    linear-gradient(336deg, hsla(250, 70%, 20%, 0.80), hsla(250, 70%, 20%, 0) 70.71%);*/
+}
+
+
+
+
+
+.main-landing {
+	background-image: url("../images/background-line.svg");
+	background-repeat:;
+
+}
+
+
+.about-artist {
+	background-image: url("../images/background-cruve.svg");
+	background-repeat: no-repeat;
+	background-position: left;
+
+}
+
+
+.collection {
+	background-image: url("../images/background-cruve.svg");
+	background-repeat: no-repeat;
+	background-position: center;
+	/*background-size: 900%;*/
+
+}
+
+
+.header-nav .title-voice {
+	font-family: 'Slackey', cursive;
+	font-weight: 700;
+	font-size: 50px;
+
+}
+
+
+
+
+a span {
+	font-family: "Slackey", sans-serif;
+}
+
+
+
+
+.title-voice span {
+	color: white;
+	-webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  transition: 0.2s
+}
+
+.title-voice span:hover {
+	filter: invert(100%);
+}
+header nav a:hover {
+	filter: invert(100%);
+	text-decoration: underline;
+}
+
+
+
+.inner-column {
+	max-width: 80ch;
+	margin: 0 auto;
+	padding: 20px 40px;
+}
+
+
+
+
+info-card {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	padding: 40px;
+	background-color: hsla(191, 32%, 80%, 1.00);
+	border-radius: 40px;
+
+}
+
+.main-landing info-card {
+		animation: 4s floating infinite ease-in-out;
+}
+
+info-card img {
+	border-radius: 40px;
+}
+
+info-card .card-heading {
+	/*margin-top: 25px;*/
+	text-transform: uppercase;
+	font-size: 20px;
+	font-weight: 600;
+	text-align: center;
+	font-family: "Slackey", monospace;
+	background-color: var(--dragon-color);
+	padding: 7px 20px;
+	border-radius: 5px;
+	color: white;
+
+
+}
+
+
+
+info-card .mon-types {
+	display: flex;
+	justify-content: space-between;
+
+}
+
+
+info-card .mon-type {
+	text-align: center;
+	min-width: 100px;
+	text-transform: uppercase;
+	font-family: "Slackey", monospace;
+	font-size: 14px;
+	font-weight: 700;
+	padding: 5px 20px;
+		border-radius: 5px;
+	background-color: var(--normal-color);
+	box-shadow: 0 0 20px var(--normal-color);
+	color: white;
+
+}
+
+
+info-card .normal {
+
+}
+
+info-card .fire {
+
+	background-color: var(--fire-color);
+	box-shadow: 0 0 20px var(--fire-color);
+
+	
+}
+
+
+info-card .water {
+
+	background-color: var(--water-color);
+	box-shadow: 0 0 20px var(--water-color);
+
+	
+}
+
+
+info-card .grass {
+
+	background-color: var(--grass-color);
+	box-shadow: 0 0 20px var(--grass-color);
+
+	
+}
+
+
+info-card .electric {
+
+	background-color: var(--electric-color);
+	box-shadow: 0 0 20px var(--electric-color);
+
+	
+}
+
+
+info-card .ice {
+
+	background-color: var(--ice-color);
+	box-shadow: 0 0 20px var(--ice-color);
+
+	
+}
+
+
+info-card .ground {
+
+	background-color: var(--ground-color);
+	box-shadow: 0 0 20px var(--ground-color);
+
+	
+}
+
+
+info-card .flying {
+
+	background-color: var(--flying-color);
+	box-shadow: 0 0 20px var(--flying-color);
+
+	
+}
+
+
+info-card .psychic {
+
+	background-color: var(--psychic-color);
+	box-shadow: 0 0 20px var(--psychic-color);
+
+	
+}
+
+
+info-card .bug {
+
+	background-color: var(--bug-color);
+	box-shadow: 0 0 20px var(--bug-color);
+
+	
+}
+
+
+info-card .rock {
+
+	background-color: var(--rock-color);
+	box-shadow: 0 0 20px var(--rock-color);
+
+	
+}
+
+
+info-card .ghost {
+
+	background-color: var(--ghost-color);
+	box-shadow-c: 0 0 20px var(--ghost-color);
+
+	
+}
+
+
+info-card .dark {
+
+	background-color: var(--dark-color);
+	box-shadow: 0 0 20px var(--dark-color);
+
+	
+}
+
+info-card .fighting {
+
+	background-color: var(--fighting-color);
+	box-shadow: 0 0 20px var(--fighting-color);
+
+	
+}
+
+
+info-card .dragon {
+
+	background-color: var(--dragon-color);
+	box-shadow: 0 0 20px var(--dragon-color);
+
+	
+}
+
+
+info-card .steel {
+
+	background-color: var(--steel-color);
+	box-shadow: 0 0 20px var(--steel-color);
+
+	
+}
+
+
+
+info-card .fairy {
+
+		background-color: var(--fairy-color);
+		box-shadow: 0 0 20px var(--fairy-color);
+
+}
+
+
+
+.about-artist info-card .mon-types {
+	/*display: none;*/
+}
+
+
+
+
+
+
+
+
+
+
+/*typograhy*/
+
+
+
+.intrigue-voice {
+	font-family: "Slackey", sans-serif;
+	text-transform: uppercase;
+	color: hsla(351, 78%, 57%, 1.00);
+	letter-spacing: 3px;
+	font-size: 16px;
+	font-weight: 700;
+	margin-top: 30px;
+
+}
+
+
+.attention-voice {
+	font-family: "Slackey", sans-serif;
+	font-size: 2rem;
+	font-weight: 600;
+	margin-top: 25px;
+	line-height: 1.3em;
+
+}
+
+
+.calm-voice {
+	font-size: 15px;
+	color: hsla(0, 0%, 39%, 1.00);
+	margin-top: 25px;
+	line-height: 1.7em;
+}
+
+
+.bid-button {
+	margin-top: 25px;
+	padding: 15px 50px;
+	background-color: black;
+	border-radius: 10px;
+	color: white;
+	font-size: 18px;
+	transition: 0.2s;
+}
+
+.bid-button:hover {
+	filter: invert(100%);
+}
+
+.bid-button picture {
+	display: inline-block;
+	filter: invert(100%);
+	width: 18px;
+}
+
+
+
+.solid-voice {
+	font-size: 14px;
+	text-align: center;
+	margin-top: 25px;
+
+}
+
+
+.text-flex {
+	text-align: center;
+}
+
+
+
+
+/**Sections******/
+
+
+main > * {
+	padding: 50px 0;
+}
+
+
+
+
+
+
+.header-nav {
+	text-align: center;
+	padding: 20px;
+	/*color: white;*/
+/*	*/
+
+
+}
+
+@media (min-width: 1400px){
+	
+	.header-nav {
+		max-width: 1500px;
+		margin: 0 auto;
+	}
+
+
+}
+
+
+.header-nav nav {
+		display: none;
+	}
+
+
+
+.header-nav a {
+
+
+	font-size: 14px;
+
+	font-weight: 500;
+
+	padding: 0 10px;
+	margin:  0 10px;
+	transition: 0.2s
+
+}
+
+
+.header-button {
+	border: 1px solid black;
+	border-radius: 20px;
+	padding: 40px 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@keyframes floating {
+  0% {
+		transform: translateY(10px);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
+
+	100% {
+		transform: translateY(10px);
+	}
+}
+
+
+
+
+
+
+.carousel-section > * {
+	padding: 40px 0;
+	
+	border-top: 2px solid hsla(240, 7%, 94%, 1.00);
+
+
+}
+
+
+
+.carousel-cell {
+	padding: 20px;
+	/*border:  5px solid yellow;*/
+
+}
+
+.carousel-cell {
+	width: 25%;
+	opacity: .7;
+}
+
+
+
+
+
+
+
+.about-artist {
+	/*padding-top: 50px;*/
+
+}
+
+
+
+
+.arist-image-box {
+	position: relative;
+}
+
+.arist-image img {
+	border-radius: 40px;
+}
+
+
+
+
+
+.about-artist info-card {
+	position: absolute;
+	width: 150px;
+	border-radius: 20px;
+	padding: 15px;
+	box-shadow: 0px 0px 60px 0px rgb(0 0 0 / 3%);
+	gap: 15px;
+	border-width: 3px;
+}
+
+.about-artist info-card img {
+	border-radius: 20px;
+}
+
+
+
+
+.about-artist info-card .card-heading {
+
+	font-size: 12px;
+
+}
+
+
+
+
+.about-artist info-card .mon-types {
+
+	justify-content: space-around;
+
+}
+
+
+
+
+.about-artist info-card .mon-type {
+
+	/*margin-top: 1em;*/
+	font-size: 8px;
+	min-width: 10px;
+	padding: 5px 15px;	
+}
+
+
+.about-artist .arist-image-a .card-heading {
+
+}
+
+
+
+
+
+
+
+
+
+.arist-image-a {
+	top: -130px;
+	left: -20px;
+	animation: 4s floating infinite ease-in-out;
+
+}
+
+.arist-image-b {
+	bottom: -110px;
+	left: -20px;
+	animation: 4s floating infinite ease-in-out;
+	animation-delay: -1s;
+	background-color: hsla(115, 44%, 84%, 1.00);
+}
+
+
+.arist-image-b .card-heading {
+	background-color: var(--flying-color);
+}
+
+
+
+
+.arist-image-c {
+	bottom: 60px;
+	right: -60px;
+	animation: 8s floating infinite ease-in-out;
+	animation-delay: -1s;
+	background-color: hsla(201, 95%, 80%, 1.00);
+}
+
+.arist-image-c .card-heading {
+	background-color: var(--fairy-color);
+}
+
+
+
+
+
+
+.about-artist .text-flex {
+	margin-top: 60px;
+}
+
+
+
+
+
+
+
+
+
+.about-artist .text-flex a {
+	font-size: 18px;
+	text-align: center;
+	text-decoration: underline;
+	font-weight: 900px;
+	fill: black;
+	margin-top: 25px;
+}
+
+.about-artist .text-flex a picture {
+	display: none;
+}
+
+
+
+
+
+
+
+
+
+
+.about-item {
+	background-image: linear-gradient(90deg, hsla(285, 49%, 97%, 1.00), hsla(43, 99%, 96%, 1.00));
+
+
+}
+
+
+.about-item li {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	text-align: center;
+	margin-top: 25px;
+}
+
+.about-item .details h3 {
+	font-size: 2rem;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+}
+
+.about-item .details p {
+	font-size: 1rem;
+	color: #636363;
+	margin-top: 15px;
+}
+
+
+
+
+
+@media (min-width: 800px){
+
+	main > * {
+	padding: 120px 0;
+	}
+
+	.inner-column {
+		max-width: 120ch;
+	}
+
+	.header-nav {
+		text-align: initial;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+
+		/*border: 3px solid yellow;*/
+	}
+
+
+	.header-nav nav {
+		display: flex;
+
+		align-items: center;
+
+		
+	}
+
+	.header-nav nav .bid-button {
+		padding: 15px 25px;
+	}
+
+
+	info-card .mon-types {
+		display: flex;
+		justify-content: space-evenly;
+
+	}
+
+
+
+
+
+	.main-landing .inner-column,
+	.about-item .inner-column {
+		display: flex;
+		flex-direction: row-reverse;
+		justify-content: space-between;
+
+
+	}
+
+	.main-landing .inner-column .text-flex,
+	.about-item .inner-column .text-flex {
+		flex-basis: 45%;
+		text-align: left;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+
+	}
+
+	.main-landing .attention-voice {
+		font-size: 56px;
+	}
+	.main-landing .inner-column info-card,
+	.about-item .inner-column picture {
+		flex-basis: 40%;
+	}
+
+	.about-item .attention-voice {
+		font-size: 40px;
+	}
+	.about-item .details {
+		align-self: stretch;
+		display: flex;
+		justify-content: space-around;
+	}
+
+
+	.about-item .text-flex .bid-button {
+		margin-top: 60px;
+	}
+
+
+
+
+
+
+
+
+
+
+
+	.about-artist .inner-column {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+
+
+	}
+
+
+	.about-artist .inner-column .text-flex {
+		flex-basis: 45%;
+		text-align: left;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+
+
+	.about-artist .inner-column .arist-image-box {
+		flex-basis: 40%;
+	}
+
+	.about-artist .attention-voice {
+		font-size: 42px;
+	}
+
+	.about-artist info-card {
+		width: 200px;
+	}
+
+
+
+
+}
+
+
+
+
+
+
+
+/*COllections*/
+
+.collection {
+	background:
+    	background-image: linear-gradient(90deg, hsla(285, 49%, 97%, 1.00), hsla(43, 99%, 96%, 1.00));
+
+}
+
+
+
+
+
+.collection-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	padding: 60px 0;
+	/*justify-content: space-between;*/
+}
+
+.collection-grid > * {
+	display: flex;
+
+	flex-direction: column;
+	gap: 20px;
+
+}
+
+
+
+.collection-grid .left-side {
+	width: 100%;
+}
+
+
+
+
+.collection-grid .right-bottom {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	justify-content: space-between;
+}
+
+
+.collection-grid info-card .mon-type {
+	font-size: 14px;
+	/*min-width: 50px;*/
+}
+
+
+
+
+
+
+.collection-grid .fight-dragon {
+	background-color: hsla(351, 94%, 85%, 1.00);
+}
+
+.collection-grid .fight-dragon .card-heading {
+	background-color: var(--fighting-color);
+}
+
+
+
+
+.collection-grid .normal-bug {
+	background-color: hsla(79, 61%, 76%, 1.00);
+}
+
+.collection-grid .normal-bug .card-heading {
+	background-color: var(--normal-color);
+}
+
+
+
+
+.collection-grid .ice-grass {
+	background-color: hsla(115, 44%, 84%, 1.00);
+}
+
+.collection-grid .ice-grass .card-heading {
+	background-color: var(--ice-color);
+}
+
+
+
+
+.collection-grid .dark-fighing {
+	background-color: hsla(258, 10%, 67%, 1.00);
+}
+
+.collection-grid .dark-fighing .card-heading {
+	background-color: var(--fighting-color);
+}
+
+
+
+
+.collection-grid .flying-ghost {
+	background-color: hsla(229, 41%, 65%, 1.00);
+}
+
+
+.collection-grid .flying-ghost .card-heading {
+	background-color: var(--flying-color);
+}
+
+
+.footer-block2 {
+	padding: 50px 0;
+	background-image: linear-gradient(90deg, hsla(32, 62%, 94%, 1.00), hsla(25, 99%, 86%, 1.00));
+
+}
+
+
+
+
+
+.footer-block2 .inner-column {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+}
+
+.flex-child {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	/*width: 20%;*/
+	text-align: right;
+}
+
+.footer-block2 p {
+	font-size: 12px;
+}
+
+.footer-block2 .flex-text p {
+	margin-top: 10px;
+}
+
+.footer-block2 .flex-text .dev-name {
+	font-size: 14px;
+}
+
+
+
+
+@media (min-width:  800px){
+	
+	
+	.collection .attention-voice {
+	font-size: 42px;
+	}
+
+	.collection-grid .mon-type {
+		font-size: 16px;
+	}
+
+
+	.collection-grid .ice-grass .mon-type {
+		min-width: 150px;
+	}
+
+
+	.collection-grid {
+		display: flex;
+		flex-direction: row;
+		gap: 30px;
+		padding: 60px 0;
+		justify-content: space-between;
+		align-items: stretch;
+	}
+
+	.collection-grid > * {
+		display: flex;
+		flex-direction: column;
+		gap: 30px;
+
+	}
+
+	.collection-grid .left-side {
+
+		width: 75%;
+
+	}
+
+	.collection-grid .right-side {
+		width: 100%;
+	}
+
+	.collection-grid .right-side > info-card {
+		/*width: 100%;*/
+	}
+
+
+
+
+	.collection-grid .right-bottom {
+		display: flex;
+		flex-direction: row;
+		gap: 10px;
+		justify-content: space-between;
+	}
+
+	.footer-block2 p {
+		font-size: 1rem;
+	}
+}
+
+
+
+
+
+
+
+
+@media (max-width: 600px) {
+
+	.about-artist .text-flex {
+		
+		margin-top: 120px;
+
+	}
+
+	.arist-image-c {
+		right: -30px;
+	}
+}
+
+
+
+
+
+
+

@@ -1,0 +1,26 @@
+
+media-item {
+	display: block;
+	padding: 5vh 0;
+}
+
+
+
+media-item header {
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	align-items: center;
+	/*gap: 25px;*/
+}
+media-item header > picture {
+	width: 50px;
+}
+
+media-item header .attention-voice {
+	margin-top: 30px;
+}
+
+
+
+

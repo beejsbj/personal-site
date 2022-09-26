@@ -1,26 +1,5 @@
 [
 	{
-		"title": "Quantumania",
-		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-		"image": "landscape.jpg",
-		"url" : "projects/quantumania",
-		"tools" : [
-			"HTML",
-			"CSS"
-		]
-	},
-	{
-		"title": "Theme Challenge",
-		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-		"image": "landscape.jpg",
-		"url" : "projects/quantumania",
-		"tools" : [
-			"HTML",
-			"CSS",
-			"PHP"
-		]
-	},
-	{
 		"title": "Layout&nbspGarden",
 		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
 		"image": "landscape.jpg",
@@ -44,5 +23,38 @@
 			"JS"
 		],
 		"feature": true
+	},
+	{
+		"title": "Quantumon",
+		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"image": "landscape.jpg",
+		"url" : "projects/quantumon",
+		"tools" : [
+			"HTML",
+			"CSS"
+		]
+	},
+	{
+		"title": "Theme Challenge",
+		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"image": "landscape.jpg",
+		"url" : "projects/theme-challenge",
+		"tools" : [
+			"HTML",
+			"CSS",
+			"PHP"
+		]
+	},
+	{
+		"title": "Lottery App",
+		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"image": "landscape.jpg",
+		"url" : "projects/lottery-app",
+		"tools" : [
+			"HTML",
+			"CSS",
+			"PHP",
+			"JS"
+		]
 	}
 ]

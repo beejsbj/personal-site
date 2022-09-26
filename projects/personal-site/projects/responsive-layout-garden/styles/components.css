@@ -1,0 +1,19 @@
+layout-module {
+	/*box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;*/
+	/*padding: 60px 15px;*/
+}
+/* buttons and icons and smaller reusable bits here */
+
+
+
+.shapes #circle {
+	fill:var(--color-dark);
+	stroke:black;
+	stroke-width:2px;
+}
+
+.shapes #rectangle {
+	fill:var(--color-light);
+	stroke:black;
+	stroke-width:2.03px;
+}

@@ -1,0 +1,72 @@
+
+/* buttons and icons and smaller reusable bits here. */
+
+.button {
+	display: block;
+
+	border-radius: 30px;
+	border: 2px solid var(--weed-secondary-color);
+	padding: .5em 1em;
+	background-color: var(--ink); /*using opposite colors*/
+	/*min-width: 100px;*/
+
+	font-family: 'Lato', sans-serif;
+	font-size: 1rem;
+	color: var(--paper); /*using opposite colors*/
+	text-transform: uppercase;
+	text-align: center;
+
+	transition: 0.2s;
+
+	position: relative;
+	
+}
+
+
+
+.button .leaf {
+	display: none;
+
+	position: absolute;
+	max-width: 40px;
+	top: -0.5em;
+	right: -1em;
+	fill: var(--paper);
+	transform: rotate(20deg);
+}
+
+
+.button:hover {
+	background-color: var(--weed-secondary-color);
+}
+
+.button:hover .leaf {
+	display: block;
+}
+
+
+
+a:not(.home, .button):hover {
+		color: var(--weed-secondary-color);
+		text-decoration: underline;
+		transition: 0.2s;
+		/*text-decoration-style: wavy;*/
+	}
+
+
+picture {
+	background-color: var(--weed-white);
+	border-radius: 30px;
+	overflow: hidden;
+}
+
+.blend {
+	
+	mix-blend-mode: darken;
+}
+
+
+
+
+
+@import 'forms.css';
