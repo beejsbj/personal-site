@@ -13,14 +13,26 @@
 				"I began my journey into webdev last year through a remote program at perpetual education and have come to gain a passion for it",
 				"I began my journey into webdev last year through a remote program at perpetual education and have come to gain a passion for it"
 			],
-			"images" : ["square.jpg", "portrait.jpg", "landscape.jpg"]
+			"images" : ["skull1.jpg", "skull2.jpg", "skull3.jpg"]
 		},
 		{
 			"module" : "contact-list",
 			"heading": "Find more of me below:",
 			"contacts" : [
 				{
-					"name": "Codepen",
+					"name": "Email",
+					"link": "https://codepen.io/beejsbj"
+				},
+				{
+					"name": "Github",
+					"link": "https://codepen.io/beejsbj"
+				},
+				{
+					"name": "LinkedIn",
+					"link": "https://codepen.io/beejsbj"
+				},
+				{
+					"name": "Twitter",
 					"link": "https://codepen.io/beejsbj"
 				},
 				{
@@ -28,19 +40,7 @@
 					"link": "https://codepen.io/beejsbj"
 				},
 				{
-					"name": "Codepen",
-					"link": "https://codepen.io/beejsbj"
-				},
-				{
-					"name": "Codepen",
-					"link": "https://codepen.io/beejsbj"
-				},
-				{
-					"name": "Codepen",
-					"link": "https://codepen.io/beejsbj"
-				},
-				{
-					"name": "Codepen",
+					"name": "Blog",
 					"link": "https://codepen.io/beejsbj"
 				}
 			]
