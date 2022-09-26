@@ -129,6 +129,90 @@
 						}
 					],
 					"svg" : "svg name"
+				},
+				{
+					"heading": "Making Decisions",
+					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+					"exercises" : [
+						{
+							"number" : "05",
+							"name" : "Area of a Rectangular Room",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Pizza Party",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Paint Calculator",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Self-Checkout",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Currency Conversion",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "omputing Simple Interest",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Determining Compound Interest",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						}
+					],
+					"svg" : "svg name"
+				},
+				{
+					"heading": "Making Decisions",
+					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+					"exercises" : [
+						{
+							"number" : "05",
+							"name" : "Area of a Rectangular Room",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Pizza Party",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Paint Calculator",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Self-Checkout",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Currency Conversion",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "omputing Simple Interest",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						},
+						{
+							"number" : "05",
+							"name" : "Determining Compound Interest",
+							"description" : "a program that prompts for your name and prints a greeting using your name."
+						}
+					],
+					"svg" : "svg name"
 				}
 			]
 		}
