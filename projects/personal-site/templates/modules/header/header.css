@@ -12,7 +12,7 @@ header .circle {
 	right: -90px;
 	top : -90px;
 	width: 200px;
-
+	z-index: -99;
 
 }
 
@@ -22,7 +22,7 @@ header .circle {
 		grid-template-columns: repeat(12, 1fr);
 	}
 	header > inner-column > h1 {
-		grid-column-start: 2;
+		grid-column: 2 / end;
 	}
 	header .circle {
 		position: absolute;
@@ -39,7 +39,7 @@ header .circle {
 	}
 	header .circle {
 		position: absolute;
-		top:  55%;
+		top:  30%;
 		right: initial;
 		width: 40vw;
 		left: -300px;
@@ -57,12 +57,18 @@ header .circle {
 
 		width: 650px;
 	}
+
+
+
+
 }
+
 @media(min-width: 2000px) {
 
 	header .circle {
 
 		left: -600px;
 		width: 1200px;
+
 	}
 }
