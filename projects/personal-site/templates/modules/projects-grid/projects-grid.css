@@ -64,7 +64,7 @@ project-card p::after {
 
 @media(min-width: 500px) {
 	section.projects-grid .notice-voice {
-		max-width: 300px;
+		max-width: 60ch;
 		/*grid-column: 2 / end;*/
 	}
 
