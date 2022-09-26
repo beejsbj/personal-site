@@ -21,7 +21,7 @@
 		]
 	},
 	{
-		"title": "Responsive Layout&nbspGarden",
+		"title": "Layout&nbspGarden",
 		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
 		"image": "landscape.jpg",
 		"url" : "?page=layout-garden",
@@ -33,7 +33,7 @@
 		"feature": true
 	},
 	{
-		"title": "Exercises&nbspfor Programmers",
+		"title": "Exercises&nbsp4 Programmers",
 		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
 		"image": "landscape.jpg",
 		"url" : "?page=e4p",
