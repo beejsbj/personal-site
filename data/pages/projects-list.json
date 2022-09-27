@@ -1,7 +1,7 @@
 [
 	{
 		"title": "Layout&nbspGarden",
-		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"description": "This here is a garden of different layouts, showcasing responsiveness across different viewports",
 		"image": "landscape.jpg",
 		"url" : "?page=layout-garden",
 		"tools" : [
@@ -13,7 +13,7 @@
 	},
 	{
 		"title": "Exercises&nbsp4 Programmers",
-		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"description": "A book of 57 exercises recommended by my mentor, Derek. A great set to learna and reinforce programming fundamentals",
 		"image": "landscape.jpg",
 		"url" : "?page=e4p",
 		"tools" : [
@@ -26,7 +26,7 @@
 	},
 	{
 		"title": "Quantumon",
-		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"description": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle.",
 		"image": "landscape.jpg",
 		"url" : "projects/quantumon",
 		"tools" : [
@@ -36,7 +36,7 @@
 	},
 	{
 		"title": "Theme Challenge",
-		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"description": "This was a fun challenge, where we were given a code base and were instructed to Style a website to match a chosen industry",
 		"image": "landscape.jpg",
 		"url" : "projects/theme-challenge",
 		"tools" : [
@@ -47,7 +47,7 @@
 	},
 	{
 		"title": "Lottery App",
-		"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
+		"description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
 		"image": "landscape.jpg",
 		"url" : "projects/lottery-app",
 		"tools" : [

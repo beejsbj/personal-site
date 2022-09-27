@@ -7,9 +7,12 @@
 
 	"sections": [
 		{
+			"heading": "this is Burooj",
+			"paragraph": "I make places on the web"
 		},
 		{
-			"module" : "projects-grid"
+			"module" : "projects-grid",
+			"intro-paragraph" : "Here's some"
 		}
 	]
 }
