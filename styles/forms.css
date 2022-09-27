@@ -1,0 +1,56 @@
+
+form {
+	display: grid;
+	gap:  20px;
+	justify-items: start;
+	/*max-width: 800px;*/
+}
+
+
+
+
+form .input-field {
+	display: grid;
+	gap:  10px;
+
+}
+
+form input {
+	order: 2;
+	background-color: var(--paper2);
+	padding: 5px;
+	width: 300px;
+}
+
+form input::placeholder {
+	opacity: 0.1;
+}
+
+form .output-field {
+	background-color: var(--paper2);
+
+	padding: 20px;
+}
+form .radio-list {
+	width: 100%;
+	padding: 0 20px;
+}
+
+form .radio-list,
+form .radio-list .input-field {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+}
+
+form .radio-list input {
+	display: none;
+}
+
+form .radio-list label {
+	cursor: pointer;
+}
+
+form .radio-list input:checked + label {
+	outline:5px solid var(--dark-highlight);
+}

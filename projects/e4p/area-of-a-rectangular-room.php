@@ -118,12 +118,12 @@ if (isset($_POST['submitted'])){
 <form method="POST">
     <div class="input-field radio-list">
         <div class="input-field">
-            <input type="radio" name="unitChoice" value="feet">
-            <label for="">feet</label>
+            <input id="ifeet" type="radio" name="unitChoice" value="feet">
+            <label for="ifeet">feet</label>
         </div>
         <div class="input-field">
-            <input type="radio" name="unitChoice" value="meter">
-            <label for="">meter</label>
+            <input id="imeter" type="radio" name="unitChoice" value="meter">
+            <label for="imeter">meter</label>
         </div>
     </div>
     <div class="input-field">

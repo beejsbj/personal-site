@@ -1,0 +1,14 @@
+{
+	"id": "pageNotFound",
+	"title": "404",
+	"intro": "Page not Found.",
+
+	"sections": [
+		{
+			"heading": "You are lost"
+		},
+		{
+			"heading": "or a typo"
+		}	
+	]
+}

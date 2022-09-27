@@ -92,8 +92,8 @@ if (isset($_POST['submitted'])) {
             <form method="POST">
 
                 <div class="input-field">
-                    <input type="text" class="text-number-input" required name="inputString" placeholder="What is the input string?" value="<?=$inputString?>">
-                    <label for="">What is the input string?</label>
+                    <input id="char-count" type="text" class="text-number-input" required name="inputString" placeholder="What is the input string?" value="<?=$inputString?>">
+                    <label for="char-count">What is the input string?</label>
                 </div>
 
 

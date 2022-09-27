@@ -1,0 +1,32 @@
+
+/* buttons and icons and smaller reusable bits here */
+
+
+
+a {
+	color: var(--link);
+}
+
+.button {
+	padding: 5px 15px;
+	background-color: var(--light-color);
+}
+
+.button:hover {
+	background-color: var(--light-highlight);
+}
+
+button {
+	padding: 5px 15px;
+	color: var(--paper);
+	background-color: var(--link) ;
+	cursor: pointer;
+}
+
+.hover-hide {
+	opacity: 0;
+}
+
+.hover-hide:hover {
+	opacity: 1;
+}

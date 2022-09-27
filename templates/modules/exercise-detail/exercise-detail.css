@@ -1,0 +1,11 @@
+exercise-detail {
+	display: grid;
+	gap:  40px;
+	justify-items: start;
+}
+
+@media (min-width:  500px){
+	exercise-detail {
+		grid-column: 2 / end;
+	}
+}
