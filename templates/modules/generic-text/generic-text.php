@@ -14,15 +14,3 @@
 
 
 
-Warning
-: Undefined array key "exercise" in
-/home/peadmin/public_html/alpha-4/burooj/templates/modules/exercise-detail/exercise-detail.php
-on line
-4
-
-
-Deprecated
-: explode(): Passing null to parameter #2 ($string) of type string is deprecated in
-/home/peadmin/public_html/alpha-4/burooj/functions.php
-on line
-95
