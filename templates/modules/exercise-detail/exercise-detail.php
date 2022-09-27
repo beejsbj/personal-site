@@ -1,7 +1,7 @@
 <?php 
 // if heading exists condition
 	$exLink = $_GET['exercise'] ?? "saying-hello";
-	$exerciseName = unDasher($_GET['exercise']);
+	$exerciseName = unDasher($exLink);
 ?>
 <exercise-detail>
 	<a href="?page=e4p">BACK</a>
