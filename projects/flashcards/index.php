@@ -1,7 +1,7 @@
 <?php 
-	// include('functions.php'); 
-	// $currentPage = currentPage();
-	// $pageData = getPageData($currentPage);
+	include('functions.php'); 
+	$currentPage = currentPage();
+	$pageData = getPageData($currentPage);
 ?>
 <?php include('templates/modules/header/header.php'); ?>
 <main class="page-content">
