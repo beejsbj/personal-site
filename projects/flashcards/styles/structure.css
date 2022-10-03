@@ -10,9 +10,9 @@ main {
 }
 
 inner-column {
-	display: block;
+	display: grid;
 	width: 98%;
-	max-width: var(--standard); /* could be a variable in settings */
+	max-width: var(--tight); /* could be a variable in settings */
 	margin-right: auto;
 	margin-left: auto;
 	padding: 30px 10px; /* a loose default */

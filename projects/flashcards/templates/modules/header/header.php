@@ -13,7 +13,6 @@
 	<body>
 		<header>
 			<inner-column>
-				<h1 class='loud-voice'><em>PSSST</em> (CSS)</h1>
-				<?php include('templates/modules/site-menu/site-menu.php'); ?>
+				<h1 class='loud-voice'>Study Hall Cards</h1>
 			</inner-column>
 		</header>
