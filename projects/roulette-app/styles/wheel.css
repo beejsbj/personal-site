@@ -1,0 +1,31 @@
+inner-column {
+	display: grid;
+	gap: 10px;
+	/*grid-template-columns: 1fr 1fr;*/
+	/*box-shadow: 5px 5px 105px  dimgray;*/
+}
+
+inner-column>h1 {
+	text-align: center;
+	color: white;
+	margin-bottom: 40px;
+}
+
+wheel-module {
+	max-width: 700px;
+	align-self: center;
+}
+
+
+
+#red path {
+	fill:rgb(246,83,162);
+	fill-rule:nonzero;
+	stroke:white;
+	stroke-width:1px;
+
+}
+#slice29 > path {
+	box-shadow: 0px 0px 5px 10px hotpink;
+	filter: drop-shadow(3px 5px 2px green);
+}
