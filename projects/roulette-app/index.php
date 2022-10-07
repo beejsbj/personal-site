@@ -28,7 +28,7 @@
 				</inner-column>
 			</section>
 		</main>
-		
+		<script src="scripts/wheel.js"></script>
 	</body>
 
 </html>

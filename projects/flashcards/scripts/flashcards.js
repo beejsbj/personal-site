@@ -16,7 +16,7 @@ pePromise
 		console.log(shortCuts);
 		const beginButton = document.querySelector("button#begin");
 		beginButton.addEventListener("click", function () {
-			CardRenderer(index, shortCuts);
+			cardRenderer(index, shortCuts);
 		});
 	})
 	.catch( function() {
@@ -24,7 +24,8 @@ pePromise
 	})
 ;
 
-function CardRenderer(index, cardsData) {
+function cardRenderer(index, cardsData) {
+
 	if (index < cardsData.length) {
 		cardHeader.innerHTML = headerTemplater(index, cardsData);
 		actionArea.innerHTML = cardTemplater(index, cardsData);
@@ -41,11 +42,12 @@ function headerTemplater(index, cardsData) {
 	var cardType = cardData.type;
 	var cardLesson = cardData.lesson;
 
-	const headerTemplate = `<h1 class="category">${cardType}</h1>
-<h2 class="card-count">${index + 1}/${cardsData.length}</h2>
-<h3 class="lesson">
-	${cardLesson}
-</h3>`;
+	const headerTemplate = `
+		<h1 class="category">${cardType}</h1>
+		<h2 class="card-count">${index + 1}/${cardsData.length}</h2>
+		<h3 class="lesson">
+			${cardLesson}
+		</h3>`;
 
 	return headerTemplate;
 }
@@ -68,21 +70,21 @@ function cardTemplater(index, cardsData) {
 		cardBack = '<div class="keys firm-voice">' + keysString + '</div>' + cardBack;
 	}
 
-	const template = `<flash-card id='card${index}'>
-		<front-side>
+	const template = `
+		<flash-card id='card${index}'>
+			<front-side>
+				<p class="notice-voice">${cardFront}</p>
+			</front-side>
 
-			<p class="notice-voice">${cardFront}</p>
-
-		</front-side>
-		<back-side class='hide'>
-			<p>${cardBack}</p>
-		</back-side>
+			<back-side class='hide'>
+				<p>${cardBack}</p>
+			</back-side>
+		</flash-card>
 		<div class="buttons">
-				<button id="reveal">Flip</button>
-				<button class='hide' id="bad">Bad</button>
-				<button class='hide' id="good">Good</button>
-			</div>
-	</flash-card>`;
+			<button id="reveal">Flip</button>
+			<button class='hide' id="bad">Bad</button>
+			<button class='hide' id="good">Good</button>
+		</div>`;
 
 	return template;
 }
@@ -104,12 +106,12 @@ function buttonHandler(index, cardsData) {
 	badButton.addEventListener("click", function () {
 		//push back card step
 		index++;
-		CardRenderer(index, cardsData);
+		cardRenderer(index, cardsData);
 	});
 	goodButton.addEventListener("click", function () {
 		//push early card step
 		index++;
-		CardRenderer(index, cardsData);
+		cardRenderer(index, cardsData);
 	});
 	
 	
@@ -117,22 +119,24 @@ function buttonHandler(index, cardsData) {
 
 function renderEnd() {
 	cardHeader.innerHTML = `<h1 class="welcome">Finished!</h1>`;
-	actionArea.innerHTML = `<form>
-					<ul>
-						<li>
-							<input type="checkbox" id="shortcuts" name="shortcuts" value="Bike">
-							<label for="shortcuts"> Shortcuts</label>
-						</li>
-						<li>
-							<input type="checkbox" id="concepts" name="concepts" value="Bike">
-							<label for="concepts"> concepts</label>
-						</li>
-					</ul>
-					<button id="redo" type="reset"> Go again? </button>
-				</form>`;
+	actionArea.innerHTML = `
+		<form>
+			<ul>
+				<li>
+					<input type="checkbox" id="shortcuts" name="shortcuts" value="Bike">
+					<label for="shortcuts"> Shortcuts</label>
+				</li>
+				<li>
+					<input type="checkbox" id="concepts" name="concepts" value="Bike">
+					<label for="concepts"> concepts</label>
+				</li>
+			</ul>
+			<button id="redo" type="reset"> Go again? </button>
+		</form>`;
+
 	const redoButton = document.querySelector("button#redo");
 	redoButton.addEventListener("click", function () {
-		CardRenderer(index, shortCuts);
+		cardRenderer(index, shortCuts);
 	});
 
 };

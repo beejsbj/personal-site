@@ -30,6 +30,8 @@
 }
 .button {
 	font-family: 'expose', 'Luckiest Guy', cursive;
+	background-color: var(--shade2);
+	color: white;
 }
 
 

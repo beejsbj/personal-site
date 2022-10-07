@@ -17,15 +17,63 @@ wheel-module {
 }
 
 
+svg {
+	fill-rule:evenodd;
+	clip-rule:evenodd;
+	stroke-linejoin:round;
+	stroke-miterlimit:2;
+}
 
-#red path {
-	fill:rgb(246,83,162);
+svg text {
+	font-family:'Verdana', sans-serif;
+	font-size:16px;
+}
+
+
+
+svg #black path {
+	fill:none;
 	fill-rule:nonzero;
-	stroke:white;
-	stroke-width:1px;
+	stroke:rgb(19,27,243);
+	stroke-width:1.53px;
+}
+
+svg #black text {
+	fill:none;
+	stroke:rgb(59,27,243);
+	stroke-width:2.55px;
 
 }
-#slice29 > path {
-	box-shadow: 0px 0px 5px 10px hotpink;
-	filter: drop-shadow(3px 5px 2px green);
+
+svg #red text {
+	fill:none;
+	stroke:rgb(243,27,27);
+	stroke-width:2.55px;
+}
+
+
+svg #red path {
+	fill:none;
+	fill-rule:nonzero;
+	stroke:rgb(243,27,27);
+	stroke-width:1.53px;
+}
+
+svg .selected path {
+	fill:none;
+	fill-rule:nonzero;
+	stroke:rgb(27,243,67) !important;
+	stroke-width:1.53px;
+	transition: 0.2s;
+}
+
+svg .selected text {
+	fill:none;
+	stroke:rgb(27,243,67) !important;
+	stroke-width:2.55px;
+	transition: 0.2s;
+}
+
+svg #center {
+	ble
 }

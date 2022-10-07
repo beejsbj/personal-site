@@ -415,8 +415,9 @@ function appendChildren(parent, children) {
 
 
 
-const d = new Date(1664064000000);
+var d = new Date(1664064000000);
 d.setUTCDate(d.getUTCDate() + (7 - d.getUTCDay()) % 7 + 7);
 
 
-new FlipDown(d.getTime()/1000).start();
+// new FlipDown(d.getTime()/1000).start();
+new FlipDown(1666064000).start();

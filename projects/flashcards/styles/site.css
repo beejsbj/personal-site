@@ -46,7 +46,7 @@ card-module {
 	background-color: white;
 	min-height: 620px;
 	gap: 30px;
-	padding: 20px;
+	padding: 10px;
 	display: grid;
 	grid-template-rows: 0.1fr 1fr;
 	grid-template-columns: 1fr;
@@ -58,6 +58,7 @@ card-module header {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	justify-items: center;
+	align-items: center;
 }
 h1.welcome {
 	grid-column-start: 2;
@@ -72,11 +73,19 @@ flash-card p {
 action-area {
 	display: grid;
 	/*width: 1fr;*/
+	grid-template-rows: 1fr 0.1fr;
+	align-content: space-between;
+	height: 100%;
 }
-form,
+form {
+	display: grid;
+	grid-row: span 2;
+	align-content: space-between;
+
+}
 flash-card {
 	display: grid;
-	align-content: space-between;
+	align-items: start;
 }
 
 flash-card front-side,
@@ -85,7 +94,14 @@ flash-card back-side {
 	display: grid;
 }
 
+flash-card back-side {
+	border-top: 5px solid black;
+	padding-top: 20px;
+	margin-top: 20px;
+}
+
 button {
+	color: black;
 	background-color: #ebebeb;
 	padding: 20px;
 	width: 60%;
@@ -101,13 +117,14 @@ button {
 
 
 .keys {
-	background-color: salmon;
+	/*background-color: salmon;*/
 	text-align: center;
-	padding: 10px;
+	padding-bottom: 20px;
 	justify-self: center;
 	display: flex;
 	align-items: center;
 	gap: 5px;
+
 
 }
 
@@ -118,11 +135,8 @@ flash-card code {
 .keys .glyph {
     border: 1px solid #111;
     display: block;
-    padding: 16px;
-    font-size: 18px;
+    padding: 10px;
     border-radius: 4px;
-    font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Sans-serif;
+    font-family: Sans-serif;
     text-align: center;
-    min-width: 50px;
-    letter-spacing: .06em;
 }

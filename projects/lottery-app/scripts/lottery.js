@@ -164,7 +164,7 @@ function animationIterationDelay(ele, animation) {
 function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
-setInterval(animationIterationDelay, getRndInteger(6000, 12000), 'bid-card h2', 'bounce-top');
-setInterval(animationIterationDelay, getRndInteger(6000, 12000), 'past-card h2', 'bounce-top');
-setInterval(animationIterationDelay, getRndInteger(6000, 12000), 'bid-card label', 'wobble-hor-bottom');
+setInterval(animationIterationDelay, getRndInteger(6000, 12000), 'bid-card h2', 'wobble-hor-bottom');
+setInterval(animationIterationDelay, getRndInteger(6000, 12000), 'past-card h2', 'wobble-hor-bottom');
+setInterval(animationIterationDelay, getRndInteger(6000, 12000), 'bid-card label', 'bounce-top');
 

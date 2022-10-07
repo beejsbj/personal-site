@@ -40,14 +40,15 @@
 						</nav>
 					</lottery-module>
 					<bid-card class='slide-in-left'>
-						<text-content>
-							<h2 class="teaser-voice">current bid</h2>
-							<output for="user-bid" id="current-bid" class="attention-voice heartbeat"></output>
-						</text-content>
+						
 						<form class="bid-form" action="POST">
 							<label class="teaser-voice" for="user-bid">make your bid</label>
 							<input id="user-bid" type="number" min="1" placeholder="$$$" step="0.01">
 						</form>
+						<text-content>
+							<h2 class="teaser-voice">current bid</h2>
+							<output for="user-bid" id="current-bid" class="attention-voice heartbeat"></output>
+						</text-content>
 					</bid-card>
 					<past-card class='slide-in-left'>
 						<h2 class="teaser-voice">past winners</h2>
