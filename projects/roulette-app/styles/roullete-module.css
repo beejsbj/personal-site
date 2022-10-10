@@ -1,0 +1,42 @@
+inner-column {
+	display: grid;
+	gap: 60px;
+		justify-items: center;
+
+}
+
+@media (min-width: 600px){
+	roullete-module {
+		display: grid;
+		grid-template-columns: 0.6fr 1fr;
+	}
+}
+
+roullete-module {
+	justify-self: stretch;
+}
+
+
+
+h1 {
+
+	fill: hsla(296, 45%, 100%, 1.00);
+	fill-rule:nonzero;
+	max-width: 600px;
+}
+
+h1 .front-title {
+	/*display: none;*/
+}
+
+h1 .glow-title {
+	fill: var(--red);
+	filter: url(#glow);
+}
+
+
+
+
+
+/*number chart*/
+

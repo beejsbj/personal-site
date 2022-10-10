@@ -20,12 +20,10 @@
 					<span>Connect</span>
 				</button>
 				<inner-column>
-					<h1 class="loud-voice slide-in-top">Roullete</h1>
+					<h1>
+						<?php include 'roullete-title.php'; ?>
+					</h1>
 					<roullete-module>
-						<wheel-module>
-							<?php include 'wheel.php'; ?>
-							<button class="button" id="spin"> Spin </button>
-						</wheel-module>
 						<numbers-grid>
 							<ul class="numbers">
 								<?php for ($i=1; $i <= 36; $i++) { ?>
@@ -33,25 +31,7 @@
 									<input type="checkbox" id="num-<?=$i?>" class="num" value="<?=$i?>">
 									<label for="num-<?=$i?>">
 										<span>
-											<svg class="svg-text" width="100%" height="100%" viewBox="-120 0 200 400">
-												<defs>
-													<filter id="fil2" x="0" y="0">
-														<feGaussianBlur in="SourceGraphic" stdDeviation="5" />
-													</filter>
-												</defs>
-												<g transform="matrix(1,0,0,1,-348.834,-160.526)">
-													<g transform="matrix(1,0,0,1,128.575,14.4738)">
-														<text class="back-text" text-anchor="middle" x="100%" y="100%">
-															<?=$i?>
-														</text>
-													</g>
-													<g transform="matrix(1,0,0,1,128.575,14.4738)">
-														<text class="front-text" text-anchor="middle" x="100%" y="100%">
-															<?=$i?>
-														</text>
-													</g>
-												</g>
-											</svg>
+											<?=$i?>
 										</span>
 									</label>
 								</li>
@@ -71,14 +51,14 @@
 									</label>
 								</li>
 								<li>
-									<input type="checkbox" id="red" class="halves" value="red">
-									<label for="red">
+									<input type="checkbox" id="red-check" class="halves" value="red">
+									<label for="red-check">
 										<span> red </span>
 									</label>
 								</li>
 								<li>
-									<input type="checkbox" id="blue" class="halves" value="blue">
-									<label for="blue">
+									<input type="checkbox" id="blue-check" class="halves" value="blue">
+									<label for="blue-check">
 										<span> blue </span>
 									</label>
 								</li>
@@ -116,6 +96,10 @@
 								</li>
 							</ul>
 						</numbers-grid>
+						<wheel-module>
+							<?php include 'wheel.php'; ?>
+							<button class="button" id="spin"> <?php include 'spin.php'; ?> </button>
+						</wheel-module>
 					</roullete-module>
 				</inner-column>
 			</section>

@@ -1,25 +1,7 @@
-inner-column {
-	display: grid;
-	gap: 10px;
-
-}
-
-@media (min-width: 600px){
-	roullete-module {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-	}
-}
-
-inner-column>h1 {
-	text-align: center;
-	color: white;
-	margin-bottom: 40px;
-}
-
 wheel-module {
 	max-width: 700px;
 	align-self: center;
+	position: relative;
 }
 
 svg {
@@ -30,7 +12,7 @@ svg {
 }
 
 svg #centre-circle {
-	fill: hsla(238, 79%, 24%, 1.00);
+	fill: var(--paper);
 }
 
 svg.wheel text {
@@ -63,110 +45,22 @@ svg.wheel text {
 }
 
 #color-slices .selected>* {
-	fill: hsla(144, 100%, 100%, 1.00);
+	fill: hsla(144, 100%, 100%, 1.00) !important;
 	transition: 0.2s;
 }
 
 
-
-
-/*number chart*/
-
-
-numbers-grid {
-	color: white;
-	display: grid;
-	grid-template-columns: 0.2fr 0.2fr 0.6fr;
-	gap: 5px;
-
-	max-width: 315px;
-}
-
-
-numbers-grid label {
-	padding: 45px;
-	border: 1px solid var(--red);
-	position: relative;
-
-}
-
-numbers-grid label:hover {
-	box-shadow: 0px 0px 20px var(--green);
-	cursor: pointer;
-}
-numbers-grid input:checked + label {
-	border: 1px solid white;
-}
-
-
-numbers-grid input:checked + label::after,
-numbers-grid input:checked + label::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	box-shadow: 0px 0px 20px var(--green);
-	
-	z-index: 99;
-}
-
-
-
-numbers-grid span {
-	font-family: Tourney;
-	font-weight: 100;
-	font-size: 52.04px;
+button#spin {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	max-width: ;
+
 }
 
-numbers-grid input:checked + label span {
-
-	text-shadow: 0px 0px 10px var(--green);
-	
-}
-
-numbers-grid input {
-	display: none;
-}
-
-
-numbers-grid .numbers {
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
-	order: 2;
-	gap: 5px;
-}
-
-numbers-grid .chunks {
-	display: grid;
-	gap: 5px;
-}
-numbers-grid .chunks label {
-	width: 100%;
-	height: 100%;
-}
-
-numbers-grid .chunks span {
-	writing-mode: vertical-rl;
-	text-orientation: sideways;
-}
-
-.svg-text text {
-	font-size: 150px;
-	font-family: Tourney-Medium, Tourney;
-}
-
-.svg-text .front-text {
-	fill: white;
-}
-
-.svg-text .back-text {
-	fill: var(--green);
-	filter: url(#fil2);
+button#spin .spin-svg {
+	fill:white;
+	fill-rule:nonzero;
 }
 

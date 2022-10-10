@@ -91,10 +91,38 @@ footer .button.icon {
 
 
 
-.button.roll {
+.button#spin {
 	/*background-image: linear-gradient(hsla(173, 66%, 37%, 1.00), hsla(95, 77%, 54%, 1.00)) ;*/
-	background-color: hsla(60, 100%, 50%, 1.0);
-	color: var(--color);
+	background-color: var(--paper);
+	color: white;
+	font-size: 50px;
+	position: relative;
+
+
+}
+
+.button#spin::after,
+.button#spin::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	height: 100px;
+	width: 100px;
+	top: 0;
+	left: 0;
+
+	border: 1px solid white;
+
+	z-index: -99;
+
+	transform: rotate(45deg);
+}
+
+
+.button#spin::before {
+	/*transform: rotate(-45deg);*/
 }
 
 .button.roll:hover {
@@ -109,6 +137,7 @@ footer .button.icon {
 	left: 0;
 	z-index: 99999;
 	border-radius: 5px;
+	display: none;
 }
 
 .button.connect .metamask-icon {
