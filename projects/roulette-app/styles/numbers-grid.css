@@ -22,8 +22,10 @@ numbers-grid #third-12 + label,
 numbers-grid #blue-check + label {
 	border: 1px solid var(--blue);
 	box-shadow: 0px 0px 5px var(--blue);
-
-
+}
+numbers-grid #second-12 + label {
+	border: 1px solid var(--blue);
+	box-shadow: 3px 0px 5px var(--red);, -3px 0px 5px var(--blue);
 }
 
 
