@@ -63,9 +63,25 @@
   }
 }
 
+@keyframes neon1 {
+  0% {
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #ff1177,
+      0 0 35px #ff1177, 0 0 40px #ff1177, 0 0 50px #ff1177, 0 0 75px #ff1177;
+  }
+  50% {
+    text-shadow: 0 0 5px #fff, 0 0 5px #fff, 0 0 15px #fff, 0 0 10px #ff1177,
+      0 0 35px #ff1177, 0 0 20px #ff1177, 0 0 25px #ff1177, 0 0 36px #ff1177;
+  }
+
+  100% {
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #ff1177,
+      0 0 35px #ff1177, 0 0 40px #ff1177, 0 0 25px #ff1177, 0 0 75px #ff1177;
+  }
+}
+
 .button.connect {
 
-  animation: pulseGlow 2s infinite ease-in-out; 
+  animation: neon1 2s infinite ease-in-out; 
 }
 
 

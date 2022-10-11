@@ -40,15 +40,15 @@ function highlight(timePassed, i) {
 	var currentWhiteSlice = document.querySelector(whiteSliceName);
 	var currentColorSlice = document.querySelector(colorSliceName);
 	// console.log(i);
-	currentWhiteSlice.classList.toggle('selected');
-	currentColorSlice.classList.toggle('selected');
+	currentWhiteSlice.classList.add('selected');
+	currentColorSlice.classList.add('selected');
 
 	
 
 	if (timePassed < (spinTime - frameTime)) {
 		setTimeout(function() {
-			currentWhiteSlice.classList.toggle('selected');
-			currentColorSlice.classList.toggle('selected');
+			currentWhiteSlice.classList.remove('selected');
+			currentColorSlice.classList.remove('selected');
 		}, frameTime);
 	}
 }
