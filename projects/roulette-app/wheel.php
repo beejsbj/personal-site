@@ -1,9 +1,10 @@
 <svg class="wheel" viewBox="350 350 1300 1300">
+  
   <defs>
     <filter id="fil1" x="0" y="0">
       <feGaussianBlur in="SourceGraphic" stdDeviation="10" />
-    
   </defs>
+
   <g id="color-slices">
     <g id="blue-color" data-name="blue">
       <polygon class="cls-13" points="999.62 1003.08 999.8 1001.96 999.29 1000.4 999.66 1000.25 1000.1 1000.31 1007.1 1001.51 1000.17 1003.06 999.81 1001.98 999.62 1003.08" />
