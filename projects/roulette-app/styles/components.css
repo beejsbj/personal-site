@@ -8,14 +8,13 @@
 .buttons picture {
 	max-width: 20px;
 }
+button {
+	cursor: url("../neon-pointer.cur"), auto !important;
+}
 .button {
 	
-	--h: 10;
-	background-color: black;
-	padding: 10px;
-	font-family: 'Luckiest Guy', cursive;
-	color: var(--paper);
-	position: relative;
+	cursor: url("../neon-pointer.cur"), auto !important;
+
 	/*overflow: hidden;*/
 	/*transition: 0.3s;*/
 
@@ -30,133 +29,42 @@
 }
 
 
-.button.rounded {
-	border-radius: 5px;
-}
-
-.button.outline {
-	background-color: transparent;
-	border: 1px solid white;
-	color: white;
-}
-
-.button.text {
-	background-color: transparent;
-	color: var(--color);
-	padding: 10px;
-}
-
-.button:not(.outline, .text):hover {
-	background-color: var(--shade2);
-	color: white;
-}
-.button.outline:hover,
-.button.text:hover {
-	/*background-color: hsla(215, 100%, 88%, 0.30);*/
-}
-.button::after {
-	content: "";
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%) skewX(10deg) skewY(-20deg);
-
-	background-color: hsla(215, 100%, 58%, 1.0);
-	filter: sepia(50%) saturate(3);
-	transition: 0.3s;
-	z-index: 1;
-	width: 30%;
-	height: 50%;
-	display: none;
-}
-.button:hover::after {
-	animation: jelly infinite 0.5s;
-}
-
-.button:visited {
-
-}
-
-.button.icon {
-	min-width: 16px;
-	
-	border-radius: 50%;
-	padding: 5px;
-}
-footer .button.icon {
-	border: 1px solid white;
-	gap: 0;
-}
 
 
 
 
-.button#spin {
-	/*background-image: linear-gradient(hsla(173, 66%, 37%, 1.00), hsla(95, 77%, 54%, 1.00)) ;*/
-	background-color: var(--paper);
-	color: white;
-	font-size: 50px;
-	position: relative;
 
 
-}
-
-.button#spin::after,
-.button#spin::before {
-	content: "";
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	height: 100px;
-	width: 100px;
-	top: 0;
-	left: 0;
-
-	border: 1px solid white;
-
-	z-index: -99;
-
-	transform: rotate(45deg);
-}
 
 
-.button#spin::before {
-	/*transform: rotate(-45deg);*/
-}
-
-.button.roll:hover {
-
-
-}
 
 
 .button.connect {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 10px;
+	right: 10px;
 	z-index: 99999;
-	border-radius: 5px;
-	display: none;
+	font-weight: 900;
+	/*display: none;*/
+	/*transition: 0.2s;*/
+	font-size: 1.2rem;
+}
+
+.button.connect:hover {
+	font-weight: 100;
 }
 
 .button.connect .metamask-icon {
-	max-width: 20px;
+	max-width: 30px;
+	transform: rotateY(180deg);
 
 }
 
 @media (min-width:  1300px) {
 	.button.connect {
-	transform: rotate(-45deg);
-	font-size: 5rem;
 
-	top: 5%;
-	left: 0%;
+	
+
+	
 }
 
-
-
-.button.connect .metamask-icon {
-	max-width: 40px;
-}
-}

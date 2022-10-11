@@ -2,6 +2,7 @@ wheel-module {
 	max-width: 700px;
 	align-self: center;
 	position: relative;
+	justify-self: stretch;
 }
 
 svg {
@@ -13,6 +14,7 @@ svg {
 
 svg #centre-circle {
 	fill: var(--paper);
+	
 }
 
 svg.wheel text {
@@ -30,37 +32,49 @@ svg.wheel text {
 
 
 #white-slices :is(path, text) {
-	fill: hsla(144, 100%, 41%, 1.00);
 	filter: url(#fil1);
 }
 
-#white-slices #red>*,
-#white-slices #blue>* {
-	display: none;
+#white-slices #red>* {
+	/*display: none;*/
+	fill: var(--red);
 }
-
+,
+#white-slices #blue>* {
+	fill: var(--blue);
+}
+#white-slices .selected :is(path, text) {
+	fill: hsla(144, 100%, 40%, 1.00) !important;
+}
 #white-slices .selected {
 	display: block !important;
-	transition: 0.2s;
 }
 
 #color-slices .selected>* {
 	fill: hsla(144, 100%, 100%, 1.00) !important;
-	transition: 0.2s;
 }
 
 
-button#spin {
+.button#spin {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	max-width: ;
+	width: 100%;
+	max-width: 18%;
+	font-weight: 800;
 
 }
 
 button#spin .spin-svg {
 	fill:white;
 	fill-rule:nonzero;
+
+
+}
+
+button#spin .spin-svg #back-spin {
+	filter: url(#glow-spin);
+	fill: var(--green);
 }
 

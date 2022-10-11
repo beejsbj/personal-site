@@ -4,9 +4,7 @@ numbers-grid {
 	display: grid;
 	grid-template-columns: 0.2fr 0.2fr 0.6fr;
 	gap: 5px;
-
-	max-width: 315px;
-	transform: scale(0.7);
+	transform: scale(0.9);
 }
 
 
@@ -14,12 +12,24 @@ numbers-grid label {
 	padding: 30px;
 	border: 1px solid var(--red);
 	position: relative;
+	box-shadow: 0px 0px 5px var(--red);
+
+
+}
+numbers-grid #odd + label,
+numbers-grid #second-half + label,
+numbers-grid #third-12 + label,
+numbers-grid #blue-check + label {
+	border: 1px solid var(--blue);
+	box-shadow: 0px 0px 5px var(--blue);
+
 
 }
 
+
 numbers-grid label:hover {
 	box-shadow: 0px 0px 20px var(--green);
-	cursor: pointer;
+	cursor: url("../neon-pointer.cur"), auto;
 }
 numbers-grid input:checked + label {
 	border: 1px solid white;
@@ -36,14 +46,14 @@ numbers-grid input:checked + label::before {
 	height: 100%;
 	box-shadow: 0px 0px 20px var(--green);
 	
-	z-index: 99;
+	z-index: -99;
 }
 
 
 
 numbers-grid span {
 	font-family: Tourney;
-	font-weight: 100;
+	font-weight: 400;
 	font-size: 30px;
 	position: absolute;
 	top: 50%;
@@ -53,7 +63,8 @@ numbers-grid span {
 
 numbers-grid input:checked + label span {
 
-	text-shadow: 0px 0px 10px var(--green);
+	text-shadow: 0px 0px 30px var(--green);
+	color: var(--green);
 	
 }
 
@@ -64,7 +75,7 @@ numbers-grid input {
 
 numbers-grid .numbers {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-columns: fit-content(100%) fit-content(100%) fit-content(100%);
 	order: 2;
 	gap: 5px;
 }

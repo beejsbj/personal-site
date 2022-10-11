@@ -14,10 +14,11 @@
 		<main class="page-content">
 			<section class="page-section">
 				<button class="button connect">
+					<span>Connect</span>
 					<picture class="metamask-icon">
 						<img src="metamask-bw.png" alt="">
 					</picture>
-					<span>Connect</span>
+					
 				</button>
 				<inner-column>
 					<h1>

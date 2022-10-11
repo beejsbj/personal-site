@@ -32,20 +32,14 @@
   }
 }
 
-h1 path:nth-of-type(3) {
-  animation: flicker 6s infinite step-end;
-}
 
-h1 path:nth-of-type(7) {
+.flicker-animation2 {
   animation: flicker 5s infinite 3s step-end;
 }
 
-
-
-svg #centre-circle {
-/*  filter: url(#fil1);
-   animation: flicker 8s infinite 3s step-end;
-   animation-delay: -1s;*/
+.flicker-animation,
+#back-spin path:nth-of-type(2) {
+  animation: flicker 6s infinite step-end;
 }
 
 
@@ -55,6 +49,24 @@ svg #centre-circle {
 
 
 
+@keyframes pulseGlow {
+  0 % {
+    text-shadow: 0px 0px 20px #0d106e;
+  }
+
+  50% {
+    text-shadow: 0px 0px 20px #52b2ed;
+  }
+
+  100 % {
+    text-shadow: 0px 0px 20px #0d106e;
+  }
+}
+
+.button.connect {
+
+  animation: pulseGlow 2s infinite ease-in-out; 
+}
 
 
 

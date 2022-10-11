@@ -60,7 +60,7 @@ function removeSLiceClass() {
 
 
 
-//number chart
+//number chart styling
 
 
 const blueNums = [3, 32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12];
@@ -70,4 +70,21 @@ blueNums.forEach( function(blueNum) {
 	var blueCheckbox = document.querySelector(`#num-${blueNum} + label`);
 	console.log(blueCheckbox);
 	blueCheckbox.style.borderColor = "var(--blue)";
+	blueCheckbox.style.boxShadow = "0px 0px 5px var(--blue)";
 })
+
+
+
+
+
+
+//animation flicker
+
+var titleSign = document.querySelector(`h1 path:nth-of-type(${Math.floor(Math.random() * 8)})`)
+titleSign.classList.add('flicker-animation');
+
+var titleSign2 = document.querySelector(`h1 path:nth-of-type(${Math.floor(Math.random() * 8)})`)
+titleSign2.classList.add('flicker-animation2');
+
+var spinSign = document.querySelector(`#back-spin path:nth-of-type(${Math.floor(Math.random() * 4)})`)
+spinSign.classList.add('flicker-animation');
