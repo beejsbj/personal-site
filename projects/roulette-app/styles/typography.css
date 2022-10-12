@@ -6,17 +6,19 @@
 }
 
 .loud-voice {
-	font-family: Tourney-Medium, Tourney;
-	font-size: 6rem;
+	font-family: Tourney;
+	font-size: 4rem;
 	text-transform: capitalize;
 }
 
 
 
-.attention-voice {
-	font-family: Tourney-Medium, Tourney;
-	font-size: 2rem;
+.attention-voice span {
+	font-family: Tourney;
+	font-size: 4rem;
 	text-transform: capitalize;
+	color: white;
+	font-style: italic;
 }
 
 @media (min-width:  1500px){

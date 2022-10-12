@@ -1,16 +1,20 @@
 const spinTime = 5000;
 var frameTime = 150;
 const blueNums = [3, 32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12];
+var resultDiv = document.querySelector("div.result");
 
 function wheelStrokeColor(i) {
 	var allStrokes = document.querySelectorAll('#color-slices path');
+
 	if (blueNums.includes(i)) {
 		allStrokes.forEach(function(stroke) {
 			stroke.style.fill = "var(--blue)";
+			resultDiv.classList.add('blue');
 		})
 	} else {
 		allStrokes.forEach(function(stroke) {
 			stroke.style.fill = "var(--red)";
+			resultDiv.classList.add('red');
 		})
 	}
 }
@@ -31,18 +35,21 @@ function animations(start) {
 	// highlight the animation at the moment timePassed
 	highlight(timePassed, i);
 }
-// as timePassed goes from 0 to frameTime0
-// left gets values from 0px to 400px
+
+// as timePassed goes from 0 to frameTime
 function highlight(timePassed, i) {
-	wheelStrokeColor(i);
+	
+
 	var whiteSliceName = `#white-slices #slice-${i}`;
 	var colorSliceName = `#color-slices #slice-${i}-color`;
 	var currentWhiteSlice = document.querySelector(whiteSliceName);
 	var currentColorSlice = document.querySelector(colorSliceName);
-	// console.log(i);
+
+
 	currentWhiteSlice.classList.add('selected');
 	currentColorSlice.classList.add('selected');
-
+	centerResult(i); 
+	wheelStrokeColor(i);
 	
 
 	if (timePassed < (spinTime - frameTime)) {
@@ -53,6 +60,8 @@ function highlight(timePassed, i) {
 	}
 }
 
+
+// spin button
 var spinButton = document.querySelector('button#spin');
 spinButton.addEventListener("click", function() {
 	removeSLiceClass();
@@ -72,6 +81,20 @@ function removeSLiceClass() {
 	})
 }
 
+function centerResult(i) {
+	var spinSvgs = document.querySelectorAll("svg#spin-button > g > :not(#blue-circle)");
+	spinSvgs.forEach(function(spinSvg) {
+		spinSvg.classList.add('hide');
+	})
+	var spinText = document.querySelector("div.spin-text");
+	spinText.classList.add('hide');
+
+	resultDiv.classList.remove('hide');
+	resultDiv.classList.remove('blue');
+	resultDiv.classList.remove('red');
+	resultDiv.innerHTML = i;
+
+}
 
 
 
@@ -93,11 +116,11 @@ blueNums.forEach( function(blueNum) {
 
 //animation flicker
 
-var titleSign = document.querySelector(`h1 path:nth-of-type(${Math.floor(Math.random() * 8) + 1})`)
+var titleSign = document.querySelector(`h1 span:nth-of-type(${Math.floor(Math.random() * 8) + 1})`)
 titleSign.classList.add('flicker-animation');
 
-var titleSign2 = document.querySelector(`h1 path:nth-of-type(${Math.floor(Math.random() * 8) + 1})`)
+var titleSign2 = document.querySelector(`h1 span:nth-of-type(${Math.floor(Math.random() * 8) + 1})`)
 titleSign2.classList.add('flicker-animation2');
 
-var spinSign = document.querySelector(`#back-spin path:nth-of-type(${Math.floor(Math.random() * 4) + 1})`)
+var spinSign = document.querySelector(`div.spin-text span:nth-of-type(${Math.floor(Math.random() * 4) + 1})`)
 spinSign.classList.add('flicker-animation');

@@ -27,10 +27,15 @@
 /* then other contextual styles */
 body {
 	background-color: var(--paper);
-	background-blend-mode: multiply;
+	background-blend-mode: color-dodge;
 	overflow-x: hidden;
 
 	padding-bottom: 250px;
 	cursor: url("../neon-cursor.cur"), auto;
+}
+
+
+.hide {
+	display: none !important;
 }
 

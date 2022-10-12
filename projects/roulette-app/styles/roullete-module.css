@@ -29,19 +29,27 @@ roullete-module {
 
 
 h1 {
-
-	fill: hsla(296, 45%, 100%, 1.00);
-	fill-rule:nonzero;
 	max-width: 800px;
 }
 
-h1 .front-title {
-	/*display: none;*/
-}
 
-h1 .glow-title {
-	fill: var(--red);
-	filter: url(#glow);
+h1 span {
+
+	/*filter: url(#glow);*/
+
+	text-shadow: 
+		0 0 7px #fff,
+		0 0 10px #fff,
+		0 0 21px #fff,
+		0 0 42px #0fa,
+		0 0 82px #0fa,
+		0 0 92px #0fa,
+		0 0 102px #0fa,
+		0 0 151px #0fa;
+
+	will-change: filter, color;
+	filter: saturate(60%);
+	animation: colorFLicker steps(100) 5s infinite;
 }
 
 

@@ -4,9 +4,9 @@
 	<head>
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
-		<title>Lottery</title>
-		<meta name="description" content="Crypto lottery something something desc">
-		<meta property="og:image" content="https://peprojects.dev/alpha-4/burooj/projects/lottery-app/meta.jpg">
+		<title>Roullete</title>
+		<meta name="description" content="Crypto Roullete something something desc">
+		<meta property="og:image" content="https://peprojects.dev/alpha-4/burooj/projects/roullete-app/meta.jpg">
 		<link rel='stylesheet' href='styles/site.css'>
 	</head>
 
@@ -21,8 +21,16 @@
 					
 				</button>
 				<inner-column>
-					<h1>
-						<?php include 'roullete-title.php'; ?>
+					<h1 class="attention-voice flicker-in-2">
+						<?php //include 'roullete-title.php'; ?>
+						<span>R</span>
+						<span>O</span>
+						<span>U</span>
+						<span>L</span>
+						<span>L</span>
+						<span>E</span>
+						<span>T</span>
+						<span>E</span>
 					</h1>
 					<roullete-module>
 						<numbers-grid>
@@ -99,7 +107,18 @@
 						</numbers-grid>
 						<wheel-module>
 							<?php include 'wheel.php'; ?>
-							<button class="button" id="spin"> <?php include 'spin.php'; ?> </button>
+							<button class="button" id="spin">
+								<?php include 'spin-button.php'; ?> 
+								<div class="spin-text">
+									<span>S</span>
+									<span>P</span>
+									<span>I</span>
+									<span>N</span>
+								</div>
+								<div class="result hide">
+									
+								</div>
+							</button>
 						</wheel-module>
 					</roullete-module>
 				</inner-column>

@@ -13,7 +13,7 @@ svg {
 }
 
 svg #centre-circle {
-	fill: var(--paper);
+	display: none;
 	
 }
 
@@ -55,33 +55,23 @@ svg.wheel text {
 }
 
 
+
+
+/*spin button*/
 .button#spin {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	width: 100%;
-	width: 17%;
-	height: 17%;
+	max-width: 23%;
 	font-weight: 800;
-
-	outline: 0.5px solid white;
-	border-radius: 50%;
-	/*padding: 60px;*/
-
 
 }
 
 button#spin .spin-svg {
 	fill:white;
 	fill-rule:nonzero;
-
-	position: absolute;
-	max-width: 80%;
-
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
 
 
 }
@@ -91,3 +81,86 @@ button#spin .spin-svg #back-spin {
 	fill: var(--green);
 }
 
+
+
+#spin-button {
+	overflow: visible !important;
+}
+
+div.spin-text {
+	width: 100%;
+	position: absolute;
+
+	display: flex;
+	justify-content: center;
+
+    top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+div.spin-text span {
+	color: white;
+	font-family: Tourney;
+	font-weight: 500;
+	font-style: italic;
+	font-size: 40px;
+
+	text-shadow: 
+    0 0 10px var(--blue),
+    0 0 20px var(--red),
+    0 0 40px var(--blue),
+    0 0 80px var(--red);
+
+
+}
+
+#blue-arrow {
+	fill: var(--blue);
+	filter: url(#outer-glow-24);
+}
+
+#outline-stroke {
+	fill: none;
+	stroke: #fff;
+	stroke-miterlimit: 10;
+	stroke-width: 3px;
+}
+
+#blue-circle{
+	fill: var(--paper);
+	fill-rule: evenodd;
+}
+
+#red-arrow {
+	fill: var(--red);
+	filter: url(#outer-glow-25);
+}
+
+
+div.result {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 5rem;
+	font-weight: 100;
+	text-shadow: 
+    0 0 10px var(--color),
+    0 0 20px var(--color),
+    0 0 40px var(--color),
+    0 0 80px var(--color);
+}
+
+div.result.red {
+
+	--color: var(--red);
+	color: var(--red);
+
+}
+
+div.result.blue {
+
+	--color: var(--blue);
+	color: var(--blue);
+
+}
