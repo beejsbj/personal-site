@@ -9,7 +9,7 @@ roullete-module {
 	display: grid;
 	justify-items:  center;
 	justify-self: stretch;
-
+	gap: 40px;
 	position: relative;
 
 }
