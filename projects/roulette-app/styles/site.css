@@ -27,7 +27,11 @@
 /* then other contextual styles */
 body {
 	background-color: var(--paper);
-	background-blend-mode: color-dodge;
+	background-image: url("../wall-bg.jpg");
+	background-position: center center;
+	background-size: cover;
+	background-blend-mode: darken;
+
 	overflow-x: hidden;
 
 	padding-bottom: 250px;

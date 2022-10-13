@@ -14,7 +14,7 @@
 		<main class="page-content">
 			<section class="page-section">
 				<button class="button connect">
-					<span>Connect</span>
+					<span>CONNECT</span>
 					<picture class="metamask-icon">
 						<img src="metamask-bw.png" alt="">
 					</picture>
@@ -48,7 +48,7 @@
 							</ul>
 							<ul class="chunks halves-chunk">
 								<li>
-									<input type="checkbox" id="first-half" class="halves" value="firsthalf">
+									<input type="checkbox" id="first-half" class="halves" value="first18">
 									<label for="first-half">
 										<span> 1-&nbsp18 </span>
 									</label>
@@ -60,13 +60,13 @@
 									</label>
 								</li>
 								<li>
-									<input type="checkbox" id="red-check" class="halves" value="red">
+									<input type="checkbox" id="red-check" class="halves color" value="red">
 									<label for="red-check">
 										<span> red </span>
 									</label>
 								</li>
 								<li>
-									<input type="checkbox" id="blue-check" class="halves" value="blue">
+									<input type="checkbox" id="blue-check" class="halves color" value="blue">
 									<label for="blue-check">
 										<span> blue </span>
 									</label>
@@ -78,27 +78,27 @@
 									</label>
 								</li>
 								<li>
-									<input type="checkbox" id="second-half" class="halves" value="secondhalf">
+									<input type="checkbox" id="second-half" class="halves" value="second18">
 									<label for="second-half">
 										<span> 19-&nbsp36 </span>
 									</label>
 								</li>
 							</ul>
 							<ul class="chunks thirds-chunk">
-								<li class="thirds">
-									<input type="checkbox" id="first-12" value="first12">
+								<li >
+									<input class="thirds" type="checkbox" id="first-12" value="first12">
 									<label for="first-12">
 										<span> First&nbspThird </span>
 									</label>
 								</li>
-								<li class="thirds">
-									<input type="checkbox" id="second-12" value="second12">
+								<li >
+									<input class="thirds" type="checkbox" id="second-12" value="second12">
 									<label for="second-12">
 										<span> second&nbspThird </span>
 									</label>
 								</li>
-								<li class="thirds">
-									<input type="checkbox" id="third-12" value="third12">
+								<li >
+									<input class="thirds" type="checkbox" id="third-12" value="third12">
 									<label for="third-12">
 										<span> third&nbspThird </span>
 									</label>
@@ -120,6 +120,14 @@
 								</div>
 							</button>
 						</wheel-module>
+						<info-module>
+
+							<?php include 'arrow.php'; ?>
+							<?php include 'choose-number.php'; ?>
+							<?php include 'winner.php'; ?>
+
+						</info-module>
+
 					</roullete-module>
 				</inner-column>
 			</section>

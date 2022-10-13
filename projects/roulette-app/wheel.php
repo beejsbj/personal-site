@@ -2,7 +2,7 @@
   
   <defs>
     <filter id="fil1" x="0" y="0">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="10" />
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
   </defs>
 
   <g id="color-slices">

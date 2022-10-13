@@ -35,14 +35,15 @@ svg.wheel text {
 	filter: url(#fil1);
 }
 
-#white-slices #red>* {
-	/*display: none;*/
-	fill: var(--red);
+#white-slices #red > * {
+	/*fill: var(--red);*/
 }
-,
-#white-slices #blue>* {
-	fill: var(--blue);
+
+#white-slices path {
+	fill: var(--paper);
 }
+
+
 #white-slices .selected :is(path, text) {
 	fill: hsla(144, 100%, 40%, 1.00) !important;
 }
@@ -106,10 +107,10 @@ div.spin-text span {
 	font-size: 40px;
 
 	text-shadow: 
-    0 0 10px var(--blue),
-    0 0 20px var(--red),
-    0 0 40px var(--blue),
-    0 0 80px var(--red);
+    0 0 10px,
+    0 0 20px,
+    0 0 40px,
+    0 0 80px;
 
 
 }
