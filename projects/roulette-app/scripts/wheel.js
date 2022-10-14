@@ -132,21 +132,21 @@ function checkWin(i) {
 	var userSelection = document.querySelector('numbers-grid input:checked');
 	
 	setTimeout(function() {
-		var spanWinLose = document.querySelector('span.win-lose');
+		var resultWinLose = document.querySelector('.congrats-text');
 
-		console.log(spanWinLose);
-		if (winCondition(i, spanWinLose, userSelection)) {
-			spanWinLose.innerHTML = "YOU WIN";
+		console.log(resultWinLose);
+		if (winCondition(i, resultWinLose, userSelection)) {
+			resultWinLose.innerHTML = "<em> CONGRATULATIONS </em> <span class='win-lose'>YOU WIN</span>";
 		} else {
-			spanWinLose.innerHTML = "YOU LOSE";
+			resultWinLose.innerHTML = "<em> TRY AGAIN </em> <span class='win-lose'>YOU LOSE</span>";
 		}
 
-		console.log(spanWinLose);
+		console.log(resultWinLose);
 
 	}, 200)
 }
 
-function winCondition(i, spanWinLose, userSelection) {
+function winCondition(i, resultWinLose, userSelection) {
 	switch (userSelection.value) {
 		case i:
 			return true;
