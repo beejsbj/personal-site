@@ -27,8 +27,8 @@
 						<span>O</span>
 						<span>U</span>
 						<span>L</span>
-						<span>L</span>
 						<span>E</span>
+						<span>T</span>
 						<span>T</span>
 						<span>E</span>
 					</h1>
@@ -88,19 +88,19 @@
 								<li >
 									<input class="thirds" type="checkbox" id="first-12" value="first12">
 									<label for="first-12">
-										<span> First&nbspThird </span>
+										<span> first&nbspthird </span>
 									</label>
 								</li>
 								<li >
 									<input class="thirds" type="checkbox" id="second-12" value="second12">
 									<label for="second-12">
-										<span> second&nbspThird </span>
+										<span> second&nbspthird </span>
 									</label>
 								</li>
 								<li >
 									<input class="thirds" type="checkbox" id="third-12" value="third12">
 									<label for="third-12">
-										<span> third&nbspThird </span>
+										<span> third&nbspthird </span>
 									</label>
 								</li>
 							</ul>
