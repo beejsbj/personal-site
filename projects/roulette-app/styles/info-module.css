@@ -6,9 +6,8 @@ info-module {
   display: grid;
   justify-self: stretch;
   max-width: 90vw;
-  
-
 }
+
 svg#arrow-svg {
   position: absolute;
   max-width: 90px;
@@ -17,9 +16,7 @@ svg#arrow-svg {
   overflow: visible;
 }
 
-arrow-svg path {
-  
-}
+arrow-svg path {}
 
 .arrow-2 {
   filter: url(#outer-glow-24);
@@ -34,11 +31,9 @@ arrow-svg path {
   filter: url(#outer-glow-23);
 }
 
-
 /*choose*/
-
 choose-box {
-    width: 100%;
+  width: 100%;
   color: var(--blue);
   display: flex;
   align-items: center;
@@ -46,18 +41,15 @@ choose-box {
   gap: 15px;
   outline: 3px solid white;
   padding: 20px;
-
-  box-shadow: 
+  box-shadow:
     0 0 5px,
     0 0 10px,
     0 0 25px;
-
-  text-shadow: 
+  text-shadow:
     0 0 10px,
     0 0 20px,
     0 0 30px;
 }
-
 
 .or-text,
 .choose-text {
@@ -68,11 +60,10 @@ choose-box {
   font-weight: 300;
 }
 
-
 .or-text {
   color: var(--blue);
-   font-size: 14px;
-   font-weight: 800;
+  font-size: 14px;
+  font-weight: 800;
 }
 
 .odd-or-even-text,
@@ -85,23 +76,15 @@ choose-box {
   font-size: 32px;
 }
 
-
 .odd-or-even-text .or-text {
- color: var(--red);
+  color: var(--red);
 }
-
-
 
 .or-text {
   font-size: 14px;
 }
 
-
-
-
-
 /*winner*/
-
 results-box {
   width: 100%;
   color: var(--blue);
@@ -111,14 +94,11 @@ results-box {
   gap: 15px;
   outline: 3px solid white;
   padding: 20px;
-
-  box-shadow: 
+  box-shadow:
     0 0 5px,
     0 0 10px,
     0 0 25px;
-    
-
-  text-shadow: 
+  text-shadow:
     0 0 5px,
     0 0 10px,
     0 0 20px;
@@ -130,13 +110,16 @@ results-box .congrats-text {
   font-weight: 300;
   font-style: italic;
   font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
 }
 
 results-box .congrats-text span {
   font-size: 40px;
 }
-
-
 
 .play-again {
   font-family: Tourney, sans-serif;
@@ -146,25 +129,20 @@ results-box .congrats-text span {
   font-size: 32px;
   outline: 3px solid var(--red);
   padding: 10px;
-
-   box-shadow: 
+  box-shadow:
     0 0 5px,
     0 0 10px,
     0 0 25px;
-
-  text-shadow: 
+  text-shadow:
     0 0 10px,
     0 0 20px,
     0 0 30px;
 }
 
-
-@media (min-width: 580px) and (max-width:  850px) {
-
+@media (min-width: 580px) and (max-width: 850px) {
   .choose-text {
-  font-size: 30px;
-}
-  
+    font-size: 30px;
+  }
 
   choose-box,
   results-box {
@@ -172,11 +150,12 @@ results-box .congrats-text span {
     justify-items: center;
     text-align: center;
   }
+
   roullete-module {
     display: grid;
     grid-template-columns: 0.1fr 1fr;
-
   }
+
   wheel-module {
     grid-column: span 2;
   }
@@ -184,6 +163,7 @@ results-box .congrats-text span {
   info-module {
     grid-column: 1 / 2;
   }
+
   numbers-grid {
     grid-column: 2 / 3;
     transform: scale(1.0);
@@ -197,43 +177,45 @@ results-box .congrats-text span {
   }
 }
 
-@media (max-width:  580px) {
+@media (max-width: 580px) {
   info-module {
     grid-column-start: unset;
     transform: scale(0.45);
     justify-content: center;
   }
+
   roullete-module {
     gap: 0px;
     display: grid;
     grid-template-columns: 1fr;
-
   }
+
   h1.attention-voice span {
-  font-size: 3rem;
-}
-svg#arrow-svg {
+    font-size: 3rem;
+  }
+
+  svg#arrow-svg {
     top: unset;
     bottom: -100px;
     transform: rotateZ(180deg) rotate(45deg);
-    
   }
+
   div.result {
+    font-size: 4rem;
+  }
 
-  font-size: 4rem;
-}
+  results-box {
+    display: grid;
+    justify-content: center;
+  }
 
-results-box {
-  display: grid;
-  justify-content: center;
-}
-results-box h1 {
-  display: grid;
-  gap: 10px;
-  justify-items: center;
-}
-results-box button {
-  width: 100%;
-}
+  results-box h1 {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+  }
 
+  results-box button {
+    width: 100%;
+  }
 }
