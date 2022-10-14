@@ -63,7 +63,7 @@ choose-box {
 .choose-text {
   fill: #55addd;
   font-size: 54px;
-  font-family: Tourney;
+  font-family: Tourney, sans-serif;
   font-style: italic;
   font-weight: 300;
 }
@@ -79,7 +79,7 @@ choose-box {
 .number-text,
 .color-text {
   color: var(--red);
-  font-family: Tourney;
+  font-family: Tourney, sans-serif;
   font-weight: 500;
   font-style: italic;
   font-size: 32px;
@@ -126,7 +126,7 @@ results-box {
 
 results-box .congrats-text {
   fill: #55addd;
-  font-family: Tourney;
+  font-family: Tourney, sans-serif;
   font-weight: 300;
   font-style: italic;
   font-size: 30px;
@@ -139,7 +139,7 @@ results-box .congrats-text span {
 
 
 .play-again {
-  font-family: Tourney;
+  font-family: Tourney, sans-serif;
   font-weight: 100;
   font-style: italic;
   color: var(--red);

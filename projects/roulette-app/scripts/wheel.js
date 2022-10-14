@@ -127,47 +127,51 @@ function showHideInfoBox() {
 	chooseBox.classList.toggle('hide');
 }
 
-
-function checkWin(i){
-	var userSelection = document.querySelector('numbers-grid input:checked');
-	var spanWinLose = document.querySelector('span.win-lose');
-	console.log(userSelection.value);
-	console.log(spanWinLose.value);
-
-
-	if (userSelection.value == i) {
-		spanWinLose.innerHTML = "YOU WIN";
-	} else {
-		spanWinLose.innerHTML = "YOU LOSE";
-	}
-	if (userSelection.value == checkOddEven(i)) {
-		spanWinLose.innerHTML = "YOU WIN";
-	} else {
-		spanWinLose.innerHTML = "YOU LOSE";
-	}
-	if (userSelection.value == checkHalves(i)) {
-		spanWinLose.innerHTML = "YOU WIN";
-	} else {
-		spanWinLose.innerHTML = "YOU LOSE";
-	}
-	if (userSelection.value == checkColor(i)) {
-		spanWinLose.innerHTML = "YOU WIN";
-	} else {
-		spanWinLose.innerHTML = "YOU LOSE";
-	}
-	if (userSelection.value == checkThirds(i)) {
-		spanWinLose.innerHTML = "YOU WIN";
-	} else {
-		spanWinLose.innerHTML = "YOU LOSE";
-	}
-
+function checkWin(i) {
 	showHideInfoBox();
+	var userSelection = document.querySelector('numbers-grid input:checked');
+	
+	setTimeout(function() {
+		var spanWinLose = document.querySelector('span.win-lose');
 
+		console.log(spanWinLose);
+		if (winCondition(i, spanWinLose, userSelection)) {
+			spanWinLose.innerHTML = "YOU WIN";
+		} else {
+			spanWinLose.innerHTML = "YOU LOSE";
+		}
+
+		console.log(spanWinLose);
+
+	}, 200)
+}
+
+function winCondition(i, spanWinLose, userSelection) {
+	switch (userSelection.value) {
+		case i:
+			return true;
+			break;
+		case checkOddEven(i):
+			return true;
+			break;
+		case checkHalves(i):
+			return true;
+			break;
+		case checkColor(i):
+			return true;
+			break;
+		case checkThirds(i):
+			return true;
+			break;
+		default:
+			return false;
+			break;
+	}
 }
 
 function checkOddEven(i){
 	if (i % 2 == 0) {
-		return 'evem';
+		return 'even';
 	} else {
 		return 'odd';
 	}
@@ -220,7 +224,6 @@ function selectionLimit() {
 
 function selectionLimitLower() {
 	var checked = document.querySelectorAll('numbers-grid input:checked')
-	console.log(checked.length)
 	if (checked.length == 0) {
 		alert('please make and select a bid');
 		return false;
@@ -230,17 +233,17 @@ function selectionLimitLower() {
 
 var playAgain = document.querySelector('button.play-again');
 
-// playAgain.addEventListener('click', function() {
-// 	showHideInfoBox();
-// 	resetSLiceClass();
-// 	checkboxes.forEach(checkbox => {
-// 	checkbox.checked = false;
+playAgain.addEventListener('click', function() {
+	showHideInfoBox();
+	resetSLiceClass();
+	checkboxes.forEach(checkbox => {
+	checkbox.checked = false;
 
-// 	spinSvgs.forEach(function(spinSvg) {
-// 		spinSvg.classList.remove('hide');
-// 	})
-// 	spinText.classList.remove('hide');
-// 	centerResultDiv.classList.add('hide');
-// });
+	spinSvgs.forEach(function(spinSvg) {
+		spinSvg.classList.remove('hide');
+	})
+	spinText.classList.remove('hide');
+	centerResultDiv.classList.add('hide');
+});
 
-// })
+})

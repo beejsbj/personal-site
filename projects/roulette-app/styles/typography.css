@@ -6,7 +6,7 @@
 }
 
 .loud-voice {
-	font-family: Tourney;
+	font-family: Tourney, sans-serif;
 	font-size: 4rem;
 	text-transform: capitalize;
 }
@@ -14,7 +14,7 @@
 
 
 .attention-voice span {
-	font-family: Tourney;
+	font-family: Tourney, sans-serif;
 	font-size: 5rem;
 	text-transform: capitalize;
 	color: white;
@@ -28,13 +28,13 @@
 }
 
 .notice-voice {
-	font-family: Tourney-Medium, Tourney;
+	font-family: Tourney, sans-serif-Medium, Tourney;
 	font-size: 1rem;
 	/*font-weight: 700;*/
 }
 
 .solid-voice {
-	font-family: Tourney-Medium, Tourney;
+	font-family: Tourney, sans-serif-Medium, Tourney;
 	font-size: 20px;
 	font-weight: 700;
 }
@@ -61,7 +61,7 @@ li {
 }
 
 .whisper-voice {
-	font-family: Tourney-Medium, Tourney;
+	font-family: Tourney, sans-serif-Medium, Tourney;
 	font-size: 0.9rem;
 	font-weight: 300;
 	color: hsla(0, 0%, 44%, 1.00);

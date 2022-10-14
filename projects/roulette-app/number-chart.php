@@ -19,7 +19,7 @@
       }
 
       .cls-3, .cls-4, .cls-5, .cls-6, .cls-7, .cls-8, .cls-9, .cls-10, .cls-11, .cls-12, .cls-13, .cls-14, .cls-15, .cls-16, .cls-17, .cls-18, .cls-19, .cls-20, .cls-21, .cls-22, .cls-23, .cls-24, .cls-25, .cls-26, .cls-27, .cls-28, .cls-29, .cls-30, .cls-31, .cls-32, .cls-34, .cls-35, .cls-36, .cls-37, .cls-38, .cls-39 {
-        font-family: Tourney-Medium, Tourney;
+        font-family: Tourney, sans-serif-Medium, Tourney;
         font-size: 52.04px;
       }
 
@@ -226,7 +226,7 @@
       }
 
       .cls-33 {
-        font-family: Tourney-Regular, Tourney;
+        font-family: Tourney, sans-serif-Regular, Tourney;
         font-size: 55.78px;
       }
 

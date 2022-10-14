@@ -51,7 +51,7 @@ numbers-grid input:checked + label::before {
 
 
 numbers-grid span {
-	font-family: Tourney;
+	font-family: Tourney, sans-serif;
 	font-weight: 400;
 	font-size: 30px;
 	position: absolute;
