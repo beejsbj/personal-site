@@ -225,6 +225,7 @@ svg#arrow-svg {
 
 results-box {
   display: grid;
+  justify-content: center;
 }
 results-box h1 {
   display: grid;
