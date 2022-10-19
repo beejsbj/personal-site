@@ -4,6 +4,10 @@ const blueNums = [3, 32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7,
 var centerResultDiv = document.querySelector("div.result");
 var spinSvgs = document.querySelectorAll("svg#spin-button > g > :not(#blue-circle)");
 var spinText = document.querySelector("div.spin-text");
+var spinButton = document.querySelector('button#spin');
+var playAgainButton = document.querySelector('button.play-again');
+var arrowSvg = document.querySelector('#arrow-svg');
+
 
 //number chart styling
 blueNums.forEach(function(blueNum) {
@@ -15,7 +19,18 @@ blueNums.forEach(function(blueNum) {
 function wheelStrokeColor(i) {
 	var allColorStrokes = document.querySelectorAll('#color-slices path');
 	var allWhiteStrokes = document.querySelectorAll('#white-slices path');
-	if (blueNums.includes(i)) {
+	
+
+	if (i == 0) {
+		allColorStrokes.forEach(function(stroke) {
+			stroke.style.fill = "white";
+			centerResultDiv.classList.add('green');
+		})
+		allWhiteStrokes.forEach(function(stroke) {
+			stroke.style.fill = "var(--green)";
+		})
+
+	} else if (blueNums.includes(i)) {
 		allColorStrokes.forEach(function(stroke) {
 			stroke.style.fill = "var(--blue)";
 			centerResultDiv.classList.add('blue');
@@ -42,39 +57,49 @@ function animations(start) {
 		return;
 	}
 	var i = Math.floor(Math.random() * 37);
-	i++;
-	if (i == 37) {
-		i = 1;
-	}
+	console.log(i);
 	// highlight the animation at the moment timePassed
 	highlight(timePassed, i);
 }
 // as timePassed goes from 0 to frameTime
 function highlight(timePassed, i) {
-	var whiteSliceName = `#white-slices #slice-${i}`;
-	var colorSliceName = `#color-slices #slice-${i}-color`;
-	var currentWhiteSlice = document.querySelector(whiteSliceName);
-	var currentColorSlice = document.querySelector(colorSliceName);
-	currentWhiteSlice.classList.add('selected');
-	currentColorSlice.classList.add('selected');
 	centerResult(i); //show number in center
 	wheelStrokeColor(i); //change color of wheel to match number
+	if (i > 0) {
+		var whiteSliceName = `#white-slices #slice-${i}`;
+		var colorSliceName = `#color-slices #slice-${i}-color`;
+		var currentWhiteSlice = document.querySelector(whiteSliceName);
+		var currentColorSlice = document.querySelector(colorSliceName);
+		currentWhiteSlice.classList.add('selected');
+		currentColorSlice.classList.add('selected');
+	}
+
 	if (timePassed < (spinTime - frameTime)) {
 		setTimeout(function() {
-			currentWhiteSlice.classList.remove('selected');
-			currentColorSlice.classList.remove('selected');
+			if (i > 0) {
+				currentWhiteSlice.classList.remove('selected');
+				currentColorSlice.classList.remove('selected');
+			}
 		}, frameTime);
 	} else {
+		if (i == 0) {
+			var wheelTexts = document.querySelectorAll('svg.wheel text');
+			wheelTexts.forEach(function(Text) {
+				Text.style.fill = 'var(--green)';
+				// Text.innerHTML = ' 0 ';
+			})
+
+		}
 		checkWin(i);
 	}
 }
 // spin button
-var spinButton = document.querySelector('button#spin');
 spinButton.addEventListener("click", function() {
 	if (selectionLimitLower() == false) {
 		return;
 	}
 	resetSLiceClass();
+	spinButton.classList.add('pointer-event');
 	var start = Date.now(); // remember start time
 	setInterval(animations, frameTime, start);
 });
@@ -97,6 +122,7 @@ function centerResult(i) {
 	centerResultDiv.classList.remove('hide');
 	centerResultDiv.classList.remove('blue');
 	centerResultDiv.classList.remove('red');
+	centerResultDiv.classList.remove('green');
 	centerResultDiv.innerHTML = i;
 }
 
@@ -120,35 +146,37 @@ randomChooseEle.classList.add('flicker-animation');
 
 //winning logic
 
+
 function showHideInfoBox() {
 	var resultsBox = document.querySelector('results-box');
 	var chooseBox = document.querySelector('choose-box');
 	resultsBox.classList.toggle('hide');
 	chooseBox.classList.toggle('hide');
+
 }
 
 function checkWin(i) {
 	showHideInfoBox();
-	var userSelection = document.querySelector('numbers-grid input:checked');
+	var userSelection = document.querySelector('numbers-grid input:checked').value;
 	
 	setTimeout(function() {
 		var resultWinLose = document.querySelector('.congrats-text');
 
-		console.log(resultWinLose);
+		console.log('user selection ', userSelection);
+		console.log('rando get ', i);
 		if (winCondition(i, resultWinLose, userSelection)) {
-			resultWinLose.innerHTML = "<em> CONGRATULATIONS </em> <span class='win-lose'>YOU WIN</span>";
+			resultWinLose.innerHTML = "<em> CONGRATS </em> <span class='win-lose'>YOU WIN</span>";
 		} else {
 			resultWinLose.innerHTML = "<em> TRY AGAIN </em> <span class='win-lose'>YOU LOSE</span>";
 		}
 
-		console.log(resultWinLose);
 
 	}, 200)
 }
 
 function winCondition(i, resultWinLose, userSelection) {
-	switch (userSelection.value) {
-		case i:
+	switch (userSelection) {
+		case i.toString():
 			return true;
 			break;
 		case checkOddEven(i):
@@ -169,8 +197,10 @@ function winCondition(i, resultWinLose, userSelection) {
 	}
 }
 
+
+
 function checkOddEven(i){
-	if (i % 2 == 0) {
+	if (i != 0 && i % 2 == 0) {
 		return 'even';
 	} else {
 		return 'odd';
@@ -178,7 +208,7 @@ function checkOddEven(i){
 }
 
 function checkHalves(i){
-	if (i <= 18) {
+	if (i != 0 && i <= 18) {
 		return 'first18';
 	} else {
 		return 'second18';
@@ -190,13 +220,13 @@ function checkHalves(i){
 function checkColor(i){
 	if (blueNums.includes(i)) {
 		return 'blue';
-	} else {
+	} else if (i != 0) {
 		return 'red';
 	}
 }
 
 function checkThirds(i){
-	if (i <= 12) {
+	if (i != 0 && i <= 12) {
 		return 'first12';
 	} else if (i > 24) {
 		return 'third12';
@@ -231,11 +261,12 @@ function selectionLimitLower() {
 }
 
 
-var playAgain = document.querySelector('button.play-again');
 
-playAgain.addEventListener('click', function() {
+
+playAgainButton.addEventListener('click', function() {
 	showHideInfoBox();
 	resetSLiceClass();
+	spinButton.classList.remove('pointer-event');
 	checkboxes.forEach(checkbox => {
 	checkbox.checked = false;
 

@@ -5,7 +5,7 @@ info-module {
   grid-template-columns: 1fr;
   display: grid;
   justify-self: stretch;
-  max-width: 90vw;
+
 }
 
 svg#arrow-svg {
@@ -33,11 +33,11 @@ arrow-svg path {}
 
 /*choose*/
 choose-box {
-  width: 100%;
+
   color: var(--blue);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 15px;
   outline: 3px solid white;
   padding: 20px;
@@ -149,6 +149,10 @@ results-box .congrats-text span {
     display: grid;
     justify-items: center;
     text-align: center;
+
+  }
+  results-box .congrats-text {
+    display: grid;
   }
 
   roullete-module {
@@ -175,13 +179,19 @@ results-box .congrats-text span {
     right: -9vw;
     transform: rotateY(200deg) rotate(-45deg) scale(0.7);
   }
+
 }
+
+
 
 @media (max-width: 580px) {
   info-module {
     grid-column-start: unset;
-    transform: scale(0.45);
+    transform: scale(0.5);
     justify-content: center;
+      max-width: 90vw;
+      margin: 0 auto;
+    /*width: 98.5%;*/
   }
 
   roullete-module {
@@ -204,10 +214,7 @@ results-box .congrats-text span {
     font-size: 4rem;
   }
 
-  results-box {
-    display: grid;
-    justify-content: center;
-  }
+
 
   results-box h1 {
     display: grid;
@@ -218,4 +225,17 @@ results-box .congrats-text span {
   results-box button {
     width: 100%;
   }
+  results-box {
+    gap: 120px;
+  }
+  results-box .congrats-text {
+    gap: 60px;
+  }
 }
+
+@media (max-width: 370px) {
+
+}
+
+
+

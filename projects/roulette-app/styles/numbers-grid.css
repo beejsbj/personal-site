@@ -7,9 +7,17 @@ numbers-grid {
 	transform: scale(0.9);
 }
 
+numbers-grid zero-number {
+	grid-column:  1 / end;
 
+}
+numbers-grid zero-number label {
+	width: 98.5%;
+	border-color: white;
+}
 numbers-grid label {
 	padding: 30px;
+
 	border: 1px solid var(--red);
 	position: relative;
 	box-shadow: 0px 0px 5px var(--red);
@@ -78,9 +86,10 @@ numbers-grid input {
 
 numbers-grid .numbers {
 	display: grid;
-	grid-template-columns: fit-content(100%) fit-content(100%) fit-content(100%);
+	grid-template-columns: 1fr 1fr 1fr;
 	order: 2;
 	gap: 5px;
+
 }
 
 numbers-grid .chunks {

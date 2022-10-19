@@ -7,6 +7,8 @@ wheel-module {
 	justify-self: stretch;
 }
 
+
+
 svg {
 	fill-rule: evenodd;
 	clip-rule: evenodd;
@@ -82,6 +84,10 @@ button#spin .spin-svg {
 button#spin .spin-svg #back-spin {
 	filter: url(#glow-spin);
 	fill: var(--green);
+}
+
+button#spin.pointer-event {
+	pointer-events: none;
 }
 
 
@@ -166,4 +172,9 @@ div.result.blue {
 	--color: var(--blue);
 	color: var(--blue);
 
+}
+
+div.result.green {
+	--color: var(--green);
+	color: var(--green);
 }

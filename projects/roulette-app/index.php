@@ -34,6 +34,12 @@
 					</h1>
 					<roullete-module>
 						<numbers-grid>
+							<zero-number>
+									<input type="checkbox" id="num-0" class="num" value="0">
+									<label for="num-0">
+										<span> Z E R 0 </span>
+									</label>
+								</zero-number>
 							<ul class="numbers">
 								<?php for ($i=1; $i <= 36; $i++) { ?>
 								<li>
@@ -122,7 +128,7 @@
 						</wheel-module>
 						<info-module>
 
-							<?php include 'arrow.php'; ?>
+							
 							<?php include 'choose-number.php'; ?>
 							<?php include 'winner.php'; ?>
 
