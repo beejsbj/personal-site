@@ -4,9 +4,9 @@
 	<head>
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
-		<title>Roullete</title>
-		<meta name="description" content="Crypto Roullete something something desc">
-		<meta property="og:image" content="https://peprojects.dev/alpha-4/burooj/projects/roullete-app/images/meta.jpg">
+		<title>Roulette</title>
+		<meta name="description" content="Crypto Roulette something something desc">
+		<meta property="og:image" content="https://peprojects.dev/alpha-4/burooj/projects/roulette-app/images/meta.jpg">
 		<link rel='stylesheet' href='styles/site.css'>
 	</head>
 
