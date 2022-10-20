@@ -140,16 +140,22 @@ function centerResult(i) {
 //animation flicker
 var titleLetter = document.querySelector(`h1 span:nth-of-type(${Math.floor(Math.random() * 8) + 1})`)
 titleLetter.classList.add('flicker-animation');
+
 var titleLetter2 = document.querySelector(`h1 span:nth-of-type(${Math.floor(Math.random() * 8) + 1})`)
 titleLetter2.classList.add('flicker-animation2');
 
-var spinSignLetter = document.querySelector(`div.spin-text span:nth-of-type(${Math.floor(Math.random() * 4) + 1})`)
-spinSignLetter.classList.add('flicker-animation');
+
+setTimeout (function () {
+	var spinSignLetter = document.querySelector(`div.spin-text span:nth-of-type(${Math.floor(Math.random() * 4) + 1})`)
+	spinSignLetter.classList.add('flicker-animation');
+}, 400)
 
 //random element within choose box
-var randomChooseEles = document.querySelectorAll('choose-box *');
-randomChooseEle = randomChooseEles[Math.floor(Math.random() * (randomChooseEles.length))]
-randomChooseEle.classList.add('flicker-animation');
+setTimeout (function () {
+	var randomChooseEles = document.querySelectorAll('choose-box > *');
+	randomChooseEle = randomChooseEles[Math.floor(Math.random() * (randomChooseEles.length))]
+	randomChooseEle.classList.add('flicker-animation2');
+}, 300)
 
 
 

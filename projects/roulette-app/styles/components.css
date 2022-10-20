@@ -30,10 +30,11 @@ button {
 
 
 
-
-
-
-
+.button:hover,
+button:hover {
+	filter: saturate(170%);
+	transition: 0.3s;
+}
 
 
 
@@ -50,9 +51,7 @@ button {
 	font-size: 1.2rem;
 }
 
-.button.connect:hover {
-	font-weight: 100;
-}
+
 
 .button.connect .metamask-icon {
 	max-width: 30px;
