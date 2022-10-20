@@ -56,7 +56,7 @@ function animations(start) {
 		clearInterval(animations); // finish the animation after 2 seconds
 		return;
 	}
-	var i = Math.floor(Math.random() * 3);
+	var i = Math.floor(Math.random() * 37);
 	console.log(i);
 	// highlight the animation at the moment timePassed
 	highlight(timePassed, i);
