@@ -56,7 +56,7 @@ function animations(start) {
 		clearInterval(animations); // finish the animation after 2 seconds
 		return;
 	}
-	var i = Math.floor(Math.random() * 37);
+	var i = Math.floor(Math.random() * 3);
 	console.log(i);
 	// highlight the animation at the moment timePassed
 	highlight(timePassed, i);
@@ -86,7 +86,7 @@ function highlight(timePassed, i) {
 			var wheelTexts = document.querySelectorAll('svg.wheel text');
 			wheelTexts.forEach(function(Text) {
 				Text.style.fill = 'var(--green)';
-				// Text.innerHTML = ' 0 ';
+				Text.innerHTML = ' <defs><span>0</span></defs> ';
 			})
 
 		}
@@ -123,7 +123,7 @@ function centerResult(i) {
 	centerResultDiv.classList.remove('blue');
 	centerResultDiv.classList.remove('red');
 	centerResultDiv.classList.remove('green');
-	centerResultDiv.innerHTML = i;
+	centerResultDiv.setHTML(i);
 }
 
 //animation flicker
@@ -165,9 +165,9 @@ function checkWin(i) {
 		console.log('user selection ', userSelection);
 		console.log('rando get ', i);
 		if (winCondition(i, resultWinLose, userSelection)) {
-			resultWinLose.innerHTML = "<em> CONGRATS </em> <span class='win-lose'>YOU WIN</span>";
+			resultWinLose.setHTML("<em> CONGRATS </em> <span class='win-lose'>YOU WIN</span>");
 		} else {
-			resultWinLose.innerHTML = "<em> TRY AGAIN </em> <span class='win-lose'>YOU LOSE</span>";
+			resultWinLose.setHTML("<em> TRY AGAIN </em> <span class='win-lose'>YOU LOSE</span>");
 		}
 
 
