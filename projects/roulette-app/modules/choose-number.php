@@ -18,5 +18,5 @@
     ODD<span class="or-text">OR</span><br>
     EVEN
   </h2>
-<?php include 'arrow.php'; ?>
+<?php include 'modules/arrow.php'; ?>
 </choose-box>

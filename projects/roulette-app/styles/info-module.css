@@ -157,7 +157,7 @@ results-box .congrats-text span {
 
   roullete-module {
     display: grid;
-    grid-template-columns: 0.1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   wheel-module {

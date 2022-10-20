@@ -39,7 +39,7 @@ numbers-grid #second-12 + label {
 
 numbers-grid label:hover {
 	box-shadow: 0px 0px 20px var(--green) !important;
-	cursor: url("../neon-pointer.cur"), auto;
+	cursor: url("../images/neon-pointer.cur"), auto;
 }
 
 

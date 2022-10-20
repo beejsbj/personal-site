@@ -9,11 +9,11 @@
 	max-width: 20px;
 }
 button {
-	cursor: url("../neon-pointer.cur"), auto !important;
+	cursor: url("../images/neon-pointer.cur"), auto !important;
 }
 .button {
 	
-	cursor: url("../neon-pointer.cur"), auto !important;
+	cursor: url("../images/neon-pointer.cur"), auto !important;
 
 	/*overflow: hidden;*/
 	/*transition: 0.3s;*/

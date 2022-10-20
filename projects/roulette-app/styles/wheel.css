@@ -178,3 +178,12 @@ div.result.green {
 	--color: var(--green);
 	color: var(--green);
 }
+
+
+#zeros-circle path {
+	display: none !important;
+}
+
+#zeros-circle {
+	fill: var(--green);
+}

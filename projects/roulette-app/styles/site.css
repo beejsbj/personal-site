@@ -27,7 +27,7 @@
 /* then other contextual styles */
 body {
 	background-color: var(--paper);
-	background-image: url("../wall-bg.jpg");
+	background-image: url("../images/wall-bg.jpg");
 	background-position: center center;
 	background-size: cover;
 	background-blend-mode: darken;
@@ -35,7 +35,7 @@ body {
 	overflow-x: hidden;
 
 	padding-bottom: 250px;
-	cursor: url("../neon-cursor.cur"), auto;
+	cursor: url("../images/neon-cursor.cur"), auto;
 }
 
 

@@ -6,7 +6,7 @@
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<title>Roullete</title>
 		<meta name="description" content="Crypto Roullete something something desc">
-		<meta property="og:image" content="https://peprojects.dev/alpha-4/burooj/projects/roullete-app/meta.jpg">
+		<meta property="og:image" content="https://peprojects.dev/alpha-4/burooj/projects/roullete-app/images/meta.jpg">
 		<link rel='stylesheet' href='styles/site.css'>
 	</head>
 
@@ -16,7 +16,7 @@
 				<button class="button connect">
 					<span>CONNECT</span>
 					<picture class="metamask-icon">
-						<img src="metamask-bw.png" alt="">
+						<img src="images/metamask-bw.png" alt="">
 					</picture>
 					
 				</button>
@@ -112,9 +112,9 @@
 							</ul>
 						</numbers-grid>
 						<wheel-module>
-							<?php include 'wheel.php'; ?>
+							<?php include 'modules/wheel.php'; ?>
 							<button class="button" id="spin">
-								<?php include 'spin-button.php'; ?> 
+								<?php include 'modules/spin-button.php'; ?> 
 								<div class="spin-text">
 									<span>S</span>
 									<span>P</span>
@@ -129,8 +129,8 @@
 						<info-module>
 
 							
-							<?php include 'choose-number.php'; ?>
-							<?php include 'winner.php'; ?>
+							<?php include 'modules/choose-number.php'; ?>
+							<?php include 'modules/results-box.php'; ?>
 
 						</info-module>
 

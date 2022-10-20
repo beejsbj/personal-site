@@ -7,6 +7,8 @@ var spinText = document.querySelector("div.spin-text");
 var spinButton = document.querySelector('button#spin');
 var playAgainButton = document.querySelector('button.play-again');
 var arrowSvg = document.querySelector('#arrow-svg');
+var wheelTexts = document.querySelectorAll('svg.wheel tspan');
+var zeroes = document.querySelector('#zeros-circle');
 
 
 //number chart styling
@@ -56,7 +58,7 @@ function animations(start) {
 		clearInterval(animations); // finish the animation after 2 seconds
 		return;
 	}
-	var i = Math.floor(Math.random() * 37);
+	var i = Math.floor(Math.random() * 3);
 	console.log(i);
 	// highlight the animation at the moment timePassed
 	highlight(timePassed, i);
@@ -83,11 +85,11 @@ function highlight(timePassed, i) {
 		}, frameTime);
 	} else {
 		if (i == 0) {
-			var wheelTexts = document.querySelectorAll('svg.wheel text');
+
 			wheelTexts.forEach(function(Text) {
-				Text.style.fill = 'var(--green)';
-				Text.innerHTML = ' <defs><span>0</span></defs> ';
-			})
+				Text.classList.add('hide');
+			});
+			zeroes.classList.remove('hide');
 
 		}
 		checkWin(i);
@@ -112,6 +114,15 @@ function resetSLiceClass() {
 		slice.classList.remove("selected");
 		// console.log(slice);
 	})
+}
+
+function swapZeroes(){
+	var wheelTexts = document.querySelectorAll('svg.wheel text');
+	var zeroes = document.querySelector('#zeros-circle');
+	wheelTexts.forEach(function(Text) {
+		Text.classList.toggle('hide');
+	});
+	zeroes.classList.toggle('hide');
 }
 
 function centerResult(i) {
@@ -275,6 +286,10 @@ playAgainButton.addEventListener('click', function() {
 	})
 	spinText.classList.remove('hide');
 	centerResultDiv.classList.add('hide');
+	wheelTexts.forEach(function(Text) {
+				Text.classList.remove('hide');
+			});
+			zeroes.classList.add('hide');
 });
 
 })
