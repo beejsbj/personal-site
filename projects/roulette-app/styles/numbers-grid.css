@@ -66,6 +66,7 @@ numbers-grid span {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	text-transform: uppercase;
 }
 
 numbers-grid input:checked + label span {
