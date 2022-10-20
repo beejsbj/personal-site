@@ -149,6 +149,7 @@ results-box .congrats-text span {
     display: grid;
     justify-items: center;
     text-align: center;
+    justify-content: center;
 
   }
   results-box .congrats-text {
