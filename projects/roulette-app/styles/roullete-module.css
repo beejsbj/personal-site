@@ -81,7 +81,7 @@ h1 span {
 
 	will-change: filter, color;
 	filter: saturate(60%);
-	animation: colorFLicker steps(100) 5s infinite;
+	animation: colorFLicker steps(100) 40s;
 
 
 }

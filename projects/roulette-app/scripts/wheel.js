@@ -10,6 +10,12 @@ var arrowSvg = document.querySelector('#arrow-svg');
 var wheelTexts = document.querySelectorAll('svg.wheel tspan');
 var zeroes = document.querySelector('#zeros-circle');
 
+var checkboxGrid = document.querySelector('numbers-grid')
+var checkboxes = document.querySelectorAll('input[type=checkbox]');
+
+
+// bolean telling if wheel has been spinned
+var spinState = false;
 
 //number chart styling
 blueNums.forEach(function(blueNum) {
@@ -59,7 +65,6 @@ function animations(start) {
 		return;
 	}
 	var i = Math.floor(Math.random() * 37);
-	console.log(i);
 	// highlight the animation at the moment timePassed
 	highlight(timePassed, i);
 }
@@ -104,6 +109,7 @@ spinButton.addEventListener("click", function() {
 	spinButton.classList.add('pointer-event');
 	var start = Date.now(); // remember start time
 	setInterval(animations, frameTime, start);
+	spinState = true;
 });
 
 
@@ -173,14 +179,14 @@ function showHideInfoBox() {
 }
 
 function checkWin(i) {
+	console.log('testCheckwin ', spinState)
 	showHideInfoBox();
 	var userSelection = document.querySelector('numbers-grid input:checked').value;
 	
 	setTimeout(function() {
 		var resultWinLose = document.querySelector('.congrats-text');
 
-		console.log('user selection ', userSelection);
-		console.log('rando get ', i);
+
 		if (winCondition(i, resultWinLose, userSelection)) {
 			resultWinLose.setHTML("<em> CONGRATS </em> <span class='win-lose'>YOU WIN</span>");
 		} else {
@@ -254,15 +260,13 @@ function checkThirds(i){
 
 
 
-var checkboxes = document.querySelectorAll('input[type=checkbox]')
-checkboxes.forEach(checkbox => {
-	checkbox.addEventListener('click', selectionLimit);
-});
 
-//limit number of checked checkboxes to not go above ccount
+
+
+//limit number of checked checkboxGrid to not go above ccount
 function selectionLimit() {
 	var checked = document.querySelectorAll('numbers-grid input:checked')
-	if (checked.length > 1) {
+	if ( checked.length > 1) {
 		alert('Only select ' + 1);
 		this.checked = false;
 	}
@@ -277,25 +281,48 @@ function selectionLimitLower() {
 	}
 }
 
+checkboxGrid.addEventListener('click', function(event) {
+	if (event.target.matches('input[type=checkbox]')) {
+		if (spinState == false) {
+			console.log('iffalse ', spinState)
+			selectionLimit();
+		} else if (spinState == true) {
+			console.log('iftrue ', spinState)
+			resetRoulette();
+		}
+	}
+})
+// checkboxGrid.forEach(function(checkbox) {
+// 	console.log('testforeach ', spinState)
+// 	if (spinState == false) {
+// 		console.log('iffalse ', spinState)
+// 		checkbox.addEventListener('click', selectionLimit);
+// 	} else if (spinState == true) {
+// 		console.log('iftrue ', spinState)
+// 		checkbox.addEventListener('click', resetRoulette);
+// 	}
+
+// });
+
+playAgainButton.addEventListener('click', resetRoulette);
 
 
 
-playAgainButton.addEventListener('click', function() {
+function resetRoulette() {
 	showHideInfoBox();
 	resetSLiceClass();
 	spinButton.classList.remove('pointer-event');
-	checkboxes.forEach(checkbox => {
-	checkbox.checked = false;
-
-	spinSvgs.forEach(function(spinSvg) {
-		spinSvg.classList.remove('hide');
-	})
-	spinText.classList.remove('hide');
-	centerResultDiv.classList.add('hide');
-	wheelTexts.forEach(function(Text) {
-				Text.classList.remove('hide');
-			});
-			zeroes.classList.add('hide');
-});
-
-})
+	checkboxes.forEach( function(checkbox) {
+		checkbox.checked = false;
+		spinSvgs.forEach(function(spinSvg) {
+			spinSvg.classList.remove('hide');
+		})
+		spinText.classList.remove('hide');
+		centerResultDiv.classList.add('hide');
+		wheelTexts.forEach(function(Text) {
+			Text.classList.remove('hide');
+		});
+		zeroes.classList.add('hide');
+	});
+	spinState = false;
+}

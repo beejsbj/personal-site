@@ -290,15 +290,11 @@ numbers-grid label span {
     0 0 10px var(--color1),
     0 0 20px var(--color2),
     0 0 40px var(--color3),
-    0 0 80px var(--color4),
-    0 0 35px hsla(29, 92%, 53%, 1.00),
-    0 0 40px hsla(29, 92%, 53%, 1.00),
-    0 0 50px hsla(29, 92%, 53%, 1.00),
-    0 0 75px hsla(29, 92%, 53%, 1.00);
-  animation: neonConnect 2s infinite ease-in-out;
+    0 0 80px var(--color4);
+
   will-change: filter, color;
   filter: saturate(60%);
-  animation: colorFLicker steps(100) 5s infinite;
+  animation: colorFLicker steps(100) 60s;
 }
 
 
