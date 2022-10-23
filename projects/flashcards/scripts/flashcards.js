@@ -6,17 +6,19 @@
 const cardHeader = document.querySelector("card-module header");
 const actionArea = document.querySelector("action-area");
 var index = 0;
+var sourceCardsData;
 
 var pePromise = fetch('https://perpetual.education/wp-json/wp/v2/shortcut');
 pePromise
 	.then( function(rawData) {
 		return rawData.json();
 	})
-	.then( function(shortCuts) {
-		console.log(shortCuts);
+	.then( function(sourceJson) {
+		sourceCardsData = sourceJson;
+		console.log(sourceCardsData);
 		const beginButton = document.querySelector("button#begin");
 		beginButton.addEventListener("click", function () {
-			cardRenderer(index, shortCuts);
+			cardRenderer(index, sourceCardsData);
 		});
 	})
 	.catch( function() {
@@ -136,7 +138,8 @@ function renderEnd() {
 
 	const redoButton = document.querySelector("button#redo");
 	redoButton.addEventListener("click", function () {
-		cardRenderer(index, shortCuts);
+		index = 0;
+		cardRenderer(index, sourceCardsData);
 	});
 
 };
