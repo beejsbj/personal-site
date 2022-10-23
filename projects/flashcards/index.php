@@ -22,6 +22,10 @@
 							<label for="concepts"> concepts</label>
 						</li>
 					</ul>
+					<input-field>
+						<input type="number" id="num-cards" name="num-cards" value="20" min="5" step="1">
+						<label for="num-cards">How many cards would you like to review?</label>
+					</input-field>
 					<button id="begin" type="reset"> Begin </button>
 				</form>
 			</action-area>
