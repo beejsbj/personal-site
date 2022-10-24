@@ -39,7 +39,10 @@ body {
 .hide {
 	display: none;
 }
-
+.hide-opacity {
+	opacity: 0;
+	pointer-events: none;
+}
 
 
 card-module {

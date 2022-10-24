@@ -12,21 +12,33 @@
 			</header>
 			<action-area>
 				<form>
-					<ul>
+					<ul class="card-filter">
 						<li>
-							<input type="checkbox" id="shortcuts" name="shortcuts" value="Bike">
-							<label for="shortcuts"> Shortcuts</label>
+							<input type="checkbox" id="universal" name="universal" value="universal">
+							<label for="universal">Universal</label>
 						</li>
 						<li>
-							<input type="checkbox" id="concepts" name="concepts" value="Bike">
-							<label for="concepts"> concepts</label>
+							<input type="checkbox" id="macos" name="macos" value="macos">
+							<label for="macos">MacOS</label>
+						</li>
+						<li>
+							<input type="checkbox" id="finder" name="finder" value="finder">
+							<label for="finder">Finder</label>
+						</li>
+						<li>
+							<input type="checkbox" id="sublime-text" name="sublime-text" value="sublime-text">
+							<label for="sublime-text">Sublime Text</label>
+						</li>
+						<li>
+							<input type="checkbox" id="divvy" name="divvy" value="divvy">
+							<label for="divvy">Divvy</label>
 						</li>
 					</ul>
 					<input-field>
-						<input type="number" id="num-cards" name="num-cards" value="20" min="5" step="1">
+						<input type="number" id="num-cards" name="num-cards" value="10" min="5" step="1">
 						<label for="num-cards">How many cards would you like to review?</label>
 					</input-field>
-					<button id="begin" type="reset"> Begin </button>
+					<button id="begin" class="hide-opacity" type="reset"> Begin </button>
 				</form>
 			</action-area>
 		</card-module>

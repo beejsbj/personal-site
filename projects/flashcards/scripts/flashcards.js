@@ -1,41 +1,45 @@
 const cardHeader = document.querySelector("card-module header");
 const actionArea = document.querySelector("action-area");
 var index = 0;
-var sourceCardsData;
+var cards;
 var numCardsToReview;
+var numOfCardsInput = document.querySelector('#num-cards');
+const beginButton = document.querySelector("button#begin");
+
 
 var pePromise = fetch('https://perpetual.education/wp-json/wp/v2/shortcut/?per_page=100');
-pePromise.then(function(rawData) {
-	return rawData.json();
+pePromise
+	.then(function(rawData) {
+		return rawData.json();
 	})
 	.then(function(sourceJson) {
-		sourceCardsData = sourceJson;
-		console.log(sourceCardsData);
-
-		const beginButton = document.querySelector("button#begin");
+		cardsData = sourceJson;
+		cards = filteredCards(cardsData);
+		beginButton.classList.remove('hide-opacity'); //show button after data is fetched
 		beginButton.addEventListener("click", function() {
-			numCardsToReview = document.querySelector('#num-cards').value;
-			cardRenderer(index, sourceCardsData);
+			numCardsToReview = numOfCardsInput.value;
+			cardRenderer(index);
 		});
 	})
 	.catch(function() {
 		console.log('oops');
 });
 
-function cardRenderer(index, cardsData) {
+function cardRenderer(index) {
+	index;
 	if (index < numCardsToReview) {
-		cardHeader.innerHTML = headerTemplater(index, cardsData);
-		actionArea.innerHTML = cardTemplater(index, cardsData);
-		buttonHandler(index, cardsData);
+		cardHeader.innerHTML = headerTemplater(index);
+		actionArea.innerHTML = cardTemplater(index);
+		buttonHandler(index);
 	} else {
 		renderEnd();
 	}
 };
 
-function headerTemplater(index, cardsData) {
-	var cardData = cardsData[index];
-	var cardType = cardData.type;
-	var cardLesson = cardData.lesson;
+function headerTemplater(index) {
+	var card = cards[index];
+	var cardType = card.type;
+	var cardLesson = card.lesson ?? card.acf.application[0].post_title; //aplication instead of lesson
 	const headerTemplate = `
 		<h1 class="category">
 			${cardType}
@@ -49,13 +53,13 @@ function headerTemplater(index, cardsData) {
 	return headerTemplate;
 }
 
-function cardTemplater(index, cardsData) {
-	var cardData = cardsData[index];
-	var cardFront = cardData.acf.name;
-	var cardBack = cardData.acf.short_description;
+function cardTemplater(index) {
+	var card = cards[index];
+	var cardFront = card.acf.name;
+	var cardBack = card.acf.short_description;
 
-	if (cardData.type == "shortcut") {
-		cardBack = shortcutsCard(cardData, cardFront, cardBack);
+	if (card.type == "shortcut") {
+		cardBack = keysTemplater(card);
 	}
 	const template = `
 		<flash-card id='card${index}'>
@@ -75,9 +79,11 @@ function cardTemplater(index, cardsData) {
 	return template;
 }
 
-function shortcutsCard(cardData, cardFront, cardBack) {
+function keysTemplater(card) {
+	var cardFront = card.acf.name;
+	var cardBack = card.acf.short_description;
 	var keysString = '';
-	var keys = cardData.acf.keys;
+	var keys = card.acf.keys;
 	keys.forEach(function(key, i) {
 		keysString += '<span class="glyph">' + key.key + '</span>';
 		if (i < keys.length - 1) {
@@ -89,7 +95,7 @@ function shortcutsCard(cardData, cardFront, cardBack) {
 }
 
 
-function buttonHandler(index, cardsData) {
+function buttonHandler(index) {
 	const revealButton = document.querySelector("button#reveal");
 	const badButton = document.querySelector("button#bad");
 	const goodButton = document.querySelector("button#good");
@@ -105,12 +111,12 @@ function buttonHandler(index, cardsData) {
 		if (event.target.matches('button#bad')) {
 			//push back card step
 			index++;
-			cardRenderer(index, cardsData);
+			cardRenderer(index);
 		}
 		if (event.target.matches('button#good')) {
 			//push early card step
 			index++;
-			cardRenderer(index, cardsData);
+			cardRenderer(index);
 		}
 	})
 	revealButton.addEventListener("click", function() {
@@ -120,37 +126,67 @@ function buttonHandler(index, cardsData) {
 		badButton.classList.toggle("hide");
 		goodButton.classList.toggle("hide");
 	});
-	badButton.addEventListener("click", function() {
-		// //push back card step
-		// index++;
-		// cardRenderer(index, cardsData);
-	});
-	goodButton.addEventListener("click", function() {
-		// //push early card step
-		// index++;
-		// cardRenderer(index, cardsData);
-	});
 }
 
 function renderEnd() {
 	cardHeader.innerHTML = `<h1 class="welcome">Finished!</h1>`;
 	actionArea.innerHTML = `
 		<form>
-			<ul>
+			<ul class="card-filter">
 				<li>
-					<input type="checkbox" id="shortcuts" name="shortcuts" value="Bike">
-					<label for="shortcuts"> Shortcuts</label>
+					<input type="checkbox" id="universal" name="universal" value="universal">
+					<label for="universal">Universal</label>
 				</li>
 				<li>
-					<input type="checkbox" id="concepts" name="concepts" value="Bike">
-					<label for="concepts"> concepts</label>
+					<input type="checkbox" id="macos" name="macos" value="macos">
+					<label for="macos">MacOS</label>
+				</li>
+				<li>
+					<input type="checkbox" id="finder" name="finder" value="finder">
+					<label for="finder">Finder</label>
+				</li>
+				<li>
+					<input type="checkbox" id="sublime-text" name="sublime-text" value="sublime-text">
+					<label for="sublime-text">Sublime Text</label>
+				</li>
+				<li>
+					<input type="checkbox" id="divvy" name="divvy" value="divvy">
+					<label for="divvy">Divvy</label>
 				</li>
 			</ul>
+			<input-field>
+				<input type="number" id="num-cards" name="num-cards" value="${numCardsToReview}" min="5" step="1">
+				<label for="num-cards">How many cards would you like to review?</label>
+			</input-field>
 			<button id="redo" type="reset"> Go again? </button>
 		</form>`;
 	const redoButton = document.querySelector("button#redo");
 	redoButton.addEventListener("click", function() {
 		index = 0;
-		cardRenderer(index, sourceCardsData);
+		numCardsToReview = document.querySelector('#num-cards').value;
+		cardRenderer(indexData);
 	});
 };
+
+
+function filteredCards(cardsData) {
+	var selections = document.querySelectorAll('.card-filter input:checked');
+
+	selections = Array.from(selections);
+
+	if (selections.length) {
+		return filteredCards = cardsData.filter( function(card) {
+
+			for (let i = 0; i < selections.length; i++) {
+				console.log(card.acf.application[0].post_name);
+				if (card.acf.application[0].post_name == selections[i].value) {
+					return true;
+				}
+			}
+		})
+	} else {
+		return cardsData;
+	}
+
+}
+
