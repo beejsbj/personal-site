@@ -1,0 +1,27 @@
+resume-section > h2 {
+	mix-blend-mode: multiply;
+}
+
+resume-card {
+
+	background-image: linear-gradient(90deg, var(--light-color) , var(--paper));
+	border-radius: 10px;
+	padding: 10px;
+	margin: 10px 0;
+
+	gap:  5px;
+}
+
+resume-card li {
+	list-style: circle;
+	list-style-position: inside;
+}
+
+resume-card blockquote {
+	font-size: 0.8rem;
+	color: black;
+	background-image: linear-gradient(90deg, var(--light-highlight), var(--paper));
+	border-radius: 10px;
+	padding: 10px;
+	margin: 10px 0;
+}
