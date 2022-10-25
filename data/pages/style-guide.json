@@ -7,6 +7,21 @@
 
 	"sections": [
 		{
+			"heading": "Type Classes",
+			"heading-class" : "hide",
+			"paragraphs": {
+				"Type Class: this is booming-voice" : "booming-voice",
+				"Type Class: this is loud-voice" : "loud-voice",
+				"Type Class: this is attention-voice" : "attention-voice",
+				"Type Class: this is notice-voice" : "notice-voice",
+				"Type Class: this is solid-voice" : "solid-voice",
+				"Type Class: this is firm-voice" : "firm-voice",
+				"Type Class: this is calm-voice" : "calm-voice",
+				"Type Class: this is whisper-voice" : "whisper-voice",
+				"Type Class: this is teaser-voice" : "teaser-voice"
+			}
+		},
+		{
 			"module" : "layout-module"
 		},
 		{
