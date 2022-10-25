@@ -69,7 +69,8 @@ h1.welcome {
 	text-align: center;
 }
 
-flash-card p {
+flash-card p,
+flash-card li {
 	text-align: center;
 }
 
@@ -95,12 +96,14 @@ flash-card front-side,
 flash-card back-side {
 	justify-self: center;
 	display: grid;
+	justify-content: center;
 }
 
 flash-card back-side {
 	border-top: 5px solid black;
 	padding-top: 20px;
 	margin-top: 20px;
+	width: 100%;
 }
 
 button {
@@ -127,6 +130,7 @@ button {
 	display: flex;
 	align-items: center;
 	gap: 5px;
+	justify-content: center;
 
 
 }

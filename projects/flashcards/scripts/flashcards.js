@@ -14,7 +14,7 @@ pePromise
 	})
 	.then(function(sourceJson) {
 		cardsData = sourceJson;
-		cards = filteredCards(cardsData);
+		cards = shuffle(filteredCards(cardsData));
 		beginButton.classList.remove('hide-opacity'); //show button after data is fetched
 		beginButton.addEventListener("click", function() {
 			numCardsToReview = numOfCardsInput.value;
@@ -26,7 +26,6 @@ pePromise
 });
 
 function cardRenderer(index) {
-	index;
 	if (index < numCardsToReview) {
 		cardHeader.innerHTML = headerTemplater(index);
 		actionArea.innerHTML = cardTemplater(index);
@@ -39,7 +38,8 @@ function cardRenderer(index) {
 function headerTemplater(index) {
 	var card = cards[index];
 	var cardType = card.type;
-	var cardLesson = card.lesson ?? card.acf.application[0].post_title; //aplication instead of lesson
+	// var cardLesson = card.lesson; //lesson
+	var cardApplication = card.acf.application[0]?.post_title ?? "no data"; //aplication instead of lesson
 	const headerTemplate = `
 		<h1 class="category">
 			${cardType}
@@ -48,7 +48,7 @@ function headerTemplater(index) {
 			${index + 1}/${numCardsToReview}
 		</h2>
 		<h3 class="lesson">
-			${cardLesson}
+			${cardApplication}
 		</h3>`;
 	return headerTemplate;
 }
@@ -59,7 +59,7 @@ function cardTemplater(index) {
 	var cardBack = card.acf.short_description;
 
 	if (card.type == "shortcut") {
-		cardBack = keysTemplater(card);
+		cardBack = keysTemplater(card)  + cardBack;
 	}
 	const template = `
 		<flash-card id='card${index}'>
@@ -68,7 +68,7 @@ function cardTemplater(index) {
 			</front-side>
 
 			<back-side class='hide'>
-				<p>${cardBack}</p>
+				${cardBack}
 			</back-side>
 		</flash-card>
 		<div class="buttons">
@@ -80,8 +80,6 @@ function cardTemplater(index) {
 }
 
 function keysTemplater(card) {
-	var cardFront = card.acf.name;
-	var cardBack = card.acf.short_description;
 	var keysString = '';
 	var keys = card.acf.keys;
 	keys.forEach(function(key, i) {
@@ -90,8 +88,7 @@ function keysTemplater(card) {
 			keysString += '+';
 		}
 	});
-	cardBack = '<div class="keys firm-voice">' + keysString + '</div>' + cardBack;
-	return cardBack;
+	return '<div class="keys firm-voice">' + keysString + '</div>';
 }
 
 
@@ -178,7 +175,6 @@ function filteredCards(cardsData) {
 		return filteredCards = cardsData.filter( function(card) {
 
 			for (let i = 0; i < selections.length; i++) {
-				console.log(card.acf.application[0].post_name);
 				if (card.acf.application[0].post_name == selections[i].value) {
 					return true;
 				}
@@ -190,3 +186,24 @@ function filteredCards(cardsData) {
 
 }
 
+
+// Fisher-Yates (aka Knuth) Shuffle.
+function shuffle(array) {
+	let currentIndex = array.length, randomIndex;
+
+	// While there remain elements to shuffle.
+	while (currentIndex != 0) {
+		// Pick a remaining element.
+		randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex--;
+
+		// And swap it with the current element.
+		[array[currentIndex], array[randomIndex]] = [
+			array[randomIndex], array[currentIndex]
+		];
+	}
+	return array;
+}
+
+
+ 
