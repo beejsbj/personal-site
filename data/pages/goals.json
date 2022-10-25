@@ -6,6 +6,14 @@
 	"page-title": "Goals",
 	"sections": [
 		{
+			"heading-class" : "hide",
+			"paragraphs" : {
+				"I'm supposed to be selfish here." : "calm-voice",
+				"Honestly, when I think back to just 5 years ago, things were incredibly different. its crazy, crazy how much and how little things can change. Not enough people talk about how time feels." : "calm-voice",
+			  	"I'm supposed to be selfish here.": "calm-voice"
+			}
+		},
+		{
 			"module" : "goals-list",
 			"heading": "5-year vision",
 			"goals" : [
