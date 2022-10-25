@@ -2,19 +2,19 @@
 	$sectionHeading = $section['heading'] ?? "This is the Projects module";
 	$introPara = $section['intro-paragraph'] ?? "This is the intro Paragraph";
 	$projects = getPageData('projects-list');
+	
 
 	$currentPage = currentPage();
 
 
 	if ($currentPage != 'projects') {
-		$filtered = [];
+		$projects = projectFilter($projects, 'feature');
+	}
 
-		foreach ($projects as $project) {
-			if ( isset($project['feature'])) {
-				array_push($filtered, $project);
-			}
+	if ( isset($_GET['tags']) ) {
+		if ($_GET['tags'] == 'api3') {
+			$projects = projectFilter($projects, 'api3');
 		}
-		$projects = $filtered;
 	}
 	
  ?>
