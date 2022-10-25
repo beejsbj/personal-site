@@ -1,0 +1,11 @@
+html.goals text-content {
+	max-width: 70ch;
+}
+
+goals-module li {
+
+	background-image: linear-gradient(90deg, var(--light-color), var(--paper));
+	border-radius: 10px;
+	padding: 10px;
+	margin: 10px 0;
+}
