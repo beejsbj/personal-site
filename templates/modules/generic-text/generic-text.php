@@ -1,16 +1,25 @@
-<?php 
+<text-content>
+	<?php 
 // if heading exists condition
 	$sectionHeading = $section['heading'] ?? "This is the Generic text module";
-	$paragraph = $section['paragraph'] ?? "this is the generic text paragraph";
+	$headingClass = $section['heading-class'] ?? "attention-voice";
+	$paragraphs = $section['paragraphs'] ?? ["this is the generic text paragraph" => "calm-voice"];
+
+
 ?>
 
-<h2 class="loud-voice">
+<h2 class="<?=$headingClass?>">
 	<?=$sectionHeading?>
 </h2>
 
-<p class="attention-voice">
-	<?=$paragraph?>
-</p>
+
+<?php foreach ($paragraphs as $paragraph => $textVoice) { ?>
+		<p class="<?=$textVoice?>">
+			<?=$paragraph?>
+		</p>
+<?php } ?>
 
 
 
+
+</text-content>
