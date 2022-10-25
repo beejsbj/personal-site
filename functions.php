@@ -119,3 +119,16 @@ function currentTheme(){
 	 	return 'default';
 	 }
 }
+
+function projectFilter($projects, $tag) {
+	$filtered = [];
+
+	foreach ($projects as $project) {
+		$tags = $project['tags'] ?? [];
+
+		if ( in_array($tag, $tags) ) {
+			array_push($filtered, $project);
+		}
+	}
+	return $filtered;
+}
