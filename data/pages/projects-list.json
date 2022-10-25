@@ -9,7 +9,7 @@
 			"CSS",
 			"PHP"
 		],
-		"feature": true
+		"tags": ["feature"]
 	},
 	{
 		"title": "Exercises&nbsp4 Programmers",
@@ -22,7 +22,7 @@
 			"PHP",
 			"JS"
 		],
-		"feature": true
+		"tags": ["feature"]
 	},
 	{
 		"title": "Quantumon",
@@ -32,7 +32,8 @@
 		"tools" : [
 			"HTML",
 			"CSS"
-		]
+		],
+		"tags": ["api3"]
 	},
 	{
 		"title": "Theme Challenge",
@@ -55,6 +56,7 @@
 			"CSS",
 			"PHP",
 			"JS"
-		]
+		],
+		"tags": ["api3"]
 	}
 ]
