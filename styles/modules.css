@@ -21,7 +21,8 @@
 @import '../templates/modules/about-module/about-module.css';
 @import '../templates/modules/contact-list/contact-list.css';
 
-
+@import '../templates/modules/goals-list/goals-list.css';
+@import '../templates/modules/resume-section/resume-section.css';
 
 /*layout garden components*/
 @import '../templates/modules/layout1/layout1.css';
