@@ -2,10 +2,26 @@ exercise-detail {
 	display: grid;
 	gap:  40px;
 	justify-items: start;
-}
 
+}
+exercise-detail a,
+exercise-detail h2 {
+	grid-column: span 2;
+}
 @media (min-width:  500px){
 	exercise-detail {
 		grid-column: 2 / end;
 	}
+
+}
+
+@media (min-width:  700px){
+	exercise-detail {
+		grid-column: 2 / end;
+	}
+	exercise-detail .e4p-js {
+		grid-row: 4;
+		grid-column: 2;
+	}
+
 }

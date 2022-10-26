@@ -30,6 +30,7 @@ form .output-field {
 	background-color: var(--paper2);
 
 	padding: 20px;
+	width: 100%;
 }
 form .radio-list {
 	width: 100%;

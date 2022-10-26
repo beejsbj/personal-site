@@ -84,21 +84,21 @@ function dasher($string){
 	//lowercase the string
 	//split string at space 
 	$splitString = explode(" ", $string);
-
 	//add dashes 
 	$finalString = implode("-", $splitString);
-
 	return strtolower($finalString);
 }
 
 function unDasher($string){
 	$splitString = explode("-", $string);
-
 	$finalString = implode(" ", $splitString);
-
 	return ucwords($finalString);
 }
-
+function functionNamer($string){
+	$splitString = explode(" ", ucwords($string));
+	$finalString = implode("", $splitString);
+	return $finalString;
+}
 
 
 
