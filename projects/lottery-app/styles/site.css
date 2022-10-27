@@ -28,7 +28,7 @@
 body {
 	background-color: var(--paper);
 	background-image: url('https://media.discordapp.net/attachments/549703400791605260/1019094503904247828/unknown.png');
-	background-image: url('../stars.gif');
+	background-image: url('../assets/stars.gif');
 	background-size: contain;
 	background-position: right center;
 	background-repeat: no-repeat;

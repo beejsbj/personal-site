@@ -86,7 +86,7 @@ function checkWinner(userNumbers) {
 
 function renderResult(winningNumbers, string) {
 	var template = `<h1 class="attention-voice">Winning Numbers: <span>${winningNumbers}</span></h1><p class="attention-voice">${string}</p>`;
-	var audio = new Audio('stamp.mp3');
+	var audio = new Audio('assets/stamp.mp3');
 	finalResult.innerHTML = template;
 
 	audio.play();

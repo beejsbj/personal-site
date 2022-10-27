@@ -6,7 +6,7 @@
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<title>Lottery</title>
 		<meta name="description" content="Crypto lottery something something desc">
-		<meta property="og:image" content="https://peprojects.dev/alpha-4/burooj/projects/lottery-app/meta.jpg">
+		<meta property="og:image" content="https://peprojects.dev/alpha-4/burooj/projects/lottery-app/assets/meta.jpg">
 		<link rel='stylesheet' href='styles/site.css'>
 	</head>
 
@@ -15,7 +15,7 @@
 			<section class="page-section">
 				<button class="button connect">
 					<picture class="metamask-icon">
-						<img src="metamask-bw.png" alt="">
+						<img src="assets/metamask-bw.png" alt="">
 					</picture> 
 					<span>Connect</span>
 				</button>
