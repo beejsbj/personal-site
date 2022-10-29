@@ -9,6 +9,10 @@
 	<h2 class="loud-voice">
 		<?=$exerciseName?>
 	</h2>
+	<toggle-switch>
+		<input type="checkbox" id="php-js">
+		<label for="php-js"></label>
+	</toggle-switch>
 	<div class="e4p-php">
 		<h3 class="attention-voice"> PHP </h3>
 		<?php include("projects/e4p/$exLink.php"); ?>

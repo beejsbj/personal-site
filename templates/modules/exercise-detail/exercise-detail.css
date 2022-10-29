@@ -4,9 +4,12 @@ exercise-detail {
 	justify-items: start;
 
 }
-exercise-detail a,
-exercise-detail h2 {
+exercise-detail a {
 	grid-column: span 2;
+}
+exercise-detail toggle-switch,
+exercise-detail h2 {
+	grid-column: span 1;
 }
 @media (min-width:  500px){
 	exercise-detail {
