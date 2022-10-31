@@ -32,7 +32,7 @@ if (isset($_POST['submitted'])){
             $output = "Hello, <span>$userName</span>, welcome to the internet!";
 
 
-            if ($greetings[strtolower($userName)]) {
+            if (isset($greetings[strtolower($userName)])) {
 
                 $output = $greetings[strtolower($userName)];
 
@@ -44,13 +44,13 @@ if (isset($_POST['submitted'])){
 }
 ?>
 
-<form method="POST">
+<form id="e4p" method="POST">
     <div class="input-field">
         <input id="nme" type="text" class="text-number-input" required required name="userName" placeholder="What is your name?">
         <label for="nme">What is your name?</label>
     </div>
     <button type="submit" name="submitted"> Who? </button>
-    <div class="<?=$class?>">
+    <div id="e4p-output" class="<?=$class?>">
         <p>
             <?=$output?>
         </p>

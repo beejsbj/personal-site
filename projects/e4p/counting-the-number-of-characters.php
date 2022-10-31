@@ -89,7 +89,7 @@ if (isset($_POST['submitted'])) {
 
 
 
-            <form method="POST">
+            <form id="e4p" method="POST">
 
                 <div class="input-field">
                     <input id="char-count" type="text" class="text-number-input" required name="inputString" placeholder="What is the input string?" value="<?=$inputString?>">
@@ -102,7 +102,7 @@ if (isset($_POST['submitted'])) {
                 </button>
 
 
-                <div class="<?=$class?>">
+                <div id="e4p-output" class="<?=$class?>">
                     <p>
                         <?=$output?>
                     </p>

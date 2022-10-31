@@ -67,7 +67,7 @@ if (isset($_POST['submitted'])){
 
 
 ?>
-<form method="POST">
+<form id="e4p" method="POST">
     <div class="input-field">
         <input id="principal-ID" type="text" class="text-number-input" required name="principal" placeholder="principal?" value="<?=$principal?>" min="0.01" step="0.01">
         <label for="principal-ID">Enter the principal</label>
@@ -81,7 +81,7 @@ if (isset($_POST['submitted'])){
         <label for="time-ID">Enter the number of years</label>
     </div>
     <button type="submit" name="submitted"> Compute </button>
-    <div class="<?=$class?>">
+    <div id="e4p-output" class="<?=$class?>">
         <p>
             <?=$output?>
         </p>

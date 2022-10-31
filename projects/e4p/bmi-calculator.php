@@ -45,7 +45,7 @@ if (
     $class = "output-field"; 
 }
 ?>
-<form method="POST">
+<form id="e4p" method="POST">
     <div class="input-field range-field">
         <input id="height-ID" type="range" min="1" max="120" step="1" required name="height" placeholder="height??" value="<?=$height?>">
         <label for="height-ID"> Height: <span></span>
@@ -57,7 +57,7 @@ if (
         </label>
     </div>
     <button type="submit" name="submitted"> BMIBMI </button>
-    <div class="<?=$class?>">
+    <div id="e4p-output" class="<?=$class?>">
         <p>
             <?=$output?>
         </p>

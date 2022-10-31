@@ -113,7 +113,7 @@ if (isset($_POST['submitted'])){
 
 
 
-            <form method="POST">
+            <form id="e4p" method="POST">
 
                 <div class="input-field">
                     <input type="text" class="text-number-input" required name="people" placeholder="How many people?" value="<?=$people?>">
@@ -134,7 +134,7 @@ if (isset($_POST['submitted'])){
                 </button>
 
 
-                <div class="<?=$class?>">
+                <div id="e4p-output" class="<?=$class?>">
                     <p>
                         <?=$output?>
                     </p>

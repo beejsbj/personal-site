@@ -27,10 +27,13 @@ button {
 	opacity: 1;
 }
 
+toggle-switch {
+	position: relative;
+	transform: scale(0.6);
+}
 toggle-switch input {
 	display: none;
 }
-
 
 toggle-switch label {
 	position: relative;
@@ -59,8 +62,8 @@ toggle-switch label::before {
 	left: 8px;
 	width: 54px;
 	height: 54px;
-	background-color: hsla(227, 41%, 35%, 1.00);
-	background-image: url('https://i.imgur.com/W3hzUmL.jpg');
+	background-color: hsla(52, 78%, 61%, 1.00);
+	background-image: url('https://i.imgur.com/MWFJ87T.jpg');
 	background-position: 10% 50%;
 	background-repeat: no-repeat;
 	background-size: contain;
@@ -68,7 +71,7 @@ toggle-switch label::before {
 	z-index: 2;
 }
 
-toggle-switch input:checked + label::before {
+toggle-switch input:checked+label::before {
 	top: 0;
 	left: 0;
 	width: 140px;
@@ -85,15 +88,15 @@ label:after {
 	width: 140px;
 	height: 70px;
 	transform: scale(1);
-	background-color: hsla(52, 78%, 61%, 1.00);
-	background-image: url('https://i.imgur.com/MWFJ87T.jpg');
+	background-color: hsla(227, 41%, 35%, 1.00);
+	background-image: url('https://i.imgur.com/W3hzUmL.jpg');
 	background-position: 85% 50%;
 	background-repeat: no-repeat;
 	background-size: contain;
 	z-index: 1;
 }
 
-toggle-switch input:checked + label::after {
+toggle-switch input:checked+label::after {
 	top: 8px;
 	right: 8px;
 	width: 54px;

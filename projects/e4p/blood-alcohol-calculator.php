@@ -62,7 +62,7 @@ if (
 
 
 
-            <form method="POST">
+            <form id="e4p" method="POST">
 
                 <div class="radio-list">
                     <div class="input-field">
@@ -94,7 +94,7 @@ if (
                 </button>
 
 
-                <div class="<?=$class?>">
+                <div id="e4p-output" class="<?=$class?>">
                     <p>
                         <?=$output?>
                     </p>

@@ -63,7 +63,7 @@ if (isset($_POST['submitted'])){
 
 
 ?>
-<form method="POST">
+<form id="e4p" method="POST">
     <div class="input-field">
         <input id="amount-fromID" type="text" class="text-number-input" required name="amountFrom" placeholder="Euros?" min="0.01" step="0.01">
         <label for="amount-fromID">How many euros to exchange?</label>
@@ -73,7 +73,7 @@ if (isset($_POST['submitted'])){
         <label for="rate-fromID">What is the exchange rate?</label>
     </div>
     <button type="submit" name="submitted"> Convert </button>
-    <div class="<?=$class?>">
+    <div id="e4p-output" class="<?=$class?>">
         <p>
             <?=$output?>
         </p>

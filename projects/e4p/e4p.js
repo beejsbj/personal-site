@@ -5,15 +5,17 @@
 
 // Saying Hello -->
 // create function that,
-console.log('hello')
+
 
 function SayingHello() {
-	var name = document.querySelector('.e4p-js input').value;
+	console.log('hello')
+	var name = document.querySelector('input#nme').value;
+	var outputField = document.querySelector('div#e4p-output')
 	if (name) {
 		var output = 'hello, ' + name + ' wassup?';
-		jsOutput.innerHTML = `<p>${output}</p>`
+		outputField.innerHTML = `<p>${output}</p>`
 	} else {
-		jsOutput.innerHTML = `<p>i asked you a question twat!</p>`
+		outputField.innerHTML = `<p>i asked you a question twat!</p>`
 	}
 }
 

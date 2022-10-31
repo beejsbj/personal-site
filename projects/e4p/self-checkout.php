@@ -110,7 +110,7 @@ if (isset($_POST['submitted'])){
 
 
 
-            <form method="POST">
+            <form id="e4p" method="POST">
 
                 <item-field>
                     <h2 class="whisper-voice">1</h2>
@@ -152,7 +152,7 @@ if (isset($_POST['submitted'])){
                 </button>
 
 
-                <div class="<?=$class?>">
+                <div id="e4p-output" class="<?=$class?>">
                     <p>
                         <?=$output?>
                     </p>

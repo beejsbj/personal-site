@@ -160,50 +160,42 @@ function renderEnd() {
 	const redoButton = document.querySelector("button#redo");
 	redoButton.addEventListener("click", function() {
 		index = 0;
-		numCardsToReview = document.querySelector('#num-cards').value;
+		numCardsToReview = document.querySelector( '#num-cards' ).value;
 		cardRenderer(indexData);
 	});
 };
 
-
-function filteredCards(cardsData) {
-	var selections = document.querySelectorAll('.card-filter input:checked');
-
-	selections = Array.from(selections);
-
-	if (selections.length) {
-		return filteredCards = cardsData.filter( function(card) {
-
-			for (let i = 0; i < selections.length; i++) {
-				if (card.acf.application[0].post_name == selections[i].value) {
+function filteredCards( cardsData ) {
+	var selections = document.querySelectorAll( '.card-filter input:checked' );
+	selections = Array.from( selections );
+	if ( selections.length ) {
+		return filteredCards = cardsData.filter( function( card ) {
+			for ( let i = 0; i < selections.length; i++ ) {
+				if ( card.acf.application[ 0 ].post_name == selections[ i ].value ) {
 					return true;
 				}
 			}
-		})
+		} )
 	} else {
 		return cardsData;
 	}
-
 }
-
-
 // Fisher-Yates (aka Knuth) Shuffle.
-function shuffle(array) {
-	let currentIndex = array.length, randomIndex;
-
+function shuffle( array ) {
+	let currentIndex = array.length,
+		randomIndex;
 	// While there remain elements to shuffle.
-	while (currentIndex != 0) {
+	while ( currentIndex != 0 ) {
 		// Pick a remaining element.
-		randomIndex = Math.floor(Math.random() * currentIndex);
+		randomIndex = Math.floor( Math.random() * currentIndex );
 		currentIndex--;
-
 		// And swap it with the current element.
-		[array[currentIndex], array[randomIndex]] = [
-			array[randomIndex], array[currentIndex]
+		[ array[ currentIndex ], array[ randomIndex ] ] = [
+			array[ randomIndex ], array[ currentIndex ]
 		];
 	}
 	return array;
 }
 
 
- 
+

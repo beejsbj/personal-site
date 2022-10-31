@@ -1,0 +1,16 @@
+{
+	"id": "home",
+	"title": "Welcome",
+	"metaImage" : "",
+	"metaDesc" : "",
+	"page-title": "Hey there!",
+
+	"sections": [
+		{
+			"heading": "My latest work"
+		},
+		{
+			"heading": "things i like"
+		}
+	]
+}

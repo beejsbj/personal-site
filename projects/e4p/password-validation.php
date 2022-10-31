@@ -58,7 +58,7 @@ if (
 ?>
 
 
-            <form method="POST">
+            <form id="e4p" method="POST">
 
                 <div class="input-field">
                     <input id="username-ID" type="text" class="text-number-input" required name="username" placeholder="username??" value="<?=$username?>">
@@ -75,7 +75,7 @@ if (
                 </button>
 
 
-                <div class="<?=$class?>">
+                <div id="e4p-output" class="<?=$class?>">
                     <p>
                         <?=$output?>
                     </p>

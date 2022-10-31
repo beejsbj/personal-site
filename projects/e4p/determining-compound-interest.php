@@ -71,7 +71,7 @@ if (isset($_POST['submitted'])){
 
 
 ?>
-<form method="POST">
+<form id="e4p" method="POST">
     <div class="input-field">
         <input id="principal-ID" type="text" class="text-number-input" required name="principal" placeholder="principal?" value="<?=$principal?>" min="0.01" step="0.01">
         <label for="principal-ID">What is the principal amount?</label>
@@ -89,7 +89,7 @@ if (isset($_POST['submitted'])){
         <label for="number-ID">Times interest is compounded per year?</label>
     </div>
     <button type="submit" name="submitted"> Compute </button>
-    <div class="<?=$class?>">
+    <div id="e4p-output" class="<?=$class?>">
         <p>
             <?=$output?>
         </p>

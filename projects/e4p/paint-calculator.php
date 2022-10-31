@@ -74,7 +74,7 @@ if (isset($_POST['submitted'])){
 ?>
 
 
-            <form method="POST">
+            <form id="e4p" method="POST">
                 <!-- <div class="input-field radio-list">
                     <div class="input-field">
                         <input type="radio" name="unitChoice" value="feet">
@@ -101,7 +101,7 @@ if (isset($_POST['submitted'])){
                 </button>
 
 
-                <div class="<?=$class?>">
+                <div id="e4p-output" class="<?=$class?>">
                     <p>
                         <?=$output?>
                     </p>

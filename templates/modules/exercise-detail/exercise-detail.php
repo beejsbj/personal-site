@@ -13,30 +13,32 @@
 		<input type="checkbox" id="php-js">
 		<label for="php-js"></label>
 	</toggle-switch>
-	<div class="e4p-php">
-		<h3 class="attention-voice"> PHP </h3>
-		<?php include("projects/e4p/$exLink.php"); ?>
-	</div>
-	<div class="e4p-js">
-		<h3 class="attention-voice"> JS </h3>
+	<div>
+		<h3 class="attention-voice">PHP</h3>
 		<?php include("projects/e4p/$exLink.php"); ?>
 	</div>
 </exercise-detail>
 
-		<script src="projects/e4p/e4p.js"></script>
-		<script>
-			
-			var jsOutput = document.querySelector('.e4p-js .output-field');
-			jsOutput.classList.add('hide');
-			var jsForm = document.querySelector('.e4p-js form');
-			jsForm.method = "";
-			var button = document.querySelector('.e4p-js button');
-			button.type = "button";
-			button.name = "";
-			
-			button.addEventListener('click', function() {
-				jsOutput.classList.remove('hide');
-				<?=$funcName?>();
-			});
-		</script>
+<script src="projects/e4p/e4p.js"></script>
+<script>
+	var toggleSwitch = document.querySelector('exercise-detail toggle-switch input');
+	var button = document.querySelector('form#e4p button');
+		
+
+	toggleSwitch.addEventListener('input', function() {
+		var heading = document.querySelector('exercise-detail > div h3');
+		if (toggleSwitch.checked) {
+			button.type = 'button';
+			heading.innerHTML = 'JS';
+
+		} else {
+			button.type = 'submit';
+			heading.innerHTML = 'PHP';
+		}
+	})
+	button.addEventListener('click', function(event) {
+		// event.preventDefault();
+		<?=$funcName?>();
+	});
+</script>
 

@@ -84,7 +84,7 @@ if (
 
 
 
-            <form method="POST">
+            <form id="e4p" method="POST">
 
                 <div class="input-field">
                     <input id="age-ID" type="text" class="text-number-input" required name="age" placeholder="aGe??!!?" min="1" step="1" value="<?=$age?>">
@@ -97,7 +97,7 @@ if (
                 </button>
 
 
-                <div class="<?=$class?>">
+                <div id="e4p-output" class="<?=$class?>">
                     <p>
                         <?=$output?>
                     </p>

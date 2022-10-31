@@ -1,0 +1,89 @@
+/* P reset */
+@import 'preset.css';
+
+/* S etup */
+@import 'setup.css';
+
+/* S setings */
+@import 'settings.css';
+@import 'developer-styles.css';
+
+/* S tructure */
+@import 'structure.css';
+
+/* T ypography */
+@import 'typography.css';
+
+/* C omponents */
+@import 'components.css';
+@import 'forms.css';
+
+/* S tuff (modules) */
+@import 'modules.css';
+
+/* S ections and more stuff */
+@import 'animation.css';
+
+/* then other contextual styles */
+body {
+	background-color: var(--paper);
+	color: var(--ink);
+}
+
+.my-fantastic-image {
+	max-width: 300px;
+	border-bottom-right-radius: 30px;
+}
+
+.hide {
+	display: none;
+}
+
+
+form {
+	max-width: 300px;
+}
+
+input-field {
+	display: grid;
+	gap: 10px;
+}
+todo-app {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 10px;
+	margin-top: 30px;
+	padding: 20px;
+	background-color: whitesmoke;
+}
+
+input,
+button {
+	padding: 10px;
+}
+
+.complete h3 {
+	text-decoration: 3px wavy line-through hsla(0, 0%, 0%, 0.6);
+}
+
+todo-list {
+	/* 	outline: 3px solid blue; */
+	padding: 5px;
+	background-color: hsla(0, 0%, 90%, 1);
+	position: relative;
+}
+todo-card {
+	outline: 3px solid green;
+	background-color: wheat;
+}
+
+.remove-list {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 5px;
+}
+
+button {
+	cursor: pointer;
+}

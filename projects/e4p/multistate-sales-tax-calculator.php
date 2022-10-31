@@ -76,7 +76,7 @@ if (isset($_POST['submitted'])){
 ?>
 
 
-            <form method="POST">
+            <form id="e4p" method="POST">
             	<div class="input-field">
                     <input id="amount-ID" type="number" class="text-number-input" required required name="amount" placeholder="amount??" min="0.01" step="0.01" value="<?=$amount?>">
                     <label for="amount-ID">What is the order amount?</label>
@@ -92,7 +92,7 @@ if (isset($_POST['submitted'])){
                 <button type="submit" name="submitted">
                 	Taxify
                 </button>
-                <div class="<?=$class?>">
+                <div id="e4p-output" class="<?=$class?>">
                     <p>
                         <?=$output?>
                     </p>
