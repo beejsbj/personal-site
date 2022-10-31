@@ -29,14 +29,10 @@
 
 .notice-voice {
 	font-family: sans-serif;
-	font-size: 1rem;
+	font-size: 1.4rem;
 	line-height: 1.4;
 }
-@media (min-width: 700px) {
-	.notice-voice {
-		font-size: 1.2rem;
-	}
-}
+
 
 .solid-voice {
 	font-family: sans-serif;

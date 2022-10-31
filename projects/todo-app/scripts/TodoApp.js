@@ -50,7 +50,7 @@ class TodoApp {
 			event.preventDefault();
 			if (event.target.matches("button.add-list")) {
 				let $input = event.target.closest("input-field").querySelector("input");
-				this.add($input.value);
+				(!$input.value) ? alert('please enter something') : this.add($input.value);
 				$input.value = "";
 			}
 			if (event.target.matches("button.remove-list")) {
@@ -137,12 +137,12 @@ class List {
 
 	renderList() {
 		return `<todo-list data-id="${this.id}">
-					<h2>${this.name}</h2>
+					<h2 class="notice-voice" >${this.name}</h2>
 					<actions><button class="remove-list">X</button></actions>
 					<form>
 						<input-field>
 							<label>What do you want To do?</label>
-							<input type="text">
+							<input minlength="1" type="text">
 							<button class="add">Add</button>
 						</input-field>
 					</form>
@@ -158,7 +158,8 @@ class List {
 
 			if (event.target.matches(`[data-id="${this.id}"] button.add`)) {
 				let $input = event.target.closest("todo-list").querySelector("input");
-				this.add($input.value);
+
+				(!$input.value) ? alert('please enter something') : this.add($input.value);
 				$input.value = "";
 			}
 			if (event.target.matches(`[data-id="${this.id}"] button.remove`)) {
@@ -189,7 +190,7 @@ class Todo {
 		return `
 			<li data-id ="${this.id}">
 				<todo-card class=${this.complete ? "complete" : ""}>
-					<h3>${this.content}</h3>
+					<h3 class="calm-voice" >${this.content}</h3>
 					<actions>
 						<button class="remove">Delete</button>
 						<button class="complete">Done</button>
