@@ -1,6 +1,6 @@
 /* Should we pull in @fonts here? */
 .booming-voice {
-	
+	font-family: sans-serif;
 	font-size: 40px;
 	font-weight: 700;
 	color: var(--dark-color);

@@ -16,6 +16,9 @@ inner-column {
 	margin-right: auto;
 	margin-left: auto;
 	padding: 30px 10px; /* a loose default */
+
+	display: grid;
+	gap:  30px;
 }
 
 /*.site-header {

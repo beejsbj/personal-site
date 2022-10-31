@@ -19,7 +19,8 @@
 
 	<body>
 		<main class="page-content">
-			<h1 class="loud-voice">Todo App</h1>
+			<inner-column>
+				<h1 class="booming-voice">Todo App</h1>
 			<input-field>
 				<label class="attention-voice" for="in-app">Add a list</label>
 				<input type="text" id="in-app">
@@ -27,6 +28,7 @@
 			</input-field>
 			<todo-app>
 			</todo-app>
+			</inner-column>
 		</main>
 	</body>
 	<script src="scripts/script.js" type="module"></script>

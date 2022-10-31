@@ -40,9 +40,7 @@ body {
 }
 
 
-form {
-	max-width: 300px;
-}
+
 
 input-field {
 	display: grid;
@@ -55,6 +53,7 @@ todo-app {
 	margin-top: 30px;
 	padding: 20px;
 	background-color: whitesmoke;
+	align-items: start;
 }
 
 input,
@@ -68,13 +67,20 @@ button {
 
 todo-list {
 	/* 	outline: 3px solid blue; */
-	padding: 5px;
+	padding: 15px;
 	background-color: hsla(0, 0%, 90%, 1);
 	position: relative;
+	display: grid;
+	gap:  20px;
+	align-content: center;
+
 }
 todo-card {
-	outline: 3px solid green;
+	outline: 2px solid black;
 	background-color: wheat;
+	padding: 10px;
+	display: grid;
+	gap: 10px;
 }
 
 .remove-list {
@@ -86,4 +92,16 @@ todo-card {
 
 button {
 	cursor: pointer;
+}
+
+todo-list output-field ul {
+	display: grid;
+	gap: 20px;
+	justify-items: space-between;
+}
+
+inner-column > input-field {
+	justify-self: center;
+	min-width: 500px;
+	text-align: center;
 }
