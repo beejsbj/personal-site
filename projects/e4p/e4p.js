@@ -1,4 +1,10 @@
 //init
+function toggleOutlet() {
+	document.querySelector( 'div#e4p-output' )
+		.classList.remove( 'hide' );
+	document.querySelector( 'div#e4p-output' )
+		.classList.add( 'output-field' );
+}
 
 
 
