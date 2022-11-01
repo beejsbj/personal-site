@@ -23,22 +23,24 @@
 <script>
 	var toggleSwitch = document.querySelector('exercise-detail toggle-switch input');
 	var button = document.querySelector('form#e4p button');
-		
+
 
 	toggleSwitch.addEventListener('input', function() {
 		var heading = document.querySelector('exercise-detail > div h3');
+		var $outlet = document.querySelector('div#e4p-output');
+
 		if (toggleSwitch.checked) {
-			button.type = 'button';
 			heading.innerHTML = 'JS';
+			button.addEventListener('click', function(event) {
+				event.preventDefault();
+
+				<?=$funcName?>($outlet);
+			});
 
 		} else {
-			button.type = 'submit';
 			heading.innerHTML = 'PHP';
 		}
 	})
-	button.addEventListener('click', function(event) {
-		// event.preventDefault();
-		<?=$funcName?>();
-	});
+	
 </script>
 
