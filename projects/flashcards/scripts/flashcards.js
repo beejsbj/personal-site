@@ -180,7 +180,6 @@ class Flashdeck {
 			$badButton.classList.toggle( "hide" );
 			$goodButton.classList.toggle( "hide" );
 		} );
-		console.log( this.cards )
 		$badButton.addEventListener( 'click', () => {
 			this.moveBack( this.index ) //push back card step
 			this.cardRenderer( this.index++ );
@@ -208,7 +207,6 @@ class Flashdeck {
 	filteredToday() {
 		return this.cards.filter( ( card ) => {
 			if ( card.nextReviewDate ) {
-				console.log( 'bb' )
 				card.nextReviewDate = new Date( card.nextReviewDate );
 				return card.nextReviewDate.toDateString() == this.today.toDateString();
 			}
