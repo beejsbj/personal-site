@@ -58,8 +58,32 @@ function MadLib( $outlet ) {
 	toggleOutlet();
 }
 
+function SimpleMath( $outlet ) {
+	var $first = document.querySelector( '#e4p input#first-id' );
+	var $second = document.querySelector( '#e4p input#second-id' );
 
+	let sum = $first.value + $second.value;
+	let difference = $first.value - $second.value;
+	let product = $first.value * $second.value;
+	let quotient = $first.value / $second.value;
 
+	if ( $first && $second ) {
+		var template = `<span>${$first.value}</span> + <span>${$second.value}</span> = ${sum}<br>
+                        <span>${$first.value}</span> - <span>${$second.value}</span> = ${difference}<br>
+                        <span>${$first.value}</span> * <span>${$second.value}</span> = ${product}<br>
+                        <span>${$first.value}</span> / <span>${$second.value}</span> = ${quotient}<br>`;
+		$outlet.innerHTML = `<p>${template}</p>`
+		$first.value = "";
+		$second.value = "";
+	}
+	toggleOutlet();
+}
+// // retirement calculator -->
+function RetirementCalculator( $outlet ) {
+	var templatel
+	var $currentAge = document.querySelector( '#e4p input#current-age' );
+	var $retireAge = document.querySelector( '#e4p input#retire-age' );
+	var ageDifference = $retireAge.value - $currentAge.value;
 
 // Saying Hello -->
 // create function that,
