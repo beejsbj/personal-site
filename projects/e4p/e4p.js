@@ -5,6 +5,16 @@ function toggleOutlet() {
 	document.querySelector( 'div#e4p-output' )
 		.classList.add( 'output-field' );
 }
+// Saying Hello -->
+function SayingHello( $outlet ) {
+	var $name = document.querySelector( 'input#nme' );
+	if ( $name ) {
+		var template = 'hello, <span>' + $name.value + '</span> wassup?';
+		$outlet.innerHTML = `<p>${template}</p>`
+		$name.value = "";
+	}
+	toggleOutlet();
+}
 
 
 
