@@ -147,3 +147,7 @@ flash-card code {
     font-family: Sans-serif;
     text-align: center;
 }
+
+.card-count span.due-0 {
+	display: none ;
+}

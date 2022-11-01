@@ -5,6 +5,7 @@ class Flashdeck {
 		this.userName = userName;
 		this.repBoxes = [ 1, 3, 7, 14, 30 ]; //days
 		this.dayInMiliSeconds = 24 * 60 * 60 * 1000;
+		this.dueToday = 0;
 		this.$cardHeader = document.querySelector( "card-module header" );
 		this.$actionArea = document.querySelector( "action-area" );
 		this.$numOfCardsInput = document.querySelector( '#num-cards' );
@@ -22,7 +23,7 @@ class Flashdeck {
 				this.$beginButton.addEventListener( "click", () => {
 					this.cards = this.shuffle( this.filteredSlection( this.cards ) ); //filter cards based on checkbox selection and shuflle
 					this.cards = this.filteredToday(); //filter cards due to be reviewed today
-					this.numCardsToReview = (this.cards.length >= this.$numOfCardsInput.value) ? this.$numOfCardsInput.value : this.cards.length;
+					this.numCardsToReview = ( this.cards.length >= this.$numOfCardsInput.value ) ? this.$numOfCardsInput.value : this.cards.length;
 					this.cardRenderer( this.index );
 				} );
 			} )
@@ -81,13 +82,14 @@ class Flashdeck {
 		var card = this.cards[ index ];
 		var cardType = card.type;
 		// var cardLesson = card.lesson; //lesson
-		var cardApplication = (card.acf.application[ 0 ]) ? card.acf.application[ 0 ].post_title : "no data"; //aplication instead of lesson
+		var cardApplication = ( card.acf.application[ 0 ] ) ? card.acf.application[ 0 ].post_title : "no data"; //aplication instead of lesson
 		const headerTemplate = `
 		<h1 class="category">
 			${cardType}
 		</h1>
 		<h2 class="card-count">
 			${index + 1}/${this.numCardsToReview}
+			<span class="due-${this.dueToday}" >[Due: ${this.dueToday}]</span>
 		</h2>
 		<h3 class="lesson">
 			${cardApplication}
@@ -195,9 +197,9 @@ class Flashdeck {
 		if ( $selections.length ) {
 			return cardsData.filter( function( card ) {
 				for ( let i = 0; i < $selections.length; i++ ) {
-					if ( card.acf.application[ 0 ]) {
+					if ( card.acf.application[ 0 ] ) {
 						return card.acf.application[ 0 ].post_name == $selections[ i ].value;
-					} 
+					}
 				}
 			} )
 		} else {
@@ -205,17 +207,20 @@ class Flashdeck {
 		}
 	}
 	filteredToday() {
-
-		console.log(this.cards)
+		console.log( this.cards )
 		let sorted = this.cards.sort( ( card ) => {
 			if ( card.nextReviewDate ) {
 				card.nextReviewDate = new Date( card.nextReviewDate );
-				return (card.nextReviewDate.toDateString() == this.today.toDateString()) ? 1 : -1;
+				if ( card.nextReviewDate.toDateString() == this.today.toDateString() ) {
+					this.dueToday++;
+					return 1;
+				}
+				return -1;
 			}
 			return -1;
 		} )
-
-		console.log(sorted)
+		console.log( sorted )
+		console.log(this.dueToday)
 		return sorted;
 	}
 	// Fisher-Yates (aka Knuth) Shuffle.
