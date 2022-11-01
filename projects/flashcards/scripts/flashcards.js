@@ -205,13 +205,18 @@ class Flashdeck {
 		}
 	}
 	filteredToday() {
-		return this.cards.filter( ( card ) => {
+
+		console.log(this.cards)
+		let sorted = this.cards.sort( ( card ) => {
 			if ( card.nextReviewDate ) {
 				card.nextReviewDate = new Date( card.nextReviewDate );
-				return card.nextReviewDate.toDateString() == this.today.toDateString();
+				return (card.nextReviewDate.toDateString() == this.today.toDateString()) ? 1 : -1;
 			}
-			return true;
+			return -1;
 		} )
+
+		console.log(sorted)
+		return sorted;
 	}
 	// Fisher-Yates (aka Knuth) Shuffle.
 	shuffle( array ) {
