@@ -5,6 +5,16 @@ function toggleOutlet() {
 	document.querySelector( 'div#e4p-output' )
 		.classList.add( 'output-field' );
 }
+// boiler
+function exercise( $outlet ) {
+	var $input = document.querySelector( '#e4p input' );
+	if ( $input ) {
+		var template = `<span></span>`;
+		$outlet.innerHTML = `<p>${template}</p>`
+		$input.value = "";
+	}
+	toggleOutlet();
+}
 // Saying Hello -->
 function SayingHello( $outlet ) {
 	var $name = document.querySelector( 'input#nme' );
@@ -85,136 +95,24 @@ function RetirementCalculator( $outlet ) {
 	var $retireAge = document.querySelector( '#e4p input#retire-age' );
 	var ageDifference = $retireAge.value - $currentAge.value;
 
-// Saying Hello -->
-// create function that,
+	const today = new Date();
+	let currentYear = today.getFullYear();
+	let retireYear = currentYear + ageDifference;
 
-
-function SayingHello() {
-	console.log('hello')
-	var name = document.querySelector('input#nme').value;
-	var outputField = document.querySelector('div#e4p-output')
-	if (name) {
-		var output = 'hello, ' + name + ' wassup?';
-		outputField.innerHTML = `<p>${output}</p>`
-	} else {
-		outputField.innerHTML = `<p>i asked you a question twat!</p>`
+	if ( $currentAge && $retireAge ) {
+		template = `You have <span>${ageDifference}</span> years left until you can retire.<br>
+                        It's <span>${currentYear}</span>, so you can retire in <span>${retireYear}</span>.`;
+		$currentAge.value = "";
+		$retireAge.value = "";
 	}
-}
 
-// // Counting the Number of Characters -->
-// function CharCount() {
-// 	// prompt for the string, and store it in a variable
-// 	var string = prompt('what is the string?')
-// 	// get length of string and store it in another variable
-// 	var stringLen = string.length
-// 	// if length is 0, prompt user for string agian
-// 	if (stringLen == 0) {
-// 		alert('please type SOMETHING')
-// 		charCount()
-// 	} else {
-// 		// if not, output the length value
-// 		var output = `${string} has ${stringLen} characters.`
-// 		alert(output)
-// 	}
-// }
-// // Printing Quotes -->
-// function PrintQuote() {
-// 	// prompt for quote and store into varaible
-// 	var quote = prompt('what is the quote?');
-// 	// promt for author and store in variable
-// 	var author = prompt('who is the author?');
-// 	// if no input, ask for it again
-// 	if (author == 0 || quote == 0) {
-// 		alert('Please no blanks, try again')
-// 		printQuote()
-// 		// if not, print output
-// 	} else {
-// 		// concat quote and author into output variable
-// 		var output = `${author} says, "${quote}"`;
-// 		alert(output);
-// 	}
-// }
-// // Mad lib -->
-// function MadLib() {
-// 	// promt for noun, adj, adv, verb and store them each in a variable
-// 	var noun = prompt('what is the noun?');
-// 	while (noun == "") {
-// 		alert('you have to enter something');
-// 		var noun = prompt('what is the noun?');
-// 	}
-// 	var verb = prompt('what is the verb?');
-// 	while (verb == "") {
-// 		alert('you have to enter something');
-// 		var verb = prompt('what is the verb?');
-// 	}
-// 	var adjective = prompt('what is the adjective?');
-// 	while (adjective == "") {
-// 		alert('you have to enter something');
-// 		var adjective = prompt('what is the adjective?');
-// 	}
-// 	var adverb = prompt('what is the adverb?');
-// 	while (adverb == "") {
-// 		alert('you have to enter something');
-// 		var adverb = prompt('what is the adverb?');
-// 	}
-// 	// init output variable and interpole each of the previous variables
-// 	var output = `Do you ${verb} your ${adjective} ${noun} ${adverb}? That's hilarious!`
-// 	// alert the output
-// 	alert(output)
-// }
-// // simple math -->
-// function SimpleMath() {
-// 	// prompt for two numbers, convert to int
-// 	// 	store them each in a different variable
-// 	var first = parseInt(prompt('what is the first number?'));
-// 	while (first == "") {
-// 		alert('you have to enter a number');
-// 		var first = parseInt(prompt('what is the first number?'));
-// 	}
-// 	var second = parseInt(prompt('what is the second number?'));
-// 	while (second == "") {
-// 		alert('you have to enter a number');
-// 		var second = parseInt(prompt('what is the second number?'));
-// 	}
-// 	// perform all 4 operations and store each result in a different variable
-// 	var sum = first + second;
-// 	var difference = first - second;
-// 	var product = first * second;
-// 	var quotient = first / second;
-// 	var output = `
-// ${first} + ${second} = ${sum}
-// ${first} - ${second} = ${difference}
-// ${first} * ${second} = ${product}
-// ${first} / ${second} = ${quotient}
-// `;
-// 	alert(output)
-// 	// concat all variables into output string variable
-// }
-// // retirement calculator -->
-// function RetireCalc() {
-// 	// prompt for current age and store in var
-// 	var age = parseInt(prompt('what is the age?'));
-// 	while (age == "") {
-// 		alert('you have to enter a number');
-// 		var age = parseInt(prompt('what is the age?'));
-// 	}
-// 	// promt for desired retirement age and store in var
-// 	var retireAge = parseInt(prompt('at what age do you wanna retire?'));
-// 	while (retireAge == "") {
-// 		alert('you have to enter a number');
-// 		var retireAge = parseInt(prompt('at what age do you wanna retire?'));
-// 	}
-// 	// store current year in var
-// 	var currentYear = new Date().getFullYear();
-// 	// calculate difference between current age and desired retirement age and store in var
-// 	var ageDiff = retireAge - age;
-// 	// add the difference to the current year
-// 	var retireYear = ageDiff + currentYear;
-// 	// output the result
-// 	var output = `You have ${ageDiff} years left until you can retire.
-// It's ${currentYear}, so you can retire in ${retireYear}.`
-// 	alert(output);
-// }
+	 if (ageDifference <= 0) {
+	            template = "What're you doing?! you can retire already. <br> go! go!";
+	        }
+
+	$outlet.innerHTML = `<p>${template}</p>`
+	toggleOutlet();
+}
 // // 7 Area of a Rectangular Room -->
 // function RectArea() {
 // 	// prompt for length and width of room in feet.
@@ -291,7 +189,6 @@ function SayingHello() {
 // paint to cover ${area} square feet.`;
 // 	alert(output);
 // }
-
 // function SelfCheckout() {
 // 	// init const tax
 // 	// promtp for price of item 1
