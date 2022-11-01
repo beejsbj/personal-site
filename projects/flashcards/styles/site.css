@@ -148,6 +148,10 @@ flash-card code {
     text-align: center;
 }
 
+.card-count span {
+	color: red;
+}
 .card-count span.due-0 {
 	display: none ;
+
 }
