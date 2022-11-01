@@ -15,6 +15,48 @@ function SayingHello( $outlet ) {
 	}
 	toggleOutlet();
 }
+// Counting the Number of Characters -->
+function CountingTheNumberOfCharacters( $outlet ) {
+	var $string = document.querySelector( 'input#char-count' );
+	// get length of $string and store it in another variable
+	var stringLen = $string.value.length
+	// if length is 0, prompt user for $string agian
+	if ( $string ) {
+		// if not, template the length value
+		var template = `<span>${$string.value}</span> seems to have <span>${stringLen}</span> characters.`;
+		$outlet.innerHTML = `<p>${template}</p>`
+		$string.value = "";
+	}
+	toggleOutlet();
+}
+// Printing Quotes -->
+function PrintingQuotes( $outlet ) {
+	var $author = document.querySelector( '#e4p input#author' );
+	var $quote = document.querySelector( '#e4p input#quote' );
+	if ( $author && $quote ) {
+		var template = `<span>${$author.value}</span> says, <em>"${$quote.value}"</em>`;
+		$outlet.innerHTML = `<p>${template}</p>`
+		$author.value = "";
+		$quote.value = "";
+	}
+	toggleOutlet();
+}
+// // Mad lib -->
+function MadLib( $outlet ) {
+	var $noun = document.querySelector( '#e4p input#noun' );
+	var $verb = document.querySelector( '#e4p input#verb' );
+	var $adjective = document.querySelector( '#e4p input#adjective' );
+	var $adverb = document.querySelector( '#e4p input#adverb' );
+	if ( $noun && $verb && $adjective && $adverb ) {
+		var template = `Do you <span>${$verb.value}</span> your <span>${$adjective.value}</span> <span>${$noun.value}</span> <span>${$adverb.value}</span>? That's hilarious!`;
+		$outlet.innerHTML = `<p>${template}</p>`
+		$noun.value = "";
+		$verb.value = "";
+		$adjective.value = "";
+		$adverb.value = "";
+	}
+	toggleOutlet();
+}
 
 
 
