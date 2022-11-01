@@ -193,11 +193,11 @@ class Flashdeck {
 		var $selections = document.querySelectorAll( '.card-filter input:checked' );
 		$selections = Array.from( $selections );
 		if ( $selections.length ) {
-			return filteredSlection = cardsData.filter( function( card ) {
+			return cardsData.filter( function( card ) {
 				for ( let i = 0; i < $selections.length; i++ ) {
-					if ( card.acf.application[ 0 ].post_name == $selections[ i ].value ) {
-						return true;
-					}
+					if ( card.acf.application[ 0 ]) {
+						return card.acf.application[ 0 ].post_name == $selections[ i ].value;
+					} 
 				}
 			} )
 		} else {
