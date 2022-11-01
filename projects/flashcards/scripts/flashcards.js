@@ -22,7 +22,7 @@ class Flashdeck {
 				this.$beginButton.addEventListener( "click", () => {
 					this.cards = this.shuffle( this.filteredSlection( this.cards ) ); //filter cards based on checkbox selection and shuflle
 					this.cards = this.filteredToday(); //filter cards due to be reviewed today
-					this.numCardsToReview = this.$numOfCardsInput.value;
+					this.numCardsToReview = (this.cards.length >= this.$numOfCardsInput.value) ? this.$numOfCardsInput.value : this.cards.length;
 					this.cardRenderer( this.index );
 				} );
 			} )
