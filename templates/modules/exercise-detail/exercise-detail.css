@@ -4,6 +4,11 @@ exercise-detail {
 	justify-items: start;
 
 }
+
+exercise-detail #e4p-output span {
+	color:  var(--dark-highlight);
+}
+
 exercise-detail a {
 	grid-column: span 2;
 }

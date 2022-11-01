@@ -108,46 +108,35 @@ if (isset($_POST['submitted'])){
 
 
 }
-
-
-
-
-
-    
-
-
-
-
-
 ?>
 
 
 
 
-            <form id="e4p" method="POST">
+<form id="e4p" method="POST">
 
-                <div class="input-field">
-                    <input id="first-id" type="text" class="text-number-input" required name="first" placeholder="first number?" value="<?=$first?>" step="0.01">
-                    <label for="first-id">What is the first number?</label>
-                </div>
-                <div class="input-field">
-                    <input id="second-id" type="text" class="text-number-input" required name="second" placeholder="second number?" value="<?=$second?>" step="0.01">
-                    <label for="second-id">What is the second number?</label>
-                </div>
-
-
-                <button type="submit" name="submitted">
-                    <sub>+</sub><sup>-</sup>Mathify!<sup>×</sup><sub>÷</sub>
-                </button>
+    <div class="input-field">
+        <input id="first-id" type="number" class="text-number-input" required name="first" placeholder="first number?" value="<?=$first?>" step="0.01">
+        <label for="first-id">What is the first number?</label>
+    </div>
+    <div class="input-field">
+        <input id="second-id" type="number" class="text-number-input" required name="second" placeholder="second number?" value="<?=$second?>" step="0.01">
+        <label for="second-id">What is the second number?</label>
+    </div>
 
 
-                <div id="e4p-output" class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
+    <button type="submit" name="submitted">
+        <sub>+</sub><sup>-</sup>Mathify!<sup>×</sup><sub>÷</sub>
+    </button>
+
+
+    <div id="e4p-output" class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+    
+</form>
 
 
 

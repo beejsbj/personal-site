@@ -102,31 +102,31 @@ if (isset($_POST['submitted'])){
 ?>
 
 
-            <form id="e4p" method="POST">
+<form id="e4p" method="POST">
 
-                <div class="input-field">
-                    <input type="text" class="text-number-input" required name="currentAge" placeholder="current age?" value="<?=$currentAge?>" min="0">
-                    <label for="">What is your current age?</label>
-                </div>
-                <div class="input-field">
-                    <input type="text" class="text-number-input" required name="retireAge" placeholder="age to retire?" value="<?=$retireAge?>" min="0">
-                    <label for="">At what age would you like to retire?</label>
-                </div>
-
-
-
-                <button type="submit" name="submitted">
-                    Submit
-                </button>
+    <div class="input-field">
+        <input id="current-age" type="number" class="text-number-input" required name="currentAge" placeholder="current age?" value="<?=$currentAge?>" min="0">
+        <label for="current-age">What is your current age?</label>
+    </div>
+    <div class="input-field">
+        <input id="retire-age" type="number" class="text-number-input" required name="retireAge" placeholder="age to retire?" value="<?=$retireAge?>" min="0">
+        <label for="retire-age">At what age would you like to retire?</label>
+    </div>
 
 
-                <div id="e4p-output" class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
+
+    <button type="submit" name="submitted">
+        Submit
+    </button>
+
+
+    <div id="e4p-output" class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+    
+</form>
 
 
 

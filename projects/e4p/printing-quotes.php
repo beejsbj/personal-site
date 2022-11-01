@@ -56,27 +56,27 @@ if (isset($_POST['submitted'])) {
 
 
 
-            <form id="e4p" method="POST">
+<form id="e4p" method="POST">
 
-                <div class="input-field">
-                    <input type="text" class="text-number-input" required name="quote" placeholder="What is the Quote?" value="<?=$quote?>">
-                    <label for="">What is the Quote?</label>
-                </div>
-                <div class="input-field">
-                    <input type="text" class="text-number-input" required name="author" placeholder="Who said it?" value="<?=$author?>">
-                    <label for="">Who said it?</label>
-                </div>
-
-
-                <button type="submit" name="submitted">
-                    Print
-                </button>
+    <div class="input-field">
+        <input id="quote" type="text" class="text-number-input" required name="quote" placeholder="What is the Quote?" value="<?=$quote?>">
+        <label for="quote">What is the Quote?</label>
+    </div>
+    <div class="input-field">
+        <input id="author" type="text" class="text-number-input" required name="author" placeholder="Who said it?" value="<?=$author?>">
+        <label for="author">Who said it?</label>
+    </div>
 
 
-                <div id="e4p-output" class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
+    <button type="submit" name="submitted">
+        Print
+    </button>
+
+
+    <div id="e4p-output" class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+    
+</form>
