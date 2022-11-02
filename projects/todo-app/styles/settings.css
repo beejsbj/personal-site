@@ -17,7 +17,7 @@ html {
 	--shadow: rgba(0,0,0,.8);
 
 	--corners: 10px; /* or whatevers */
-
+	--paper2: white;
 	--paper: var(--white);
 	--ink: var(--black);
 

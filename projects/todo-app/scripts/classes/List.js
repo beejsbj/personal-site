@@ -94,6 +94,19 @@ export default class List {
 				const id = event.target.closest("li").dataset.id;
 				this.complete(id);
 			}
+			if (event.target.matches(`[data-id="${this.id}"] h2.notice-voice`) || event.target.matches(`[data-id="${this.id}"] h3.calm-voice`)) {
+				let $text = event.target
+				$text.innerHTML = `<input class="edit-text" type='text' value='${$text.innerHTML}'>`
+				let $input = document.querySelector('input.edit-text')
+				$input.addEventListener('keypress', function(event) {
+					if (event.code === 'Enter') {
+						$text.innerHTML = $input.value;
+					}
+					
+				})
+			}
+
+
 		});
 	}
 }
