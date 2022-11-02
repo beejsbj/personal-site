@@ -18,7 +18,7 @@ html {
 
 	--corners: 10px; /* or whatevers */
 
-	--paper: var(--white);
+	--paper: #f5f5f5;
 	--ink: var(--black);
 
 }
@@ -37,7 +37,8 @@ html {
 
 		--corners: 10px; /* or whatevers */
 
-		--paper: red;
-		--ink: yellow;
+		--paper: hsla(217, 6%, 17%, 1.00);
+		--paper2:  hsla(217, 8%, 13%, 1.00);
+		--ink: hsla(0, 0%, 96%, 1.00);
 	}
 }

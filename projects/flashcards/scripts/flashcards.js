@@ -84,7 +84,7 @@ class Flashdeck {
 		// var cardLesson = card.lesson; //lesson
 		var cardApplication = ( card.acf.application[ 0 ] ) ? card.acf.application[ 0 ].post_title : "no data"; //aplication instead of lesson
 		const headerTemplate = `
-		<h1 class="category">
+		<h1 class="category ${cardType}">
 			${cardType}
 		</h1>
 		<h2 class="card-count">

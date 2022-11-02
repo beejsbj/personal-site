@@ -19,7 +19,7 @@
 
 	<body>
 		<main class="page-content">
-			<inner-column>
+			<inner-column class="wide" >
 				<h1 class="booming-voice">Todo App</h1>
 			<input-field>
 				<label class="attention-voice" for="in-app">Add a list</label>
