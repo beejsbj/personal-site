@@ -9,6 +9,8 @@
 .loud-voice {
 	font-family: sans-serif;
 	font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
+	font-weight: 700;
+	line-height: 1.1;
 }
 
 @media (min-width: 700px) {
@@ -17,14 +19,12 @@
 		font-size: clamp(4.00rem, calc(3.61rem + 1.95vw), 5.00rem);
 		/* or variable font */
 	}
-	.loud-voice {
-		font-weight: 100;
-	}
 }
 
 .attention-voice {
 	font-family: sans-serif;
 	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);
+	font-weight: 700;
 }
 
 .notice-voice {

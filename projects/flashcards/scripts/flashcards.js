@@ -159,9 +159,11 @@ class Flashdeck {
 			</ul>
 			<input-field>
 				<input type="number" id="num-cards" name="num-cards" value="${this.numCardsToReview}" min="5" step="1">
-				<label for="num-cards">How many cards would you like to review?</label>
+				<label class="calm-voice" for="num-cards">How many cards would you like to review?</label>
 			</input-field>
-			<button id="redo" type="reset"> Go again? </button>
+			<div class="buttons">
+						<button id="redo" type="reset"> Go again? </button>
+					</div>
 		</form>`;
 		const $redoButton = document.querySelector( "button#redo" );
 		$redoButton.addEventListener( "click", () => {

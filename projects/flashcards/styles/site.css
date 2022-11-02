@@ -28,7 +28,7 @@
 body {
 	background-color: var(--paper);
 	color: var(--ink);
-
+	padding-top: 5vh;
 }
 
 .my-fantastic-image {
@@ -85,7 +85,13 @@ form {
 	display: grid;
 	grid-row: span 2;
 	align-content: space-between;
+	
+}
 
+@media (min-width:  700px){
+	form {
+		grid-template-columns: 1fr 1fr;
+	}
 }
 flash-card {
 	display: grid;
@@ -119,6 +125,7 @@ button {
 	display: flex;
 	gap: 30px;
 	justify-content: center;
+	grid-column: 1 / end;
 }
 
 
@@ -180,3 +187,26 @@ header {
 		filter: invert(100%);
 	}
 }
+
+
+.card-filter {
+	display: grid;
+	gap:  5px;
+	grid-column: span 1;
+}
+
+input-field {
+	display: grid;
+	gap: 10px;
+	max-width: 310px;
+	align-self: start;
+
+}
+input-field label {
+	grid-row: 1;
+}
+input-field input {
+	padding: 10px;
+	font-size: 20px;
+}
+

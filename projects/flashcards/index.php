@@ -8,7 +8,7 @@
 	<inner-column>
 		<card-module>
 			<header>
-				<h1 class="welcome">Welcome</h1>
+				<h1 class="welcome attention-voice">Welcome</h1>
 			</header>
 			<action-area>
 				<form>
@@ -36,9 +36,11 @@
 					</ul>
 					<input-field>
 						<input type="number" id="num-cards" name="num-cards" value="10" min="5" step="1">
-						<label for="num-cards">How many cards would you like to review?</label>
+						<label class="calm-voice" for="num-cards">How many cards would you like to review?</label>
 					</input-field>
-					<button id="begin" class="hide-opacity" type="reset"> Begin </button>
+					<div class="buttons">
+						<button id="begin" class="hide-opacity" type="reset"> Begin </button>
+					</div>
 				</form>
 			</action-area>
 		</card-module>
