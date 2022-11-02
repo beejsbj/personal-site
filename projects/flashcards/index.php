@@ -14,6 +14,9 @@
 				<form>
 					<ul class="card-filter">
 						<li>
+							<h2 class="solid-voice" >Select what cards you would like to review.. or dont.</h2>
+						</li>
+						<li>
 							<input type="checkbox" id="universal" name="universal" value="universal">
 							<label for="universal">Universal</label>
 						</li>
