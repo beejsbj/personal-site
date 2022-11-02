@@ -17,7 +17,7 @@ export default class List {
 	}
 	add(content) {
 		let todoTemplate = {
-			id: this.lastId++,
+			id: this.getUniqueID(),
 			content,
 			complete: false,
 			dateCreated: new Date()
@@ -26,6 +26,18 @@ export default class List {
 		this.list.push(todo);
 
 		this.renderTodos();
+	}
+
+	getUniqueID() {
+		let found = this.list.find(  (todo) => {
+			return this.lastId == todo.id;
+		})
+
+		if (found) {
+			this.lastId++;
+			this.getUniqueID()
+		};
+		return this.lastId;
 	}
 
 	remove(id) {
