@@ -1,26 +1,19 @@
 /* P reset */
 @import 'preset.css';
-
 /* S etup */
 @import 'setup.css';
-
 /* S setings */
 @import 'settings.css';
 @import 'developer-styles.css';
-
 /* S tructure */
 @import 'structure.css';
-
 /* T ypography */
 @import 'typography.css';
-
 /* C omponents */
 @import 'components.css';
 @import 'forms.css';
-
 /* S tuff (modules) */
 @import 'modules.css';
-
 /* S ections and more stuff */
 @import 'animation.css';
 
@@ -39,30 +32,31 @@ body {
 .hide {
 	display: none;
 }
+
 .hide-opacity {
 	opacity: 0;
 	pointer-events: none;
 }
 
-
 card-module {
 	background-color: var(--paper2);
 	min-height: 620px;
-	gap: 30px;
+	gap: 80px;
 	padding: 20px;
 	display: grid;
 	grid-template-rows: 0.1fr 1fr;
 	grid-template-columns: 1fr;
 	/*max-width: 800px;*/
 	justify-content: center;
-
 }
+
 card-module header {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	justify-items: center;
 	align-items: center;
 }
+
 h1.welcome {
 	grid-column-start: 2;
 	font-size: 40px;
@@ -81,18 +75,19 @@ action-area {
 	align-content: space-between;
 	height: 100%;
 }
+
 form {
 	display: grid;
 	grid-row: span 2;
 	align-content: space-between;
-	
 }
 
-@media (min-width:  700px){
+@media (min-width: 700px) {
 	form {
 		grid-template-columns: 1fr 1fr;
 	}
 }
+
 flash-card {
 	display: grid;
 	align-items: start;
@@ -120,14 +115,17 @@ button {
 	justify-self: center;
 }
 
+button:hover {
+	background-color: hsla(144, 39%, 76%, 1.00);
+}
 
 .buttons {
 	display: flex;
 	gap: 30px;
 	justify-content: center;
 	grid-column: 1 / end;
+	order: 3;
 }
-
 
 .keys {
 	/*background-color: salmon;*/
@@ -138,48 +136,45 @@ button {
 	align-items: center;
 	gap: 5px;
 	justify-content: center;
-
-
 }
 
 flash-card code {
 	display: inline-block;
 	padding: 5px;
 }
+
 .keys .glyph {
-    border: 1px solid #111;
-    display: block;
-    padding: 10px;
-    border-radius: 4px;
-    font-family: Sans-serif;
-    text-align: center;
+	border: 1px solid #111;
+	display: block;
+	padding: 10px;
+	border-radius: 4px;
+	font-family: Sans-serif;
+	text-align: center;
 }
 
 .card-count span {
 	color: red;
 }
+
 .card-count span.due-0 {
-	display: none ;
-
+	display: none;
 }
-
 
 header {
 	font-family: monospace;
 }
+
 /*//category*/
 .category {
-	
 	border-radius: 4px;
 	padding: 10px 20px;
 }
+
 .category.shortcut {
-	
-
-    background-color: #fafafa;
-    box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.5),-1px -1px 2px 0 rgba(0,0,0,0.05);
-    color: black;
-
+	background-color: #fafafa;
+	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.5), -1px -1px 2px 0 rgba(0, 0, 0, 0.05);
+	color: black;
+	cursor: text;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -188,11 +183,11 @@ header {
 	}
 }
 
-
 .card-filter {
 	display: grid;
-	gap:  5px;
+	gap: 5px;
 	grid-column: span 1;
+	order: 2;
 }
 
 input-field {
@@ -200,13 +195,15 @@ input-field {
 	gap: 10px;
 	max-width: 310px;
 	align-self: start;
-
+	grid-column: 1 / end;
+	order: 1;
 }
+
 input-field label {
 	grid-row: 1;
 }
+
 input-field input {
 	padding: 10px;
 	font-size: 20px;
 }
-

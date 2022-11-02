@@ -19,6 +19,7 @@ html {
 	--corners: 10px; /* or whatevers */
 
 	--paper: #f5f5f5;
+	--paper2: hsla(0, 0%, 100%, 1.00);
 	--ink: var(--black);
 
 }

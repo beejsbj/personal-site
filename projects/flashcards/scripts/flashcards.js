@@ -81,12 +81,14 @@ class Flashdeck {
 	headerTemplater( index ) {
 		var card = this.cards[ index ];
 		var cardType = card.type;
+
+		var slug = 'https://perpetual.education/study-hall/#' + card.slug;
 		// var cardLesson = card.lesson; //lesson
 		var cardApplication = ( card.acf.application[ 0 ] ) ? card.acf.application[ 0 ].post_title : "no data"; //aplication instead of lesson
 		const headerTemplate = `
-		<h1 class="category ${cardType}">
+		<a target="study-hall" href="${slug}" class="category ${cardType}">
 			${cardType}
-		</h1>
+		</a>
 		<h2 class="card-count">
 			${index + 1}/${this.numCardsToReview}
 			<span class="due-${this.dueToday}" >[Due: ${this.dueToday}]</span>
@@ -177,6 +179,7 @@ class Flashdeck {
 		const $revealButton = document.querySelector( "button#reveal" );
 		const $badButton = document.querySelector( "button#bad" );
 		const $goodButton = document.querySelector( "button#good" );
+		console.log(this.index)
 		$revealButton.addEventListener( "click", function() {
 			var $backSide = document.querySelector( "flash-card back-side" );
 			$backSide.classList.toggle( "hide" );
@@ -222,7 +225,6 @@ class Flashdeck {
 			return -1;
 		} )
 		console.log( sorted )
-		console.log(this.dueToday)
 		return sorted;
 	}
 	// Fisher-Yates (aka Knuth) Shuffle.
@@ -242,4 +244,4 @@ class Flashdeck {
 		return array;
 	}
 }
-var yourDeck = new Flashdeck( 'burooj' );
+var yourDeck = new Flashdeck( 'Study Hall' );
