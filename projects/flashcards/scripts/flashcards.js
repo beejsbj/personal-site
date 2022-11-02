@@ -70,27 +70,29 @@ class Flashdeck {
 		console.log( text );
 	}
 	cardRenderer( index ) {
+
 		if ( index < this.numCardsToReview ) {
 			this.$cardHeader.innerHTML = this.headerTemplater( index );
 			this.$actionArea.innerHTML = this.cardTemplater( index );
-			this.buttonHandler();
+			this.flipCard();
 		} else {
 			this.renderEnd();
 		}
 	};
 	headerTemplater( index ) {
-		var card = this.cards[ index ];
-		var cardType = card.type;
 
-		var slug = 'https://perpetual.education/study-hall/#' + card.slug;
-		// var cardLesson = card.lesson; //lesson
-		var cardApplication = ( card.acf.application[ 0 ] ) ? card.acf.application[ 0 ].post_title : "no data"; //aplication instead of lesson
+		let card = this.cards[ index ];
+		let cardType = card.type;
+
+		let slug = 'https://perpetual.education/study-hall/#' + card.slug;
+		// let cardLesson = card.lesson; //lesson
+		let cardApplication = ( card.acf.application[ 0 ] ) ? card.acf.application[ 0 ].post_title : "no data"; //aplication instead of lesson
 		const headerTemplate = `
 		<a target="study-hall" href="${slug}" class="category ${cardType}">
 			${cardType}
 		</a>
 		<h2 class="card-count">
-			${index + 1}/${this.numCardsToReview}
+			${this.index + 1}/${this.numCardsToReview}
 			<span class="due-${this.dueToday}" >[Due: ${this.dueToday}]</span>
 		</h2>
 		<h3 class="lesson">
@@ -99,9 +101,11 @@ class Flashdeck {
 		return headerTemplate;
 	}
 	cardTemplater( index ) {
-		var card = this.cards[ index ];
-		var cardFront = card.acf.name;
-		var cardBack = card.acf.short_description;
+		console.log(index)
+		let card = this.cards[ index ];
+		console.log(card)
+		let cardFront = card.acf.name;
+		let cardBack = card.acf.short_description;
 		if ( card.type == "shortcut" ) {
 			cardBack = this.keysTemplater( card ) + cardBack;
 		}
@@ -134,7 +138,7 @@ class Flashdeck {
 		return '<div class="keys firm-voice">' + keysString + '</div>';
 	}
 	renderEnd() {
-		this.$cardHeader.innerHTML = `<h1 class="welcome">Finished!</h1>`;
+		this.$cardHeader.innerHTML = `<h1 class="welcome attention-voice" >Finished!</h1>`;
 		this.$actionArea.innerHTML = `
 		<form>
 			<ul class="card-filter">
@@ -175,11 +179,10 @@ class Flashdeck {
 			this.cardRenderer( this.index );
 		} );
 	};
-	buttonHandler() {
+	flipCard() {
 		const $revealButton = document.querySelector( "button#reveal" );
 		const $badButton = document.querySelector( "button#bad" );
 		const $goodButton = document.querySelector( "button#good" );
-		console.log(this.index)
 		$revealButton.addEventListener( "click", function() {
 			var $backSide = document.querySelector( "flash-card back-side" );
 			$backSide.classList.toggle( "hide" );
@@ -189,13 +192,14 @@ class Flashdeck {
 		} );
 		$badButton.addEventListener( 'click', () => {
 			this.moveBack( this.index ) //push back card step
-			this.cardRenderer( this.index++ );
+			this.cardRenderer( ++this.index );
 		} )
 		$goodButton.addEventListener( 'click', () => {
 			this.moveNext( this.index ) //push front card step
-			this.cardRenderer( this.index++ );
+			this.cardRenderer( ++this.index );
 		} )
 	}
+
 	filteredSlection( cardsData ) {
 		var $selections = document.querySelectorAll( '.card-filter input:checked' );
 		$selections = Array.from( $selections );
