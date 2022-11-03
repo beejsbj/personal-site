@@ -80,7 +80,7 @@ function renderPage ($data) {
 
 
 
-function dasher($string){
+function getKebabCase($string){
 	//lowercase the string
 	//split string at space 
 	$splitString = explode(" ", $string);
@@ -89,14 +89,15 @@ function dasher($string){
 	return strtolower($finalString);
 }
 
-function unDasher($string){
+function kebabToCapital($string){
 	$splitString = explode("-", $string);
 	$finalString = implode(" ", $splitString);
 	return ucwords($finalString);
 }
-function functionNamer($string){
+function getCamelCase($string){
 	$splitString = explode(" ", ucwords($string));
 	$finalString = implode("", $splitString);
+	$finalString[0] = strtolower($finalString[0]);
 	return $finalString;
 }
 
