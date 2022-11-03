@@ -118,7 +118,7 @@ if (isset($_POST['submitted'])){
 <form id="e4p" method="POST">
     <div class="input-field radio-list">
         <div class="input-field">
-            <input id="ifeet" type="radio" name="unitChoice" value="feet">
+            <input id="ifeet" type="radio" name="unitChoice" value="feet" checked>
             <label for="ifeet">feet</label>
         </div>
         <div class="input-field">
@@ -127,12 +127,12 @@ if (isset($_POST['submitted'])){
         </div>
     </div>
     <div class="input-field">
-        <input type="text" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.01" min="1">
-        <label for=""> What is the length of the room?</label>
+        <input type="number" id="length" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.01" min="1">
+        <label for="length"> What is the length of the room?</label>
     </div>
     <div class="input-field">
-        <input type="text" class="text-number-input" required name="width" placeholder="width??" value="<?=$width?>" step="0.01" min="1">
-        <label for=""> What is the width of the room?</label>
+        <input id="width" type="number" class="text-number-input" required name="width" placeholder="width??" value="<?=$width?>" step="0.01" min="1">
+        <label for="width"> What is the width of the room?</label>
     </div>
     <button type="submit" name="submitted"> Calculate </button>
     <div id="e4p-output" class="<?=$class?>">
