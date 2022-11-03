@@ -5,6 +5,7 @@ function toggleOutlet() {
 	document.querySelector( 'div#e4p-output' )
 		.classList.add( 'output-field' );
 }
+
 // boiler
 function exercise( $outlet ) {
 	var $input = document.querySelector( '#e4p input' );
@@ -16,7 +17,7 @@ function exercise( $outlet ) {
 	toggleOutlet();
 }
 // Saying Hello -->
-function SayingHello( $outlet ) {
+function sayingHello( $outlet ) {
 	var $name = document.querySelector( 'input#nme' );
 	if ( $name ) {
 		var template = 'hello, <span>' + $name.value + '</span> wassup?';
@@ -26,7 +27,7 @@ function SayingHello( $outlet ) {
 	toggleOutlet();
 }
 // Counting the Number of Characters -->
-function CountingTheNumberOfCharacters( $outlet ) {
+function countingTheNumberOfCharacters( $outlet ) {
 	var $string = document.querySelector( 'input#char-count' );
 	// get length of $string and store it in another variable
 	var stringLen = $string.value.length
@@ -40,7 +41,7 @@ function CountingTheNumberOfCharacters( $outlet ) {
 	toggleOutlet();
 }
 // Printing Quotes -->
-function PrintingQuotes( $outlet ) {
+function printingQuotes( $outlet ) {
 	var $author = document.querySelector( '#e4p input#author' );
 	var $quote = document.querySelector( '#e4p input#quote' );
 	if ( $author && $quote ) {
@@ -52,7 +53,7 @@ function PrintingQuotes( $outlet ) {
 	toggleOutlet();
 }
 // // Mad lib -->
-function MadLib( $outlet ) {
+function madLib( $outlet ) {
 	var $noun = document.querySelector( '#e4p input#noun' );
 	var $verb = document.querySelector( '#e4p input#verb' );
 	var $adjective = document.querySelector( '#e4p input#adjective' );
@@ -68,15 +69,13 @@ function MadLib( $outlet ) {
 	toggleOutlet();
 }
 
-function SimpleMath( $outlet ) {
+function simpleMath( $outlet ) {
 	var $first = document.querySelector( '#e4p input#first-id' );
 	var $second = document.querySelector( '#e4p input#second-id' );
-
 	let sum = $first.value + $second.value;
 	let difference = $first.value - $second.value;
 	let product = $first.value * $second.value;
 	let quotient = $first.value / $second.value;
-
 	if ( $first && $second ) {
 		var template = `<span>${$first.value}</span> + <span>${$second.value}</span> = ${sum}<br>
                         <span>${$first.value}</span> - <span>${$second.value}</span> = ${difference}<br>
@@ -89,81 +88,75 @@ function SimpleMath( $outlet ) {
 	toggleOutlet();
 }
 // // retirement calculator -->
-function RetirementCalculator( $outlet ) {
+function retirementCalculator( $outlet ) {
 	var templatel
 	var $currentAge = document.querySelector( '#e4p input#current-age' );
 	var $retireAge = document.querySelector( '#e4p input#retire-age' );
 	var ageDifference = $retireAge.value - $currentAge.value;
-
 	const today = new Date();
 	let currentYear = today.getFullYear();
 	let retireYear = currentYear + ageDifference;
-
 	if ( $currentAge && $retireAge ) {
 		template = `You have <span>${ageDifference}</span> years left until you can retire.<br>
                         It's <span>${currentYear}</span>, so you can retire in <span>${retireYear}</span>.`;
 		$currentAge.value = "";
 		$retireAge.value = "";
 	}
-
-	 if (ageDifference <= 0) {
-	            template = "What're you doing?! you can retire already. <br> go! go!";
-	        }
-
+	if ( ageDifference <= 0 ) {
+		template = "What're you doing?! you can retire already. <br> go! go!";
+	}
 	$outlet.innerHTML = `<p>${template}</p>`
 	toggleOutlet();
 }
-// // 7 Area of a Rectangular Room -->
-// function RectArea() {
-// 	// prompt for length and width of room in feet.
-// 	var length = parseInt(prompt('what is the length?'));
-// 	while (length == "") {
-// 		alert('you have to enter a number');
-// 		var length = parseInt(prompt('what is the length?'));
-// 	}
-// 	var width = parseInt(prompt('what is the width?'));
-// 	while (width == "") {
-// 		alert('you have to enter a number');
-// 		var width = parseInt(prompt('what is the width?'));
-// 	}
-// 	// calculate the area, point var to it
-// 	var areaInFt = length * width;
-// 	// convert to meters
-// 	const ftToMeters = 0.09290304;
-// 	var areaInMeters = areaInFt * ftToMeters;
-// 	// concat area in ft and area in meters to string and alert it
-// 	var output = `You entered dimensions of ${width} feet by ${length} feet.
-// The area is
-// ${areaInFt} square feet
-// ${areaInMeters} square meters`
-// 	alert(output);
-// }
-// // Pizza Party -->
-// function PizzaParty() {
-// 	// prompt for number of people
-// 	var people = parseInt(prompt('how many people?'));
-// 	while (people == "") {
-// 		alert('you have to enter a number');
-// 		var people = parseInt(prompt('how many people?'));
-// 	}
-// 	// prompt for number of pizzas
-// 	var pizzas = parseInt(prompt('how many pizzas?'));
-// 	while (pizzas == "") {
-// 		alert('you have to enter a number');
-// 		var pizzas = parseInt(prompt('how many pizzas?'));
-// 	}
-// 	// init var for number of slices in a single pizza, defaut value.
-// 	const slicesPerPizza = 8;
-// 	var totalSlices = slicesPerPizza * pizzas
-// 	// store the quotient and reminder after dividing the people over pizzas
-// 	var slicesPerPerson = parseInt(totalSlices / people);
-// 	var leftoverSlices = totalSlices % people;
-// 	// concat into string and print
-// 	var output = `${people} people with ${pizzas} pizzas
-// Each person gets ${slicesPerPerson} pieces of pizza.
-// There are ${leftoverSlices} leftover pieces.`
-// 	alert(output);
-// }
+
+function areaOfARectangularRoom( $outlet ) {
+	var $unit = document.querySelector( "#e4p .radio-list input[name='unitChoice']:checked" );
+	let $length = document.querySelector( "#length" );
+	let $width = document.querySelector( "#width" );
+	const convertConst = 0.09290304;
+	console.log( $unit )
+	if ( $unit.value == 'feet' ) {
+		let areaFt = $length.value * $width.value;
+		let areaMt = areaFt * convertConst;
+		var template = `The area is<br>
+                        <span>${areaFt}</span> square feet<br>
+                        <span>${areaMt.toFixed(2)}</span> square meters`;
+	} else {
+		let areaMt = $length.value * $width.value;
+		let areaFt = areaMt / convertConst;
+		var template = `The area is<br>
+                        <span>${areaMt}</span> square meters<br>
+                        <span>${areaFt.toFixed(2)}</span> square feet`;
+	}
+	$outlet.innerHTML = `<p>${template}</p>`
+	$length.value = "";
+	$width.value = "";
+	toggleOutlet();
+}
+
+function pizzaParty( $outlet ) {
+	var $people = document.querySelector( '#e4p #people' );
+	var $pizzas = document.querySelector( '#e4p #pizzas' );
+	var $slices = document.querySelector( '#e4p #slices' );
+	//calculations
+	var totalSlices = $pizzas.value * $slices.value;
+	console.log(totalSlices)
+	var slicesPerPerson = ( totalSlices / $people.value ).toFixed(0);
+	var leftover = ( totalSlices % $people.value )
+		.toFixed( 0 );
+	//checking for plurals
+	personPluraler = ( $people.value > 1 ) ? "people" : "person";
+	pizzaPluraler = ( $pizzas.value > 1 ) ? "pizzas" : "pizza";
+	slicePluraler = ( slicesPerPerson > 1 ) ? "slices" : "slice";
+	var template = `<span>${$people.value} ${personPluraler}</span> with <span>${$pizzas.value} ${pizzaPluraler}</span>?<br>
+                       So each person gets <span>${slicesPerPerson} ${slicePluraler}</span> of pizza.<br>
+                       There's <span>${leftover}</span> leftover slices.`;
+	$outlet.innerHTML = `<p>${template}</p>`
+	$people.value = "";
+	$pizzas.value = "";
+	$slices.value = "";
+	toggleOutlet();
+}
 // // Paint Calc -->
 // function PaintCalc() {
 // 	// promt for length and width
