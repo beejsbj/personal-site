@@ -31,11 +31,11 @@
 				 		$exName = $exercise['name'] ?? "exercise name";
 				 		$exNumber = $exercise['number']  ?? "exercise Number";
 				 		$exDesc = $exercise['description']  ?? "exercise chapterDesc";
-				 		$exLink = dasher($exName);
+				 		$exLink = $exercise['slug'] ?? "?page=exercise-detail&exercise=" . getKebabCase($exName);
 				 		?>
 
 						<li>
-							<a href="?page=exercise-detail&exercise=<?=$exLink?>"><?=$exName?></a>
+							<a href="<?=$exLink?>"><?=$exName?></a>
 						</li>
 				<?php } ?>
 				</ul>
