@@ -332,6 +332,7 @@
 						{
 							"number" : "53",
 							"name" : "Todo List",
+							"slug" : "projects/todo-app",
 							"description" : "a program that prompts for your name and prints a greeting using your name."
 						},
 						{
