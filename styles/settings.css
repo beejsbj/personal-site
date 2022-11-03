@@ -25,7 +25,7 @@ html {
 
 @media (prefers-color-scheme: dark) {
 	html {
-		--black: #111111;
+	/*	--black: #111111;
 		--white: #efefef;
 
 		--neutral-stuffs: gray;
@@ -37,8 +37,8 @@ html {
 
 		--corners: 10px; /* or whatevers */
 
-		--paper: red;
-		--ink: yellow;
+		--paper: ;
+		--ink: ;*/
 	}
 }
 
