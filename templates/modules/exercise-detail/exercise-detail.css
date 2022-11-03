@@ -9,17 +9,39 @@ exercise-detail #e4p-output span {
 	color:  var(--dark-highlight);
 }
 
-exercise-detail a {
-	grid-column: span 2;
+exercise-detail actions-component a {
+	background-color: var(--light-color);
+	border-radius: 50%;
+	padding: 30px;
+	position: relative;
 }
-exercise-detail toggle-switch,
-exercise-detail h2 {
-	grid-column: span 1;
+exercise-detail actions-component a span {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
+
+exercise-detail actions-component {
+	display: flex;
+	justify-self: stretch;
+	align-items: center;
+
+	justify-content: space-between;
+}
+
 @media (min-width:  500px){
 	exercise-detail {
 		grid-column: 2 / end;
+		grid-template-columns: 1fr 1fr;
 	}
+
+exercise-detail h2 {
+	grid-column: 1/end;
+}
+
+
+
 
 }
 
