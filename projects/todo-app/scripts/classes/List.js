@@ -1,4 +1,5 @@
 import Todo from "./Todo.js";
+///testing added this just now
 export default class List {
 	constructor( record ) {
 		this.name = record.name;
@@ -6,14 +7,18 @@ export default class List {
 		this.list = record.list;
 		this.dateCreated = record.dateCreated;
 		this.lastId = 0;
-		this.trash = record.trash ?? [];
+		this.trash = record.trash ? ? [];
 		this.buttonHandler();
 	}
 	initData() {
-		this.list = this.list.map( function( todoData ) {
+		this.list = this.rehydrateTodos( this.list );
+		this.trash = this.rehydrateTodos( this.trash );
+		this.renderTodos();
+	}
+	rehydrateTodos( data ) {
+		return data.map( function( todoData ) {
 			return new Todo( todoData );
 		} );
-		this.renderTodos();
 	}
 	add( content ) {
 		let todoTemplate = {
@@ -43,8 +48,10 @@ export default class List {
 		let filtered = this.list.filter( function( todo ) {
 			return todo.id != id;
 		} );
-		this.trash.push(this.findCardById(id));
-		console.log('removed', this.trash);
+		let todo = this.findCardById( id );
+		todo.id = new Date();
+		this.trash.push( todo );
+		console.log( "removed", this.trash );
 		this.list = filtered;
 		this.renderTodos();
 	}
