@@ -1,35 +1,34 @@
 <?php
 
-
 $class = "hide";
- // $class = "output-field";
+// $class = "output-field";
 
-$people = '';
-$pizza = '';
-$slicesPerPizza = '';
+$people = "";
+$pizza = "";
+$slicesPerPizza = "";
 $totalSlices = 0;
 $slicesPerPerson = 0;
 
 $leftover = 0;
 
-
 $personPluraler = "person";
 $pizzaPluraler = "pizza";
 $slicePluraler = "slice";
 
-
-
-if (isset($_POST['submitted'])){
-    
-    if ((isset($_POST['people'])) && (isset($_POST['pizza'])) && (isset($_POST['slicesPerPizza']))) {
-        
-
-
-        if (($_POST['people'] != 0) && ($_POST['pizza'] != 0) && ($_POST['slicesPerPizza'] != 0)) {
-
-            $people = floatval($_POST['people']);
-            $pizza = floatval($_POST['pizza']);
-            $slicesPerPizza = floatval($_POST['slicesPerPizza']);
+if (isset($_POST["submitted"])) {
+    if (
+        isset($_POST["people"]) &&
+        isset($_POST["pizza"]) &&
+        isset($_POST["slicesPerPizza"])
+    ) {
+        if (
+            $_POST["people"] != 0 &&
+            $_POST["pizza"] != 0 &&
+            $_POST["slicesPerPizza"] != 0
+        ) {
+            $people = floatval($_POST["people"]);
+            $pizza = floatval($_POST["pizza"]);
+            $slicesPerPizza = floatval($_POST["slicesPerPizza"]);
 
             $totalSlices = $pizza * $slicesPerPizza;
 
@@ -59,21 +58,21 @@ if (isset($_POST['submitted'])){
 ?>
 <form id="e4p" method="POST">
     <div class="input-field">
-        <input id="people" type="number" class="text-number-input" required name="people" placeholder="How many people?" value="<?=$people?>">
+        <input id="people" type="number" class="text-number-input" required name="people" placeholder="How many people?" value="<?= $people ?>">
         <label for="people">How many people?</label>
     </div>
     <div class="input-field">
-        <input id="pizzas" type="number" class="text-number-input" required name="pizza" placeholder="How many pizzas?" value="<?=$pizza?>">
+        <input id="pizzas" type="number" class="text-number-input" required name="pizza" placeholder="How many pizzas?" value="<?= $pizza ?>">
         <label for="pizzas">How many pizzas do you have?</label>
     </div>
     <div class="input-field">
-        <input id="slices" type="number" class="text-number-input" required name="slicesPerPizza" placeholder="How many slices?" value="<?=$slicesPerPizza?>">
+        <input id="slices" type="number" class="text-number-input" required name="slicesPerPizza" placeholder="How many slices?" value="<?= $slicesPerPizza ?>">
         <label for="slices">How many slices does each pizza have?</label>
     </div>
     <button type="submit" name="submitted"> Slice! </button>
-    <div id="e4p-output" class="<?=$class?>">
+    <div id="e4p-output" class="<?= $class ?>">
         <p>
-            <?=$output?>
+            <?= $output ?>
         </p>
     </div>
 </form>
