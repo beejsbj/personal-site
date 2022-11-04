@@ -1,9 +1,9 @@
-<?php 
-	include('functions.php'); 
+<?php
+	include "functions.php";
 	$currentPage = currentPage();
 	$pageData = getPageData($currentPage);
 ?>
-<?php include('templates/modules/header/header.php'); ?>
+<?php include "templates/modules/header/header.php"; ?>
 <main class="page-content">
 	<inner-column>
 		<card-module>
@@ -49,5 +49,5 @@
 		</card-module>
 	</inner-column>
 </main>
-<?php include('templates/modules/footer/footer.php'); ?>
+<?php include "templates/modules/footer/footer.php"; ?>
 <script src="scripts/flashcards.js"></script>

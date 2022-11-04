@@ -1,34 +1,41 @@
 class Flashdeck {
 	constructor( userName ) {
-		this.today = new Date();
 		this.index = 0;
 		this.userName = userName;
 		this.repBoxes = [ 1, 3, 7, 14, 30 ]; //days
 		this.dayInMiliSeconds = 24 * 60 * 60 * 1000;
-		this.dueToday = 0;
 		this.$cardHeader = document.querySelector( "card-module header" );
 		this.$actionArea = document.querySelector( "action-area" );
-		this.$numOfCardsInput = document.querySelector( '#num-cards' );
+		this.$numOfCardsInput = document.querySelector( "#num-cards" );
 		this.$beginButton = document.querySelector( "button#begin" );
 		this.getData();
 	}
 	getData() {
-		var pePromise = fetch( 'https://perpetual.education/wp-json/wp/v2/shortcut/?per_page=100' );
-		pePromise.then( function( rawData ) {
+		var pePromise = fetch(
+			"https://perpetual.education/wp-json/wp/v2/shortcut/?per_page=100"
+		);
+		pePromise
+			.then( function( rawData ) {
 				return rawData.json();
 			} )
 			.then( ( sourceJson ) => {
-				this.cards = ( localStorage.Flashcards ) ? JSON.parse( localStorage.Flashcards ) : sourceJson; //check local storage first, if empty, user api data.
-				this.$beginButton.classList.remove( 'hide-opacity' ); //show button after data is fetched
+				this.cards = localStorage.Flashcards
+					? JSON.parse( localStorage.Flashcards )
+					: sourceJson; //check local storage first, if empty, user api data.
+				this.$beginButton.classList.remove( "hide-opacity" ); //show button after data is fetched
 				this.$beginButton.addEventListener( "click", () => {
 					this.cards = this.shuffle( this.filteredSlection( this.cards ) ); //filter cards based on checkbox selection and shuflle
+					this.rehydrateDate();
 					this.cards = this.filteredToday(); //filter cards due to be reviewed today
-					this.numCardsToReview = ( this.cards.length >= this.$numOfCardsInput.value ) ? this.$numOfCardsInput.value : this.cards.length;
+					this.numCardsToReview =
+						this.cards.length >= this.$numOfCardsInput.value
+						? this.$numOfCardsInput.value
+						: this.cards.length;
 					this.cardRenderer( this.index );
 				} );
 			} )
 			.catch( function() {
-				console.log( 'oops' );
+				console.log( "oops" );
 			} );
 	}
 	findCard( id ) {
@@ -38,29 +45,39 @@ class Flashdeck {
 	}
 	moveNext( index ) {
 		let card = this.cards[ index ];
-		let box = ( card.repBox ) ? this.repBoxes.indexOf( card.repBox ) : this.repBoxes[ 1 ]; //if a box isnt set, set to default of 3
+		let box = card.repBox
+			? this.repBoxes.indexOf( card.repBox )
+			: this.repBoxes[ 1 ]; //if a box isnt set, set to default of 3
 		if ( box != this.repBoxes.length - 1 ) {
 			card.repBox = this.repBoxes[ ++box ];
 		}
 		card.lastReviewDate = new Date();
 		card.nextReviewDate = this.setNextDate( card );
-		this.printer( `Correct! you ${this.userName}, will see this card in ${card.repBox} days` );
+		this.printer(
+			`Correct! you ${this.userName}, will see this card in ${card.repBox} days`
+		);
 		this.setData();
 	}
 	// move card to older box.
 	moveBack( index ) {
 		let card = this.cards[ index ];
-		let box = ( card.repBox ) ? this.repBoxes.indexOf( card.repBox ) : this.repBoxes[ 1 ];
+		let box = card.repBox
+			? this.repBoxes.indexOf( card.repBox )
+			: this.repBoxes[ 1 ];
 		if ( box != 0 ) {
 			card.repBox = this.repBoxes[ --box ];
 		}
 		card.lastReviewDate = new Date();
 		card.nextReviewDate = this.setNextDate( card );
-		this.printer( `Wroooog ${this.userName} you'll see this card in ${card.repBox} days` );
+		this.printer(
+			`Wroooog ${this.userName} you'll see this card in ${card.repBox} days`
+		);
 		this.setData();
 	}
 	setNextDate( card ) {
-		return new Date( card.lastReviewDate.getTime() + card.repBox * this.dayInMiliSeconds );
+		return new Date(
+			card.lastReviewDate.getTime() + card.repBox * this.dayInMiliSeconds
+		);
 	}
 	setData() {
 		localStorage.Flashcards = JSON.stringify( this.cards );
@@ -70,7 +87,6 @@ class Flashdeck {
 		console.log( text );
 	}
 	cardRenderer( index ) {
-
 		if ( index < this.numCardsToReview ) {
 			this.$cardHeader.innerHTML = this.headerTemplater( index );
 			this.$actionArea.innerHTML = this.cardTemplater( index );
@@ -78,22 +94,28 @@ class Flashdeck {
 		} else {
 			this.renderEnd();
 		}
-	};
+	}
 	headerTemplater( index ) {
-
+		this.dueChecker(); //count number of card due today and overdue
 		let card = this.cards[ index ];
 		let cardType = card.type;
-
-		let slug = 'https://perpetual.education/study-hall/#' + card.slug;
+		let slug = "https://perpetual.education/study-hall/#" + card.slug;
 		// let cardLesson = card.lesson; //lesson
-		let cardApplication = ( card.acf.application[ 0 ] ) ? card.acf.application[ 0 ].post_title : "no data"; //aplication instead of lesson
+		let cardApplication = card.acf.application[ 0 ]
+			? card.acf.application[ 0 ].post_title
+			: "no data"; //aplication instead of lesson
 		const headerTemplate = `
 		<a target="study-hall" href="${slug}" class="category ${cardType}">
 			${cardType}
 		</a>
 		<h2 class="card-count">
+			<span data-overdue="${this.overdue}" class="overdue" >[Overdue: ${
+			this.overdue
+		}]</span>
 			${this.index + 1}/${this.numCardsToReview}
-			<span class="due-${this.dueToday}" >[Due: ${this.dueToday}]</span>
+			<span data-overdue="${this.dueToday}" class="due" >[Due: ${
+			this.dueToday
+		}]</span>
 		</h2>
 		<h3 class="lesson">
 			${cardApplication}
@@ -101,9 +123,9 @@ class Flashdeck {
 		return headerTemplate;
 	}
 	cardTemplater( index ) {
-		console.log(index)
+		console.log( index );
 		let card = this.cards[ index ];
-		console.log(card)
+		console.log( card );
 		let cardFront = card.acf.name;
 		let cardBack = card.acf.short_description;
 		if ( card.type == "shortcut" ) {
@@ -127,15 +149,15 @@ class Flashdeck {
 		return template;
 	}
 	keysTemplater( card ) {
-		var keysString = '';
+		var keysString = "";
 		var keys = card.acf.keys;
 		keys.forEach( function( key, i ) {
-			keysString += '<span class="glyph">' + key.key + '</span>';
+			keysString += '<span class="glyph">' + key.key + "</span>";
 			if ( i < keys.length - 1 ) {
-				keysString += '+';
+				keysString += "+";
 			}
 		} );
-		return '<div class="keys firm-voice">' + keysString + '</div>';
+		return '<div class="keys firm-voice">' + keysString + "</div>";
 	}
 	renderEnd() {
 		this.$cardHeader.innerHTML = `<h1 class="welcome attention-voice" >Finished!</h1>`;
@@ -174,11 +196,12 @@ class Flashdeck {
 		const $redoButton = document.querySelector( "button#redo" );
 		$redoButton.addEventListener( "click", () => {
 			this.index = 0;
-			this.numCardsToReview = document.querySelector( '#num-cards' )
+			this.numCardsToReview = document.querySelector( "#num-cards" )
 				.value;
+			this.cards = this.filteredToday(); //filter cards due to be reviewed today
 			this.cardRenderer( this.index );
 		} );
-	};
+	}
 	flipCard() {
 		const $revealButton = document.querySelector( "button#reveal" );
 		const $badButton = document.querySelector( "button#bad" );
@@ -190,18 +213,17 @@ class Flashdeck {
 			$badButton.classList.toggle( "hide" );
 			$goodButton.classList.toggle( "hide" );
 		} );
-		$badButton.addEventListener( 'click', () => {
-			this.moveBack( this.index ) //push back card step
+		$badButton.addEventListener( "click", () => {
+			this.moveBack( this.index ); //push back card step
 			this.cardRenderer( ++this.index );
-		} )
-		$goodButton.addEventListener( 'click', () => {
-			this.moveNext( this.index ) //push front card step
+		} );
+		$goodButton.addEventListener( "click", () => {
+			this.moveNext( this.index ); //push front card step
 			this.cardRenderer( ++this.index );
-		} )
+		} );
 	}
-
 	filteredSlection( cardsData ) {
-		var $selections = document.querySelectorAll( '.card-filter input:checked' );
+		var $selections = document.querySelectorAll( ".card-filter input:checked" );
 		$selections = Array.from( $selections );
 		if ( $selections.length ) {
 			return cardsData.filter( function( card ) {
@@ -210,26 +232,43 @@ class Flashdeck {
 						return card.acf.application[ 0 ].post_name == $selections[ i ].value;
 					}
 				}
-			} )
+			} );
 		} else {
 			return cardsData;
 		}
 	}
 	filteredToday() {
-		console.log( this.cards )
-		let sorted = this.cards.sort( ( card ) => {
-			if ( card.nextReviewDate ) {
-				card.nextReviewDate = new Date( card.nextReviewDate );
-				if ( card.nextReviewDate.toDateString() == this.today.toDateString() ) {
-					this.dueToday++;
-					return 1;
-				}
-				return -1;
+		console.log( this.cards );
+		let sorted = this.cards.sort( ( cardA, cardB ) => {
+			if ( cardA.nextReviewDate && cardB.nextReviewDate ) {
+				return cardA.nextReviewDate.getTime() - cardB.nextReviewDate.getTime();
 			}
-			return -1;
-		} )
-		console.log( sorted )
+		} );
+		console.log( sorted );
 		return sorted;
+	}
+	rehydrateDate() {
+		this.cards.map( ( card ) => {
+			card.nextReviewDate
+				? ( card.nextReviewDate = new Date( card.nextReviewDate ) )
+				: ( card.nextReviewDate = new Date() );
+		} );
+	}
+	dueChecker() {
+		this.today = new Date();
+		this.dueToday = 0;
+		this.overdue = 0;
+		this.cards.forEach( ( card ) => {
+			if ( card.nextReviewDate.toDateString() == this.today.toDateString() ) {
+				this.dueToday++;
+			} else if (
+				card.nextReviewDate.getTime() / ( 1000 * 60 * 60 * 24 )
+				< this.today.getTime() / ( 1000 * 60 * 60 * 24 )
+			) {
+				this.overdue++;
+			}
+
+		} );
 	}
 	// Fisher-Yates (aka Knuth) Shuffle.
 	shuffle( array ) {
@@ -242,10 +281,11 @@ class Flashdeck {
 			currentIndex--;
 			// And swap it with the current element.
 			[ array[ currentIndex ], array[ randomIndex ] ] = [
-				array[ randomIndex ], array[ currentIndex ]
+				array[ randomIndex ],
+				array[ currentIndex ],
 			];
 		}
 		return array;
 	}
 }
-var yourDeck = new Flashdeck( 'Study Hall' );
+var yourDeck = new Flashdeck( "Study Hall" );

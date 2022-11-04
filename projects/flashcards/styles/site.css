@@ -82,8 +82,6 @@ form {
 	align-content: space-between;
 }
 
-
-
 flash-card {
 	display: grid;
 	align-items: start;
@@ -114,6 +112,7 @@ button {
 button:hover {
 	background-color: hsla(144, 39%, 76%, 1.00);
 }
+
 button#bad:hover {
 	background-color: hsla(0, 39%, 76%, 1.00);
 }
@@ -155,11 +154,16 @@ flash-card code {
 	text-align: center;
 }
 
-.card-count span {
+.card-count span.overdue {
 	color: red;
 }
 
-.card-count span.due-0 {
+.card-count span.due {
+	color: green;
+}
+
+.card-count span[data-due="0"],
+.card-count span[data-overdue="0"] {
 	display: none;
 }
 
