@@ -7,7 +7,7 @@ export default class List {
 		this.list = record.list;
 		this.dateCreated = record.dateCreated;
 		this.lastId = 0;
-		this.trash = record.trash ? ? [];
+		this.trash = record.trash;
 		this.buttonHandler();
 	}
 	initData() {
