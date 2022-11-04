@@ -11,6 +11,7 @@ footer .circle {
 		right: initial;
 		left: -200px;
 		display: block;
+		z-index: -999;
 	}
 
 
@@ -37,6 +38,6 @@ footer .circle {
 		left: initial;
 		display: block;
 		width: 600px;
-		z-index: -99;
+		
 	}
 }

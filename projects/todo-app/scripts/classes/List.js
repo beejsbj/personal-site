@@ -1,4 +1,4 @@
-import Todo from './Todo.js';
+import Todo from "./Todo.js";
 export default class List {
 	constructor( record ) {
 		this.name = record.name;
@@ -6,6 +6,7 @@ export default class List {
 		this.list = record.list;
 		this.dateCreated = record.dateCreated;
 		this.lastId = 0;
+		this.trash = record.trash ?? [];
 		this.buttonHandler();
 	}
 	initData() {
@@ -19,26 +20,31 @@ export default class List {
 			id: this.getUniqueID(),
 			content,
 			complete: false,
-			dateCreated: new Date()
+			dateCreated: new Date(),
 		};
 		const todo = new Todo( todoTemplate );
 		this.list.push( todo );
 		this.renderTodos();
 	}
+	findCardById( id ) {
+		return this.list.find( ( todo ) => {
+			return id == todo.id;
+		} );
+	}
 	getUniqueID() {
-		let found = this.list.find( ( todo ) => {
-			return this.lastId == todo.id;
-		} )
+		let found = this.findCardById( this.lastId );
 		if ( found ) {
 			this.lastId++;
-			this.getUniqueID()
-		};
+			this.getUniqueID();
+		}
 		return this.lastId;
 	}
 	remove( id ) {
 		let filtered = this.list.filter( function( todo ) {
 			return todo.id != id;
 		} );
+		this.trash.push(this.findCardById(id));
+		console.log('removed', this.trash);
 		this.list = filtered;
 		this.renderTodos();
 	}
@@ -56,7 +62,9 @@ export default class List {
 			template += todo.render();
 		} );
 		template += "</ul>";
-		this.$outlet = document.querySelector( `[data-id="${this.id}"] output-field` );
+		this.$outlet = document.querySelector(
+			`[data-id="${this.id}"] output-field`
+		);
 		this.$outlet.innerHTML = template;
 	}
 	renderList() {
@@ -81,7 +89,9 @@ export default class List {
 			if ( event.target.matches( `[data-id="${this.id}"] button.add` ) ) {
 				let $input = event.target.closest( "todo-list" )
 					.querySelector( "input" );
-				( !$input.value ) ? alert( 'please enter something' ): this.add( $input.value );
+				!$input.value
+					? alert( "please enter something" )
+					: this.add( $input.value );
 				$input.value = "";
 			}
 			if ( event.target.matches( `[data-id="${this.id}"] button.remove` ) ) {
@@ -94,15 +104,18 @@ export default class List {
 					.dataset.id;
 				this.complete( id );
 			}
-			if ( event.target.matches( `[data-id="${this.id}"] h2.notice-voice` ) || event.target.matches( `[data-id="${this.id}"] h3.calm-voice` ) ) {
-				let $text = event.target
-				$text.innerHTML = `<input class="edit-text" type='text' value='${$text.innerHTML}'>`
-				let $input = document.querySelector( 'input.edit-text' )
-				$input.addEventListener( 'keypress', function( event ) {
-					if ( event.code === 'Enter' ) {
+			if (
+				event.target.matches( `[data-id="${this.id}"] h2.notice-voice` )
+				|| event.target.matches( `[data-id="${this.id}"] h3.calm-voice` )
+			) {
+				let $text = event.target;
+				$text.innerHTML = `<input class="edit-text" type='text' value='${$text.innerHTML}'>`;
+				let $input = document.querySelector( "input.edit-text" );
+				$input.addEventListener( "keypress", function( event ) {
+					if ( event.code === "Enter" ) {
 						$text.innerHTML = $input.value;
 					}
-				} )
+				} );
 			}
 		} );
 	}

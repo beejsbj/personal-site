@@ -1,28 +1,28 @@
 /* P reset */
-@import 'preset.css';
+@import "preset.css";
 
 /* S etup */
-@import 'setup.css';
+@import "setup.css";
 
 /* S setings */
-@import 'settings.css';
-@import 'developer-styles.css';
+@import "settings.css";
+@import "developer-styles.css";
 
 /* S tructure */
-@import 'structure.css';
+@import "structure.css";
 
 /* T ypography */
-@import 'typography.css';
+@import "typography.css";
 
 /* C omponents */
-@import 'components.css';
-@import 'forms.css';
+@import "components.css";
+@import "forms.css";
 
 /* S tuff (modules) */
-@import 'modules.css';
+@import "modules.css";
 
 /* S ections and more stuff */
-@import 'animation.css';
+@import "animation.css";
 
 /* then other contextual styles */
 body {
@@ -30,22 +30,10 @@ body {
 	color: var(--ink);
 }
 
-.my-fantastic-image {
-	max-width: 300px;
-	border-bottom-right-radius: 30px;
-}
-
 .hide {
 	display: none;
 }
 
-
-
-
-input-field {
-	display: grid;
-	gap: 10px;
-}
 todo-app {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -56,27 +44,24 @@ todo-app {
 	align-items: start;
 }
 
-input,
-button {
-	padding: 10px;
-}
-
-.complete h3 {
-	text-decoration: 3px wavy line-through hsla(0, 0%, 0%, 0.6);
-}
-
 todo-list {
 	/* 	outline: 3px solid blue; */
 	padding: 15px;
 	background-color: var(--paper2);
 	position: relative;
 	display: grid;
-	gap:  20px;
+	gap: 20px;
 	align-content: center;
 	border-radius: 5px;
 	overflow: hidden;
-
 }
+
+todo-list output-field ul {
+	display: grid;
+	gap: 20px;
+	justify-items: space-between;
+}
+
 todo-card {
 	outline: 2px solid black;
 	background-color: var(--paper2);
@@ -86,37 +71,6 @@ todo-card {
 	border-radius: 2px;
 }
 
-.remove-list {
-	position: absolute;
-	top: 0;
-	right: 0;
-	padding: 10px;
-	border-radius: 3px;
-	background-color: hsla(0, 39%, 60%, 1.00);
-}
-
-button {
-	cursor: pointer;
-	background-color: hsla(144, 39%, 76%, 1.00);
-	border-radius: 5px;
-}
-button.remove {
-	background-color: hsla(0, 39%, 60%, 1.00);
-}
-
-todo-list output-field ul {
-	display: grid;
-	gap: 20px;
-	justify-items: space-between;
-}
-
-inner-column > input-field {
-	justify-self: center;
-	min-width: 500px;
-	text-align: center;
-}
-
-input.edit-text {
-	padding: 0;
-	font-size: inherit;
+todo-card .complete h3 {
+	text-decoration: 3px wavy line-through hsla(0, 0%, 0%, 0.6);
 }
