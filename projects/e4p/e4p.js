@@ -182,6 +182,20 @@ function pizzaParty( $outlet ) {
 // paint to cover ${area} square feet.`;
 // 	alert(output);
 // }
+function paintCalculator( $outlet ) {
+	var $length = document.querySelector( '#e4p #lengthid' );
+	var $width = document.querySelector( '#e4p #widthid' );
+	var galConst = 350;
+	if ( $length && $width ) {
+		let area = length.value * width.value;
+		let gallons = area / galConst;
+		var template = `You will need to purchase <span>${gallons}</span> gallons of paint to cover <span>${area}</span> square feet`;
+		$outlet.innerHTML = `<p>${template}</p>`
+		$length.value = "";
+		$width.value = "";
+	}
+	toggleOutlet();
+}
 // function SelfCheckout() {
 // 	// init const tax
 // 	// promtp for price of item 1
