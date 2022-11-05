@@ -157,31 +157,7 @@ function pizzaParty( $outlet ) {
 	$slices.value = "";
 	toggleOutlet();
 }
-// // Paint Calc -->
-// function PaintCalc() {
-// 	// promt for length and width
-// 	var length = parseInt(prompt('what is the length?'));
-// 	while (length == "") {
-// 		alert('you have to enter a number');
-// 		var length = parseInt(prompt('what is the length?'));
-// 	}
-// 	var width = parseInt(prompt('what is the width?'));
-// 	while (width == "") {
-// 		alert('you have to enter a number');
-// 		var width = parseInt(prompt('what is the width?'));
-// 	}
-// 	// init constant areapergallon = 350
-// 	const areaPerGallon = 350;
-// 	// calculate area of cieling
-// 	var area = length * width;
-// 	// calculate gallons needed per area
-// 	var gallons = area / areaPerGallon;
-// 	// round up gallons to a whole number
-// 	gallons = Math.ceil(gallons);
-// 	var output = `You will need to purchase ${gallons} gallons of
-// paint to cover ${area} square feet.`;
-// 	alert(output);
-// }
+
 function paintCalculator( $outlet ) {
 	var $length = document.querySelector( '#e4p #lengthid' );
 	var $width = document.querySelector( '#e4p #widthid' );
@@ -196,6 +172,7 @@ function paintCalculator( $outlet ) {
 	}
 	toggleOutlet();
 }
+
 function selfCheckout( $outlet ) {
 	//item1
 	var $price1 = document.querySelector( '#e4p #priceid1' );
