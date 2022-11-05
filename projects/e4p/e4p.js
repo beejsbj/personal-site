@@ -196,6 +196,36 @@ function paintCalculator( $outlet ) {
 	}
 	toggleOutlet();
 }
+function selfCheckout( $outlet ) {
+	//item1
+	var $price1 = document.querySelector( '#e4p #priceid1' );
+	var $quantity1 = document.querySelector( '#e4p #quantityid1' );
+	//item2
+	var $price2 = document.querySelector( '#e4p #priceid2' );
+	var $quantity2 = document.querySelector( '#e4p #quantityid2' );
+	//item3
+	var $price3 = document.querySelector( '#e4p #priceid3' );
+	var $quantity3 = document.querySelector( '#e4p #quantityid3' );
+	var taxRate = 0.055;
+	if ( $price1 && $quantity1 && $price2 && $quantity2 && $price3 && $quantity3 ) {
+		let subTotal = $price1.value * $quantity1.value + $price2.value * $quantity2.value + $price3.value * $quantity3.value
+		let tax = subTotal * taxRate;
+		let total = (subTotal + tax).toFixed(2);
+		var template = `price of item 1  : <span>${$price1.value}</span> <br>
+				       quantity of item 1: <span>${$quantity1.value}</span> <br>
+				       price of item 2   : <span>${$price2.value}</span> <br>
+				       quantity of item 2: <span>${$quantity2.value}</span> <br>
+				       price of item 3   : <span>${$price3.value}</span> <br>
+				       quantity of item 3: <span>${$quantity3.value}</span> <br>
+				       Subtotal: <span>${subTotal}</span> <br>
+				       Tax: <span>${tax}</span> <br>
+				       Total: <span>${total}</span>`;
+		$outlet.innerHTML = `<p>${template}</p>`
+	}
+	toggleOutlet();
+}
+
+
 // function SelfCheckout() {
 // 	// init const tax
 // 	// promtp for price of item 1
