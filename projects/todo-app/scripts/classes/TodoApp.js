@@ -14,6 +14,7 @@ export default class TodoApp {
 			template += list.renderList();
 		} );
 		this._$todoApp.innerHTML = template;
+		
 		this.lists.forEach( function( list ) {
 			list.initData();
 		} );
@@ -80,13 +81,14 @@ export default class TodoApp {
 				|| event.target.matches( "button.complete" )
 			) {
 				this.setData();
-				console.log( "saved to storage" );
+				
 			}
 		} );
 	}
 	setData() {
 		localStorage.TodoAppData = JSON.stringify( this.lists );
 		localStorage.TodoAppTrash = JSON.stringify( this.trash );
+		console.log( "saved to storage" );
 	}
 	getData() {
 		let data = localStorage.TodoAppData
