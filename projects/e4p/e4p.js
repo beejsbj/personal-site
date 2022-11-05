@@ -89,7 +89,6 @@ function simpleMath( $outlet ) {
 }
 // // retirement calculator -->
 function retirementCalculator( $outlet ) {
-	var templatel
 	var $currentAge = document.querySelector( '#e4p input#current-age' );
 	var $retireAge = document.querySelector( '#e4p input#retire-age' );
 	var ageDifference = $retireAge.value - $currentAge.value;
@@ -202,6 +201,60 @@ function selfCheckout( $outlet ) {
 	toggleOutlet();
 }
 
+
+function currencyConversion( $outlet ) {
+	var $amount = document.querySelector( '#e4p #amount-fromID' );
+	var $rate = document.querySelector( '#e4p #rate-fromID' );
+	
+
+	if ( $amount && $rate ) {
+		let result = $amount.value * $rate.value;
+		var template = `<span>${$amount.value}</span> euros at an exchange rate of 
+					<span>${$rate.value}</span> is <span>${result}</span> U.S. dollars.`;
+		$outlet.innerHTML = `<p>${template}</p>`
+		$amount.value = "";
+		$rate.value = "";
+	}
+	toggleOutlet();
+}
+
+function computingSimpleInterest( $outlet ) {
+	var $principal = document.querySelector( '#e4p #principal-ID' );
+	var $rate = document.querySelector( '#e4p #rate-ID' );
+	var $time = document.querySelector( '#e4p #time-ID' );
+
+	if ( $principal && $rate && $time ) {
+		$amount = $principal.value * (1 + (($rate.value / 100) * $time.value));
+		var template = `After <span>${$time.value}</span> years at <span>${$rate.value}%</span>, 
+					<br>the investment will be worth <span>$${amount}</span>.`;
+		$outlet.innerHTML = `<p>${template}</p>`
+		$principal.value = "";
+		$time.value = "";
+		$rate.value = "";
+	}
+	toggleOutlet();
+}
+
+function determiningCompoundInterest( $outlet ) {
+	var $principal = document.querySelector( '#e4p #principal-ID' );
+	var $rate = document.querySelector( '#e4p #rate-ID' );
+	var $time = document.querySelector( '#e4p #time-ID' );
+	var $number = document.querySelector( '#e4p #number-ID' );
+
+	if ( $principal && $rate && $time && $number ) {
+		amount = $principal.value * Math.pow((1 + (($rate.value / (100 * $number.value)))), ($number.value * $time.value));
+		var template = `<span>$${$principal.value}</span> invested at 
+						<span>${$rate.value}%</span> for 
+						<span>${$time.value}</span> years compounded 
+						<span>${$number.value}</span> times per year is 
+						<span>$${amount.toFixed(2)}</span>.`
+		$principal.value = "";
+		$time.value = "";
+		$rate.value = "";
+		$number.value = "";
+	}
+	toggleOutlet();
+}
 
 // function SelfCheckout() {
 // 	// init const tax
