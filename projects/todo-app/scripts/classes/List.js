@@ -33,7 +33,6 @@ export default class List {
 		this.renderTodos();
 	}
 	findCardById( id ) {
-		// console.log(this.list)
 		return this.list.find( ( todo ) => {
 			return id == todo.id;
 		} );
@@ -68,12 +67,12 @@ export default class List {
 		} );
 		template += "</ul>";
 		this.$outlet = document.querySelector(
-			`[data-id="${this.id}"] output-field`
+			`[data-listId="${this.id}"] output-field`
 		);
 		this.$outlet.innerHTML = template;
 	}
 	renderList() {
-		return `<todo-list data-id="${this.id}">
+		return `<todo-list data-listId="${this.id}">
 					<h2 class="notice-voice" >${this.name}</h2>
 					<actions><button class="remove-list">❌</button></actions>
 					<form>
@@ -92,29 +91,29 @@ export default class List {
 		window.addEventListener( "click", ( event ) => {
 			event.preventDefault();
 
-			if ( event.target.matches( `[data-id="${this.id}"] button.add` ) ) {
+			if ( event.target.matches( `[data-listId="${this.id}"] button.add` ) ) {
 				// console.log(this.list);
 				let $input = event.target.closest( "todo-list" )
 					.querySelector( "input" );
 				!$input.value ? alert( "please enter something" ) : this.add( $input.value );
 				$input.value = "";
 			}
-			if ( event.target.matches( `[data-id="${this.id}"] button.remove` ) ) {
+			if ( event.target.matches( `[data-listId="${this.id}"] button.remove` ) ) {
 				const id = event.target.closest( "li" ).dataset.id;
 				this.remove( id );
 			}
-			if ( event.target.matches( `[data-id="${this.id}"] button.complete` ) ) {
+			if ( event.target.matches( `[data-listId="${this.id}"] button.complete` ) ) {
 				const id = event.target.closest( "li" ).dataset.id;
-				// console.log(this.list);
+				console.log(this.list);
 				this.complete( id );
 			}
 			if (
-				event.target.matches( `[data-id="${this.id}"] h2.notice-voice` )
-				|| event.target.matches( `[data-id="${this.id}"] h3.calm-voice` )
+				event.target.matches( `[data-listId="${this.id}"] h2.notice-voice` )
+				|| event.target.matches( `[data-listId="${this.id}"] h3.calm-voice` )
 			) {
 				let $text = event.target;
 				$text.innerHTML = `<input class="edit-text" type='text' value='${$text.innerHTML}'>`;
-				let $input = document.querySelector( "input.edit-text" );
+				let $input = $text.querySelector( "input.edit-text" );
 				$input.addEventListener( "keypress", function( event ) {
 					if ( event.code === "Enter" ) {
 						$text.innerHTML = $input.value;
