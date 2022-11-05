@@ -2,16 +2,20 @@
 
     <style>
         item-field {
-            display: flex;
             gap: 25px;
-            align-items: center;
-            justify-content: space-between;
+            /*align-items: start;*/
         }
+        .default-theme exercise-form h4 {
+                display: none;
+            }
 
-        item-field > .input-field {
-            flex-basis: 80%;
+        @media(min-width: 750px) {
+            item-field {
+                grid-template-columns: 1fr 1fr;
+                justify-content: space-between;
+            }
+            
         }
-
 
         .output-field {
             text-align: left;
@@ -110,55 +114,55 @@ if (isset($_POST['submitted'])){
 
 
 
-            <form id="e4p" method="POST">
+<form id="e4p" method="POST">
 
-                <item-field>
-                    <h2 class="whisper-voice">1</h2>
-                    <div class="input-field">
-                    <input id="priceid1" type="text" class="text-number-input" required name="price1" placeholder="Price?" value="<?=$price1?>">
-                    <label for="priceid1">Enter Price</label>
-                </div>
-                <div class="input-field">
-                    <input id="quantityid1" type="text" class="text-number-input" required name="quantity1" placeholder="Quantity??" value="<?=$quantity1?>">
-                    <label for="quantityid1">Enter Quantity</label>
-                </div>
-                </item-field>
-                <item-field>
-                    <h2 class="whisper-voice">2</h2>
-                    <div class="input-field">
-                    <input id="priceid2" type="text" class="text-number-input" required name="price2" placeholder="Price?" value="<?=$price2?>">
-                    <label for="priceid2">Enter Price</label>
-                </div>
-                <div class="input-field">
-                    <input id="quantityid2" type="text" class="text-number-input" required name="quantity2" placeholder="Quantity??" value="<?=$quantity2?>">
-                    <label for="quantityid2">Enter Quantity</label>
-                </div>
-                </item-field>
-                <item-field>
-                    <h2 class="whisper-voice">3</h2>
-                    <div class="input-field">
-                    <input id="priceid3" type="text" class="text-number-input" required name="price3" placeholder="Price?" value="<?=$price3?>">
-                    <label for="priceid3">Enter Price</label>
-                </div>
-                <div class="input-field">
-                    <input id="quantityid3" type="text" class="text-number-input" required name="quantity3" placeholder="Quantity??" value="<?=$quantity3?>">
-                    <label for="quantityid3">Enter Quantity</label>
-                </div>
-                </item-field>
-
-
-                <button type="submit" name="submitted">
-                    Checkout
-                </button>
+    <item-field>
+        <h4 class="whisper-voice">1</h4>
+        <div class="input-field">
+        <input id="priceid1" type="number" class="text-number-input" required name="price1" placeholder="Price?" value="<?=$price1?>">
+        <label for="priceid1">Enter Price</label>
+    </div>
+    <div class="input-field">
+        <input id="quantityid1" type="number" class="text-number-input" required name="quantity1" placeholder="Quantity??" step="1" value="<?=$quantity1?>">
+        <label for="quantityid1">Enter Quantity</label>
+    </div>
+    </item-field>
+    <item-field>
+        <h4 class="whisper-voice">2</h4>
+        <div class="input-field">
+        <input id="priceid2" type="number" class="text-number-input" required name="price2" placeholder="Price?" value="<?=$price2?>">
+        <label for="priceid2">Enter Price</label>
+    </div>
+    <div class="input-field">
+        <input id="quantityid2" type="number" class="text-number-input" required name="quantity2" placeholder="Quantity??" step="1" value="<?=$quantity2?>">
+        <label for="quantityid2">Enter Quantity</label>
+    </div>
+    </item-field>
+    <item-field>
+        <h4 class="whisper-voice">3</h4>
+        <div class="input-field">
+        <input id="priceid3" type="number" class="text-number-input" required name="price3" placeholder="Price?" value="<?=$price3?>">
+        <label for="priceid3">Enter Price</label>
+    </div>
+    <div class="input-field">
+        <input id="quantityid3" type="number" class="text-number-input" required name="quantity3" placeholder="Quantity??" step="1" value="<?=$quantity3?>">
+        <label for="quantityid3">Enter Quantity</label>
+    </div>
+    </item-field>
 
 
-                <div id="e4p-output" class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
+    <button type="submit" name="submitted">
+        Checkout
+    </button>
+
+
+    <div id="e4p-output" class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+    
+</form>
 
 
 

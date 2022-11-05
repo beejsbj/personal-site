@@ -73,22 +73,22 @@ if (isset($_POST['submitted'])){
 ?>
 <form id="e4p" method="POST">
     <div class="input-field">
-        <input id="principal-ID" type="text" class="text-number-input" required name="principal" placeholder="principal?" value="<?=$principal?>" min="0.01" step="0.01">
+        <input id="principal-ID" type="number" class="text-number-input" required name="principal" placeholder="principal?" value="<?=$principal?>" min="0.01" step="0.01">
         <label for="principal-ID">What is the principal amount?</label>
     </div>
     <div class="input-field">
-        <input id="rate-ID" type="text" class="text-number-input" required name="rate" placeholder="rate?" value="<?=$rate?>" min="0.01" step="0.01">
+        <input id="rate-ID" type="number" class="text-number-input" required name="rate" placeholder="rate?" value="<?=$rate?>" min="0.01" step="0.01">
         <label for="rate-ID">What is the rate?</label>
     </div>
     <div class="input-field">
-        <input id="time-ID" type="text" class="text-number-input" required name="time" placeholder="time?" value="<?=$time?>" min="1" step="1">
+        <input id="time-ID" type="number" class="text-number-input" required name="time" placeholder="time?" value="<?=$time?>" min="1" step="1">
         <label for="time-ID">What is the number of years?</label>
     </div>
     <div class="input-field">
-        <input id="number-ID" type="text" class="text-number-input" required name="number" placeholder="Compound number?" value="<?=$number?>" min="1" step="1">
+        <input id="number-ID" type="number" class="text-number-input" required name="number" placeholder="Compound number?" value="<?=$number?>" min="1" step="1">
         <label for="number-ID">Times interest is compounded per year?</label>
     </div>
-    <button type="submit" name="submitted"> Compute </button>
+    <button type="submit" name="submitted"> Determine </button>
     <div id="e4p-output" class="<?=$class?>">
         <p>
             <?=$output?>

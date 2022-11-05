@@ -74,40 +74,30 @@ if (isset($_POST['submitted'])){
 ?>
 
 
-            <form id="e4p" method="POST">
-                <!-- <div class="input-field radio-list">
-                    <div class="input-field">
-                        <input type="radio" name="unitChoice" value="feet">
-                        <label for="">feet</label>
-                    </div>
-                    <div class="input-field">
-                        <input type="radio" name="unitChoice" value="meter"> 
-                        <label for="">meter</label>
-                    </div>
-                </div> -->
-                <div class="input-field">
-                    <input id="lengthid" type="text" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.1" min="1">
-                    <label for="lengthid"> What is the length?</label>
-                </div>
+<form id="e4p" method="POST">
+    <div class="input-field">
+        <input id="lengthid" type="number" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.1" min="1">
+        <label for="lengthid"> What is the length?</label>
+    </div>
 
-                <div class="input-field">
-                    <input id="widthid" type="text" class="text-number-input" required name="width" placeholder="width??" value="<?=$width?>" step="0.1"  min="1">
-                    <label for="widthid"> What is the width?</label>
-                </div>
+    <div class="input-field">
+        <input id="widthid" type="number" class="text-number-input" required name="width" placeholder="width??" value="<?=$width?>" step="0.1"  min="1">
+        <label for="widthid"> What is the width?</label>
+    </div>
 
 
-                <button type="submit" name="submitted">
-                    Calculator
-                </button>
+    <button type="submit" name="submitted">
+        Calculator
+    </button>
 
 
-                <div id="e4p-output" class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
+    <div id="e4p-output" class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+    
+</form>
 
 
 
