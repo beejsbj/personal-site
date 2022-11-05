@@ -16,10 +16,10 @@
 		<?=$exerciseName?>
 	</h2>
 	
-	<div>
+	<exercise-form>
 		<h3 class="attention-voice">PHP</h3>
 		<?php include("projects/e4p/$exLink.php"); ?>
-	</div>
+	</exercise-form>
 </exercise-detail>
 
 <script src="projects/e4p/e4p.js"></script>
@@ -29,7 +29,7 @@
 
 
 	$toggleSwitch.addEventListener('input', function() {
-		var heading = document.querySelector('exercise-detail > div h3');
+		var heading = document.querySelector('exercise-detail > exercise-form h3');
 		var $outlet = document.querySelector('div#e4p-output');
 
 		if ($toggleSwitch.checked) {
