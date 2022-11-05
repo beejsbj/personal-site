@@ -1,31 +1,33 @@
-<?php 
-	include('functions.php'); 
-	$currentPage = currentPage();
-	$pageData = getPageData($currentPage);
+<?php
+include "functions.php";
+$currentPage = currentPage();
+$pageData = getPageData($currentPage);
 ?>
 <!doctype html>
-<html lang='en' class='special-magic no-js <?=$pageData[' id']?>'>
+<html lang='en' class='special-magic no-js <?= $pageData[" id"] ?>'>
 
 	<head>
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<title>
-			<?=$pageData['title']?>
+			<?= $pageData["title"] ?>
 		</title>
-		<meta name="description" content="<?=$pageData['title']?>">
-		<meta property="og:image" content="<?=$pageData['title']?>">
+		<meta name="description" content="<?= $pageData["title"] ?>">
+		<meta property="og:image" content="<?= $pageData["title"] ?>">
 		<link rel='stylesheet' href='styles/site.css'>
 	</head>
 
 	<body>
 		<main class="page-content">
-			<?php include('templates/modules/header/header.php') ?>
+			<?php include "templates/modules/header/header.php"; ?>
 			<inner-column class="wide" >
-			<input-field>
+			<form>
+				<input-field class='list'>
 				<label class="attention-voice" for="in-app">Add a list</label>
 				<input type="text" id="in-app">
 				<button class="add-list">Add List</button>
 			</input-field>
+			</form>
 			<todo-app>
 			</todo-app>
 			</inner-column>

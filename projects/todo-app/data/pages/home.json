@@ -1,16 +1,9 @@
 {
 	"id": "home",
-	"title": "Welcome",
+	"title": "ToDo",
 	"metaImage" : "",
 	"metaDesc" : "",
 	"page-title": "Hey there!",
 
-	"sections": [
-		{
-			"heading": "My latest work"
-		},
-		{
-			"heading": "things i like"
-		}
-	]
+	"sections": []
 }
