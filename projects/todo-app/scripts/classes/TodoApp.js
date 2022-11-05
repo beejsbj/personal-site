@@ -59,7 +59,6 @@ export default class TodoApp {
 		this.setData();
 	}
 	buttonHandler() {
-		let $addListButton = document.querySelector( "button.add-list" );
 		window.addEventListener( "click", () => {
 			event.preventDefault();
 			if ( event.target.matches( "button.add-list" ) ) {
@@ -81,9 +80,13 @@ export default class TodoApp {
 				|| event.target.matches( "button.complete" )
 			) {
 				this.setData();
-				
 			}
 		} );
+		window.addEventListener("keypress", (event) => {
+			if ( event.code === "Enter" ) {
+				this.setData();
+					}
+		})
 	}
 	setData() {
 		localStorage.TodoAppData = JSON.stringify( this.lists );
