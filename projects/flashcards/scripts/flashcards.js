@@ -17,31 +17,33 @@ class Flashdeck {
 		pePromise
 			.then( function( rawData ) {
 				return rawData.json();
-			} )
+			})
 			.then( ( sourceJson ) => {
 				this.cards = localStorage.Flashcards
 					? JSON.parse( localStorage.Flashcards )
 					: sourceJson; //check local storage first, if empty, user api data.
-				this.$beginButton.classList.remove( "hide-opacity" ); //show button after data is fetched
-				this.$beginButton.addEventListener( "click", () => {
-					this.cards = this.shuffle( this.filteredSlection( this.cards ) ); //filter cards based on checkbox selection and shuflle
-					this.rehydrateDate();
-					this.cards = this.filteredToday(); //filter cards due to be reviewed today
-					this.numCardsToReview =
-						this.cards.length >= this.$numOfCardsInput.value
-						? this.$numOfCardsInput.value
-						: this.cards.length;
-					this.cardRenderer( this.index );
-				} );
-			} )
+				this.beginButton();
+			})
 			.catch( function() {
 				console.log( "oops" );
-			} );
+			});
+	}
+	beginButton() {
+		this.$beginButton.classList.remove( "hide-opacity" ); //show button after data is fetched
+		this.$beginButton.addEventListener( "click", () => {
+			this.cards = this.shuffle( this.filteredSlection( this.cards ) ); //filter cards based on checkbox selection and shuflle
+			this.rehydrateDate();
+			this.cards = this.sortedToday(); //filter cards due to be reviewed today
+			this.numCardsToReview = ( this.cards.length >= this.$numOfCardsInput.value )
+				? this.$numOfCardsInput.value
+				: this.cards.length;
+			this.cardRenderer( this.index );
+		});
 	}
 	findCard( id ) {
 		return this.cards.find( function( card ) {
 			return card.id == id;
-		} );
+		});
 	}
 	moveNext( index ) {
 		let card = this.cards[ index ];
@@ -156,7 +158,7 @@ class Flashdeck {
 			if ( i < keys.length - 1 ) {
 				keysString += "+";
 			}
-		} );
+		});
 		return '<div class="keys firm-voice">' + keysString + "</div>";
 	}
 	renderEnd() {
@@ -198,9 +200,9 @@ class Flashdeck {
 			this.index = 0;
 			this.numCardsToReview = document.querySelector( "#num-cards" )
 				.value;
-			this.cards = this.filteredToday(); //filter cards due to be reviewed today
+			this.cards = this.sortedToday(); //filter cards due to be reviewed today
 			this.cardRenderer( this.index );
-		} );
+		});
 	}
 	flipCard() {
 		const $revealButton = document.querySelector( "button#reveal" );
@@ -212,15 +214,15 @@ class Flashdeck {
 			$revealButton.classList.toggle( "hide" );
 			$badButton.classList.toggle( "hide" );
 			$goodButton.classList.toggle( "hide" );
-		} );
+		});
 		$badButton.addEventListener( "click", () => {
 			this.moveBack( this.index ); //push back card step
 			this.cardRenderer( ++this.index );
-		} );
+		});
 		$goodButton.addEventListener( "click", () => {
 			this.moveNext( this.index ); //push front card step
 			this.cardRenderer( ++this.index );
-		} );
+		});
 	}
 	filteredSlection( cardsData ) {
 		var $selections = document.querySelectorAll( ".card-filter input:checked" );
@@ -232,18 +234,18 @@ class Flashdeck {
 						return card.acf.application[ 0 ].post_name == $selections[ i ].value;
 					}
 				}
-			} );
+			});
 		} else {
 			return cardsData;
 		}
 	}
-	filteredToday() {
+	sortedToday() {
 		console.log( this.cards );
 		let sorted = this.cards.sort( ( cardA, cardB ) => {
 			if ( cardA.nextReviewDate && cardB.nextReviewDate ) {
 				return cardA.nextReviewDate.getTime() - cardB.nextReviewDate.getTime();
 			}
-		} );
+		});
 		console.log( sorted );
 		return sorted;
 	}
@@ -252,7 +254,7 @@ class Flashdeck {
 			card.nextReviewDate
 				? ( card.nextReviewDate = new Date( card.nextReviewDate ) )
 				: ( card.nextReviewDate = new Date() );
-		} );
+		});
 	}
 	dueChecker() {
 		this.today = new Date();
@@ -267,8 +269,7 @@ class Flashdeck {
 			) {
 				this.overdue++;
 			}
-
-		} );
+		});
 	}
 	// Fisher-Yates (aka Knuth) Shuffle.
 	shuffle( array ) {
