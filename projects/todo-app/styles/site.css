@@ -38,8 +38,6 @@ todo-app {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 	gap: 10px;
-	margin-top: 30px;
-	padding: 20px;
 	background-color: var(--paper);
 	align-items: start;
 }
@@ -71,6 +69,10 @@ todo-card {
 	border-radius: 2px;
 }
 
-todo-card .complete h3 {
-	text-decoration: 3px wavy line-through hsla(0, 0%, 0%, 0.6);
+todo-card.complete {
+	opacity: 0.5;
+
+}
+todo-card.complete h3.calm-voice {
+	text-decoration: 3px wavy line-through hsla(0, 100%, 50%, 1);
 }
