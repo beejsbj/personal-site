@@ -1,6 +1,7 @@
 <?php 
 	include('functions.php'); 
 	$currentPage = currentPage();
+	$currentTheme = currentTheme();
 	$pageData = getPageData($currentPage);
 ?>
 

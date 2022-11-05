@@ -1,7 +1,7 @@
  
 
 <!doctype html>
-<html lang='en' class='special-magic no-js <?=$pageData['id']?>'>
+<html lang='en' class='special-magic no-js <?=$pageData['id']?> <?=$currentTheme?>-theme'>
 
 	<head>
 		<meta charset='utf-8'>
