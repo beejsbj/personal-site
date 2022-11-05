@@ -18,7 +18,7 @@ inner-column {
 	padding: 30px 10px; /* a loose default */
 
 	display: grid;
-	gap:  30px;
+	gap:  60px;
 }
 
 /*.site-header {

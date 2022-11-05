@@ -1,9 +1,9 @@
 /* buttons and icons and smaller reusable bits here */
 
-inner-column > input-field {
-	justify-self: center;
-	min-width: 500px;
+input-field.list {
 	text-align: center;
+	max-width: 500px;
+	margin: 0 auto;
 }
 
 input-field {
@@ -20,9 +20,10 @@ button.remove-list {
 	position: absolute;
 	top: 0;
 	right: 0;
-	padding: 10px;
-	border-radius: 3px;
-	background-color: hsla(0, 39%, 60%, 1);
+	padding: 5px;
+	border-radius: 0 0 0 5px;
+	font-size: 10px;
+	/*background-color: hsla(0, 39%, 60%, 1);*/
 }
 
 button {
