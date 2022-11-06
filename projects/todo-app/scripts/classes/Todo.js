@@ -14,12 +14,19 @@ export default class Todo {
 		return `
 			<li data-id ="${this.id}">
 				<todo-card class=${this.complete ? "complete" : ""}>
-					<h3 class="calm-voice" >${this.content}</h3>
 					<actions>
-						<button class="remove">Delete</button>
-						<button class="complete">Done</button>
+						<button class="complete"></button>
+						<button class="remove">
+							<picture>
+								<svg viewBox="0 0 50 50" preserveAspectRatio="xMidYMid" width="50" height="50">
+								   <line x1="0" y1="0" x2="50" y2="50" />
+								   <line x1="50" y1="0" x2="0" y2="50" />
+								</svg>
+							</picture>
+						</button>	
 					</actions>
-			</todo-card>
+					<h3 class="calm-voice" >${this.content}</h3>	
+				</todo-card>
 			</li>
 		`;
 	}
