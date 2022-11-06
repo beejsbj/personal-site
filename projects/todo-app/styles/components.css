@@ -8,7 +8,15 @@ input-field.list {
 
 input-field {
 	display: grid;
-	gap: 10px;
+	gap: 5px;
+}
+
+todo-list input-field {
+	display: grid;
+	grid-template-columns: 0.8fr 0.2fr;
+}
+todo-list input-field label {
+	grid-column: span 2;
 }
 
 input {
@@ -20,11 +28,12 @@ input {
 
 .edit-text {
 	padding: 0;
+	font-family: inherit;
 	font-size: inherit;
 	
 	margin: 0;
 	outline: 1px solid black;
-	background-color: var(--paper);
+	background-color: inherit;
 	color: var(--ink);
 }
 
@@ -35,30 +44,49 @@ button {
 	border-radius: var(--corners);
 	padding: 10px;
 }
-.remove {
-	background-color: var(--highlight);
-}
-
-
 .remove-list {
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: -6px;
+	right: -5px;
 	border-radius: 0 0 0 var(--corners);
 	font-size: 10px;
-	padding: 5px;
+	background-color: transparent;
+	padding: 0;
+
 }
 
-button.remove-list picture {
-	width: 	15px;
+.remove {
+	background-color: transparent;
+	padding: 0;
+	display: none;
+	position: absolute;
+	top: 50%;
+	right: 10px;
+	transform: translateY(-50%);
 }
 
-button.remove-list svg {
+todo-card:hover button.remove {
+	display: block;
+}
+
+button picture {
+	width: 	20px;
+}
+
+button svg {
 	overflow: visible;
 	stroke: var(--highlight);
 	stroke-width: 10;
 	stroke-linecap: round;
 }
-button.remove-list:hover svg {
-	stroke: var(--paper);
+
+
+button.complete {
+	background-color: transparent;
+	border-radius: 50%;
+	border: 1px solid black;
+}
+
+todo-card.complete button.complete {
+	background-color: var(--color);
 }
