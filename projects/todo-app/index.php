@@ -23,7 +23,7 @@ $pageData = getPageData($currentPage);
 			<inner-column class="wide" >
 			<form>
 				<input-field class='list'>
-				<label class="attention-voice" for="in-app">Add a list</label>
+				<label class="loud-voice" for="in-app">Add a list</label>
 				<input type="text" id="in-app">
 				<button class="add-list">Add List</button>
 			</input-field>
