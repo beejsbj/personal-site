@@ -71,7 +71,7 @@ export default class TodoApp {
 			}
 			if ( event.target.matches( "button.remove-list" ) ) {
 				let id = event.target.closest( "todo-list" )
-					.dataset.id;
+					.dataset.listId;
 				this.remove( id );
 			}
 			if (
