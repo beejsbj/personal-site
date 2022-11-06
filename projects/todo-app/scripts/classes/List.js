@@ -73,7 +73,7 @@ export default class List {
 	}
 	renderList() {
 		return `<todo-list data-list-id="${this.id}">
-					<h2 class="notice-voice" >${this.name}</h2>
+					<h2 class="attention-voice" >${this.name}</h2>
 					<actions>
 						<button class="remove-list">
 						<picture>
@@ -86,7 +86,7 @@ export default class List {
 					</actions>
 					<form>
 						<input-field>
-							<label>What do you want To do?</label>
+							<label class="notice-voice" >What do you want To do?</label>
 							<input minlength="1" type="text">
 							<button class="add">Add</button>
 						</input-field>
@@ -117,7 +117,7 @@ export default class List {
 				this.complete( id );
 			}
 			if (
-				event.target.matches( `[data-list-id="${this.id}"] h2.notice-voice` )
+				event.target.matches( `[data-list-id="${this.id}"] h2.attention-voice` )
 				|| event.target.matches( `[data-list-id="${this.id}"] h3.calm-voice` )
 			) {
 				let $text = event.target;
