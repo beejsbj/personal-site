@@ -53,7 +53,8 @@
 
 .calm-voice,
 p,
-li {
+li,
+label {
 	font-family: sans-serif;
 	font-size: 1rem;
 	line-height: 1.4;

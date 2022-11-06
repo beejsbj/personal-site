@@ -1,4 +1,5 @@
 
+
 html {
 
 	--standard: 1140px;
@@ -9,14 +10,14 @@ html {
 	--black: #111111;
 	--white: #efefef;
 
-	--neutral-stuffs: gray;
+	--neutral: hsla(53, 38%, 76%, 1.00);
 
-	--color: #9ec9eb;
-	--highlight: #aadee9;
+	--color: hsla(144, 40%, 76%, 1);
+	--highlight: hsla(323, 40%, 76%, 1.00);
 
 	--shadow: rgba(0,0,0,.8);
 
-	--corners: 10px; /* or whatevers */
+	--corners: 5px; /* or whatevers */
 	--paper2: white;
 	--paper: var(--white);
 	--ink: var(--black);
@@ -28,10 +29,10 @@ html {
 		--black: #111111;
 		--white: #efefef;
 
-		--neutral-stuffs: gray;
+		--neutral: hsla(53, 38%, 76%, 1.00);
 
-		--color: #9ec9eb;
-		--highlight: #aadee9;
+		--color: hsla(144, 40%, 36%, 1);
+		--highlight: hsla(323, 40%, 36%, 1.00);
 
 		--shadow: rgba(0,0,0,.8);
 

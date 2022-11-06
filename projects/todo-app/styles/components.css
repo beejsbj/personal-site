@@ -11,35 +11,54 @@ input-field {
 	gap: 10px;
 }
 
-input,
-button {
+input {
+	background-color: var(--paper);
 	padding: 10px;
+	border: 1px solid var(--neutral);
+	border-radius: var(--corners);
 }
 
-button.remove-list {
-	position: absolute;
-	top: 0;
-	right: 0;
-	padding: 5px;
-	border-radius: 0 0 0 5px;
-	font-size: 10px;
-	/*background-color: hsla(0, 39%, 60%, 1);*/
-}
-
-button {
-	cursor: pointer;
-	background-color: hsla(144, 39%, 76%, 1);
-	border-radius: 5px;
-}
-button.remove {
-	background-color: hsla(0, 39%, 60%, 1);
-}
-
-input.edit-text {
+.edit-text {
 	padding: 0;
 	font-size: inherit;
-	border: none;
+	
 	margin: 0;
 	outline: 1px solid black;
 	background-color: var(--paper);
+	color: var(--ink);
+}
+
+
+button {
+	cursor: pointer;
+	background-color: var(--color);
+	border-radius: var(--corners);
+	padding: 10px;
+}
+.remove {
+	background-color: var(--highlight);
+}
+
+
+.remove-list {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border-radius: 0 0 0 var(--corners);
+	font-size: 10px;
+	padding: 5px;
+}
+
+button.remove-list picture {
+	width: 	15px;
+}
+
+button.remove-list svg {
+	overflow: visible;
+	stroke: var(--highlight);
+	stroke-width: 10;
+	stroke-linecap: round;
+}
+button.remove-list:hover svg {
+	stroke: var(--paper);
 }
