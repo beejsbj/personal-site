@@ -8,7 +8,7 @@
 			<?=$sectionHeading?>
 		</h2>
 		<?php
-	$paragraphs = $section['paragraphs'] ?? ["this is about paragraph"]; 
+	$paragraphs = $section['paragraphs'] ?? ["this is about paragraph","this is about paragraph"]; 
 	foreach ($paragraphs as $paragraph) { ?>
 		<p class="calm-voice">
 			<?=$paragraph?>

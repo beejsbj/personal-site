@@ -12,10 +12,27 @@ project-card {
 	grid-column: span 12;
 }
 
-project-card .tools {
+project-card .tools  {
 	display: none;
+	gap: 10px;
+	position: absolute;
+	bottom: 0;
+	right: 0px;
 }
+/*project-card .tools li {
+	position: relative;
+	border-radius: 50%;
+	background-color: var(--light-color);
+	padding: 20px;
+	font-size: 12px;
+}
+project-card .tools li span {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 
+}*/
 project-card .button {
 	position: absolute;
 	bottom: 0px;

@@ -45,7 +45,7 @@
 				<ul class="tools">
 					<?php
 						foreach ($tools as $tool) {
-							echo "<li>$tool</li>";
+							echo "<li><span>$tool</span></li>";
 						}
 					?>
 				</ul>
