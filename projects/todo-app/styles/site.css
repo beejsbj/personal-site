@@ -27,6 +27,11 @@
 /* then other contextual styles */
 body {
 	background-color: var(--paper);
+	/*background-image: url('../images/leafs-corner.png');*/
+	background-repeat: no-repeat;
+	background-position: 100% 0px;
+	bac
+	background-size: 40%;
 	color: var(--ink);
 }
 
@@ -34,12 +39,22 @@ body {
 	display: none;
 }
 
+.booming-voice {
+	text-align: center;
+	mask-image: url('../images/brush-stroke.svg');
+	-webkit-mask-image: url('../images/brush-stroke.svg');
+	-webkit-mask-size: contain;
+	-webkit-mask-position: center center;
+	-webkit-mask-repeat:  no-repeat;
+	background-color: var(--highlight);
+}
+
 todo-app {
 	display: flex;
-	gap: 10px;
+	gap: 20px;
 	background-color: var(--paper);
 	align-items: start;
-
+	padding: 20px;
 	overflow-x: scroll;
 	scroll-snap-type: x mandatory;
 }
@@ -53,10 +68,24 @@ todo-list {
 	gap: 20px;
 	align-content: center;
 	border-radius: var(--corners);
-	overflow: hidden;
 	min-width: 90vw;
 	scroll-snap-align: center;
 }
+
+todo-list h2 {
+	text-align: center;
+	justify-self: center;
+	padding: 5px 80px;
+	background-color: var(--color);
+	mask-image: url('../images/brush-stroke.svg');
+	-webkit-mask-image: url('../images/brush-stroke.svg');
+	-webkit-mask-size: contain;
+	-webkit-mask-position: center center;
+	-webkit-mask-repeat:  no-repeat;
+	transform: translateY(-30px);
+}
+
+
 
 todo-list output-field ul {
 	display: grid;
@@ -65,19 +94,24 @@ todo-list output-field ul {
 }
 
 todo-card {
-	/*outline: 2px solid black;*/
-	background-color: var(--paper);
-	padding: 10px;
+
+
+	padding: 5px 0;
 	display: grid;
 	gap: 10px;
-	border-radius: var(--corners);
-	/*min-width: 300px;*/
+
+	border-bottom: 2px dotted black;
+	grid-template-columns: 0.1fr 1fr;
+	align-items: end;
+	position: relative;
+
 }
 
 todo-card.complete {
 	opacity: 0.5;
 
 }
+
 todo-card.complete h3.calm-voice {
 	text-decoration: 3px wavy line-through hsla(0, 100%, 50%, 1);
 }
@@ -90,6 +124,7 @@ todo-card.complete h3.calm-voice {
 
 
 	}
+
 	todo-list {
 		min-width: initial;
 	}
