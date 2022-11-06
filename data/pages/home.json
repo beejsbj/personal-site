@@ -7,14 +7,14 @@
 
 	"sections": [
 		{
-			"heading": "this is Burooj",
+			"heading": "My name is Burooj",
 			"paragraphs": {
-				"I make places on the web" : "calm-voice"
+				"and I make places on the web, woo!" : "calm-voice"
 			}
 		},
 		{
 			"module" : "projects-grid",
-			"intro-paragraph" : "Here's some"
+			"intro-paragraph" : "Here's some im proud to share front and center!"
 		}
 	]
 }

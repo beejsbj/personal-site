@@ -1,7 +1,7 @@
 [
 	{
 		"title": "Layout&nbspGarden",
-		"description": "This here is a garden of different layouts, showcasing responsiveness across different viewports",
+		"description": "This here is a garden of different several layouts, showcasing responsiveness across different viewports",
 		"image": "landscape.jpg",
 		"url" : "?page=layout-garden",
 		"tools" : [
@@ -13,7 +13,7 @@
 	},
 	{
 		"title": "Exercises&nbsp4 Programmers",
-		"description": "A book of 57 exercises recommended by my mentor, Derek. A great set to learna and reinforce programming fundamentals",
+		"description": "A book of 57 exercises recommended by my mentor, Derek. A great book to learn and reinforce programming fundamentals",
 		"image": "landscape.jpg",
 		"url" : "?page=e4p",
 		"tools" : [
@@ -37,7 +37,7 @@
 	},
 	{
 		"title": "Theme Challenge",
-		"description": "This was a fun challenge, where we were given a code base and were instructed to Style a website to match a chosen industry",
+		"description": "This was a fun challenge, where we were given a code base and were instructed to only use CSS to get a website to fit within chosen industry",
 		"image": "landscape.jpg",
 		"url" : "projects/theme-challenge",
 		"tools" : [
@@ -60,7 +60,7 @@
 	},
 	{
 		"title": "Roulette App",
-		"description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
+		"description": "Back for more gambling. this had some bumps, but I really ended up liking the aesthetic I came up with!",
 		"image": "landscape.jpg",
 		"url" : "https://api3-roulette.netlify.app/",
 		"tools" : [
@@ -69,6 +69,18 @@
 			"JS"
 		],
 		"tags": ["api3"]
+	},
+	{
+		"title": "Flash Cards",
+		"description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. Learnt a lot of refactoring with this one! ",
+		"image": "landscape.jpg",
+		"url" : "https://api3-roulette.netlify.app/",
+		"tools" : [
+			"HTML",
+			"CSS",
+			"JS"
+		],
+		"tags": ["feature"]
 	}
 
 ]

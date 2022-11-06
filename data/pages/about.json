@@ -9,9 +9,12 @@
 			"module" : "about-module",
 			"heading": "A blurb about me…",
 			"paragraphs": [
+				"These are always hard...",
 				"I began my journey into webdev last year through a remote program at perpetual education and have come to gain a passion for it",
-				"I began my journey into webdev last year through a remote program at perpetual education and have come to gain a passion for it",
-				"I began my journey into webdev last year through a remote program at perpetual education and have come to gain a passion for it"
+				"Im currently a computer science student as well, and really its reaffirmed my love for the prettier side of things.",
+				"In another life i would have been a doctor, dancer or a cook.",
+				"Im a big fan of storytelling, in all its forms. books, tv, video games, conversations.",
+				"i hope to get good enough at this to one day tell a story through a website."
 			],
 			"images" : ["burooj1.jpg", "burooj2.jpg", "burooj3.jpg"]
 		},
@@ -37,7 +40,7 @@
 				},
 				{
 					"name": "Codepen",
-					"link": "https://codepen.io/boroujr"
+					"link": "https://codepen.io/beejsbj"
 				},
 				{
 					"name": "Blog",
