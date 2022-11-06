@@ -1,13 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap');
 /* Should we pull in @fonts here? */
 .booming-voice {
-	font-family: sans-serif;
+	font-family: 'Amatic SC', cursive;
 	font-size: 40px;
 	font-weight: 700;
 	color: var(--dark-color);
 }
 
 .loud-voice {
-	font-family: sans-serif;
+	font-family: 'Amatic SC', cursive;
 	font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
 }
 
@@ -18,18 +19,18 @@
 		/* or variable font */
 	}
 	.loud-voice {
-		font-weight: 100;
+		font-weight: 700;
 	}
 }
 
 .attention-voice {
-	font-family: sans-serif;
+	font-family: 'Amatic SC', cursive;
 	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);
 }
 
 .notice-voice {
-	font-family: sans-serif;
-	font-size: 1.4rem;
+	font-family: 'Amatic SC', cursive;
+	font-size: 1.5rem;
 	line-height: 1.4;
 }
 
@@ -41,7 +42,7 @@
 }
 
 .firm-voice {
-	font-family: 'Lato', sans-serif;
+	font-family: sans-serif;
 	font-size: 0.9rem;
 	line-height: 1.4;
 	text-transform: uppercase;
@@ -53,8 +54,7 @@
 
 .calm-voice,
 p,
-li,
-label {
+li {
 	font-family: sans-serif;
 	font-size: 1rem;
 	line-height: 1.4;
@@ -69,13 +69,13 @@ label {
 }
 
 .whisper-voice {
-	font-family: 'Lato', sans-serif;
+	font-family: 'Amatic SC', cursive;
 	font-size: 0.9rem;
 	color: gray;
 }
 
 .teaser-voice {
-	font-family: 'Lato', sans-serif;
+	font-family: sans-serif;
 	font-size: 14px;
 	text-transform: uppercase;
 }
