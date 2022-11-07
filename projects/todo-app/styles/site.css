@@ -27,10 +27,10 @@
 /* then other contextual styles */
 body {
 	background-color: var(--paper);
-	/*background-image: url('../images/leafs-corner.png');*/
+	background-image: url('../images/leafs-corner.png');
 	background-repeat: no-repeat;
-	background-position: 100% 0px;
-	bac
+	background-position: 00px 0px;
+	background-size: 80%;
 	background-size: 40%;
 	color: var(--ink);
 }
@@ -41,6 +41,7 @@ body {
 
 .booming-voice {
 	text-align: center;
+	padding: 10px 20px;
 	mask-image: url('../images/brush-stroke.svg');
 	-webkit-mask-image: url('../images/brush-stroke.svg');
 	-webkit-mask-size: contain;
@@ -51,7 +52,7 @@ body {
 
 todo-app {
 	display: flex;
-	gap: 20px;
+	gap: 30px;
 	background-color: var(--paper);
 	align-items: start;
 	padding: 20px;
@@ -62,7 +63,7 @@ todo-app {
 todo-list {
 	/* 	outline: 3px solid blue; */
 	padding: 15px;
-	background-color: var(--paper2);
+	background-color: var(--color-light);
 	position: relative;
 	display: grid;
 	gap: 20px;
@@ -72,39 +73,47 @@ todo-list {
 	scroll-snap-align: center;
 }
 
+
+
 todo-list h2 {
 	text-align: center;
 	justify-self: center;
-	padding: 5px 80px;
+	padding: 10px 80px;
+
+	/*background-image*/
 	background-color: var(--color);
 	mask-image: url('../images/brush-stroke.svg');
 	-webkit-mask-image: url('../images/brush-stroke.svg');
 	-webkit-mask-size: contain;
 	-webkit-mask-position: center center;
 	-webkit-mask-repeat:  no-repeat;
-	transform: translateY(-30px);
+	transform: translateY(-35px);
 }
 
 
 
 todo-list output-field ul {
 	display: grid;
-	gap: 20px;
+	gap: 30px;
 	justify-items: space-between;
 }
 
 todo-card {
 
 
-	padding: 5px 0;
+	padding: 10px 0;
 	display: grid;
 	gap: 10px;
 
-	border-bottom: 2px dotted black;
+	border-bottom: 2px dotted var(--ink);
 	grid-template-columns: 0.1fr 1fr;
 	align-items: end;
 	position: relative;
 
+}
+
+todo-card h3.calm-voice {
+	justify-self: start;
 }
 
 todo-card.complete {
