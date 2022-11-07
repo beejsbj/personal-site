@@ -13,7 +13,8 @@ html {
 	--neutral: hsla(53, 38%, 76%, 1.00);
 
 	--color: hsla(144, 40%, 76%, 1);
-	--highlight: hsla(323, 40%, 76%, 1.00);
+	--color-light: hsla(144, 40%, 90%, 1);
+	--highlight: hsla(210, 40%, 50%, 1.00);
 
 	--shadow: rgba(0,0,0,.8);
 
@@ -31,12 +32,13 @@ html {
 
 		--neutral: hsla(53, 38%, 76%, 1.00);
 
-		--color: hsla(144, 40%, 36%, 1);
-		--highlight: hsla(323, 40%, 36%, 1.00);
+		--color: hsla(144, 40%, 40%, 1);
+		--color-light: hsla(144, 40%, 20%, 1);
+		--highlight: hsla(210, 40%, 40%, 1.00);
 
 		--shadow: rgba(0,0,0,.8);
 
-		--corners: 10px; /* or whatevers */
+		--corners: 5px; /* or whatevers */
 
 		--paper: hsla(217, 6%, 17%, 1.00);
 		--paper2:  hsla(217, 8%, 13%, 1.00);
