@@ -99,7 +99,6 @@ export default class List {
 	buttonHandler() {
 		window.addEventListener( "click", ( event ) => {
 			event.preventDefault();
-
 			if ( event.target.matches( `[data-list-id="${this.id}"] button.add` ) ) {
 				// console.log(this.list);
 				let $input = event.target.closest( "todo-list" )
@@ -107,7 +106,8 @@ export default class List {
 				!$input.value ? alert( "please enter something" ) : this.add( $input.value );
 				$input.value = "";
 			}
-			if ( event.target.matches( `[data-list-id="${this.id}"] button.remove` ) ) {
+			if ( event.target.matches( `[data-list-id="${this.id}"] button.remove svg` ) ) {
+
 				const id = event.target.closest( "li" ).dataset.id;
 				this.remove( id );
 			}

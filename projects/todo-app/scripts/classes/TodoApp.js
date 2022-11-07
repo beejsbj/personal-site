@@ -18,6 +18,7 @@ export default class TodoApp {
 		this.lists.forEach( function( list ) {
 			list.initData();
 		} );
+		this.hueRotater();
 	}
 	findListById( id ) {
 		return this.lists.find( ( list ) => {
@@ -69,14 +70,14 @@ export default class TodoApp {
 					: this.add( $input.value );
 				$input.value = "";
 			}
-			if ( event.target.matches( "button.remove-list" ) ) {
+			if ( event.target.matches( "button.remove-list svg" ) ) {
 				let id = event.target.closest( "todo-list" )
 					.dataset.listId;
 				this.remove( id );
 			}
 			if (
 				event.target.matches( "button.add" )
-				|| event.target.matches( "button.remove" )
+				|| event.target.matches( "button.remove svg" )
 				|| event.target.matches( "button.complete" )
 			) {
 				this.setData();
@@ -109,5 +110,15 @@ export default class TodoApp {
 		return data.map( function( listData ) {
 			return new List( listData );
 		} );
+	}
+	hueRotater(){
+		let hues = 360;
+
+		let lists = document.querySelectorAll('todo-list');
+		let hueJump = hues / lists.length;
+		lists.forEach( function (list, i) {
+			console.log('hi')
+			list.style.filter = `hue-rotate(${i*hueJump}deg)`
+		})
 	}
 }
