@@ -26,6 +26,7 @@
 
 /* then other contextual styles */
 body {
+	padding-top: 50px;
 	background-color: var(--paper);
 	background-image: url('../images/leafs-corner.png');
 	background-repeat: no-repeat;
