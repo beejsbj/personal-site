@@ -24,15 +24,17 @@ input {
 	padding: 10px;
 	border: 1px solid var(--neutral);
 	border-radius: var(--corners);
+	color: var(--ink);
 }
 
 .edit-text {
 	padding: 0;
+	border: none;
 	font-family: inherit;
 	font-size: inherit;
-	
-	margin: 0;
-	outline: 1px solid black;
+	text-align: inherit;
+	justify-self: center;
+	outline: 1px dotted var(--ink);
 	background-color: inherit;
 	color: var(--ink);
 }
@@ -44,30 +46,35 @@ button {
 	border-radius: var(--corners);
 	padding: 10px;
 }
-.remove-list {
+button:hover {
+	background-color: var(--highlight);
+}
+
+.remove-list,
+.remove {
 	position: absolute;
-	top: -6px;
-	right: -5px;
-	border-radius: 0 0 0 var(--corners);
-	font-size: 10px;
 	background-color: transparent;
 	padding: 0;
+	transform: rotate(20deg);
+}
 
+:is(.remove-list, .remove):hover,
+:is(.remove-list, .remove):focus {
+	background-color: transparent;
+	transform: rotate(540deg) scale(1.2);
+}
+
+.remove-list {
+	top: -6px;
+	right: -1px;
 }
 
 .remove {
-	background-color: transparent;
-	padding: 0;
-	display: none;
-	position: absolute;
-	top: 50%;
+	top: 10px;
 	right: 10px;
-	transform: translateY(-50%);
 }
 
-todo-card:hover button.remove {
-	display: block;
-}
+
 
 button picture {
 	width: 	20px;
@@ -84,9 +91,18 @@ button svg {
 button.complete {
 	background-color: transparent;
 	border-radius: 50%;
-	border: 1px solid black;
+	border: 1px solid var(--ink);
 }
 
 todo-card.complete button.complete {
 	background-color: var(--color);
+}
+
+@media(min-width: 800px) {
+	.remove {
+		display: none;
+	}
+	todo-card:hover button.remove {
+	display: block;
+}
 }
