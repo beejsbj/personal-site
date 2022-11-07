@@ -58,9 +58,16 @@ export default class List {
 	}
 	complete( id ) {
 		this.findCardById( id ).toggleComplete();
+		
 		this.renderTodos();
 	}
+	sorter() {
+		this.list.sort( function(a, b) {
+			return a.complete - b.complete;
+		})
+	}
 	renderTodos() {
+		this.sorter();
 		var template = "<ul>";
 		this.list.forEach( function( todo ) {
 			template += todo.render();
