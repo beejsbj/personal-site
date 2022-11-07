@@ -46,7 +46,7 @@ body {
 	-webkit-mask-image: url('../images/brush-stroke.svg');
 	-webkit-mask-size: contain;
 	-webkit-mask-position: center center;
-	-webkit-mask-repeat:  no-repeat;
+	-webkit-mask-repeat: no-repeat;
 	background-color: var(--highlight);
 }
 
@@ -86,7 +86,7 @@ todo-list h2 {
 	-webkit-mask-image: url('../images/brush-stroke.svg');
 	-webkit-mask-size: contain;
 	-webkit-mask-position: center center;
-	-webkit-mask-repeat:  no-repeat;
+	-webkit-mask-repeat: no-repeat;
 	transform: translateY(-35px);
 }
 
@@ -97,6 +97,7 @@ todo-list output-field ul {
 	gap: 30px;
 	justify-items: space-between;
 }
+
 
 todo-card {
 

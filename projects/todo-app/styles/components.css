@@ -1,21 +1,24 @@
 /* buttons and icons and smaller reusable bits here */
 
+input-field {
+	display: grid;
+	gap: 5px;
+}
+
+
 input-field.list {
 	text-align: center;
 	max-width: 500px;
 	margin: 0 auto;
 }
 
-input-field {
-	display: grid;
-	gap: 5px;
-}
 
 todo-list input-field {
 	display: grid;
 	grid-template-columns: 0.8fr 0.2fr;
 }
-todo-list input-field label {
+
+todo-list label {
 	grid-column: span 2;
 }
 
@@ -27,7 +30,7 @@ input {
 	color: var(--ink);
 }
 
-.edit-text {
+input.edit-text {
 	padding: 0;
 	border: none;
 	font-family: inherit;
@@ -46,10 +49,13 @@ button {
 	border-radius: var(--corners);
 	padding: 10px;
 }
+
 button:hover {
 	background-color: var(--highlight);
 }
 
+
+/*remove button*/
 .remove-list,
 .remove {
 	position: absolute;
@@ -74,10 +80,8 @@ button:hover {
 	right: 10px;
 }
 
-
-
 button picture {
-	width: 	20px;
+	width: 20px;
 }
 
 button svg {
@@ -87,22 +91,32 @@ button svg {
 	stroke-linecap: round;
 }
 
-
+/*complete button*/
 button.complete {
 	background-color: transparent;
 	border-radius: 50%;
 	border: 1px solid var(--ink);
+	position: relative;
+
 }
 
-todo-card.complete button.complete {
-	background-color: var(--color);
+todo-card.complete button.complete::after {
+	content: "";
+	border-radius: inherit;
+	padding: 40%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: var(--highlight);
 }
 
 @media(min-width: 800px) {
 	.remove {
 		display: none;
 	}
+
 	todo-card:hover button.remove {
-	display: block;
-}
+		display: block;
+	}
 }
