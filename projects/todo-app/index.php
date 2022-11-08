@@ -33,6 +33,8 @@ $pageData = getPageData($currentPage);
 			</inner-column>
 		</main>
 	</body>
+
 	<script src="scripts/script.js" type="module"></script>
+	<script type="module" src="https://unpkg.com/rough-notation?module"></script>
 
 </html>

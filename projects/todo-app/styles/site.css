@@ -79,7 +79,7 @@ todo-list {
 todo-list h2 {
 	text-align: center;
 	justify-self: center;
-	padding: 10px 80px;
+	padding: 10px 40px;
 
 	/*background-image*/
 	background-color: var(--color);
@@ -90,7 +90,9 @@ todo-list h2 {
 	-webkit-mask-repeat: no-repeat;
 	transform: translateY(-35px);
 }
-
+todo-list h2:has(.edit-text) {
+	padding: 5px 0;
+}
 
 
 todo-list output-field ul {
@@ -124,7 +126,7 @@ todo-card.complete {
 }
 
 todo-card.complete h3.calm-voice {
-	text-decoration: 3px wavy line-through hsla(0, 100%, 50%, 1);
+	/*text-decoration: 3px wavy line-through hsla(0, 100%, 50%, 1);*/
 }
 
 @media(min-width: 660px) {

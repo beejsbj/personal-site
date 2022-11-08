@@ -32,6 +32,7 @@ input {
 
 input.edit-text {
 	padding: 0;
+	margin: 0;
 	border: none;
 	font-family: inherit;
 	font-size: inherit;
@@ -39,6 +40,7 @@ input.edit-text {
 	justify-self: center;
 	outline: 1px dotted var(--ink);
 	background-color: inherit;
+	filter: saturate(200%);
 	color: var(--ink);
 }
 
