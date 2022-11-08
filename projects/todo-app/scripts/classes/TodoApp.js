@@ -70,23 +70,25 @@ export default class TodoApp {
 					: this.add( $input.value );
 				$input.value = "";
 			}
-			if ( event.target.matches( "button.remove-list svg" ) ) {
+			if ( event.target.matches( "button.remove-list *" ) ) {
 				let id = event.target.closest( "todo-list" )
 					.dataset.listId;
+				console.log(event.target)
 				this.remove( id );
 			}
 			if (
 				event.target.matches( "button.add" )
-				|| event.target.matches( "button.remove svg" )
+				|| event.target.matches( "button.remove *" )
 				|| event.target.matches( "button.complete" )
 			) {
 				this.setData();
 			}
 		} );
-		window.addEventListener("keypress", (event) => {
+		window.addEventListener("keydown", (event) => {
 			if ( event.code === "Enter" ) {
 				this.setData();
-					}
+
+			}
 		})
 	}
 	setData() {
