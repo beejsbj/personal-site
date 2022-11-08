@@ -24,7 +24,7 @@ $pageData = getPageData($currentPage);
 			<form>
 				<input-field class='list'>
 				<label class="loud-voice" for="in-app">Add a list</label>
-				<input class="loud-voice" type="text" id="in-app">
+				<input class="loud-voice" autofocus="autofocus" type="text" id="in-app">
 				<button class="add-list">Add List</button>
 			</input-field>
 			</form>

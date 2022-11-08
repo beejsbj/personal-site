@@ -79,7 +79,7 @@ todo-list {
 todo-list h2 {
 	text-align: center;
 	justify-self: center;
-	padding: 10px 40px;
+	padding: 10px 60px;
 
 	/*background-image*/
 	background-color: var(--color);
