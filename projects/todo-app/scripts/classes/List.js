@@ -1,4 +1,5 @@
 import Todo from "./Todo.js";
+import { annotate } from 'https://unpkg.com/rough-notation?module';
 
 export default class List {
 	constructor( record ) {
@@ -113,29 +114,47 @@ export default class List {
 				!$input.value ? alert( "please enter something" ) : this.add( $input.value );
 				$input.value = "";
 			}
-			if ( event.target.matches( `[data-list-id="${this.id}"] button.remove svg` ) ) {
+			if ( event.target.matches( `[data-list-id="${this.id}"] button.remove *` ) ) {
 
 				const id = event.target.closest( "li" ).dataset.id;
 				this.remove( id );
 			}
 			if ( event.target.matches( `[data-list-id="${this.id}"] button.complete` ) ) {
-				const id = event.target.closest( "li" ).dataset.id;
-				console.log(this.list);
+				const $li = event.target.closest( "li" );
+				let id = $li.dataset.id;
+				let $content = $li.querySelector(".calm-voice");
 				this.complete( id );
+				this.crossOff($content); //why doesnt this wooooork
 			}
 			if (
 				event.target.matches( `[data-list-id="${this.id}"] h2.attention-voice` )
 				|| event.target.matches( `[data-list-id="${this.id}"] h3.calm-voice` )
 			) {
 				let $text = event.target;
-				$text.innerHTML = `<input class="edit-text" type='text' value='${$text.innerHTML}'>`;
+				let content = $text.textContent
+				$text.innerHTML = `<input class="edit-text" type='text' value='${content}'>`;
 				let $input = $text.querySelector( "input.edit-text" );
-				$input.addEventListener( "keypress", function( event ) {
+				$input.setSelectionRange(content.length - 1, content.length - 1)
+				$input.focus();
+
+				$input.addEventListener( "keydown", ( event ) => {
 					if ( event.code === "Enter" ) {
-						$text.innerHTML = $input.value;
+						let value = $input.value
+						$text.innerText = value;
+						this.name = value
+
+					}
+					if (event.code == "Escape") {
+						$text.innerText = content;
 					}
 				} );
 			}
 		} );
+	}
+
+	crossOff(element) {
+		//why doesnt this wooooork
+		const annotation = annotate(element, { type: 'crossed-off', color: 'red' });
+		(annotation.isShowing()) ? annotation.hide() : annotation.show();
 	}
 }
