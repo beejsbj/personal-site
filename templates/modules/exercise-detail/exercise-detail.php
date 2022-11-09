@@ -38,6 +38,7 @@
 				event.preventDefault();
 
 				<?=$funcName?>($outlet);
+				$form.reset();
 			});
 
 		} else {
