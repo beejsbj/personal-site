@@ -122,9 +122,9 @@ export default class List {
 			if ( event.target.matches( `[data-list-id="${this.id}"] button.complete` ) ) {
 				const $li = event.target.closest( "li" );
 				let id = $li.dataset.id;
-				let $content = $li.querySelector(".calm-voice");
+				let $card = $li.querySelector("todo-card");
 				this.complete( id );
-				this.crossOff($content); //why doesnt this wooooork
+				this.crossOff($card); //why doesnt this wooooork
 			}
 			if (
 				event.target.matches( `[data-list-id="${this.id}"] h2.attention-voice` )
