@@ -58,30 +58,30 @@ if (
 ?>
 
 
-            <form id="e4p" method="POST">
+<form id="e4p" method="POST">
 
-                <div class="input-field">
-                    <input id="username-ID" type="text" class="text-number-input" required name="username" placeholder="username??" value="<?=$username?>">
-                    <label for="username-ID">Username</label>
-                </div>
-                <div class="input-field">
-                    <input required class="text-number-input" id="password-ID" type="password" name="password" placeholder="password?!" value="<?=$password?>">
-                    <label for="password-ID">password</label>
-                </div>
-
-
-                <button type="submit" name="submitted">
-                    Validate
-                </button>
+    <div class="input-field">
+        <input id="username-ID" type="text" class="text-number-input" required name="username" placeholder="username??" value="<?=$username?>">
+        <label for="username-ID">Username</label>
+    </div>
+    <div class="input-field">
+        <input required class="text-number-input" id="password-ID" type="password" name="password" placeholder="password?!" value="<?=$password?>">
+        <label for="password-ID">password</label>
+    </div>
 
 
-                <div id="e4p-output" class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
+    <button type="submit" name="submitted">
+        Validate
+    </button>
+
+
+    <div id="e4p-output" class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+    
+</form>
 
 
 
