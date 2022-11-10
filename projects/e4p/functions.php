@@ -17,6 +17,8 @@
   		}
 }
 
+($name == $value) ? 'checked' : null; 
+
 function dasher($string){
                     //lowercase the string
                     //split string at space 
