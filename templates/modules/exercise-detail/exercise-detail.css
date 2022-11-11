@@ -28,6 +28,9 @@ exercise-detail actions-component {
 
 	justify-content: space-between;
 }
+exercise-form {
+	gap: 30px;
+}
 
 @media (min-width: 500px) {
 	exercise-detail {

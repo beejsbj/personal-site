@@ -35,7 +35,6 @@ form .output-field {
 }
 form .radio-list {
 	width: 100%;
-	padding: 0 20px;
 }
 
 form .radio-list,
@@ -51,8 +50,20 @@ form .radio-list input {
 
 form .radio-list label {
 	cursor: pointer;
+	position: relative;
 }
 
-form .radio-list input:checked + label {
-	outline:5px solid var(--dark-highlight);
+form .radio-list input:checked + label::after {
+	content: "";
+	position: absolute;
+	bottom: 0px;
+	left: -10px;
+/*	transform: translate(-50%, -50%);*/
+	z-index: -1;
+
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background-color: var(--light-color);
+	animation: bounce-in-top 0.2s ease-in;
 }

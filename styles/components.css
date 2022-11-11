@@ -82,7 +82,7 @@ toggle-switch input:checked+label::before {
 }
 
 /*JS*/
-label:after {
+toggle-switch label:after {
 	text-align: right;
 	top: 0;
 	right: 0;
