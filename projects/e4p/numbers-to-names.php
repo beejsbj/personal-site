@@ -97,29 +97,7 @@ $number = '';
 $name = '';
 $language = '';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-if (
-    isset($_POST['submitted']) &&
-    (isset($_POST['number']))  && 
-    ($_POST['number'] != '')   && 
-    (isset($_POST['language']))  && 
-    ($_POST['language'] != '')
-) {
+if ( isset($_POST['submitted']) ) {
 	$number = $_POST['number'];
 	$language = $_POST['language'];
 
@@ -133,40 +111,36 @@ if (
 }
 ?>
 
+<form id="e4p" method="POST">
+
+	<div class="input-field select-list" >
+        <select id="langauge-ID" name="language">
+		  <option value="english" selected>English</option>
+		  <option value="arabic">Arabic</option>
+		  <option value="mandarin">Mandarin</option>
+		  <option value="french">French</option>
+		  <option value="spanish">Spanish</option>
+		</select>
+        <label for="language-ID">Choose a language</label>
+    </div>
+    <div class="input-field">
+        <input id="number-ID" type="number" min="1" max="12" step="1" class="text-number-input" class="text-number-input" required name="number" placeholder="number??" value="<?=$number?>">
+        <label for="number-ID">Enter number of month</label>
+    </div>
 
 
+    <button type="submit" name="submitted">
+    	Namify
+    </button>
 
 
-            <form id="e4p" method="POST">
-
-            	<div class="input-field select-list" >
-                    <select id="langauge-ID" name="language">
-					  <option value="english" selected>English</option>
-					  <option value="arabic">Arabic</option>
-					  <option value="mandarin">Mandarin</option>
-					  <option value="french">French</option>
-					  <option value="spanish">Spanish</option>
-					</select>
-                    <label for="language-ID">Choose a language</label>
-                </div>
-                <div class="input-field">
-                    <input id="number-ID" type="number" min="1" max="12" step="1" class="text-number-input" class="text-number-input" required name="number" placeholder="number??" value="<?=$number?>">
-                    <label for="number-ID">Enter number of month</label>
-                </div>
-
-
-                <button type="submit" name="submitted">
-                	Namify
-                </button>
-
-
-                <div id="e4p-output" class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
+    <div id="e4p-output" class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+    
+</form>
 
 
 

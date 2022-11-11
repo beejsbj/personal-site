@@ -5,6 +5,7 @@
 .booming-voice {
 	font-family: 'Newsreader', serif;
 	font-size: 40px;
+
 	font-weight: 700;
 	color: var(--dark-color);
 }
@@ -14,6 +15,7 @@
 	font-family: 'Lato', sans-serif;
 	font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
 	color: var(--dark-color);
+	font-weight: 100;
 }
 
 @media (min-width: 700px) {

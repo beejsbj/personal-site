@@ -26,25 +26,27 @@
 <script>
 	var $toggleSwitch = document.querySelector('exercise-detail toggle-switch input');
 	var $form = document.querySelector('form#e4p');
+	var $heading = document.querySelector('exercise-detail > exercise-form h3');
+	var $outlet = document.querySelector('div#e4p-output');
 
-
-	$toggleSwitch.addEventListener('input', function() {
-		var heading = document.querySelector('exercise-detail > exercise-form h3');
-		var $outlet = document.querySelector('div#e4p-output');
-
-		if ($toggleSwitch.checked) {
-			heading.innerHTML = 'JS';
-			$form.addEventListener('submit', function(event) {
+	$toggleSwitch.checked = localStorage.toggleSwitch
+		? JSON.parse(localStorage.toggleSwitch)
+		: false;
+	toggleRunner();
+	$toggleSwitch.addEventListener('input', toggleRunner)
+	$form.addEventListener('submit', function (event) {
+			if ($toggleSwitch.checked) {
 				event.preventDefault();
-
 				<?=$funcName?>($outlet);
-				$form.reset();
-			});
-
-		} else {
-			heading.innerHTML = 'PHP';
-		}
-	})
+			} else {
+				$form.submit();
+			}
+		})
+	function toggleRunner() {
+		localStorage.toggleSwitch = JSON.stringify( $toggleSwitch.checked );
+		$heading.innerHTML = ($toggleSwitch.checked) ? 'JS' : 'PHP';
+		
+	}
 	
 </script>
 

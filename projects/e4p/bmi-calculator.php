@@ -64,21 +64,16 @@ if (
     </div>
 </form>
 <script>
-const myCoolForm = document.querySelector('form');
-const rangeH = myCoolForm.querySelector('#height-ID');
-const outputH = myCoolForm.querySelector('#height-ID + label span');
-const rangeW = myCoolForm.querySelector('#weight-ID');
-const outputW = myCoolForm.querySelector('#weight-ID + label span');
-// the thing it's listening for is a change of value of input in general / on the whole form (not to be confused with the specific input)
-myCoolForm.addEventListener('input', function() {
-    rangeHft = parseInt(rangeH.value / 12);
-    rangeHin = Math.round(rangeH.value % 12);
-    outputH.innerHTML = 'ft: ' + rangeHft + ' in: ' + rangeHin;
-});
-myCoolForm.addEventListener('input', function() {
-    outputW.innerHTML = rangeW.value + ' lbs';
-});
-// myCoolForm.addEventListener('change', function() {
-//   output.innerHTML = range.value;
-// }); // this will only update when you let go - and the value has officially changed
+    const myCoolForm = document.querySelector('form');
+    const rangeH = myCoolForm.querySelector('#height-ID');
+    const outputH = myCoolForm.querySelector('#height-ID + label span');
+    const rangeW = myCoolForm.querySelector('#weight-ID');
+    const outputW = myCoolForm.querySelector('#weight-ID + label span');
+    
+    myCoolForm.addEventListener('input', function() {
+        rangeHft = parseInt(rangeH.value / 12);
+        rangeHin = Math.round(rangeH.value % 12);
+        outputH.innerHTML = 'ft: ' + rangeHft + ' in: ' + rangeHin;
+        outputW.innerHTML = rangeW.value + ' lbs';
+    });
 </script>

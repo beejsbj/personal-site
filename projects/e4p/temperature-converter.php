@@ -59,44 +59,56 @@ if (
 }
 ?>
 
+<form id="e4p" method="POST">
 
+    <div class="radio-list">
+        <div class="input-field">
+            <input 
+                id="celcius-ID" 
+                type="radio" 
+                <?=($unit == 'celcius') ? 'checked' : null?> 
+                name="unit" 
+                value="celcius"
+            >
+            <label for="celcius-ID">Celcius</lawbel>
+        </div>
+        <div class="input-field">
+            <input 
+                id="farenheit-ID" 
+                type="radio" 
+                <?=($unit == 'farenheit') ? 'checked' : null?> 
+                name="unit" 
+                value="farenheit"
+            >
+            <label for="farenheit-ID">Farenheit</label>
+        </div>
+        <div class="input-field">
+            <input 
+                id="kelvin-ID" 
+                type="radio" 
+                <?=($unit == 'kelvin') ? 'checked' : null?> 
+                name="unit" 
+                value="kelvin"
+            >
+            <label for="kelvin-ID">Kelvin</label>
+        </div>
+    </div>
 
+    <div class="input-field">
+        <input id="temperature-ID" type="number" class="text-number-input" required step="0.1" name="temperature" placeholder="temperature??" value="<?=$temperature?>">
+        <label for="temperature-ID">temperature in selected unit?</label>
+    </div>
 
-            <form id="e4p" method="POST">
-
-                <div class="radio-list">
-                    <div class="input-field">
-                        <input id="celcius-ID" type="radio" <?=isChecked($unit, 'celcius')?> name="unit" value="celcius">
-                        <label for="celcius-ID">Celcius</label>
-                    </div>
-                    <div class="input-field">
-                        <input id="farenheit-ID" type="radio" <?=isChecked($unit, 'farenheit')?> name="unit" value="farenheit">
-                        <label for="farenheit-ID">Farenheit</label>
-                    </div>
-                    <div class="input-field">
-                        <input id="kelvin-ID" type="radio" <?=isChecked($unit, 'kelvin')?> name="unit" value="kelvin">
-                        <label for="kelvin-ID">Kelvin</label>
-                    </div>
-                </div>
-
-                <div class="input-field">
-                    <input id="temperature-ID" type="text" class="text-number-input" required step="0.1" name="temperature" placeholder="temperature??" value="<?=$temperature?>">
-                    <label for="temperature-ID">temperature in selected unit?</label>
-                </div>
-
-
-                <button type="submit" name="submitted">
-                    Convert
-                </button>
-
-
-                <div id="e4p-output" class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
+    <button type="submit" name="submitted">
+        Convert
+    </button>
+    <div id="e4p-output" class="<?=$class?>">
+        <p>
+            <?=$output?>
+        </p>
+    </div>
+    
+</form>
         
 
 

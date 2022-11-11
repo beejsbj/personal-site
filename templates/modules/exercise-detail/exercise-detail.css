@@ -1,12 +1,11 @@
 exercise-detail {
 	display: grid;
-	gap:  40px;
+	gap: 40px;
 	justify-items: start;
-
 }
 
 exercise-detail #e4p-output span {
-	color:  var(--dark-highlight);
+	color: var(--dark-highlight);
 }
 
 exercise-detail actions-component a {
@@ -30,22 +29,22 @@ exercise-detail actions-component {
 	justify-content: space-between;
 }
 
-@media (min-width:  500px){
+@media (min-width: 500px) {
 	exercise-detail {
 		grid-column: 2 / end;
 		grid-template-columns: 1fr 1fr;
 	}
 
-exercise-detail h2 {
-	grid-column: 1/end;
+	exercise-detail exercise-form {
+		grid-column: span 2;
+	}
+
+	exercise-detail h2 {
+		grid-column: 1 / end;
+	}
 }
 
-
-
-
-}
-
-@media (min-width:  700px){
+@media (min-width: 700px) {
 	exercise-detail {
 		grid-column: 2 / end;
 	}
@@ -53,5 +52,4 @@ exercise-detail h2 {
 		grid-row: 4;
 		grid-column: 2;
 	}
-
 }
