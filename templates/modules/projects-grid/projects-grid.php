@@ -1,6 +1,5 @@
 <?php 
 	$sectionHeading = $section['heading'] ?? "This is the Projects module";
-	$introPara = $section['intro-paragraph'] ?? "This is the intro Paragraph";
 	$projects = getPageData('projects-list');
 	
 
@@ -19,9 +18,7 @@
 	
  ?>
 
-<p class="notice-voice">
-	<?=$introPara?>
-</p>
+
 
 <projects-grid>
 	<?php 

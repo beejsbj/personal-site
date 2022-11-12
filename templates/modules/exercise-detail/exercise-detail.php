@@ -22,12 +22,12 @@
 	</exercise-form>
 </exercise-detail>
 
-<script src="projects/e4p/e4p.js"></script>
-<script>
-	var $toggleSwitch = document.querySelector('exercise-detail toggle-switch input');
 	var $form = document.querySelector('form#e4p');
 	var $heading = document.querySelector('exercise-detail > exercise-form h3');
 	var $outlet = document.querySelector('div#e4p-output');
+<script src="projects/e4p/e4p.js"></script>
+<script>
+	var $toggleSwitch = document.querySelector('exercise-detail toggle-switch input');
 
 	$toggleSwitch.checked = localStorage.toggleSwitch
 		? JSON.parse(localStorage.toggleSwitch)
