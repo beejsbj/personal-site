@@ -83,13 +83,14 @@ export default class List {
 		return `<todo-list data-list-id="${this.id}">
 					<h2 class="attention-voice" >${this.name}</h2>
 					<actions>
+						<div class="handle" >+</div>
 						<button class="remove-list">
-						<picture>
-							<svg viewBox="0 0 50 50" preserveAspectRatio="xMidYMid" width="50" height="50">
-							   <line x1="0" y1="0" x2="50" y2="50" />
-							   <line x1="50" y1="0" x2="0" y2="50" />
-							</svg>
-						</picture>
+							<picture>
+								<svg viewBox="0 0 50 50" preserveAspectRatio="xMidYMid" width="50" height="50">
+								   <line x1="0" y1="0" x2="50" y2="50" />
+								   <line x1="50" y1="0" x2="0" y2="50" />
+								</svg>
+							</picture>
 						</button>
 					</actions>
 					<form>
@@ -157,4 +158,5 @@ export default class List {
 		const annotation = annotate(element, { type: 'crossed-off', color: 'red' });
 		(annotation.isShowing()) ? annotation.hide() : annotation.show();
 	}
+
 }

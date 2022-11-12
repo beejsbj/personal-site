@@ -15,6 +15,7 @@ $pageData = getPageData($currentPage);
 		<meta name="description" content="<?= $pageData["title"] ?>">
 		<meta property="og:image" content="<?= $pageData["title"] ?>">
 		<link rel='stylesheet' href='styles/site.css'>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bevacqua/dragula@3.7.3/dist/dragula.min.css">
 	</head>
 
 	<body>
@@ -33,7 +34,7 @@ $pageData = getPageData($currentPage);
 			</inner-column>
 		</main>
 	</body>
-
+	<script src='https://cdn.jsdelivr.net/gh/bevacqua/dragula@3.7.3/dist/dragula.min.js'></script>
 	<script src="scripts/script.js" type="module"></script>
 	<script type="module" src="https://unpkg.com/rough-notation?module"></script>
 

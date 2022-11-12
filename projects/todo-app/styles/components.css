@@ -63,7 +63,6 @@ button:hover {
 	position: absolute;
 	background-color: transparent;
 	padding: 0;
-	transform: rotate(20deg);
 }
 
 :is(.remove-list, .remove):hover,
@@ -73,8 +72,8 @@ button:hover {
 }
 
 .remove-list {
-	top: -6px;
-	right: -1px;
+	top: -8px;
+	right: -8px;
 }
 
 .remove {
@@ -121,4 +120,14 @@ todo-card.complete button.complete::after {
 	todo-card:hover button.remove {
 		display: block;
 	}
+}
+
+
+.handle {
+	fill: black;
+	max-width: 20px;
+	cursor: grab;
+	position: absolute;
+	top: 10px;
+	font-size: 20px;
 }
