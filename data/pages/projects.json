@@ -6,7 +6,13 @@
 	"page-title": "Projects",
 	"sections": [
 		{
-			"intro-paragraph" : "Here is where you will find the projects i've been involved in, a mix of personal and student projects.",
+			"module" : "generic-text",
+			"heading-class" : "hide",
+			"paragraphs": {
+				"Here is where you will find the projects i've been involved in, a mix of personal and student projects." : "notice-voice"
+			}
+		},
+		{
 			"module" : "projects-grid",
 			"heading": "grid of Projects"
 		}
