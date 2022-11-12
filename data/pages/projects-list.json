@@ -74,7 +74,7 @@
 		"title": "Flash Cards",
 		"description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. Learnt a lot of refactoring with this one! ",
 		"image": "landscape.jpg",
-		"url" : "https://api3-roulette.netlify.app/",
+		"url" : "projects/flashcards",
 		"tools" : [
 			"HTML",
 			"CSS",
