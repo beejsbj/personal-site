@@ -8,6 +8,8 @@
 	padding: 100px;
 	transform: scale(1.1);
 	transition: 0.2s;
+	z-index: 2;
+
 }
 .site-menu ul {
 	display: grid;
