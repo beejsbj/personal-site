@@ -72,7 +72,7 @@
 	},
 	{
 		"title": "Flash Cards",
-		"description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. Learnt a lot of refactoring with this one! ",
+		"description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
 		"image": "landscape.jpg",
 		"url" : "projects/flashcards",
 		"tools" : [
