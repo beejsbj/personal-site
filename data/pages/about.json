@@ -1,5 +1,5 @@
 {
-	"id": "About",
+	"id": "about",
 	"title": "About",
 	"metaImage" : "",
 	"metaDesc" : "",
@@ -8,44 +8,37 @@
 		{
 			"module" : "about-module",
 			"heading": "A blurb about me…",
-			"paragraphs": [
-				"These are always hard...",
-				"I began my journey into webdev last year through a remote program at perpetual education and have come to gain a passion for it",
-				"Im currently a computer science student as well, and really its reaffirmed my love for the prettier side of things.",
-				"Im a big fan of storytelling, in all its forms books, conversations and people.",
-				"i hope to get good enough at this to one day tell a story through a website."
-			],
-			"images" : ["burooj1.jpg", "burooj2.jpg", "burooj3.jpg"]
+			"paragraphs": {
+				"These are always hard..." : "calm-voice",
+				"I began my journey into webdev last year through a remote program at perpetual education and have come to gain a passion for it" : "calm-voice",
+				"Im currently a computer science student as well, and really its reaffirmed my love for the prettier side of things." : "calm-voice",
+				"Im a big fan of storytelling, in all its forms books, conversations and people." : "calm-voice",
+				"i hope to get good enough at this to one day tell a story through a website." : "calm-voice"
+			},
+			"images" : [
+				{
+					"slug" : "burooj1.jpg",
+					"name" : "",
+					"caption" : ""
+				}, 
+				{
+					"slug" : "burooj2.jpg",
+					"name" : "",
+					"caption" : ""
+				}, 
+				{
+					"slug" : "burooj3.jpg",
+					"name" : "",
+					"caption" : ""
+				}
+			]
 		},
 		{
 			"module" : "contact-list",
 			"heading": "Find more of me below:",
-			"contacts" : [
-				{
-					"name": "Email",
-					"link": "burooj.bj@gmail.com"
-				},
-				{
-					"name": "Github",
-					"link": "https://github.com/beejsbj/"
-				},
-				{
-					"name": "LinkedIn",
-					"link": "https://www.linkedin.com/in/boroujrashid/"
-				},
-				{
-					"name": "Twitter",
-					"link": "https://twitter.com/buroojbj"
-				},
-				{
-					"name": "Codepen",
-					"link": "https://codepen.io/beejsbj"
-				},
-				{
-					"name": "Blog",
-					"link": "https://beejsbj.substack.com"
-				}
-			]
+			"heading-class" : "attention-voice",
+			"paragraphs" : {"" : "hide"},
+			"menu" : "contact"
 		}
 	]
 }
