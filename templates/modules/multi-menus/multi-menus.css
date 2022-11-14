@@ -1,0 +1,4 @@
+menu-group#style-guide-menu-group {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+}

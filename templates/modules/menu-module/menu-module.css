@@ -1,0 +1,7 @@
+@import 'site-menu.css';
+@import 'theme-menu.css';
+
+.garden-menu ul {
+	display: flex;
+	gap: 10px;
+}
