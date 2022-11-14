@@ -107,7 +107,13 @@ function getCamelCase($string){
 function activePage($current){
 	
   if (currentPage() == $current) {
-    echo "active";
+    return "active";
+  } 
+}
+function activeTheme($current){
+	
+  if (currentPage() == $current) {
+    return "active";
   } 
 }
 
