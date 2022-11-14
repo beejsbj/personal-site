@@ -1,7 +1,8 @@
 [
 	{
-		"id" : 0,
-		"name" : "Default",
-		"slug" : "default"
+		"id" : "theme0",
+		"class" : "default",
+		"name" : "",
+		"slug" : "&theme=default"
 	}
 ]

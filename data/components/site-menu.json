@@ -1,0 +1,26 @@
+[
+	{
+		"id" : "site0",
+		"class" : "home",
+		"name" : "Home",
+		"slug" : "?page=home"
+	},
+	{
+		"id" : "site1",
+		"class" : "about",
+		"name" : "About",
+		"slug" : "?page=about"
+	},
+	{
+		"id" : "site2",
+		"class" : "projects",
+		"name" : "Projects",
+		"slug" : "?page=projects"
+	},
+	{
+		"id" : "site3",
+		"class" : "style-guide",
+		"name" : "Style Guide",
+		"slug" : "?page=style-guide"
+	}
+]
