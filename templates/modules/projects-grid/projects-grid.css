@@ -80,7 +80,7 @@ project-card p::after {
 	}
 
 	project-card {
-		display: grid;
+
 		grid-template-columns: repeat(12, 1fr);
 	}
 
@@ -96,12 +96,12 @@ project-card p::after {
 
 	project-card picture {
 		order: 2;
-		grid-column: span 12;
+		grid-column: 2 / -1;
 	}
 
 	project-card p {
 		order: 3;
-		grid-column: 2 / end;
+		grid-column: 2 / -1;
 	}
 
 	project-card .button {
@@ -121,6 +121,10 @@ project-card p::after {
 }
 
 @media(min-width: 750px) {
+	project-card {
+
+		grid-template-columns: repeat(10, 1fr);
+	}
 	project-card:nth-of-type(odd) {
 		grid-column: span 10;
 	}
@@ -151,7 +155,7 @@ project-card p::after {
 	}
 
 	project-card picture {
-		grid-column: span 10;
+		grid-column: 2 / -2;
 		grid-row: span 2;
 	}
 
@@ -162,8 +166,7 @@ project-card p::after {
 	project-card p {
 		position: static;
 		grid-column: span 1;
-		width: 100px;
-		/*text-align: justify;*/
+/*		width: 90px; #todo*/
 	}
 
 	project-card p::after {
@@ -173,11 +176,10 @@ project-card p::after {
 	project-card .button {
 		order: 4;
 		position: initial;
-		grid-column: 12 / 13;
+		grid-column: span 1;
 		align-self: end;
 		text-align: center;
 		padding: 15px 20px;
-		width: 100px;
 	}
 }
 
@@ -191,23 +193,27 @@ project-card p::after {
 
 	project-card:nth-of-type(3n+1) {
 		grid-column: 1 / span 12;
+		grid-template-columns: repeat(12, 1fr);
+
 		
 
 	}
 
 	project-card:nth-of-type(3n+2) {
 		grid-column: 1 / span 8;
+		grid-template-columns: repeat(8, 1fr);
 	}
 
 	project-card:nth-of-type(3n+3) {
 		grid-column: span 8 / -1;
+		grid-template-columns: repeat(8, 1fr);
 	}
 
 	project-card h1 {
 		transform: rotate(0deg);
 		writing-mode: initial;
 		text-orientation: initial;
-		grid-column: 1 / span 12;
+		grid-column: 1 / -1;
 		grid-row: 1 / span 1;
 	}
 
@@ -221,7 +227,7 @@ project-card p::after {
 	}
 
 	project-card picture {
-		grid-column: 2 / span 11;
+		grid-column: 2 / -1;
 		grid-row: 1 / span 2;
 
 		position: relative;
@@ -229,7 +235,7 @@ project-card p::after {
 	}
 
 	project-card:nth-of-type(3n+1) picture {
-		grid-column: 2 / span 11;
+		grid-column: 2 / -1;
 		grid-row: 1 / span 2;
 
 	}
