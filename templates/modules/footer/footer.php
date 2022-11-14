@@ -3,12 +3,11 @@
 			  <circle cx="50" cy="50" r="40" />
 	</svg> 
 	<inner-column class="menus">
-		<?php include('templates/components/site-menu/site-menu.php'); ?>
-	</inner-column>
-	<inner-column class="menus">
-		<?php include('templates/components/theme-menu/theme-menu.php'); ?>
+		<?php 
+			$menu = "site";
+			include('templates/modules/menu-module/menu-module.php');
+			$menu = "theme";
+			include('templates/modules/menu-module/menu-module.php');  
+		?>
 	</inner-column>
 </footer>
-</body>
-
-</html>
