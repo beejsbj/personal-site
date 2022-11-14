@@ -1,4 +1,10 @@
-menu-group#style-guide-menu-group {
+#style-guide-menu-group {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.style-guide .things-grid ul {
+	display: grid;
+	grid-template-columns: repeat( auto-fit, minmax(250px, 1fr) );
+	gap: 30px;
 }

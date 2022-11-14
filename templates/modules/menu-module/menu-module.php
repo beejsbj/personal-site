@@ -1,6 +1,6 @@
 
 <?php
-	$menu = $section['menu'] ?? $menu; 
+	$menu = $section['menu'] ?? $menu ?? 'test'; 
 
 	$menuJson = file_get_contents("data/components/$menu-menu.json");
 	$menuData = json_decode($menuJson, true);
