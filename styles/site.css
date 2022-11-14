@@ -1,29 +1,28 @@
 /* P reset */
-@import 'preset.css';
+@import "preset.css";
 
 /* S etup */
-@import 'setup.css';
+@import "setup.css";
 
 /* S setings */
-@import 'settings.css';
-@import 'developer-styles.css';
+@import "settings.css";
+@import "developer-styles.css";
 
 /* S tructure */
-@import 'structure.css';
+@import "structure.css";
 
 /* T ypography */
-@import 'typography.css';
+@import "typography.css";
 
 /* C omponents */
-@import 'components.css';
-@import 'forms.css';
+@import "components.css";
+@import "forms.css";
 
 /* S tuff (modules) */
-@import 'modules.css';
+@import "modules.css";
 
 /* S ections and more stuff */
-@import 'animation.css';
-
+@import "animation.css";
 
 /* then other contextual styles */
 body {
@@ -42,14 +41,13 @@ body {
 	display: none;
 }
 
-
 body main {
 	display: grid;
 	gap: 30px;
 }
 
-html.style-guide section inner-column {
+html.style-guide main section inner-column {
 	border-top: 1px solid black;
-	margin-top: 20px;
-	padding-top: 20px;
+
+	padding-top: 40px;
 }

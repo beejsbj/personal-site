@@ -3,10 +3,10 @@
 
 
 /*menus*/
-@import '../templates/components/site-menu/site-menu.css';
-@import '../templates/components/theme-menu/theme-menu.css';
 
-@import '../templates/modules/garden-menu/garden-menu.css';
+
+@import '../templates/modules/multi-menus/multi-menus.css';
+@import '../templates/modules/menu-module/menu-module.css';
 
 
 
