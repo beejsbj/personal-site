@@ -3,10 +3,13 @@
 	"title": "Style Guide",
 	"metaImage" : "",
 	"metaDesc" : "",
-	"page-title": "Styles live here",
+	"page-title": "Style Guide",
 
 	"sections": [
 		
+		{
+			"module" : "generic-text"
+		},
 		{
 			"module" : "layout-module"
 		},
@@ -35,10 +38,21 @@
 			"module" : "contact-list"
 		},
 		{
+			"module" : "menu-module",
+			"menu" : "test"
+		},
+		{
+			"module" : "multi-menus",
+			"id" : "style-guide-menu-group"
+		},
+		{
 			"module" : "e4p-grid"
 		},
 		{
 			"module" : "exercise-detail"
+		},
+		{
+			"module" : "image-grid"
 		},
 		{
 			"module" : "goals-list"
