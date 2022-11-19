@@ -36,11 +36,11 @@ function toggleRunner() {
 
 //init
 function toggleOutlet() {
-	document.querySelector("form output").classList.remove("hide");
+	$form.querySelector("output").classList.remove("hide");
 }
 // boiler
 function exercise($outlet) {
-	var $input = document.querySelector("#e4p #input-ID");
+	var $input = $form.querySelector("#input-ID");
 	var template = `<span></span>`;
 	$outlet.innerHTML = `<p>${template}</p>`;
 	$input.value = "";
@@ -48,7 +48,7 @@ function exercise($outlet) {
 }
 // Saying Hello -->
 function sayingHello($outlet) {
-	var $name = document.querySelector("input#nme");
+	var $name = $form.querySelector("input#nme");
 	if ($name) {
 		var template = "hello, <span>" + $name.value + "</span> wassup?";
 		$outlet.innerHTML = `<p>${template}</p>`;
@@ -58,7 +58,7 @@ function sayingHello($outlet) {
 }
 // Counting the Number of Characters -->
 function countingTheNumberOfCharacters($outlet) {
-	var $string = document.querySelector("input#stringID");
+	var $string = $form.querySelector("input#stringID");
 	// get length of $string and store it in another variable
 	var stringLen = $string.value.length;
 	// if length is 0, prompt user for $string agian
@@ -72,8 +72,8 @@ function countingTheNumberOfCharacters($outlet) {
 }
 // Printing Quotes -->
 function printingQuotes($outlet) {
-	var $author = document.querySelector("#e4p input#author");
-	var $quote = document.querySelector("#e4p input#quote");
+	var $author = $form.querySelector("input#author");
+	var $quote = $form.querySelector("input#quote");
 	if ($author && $quote) {
 		var template = `<span>${$author.value}</span> says, <em>"${$quote.value}"</em>`;
 		$outlet.innerHTML = `<p>${template}</p>`;
@@ -84,10 +84,10 @@ function printingQuotes($outlet) {
 }
 // // Mad lib -->
 function madLib($outlet) {
-	var $noun = document.querySelector("#e4p input#noun");
-	var $verb = document.querySelector("#e4p input#verb");
-	var $adjective = document.querySelector("#e4p input#adjective");
-	var $adverb = document.querySelector("#e4p input#adverb");
+	var $noun = $form.querySelector("input#noun");
+	var $verb = $form.querySelector("input#verb");
+	var $adjective = $form.querySelector("input#adjective");
+	var $adverb = $form.querySelector("input#adverb");
 	if ($noun && $verb && $adjective && $adverb) {
 		var template = `Do you <span>${$verb.value}</span> your <span>${$adjective.value}</span> <span>${$noun.value}</span> <span>${$adverb.value}</span>? That's hilarious!`;
 		$outlet.innerHTML = `<p>${template}</p>`;
@@ -100,15 +100,16 @@ function madLib($outlet) {
 }
 
 function simpleMath($outlet) {
-	var $first = document.querySelector("#e4p input#first-id");
-	var $second = document.querySelector("#e4p input#second-id");
+	var $first = $form.querySelector("input#first-id");
+	var $second = $form.querySelector("input#second-id");
 	let sum = $first.value + $second.value;
 	let difference = $first.value - $second.value;
 	let product = $first.value * $second.value;
 	let quotient = $first.value / $second.value;
 	if ($first && $second) {
 		var template = `<span>${$first.value}</span> + <span>${$second.value}</span> = ${sum}<br>
-                        <span>${$first.value}</span> - <span>${$second.value}</span> = ${difference}<br>                        <span>${$first.value}</span> * <span>${$second.value}</span> = ${product}<br>
+                        <span>${$first.value}</span> - <span>${$second.value}</span> = ${difference}<br>
+                        <span>${$first.value}</span> * <span>${$second.value}</span> = ${product}<br>
                         <span>${$first.value}</span> / <span>${$second.value}</span> = ${quotient}<br>`;
 		$outlet.innerHTML = `<p>${template}</p>`;
 		$first.value = "";
@@ -118,8 +119,8 @@ function simpleMath($outlet) {
 }
 // // retirement calculator -->
 function retirementCalculator($outlet) {
-	var $currentAge = document.querySelector("#e4p input#current-age");
-	var $retireAge = document.querySelector("#e4p input#retire-age");
+	var $currentAge = $form.querySelector("input#current-age");
+	var $retireAge = $form.querySelector("input#retire-age");
 	var ageDifference = $retireAge.value - $currentAge.value;
 	const today = new Date();
 	let currentYear = today.getFullYear();
@@ -138,11 +139,11 @@ function retirementCalculator($outlet) {
 }
 
 function areaOfARectangularRoom($outlet) {
-	var $unit = document.querySelector(
-		"#e4p .radio-list input[name='unitChoice']:checked"
+	var $unit = $form.querySelector(
+		".radio-list input[name='unitChoice']:checked"
 	);
-	let $length = document.querySelector("#length");
-	let $width = document.querySelector("#width");
+	let $length = $form.querySelector("#length");
+	let $width = $form.querySelector("#width");
 	const convertConst = 0.09290304;
 	console.log($unit);
 	if ($unit.value == "feet") {
@@ -165,9 +166,9 @@ function areaOfARectangularRoom($outlet) {
 }
 
 function pizzaParty($outlet) {
-	var $people = document.querySelector("#e4p #people");
-	var $pizzas = document.querySelector("#e4p #pizzas");
-	var $slices = document.querySelector("#e4p #slices");
+	var $people = $form.querySelector("#people");
+	var $pizzas = $form.querySelector("#pizzas");
+	var $slices = $form.querySelector("#slices");
 	//calculations
 	var totalSlices = $pizzas.value * $slices.value;
 	console.log(totalSlices);
@@ -188,8 +189,8 @@ function pizzaParty($outlet) {
 }
 
 function paintCalculator($outlet) {
-	var $length = document.querySelector("#e4p #lengthid");
-	var $width = document.querySelector("#e4p #widthid");
+	var $length = $form.querySelector("#lengthid");
+	var $width = $form.querySelector("#widthid");
 	var galConst = 350;
 	if ($length && $width) {
 		let area = length.value * width.value;
@@ -204,14 +205,14 @@ function paintCalculator($outlet) {
 
 function selfCheckout($outlet) {
 	//item1
-	var $price1 = document.querySelector("#e4p #priceid1");
-	var $quantity1 = document.querySelector("#e4p #quantityid1");
+	var $price1 = $form.querySelector("#priceid1");
+	var $quantity1 = $form.querySelector("#quantityid1");
 	//item2
-	var $price2 = document.querySelector("#e4p #priceid2");
-	var $quantity2 = document.querySelector("#e4p #quantityid2");
+	var $price2 = $form.querySelector("#priceid2");
+	var $quantity2 = $form.querySelector("#quantityid2");
 	//item3
-	var $price3 = document.querySelector("#e4p #priceid3");
-	var $quantity3 = document.querySelector("#e4p #quantityid3");
+	var $price3 = $form.querySelector("#priceid3");
+	var $quantity3 = $form.querySelector("#quantityid3");
 	var taxRate = 0.055;
 	if ($price1 && $quantity1 && $price2 && $quantity2 && $price3 && $quantity3) {
 		let subTotal =
@@ -235,8 +236,8 @@ function selfCheckout($outlet) {
 }
 
 function currencyConversion($outlet) {
-	var $amount = document.querySelector("#e4p #amount-fromID");
-	var $rate = document.querySelector("#e4p #rate-fromID");
+	var $amount = $form.querySelector("#amount-fromID");
+	var $rate = $form.querySelector("#rate-fromID");
 	if ($amount && $rate) {
 		let result = $amount.value * $rate.value;
 		var template = `<span>${$amount.value}</span> euros at an exchange rate of 
@@ -249,9 +250,9 @@ function currencyConversion($outlet) {
 }
 
 function computingSimpleInterest($outlet) {
-	var $principal = document.querySelector("#e4p #principal-ID");
-	var $rate = document.querySelector("#e4p #rate-ID");
-	var $time = document.querySelector("#e4p #time-ID");
+	var $principal = $form.querySelector("#principal-ID");
+	var $rate = $form.querySelector("#rate-ID");
+	var $time = $form.querySelector("#time-ID");
 	if ($principal && $rate && $time) {
 		$amount = $principal.value * (1 + ($rate.value / 100) * $time.value);
 		var template = `After <span>${$time.value}</span> years at <span>${$rate.value}%</span>, 
@@ -265,10 +266,10 @@ function computingSimpleInterest($outlet) {
 }
 
 function determiningCompoundInterest($outlet) {
-	var $principal = document.querySelector("#e4p #principal-ID");
-	var $rate = document.querySelector("#e4p #rate-ID");
-	var $time = document.querySelector("#e4p #time-ID");
-	var $number = document.querySelector("#e4p #number-ID");
+	var $principal = $form.querySelector("#principal-ID");
+	var $rate = $form.querySelector("#rate-ID");
+	var $time = $form.querySelector("#time-ID");
+	var $number = $form.querySelector("#number-ID");
 	if ($principal && $rate && $time && $number) {
 		amount =
 			$principal.value *
@@ -290,8 +291,8 @@ function determiningCompoundInterest($outlet) {
 }
 // tax calculator
 function taxCalculator($outlet) {
-	var $amount = document.querySelector("#e4p #amount-ID");
-	var $state = document.querySelector("#e4p #state-ID");
+	var $amount = $form.querySelector("#amount-ID");
+	var $state = $form.querySelector("#state-ID");
 	const rates = [
 		["wi", "wisconsin", 5.5],
 		["mn", "minnesota", 6.875],
@@ -325,8 +326,8 @@ function taxCalculator($outlet) {
 }
 
 function passwordValidation($outlet) {
-	var $username = document.querySelector("#e4p #username-ID");
-	var $password = document.querySelector("#e4p #password-ID");
+	var $username = $form.querySelector("#username-ID");
+	var $password = $form.querySelector("#password-ID");
 	const locker = {
 		username: "password",
 	};
@@ -340,7 +341,7 @@ function passwordValidation($outlet) {
 }
 
 function legalDrivingAge($outlet) {
-	var $age = document.querySelector("#e4p #age-ID");
+	var $age = $form.querySelector("#age-ID");
 	legalAges = {
 		argentina: 17,
 		brazil: 18,
@@ -378,12 +379,10 @@ function legalDrivingAge($outlet) {
 }
 
 function bloodAlcoholCalculator($outlet) {
-	var $gender = document.querySelector(
-		"#e4p .radio-list input[name='gender']:checked"
-	);
-	var $weight = document.querySelector("#e4p #weight-ID");
-	var $number = document.querySelector("#e4p #number-ID");
-	var $time = document.querySelector("#e4p #time-ID");
+	var $gender = $form.querySelector(".radio-list input[name='gender']:checked");
+	var $weight = $form.querySelector("#weight-ID");
+	var $number = $form.querySelector("#number-ID");
+	var $time = $form.querySelector("#time-ID");
 	var result = BACalc(
 		$gender.value,
 		$weight.value,
@@ -411,10 +410,8 @@ function BACalc(gender, weight, number, time) {
 }
 //
 function temperatureConverter($outlet) {
-	var $unit = document.querySelector(
-		"#e4p .radio-list input[name='unit']:checked"
-	);
-	var $temperature = document.querySelector("#e4p #temperature-ID");
+	var $unit = $form.querySelector(".radio-list input[name='unit']:checked");
+	var $temperature = $form.querySelector("#temperature-ID");
 	var template = "";
 	let k = 0;
 	let c = 0;
@@ -448,8 +445,8 @@ function temperatureConverter($outlet) {
 
 // BMI calculator
 function bmiCalculator($outlet) {
-	var $height = document.querySelector("#e4p #height-ID");
-	var $weight = document.querySelector("#e4p #weight-ID");
+	var $height = $form.querySelector("#height-ID");
+	var $weight = $form.querySelector("#weight-ID");
 
 	var bmi = ($weight.value / ($height.value * $height.value)) * 703;
 
@@ -468,29 +465,30 @@ function bmiCalculator($outlet) {
 
 // boiler
 function multistateSalesTaxCalculator($outlet) {
-	var $amount = document.querySelector("#e4p #amount-ID");
-	var $state = document.querySelector("#e4p #state-ID");
-	var $county = document.querySelector("#e4p #county-ID");
+	var $amount = $form.querySelector("#amount-ID");
+	var $state = $form.querySelector("#state-ID");
+	var $county = $form.querySelector("#county-ID");
 	var taxRate = 0;
 	var countyRate = 0;
 	const rates = [
 		["wi", "wisconsin", 5.5, { "eau claire": 0.5, dunn: 0.4 }],
 		["mn", "minnesota", 6.875],
 		["tx", "texas", 6.25],
-		["ca", "california", 7.25, { "alameda": 10.750, "los angeles": 9.5 }],
-		["al", "alabama", 4, {"cherokee": 10, russell: 9.875}],
+		["ca", "california", 7.25, { alameda: 10.75, "los angeles": 9.5 }],
+		["al", "alabama", 4, { cherokee: 10, russell: 9.875 }],
 		["hi", "hawaii", 4],
 		["me", "maine", 5.5],
 	];
 	rates.forEach(function (state) {
-		console.log(state)
+		console.log(state);
 		if (state.includes($state.value)) {
 			taxRate = state[2];
 			countyRate = state[3][$county.value];
 		}
-	})
+	});
 
-	var tax = ($amount.value * taxRate / 100) + ($amount.value * countyRate / 100)
+	var tax =
+		($amount.value * taxRate) / 100 + ($amount.value * countyRate) / 100;
 	var total = Number($amount.value) + tax;
 	var template = `The subtotal is <span>$${$amount.value}</span> <br>
 						       The tax is <span>$${tax.toFixed(2)}</span> <br>
@@ -500,41 +498,41 @@ function multistateSalesTaxCalculator($outlet) {
 	toggleOutlet();
 }
 
-
 //number to names
 function numbersToNames($outlet) {
-
-	var $input = document.querySelector("#e4p #input-ID");
+	var $input = $form.querySelector("#input-ID");
 	this.data = [];
-	this.month = 'April';
+	this.month = "April";
 	this.translation = {};
 	this.template = `<li>The name of the month in <span>English</span> is <span>${this.month}</span>.</li>`;
 
-
-	this.getLanguages = function() {
+	this.getLanguages = function () {
 		const options = {
-		method: 'GET',
-		headers: {
-			'Accept-Encoding': 'application/gzip',
-			'X-RapidAPI-Key': 'f757ce2015msh390ba050dd98e64p1cb706jsne14b87f22dc1',
-			'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
-		}
+			method: "GET",
+			headers: {
+				"Accept-Encoding": "application/gzip",
+				"X-RapidAPI-Key": "f757ce2015msh390ba050dd98e64p1cb706jsne14b87f22dc1",
+				"X-RapidAPI-Host": "google-translate1.p.rapidapi.com",
+			},
 		};
-		fetch('https://google-translate1.p.rapidapi.com/language/translate/v2/languages?target=en', options)
-			.then(response => response.json())
-			.then(response => randomFilter(response.data.languages))
-			.catch(err => console.error(err));
-	}
-	this.randomFilter = function(data) {
+		fetch(
+			"https://google-translate1.p.rapidapi.com/language/translate/v2/languages?target=en",
+			options
+		)
+			.then((response) => response.json())
+			.then((response) => randomFilter(response.data.languages))
+			.catch((err) => console.error(err));
+	};
+	this.randomFilter = function (data) {
 		const arr = data
-			.map((a) => ({sort: Math.random(), value: a}))
+			.map((a) => ({ sort: Math.random(), value: a }))
 			.sort((a, b) => a.sort - b.sort)
 			.map((a) => a.value)
-			.slice(0, 5)
-		this.data = arr; 
-		this.translator()
-	}
-	this.getTranslation = function(obj) {
+			.slice(0, 5);
+		this.data = arr;
+		this.translator();
+	};
+	this.getTranslation = function (obj) {
 		var language = obj.language;
 		const encodedParams = new URLSearchParams();
 		encodedParams.append("q", this.month);
@@ -542,38 +540,48 @@ function numbersToNames($outlet) {
 		encodedParams.append("source", "en");
 
 		const options = {
-			method: 'POST',
+			method: "POST",
 			headers: {
-				'content-type': 'application/x-www-form-urlencoded',
-				'Accept-Encoding': 'application/gzip',
-				'X-RapidAPI-Key': 'f757ce2015msh390ba050dd98e64p1cb706jsne14b87f22dc1',
-				'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
+				"content-type": "application/x-www-form-urlencoded",
+				"Accept-Encoding": "application/gzip",
+				"X-RapidAPI-Key": "f757ce2015msh390ba050dd98e64p1cb706jsne14b87f22dc1",
+				"X-RapidAPI-Host": "google-translate1.p.rapidapi.com",
 			},
-			body: encodedParams
+			body: encodedParams,
 		};
 
-		fetch('https://google-translate1.p.rapidapi.com/language/translate/v2', options)
-			.then(response => response.json())
-			.then(response => this.translation[language] = response.data.translations[0].translatedText)
-			.catch(err => console.error(err));
-	}
+		fetch(
+			"https://google-translate1.p.rapidapi.com/language/translate/v2",
+			options
+		)
+			.then((response) => response.json())
+			.then(
+				(response) =>
+					(this.translation[language] =
+						response.data.translations[0].translatedText)
+			)
+			.catch((err) => console.error(err));
+	};
 
-	this.translator = function() {
-		this.data.forEach(lang => {
+	this.translator = function () {
+		this.data.forEach((lang) => {
 			this.getTranslation(lang);
-		})
+		});
 		this.templater();
-	}
+	};
 
 	this.templater = function () {
 		for (var i = 0; i < this.data.length; i++) {
-			console.log(this.data[i])
-			console.log(this.translation[this.data[i].language])
-			this.template += `<li>The name of the month in <span>${this.data[i].name}</span> is <span>${this.translation[this.data[i].language]}</span>.</li>`;
-
+			console.log(this.data[i]);
+			console.log(this.translation[this.data[i].language]);
+			this.template += `<li>The name of the month in <span>${
+				this.data[i].name
+			}</span> is <span>${
+				this.translation[this.data[i].language]
+			}</span>.</li>`;
 		}
 		$outlet.innerHTML = `<ul>${template}</ul>`;
-	}
+	};
 
 	this.getLanguages();
 	toggleOutlet();
