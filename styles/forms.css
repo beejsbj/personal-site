@@ -27,7 +27,7 @@ form input::placeholder {
 	opacity: 0.1;
 }
 
-form .output-field {
+form output {
 	background-color: var(--paper2);
 
 	padding: 20px;

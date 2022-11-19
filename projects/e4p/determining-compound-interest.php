@@ -89,9 +89,7 @@ if (isset($_POST['submitted'])){
         <label for="number-ID">Times interest is compounded per year?</label>
     </div>
     <button type="submit" name="submitted"> Determine </button>
-    <div id="e4p-output" class="<?=$class?>">
-        <p>
-            <?=$output?>
-        </p>
-    </div>
+    <output class="<?=$class?>" >
+	 <p><?=$output?></p>
+</output>
 </form>

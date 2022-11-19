@@ -40,9 +40,10 @@
 <script>
 	var $form = document.querySelector('form#e4p');
 	var $heading = document.querySelector('exercise-detail > exercise-form h3');
-	var $outlet = document.querySelector('div#e4p-output');
+	var $outlet = document.querySelector('form output');
 	var $toggleSwitch = document.querySelector('exercise-detail toggle-switch');
 	var $submit = document.querySelector("#e4p button");
+
 	var checkedId = localStorage.toggleSwitch
 		? JSON.parse(localStorage.toggleSwitch)
 		: 'option-php';

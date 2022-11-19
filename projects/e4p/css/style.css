@@ -488,7 +488,7 @@ button:hover {
 
 /*output-field*/
 
-.output-field {
+output {
     font-family: monospace;
     padding: 30px;
     display: flex;
@@ -502,13 +502,13 @@ button:hover {
     line-height: 1.2em;
 }
 
-.output-field span,
+output span,
 .input-field label span {
     /*font-weight: 700;*/
     color: hsla(60, 100%, 70%, 1.00);
 }
 
-.output-field em {
+output em {
     font-style: italic;
 }
 

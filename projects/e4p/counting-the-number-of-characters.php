@@ -78,36 +78,27 @@ if (isset($_POST['submitted'])) {
 
 }
 
-
-    
-
-
-
-
-
 ?>
 
+<form id="e4p" autocomplete='off' method="POST">
+
+    <div class="input-field">
+        <input id="stringID" type="text" class="text-number-input" required name="inputString" placeholder="What is the input string?" value="<?=$inputString?>">
+        <label for="stringID">What is the input string?</label>
+    </div>
 
 
-            <form id="e4p" autocomplete='off' method="POST">
-
-                <div class="input-field">
-                    <input id="char-count" type="text" class="text-number-input" required name="inputString" placeholder="What is the input string?" value="<?=$inputString?>">
-                    <label for="char-count">What is the input string?</label>
-                </div>
+    <button type="submit" name="submitted">
+        Count
+    </button>
 
 
-                <button type="submit" name="submitted">
-                    Count
-                </button>
+    <output class="<?=$class?>" >
+	 <p><?=$output?></p>
+</output>
+    
+</form>
 
 
-                <div id="e4p-output" class="<?=$class?>">
-                    <p>
-                        <?=$output?>
-                    </p>
-                </div>
-                
-            </form>
 
 

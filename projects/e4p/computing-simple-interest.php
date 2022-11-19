@@ -81,9 +81,7 @@ if (isset($_POST['submitted'])){
         <label for="time-ID">Enter the number of years</label>
     </div>
     <button type="submit" name="submitted"> Compute </button>
-    <div id="e4p-output" class="<?=$class?>">
-        <p>
-            <?=$output?>
-        </p>
-    </div>
+    <output class="<?=$class?>" >
+	 <p><?=$output?></p>
+</output>
 </form>

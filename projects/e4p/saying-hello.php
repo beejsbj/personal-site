@@ -50,9 +50,7 @@ if (isset($_POST['submitted'])){
         <label for="nme">What is your name?</label>
     </div>
     <button type="submit" name="submitted"> Who? </button>
-    <div id="e4p-output" class="<?=$class?>">
-        <p>
-            <?=$output?>
-        </p>
-    </div>
+    <output class="<?=$class?>" >
+	 <p><?=$output?></p>
+</output>
 </form>

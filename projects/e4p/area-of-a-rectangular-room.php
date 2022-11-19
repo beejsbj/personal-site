@@ -23,7 +23,7 @@ display both area in feet and area in meters
             font-size: clamp(3.13rem, calc(1.81rem + 6.58vw), 9.38rem);
         }
 
-        .output-field p {
+        output p {
             /*text-align: left; */
         }
     </style>
@@ -135,9 +135,7 @@ if (isset($_POST['submitted'])){
         <label for="width"> What is the width of the room?</label>
     </div>
     <button type="submit" name="submitted"> Calculate </button>
-    <div id="e4p-output" class="<?=$class?>">
-        <p>
-            <?=$output?>
-        </p>
-    </div>
+    <output class="<?=$class?>" >
+	 <p><?=$output?></p>
+</output>
 </form>

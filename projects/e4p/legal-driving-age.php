@@ -1,5 +1,5 @@
 <style>
-    .output-field {
+    output {
         flex-direction: column;
         gap: 20px;
     }
@@ -69,12 +69,12 @@ if (isset($_POST["submitted"]) && isset($_POST["age"]) && $_POST["age"] != "") {
     <button type="submit" name="submitted">
         Legalize
     </button>
-    <div id="e4p-output" class="<?= $class ?>">
+    <output class="<?=$class?>" >
         <p>
             <?= $output ?>
         </p>
         <ul class='country-list'>
             <?= $countryOutput ?>
         </ul>
-    </div>   
+    </output>  
 </form>

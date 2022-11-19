@@ -1,7 +1,6 @@
 //init
 function toggleOutlet() {
-	document.querySelector("div#e4p-output").classList.remove("hide");
-	document.querySelector("div#e4p-output").classList.add("output-field");
+	document.querySelector("form output").classList.remove("hide");
 }
 // boiler
 function exercise($outlet) {
@@ -23,7 +22,7 @@ function sayingHello($outlet) {
 }
 // Counting the Number of Characters -->
 function countingTheNumberOfCharacters($outlet) {
-	var $string = document.querySelector("input#char-count");
+	var $string = document.querySelector("input#stringID");
 	// get length of $string and store it in another variable
 	var stringLen = $string.value.length;
 	// if length is 0, prompt user for $string agian

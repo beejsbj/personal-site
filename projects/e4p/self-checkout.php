@@ -17,7 +17,7 @@
             
         }
 
-        .output-field {
+        output {
             text-align: left;
         }
     </style>
@@ -156,11 +156,9 @@ if (isset($_POST['submitted'])){
     </button>
 
 
-    <div id="e4p-output" class="<?=$class?>">
-        <p>
-            <?=$output?>
-        </p>
-    </div>
+    <output class="<?=$class?>" >
+	 <p><?=$output?></p>
+</output>
     
 </form>
 

@@ -32,9 +32,8 @@ var VsayingHello = {
 	},
 	computed: {
 		output() {
-			document.querySelector("div#e4p-output").classList.add('hide');
-			document.querySelector("div#e4p-output").classList.add("output-field");
-			let template = `Vue dit Bonjour, ${this.nme}`;
+			document.querySelector("form output").classList.add('hide');
+			let template = `<p>Vue dit Bonjour, ${this.nme}</p>`;
 			if (!isInputEmpty()) {
 				
 				return template;
@@ -44,9 +43,34 @@ var VsayingHello = {
 	methods: {
 		submit(event) {
 			event.preventDefault();
-			document.querySelector("div#e4p-output").classList.remove('hide');
-			console.log('h48i')
+			document.querySelector("form output").classList.remove('hide');
 		},
 	},
 };
+
+var VcountingTheNumberOfCharacters = {
+	el: "#e4p.vue",
+
+	data: function () {
+		return {
+			stringID: "",
+		};
+	},
+
+	computed: {
+		output() {
+			// document.querySelector("form output").classList.add('hide');
+			let template = `Length of string: <span>${this.stringID.length}</span>`;
+			return `<p>${template}</p>`
+		},
+	},
+
+	methods: {
+		submit() {
+			event.preventDefault();
+			document.querySelector("form output").classList.remove('hide');
+		}
+	}
+
+}
 

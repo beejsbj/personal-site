@@ -8,7 +8,7 @@ exercise-detail > exercise-form h3 {
 	text-transform: uppercase;
 }
 
-exercise-detail #e4p-output span {
+exercise-detail output span {
 	color: var(--dark-highlight);
 }
 

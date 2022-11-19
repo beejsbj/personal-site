@@ -73,9 +73,7 @@ if (isset($_POST['submitted'])){
         <label for="rate-fromID">What is the exchange rate?</label>
     </div>
     <button type="submit" name="submitted"> Convert </button>
-    <div id="e4p-output" class="<?=$class?>">
-        <p>
-            <?=$output?>
-        </p>
-    </div>
+    <output class="<?=$class?>" >
+	 <p><?=$output?></p>
+</output>
 </form>

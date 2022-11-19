@@ -102,11 +102,9 @@ if (
     <button type="submit" name="submitted">
         Convert
     </button>
-    <div id="e4p-output" class="<?=$class?>">
-        <p>
-            <?=$output?>
-        </p>
-    </div>
+    <output class="<?=$class?>" >
+	 <p><?=$output?></p>
+</output>
     
 </form>
         
