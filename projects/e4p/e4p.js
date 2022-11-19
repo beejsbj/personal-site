@@ -1,3 +1,39 @@
+var $heading = document.querySelector("exercise-detail > exercise-form h3");
+var $toggleSwitch = document.querySelector("exercise-detail toggle-switch");
+var $form = document.querySelector("form#e4p");
+var $outlet = $form.querySelector("output");
+var $submit = $form.querySelector("button");
+
+//looks for php or js selection
+var checkedId = localStorage.toggleSwitch
+	? JSON.parse(localStorage.toggleSwitch)
+	: "option-php";
+var $checkedSwitch = $toggleSwitch.querySelector(`#${checkedId}`);
+$checkedSwitch.checked = true;
+toggleRunner();
+$toggleSwitch.addEventListener("input", toggleRunner);
+
+//submit event listner
+if (!$form.dataset.handler) {
+	$form.dataset.handler = "true";
+	$form.addEventListener("submit", function (event) {
+		if ($checkedSwitch.value == "php") {
+			$form.submit();
+		} else {
+			event.preventDefault();
+			if ($checkedSwitch.value == "js") {
+				callForm();
+			}
+		}
+	});
+}
+
+function toggleRunner() {
+	$checkedSwitch = $toggleSwitch.querySelector("input:checked");
+	localStorage.toggleSwitch = JSON.stringify($checkedSwitch.id);
+	$heading.innerHTML = $checkedSwitch.value;
+}
+
 //init
 function toggleOutlet() {
 	document.querySelector("form output").classList.remove("hide");
@@ -72,8 +108,7 @@ function simpleMath($outlet) {
 	let quotient = $first.value / $second.value;
 	if ($first && $second) {
 		var template = `<span>${$first.value}</span> + <span>${$second.value}</span> = ${sum}<br>
-                        <span>${$first.value}</span> - <span>${$second.value}</span> = ${difference}<br>
-                        <span>${$first.value}</span> * <span>${$second.value}</span> = ${product}<br>
+                        <span>${$first.value}</span> - <span>${$second.value}</span> = ${difference}<br>                        <span>${$first.value}</span> * <span>${$second.value}</span> = ${product}<br>
                         <span>${$first.value}</span> / <span>${$second.value}</span> = ${quotient}<br>`;
 		$outlet.innerHTML = `<p>${template}</p>`;
 		$first.value = "";
