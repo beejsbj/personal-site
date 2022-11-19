@@ -29,7 +29,6 @@ form input::placeholder {
 
 form output {
 	background-color: var(--paper2);
-
 	padding: 20px;
 	width: 100%;
 }
