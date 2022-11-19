@@ -21,16 +21,16 @@ check it out at: burooj.dev
 
 #### Up next
 * [ ] home content
-* [ ] get feedback for site after adding images 
+* [ ] project detail
 
 <hr>
 
 #### todo
 * [ ] make images for each of the projects
-* [ ] project detail
-* [ ] display tools used for each project
+* [ ] get feedback for site after adding images 
 * [ ] write case study/project detail pages
 * [ ] update resume/goals content
+* [ ] display tools used for each project
 * [ ] create CSS theme based on perpetual education style-guide
 * [ ] create CSS theme based on persona 5 visual design
 * [ ] create CSS theme based on some industrual basic design
