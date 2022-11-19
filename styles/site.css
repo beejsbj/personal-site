@@ -40,6 +40,9 @@ body {
 .hide {
 	display: none;
 }
+.hide-opacity {
+	opacity: 0;
+}
 
 body main {
 	display: grid;
