@@ -74,7 +74,7 @@ if (isset($_POST['submitted'])){
 ?>
 
 
-<form id="e4p" method="POST">
+<form id="e4p" autocomplete='off' method="POST">
     <div class="input-field">
         <input id="lengthid" type="number" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.1" min="1">
         <label for="lengthid"> What is the length?</label>

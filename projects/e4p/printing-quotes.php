@@ -56,7 +56,7 @@ if (isset($_POST['submitted'])) {
 
 
 
-<form id="e4p" method="POST">
+<form id="e4p" autocomplete='off' method="POST">
 
     <div class="input-field">
         <input id="quote" type="text" class="text-number-input" required name="quote" placeholder="What is the Quote?" value="<?=$quote?>">

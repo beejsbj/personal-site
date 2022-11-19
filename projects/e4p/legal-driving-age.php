@@ -60,7 +60,7 @@ if (isset($_POST["submitted"]) && isset($_POST["age"]) && $_POST["age"] != "") {
 }
 ?>
 
-<form id="e4p" method="POST">
+<form id="e4p" autocomplete='off' method="POST">
 
     <div class="input-field">
         <input id="age-ID" type="number" class="text-number-input" required name="age" placeholder="aGe??!!?" min="1" step="1" value="<?= $age ?>">

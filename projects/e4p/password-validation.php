@@ -58,7 +58,7 @@ if (
 ?>
 
 
-<form id="e4p" method="POST">
+<form id="e4p" autocomplete='off' method="POST">
 
     <div class="input-field">
         <input id="username-ID" type="text" class="text-number-input" required name="username" placeholder="username??" value="<?=$username?>">

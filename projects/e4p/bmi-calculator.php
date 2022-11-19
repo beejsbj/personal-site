@@ -45,7 +45,7 @@ if (
     $class = "output-field"; 
 }
 ?>
-<form id="e4p" method="POST">
+<form id="e4p" autocomplete='off' method="POST">
     <div class="input-field range-field">
         <input id="height-ID" type="range" min="1" max="120" step="1" required name="height" placeholder="height??" value="<?=$height?>">
         <label for="height-ID"> Height: <span></span>

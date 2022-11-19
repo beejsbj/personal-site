@@ -56,7 +56,7 @@ if (isset($_POST["submitted"])) {
     }
 }
 ?>
-<form id="e4p" method="POST">
+<form id="e4p" autocomplete='off' method="POST">
     <div class="input-field">
         <input id="people" type="number" class="text-number-input" required name="people" placeholder="How many people?" value="<?= $people ?>">
         <label for="people">How many people?</label>

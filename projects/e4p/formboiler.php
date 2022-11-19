@@ -14,7 +14,7 @@ if (
     $class = "output-field"; 
 }
 ?>
-<form id="e4p" method="POST">
+<form id="e4p" autocomplete='off' method="POST">
     <div class="input-field">
         <input id="input1-ID" type="text" class="text-number-input" class="text-number-input" required name="input1" placeholder="input1??" value="<?=$input1?>">
         <label for="input1-ID"></label>

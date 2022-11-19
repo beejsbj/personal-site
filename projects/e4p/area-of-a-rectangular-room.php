@@ -115,7 +115,7 @@ if (isset($_POST['submitted'])){
 
 
 ?>
-<form id="e4p" method="POST">
+<form id="e4p" autocomplete='off' method="POST">
     <div class="input-field radio-list">
         <div class="input-field">
             <input id="ifeet" type="radio" name="unitChoice" value="feet" checked>
