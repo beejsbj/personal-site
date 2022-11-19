@@ -4,6 +4,10 @@ exercise-detail {
 	justify-items: start;
 }
 
+exercise-detail > exercise-form h3 {
+	text-transform: uppercase;
+}
+
 exercise-detail #e4p-output span {
 	color: var(--dark-highlight);
 }

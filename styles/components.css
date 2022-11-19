@@ -30,7 +30,8 @@ button {
 
 toggle-switch {
 	position: relative;
-	transform: scale(0.6);
+	grid-auto-flow: column;
+	gap: 10px;
 }
 toggle-switch input {
 	display: none;
@@ -38,70 +39,11 @@ toggle-switch input {
 
 toggle-switch label {
 	position: relative;
-	width: 140px;
-	height: 70px;
 	cursor: pointer;
+	text-transform: uppercase;
 }
 
-toggle-switch label::before,
-toggle-switch label::after {
-	content: "";
-	padding: 10px;
-	position: absolute;
-	border-radius: 50px;
-	transition:
-		0.5s ease top,
-		0.5s ease left,
-		0.5s ease right,
-		0.5s ease width,
-		0.5s ease height;
-}
-
-/*PHP*/
-toggle-switch label::before {
-	top: 8px;
-	left: 8px;
-	width: 54px;
-	height: 54px;
-	background-color: hsla(52, 78%, 61%, 1.00);
-	background-image: url('https://i.imgur.com/MWFJ87T.jpg');
-	background-position: 10% 50%;
-	background-repeat: no-repeat;
-	background-size: contain;
-	transform: scale(0.85);
-	z-index: 2;
-}
-
-toggle-switch input:checked+label::before {
-	top: 0;
-	left: 0;
-	width: 140px;
-	height: 70px;
-	transform: scale(1);
-	z-index: 1;
-}
-
-/*JS*/
-toggle-switch label:after {
-	text-align: right;
-	top: 0;
-	right: 0;
-	width: 140px;
-	height: 70px;
-	transform: scale(1);
-	background-color: hsla(227, 41%, 35%, 1.00);
-	background-image: url('https://i.imgur.com/W3hzUmL.jpg');
-	background-position: 85% 50%;
-	background-repeat: no-repeat;
-	background-size: contain;
-	z-index: 1;
-}
-
-toggle-switch input:checked+label::after {
-	top: 8px;
-	right: 8px;
-	width: 54px;
-	height: 54px;
-	z-index: 2;
-	transform: scale(0.85);
+toggle-switch input:checked + label {
+	background-color: var(--light-color);
+	transform: scale(1.2);
 }

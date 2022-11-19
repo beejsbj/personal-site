@@ -134,6 +134,7 @@ todo-card.complete h3.calm-voice {
 		overflow-x: initial;
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		grid-template-rows: masonry;
 
 
 	}
