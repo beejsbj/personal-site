@@ -17,32 +17,32 @@
 						{
 							"number" : "01",
 							"name" : "Saying Hello",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
+							"description" : "A program that prompts for your name and prints a greeting using your name."
 						},
 						{
 							"number" : "02",
 							"name" : "Counting the Number of Characters",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
+							"description" : "A program that prompts for an input string and displays the number of characters the string contains."
 						},
 						{
 							"number" : "03",
 							"name" : "Printing Quotes",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
+							"description" : "A program that prompts for a quote and an author and displays it"
 						},
 						{
 							"number" : "04",
 							"name" : "Mad Lib",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
+							"description" : "A simple mad-lib program that prompts for a noun, verb, adverb, and adjective and injects them into a story."
 						},
 						{
 							"number" : "05",
 							"name" : "Simple Math",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
+							"description" : "A program that prompts for two numbers. and displays the sum, difference, product, and quotient of those numbers"
 						},
 						{
 							"number" : "06",
 							"name" : "Retirement Calculator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
+							"description" : "A program that determines how many years you have left until retirement and the year you can retire."
 						}
 					]
 				},
