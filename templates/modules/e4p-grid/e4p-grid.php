@@ -18,12 +18,15 @@
 
 			<e4p-chapter>
 				<h1 class='attention-voice'>
-				<?=$chapterHeading?>
+					<?=$chapterHeading?>
 				</h1>
 
 				<p class="whisper-voice">
-				<?=$chapterDesc?>
+					<?=$chapterDesc?>
 				</p>
+				<aside>
+					<p class="whisper-voice"></p>
+				</aside>
 
 				<ul>
 				<?php
@@ -33,12 +36,23 @@
 				 		$exDesc = $exercise['description']  ?? "exercise chapterDesc";
 				 		$exLink = $exercise['slug'] ?? "?page=exercise-detail&exercise=" . getKebabCase($exName);
 				 		?>
-
 						<li>
 							<a href="<?=$exLink?>"><?=$exName?></a>
+							<p><?=$exDesc?></p>
 						</li>
 				<?php } ?>
 				</ul>
 			</e4p-chapter>
 	<?php } ?>
 </e4p-grid>
+<script>
+	
+
+	window.addEventListener("mousemove", function (event) {
+		if (event.target.matches("e4p-chapter li a")) {
+			var $paragraph = event.target.closest('li').querySelector('p');
+			var $aside = event.target.closest('e4p-chapter').querySelector("aside p");
+			$aside.innerHTML = $paragraph.innerHTML;
+		}
+	});
+</script>
