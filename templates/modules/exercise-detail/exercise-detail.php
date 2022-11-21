@@ -1,8 +1,8 @@
 <?php 
 // if heading exists condition
 	$exLink = $_GET['exercise'] ?? "saying-hello";
-	$exerciseName = kebabToCapital($exLink);
-	$funcName = getCamelCase($exerciseName);
+	$exerciseName = getTitleCase( substr($exLink, 3) );
+	$funcName = getCamelCase( $exerciseName );
 ?>
 <exercise-detail>
 	<actions-component>
@@ -17,7 +17,7 @@
 				<label for="option-js">js</label>
 			</radio-option>
 		</toggle-switch>
-		<a href="https://codepen.io/beejsbj/full/mdKpeKP/#<?=$funcName?>">Vue</a>
+		<a href="?page=e4p-in-vue#<?=$funcName?>">Vue</a>
 	</actions-component>
 	<h2 class="loud-voice">
 		<?=$exerciseName?>
@@ -25,7 +25,7 @@
 	
 	<exercise-form>
 		<h3 class="attention-voice">PHP</h3>
-		<?php include("projects/e4p/$exLink.php"); ?>
+		<?php include("projects/e4p/exercises/$exLink.php"); ?>
 	</exercise-form>
 </exercise-detail>
 
