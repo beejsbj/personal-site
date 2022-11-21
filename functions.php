@@ -22,11 +22,8 @@ showErrors();
 
 
   //show query string
-function queryString()
-{
+function queryString(){
 	return $_SERVER['QUERY_STRING'];
-
-
 }
 
 
@@ -62,17 +59,11 @@ function getPageData($page){
 function renderPage ($data) {
 	$pageData = $data;
 	$page = currentPage();
-	include("templates/pages/standard.php");
-
-
-	// if (file_exists("templates/pages/$page/$page.php")) {
-	// 	// include("templates/pages/$page/$page.php");
-			
-
-	// }
-	// else {
-	// 	// include("templates/pages/pageNotFound.php");
-	// }
+	if (isset($pageData['template'])) {
+			include("templates/pages/$page/$page.php");
+	} else {
+		include("templates/pages/standard.php");
+	}
 }
 
 
@@ -80,26 +71,7 @@ function renderPage ($data) {
 
 
 
-function getKebabCase($string){
-	//lowercase the string
-	//split string at space 
-	$splitString = explode(" ", $string);
-	//add dashes 
-	$finalString = implode("-", $splitString);
-	return strtolower($finalString);
-}
 
-function kebabToCapital($string){
-	$splitString = explode("-", $string);
-	$finalString = implode(" ", $splitString);
-	return ucwords($finalString);
-}
-function getCamelCase($string){
-	$splitString = explode(" ", ucwords($string));
-	$finalString = implode("", $splitString);
-	$finalString[0] = strtolower($finalString[0]);
-	return $finalString;
-}
 
 
 
@@ -138,4 +110,50 @@ function projectFilter($projects, $tag) {
 		}
 	}
 	return $filtered;
+}
+
+
+function getKebabCase($string){
+	$str = str_replace(" ", "-", strtolower($string));
+	return $str; // php-replace-space-with-dash
+}
+
+
+
+function getCamelCase($string){
+	$splitString = explode(" ", ucwords($string));
+	$finalString = implode("", $splitString);
+	$finalString[0] = strtolower($finalString[0]);
+	return $finalString;
+}
+
+function getTitleCase($title) {
+    // Our array of 'small words' which shouldn't be capitalised if
+    // they aren't the first word. Add your own words to taste.
+    $smallwordsarray = [
+        'of','a','the','and','an','or','nor','but','is','if','then','else','when',
+        'at','from','by','on','off','for','in','out','over','to','into','with'
+    ];
+
+    // Split the string into separate words
+    $words = explode('-', strtolower($title));
+
+    foreach ($words as $key => $word) {
+
+    // If this word is the first, or it's not one of our small words, 
+        if ($key == 0 or !in_array($word, $smallwordsarray)) {
+            $words[$key] = ucwords($word); //capitalise it with ucwords().
+        }
+    }
+
+    // Join the words back into a string
+    $newtitle = implode(' ', $words);
+
+    return $newtitle;
+}
+
+
+function exExists($num){
+	$existing = array_slice( scandir('projects/e4p/exercises'), 2 );
+	return isset($existing[$num]);
 }
