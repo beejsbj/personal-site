@@ -1,6 +1,10 @@
 <style>
 	body {
-		padding-top: 0px;
+/*		padding-top: 0px;*/
+	}
+
+	#selfCheckout output {
+		padding: 0;
 	}
 
 	.hideOpacity {
@@ -91,6 +95,10 @@
 	thead,
 	tfoot {
 		background-color: var(--light-color);
+	}
+
+	tfoot {
+		background-color: var(--light-highlight);
 	}
 
 	tbody tr:nth-of-type(even) {
@@ -430,6 +438,33 @@
 									</tr>
 								</tfoot>
 							</table>
+						</output>
+					</form>
+					<!--  -->
+				</exercise-form>
+			</exercise-detail>
+		</inner-column>
+	</li>
+	<li>
+		<inner-column>
+			<exercise-detail>
+				<exercise-form id="currencyConversion">
+					<a href="#currencyConversion"></a>
+					<h2 class="loud-voice">Currency Conversion</h2>
+					<!--  -->
+					<form id="e4p" autocomplete="off"> <!-- vue watch this scope -->
+						<div class="input-field">
+							<label for="from">How many euros are you exchanging?</label>
+							<input id='from' v-model="from">
+						</div>
+						<div class="input-field">
+							<label for="rate">What is the exchange rate?</label>
+							<input id='rate' v-model="rate">
+						</div>
+						<button v-on:click.prevent="submit">Button</button>
+						<output :class="{ hideOpacity: !output }">
+							<p class="solid-voice">Amount in USD</p>
+							<p><span>{{result}}</span></p>
 						</output>
 					</form>
 					<!--  -->

@@ -322,3 +322,27 @@ const selfCheckout = new Vue({
 		}
 	}
 });
+
+//11
+const currencyConversion = new Vue({
+	el: "#currencyConversion form",
+	data() {
+		return {
+			from: "",
+			rate: "",
+			output: false
+		};
+	},
+	computed: {
+		result() {
+			return (this.from * (this.rate / 100)).toFixed(2)
+		}
+	},
+	methods: {
+		submit() {
+			this.output = true;
+		}
+	}
+});
+
+//12 
