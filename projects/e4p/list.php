@@ -59,10 +59,10 @@
     <ol>
         <?php
             $exercises = array_slice( scandir('exercises'), 2 );
-            $i = 0;
+            
             foreach ($exercises as $exercise) { 
                 $exName = getTitleCase(substr($exercise, 3, -4));
-                $i++; 
+                $i = substr($exercise, 0, 2); 
                 ?>
                 <li>
                     <a class="" href="?page=<?=$exercise?>">
