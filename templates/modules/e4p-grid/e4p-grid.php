@@ -1,6 +1,7 @@
 <?php 
 // if heading exists condition
 	$sectionHeading = $section['heading'] ?? "This is the E4P module";
+
 ?>
 
 <h2 class="loud-voice">
@@ -14,7 +15,7 @@
 			$chapterHeading = $chapter['heading'] ?? "E4P chapter heading";
 			$chapterDesc = $chapter['description']  ?? "E4P chapter description";
 			$chapterSvg = $chapter['svg']  ?? "xyz.svg";
-			$chapterExercises = $chapter['exercises'] ?? [1, 2, 3, 4];?>
+			$chapterExercises = $chapter['exercises'] ?? [1, 2, 3];?>
 
 			<e4p-chapter>
 				<h1 class='attention-voice'>
@@ -31,10 +32,14 @@
 				<ul>
 				<?php
 				 	foreach ($chapterExercises as $exercise) {
-				 		$exName = $exercise['name'] ?? "exercise name";
 				 		$exNumber = $exercise['number']  ?? "exercise Number";
+				 		$exName = $exercise['name'] ?? "exercise name";
 				 		$exDesc = $exercise['description']  ?? "exercise chapterDesc";
-				 		$exLink = $exercise['slug'] ?? "?page=exercise-detail&exercise=" . getKebabCase($exName);
+				 		$exLink = $exercise['slug'] ?? "?page=exercise-detail&exercise=$exNumber-" . getKebabCase($exName);
+
+				 		if (!exExists($exNumber - 1) && !isset($exercise['slug'])) {
+				 			continue;
+				 		}
 				 		?>
 						<li>
 							<a href="<?=$exLink?>"><?=$exName?></a>
