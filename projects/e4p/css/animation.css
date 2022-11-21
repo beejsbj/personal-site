@@ -1,43 +1,33 @@
-.link-wrapper {
+
+
+li:hover .ex-name {
+	animation: tiltBounce 0.2s ease;
+	animation-fill-mode: forwards;
 	position: relative;
-	/*mix-blend-mode: darken;*/
+	z-index: 9999;
+/*	transition: 0.2s;*/
 }
 
-.ex-name {
-	animation: tiltBounce 0.15s ease;
+li:nth-of-type(even):hover .ex-name {
+	animation: tiltBounceAlt 0.2s ease;
 	animation-fill-mode: forwards;
-	/*position: absolute;*/
 	z-index: 9999;
 }
 
-.link-wrapper .shape-wrapper {
+.ex-name .shape-wrapper {
 	display: none;
 	position: absolute;
-	top: 50%;
+	top: 0;
 	left: 0;
-	right: 0;
-	transform: translate(-50%, -50%);
-	max-width: 15%;
+	width: 100%;
+	
+		z-index: -1;
 }
 
 
-.link-wrapper:hover .ex-name {
-	z-index: 9999;
-}
-
-.link-wrapper:hover .shape-wrapper {
-	transform: rotate(-6deg);
+li:hover .shape-wrapper {
 	display: block;
-	z-index: 12;
-	max-width: 70%;
-}
-
-.link-wrapper:hover .shape-wrapper .shape.cyan-fill {
-	transform: scale(3, 0.1);
-}
-
-.link-wrapper:nth-child(even):hover .shape-wrapper {
-	transform: rotate(11deg);
+	animation: jolt 0.2s 0.01s ease-out;
 }
 
 .shape-wrapper {
@@ -73,15 +63,36 @@
 }
 
 .jelly {
-	-webkit-animation-name: jelly;
 	animation-name: jelly;
-	-webkit-transform-origin: center;
 	transform-origin: center;
-	-webkit-animation-iteration-count: infinite;
 	animation-iteration-count: infinite;
-	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
+	animation-delay: 0.4s;
+	animation-duration: 0.4s;
 }
+.jellyalt {
+	animation-name: jelly;
+	transform-origin: center;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-delay: 0.2s;
+	animation-duration: 0.4s;
+}
+
+@keyframes jolt {
+	0% {
+		transform: translate(-50%, -50%) skew(20deg) scale(0, .1) rotate(-15deg);
+	}
+
+	50% {
+		transform: translate(-50%, -50%) skew(20deg) scale(3, .2) rotate(-15deg);
+	}
+
+	100% {
+		transform: translate(-55%, -49%) skewX(20deg) rotateX(40deg) rotateY(10deg) rotateZ(-10deg);
+	}
+}
+
 
 
 @keyframes stamp {
