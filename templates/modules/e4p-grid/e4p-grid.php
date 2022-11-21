@@ -35,14 +35,16 @@
 				 		$exNumber = $exercise['number']  ?? "exercise Number";
 				 		$exName = $exercise['name'] ?? "exercise name";
 				 		$exDesc = $exercise['description']  ?? "exercise chapterDesc";
-				 		$exLink = $exercise['slug'] ?? "?page=exercise-detail&exercise=$exNumber-" . getKebabCase($exName);
+				 		$exSlug = $exercise['slug'] ?? "$exNumber-" . getKebabCase($exName);
 
-				 		if (!exExists($exNumber - 1) && !isset($exercise['slug'])) {
+				 		if (!exExists($exSlug) && !isset($exercise['slug'])) {
 				 			continue;
 				 		}
 				 		?>
 						<li>
-							<a href="<?=$exLink?>"><?=$exName?></a>
+							<a href="?page=exercise-detail&exercise=<?=$exSlug?>">
+								<?=$exName?>
+							</a>
 							<p><?=$exDesc?></p>
 						</li>
 				<?php } ?>

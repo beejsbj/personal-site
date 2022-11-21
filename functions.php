@@ -153,7 +153,6 @@ function getTitleCase($title) {
 }
 
 
-function exExists($num){
-	$existing = array_slice( scandir('projects/e4p/exercises'), 2 );
-	return isset($existing[$num]);
+function exExists($slug){
+	return	file_exists("projects/e4p/exercises/$slug.php");
 }
