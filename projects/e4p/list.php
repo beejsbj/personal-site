@@ -1,4 +1,4 @@
-        <style>
+<style>
         body {
             padding-bottom: 500px;
         }
@@ -54,39 +54,31 @@
             font-family: expose;
             color: white;
         }
-        </style>
-        <nav>
+</style>
+<nav>
     <ol>
         <?php
-                include('exercises-list.php');
-
-                $i = 0;
-                foreach ($exercises as $exercise) { 
-                    $fileName = dasher($exercise);
-                    $i++; 
-                    ?>
-                        <li>
-                            <a class="link-wrapper" href="?page=<?=$fileName?>">
-                                <span class="ex-number">
-                                    <?=$i?></span>
-                                <span class="ex-name">
-                                    <?=$exercise?></span>
-                                <div class="shape-wrapper">
-                                    <div class="shape red-fill jelly">
-                                        <svg x="0px" y="0px" viewBox="0 0 108.1 47" enable-background="new 0 0 108.1 47">
-                                            <polygon fill="#FF0000" points="19.5,0,110.7,0,80.1,32.7,3.1,47 " />
-                                        </svg>
-                                    </div>
-                                    <div class="shape cyan-fill jelly">
-                                        <svg x="0px" y="0px" viewBox="0 0 108.1 47" enable-background="new 0 0 108.1 47">
-                                            <polygon fill="#00FFFF" points="11,3,85.1,0 118.8,45.6,14.3,29 " />
-                                        </svg>
-                                    </div>
-                                </div>
-                                <span class="ex-number">
-                                    <?=$i?></span>
-                            </a>
-                        </li>
+            $exercises = array_slice( scandir('exercises'), 2 );
+            $i = 0;
+            foreach ($exercises as $exercise) { 
+                $exName = getTitleCase(substr($exercise, 3, -4));
+                $i++; 
+                ?>
+                <li>
+                    <a class="" href="?page=<?=$exercise?>">
+                        <span class="ex-number">
+                            <?=$i?>
+                        </span>
+                        <span class="ex-name link-wrapper">
+                            <?=$exName?>
+                            <?php include 'shape.php' ?>   
+                        </span>
+                       
+                        <span class="ex-number">
+                            <?=$i?>
+                        </span>
+                    </a>
+                </li>
         <?php } ?>
     </ol>
 </nav>

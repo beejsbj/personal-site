@@ -25,7 +25,7 @@
                     if ($page == 'list') {
                         include('list.php');
                     } else {
-                       include("$page.php");
+                       include("exercises/$page");
                     }
                  ?>
             </div>
