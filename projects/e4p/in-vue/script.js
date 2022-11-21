@@ -306,6 +306,7 @@ const selfCheckout = new Vue({
 	},
 	methods: {
 		add() {
+			if (!this.quantity) this.quantity = 1;
 			let item = {
 				price: this.price,
 				quantity: this.quantity,
@@ -318,7 +319,6 @@ const selfCheckout = new Vue({
 		},
 		submit() {
 			this.output = true;
-			
 		}
 	}
 });
@@ -346,3 +346,162 @@ const currencyConversion = new Vue({
 });
 
 //12 
+const computingSimpleInterest = new Vue({
+	el: "#computingSimpleInterest form",
+	data() {
+		return {
+			principal: "",
+			rate: "",
+			time: "",
+			output: false
+		};
+	},
+	computed: {
+		amount() {
+			return this.principal * (1 + (this.rate/100) * this.time);
+		}
+	},
+	methods: {
+		submit() {
+			this.output = true;
+		}
+	}
+});
+
+//13 
+const determiningCompoundInterest = new Vue({
+	el: "#determiningCompoundInterest form",
+	data() {
+		return {
+			principal: "",
+			rate: "",
+			time: "",
+			number: "",
+			output: false
+		};
+	},
+	computed: {
+		amount() {
+			let amount = this.principal * ((1 + ( this.rate / ( 100 * this.number ) )) ** (this.number * this.time));
+			return amount.toFixed(2);
+		}
+	},
+	methods: {
+		submit() {
+			this.output = true;
+		}
+	}
+});
+
+// 14
+
+const taxCalculator = new Vue({
+	el: "#taxCalculator form",
+	data() {
+		return {
+			order: "",
+			state: "",
+			rates: [
+						["wi", "wisconsin", 5.5],
+						["mn", "minnesota", 6.875],
+						["tx", "texas", 6.25],
+						["ca", "california", 7.25],
+						["al", "alabama", 4],
+						["hi", "hawaii", 4],
+						["me", "maine", 5.5],
+					],
+			output: false
+		};
+	},
+	computed: {
+		rate() {
+			return this.state;
+		},
+		tax() {
+			return this.order * this.rate / 100;
+		},
+		total() {
+			return this.tax + this.order;
+		}
+	},
+	methods: {
+		submit() {
+			this.output = true;
+		}
+	}
+});
+
+//15
+const passwordValidation = new Vue({
+	el: "#passwordValidation form",
+	data() {
+		return {
+			username: "",
+			password: "",
+			locker: {
+				
+			},
+			output: false
+		};
+	},
+	watch: {
+		password(newInput, oldInput) {
+			if (newInput != oldInput) {
+				this.output = false;
+			}
+		},
+		username(newInput, oldInput) {
+			if (newInput != oldInput) {
+				this.output = false;
+			}
+		}
+	},
+	methods: {
+		register() {
+			this.locker[this.username] = this.password;
+			this.output = "you have been registered";
+		},
+		login() {
+			if (!this.username || !this.password) {
+				this.output = 'please enter something';
+				return;
+			}
+			if (this.locker[this.username] == this.password) {
+				console.log('hi')
+				this.output = 'Welcome back!'
+			} else {
+				this.output = 'I dont know you.'
+			}
+		}
+	}
+});
+
+
+//16
+const legalDrivingAge = new Vue({
+	el: "#legalDrivingAge form",
+	data() {
+		return {
+			age: "",
+			countries: {
+				argentina: 17,
+				brazil: 18,
+				canada: 16,
+				china: 18,
+				denmark: 17,
+				france: 18,
+				india: 18,
+				japan: 18,
+				mexico: 18,
+				niger: 23,
+				salvador: 15,
+				"saudi arabia": 18,
+				sweden: 16,
+				USA: 16,
+			},
+			output: false
+		};
+	}
+});
+
+//17
