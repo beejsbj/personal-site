@@ -586,3 +586,34 @@ function numbersToNames($outlet) {
 	this.getLanguages();
 	toggleOutlet();
 }
+
+//22
+
+
+//23
+
+
+//24 anagram checker 
+
+function anagramChecker($outlet) {
+	function isAnagram(str1, str2) {
+		str1 = str1.split('').sort().join('');
+		str2 = str2.split('').sort().join('');
+	    return str1 == str2; 
+	}
+	var $string1 = $form.querySelector("#string1-ID");
+	var $string2 = $form.querySelector("#string2-ID");
+	
+	 template = `Those are NOT anagrams`;
+
+    if ( isAnagram( $string1.value, $string2.value ) ) {
+        template = `those are anagrams`; 
+    }
+
+	$outlet.innerHTML = `<p>${template}</p>`;
+	$string2.value = "";
+	$string1.value = "";
+	toggleOutlet();
+}
+
+
