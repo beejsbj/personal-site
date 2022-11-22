@@ -15,7 +15,7 @@
 			$chapterHeading = $chapter['heading'] ?? "E4P chapter heading";
 			$chapterDesc = $chapter['description']  ?? "E4P chapter description";
 			$chapterSvg = $chapter['svg']  ?? "xyz.svg";
-			$chapterExercises = $chapter['exercises'] ?? [1, 2, 3];?>
+			$chapterExercises = $chapter['exercises'] ?? [1, 2, 3, 4];?>
 
 			<e4p-chapter>
 				<h1 class='attention-voice'>
@@ -52,9 +52,8 @@
 			</e4p-chapter>
 	<?php } ?>
 </e4p-grid>
-<script>
-	
 
+<script>
 	window.addEventListener("mousemove", function (event) {
 		if (event.target.matches("e4p-chapter li a")) {
 			var $paragraph = event.target.closest('li').querySelector('p');
@@ -62,4 +61,12 @@
 			$aside.innerHTML = $paragraph.innerHTML;
 		}
 	});
+
+	$chaptersList = document.querySelectorAll('e4p-chapter ul')
+	$chaptersList.forEach(function (list) {
+		if (!list.children.length) {
+			$chapter = list.closest( 'e4p-chapter' );
+			$chapter.style.display = 'none';
+		}
+	})
 </script>
