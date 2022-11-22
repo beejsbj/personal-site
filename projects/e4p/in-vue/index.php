@@ -15,18 +15,14 @@
 	inner-column {
 		padding: 70px 10px;
 	}
-	exercise-detail {
-		grid-template-columns: 1fr;
-	}
+
 
 	exercise-form {
 		position: relative;
 	}
-	li {
-		/* 	min-height: 500px; */
-	}
-	li:nth-of-type(even) {
-		background-color: hsla(45, 10%, 70%, 1);
+
+	ul.vue-e4p > li + li {
+		border-top: 10px solid var(--dark-color) ;
 	}
 
 	exercise-form > a {
@@ -52,10 +48,8 @@
 		font-size: smaller;
 	}
 
-	/* self checkout */
 	item-field {
 		gap: 25px;
-		/*align-items: start;*/
 	}
 	.default-theme exercise-form h4 {
 		display: none;
@@ -74,7 +68,6 @@
 
 	.buttons {
 		display: flex;
-		/* 	gap: 10px; */
 		justify-content: space-around;
 		justify-self: stretch;
 	}
@@ -96,7 +89,6 @@
 	thead,
 	tfoot {
 		background-color: var(--light-color);
-/*		text-align: center;*/
 	}
 
 	tfoot {
@@ -108,7 +100,7 @@
 	}
 
 </style>
-<ul>
+<ul class="vue-e4p">
 	<li>
 		<inner-column>
 			<exercise-detail>
@@ -425,25 +417,29 @@
 						autocomplete="off">
 						<!-- vue watch this scope -->
 						<div class="radio-list">
-							<input
-								required 
-								type="radio" 
-								id="feet" value="feet" 
-								v-model="unit" />
-							<label 
-								for="feet">
-								Feet
-							</label>
+							<div class="input-field">
+								<input
+									required 
+									type="radio" 
+									id="feet" value="feet" 
+									v-model="unit" />
+								<label 
+									for="feet">
+									Feet
+								</label>
+							</div>
 
-							<input
-								required 
-								type="radio" 
-								id="meter" value="meter" 
-								v-model="unit" />
-							<label 
-								for="meter">
-								Meter
-							</label>
+							<div class="input-field">
+								<input
+									required 
+									type="radio" 
+									id="meter" value="meter" 
+									v-model="unit" />
+								<label 
+									for="meter">
+									Meter
+								</label>
+							</div>
 						</div>
 						<div class="input-field">
 							<label 
@@ -569,25 +565,29 @@
 						autocomplete="off">
 						<!-- vue watch this scope -->
 						<div class="radio-list">
-							<input
-								required 
-								type="radio" 
-								id="rectangle" value="rectangle" 
-								v-model="shape" />
-							<label 
-								for="rectangle">
-								Rectangular
-							</label>
+							<div class="input-field">
+								<input
+									required 
+									type="radio" 
+									id="rectangle" value="rectangle" 
+									v-model="shape" />
+								<label 
+									for="rectangle">
+									Rectangular
+								</label>
+							</div>
 
-							<input
-								required 
-								type="radio" 
-								id="round" value="round" 
-								v-model="shape" />
-							<label 
-								for="round">
-								Round
-							</label>
+							<div class="input-field">
+								<input
+									required 
+									type="radio" 
+									id="round" value="round" 
+									v-model="shape" />
+								<label 
+									for="round">
+									Round
+								</label>
+							</div>
 						</div>
 						<div 
 							:class="{ hide: isRound, 'input-field': !isRound }">
@@ -677,16 +677,10 @@
 								id='quantity' 
 								v-model.number="quantity">
 						</div>
-						<div class="buttons">
-							<button 
-								v-on:submit.prevent="add">
-								Add Item
-							</button>
-							<button 
-								v-on:click.prevent="submit">
-								Checkout
-							</button>
-						</div>
+						<button 
+							v-on:submit.prevent="add">
+							Add Item
+						</button>
 						<output 
 							:class="{ hideOpacity: !items[0] }">
 							<table class="styled-table">
@@ -709,7 +703,7 @@
 									</tr>
 								</tbody>
 								<tfoot 
-									:class="{ hideOpacity: !output }">
+									>
 									<tr>
 										<td></td>
 										<td></td>
@@ -1032,5 +1026,25 @@
 			</exercise-detail>
 		</inner-column>
 	</li>
-	<?php include 'projects/e4p/in-vue/16-legal-driving-age.php';?>
+	<li>
+	<inner-column>
+		<exercise-detail>
+			<?php include 'projects/e4p/in-vue/16-legal-driving-age.php';?>
+			</exercise-detail>
+		</inner-column>
+	</li>
+	<li>
+		<inner-column>
+			<exercise-detail>
+				<?php include 'projects/e4p/in-vue/17-blood-alcohol-calculator.php';?>
+			</exercise-detail>
+		</inner-column>
+	</li>
+	<li>
+		<inner-column>
+			<exercise-detail>
+				<?php include 'projects/e4p/in-vue/18-temperature-converter.php';?>
+			</exercise-detail>
+		</inner-column>
+	</li>
 </ul>
