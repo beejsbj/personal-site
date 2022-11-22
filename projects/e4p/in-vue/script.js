@@ -500,8 +500,89 @@ const legalDrivingAge = new Vue({
 				USA: 16,
 			},
 			output: false
-		};
-	}
+		}
+	},
 });
 
 //17
+
+const bloodAlcoholCalculator = new Vue({
+	el: "#bloodAlcoholCalculator form",
+	data() {
+		return {
+			gender: "male",
+			weight: "",
+			time: "",
+			number: "",
+			ratio: {
+				male: 0.73,
+				female: 0.66
+			},
+			output: false
+		};
+	},
+	watch: {
+		gender(newInput, oldInput) {
+			if (newInput != oldInput) {
+				this.output = false;
+			}
+		}
+	},
+	computed: {
+		bac() {
+			let amount = this.number * 12; //12 ounces
+			return ((amount * 5.14) / this.weight) * this.ratio[this.gender] - 0.015 * this.time;
+		},
+		isLegal() {
+			return (this.bac >= 0.08)
+				? 'It is not legal to drive'
+				: 'It is legal to drive'
+		}	
+	},
+	methods: {
+		submit() {
+			this.output = true;
+		}
+	}
+});
+
+//18
+
+const temperatureConverter = new Vue({
+	el: "#temperatureConverter form",
+	data() {
+		return {
+			unit: "celcius",
+			temperature: 0
+		};
+	},
+	computed: {
+		toFarenheit() {
+			if (this.unit == 'celcius') {
+				return this.temperature * 9 / 5 + 32;
+			}
+			if (this.unit == 'kelvin') {
+				return ( this.temperature - 273.15 ) * 9 / 5 + 32;
+			}
+			return this.temperature;
+		},
+		toKelvin() {
+			if (this.unit == 'celcius') {
+				return this.temperature + 273.15;
+			}
+			if (this.unit == 'farenheit') {
+				return (this.temperature - 32) * 5 / 9 + 273.15;
+			}
+			return this.temperature;
+		},
+		toCelcius() {
+			if (this.unit == 'kelvin') {
+				return this.temperature - 273.15;
+			}
+			if (this.unit == 'farenheit') {
+				return (this.temperature - 32) * 5 / 9;
+			}
+			return this.temperature;
+		},
+	},
+});
