@@ -1047,4 +1047,25 @@
 			</exercise-detail>
 		</inner-column>
 	</li>
+	<li>
+		<inner-column>
+			<exercise-detail>
+				<?php include 'projects/e4p/in-vue/19-bmi-calculator.php';?>
+			</exercise-detail>
+		</inner-column>
+	</li>
+	<li>
+		<inner-column>
+			<exercise-detail>
+				<?php include 'projects/e4p/in-vue/20-multistate-sales-tax-calculator.php';?>
+			</exercise-detail>
+		</inner-column>
+	</li>
+	<li>
+		<inner-column>
+			<exercise-detail>
+				<?php include 'projects/e4p/in-vue/21-number-to-names.php';?>
+			</exercise-detail>
+		</inner-column>
+	</li>
 </ul>
