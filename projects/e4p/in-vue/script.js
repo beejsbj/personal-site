@@ -464,31 +464,24 @@ const taxCalculator = new Vue({
 		return {
 			order: "",
 			state: "",
-			rates: [
-						["wi", "wisconsin", 5.5],
-						["mn", "minnesota", 6.875],
-						["tx", "texas", 6.25],
-						["ca", "california", 7.25],
-						["al", "alabama", 4],
-						["hi", "hawaii", 4],
-						["me", "maine", 5.5],
-					],
+			states: stateRates,
 			output: false
 		};
 	},
 	computed: {
 		rate() {
-			return this.state;
+			return this.state.rate / 100;
 		},
 		tax() {
-			return this.order * this.rate / 100;
+			return this.order * this.rate;
 		},
 		total() {
 			return this.tax + this.order;
 		}
 	},
 	methods: {
-		submit() {			this.output = true;
+		submit() {
+			this.output = true;
 		}
 	}
 });
@@ -647,6 +640,8 @@ const temperatureConverter = new Vue({
 			return this.temperature;
 		},
 	},
+});
+
 // /19
 
 const bmiCalculator = new Vue({
@@ -751,4 +746,31 @@ const multistateSalesTaxCalculator = new Vue({
 		}		
 	},
 	methods: {
+		submit() {
+			this.output = true;
+		}
+	}
+});
+
+//21
+
+const numbersToNames = new Vue({
+	el: "#numbersToNames form",
+	data() {
+		return {
+			monthNum: "",
+			languages: ['en', 'fr', 'af', 'ko', 'zh', 'ru', 'hi', 'es', 'ja', 'ar'],				
+			output: false
+		};
+	},
+	methods: {
+		getMonthName(month, locale) {
+		  const formatter = new Intl.DateTimeFormat(locale, { month: 'long'});
+		  return formatter.format( new Date(2000, month - 1) );
+		},
+		getLangName(lang) {
+			var languageNames = new Intl.DisplayNames(['en'], {type: 'language'});
+			return languageNames.of(lang);
+		}
+	}
 });
