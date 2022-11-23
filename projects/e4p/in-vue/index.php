@@ -938,7 +938,7 @@
 								min="1" 
 								v-model.number="order">
 						</div>
-						<div class="input">
+						<div class="input-field">
 							<label 
 								for="state">
 								What is the state?
@@ -948,10 +948,10 @@
 								id='state' 
 								v-model="state">
 							  <option 
-								  v-for="rate in rates" 
-								  :value="rate[2]">
+								  v-for="state in states" 
+								  :value="state">
 
-							    {{ rate[1][0].toUpperCase() + rate[1].slice(1) }}
+							    {{ state.name }}
 							  
 							  </option>
 							</select>
@@ -962,8 +962,8 @@
 						</button>
 						<output 
 							:class="{ hideOpacity: !output }">
-							<p>The tax is <span>{{rate}}</span>.</p>
-							<p>The total is <span>{{total}}</span>.</p>
+							<p>Tax is <span>{{rate}}</span>.</p>
+							<p>Total is <span>{{total}}</span>.</p>
 						</output>
 					</form>
 					<!--  -->

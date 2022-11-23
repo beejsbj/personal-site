@@ -585,4 +585,108 @@ const temperatureConverter = new Vue({
 			return this.temperature;
 		},
 	},
+// /19
+
+const bmiCalculator = new Vue({
+	el: "#bmiCalculator form",
+	data() {
+		return {
+			weight: "",
+			height: "",
+			unit: "metric",
+			weightUnit: "kgs",
+			heightUnit: "cms",
+			color: 'green',
+			output: ""
+		};
+	},
+	watch: {
+		unit(value, old) {
+			if (value != old) {
+				this.weight = "";
+				this.height = "";
+			}
+			if (value == 'metric') {
+				this.weightUnit = 'kgs'
+				this.heightUnit = 'cms'
+			} else {
+				this.weightUnit = 'pounds'
+				this.heightUnit = 'inches'
+			}
+		},
+		bmi(value) {
+			if (value < 18.5) {
+				this.color = 'red'
+				this.output = 'Underweight'
+			} else if (value > 25) {
+				this.color = 'red'
+				this.output = 'Overweight'
+			} else {
+				this.color = 'green'
+				this.output = 'Ideal weight'
+			}
+		}
+	},
+	computed: {
+		bmi() {
+			if (this.unit == 'imperial') {
+				return (this.weight / (this.height ** 2)) * 703;
+			} else {
+				h = this.height / 100; //convert to meter
+				return (this.weight / (h ** 2));
+			}
+			
+		},
+		inputs() {
+			return this.weight && this.height
+		}	
+	}
+});
+// 20
+
+
+const multistateSalesTaxCalculator = new Vue({
+	el: "#multistateSalesTaxCalculator form",
+	data() {
+		return {
+			amount: 0,
+			state: "",
+			county: "",
+			states: stateRates,
+			output: false
+		};
+	},
+	watch: {
+		state(newInput, oldInput) {
+			if (newInput != oldInput) {
+				this.output = false;
+			}
+		},
+		county(newInput, oldInput) {
+			if (newInput != oldInput) {
+				this.output = false;
+			}
+		},
+	},
+	computed: {
+		countys() {
+			return this.state.countys;
+		},
+		stateRate() {
+			return this.state.rate / 100;
+		},	
+		countyRate() {
+			return this.county.rate / 100;
+		},
+		stateTax() {
+			return this.amount * this.stateRate;
+		},
+		countyTax() {
+			return this.amount * this.countyRate;
+		},
+		total() {
+			return this.amount + this.stateTax + this.countyTax;
+		}		
+	},
+	methods: {
 });
