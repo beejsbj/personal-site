@@ -6,15 +6,15 @@
 ?>
 <exercise-detail>
 	<actions-component>
-		<a href="?page=e4p"><span>BACK</span></a>
-		<toggle-switch>
+		<a class="bubble" href="?page=e4p"><span>BACK</span></a>
+		<toggle-switch class='radio-list'>
 			<radio-option>
 				<input type="radio"  name="e4p-lang" value="php" id="option-php">
-				<label for="option-php">php</label>
+				<label for="option-php">PHP</label>
 			</radio-option>
 			<radio-option>
 				<input type="radio" name="e4p-lang" value="js"  id="option-js">
-				<label for="option-js">js</label>
+				<label for="option-js">JS</label>
 			</radio-option>
 		</toggle-switch>
 		<a href="?page=e4p-in-vue#<?=$funcName?>">Vue</a>
