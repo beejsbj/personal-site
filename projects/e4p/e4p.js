@@ -11,6 +11,7 @@ var checkedId = localStorage.toggleSwitch
 var $checkedSwitch = $toggleSwitch.querySelector(`#${checkedId}`);
 $checkedSwitch.checked = true;
 toggleRunner();
+
 $toggleSwitch.addEventListener("input", toggleRunner);
 
 //submit event listner
@@ -32,6 +33,8 @@ function toggleRunner() {
 	$checkedSwitch = $toggleSwitch.querySelector("input:checked");
 	localStorage.toggleSwitch = JSON.stringify($checkedSwitch.id);
 	$heading.innerHTML = $checkedSwitch.value;
+	$form.dataset.lang = $checkedSwitch.value;
+
 }
 
 //init
@@ -487,8 +490,7 @@ function multistateSalesTaxCalculator($outlet) {
 		}
 	});
 
-	var tax =
-		($amount.value * taxRate) / 100 + ($amount.value * countyRate) / 100;
+	var tax = ($amount.value * taxRate) / 100 + ($amount.value * countyRate) / 100;
 	var total = Number($amount.value) + tax;
 	var template = `The subtotal is <span>$${$amount.value}</span> <br>
 						       The tax is <span>$${tax.toFixed(2)}</span> <br>
@@ -500,90 +502,24 @@ function multistateSalesTaxCalculator($outlet) {
 
 //number to names
 function numbersToNames($outlet) {
-	var $input = $form.querySelector("#input-ID");
-	this.data = [];
-	this.month = "April";
-	this.translation = {};
-	this.template = `<li>The name of the month in <span>English</span> is <span>${this.month}</span>.</li>`;
+	var $input = $form.querySelector("#number-ID");
+	const languages = ['en', 'fr', 'af', 'ko', 'sg', 'zh', 'ru', 'hi', 'es', 'ja', 'ar', 'is'];	
+	
 
-	this.getLanguages = function () {
-		const options = {
-			method: "GET",
-			headers: {
-				"Accept-Encoding": "application/gzip",
-				"X-RapidAPI-Key": "f757ce2015msh390ba050dd98e64p1cb706jsne14b87f22dc1",
-				"X-RapidAPI-Host": "google-translate1.p.rapidapi.com",
-			},
-		};
-		fetch(
-			"https://google-translate1.p.rapidapi.com/language/translate/v2/languages?target=en",
-			options
-		)
-			.then((response) => response.json())
-			.then((response) => randomFilter(response.data.languages))
-			.catch((err) => console.error(err));
-	};
-	this.randomFilter = function (data) {
-		const arr = data
-			.map((a) => ({ sort: Math.random(), value: a }))
-			.sort((a, b) => a.sort - b.sort)
-			.map((a) => a.value)
-			.slice(0, 5);
-		this.data = arr;
-		this.translator();
-	};
-	this.getTranslation = function (obj) {
-		var language = obj.language;
-		const encodedParams = new URLSearchParams();
-		encodedParams.append("q", this.month);
-		encodedParams.append("target", language);
-		encodedParams.append("source", "en");
+	function getMonthName(month, locale) {
+	  const formatter = new Intl.DateTimeFormat(locale, { month: 'long'});
+	  return formatter.format( new Date(2000, month - 1) );
+	}
+	var template = '';
 
-		const options = {
-			method: "POST",
-			headers: {
-				"content-type": "application/x-www-form-urlencoded",
-				"Accept-Encoding": "application/gzip",
-				"X-RapidAPI-Key": "f757ce2015msh390ba050dd98e64p1cb706jsne14b87f22dc1",
-				"X-RapidAPI-Host": "google-translate1.p.rapidapi.com",
-			},
-			body: encodedParams,
-		};
+	languages.forEach( function (lang) {
+		var languageNames = new Intl.DisplayNames(['en'], {type: 'language'});
+		var langaugeName = languageNames.of(lang);
+		var translatedMonth = getMonthName( $input.value, lang );
+		template += `<li>The name of the month in <span>${langaugeName}</span> is <span>${translatedMonth}</span>.</li>`;
 
-		fetch(
-			"https://google-translate1.p.rapidapi.com/language/translate/v2",
-			options
-		)
-			.then((response) => response.json())
-			.then(
-				(response) =>
-					(this.translation[language] =
-						response.data.translations[0].translatedText)
-			)
-			.catch((err) => console.error(err));
-	};
-
-	this.translator = function () {
-		this.data.forEach((lang) => {
-			this.getTranslation(lang);
-		});
-		this.templater();
-	};
-
-	this.templater = function () {
-		for (var i = 0; i < this.data.length; i++) {
-			console.log(this.data[i]);
-			console.log(this.translation[this.data[i].language]);
-			this.template += `<li>The name of the month in <span>${
-				this.data[i].name
-			}</span> is <span>${
-				this.translation[this.data[i].language]
-			}</span>.</li>`;
-		}
-		$outlet.innerHTML = `<ul>${template}</ul>`;
-	};
-
-	this.getLanguages();
+	});
+	$outlet.innerHTML = `<ul>${template}</ul>`;
 	toggleOutlet();
 }
 
