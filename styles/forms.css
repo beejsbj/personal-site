@@ -9,7 +9,7 @@ form {
 
 
 
-form .input-field {
+.input-field {
 	display: grid;
 	gap:  10px;
 	justify-self: stretch;
@@ -32,27 +32,27 @@ form output {
 	padding: 20px;
 	width: 100%;
 }
-form .radio-list {
+.radio-list {
 	width: 100%;
 }
 
-form .radio-list,
-form .radio-list .input-field {
+.radio-list,
+.radio-list .input-field {
 	display: flex;
 	gap: 20px;
 	align-items: center;
 }
 
-form .radio-list input {
+.radio-list input {
 	display: none;
 }
 
-form .radio-list label {
+.radio-list label {
 	cursor: pointer;
 	position: relative;
 }
 
-form .radio-list input:checked + label::after {
+.radio-list input:checked + label::after {
 	content: "";
 	position: absolute;
 	bottom: 0px;
