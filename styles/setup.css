@@ -1,9 +1,12 @@
 
 html {
   box-sizing: border-box;
+	scroll-behavior: smooth;
+	
 }
 *, *:before, *:after {
   box-sizing: inherit;
+  scroll-margin-top: 200px;
 } /* https://www.paulirish.com/2012/box-sizing-border-box-ftw */
 
 a {
@@ -44,6 +47,5 @@ code {
 }
 
 :where(:not(:defined)) {
-	/*border: 3px solid blue;*/
 	display: grid;
 }

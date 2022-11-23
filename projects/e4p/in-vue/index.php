@@ -22,12 +22,11 @@
 	}
 
 	ul.vue-e4p > li + li {
-		border-top: 10px solid var(--dark-color) ;
+		border-top: 20px solid var(--dark-color) ;
 	}
 
 	exercise-form > a {
 		--size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3rem);
-		content: "";
 		position: absolute;
 		top: 12px;
 		left: -80px;
@@ -106,8 +105,8 @@
 			<exercise-detail>
 
 				<exercise-form 
-					id="saying-hello">
-					<a href="#saying-hello"></a>
+					id="sayingHello">
+					<a href="#sayingHello"></a>
 					<h2 class="loud-voice">
 						Saying Hello
 					</h2>
@@ -145,8 +144,8 @@
 			<exercise-detail>
 
 				<exercise-form 
-					id="char-count">
-					<a href="#char-count"></a>
+					id="countingTheNumberOfCharacters">
+					<a href="#countingTheNumberOfCharacters"></a>
 					<h2 class="loud-voice">
 						Counting Characters
 					</h2>
@@ -180,8 +179,8 @@
 			<exercise-detail>
 
 				<exercise-form 
-					id="printing-quotes">
-					<a href="#printing-quotes"></a>
+					id="printingQuotes">
+					<a href="#printingQuotes"></a>
 					<h2 class="loud-voice">
 						Printing Quotes
 					</h2>
@@ -228,8 +227,8 @@
 		<inner-column>
 			<exercise-detail>
 				<exercise-form 
-					id="mad-lib">
-					<a href="#mad-lib"></a>
+					id="madLib">
+					<a href="#madLib"></a>
 					<h2 class="loud-voice">
 						Mad Lib
 					</h2>

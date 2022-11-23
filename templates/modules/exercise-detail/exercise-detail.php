@@ -6,7 +6,7 @@
 ?>
 <exercise-detail>
 	<actions-component>
-		<a class="bubble" href="?page=e4p"><span>BACK</span></a>
+		<a class="" href="?page=e4p"><span>BACK</span></a>
 		<toggle-switch class='radio-list'>
 			<radio-option>
 				<input type="radio"  name="e4p-lang" value="php" id="option-php">
@@ -16,8 +16,9 @@
 				<input type="radio" name="e4p-lang" value="js"  id="option-js">
 				<label for="option-js">JS</label>
 			</radio-option>
+			<a href="?page=e4p-in-vue#<?=$funcName?>" target="vueforms">Vue</a>
 		</toggle-switch>
-		<a href="?page=e4p-in-vue#<?=$funcName?>">Vue</a>
+		
 	</actions-component>
 	<h2 class="loud-voice">
 		<?=$exerciseName?>

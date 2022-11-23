@@ -15,12 +15,14 @@ exercise-detail output span {
 
 
 exercise-detail actions-component {
-	display: flex;
+	display: grid;
 	gap: 30px;
-	align-items: center;
 
-	justify-content: space-between;
 }
+toggle-switch.radio-list {
+	gap: 40px;
+}
+
 exercise-form {
 	gap: 30px;
 }

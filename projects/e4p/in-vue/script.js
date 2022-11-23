@@ -1,6 +1,6 @@
 //1
 const sayingHello = new Vue({
-	el: "#saying-hello form",
+	el: "#sayingHello form",
 
 	data() {
 		return {
@@ -19,8 +19,8 @@ const sayingHello = new Vue({
 });
 
 //2
-const CountingChars = new Vue({
-	el: "#char-count form",
+const countingTheNumberOfCharacters = new Vue({
+	el: "#countingTheNumberOfCharacters form",
 	data() {
 		return {
 			string: ""
@@ -35,7 +35,7 @@ const CountingChars = new Vue({
 
 //
 const printingQuotes = new Vue({
-	el: "#printing-quotes form",
+	el: "#printingQuotes form",
 	data() {
 		return {
 			quote: "",
@@ -64,7 +64,7 @@ const printingQuotes = new Vue({
 
 //
 const madLib = new Vue({
-	el: "#mad-lib form",
+	el: "#madLib form",
 	data() {
 		return {
 			noun: "",
