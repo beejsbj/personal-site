@@ -383,6 +383,7 @@
 							</label>
 							<input
 								required 
+								:min='currAge'
 								type="number" 
 								id='retireAge' 
 								v-model="retireAge">
@@ -596,7 +597,7 @@
 								Enter the length of room in feet
 							</label>
 							<input
-								required 
+								v-bind:required="!isRound" 
 								id='lengthPaint' 
 								v-model="lengthPaint">
 						</div>
@@ -607,7 +608,7 @@
 								Enter the width of room in feet
 							</label>
 							<input
-								required 
+								v-bind:required="!isRound" 
 								id='widthPaint' 
 								v-model="widthPaint">
 						</div>
@@ -618,7 +619,7 @@
 								Enter the radius of room in feet
 							</label>
 							<input
-								required 
+								v-bind:required="isRound" 
 								id='radiusPaint' 
 								v-model="radiusPaint">
 						</div>
@@ -864,12 +865,12 @@
 						</div>
 						<div class="input-field">
 							<label 
-								for="rate12">
+								for="rate13">
 								Enter the rate of interest
 							</label>
 							<input
 								required 
-								id='rate12' 
+								id='rate13' 
 								type="number" 
 								min="1" 
 								v-model.number="rate">

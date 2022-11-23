@@ -147,7 +147,6 @@ const retirementCalculator = new Vue({
 			let today = new Date();
 
 			let year = today.getFullYear();
-			console.log(year);
 			this.output = `You have ${ageDiff} years left until you can retire.
        						It's ${year}, so you can retire in ${year + ageDiff}.`;
 		}
@@ -733,7 +732,7 @@ const multistateSalesTaxCalculator = new Vue({
 			return this.state.rate / 100;
 		},	
 		countyRate() {
-			return this.county.rate / 100;
+			return (this.county.rate ?? 0) / 100 ;
 		},
 		stateTax() {
 			return this.amount * this.stateRate;

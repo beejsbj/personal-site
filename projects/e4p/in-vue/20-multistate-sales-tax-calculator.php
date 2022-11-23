@@ -44,7 +44,7 @@
 					What is the county?
 				</label>
 				<select 
-					required
+					v-bind:required="countys"
 					id='county20' 
 					v-model="county">
 				  <option 
