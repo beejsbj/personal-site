@@ -394,7 +394,70 @@ const determiningCompoundInterest = new Vue({
 });
 
 // 14
+var stateRates = [
+	{
+		name: 'Wisconsin',
+		rate: 5.5,
+		countys: [
+			{
+				name: "Eau Claire",
+				rate: 0.5	
+			},
+			{
+				name: "Dunn",
+				rate: 0.4	
+			}
 
+		]
+	},
+	{
+		name: 'Minnesota',
+		rate: 6.875,
+	},
+	{
+		name: 'Texas',
+		rate: 5.5,
+	},
+	{
+		name: 'California',
+		rate: 5.5,
+		countys: [
+			{
+				name: "Alameda",
+				rate: 10.75	
+			},
+			{
+				name: "Los Angeles",
+				rate: 9.5	
+			}
+
+		]
+	},
+	{
+		name: 'Alabama',
+		rate: 5.5,
+		countys: [
+			{
+				name: "Cherokee",
+				rate: 10	
+			},
+			{
+				name: "Russell",
+				rate: 9.875	
+			}
+
+		]
+	},
+	{
+		name: 'Hawaii',
+		rate: 5.5,
+	},
+	{
+		name: 'Maine',
+		rate: 5.5,
+	},
+
+];
 const taxCalculator = new Vue({
 	el: "#taxCalculator form",
 	data() {
@@ -425,8 +488,7 @@ const taxCalculator = new Vue({
 		}
 	},
 	methods: {
-		submit() {
-			this.output = true;
+		submit() {			this.output = true;
 		}
 	}
 });
