@@ -1,4 +1,8 @@
-
+<style>
+	[data-lang="js"] div.select-list {
+		display: none;
+	}
+</style>
 
     
 <?php
