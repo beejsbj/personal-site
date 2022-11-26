@@ -1,0 +1,15 @@
+@import 'preset.css';
+
+@import 'setup.css';
+
+@import 'settings.css';
+
+@import 'typography.css';
+
+
+body {
+	background-color: var(--paper);
+	color: var(--ink);
+}
+
+
