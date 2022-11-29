@@ -524,13 +524,34 @@ function numbersToNames($outlet) {
 }
 
 //22
+function comparingNumbers($outlet) {
+	var $numbers = $form.querySelectorAll("input");
+	var smallest = Number($numbers[0].value);
+
+	$numbers.forEach( function($number) {
+		let number = Number($number.value);
+		if (number <= smallest) smallest = number;
+	})
+
+	var template = `the smallest number is <span>${smallest}</span>`;
+	$outlet.innerHTML = `<p>${template}</p>`;
+	$numbers.value = "";
+	toggleOutlet();
+}
+
 
 
 //23
+function troubleshootingCarIssues($outlet) {
+	var $input = $form.querySelector("#input-ID");
+	var template = `<span></span>`;
+	$outlet.innerHTML = `<p>${template}</p>`;
+	$input.value = "";
+	toggleOutlet();
+}
 
 
 //24 anagram checker 
-
 function anagramChecker($outlet) {
 	function isAnagram(str1, str2) {
 		str1 = str1.split('').sort().join('');

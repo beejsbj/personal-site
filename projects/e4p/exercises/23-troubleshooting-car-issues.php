@@ -16,6 +16,6 @@ if (  isset( $_POST['submitted'] ) ) {
     <button type="submit" name="submitted">
     </button>
     <output class="<?=$class?>" >
-	 <p><?=$output?></p>
-</output>
+    	<p><?=$output?></p>
+    </output>
 </form>

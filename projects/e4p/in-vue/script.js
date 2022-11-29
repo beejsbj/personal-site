@@ -773,3 +773,70 @@ const numbersToNames = new Vue({
 		}
 	}
 });
+
+
+//22
+const comparingNumbers = new Vue({
+	el: "#comparingNumbers form",
+	data() {
+		return {
+			number: "",
+			numbers: [],
+			output: false
+		};
+	},
+	computed: {
+		largest() {
+			return Math.max(...this.numbers);
+		},
+		smallest() {
+			return Math.min(...this.numbers);
+		},
+		mean() {
+			return (this.sum / this.numbers.length).toFixed(2);
+		},
+		sum() {
+			return this.numbers.reduce(function (total, number) {
+				return total + number;
+			}, 0);
+		}
+	},
+	methods: {
+		submit() {
+			this.numbers.push(this.number);
+			this.number = '';
+			this.output = true;
+		}
+	}
+});
+
+
+//23
+
+const troubleshootingCarIssues = new Vue({
+	el: "#troubleshootingCarIssues form",
+	data() {
+		return {
+			: "",
+			: "",
+			output: false
+		};
+	},
+	watch: {
+		(newInput, oldInput) {
+			if (newInput != oldInput) {
+				this.output = false;
+			}
+		},
+		(newInput, oldInput) {
+			if (newInput != oldInput) {
+				this.output = false;
+			}
+		}
+	},
+	methods: {
+		submit() {
+			this.output = true;
+		}
+	}
+});

@@ -98,6 +98,12 @@
 		background-color: var(--paper);
 	}
 
+	.flex-list {
+		display: flex;
+		gap: 5px;
+		margin-bottom: 10px;
+	}
+
 </style>
 <ul class="vue-e4p">
 	<li>
@@ -1065,6 +1071,13 @@
 		<inner-column>
 			<exercise-detail>
 				<?php include 'projects/e4p/in-vue/21-number-to-names.php';?>
+			</exercise-detail>
+		</inner-column>
+	</li>
+	<li>
+		<inner-column>
+			<exercise-detail>
+				<?php include 'projects/e4p/in-vue/22-comparing-numbers.php';?>
 			</exercise-detail>
 		</inner-column>
 	</li>
