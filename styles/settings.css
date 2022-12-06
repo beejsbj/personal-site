@@ -23,52 +23,30 @@ html {
 
 }
 
-@media (prefers-color-scheme: dark) {
-	html {
-	/*	--black: #111111;
-		--white: #efefef;
-
-		--neutral-stuffs: gray;
-
-		--color: #9ec9eb;
-		--highlight: #aadee9;
-
-		--shadow: rgba(0,0,0,.8);
-
-		--corners: 10px; /* or whatevers */
-
-		--paper: ;
-		--ink: ;
-	}
-}
-
 
 html {
-	--paper: rgba(217, 215, 208, 1.00);
-	--paper2:  hsla(47, 48%, 83%, 1.00);
-	--ink: rgba(45, 7, 6, 1.00);
-	--link: rgba(52, 90, 159, 1.00);
+	--paper: hsla(47, 11%, 83%, 1.00);
+	--paper2: hsla(47, 48%, 83%, 1.00);
+	--ink: hsla(3, 58%, 10%, 1.00);
+	--link: hsla(219, 51%, 41%, 1.00);
 
-	--dark-color: rgba(124, 38, 33, 1.00); /*also for bold*/
-	--dark-highlight: rgba(180, 94, 89, 1.00); /*//also for italics*/
+	--dark-color: hsla(3, 58%, 31%, 1.00); /*also for bold*/
+	--dark-highlight: hsla(3, 38%, 53%, 1.00); /*//also for italics*/
 	
-	--light-color: rgba(229,180,131,1); /*subdued*/
-	--light-highlight: rgba(233, 159, 85, 1.00); /*louder*/
+	--light-color: hsla(30, 65%, 71%, 1.00); /*subdued*/
+	--light-highlight: hsla(30, 77%, 62%, 1.00); /*louder*/
 	
 
 }
 
 @media (prefers-color-scheme: dark) {
-	/*html {
-	--paper: rgba(45, 7, 2, 1.00);
-	--ink: rgba(217, 215, 208, 1.00);
-	--link: hsla(219, 50%, 61%, 1.00);
+	html {
+	--ink: hsla(47, 11%, 83%, 1.00);
+	--paper: hsla(3, 58%, 5%, 1.00);
 
-	--dark-color: rgba(217, 215, 208, 1.00);
-	--dark-highlight: rgba(255, 255, 255, 1.00);
+	--dark-color: hsla(3, 38%, 53%, 1.00); /*using dark-highlight*/
+	--dark-highlight: hsla(30, 65%, 71%, 1.00); /*//using light-highlight*/
+	
 
-	--light-color: rgba(163, 7, 3, 1.00);
-	--light-highlight: rgba(233, 159, 85, 1.00);
-
-	}*/
+	}
 }
