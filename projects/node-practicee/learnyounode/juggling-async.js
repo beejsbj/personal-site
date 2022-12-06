@@ -12,6 +12,7 @@ http.get(url1, function(response) {
 	})
 	response.on( 'end', function(end){
 		console.log(data1);
+
 		http.get(url2, function(response) {
 			let data2 = '';
 			response.on('data', function(data) {
@@ -19,6 +20,7 @@ http.get(url1, function(response) {
 			})
 			response.on( 'end', function(end){
 				console.log(data2);
+				
 				http.get(url3, function(response) {
 					let data3 = '';
 					response.on('data', function(data) {
