@@ -1,0 +1,12 @@
+{
+  "name": "css-merge-practice",
+  "version": "1.0.0",
+  "description": "A CSS methodology so great, it needed a name... ;)",
+  "main": "merge-css.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
