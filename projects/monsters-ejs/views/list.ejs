@@ -1,0 +1,53 @@
+<%- include( 'menu.ejs' )  %>
+<h1>List</h1>
+
+<style>
+	picture {
+		display: block;
+		overflow: hidden;
+	}
+
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+	:where(:not(:defined)) {
+		display: block;
+	}
+	ul {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		list-style: none;
+	}
+	li {
+		margin: 0;
+		padding: 0;
+	}
+	digmon-card {
+		--color: red;
+		background: var(--color);
+	}
+</style>
+
+<ul>
+	<% digimons.forEach(function(digimon){ 
+		console.log(  )%>
+		<li>
+			<digimon-card>
+				<h3><%=digimon.name%></h3>
+				<picture>
+					<img src="<%=digimon.images[0].href%>">
+				</picture>
+				<ul>
+					<li>
+						<%=digimon.levels[0]['level']%>
+					</li>
+					<li>
+						<%=(digimon.types[0]['type'])%>
+					</li>
+				</ul>
+			</digimon-card>
+		</li>
+	<% }) %>
+</ul>
