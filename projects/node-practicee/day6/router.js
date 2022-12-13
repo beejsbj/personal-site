@@ -20,6 +20,7 @@ const server = http.createServer(function (request, response) {
 	const urlObj = new URL(request.url, `http://${HOSTNAME}:${PORT}`);
 	let page = urlObj.searchParams.get("page") ?? 'home';
 	let pagePath = `./pages/${page}.html`;
+	console.log(urlObj)
 
 	// check if page exits, else returns 404
 	if (fileSystem.existsSync(pagePath)) {
