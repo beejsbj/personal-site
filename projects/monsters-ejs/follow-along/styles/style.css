@@ -7,16 +7,10 @@ nav {
 	gap: 10px;
 }
 
-a {
-	display: block;
-}
+
 
 ul.monsters {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 	gap: 20px;
-}
-
-img {
-	width: 100%;
 }
