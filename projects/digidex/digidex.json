@@ -1,0 +1,6587 @@
+[
+   
+   {
+      "id":970,
+      "name":"Renamon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Renamon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":7,
+            "level":"Child"
+         }
+      ],
+      "types":[
+         {
+            "id":30,
+            "type":"Beast Man"
+         }
+      ],
+      "attributes":[
+         {
+            "id":6,
+            "attribute":"Data"
+         }
+      ],
+      "fields":[
+         {
+            "id":1,
+            "field":"Nature Spirits"
+         },
+         {
+            "id":8,
+            "field":"Nightmare Soldiers"
+         }
+      ],
+      "releaseDate":"2001",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"金色狐の姿をした獣人型デジモン。レナモンは人間との関係がストレートに現れるデジモンで、幼年期の頃の育て方によっては、特に知能が高いレナモンに進化できると言われている。常に冷静沈着で、あらゆる状況下でもその冷静さを失わないほど訓練されている。細身で長身の姿は他の成長期と比べても抜きに出ており、パワーバトルと言うよりは、スピードを利用した多彩な術で敵を翻弄する。得意技は相手の姿をコピーして自身のテクスチャを張り替える変化の術『狐変虚（こへんきょ）』。必殺技は鋭利な木葉を敵に投げる『狐葉楔（こようせつ）』。 "
+         },
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A Beast Man Digimon with the appearance of a golden fox. The relationship Renamon has with humans is directly apparent; it is said that depending on how it was raised during its time as a Baby, it can evolve into a Renamon of particularly high intelligence. It is always calm, cool, and collected, as well as disciplined enough not to lose that composure in any situation. Its slender, tall appearance stands out when compared with other Child levels, and rather than emphasising on power in battle, it instead makes sport of the enemy with various techniques that utilise its speed. Its Signature Move is a transformation art in which it copies the opponent's appearance and re-covers itself in that texture (Kohenkyo). Its Special Move is throwing sharpened leaves at the opponent (Koyousetsu). "
+         }
+      ],
+      "skills":[
+         {
+            "id":2532,
+            "skill":"Kokaishū",
+            "translation":"Fox Spin Kick",
+            "description":"Attacks with multiple roundhouse kicks. "
+         },
+         {
+            "id":2528,
+            "skill":"Kosengeki",
+            "translation":"Fox Flash Attack",
+            "description":"A swift claw attack. "
+         },
+         {
+            "id":2531,
+            "skill":"Tōhakken",
+            "translation":"Tohachi Game",
+            "description":"In Digimon Tamers, ignites its hands and feet in blue fire and attacks the enemy with them. In Another Mission, hits the enemy with a powerful hand strike. "
+         },
+         {
+            "id":2229,
+            "skill":"Kohenkyo",
+            "translation":"Fox Switch Deception",
+            "description":"A transformation art in which it copies the opponent's appearance and re-covers itself in that texture. "
+         },
+         {
+            "id":2529,
+            "skill":"Kūchū Koyōsetsu",
+            "translation":"Aerial Fox Leaf Arrowheads",
+            "description":"Uses Koyousetsu while in midair. "
+         },
+         {
+            "id":2526,
+            "skill":"Sōzan",
+            "translation":"Claw Slash",
+            "description":"A swift claw attack. "
+         },
+         {
+            "id":2530,
+            "skill":"Shōda",
+            "translation":"Palm Strike",
+            "description":"Attacks with a strong hand strike. "
+         },
+         {
+            "id":2527,
+            "skill":"Korenkyaku",
+            "translation":"Fox Combo Kick",
+            "description":"Spins about before unleashing several high kicks in rapid succession. "
+         },
+         {
+            "id":2228,
+            "skill":"Koyōsetsu",
+            "translation":"Fox Leaf Arrowheads",
+            "description":"Fires a barrage of sharpened leaves at the opponent. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":597,
+            "digimon":"Pokomon",
+            "condition":""
+         },
+         {
+            "id":532,
+            "digimon":"Wanyamon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Digitama",
+            "condition":""
+         },
+         {
+            "id":1154,
+            "digimon":"Nyaromon",
+            "condition":""
+         },
+         {
+            "id":1171,
+            "digimon":"Tanemon",
+            "condition":""
+         },
+         {
+            "id":948,
+            "digimon":"Puttimon",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":717,
+            "digimon":"Dogmon",
+            "condition":""
+         },
+         {
+            "id":1006,
+            "digimon":"Leomon",
+            "condition":""
+         },
+         {
+            "id":1079,
+            "digimon":"Turuiemon",
+            "condition":""
+         },
+         {
+            "id":243,
+            "digimon":"Hanumon",
+            "condition":"with Kudamon 2006 Anime Version"
+         },
+         {
+            "id":695,
+            "digimon":"Depthmon",
+            "condition":""
+         },
+         {
+            "id":1075,
+            "digimon":"Kiwimon",
+            "condition":""
+         },
+         {
+            "id":677,
+            "digimon":"Aquilamon",
+            "condition":""
+         },
+         {
+            "id":679,
+            "digimon":"Prairiemon",
+            "condition":""
+         },
+         {
+            "id":302,
+            "digimon":"Lighdramon",
+            "condition":"with the Digimental of Friendship"
+         },
+         {
+            "id":654,
+            "digimon":"Kyubimon (Silver)",
+            "condition":""
+         },
+         {
+            "id":1123,
+            "digimon":"Holsmon",
+            "condition":""
+         },
+         {
+            "id":458,
+            "digimon":"Ebidramon",
+            "condition":""
+         },
+         {
+            "id":946,
+            "digimon":"Garurumon",
+            "condition":""
+         },
+         {
+            "id":1085,
+            "digimon":"Yaksamon",
+            "condition":""
+         },
+         {
+            "id":257,
+            "digimon":"Kyubimon",
+            "condition":"with or without Guilmon"
+         },
+         {
+            "id":807,
+            "digimon":"Youkomon",
+            "condition":""
+         },
+         {
+            "id":709,
+            "digimon":"Reppamon",
+            "condition":""
+         },
+         {
+            "id":522,
+            "digimon":"Lynxmon",
+            "condition":""
+         },
+         {
+            "id":437,
+            "digimon":"Devimon",
+            "condition":""
+         },
+         {
+            "id":558,
+            "digimon":"Harpymon",
+            "condition":""
+         },
+         {
+            "id":103,
+            "digimon":"Orcamon",
+            "condition":""
+         },
+         {
+            "id":1329,
+            "digimon":"Scumon",
+            "condition":""
+         },
+         {
+            "id":19,
+            "digimon":"Guardromon",
+            "condition":""
+         },
+         {
+            "id":155,
+            "digimon":"Black Growmon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"IceDevimon",
+            "condition":""
+         },
+         {
+            "id":900,
+            "digimon":"Black Tailmon",
+            "condition":""
+         },
+         {
+            "id":144,
+            "digimon":"Gargomon",
+            "condition":""
+         },
+         {
+            "id":949,
+            "digimon":"Geremon",
+            "condition":""
+         },
+         {
+            "id":993,
+            "digimon":"Woodmon",
+            "condition":""
+         },
+         {
+            "id":1311,
+            "digimon":"Sakuyamon",
+            "condition":"Warp Evolution with or without Makino Ruki or Taomon and Kabukimon"
+         },
+         {
+            "id":550,
+            "digimon":"Lekismon",
+            "condition":""
+         },
+         {
+            "id":580,
+            "digimon":"Devidramon",
+            "condition":""
+         },
+         {
+            "id":622,
+            "digimon":"Ginryumon",
+            "condition":""
+         },
+         {
+            "id":371,
+            "digimon":"Numemon",
+            "condition":""
+         },
+         {
+            "id":1351,
+            "digimon":"Meicoomon",
+            "condition":""
+         },
+         {
+            "id":1246,
+            "digimon":"XV-mon",
+            "condition":""
+         },
+         {
+            "id":844,
+            "digimon":"Renamon (X-Antibody)",
+            "condition":"with X-Antibody"
+         },
+         {
+            "id":356,
+            "digimon":"Gold Numemon",
+            "condition":""
+         },
+         {
+            "id":1117,
+            "digimon":"Growmon",
+            "condition":""
+         },
+         {
+            "id":1378,
+            "digimon":"Rinkmon",
+            "condition":""
+         }
+      ]
+   },
+   {
+      "id":669,
+      "name":"Palmon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Palmon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":7,
+            "level":"Child"
+         }
+      ],
+      "types":[
+         {
+            "id":20,
+            "type":"Plant"
+         }
+      ],
+      "attributes":[
+         {
+            "id":3,
+            "attribute":"Vaccine"
+         },
+         {
+            "id":6,
+            "attribute":"Data"
+         }
+      ],
+      "fields":[
+         {
+            "id":1,
+            "field":"Nature Spirits"
+         },
+         {
+            "id":3,
+            "field":"Wind Guardians"
+         },
+         {
+            "id":10,
+            "field":"Jungle Troopers"
+         }
+      ],
+      "releaseDate":"1998",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A Plant Digimon with a tropical flower blooming on its head. Although it evolved like a reptile from Tanemon, it is an unusual Type which is classified as a Plant based on its outward appearances and special qualities. During the day it opens up the flower and spreads its leaf-like arms to perform photosynthesis. It usually buries its root-like feet under the ground, and although it is absorbing nutrients, it is also able to walk. As for the flower on its head, when it is joyful or happy it will waft about a sweet fragrance, but when it is angered or senses danger, it releases a foul stench that will drive off even large Digimon. Its Special Move is entangling the opponent in ivy laced with a powerful toxin (Poison Ivy). If you suffer this attack, your body will be completely paralyzed. "
+         },
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"頭にトロピカルな花を咲かせた植物型デジモン。タネモンから爬虫類的に進化したが、外見や特性上から植物型と分類される珍しいタイプ。昼間は花と葉の様な腕を広げ光合成をしている。普段は地中に根の様な足を埋め、養分を吸っているが、歩行することも可能。頭部の花は、楽しい時や嬉しい時は甘い香りを漂わせ、怒った時や危険を感じた時は大型デジモンも逃げ出すほどの臭い匂いを放出する。必殺技は強烈な毒性を帯びたツタを敵に絡ませる『ポイズンアイビー』。この攻撃を受けると体が麻痺してしまう。 "
+         }
+      ],
+      "skills":[
+         {
+            "id":1805,
+            "skill":"Sleep Spore",
+            "translation":"",
+            "description":"Shakes its petals, which releases spores that can put Digimon to sleep. "
+         },
+         {
+            "id":1801,
+            "skill":"Plant Shock",
+            "translation":"",
+            "description":"Hit the opponent with leaves, claws them, or showers them with poisonous pollen. "
+         },
+         {
+            "id":1802,
+            "skill":"Thorn Thrust",
+            "translation":"",
+            "description":"Stabs upwards with its extended fingers. "
+         },
+         {
+            "id":1803,
+            "skill":"Nioi Kougeki",
+            "translation":"Stench Attack",
+            "description":"Releases a foul stench. "
+         },
+         {
+            "id":1799,
+            "skill":"Thorn Throw",
+            "translation":"",
+            "description":"Impales the opponent with her vines before throwing it. "
+         },
+         {
+            "id":1804,
+            "skill":"Kusai Nioi",
+            "translation":"Stinky Stench",
+            "description":"Gives off a powerful stench that makes Digimon unwilling to fight it. "
+         },
+         {
+            "id":109,
+            "skill":"Poison Ivy",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":1797,
+            "skill":"Odor Attack",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":1798,
+            "skill":"Totemo Kusai Nioi",
+            "translation":"Very Stinky Stench",
+            "description":"Blows out a powerful poisonous smoke. "
+         },
+         {
+            "id":1800,
+            "skill":"Root Stretch",
+            "translation":"",
+            "description":"Slashes a foe with its claws. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":496,
+            "digimon":"Kyaromon",
+            "condition":""
+         },
+         {
+            "id":804,
+            "digimon":"Pyocomon",
+            "condition":""
+         },
+         {
+            "id":154,
+            "digimon":"Yuramon",
+            "condition":""
+         },
+         {
+            "id":466,
+            "digimon":"Budmon",
+            "condition":""
+         },
+         {
+            "id":1171,
+            "digimon":"Tanemon",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":1056,
+            "digimon":"Algomon (Perfect)",
+            "condition":"with Wizarmon and Wendimon"
+         },
+         {
+            "id":361,
+            "digimon":"Tailmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":631,
+            "digimon":"Bakemon",
+            "condition":"Death Evolution"
+         },
+         {
+            "id":493,
+            "digimon":"Mojyamon",
+            "condition":""
+         },
+         {
+            "id":811,
+            "digimon":"Tuskmon",
+            "condition":""
+         },
+         {
+            "id":744,
+            "digimon":"Fairimon",
+            "condition":""
+         },
+         {
+            "id":1075,
+            "digimon":"Kiwimon",
+            "condition":""
+         },
+         {
+            "id":404,
+            "digimon":"Ponchomon",
+            "condition":""
+         },
+         {
+            "id":1117,
+            "digimon":"Growmon",
+            "condition":""
+         },
+         {
+            "id":935,
+            "digimon":"Togemon",
+            "condition":""
+         },
+         {
+            "id":949,
+            "digimon":"Geremon",
+            "condition":""
+         },
+         {
+            "id":1006,
+            "digimon":"Leomon",
+            "condition":""
+         },
+         {
+            "id":716,
+            "digimon":"Parasaurmon",
+            "condition":""
+         },
+         {
+            "id":1292,
+            "digimon":"Rosemon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":1379,
+            "digimon":"Fugamon",
+            "condition":""
+         },
+         {
+            "id":382,
+            "digimon":"Vegimon",
+            "condition":""
+         },
+         {
+            "id":95,
+            "digimon":"Fangmon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"J Mojyamon",
+            "condition":""
+         },
+         {
+            "id":539,
+            "digimon":"Red Vegimon",
+            "condition":""
+         },
+         {
+            "id":1375,
+            "digimon":"Yukidarumon",
+            "condition":""
+         },
+         {
+            "id":1295,
+            "digimon":"Witchmon",
+            "condition":""
+         },
+         {
+            "id":764,
+            "digimon":"Snimon",
+            "condition":""
+         },
+         {
+            "id":472,
+            "digimon":"Kuwagamon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Whamon Adult",
+            "condition":""
+         },
+         {
+            "id":362,
+            "digimon":"Nanimon",
+            "condition":""
+         },
+         {
+            "id":45,
+            "digimon":"Mori Shellmon",
+            "condition":""
+         },
+         {
+            "id":31,
+            "digimon":"Togemon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1140,
+            "digimon":"Wizarmon",
+            "condition":""
+         },
+         {
+            "id":487,
+            "digimon":"Tuchidarumon",
+            "condition":""
+         },
+         {
+            "id":1136,
+            "digimon":"Coelamon",
+            "condition":""
+         },
+         {
+            "id":1329,
+            "digimon":"Scumon",
+            "condition":""
+         },
+         {
+            "id":956,
+            "digimon":"Igamon",
+            "condition":""
+         },
+         {
+            "id":1351,
+            "digimon":"Meicoomon",
+            "condition":""
+         },
+         {
+            "id":677,
+            "digimon":"Aquilamon",
+            "condition":""
+         },
+         {
+            "id":371,
+            "digimon":"Numemon",
+            "condition":""
+         },
+         {
+            "id":393,
+            "digimon":"Cheer Galmon",
+            "condition":"With the Digimental of Purity"
+         },
+         {
+            "id":1369,
+            "digimon":"Palmon (X-Antibody)",
+            "condition":"with X-Antibody"
+         },
+         {
+            "id":303,
+            "digimon":"Dokugumon",
+            "condition":""
+         },
+         {
+            "id":778,
+            "digimon":"Raremon",
+            "condition":""
+         },
+         {
+            "id":97,
+            "digimon":"Ankylomon",
+            "condition":"with Armadimon and Pawn Chessmon White"
+         },
+         {
+            "id":166,
+            "digimon":"Eosmon (Adult)",
+            "condition":""
+         },
+         {
+            "id":709,
+            "digimon":"Reppamon",
+            "condition":""
+         },
+         {
+            "id":1246,
+            "digimon":"XV-mon",
+            "condition":""
+         },
+         {
+            "id":879,
+            "digimon":"Angemon",
+            "condition":""
+         },
+         {
+            "id":264,
+            "digimon":"Submarimon",
+            "condition":""
+         },
+         {
+            "id":475,
+            "digimon":"Birdramon",
+            "condition":""
+         },
+         {
+            "id":352,
+            "digimon":"Orgemon",
+            "condition":""
+         },
+         {
+            "id":993,
+            "digimon":"Woodmon",
+            "condition":""
+         },
+         {
+            "id":483,
+            "digimon":"Centalmon",
+            "condition":""
+         },
+         {
+            "id":723,
+            "digimon":"Sunflowmon",
+            "condition":""
+         }
+      ]
+   },
+   {
+      "id":1373,
+      "name":"Gummymon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Gummymon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":8,
+            "level":"Baby II"
+         }
+      ],
+      "types":[
+         {
+            "id":16,
+            "type":"Lesser"
+         }
+      ],
+      "attributes":[
+         {
+            "id":2,
+            "attribute":"Free"
+         }
+      ],
+      "fields":[
+         
+      ],
+      "releaseDate":"2000",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"ゼリモンが成長したデジモン。とても元気な性格はゼリモン譲りで、明朗活発である。成長はしているが、相変わらず体の体組織は不安定でプニプニしているが、ゼリモン同様角の部分は硬くなっていて頭突きで敵を威嚇する。ゼリモンからの大きな変化は体と耳らしきものが頭部より出ている。必殺技は粘着質の泡を沢山吐き出す『ダブルボブル』。 "
+         },
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A Digimon that grew up from Zerimon. As it inherited an exceedingly energetic personality from Zerimon, it is both cheerful and lively. Although it is growing, it's squishy because its body tissue is as unstable as usual, but just like Zerimon, parts of its horn have hardened and it intimidates the opponent with headbutts. Its greatest change from Zerimon is that it has a body and ear-like objects coming out of its head. Its Special Move is spewing out a lot of adhesive bubbles (Double Bobble). "
+         }
+      ],
+      "skills":[
+         {
+            "id":87,
+            "skill":"San no Awa",
+            "translation":"Acid Bubbles",
+            "description":"Shoots bubble-like substances from its mouth. "
+         },
+         {
+            "id":2509,
+            "skill":"Double Bobble",
+            "translation":"",
+            "description":"Fires a stream of adhesive bubbles from its mouth. "
+         },
+         {
+            "id":3441,
+            "skill":"Double Bubble",
+            "translation":"",
+            "description":"Spits out a lot of adhesive bubbles. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":755,
+            "digimon":"Poyomon",
+            "condition":""
+         },
+         {
+            "id":1035,
+            "digimon":"Zerimon",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":1184,
+            "digimon":"Blucomon",
+            "condition":""
+         },
+         {
+            "id":1278,
+            "digimon":"Gaomon",
+            "condition":""
+         },
+         {
+            "id":1034,
+            "digimon":"Betamon",
+            "condition":""
+         },
+         {
+            "id":917,
+            "digimon":"Jazamon",
+            "condition":""
+         },
+         {
+            "id":1369,
+            "digimon":"Palmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":309,
+            "digimon":"DORUmon",
+            "condition":""
+         },
+         {
+            "id":1202,
+            "digimon":"Hagurumon",
+            "condition":""
+         },
+         {
+            "id":117,
+            "digimon":"Terriermon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1267,
+            "digimon":"Toy Agumon",
+            "condition":""
+         },
+         {
+            "id":970,
+            "digimon":"Renamon",
+            "condition":""
+         },
+         {
+            "id":1367,
+            "digimon":"Bakumon",
+            "condition":""
+         },
+         {
+            "id":664,
+            "digimon":"V-mon",
+            "condition":""
+         },
+         {
+            "id":584,
+            "digimon":"Clear Agumon",
+            "condition":""
+         },
+         {
+            "id":1190,
+            "digimon":"Terriermon",
+            "condition":""
+         },
+         {
+            "id":1153,
+            "digimon":"Armadimon",
+            "condition":""
+         }
+      ]
+   },
+   {
+      "id":412,
+      "name":"Tentomon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Tentomon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":7,
+            "level":"Child"
+         }
+      ],
+      "types":[
+         {
+            "id":17,
+            "type":"Insect"
+         }
+      ],
+      "attributes":[
+         {
+            "id":3,
+            "attribute":"Vaccine"
+         },
+         {
+            "id":6,
+            "attribute":"Data"
+         },
+         {
+            "id":4,
+            "attribute":"Virus"
+         }
+      ],
+      "fields":[
+         {
+            "id":1,
+            "field":"Nature Spirits"
+         },
+         {
+            "id":10,
+            "field":"Jungle Troopers"
+         },
+         {
+            "id":5,
+            "field":"Metal Empire"
+         }
+      ],
+      "releaseDate":"1998",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"The original type of Insect Digimon who, although it has a hard shell, still has low aggression. It has one hard claw on each of its fore-legs, and four on each of its middle- and hind-legs, and in particular, the middle-legs are able to skillfully grasp objects just like a human hand. Although the other Insects at its evolution level only possess fighting spirit, it still retains its naturally friendly sentiments, and displays its carefree way of life by doing things like sniffing the scent of flowers and napping in the shade of a tree. Its Special Move, which it possesses just in case, is hurling static electricity that it amplified with its wings (Petit Thunder). "
+         },
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"硬い甲殻を持つが、まだ攻撃性の低い昆虫型デジモンの原初タイプ。前肢に１本、中肢と後肢に４本の硬質爪を持ち、特に中肢は人間の手並に器用に物をつかんだりできる。進化型にあたる他の昆虫型は闘争心しか持たないが、この時点では自然を親しむ感情が残っているようで、花の匂いを嗅いだり木陰で昼寝をしたりといった、のんきな生態を見せる。一応持っている必殺技は、羽で増幅させた静電気を飛ばす『プチサンダー』。 "
+         }
+      ],
+      "skills":[
+         {
+            "id":1189,
+            "skill":"Dynamo Spin",
+            "translation":"",
+            "description":"While flying, spins forward and electrocutes foes. "
+         },
+         {
+            "id":132,
+            "skill":"Tai Atari",
+            "translation":"Body Blow",
+            "description":"Tackles the enemy. "
+         },
+         {
+            "id":1193,
+            "skill":"Rolling Whip",
+            "translation":"",
+            "description":"Falls on its back and kicks with its hind legs. "
+         },
+         {
+            "id":1186,
+            "skill":"Claw Rush",
+            "translation":"",
+            "description":"A flurry of claw swipes. "
+         },
+         {
+            "id":1187,
+            "skill":"Rolling Guard",
+            "translation":"",
+            "description":"Spins along the ground and slams into the foe, or curs up in a ball to raise its defense. "
+         },
+         {
+            "id":692,
+            "skill":"Petit Thunder",
+            "translation":"",
+            "description":"Attacks with a discharge of electricity. "
+         },
+         {
+            "id":1183,
+            "skill":"Shock Jaw",
+            "translation":"",
+            "description":"Spins up at an angle while covered in electricity. "
+         },
+         {
+            "id":1185,
+            "skill":"Electrical Discharge",
+            "translation":"",
+            "description":"Discharges electrcity from its whole body, shocking anyone near it. "
+         },
+         {
+            "id":1188,
+            "skill":"Katai Tsume",
+            "translation":"Hard Claw",
+            "description":"Attacks the foe with a hard claw. "
+         },
+         {
+            "id":1192,
+            "skill":"Aerial Claw Rush",
+            "translation":"",
+            "description":"A midair flurry of claw swipes and kicks. "
+         },
+         {
+            "id":1184,
+            "skill":"Stumbling Attack",
+            "translation":"",
+            "description":"Hits the enemy repeatedly with its claws by first hopping sideways towards them and then falling on them frontwise. "
+         },
+         {
+            "id":1191,
+            "skill":"Rhino Spin",
+            "translation":"",
+            "description":"Flips over and spins on its back while charged with electricity. "
+         },
+         {
+            "id":1190,
+            "skill":"Twice Arm",
+            "translation":"",
+            "description":"Slices the enemy with both claws. Sometimes follows up with an uppercut. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":90,
+            "digimon":"Tokomon",
+            "condition":""
+         },
+         {
+            "id":933,
+            "digimon":"Gigimon",
+            "condition":""
+         },
+         {
+            "id":466,
+            "digimon":"Budmon",
+            "condition":""
+         },
+         {
+            "id":87,
+            "digimon":"Mochimon",
+            "condition":""
+         },
+         {
+            "id":478,
+            "digimon":"Minomon",
+            "condition":""
+         },
+         {
+            "id":116,
+            "digimon":"Missimon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Digitama",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":1191,
+            "digimon":"Sorcerimon",
+            "condition":""
+         },
+         {
+            "id":836,
+            "digimon":"Searchmon",
+            "condition":""
+         },
+         {
+            "id":158,
+            "digimon":"Gekomon",
+            "condition":""
+         },
+         {
+            "id":320,
+            "digimon":"Salamandamon",
+            "condition":"with the Digimental of Courage"
+         },
+         {
+            "id":723,
+            "digimon":"Sunflowmon",
+            "condition":""
+         },
+         {
+            "id":371,
+            "digimon":"Numemon",
+            "condition":""
+         },
+         {
+            "id":403,
+            "digimon":"Kuwagamon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":781,
+            "digimon":"Dobermon",
+            "condition":""
+         },
+         {
+            "id":402,
+            "digimon":"Chamelemon",
+            "condition":""
+         },
+         {
+            "id":511,
+            "digimon":"Dinohumon",
+            "condition":""
+         },
+         {
+            "id":459,
+            "digimon":"Blade Kuwagamon",
+            "condition":""
+         },
+         {
+            "id":935,
+            "digimon":"Togemon",
+            "condition":""
+         },
+         {
+            "id":327,
+            "digimon":"Flybeemon",
+            "condition":""
+         },
+         {
+            "id":27,
+            "digimon":"Sand Yanmamon",
+            "condition":""
+         },
+         {
+            "id":1357,
+            "digimon":"Gokimon",
+            "condition":""
+         },
+         {
+            "id":19,
+            "digimon":"Guardromon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Jiko Chuumon",
+            "condition":"With the Digimental of Knowledge"
+         },
+         {
+            "id":190,
+            "digimon":"Tyrant Kabuterimon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":413,
+            "digimon":"Tortamon",
+            "condition":""
+         },
+         {
+            "id":1157,
+            "digimon":"Yanmamon",
+            "condition":""
+         },
+         {
+            "id":539,
+            "digimon":"Red Vegimon",
+            "condition":""
+         },
+         {
+            "id":1140,
+            "digimon":"Wizarmon",
+            "condition":""
+         },
+         {
+            "id":113,
+            "digimon":"Cyclomon",
+            "condition":""
+         },
+         {
+            "id":452,
+            "digimon":"Waspmon",
+            "condition":""
+         },
+         {
+            "id":352,
+            "digimon":"Orgemon",
+            "condition":""
+         },
+         {
+            "id":156,
+            "digimon":"Honeybeemon",
+            "condition":""
+         },
+         {
+            "id":949,
+            "digimon":"Geremon",
+            "condition":""
+         },
+         {
+            "id":806,
+            "digimon":"Monochromon",
+            "condition":""
+         },
+         {
+            "id":993,
+            "digimon":"Woodmon",
+            "condition":""
+         },
+         {
+            "id":472,
+            "digimon":"Kuwagamon",
+            "condition":"with or without Kokuwamon"
+         },
+         {
+            "id":21,
+            "digimon":"Sagittarimon",
+            "condition":""
+         },
+         {
+            "id":902,
+            "digimon":"Herakle Kabuterimon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":483,
+            "digimon":"Centalmon",
+            "condition":""
+         },
+         {
+            "id":1344,
+            "digimon":"Sealsdramon",
+            "condition":""
+         },
+         {
+            "id":808,
+            "digimon":"Atlur Kabuterimon (Red)",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":1217,
+            "digimon":"Airdramon",
+            "condition":""
+         },
+         {
+            "id":199,
+            "digimon":"Fla Wizarmon",
+            "condition":"with or without the Digimental of Courage"
+         },
+         {
+            "id":1329,
+            "digimon":"Scumon",
+            "condition":""
+         },
+         {
+            "id":216,
+            "digimon":"Tyranomon",
+            "condition":""
+         },
+         {
+            "id":1024,
+            "digimon":"Stingmon",
+            "condition":"with or without Wormmon"
+         },
+         {
+            "id":778,
+            "digimon":"Raremon",
+            "condition":""
+         },
+         {
+            "id":346,
+            "digimon":"Tailmon",
+            "condition":""
+         },
+         {
+            "id":1246,
+            "digimon":"XV-mon",
+            "condition":""
+         },
+         {
+            "id":764,
+            "digimon":"Snimon",
+            "condition":""
+         },
+         {
+            "id":524,
+            "digimon":"Bomber Nanimon",
+            "condition":""
+         },
+         {
+            "id":1351,
+            "digimon":"Meicoomon",
+            "condition":""
+         },
+         {
+            "id":264,
+            "digimon":"Submarimon",
+            "condition":""
+         },
+         {
+            "id":166,
+            "digimon":"Eosmon (Adult)",
+            "condition":""
+         },
+         {
+            "id":1115,
+            "digimon":"Kabuterimon",
+            "condition":"with or without Gabumon or Kyokomon"
+         },
+         {
+            "id":97,
+            "digimon":"Ankylomon",
+            "condition":""
+         },
+         {
+            "id":867,
+            "digimon":"Digmon",
+            "condition":""
+         }
+      ]
+   },
+   
+   {
+      "id":394,
+      "name":"Gabumon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Gabumon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":7,
+            "level":"Child"
+         }
+      ],
+      "types":[
+         {
+            "id":45,
+            "type":"Reptile"
+         }
+      ],
+      "attributes":[
+         {
+            "id":3,
+            "attribute":"Vaccine"
+         },
+         {
+            "id":6,
+            "attribute":"Data"
+         }
+      ],
+      "fields":[
+         {
+            "id":1,
+            "field":"Nature Spirits"
+         },
+         {
+            "id":3,
+            "field":"Wind Guardians"
+         },
+         {
+            "id":2,
+            "field":"Virus Busters"
+         },
+         {
+            "id":5,
+            "field":"Metal Empire"
+         }
+      ],
+      "releaseDate":"1997",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"毛皮を被っているが、れっきとした爬虫類型デジモン。とても臆病で恥ずかしがりやな性格でいつもガルルモンが残していったデータをかき集めて毛皮状にしてかぶっている。他のデジモンから恐れられているガルルモンの毛皮をかぶっているため、身を守るための保護の役目もしている。毛皮をかぶると性格が１８０°変わってしまう。必殺技は『プチファイアー』。 "
+         },
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"Although it is covered by a fur pelt, it is clearly a Reptile Digimon. Due to its extremely timid and shy personality, it always gathers up the data which Garurumon leaves behind, and shapes it into a fur pelt to wear. Because it is wearing the fur pelt of Garurumon, who is feared by other Digimon, it fills the role of safeguarding itself as a result of protecting its body. When it is wearing the fur pelt, its personality does a complete 180° shift. Its Special Move is \"Petit Fire\". "
+         }
+      ],
+      "skills":[
+         {
+            "id":1141,
+            "skill":"Petit Fire Hook",
+            "translation":"",
+            "description":"Punches with its hand full of Petit Fire. "
+         },
+         {
+            "id":736,
+            "skill":"Petit Fire",
+            "translation":"",
+            "description":"Shoots a stream of red flame. "
+         },
+         {
+            "id":1135,
+            "skill":"Crush Nail",
+            "translation":"",
+            "description":"Unleashes a combo attack with its claws. "
+         },
+         {
+            "id":1137,
+            "skill":"Claw Attack",
+            "translation":"",
+            "description":"Attacks with its claws. "
+         },
+         {
+            "id":1133,
+            "skill":"Hidden Knock",
+            "translation":"",
+            "description":"Rapidly punches at the enemy. "
+         },
+         {
+            "id":1140,
+            "skill":"Horn Attack",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":1142,
+            "skill":"Upperclaw",
+            "translation":"",
+            "description":"Knocks the enemy into the air with an upward swing of the claws on both hands. "
+         },
+         {
+            "id":737,
+            "skill":"Little Horn",
+            "translation":"",
+            "description":"Rams the horn on its head into the foe. "
+         },
+         {
+            "id":1132,
+            "skill":"Drill Horn Special",
+            "translation":"",
+            "description":"Jumps into the air and attacks with horn by spinning over a long distance. "
+         },
+         {
+            "id":915,
+            "skill":"Beast Attack",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":1134,
+            "skill":"Blue Cyclone",
+            "translation":"",
+            "description":"Spins around while spitting out blue fire from its mouth. "
+         },
+         {
+            "id":1139,
+            "skill":"Skull Cracker",
+            "translation":"",
+            "description":"Drops straight down horn-first. "
+         },
+         {
+            "id":738,
+            "skill":"Gabumon Shot",
+            "translation":"",
+            "description":"Emits a small blast from the mouth. "
+         },
+         {
+            "id":1138,
+            "skill":"Fire Enbu Ken",
+            "translation":"Fire Waltz Sword",
+            "description":"Empowers Igamon's sword with its Petit Fire to unleash a fiery slash. "
+         },
+         {
+            "id":1136,
+            "skill":"Drill Horn",
+            "translation":"",
+            "description":"Jumps into the air and attacks with horn by spinning. "
+         },
+         {
+            "id":524,
+            "skill":"Tsuno Kougeki",
+            "translation":"Horn Attack",
+            "description":" "
+         },
+         {
+            "id":1131,
+            "skill":"Machine Gun Jab",
+            "translation":"",
+            "description":"Continual throws punches at the foe. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":90,
+            "digimon":"Tokomon",
+            "condition":""
+         },
+         {
+            "id":1318,
+            "digimon":"Peti Meramon",
+            "condition":""
+         },
+         {
+            "id":1017,
+            "digimon":"Poromon",
+            "condition":""
+         },
+         {
+            "id":1240,
+            "digimon":"Tunomon",
+            "condition":""
+         },
+         {
+            "id":1343,
+            "digimon":"Hopmon",
+            "condition":""
+         },
+         {
+            "id":1154,
+            "digimon":"Nyaromon",
+            "condition":""
+         },
+         {
+            "id":532,
+            "digimon":"Wanyamon",
+            "condition":""
+         },
+         {
+            "id":682,
+            "digimon":"Koromon",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":781,
+            "digimon":"Dobermon",
+            "condition":""
+         },
+         {
+            "id":900,
+            "digimon":"Black Tailmon",
+            "condition":""
+         },
+         {
+            "id":654,
+            "digimon":"Kyubimon (Silver)",
+            "condition":""
+         },
+         {
+            "id":1362,
+            "digimon":"Nefertimon",
+            "condition":""
+         },
+         {
+            "id":371,
+            "digimon":"Numemon",
+            "condition":""
+         },
+         {
+            "id":778,
+            "digimon":"Raremon",
+            "condition":""
+         },
+         {
+            "id":139,
+            "digimon":"Wolfmon",
+            "condition":"with the Human Spirit of Light"
+         },
+         {
+            "id":178,
+            "digimon":"Nefertimon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1209,
+            "digimon":"Gryzmon",
+            "condition":""
+         },
+         {
+            "id":702,
+            "digimon":"Gabumon -Yujo no Kizuna-",
+            "condition":""
+         },
+         {
+            "id":892,
+            "digimon":"Sangloupmon",
+            "condition":"with Lunamon"
+         },
+         {
+            "id":709,
+            "digimon":"Reppamon",
+            "condition":""
+         },
+         {
+            "id":677,
+            "digimon":"Aquilamon",
+            "condition":""
+         },
+         {
+            "id":1379,
+            "digimon":"Fugamon",
+            "condition":""
+         },
+         {
+            "id":789,
+            "digimon":"Garurumon (Black)",
+            "condition":""
+         },
+         {
+            "id":631,
+            "digimon":"Bakemon",
+            "condition":"with Death Evolution"
+         },
+         {
+            "id":95,
+            "digimon":"Fangmon",
+            "condition":""
+         },
+         {
+            "id":275,
+            "digimon":"Greymon",
+            "condition":"with Agumon"
+         },
+         {
+            "id":949,
+            "digimon":"Geremon",
+            "condition":""
+         },
+         {
+            "id":271,
+            "digimon":"Metal Garurumon",
+            "condition":"Warp Evolution with Were Garurumon and Garurumon"
+         },
+         {
+            "id":352,
+            "digimon":"Orgemon",
+            "condition":""
+         },
+         {
+            "id":366,
+            "digimon":"Garurumon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":346,
+            "digimon":"Tailmon",
+            "condition":""
+         },
+         {
+            "id":694,
+            "digimon":"Gaogamon",
+            "condition":"with Gaomon"
+         },
+         {
+            "id":969,
+            "digimon":"Ikkakumon",
+            "condition":""
+         },
+         {
+            "id":636,
+            "digimon":"Dark Lizamon",
+            "condition":""
+         },
+         {
+            "id":666,
+            "digimon":"V-dramon",
+            "condition":""
+         },
+         {
+            "id":216,
+            "digimon":"Tyranomon",
+            "condition":""
+         },
+         {
+            "id":1381,
+            "digimon":"Pegasmon",
+            "condition":""
+         },
+         {
+            "id":1351,
+            "digimon":"Meicoomon",
+            "condition":""
+         },
+         {
+            "id":1291,
+            "digimon":"Jungle Mojyamon",
+            "condition":""
+         },
+         {
+            "id":1286,
+            "digimon":"Flymon",
+            "condition":""
+         },
+         {
+            "id":487,
+            "digimon":"Tuchidarumon",
+            "condition":""
+         },
+         {
+            "id":303,
+            "digimon":"Dokugumon",
+            "condition":""
+         },
+         {
+            "id":1115,
+            "digimon":"Kabuterimon",
+            "condition":"with Tentomon"
+         },
+         {
+            "id":1309,
+            "digimon":"Omegamon (X-Antibody)",
+            "condition":"with Agumon, Were Garurumon, and Metal Greymon"
+         },
+         {
+            "id":1117,
+            "digimon":"Growmon",
+            "condition":""
+         },
+         {
+            "id":1129,
+            "digimon":"Kita Kitsunemon",
+            "condition":"with the Digimental of Friendship"
+         },
+         {
+            "id":1118,
+            "digimon":"Dobermon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1228,
+            "digimon":"Gorimon",
+            "condition":""
+         },
+         {
+            "id":237,
+            "digimon":"Greymon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":752,
+            "digimon":"Drimogemon",
+            "condition":""
+         },
+         {
+            "id":1183,
+            "digimon":"Omegamon",
+            "condition":"Warp Evolution with or without Agumon or Invisible Connection"
+         },
+         {
+            "id":1294,
+            "digimon":"Opossummon",
+            "condition":""
+         },
+         {
+            "id":1329,
+            "digimon":"Scumon",
+            "condition":""
+         },
+         {
+            "id":1006,
+            "digimon":"Leomon",
+            "condition":""
+         },
+         {
+            "id":243,
+            "digimon":"Hanumon",
+            "condition":""
+         },
+         {
+            "id":1071,
+            "digimon":"Bullmon",
+            "condition":""
+         },
+         {
+            "id":269,
+            "digimon":"DORUgamon",
+            "condition":""
+         },
+         {
+            "id":362,
+            "digimon":"Nanimon",
+            "condition":""
+         },
+         {
+            "id":764,
+            "digimon":"Snimon",
+            "condition":""
+         },
+         {
+            "id":800,
+            "digimon":"Algomon (Adult)",
+            "condition":""
+         },
+         {
+            "id":1375,
+            "digimon":"Yukidarumon",
+            "condition":""
+         },
+         {
+            "id":1403,
+            "digimon":"Gabumon (X-Antibody)",
+            "condition":"with X-Antibody"
+         },
+         {
+            "id":879,
+            "digimon":"Angemon",
+            "condition":""
+         },
+         {
+            "id":1342,
+            "digimon":"Rukamon",
+            "condition":""
+         },
+         {
+            "id":1012,
+            "digimon":"Gururumon",
+            "condition":""
+         },
+         {
+            "id":806,
+            "digimon":"Monochromon",
+            "condition":""
+         },
+         {
+            "id":257,
+            "digimon":"Kyubimon",
+            "condition":""
+         },
+         {
+            "id":302,
+            "digimon":"Lighdramon",
+            "condition":""
+         },
+         {
+            "id":1024,
+            "digimon":"Stingmon",
+            "condition":""
+         },
+         {
+            "id":361,
+            "digimon":"Tailmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":340,
+            "digimon":"Strikedramon",
+            "condition":""
+         },
+         {
+            "id":60,
+            "digimon":"Geo Greymon",
+            "condition":""
+         },
+         {
+            "id":382,
+            "digimon":"Vegimon",
+            "condition":""
+         },
+         {
+            "id":979,
+            "digimon":"Metal Garurumon (Black)",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":646,
+            "digimon":"Seadramon",
+            "condition":""
+         },
+         {
+            "id":946,
+            "digimon":"Garurumon",
+            "condition":"with Gomamon"
+         },
+         {
+            "id":97,
+            "digimon":"Ankylomon",
+            "condition":""
+         },
+         {
+            "id":1246,
+            "digimon":"XV-mon",
+            "condition":""
+         },
+         {
+            "id":310,
+            "digimon":"Boarmon",
+            "condition":""
+         },
+         {
+            "id":1079,
+            "digimon":"Turuiemon",
+            "condition":""
+         },
+         {
+            "id":1019,
+            "digimon":"Kenkimon",
+            "condition":"with the Digimental of Friendship"
+         },
+         {
+            "id":1276,
+            "digimon":"Mikemon",
+            "condition":""
+         },
+         {
+            "id":1310,
+            "digimon":"Nise Drimogemon",
+            "condition":""
+         },
+         {
+            "id":483,
+            "digimon":"Centalmon",
+            "condition":""
+         },
+         {
+            "id":794,
+            "digimon":"Leomon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1140,
+            "digimon":"Wizarmon",
+            "condition":""
+         },
+         {
+            "id":956,
+            "digimon":"Igamon",
+            "condition":""
+         },
+         {
+            "id":1075,
+            "digimon":"Kiwimon",
+            "condition":""
+         }
+      ]
+   },
+   
+   {
+      "id":1292,
+      "name":"Rosemon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Rosemon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":4,
+            "level":"Ultimate"
+         },
+         {
+            "id":2,
+            "level":"Perfect"
+         }
+      ],
+      "types":[
+         {
+            "id":35,
+            "type":"Fairy"
+         }
+      ],
+      "attributes":[
+         {
+            "id":6,
+            "attribute":"Data"
+         }
+      ],
+      "fields":[
+         {
+            "id":3,
+            "field":"Wind Guardians"
+         },
+         {
+            "id":10,
+            "field":"Jungle Troopers"
+         },
+         {
+            "id":8,
+            "field":"Nightmare Soldiers"
+         }
+      ],
+      "releaseDate":"1999",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"草花の女王と呼ばれる薔薇の様な姿をした妖精型デジモン。美しい大人の女性の姿をしており、常に美しくあることを願っている。性格は多少、自意識過剰なところもあるが、その実力は他の究極体とも引けを取らないほどである。また、胸元には愛と美のシンボルが刻まれた宝玉「ティファレト」を身につけている。このティファレトを持つものは、永遠の美しさと強さを約束されると言われている。必殺技は電気を帯びた棘の鞭でどんなに狂暴なデジモンでも手なずけてしまう『ソーンウィップ』。この技を受けたものは、身も心もロゼモンの虜になってしまうと言われている。また、鞭の切っ先で敵を仕留める『ローゼスレイピア』。そして、ロゼモンの究極にして禁断の誘惑『フォービドゥンテンプテイション』を受けたデジモンは、無数のバラの花に包まれて美しくデータ破壊される。 "
+         },
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A Fairy Digimon with an appearance resembling a rose, it is referred to as the Queen of Flowers. It has the appearance of a beautiful woman, and desires to remain beautiful forever. Its personality is more or less that way, and though it is excessively self-conscious about such things, its true strength does not in fact compare unfavorably with other Ultimates. Also, it wears on its breast a \"Tiferet\", a jewel which is engraved with the symbol of love and beauty. This Tiferet that it possesses is said to promise it eternal beauty and power. Its Special Move is taming Digimon, no matter how frenzied, with a thorned whip charged with electricity (Thorn Whip). It is said that those that suffer this technique become Rosemon's slave, body and soul. Also, it can bring down the opponent using the whip as a rapier (Roses Rapier). Additionally, as for Digimon who suffer Rosemon's ultimate Forbidden Temptation, their data is beautifully destroyed in a shower of innumerable rose petals. "
+         }
+      ],
+      "skills":[
+         {
+            "id":1236,
+            "skill":"Thorn Whip",
+            "translation":"",
+            "description":"Lashes out at the enemy with its thorny vines, or swings its vines to spread pollen. "
+         },
+         {
+            "id":3263,
+            "skill":"Roses Rapier",
+            "translation":"",
+            "description":"Strike the enemy with the tip of the poisonous electrified whip. it uses fencing skills that pierce its opponent. "
+         },
+         {
+            "id":788,
+            "skill":"Beauty Shock",
+            "translation":"",
+            "description":"Emits an electric shock from its fingers. "
+         },
+         {
+            "id":3269,
+            "skill":"Rose Velvet",
+            "translation":"",
+            "description":"Covers the ground in thorns to restrict enemy's action. "
+         },
+         {
+            "id":3264,
+            "skill":"Rosy Cradle",
+            "translation":"",
+            "description":"Spreads a rose-scented gas and puts all the enemies to sleep. "
+         },
+         {
+            "id":3265,
+            "skill":"Ivy Hug",
+            "translation":"",
+            "description":"Stabs a vine into the ground, causing many vines to erupt from the ground to binds and damages the opponent. "
+         },
+         {
+            "id":3267,
+            "skill":"Forbidden Temptation",
+            "translation":"",
+            "description":"The shine from its Tiferet jewel overtaking its body, unleashes multiple roses with pollen that destroys the opponent's data or releases a powerful energy wave. "
+         },
+         {
+            "id":3266,
+            "skill":"Prickle Storm",
+            "translation":"",
+            "description":"Shoots a green energy. "
+         },
+         {
+            "id":2412,
+            "skill":"Fascination",
+            "translation":"",
+            "description":"Enthralls an opponent and absorb its life-force with a pink gas. "
+         },
+         {
+            "id":3268,
+            "skill":"Thorn Shoot",
+            "translation":"",
+            "description":"Fire one thorn from a rose. "
+         },
+         {
+            "id":3270,
+            "skill":"Danger Thorn",
+            "translation":"",
+            "description":"Shoot numerous rose thorns at all enemies. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":228,
+            "digimon":"Vermillimon",
+            "condition":""
+         },
+         {
+            "id":802,
+            "digimon":"Lilimon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":183,
+            "digimon":"Were Garurumon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1029,
+            "digimon":"Triceramon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1199,
+            "digimon":"Jyagamon",
+            "condition":""
+         },
+         {
+            "id":1390,
+            "digimon":"Mamemon",
+            "condition":""
+         },
+         {
+            "id":431,
+            "digimon":"Blossomon",
+            "condition":"with or without Lilimon and Lilamon"
+         },
+         {
+            "id":421,
+            "digimon":"Mach Gaogamon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Pajramon",
+            "condition":""
+         },
+         {
+            "id":272,
+            "digimon":"Lilamon",
+            "condition":"with or without Lilimon and Blossomon"
+         },
+         {
+            "id":1063,
+            "digimon":"Angewomon",
+            "condition":""
+         },
+         {
+            "id":861,
+            "digimon":"Crescemon",
+            "condition":""
+         },
+         {
+            "id":315,
+            "digimon":"Lalamon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":1385,
+            "digimon":"Andiramon",
+            "condition":""
+         },
+         {
+            "id":33,
+            "digimon":"Gerbemon",
+            "condition":""
+         },
+         {
+            "id":141,
+            "digimon":"Delumon",
+            "condition":"with certain Digimon from the Pendulum series"
+         },
+         {
+            "id":514,
+            "digimon":"Pumpmon",
+            "condition":""
+         },
+         {
+            "id":669,
+            "digimon":"Palmon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":71,
+            "digimon":"Lilimon",
+            "condition":"with or without Matadrmon, certain Digimon from the Pendulum series or Lilamon and Blossomon"
+         },
+         {
+            "id":935,
+            "digimon":"Togemon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":170,
+            "digimon":"Lady Devimon",
+            "condition":""
+         },
+         {
+            "id":967,
+            "digimon":"Rize Greymon",
+            "condition":""
+         },
+         {
+            "id":536,
+            "digimon":"Chimairamon",
+            "condition":""
+         },
+         {
+            "id":790,
+            "digimon":"Babamon",
+            "condition":""
+         },
+         {
+            "id":1221,
+            "digimon":"Yatagaramon",
+            "condition":""
+         },
+         {
+            "id":683,
+            "digimon":"Piccolomon",
+            "condition":""
+         },
+         {
+            "id":714,
+            "digimon":"Blue Meramon",
+            "condition":""
+         },
+         {
+            "id":70,
+            "digimon":"Andromon",
+            "condition":""
+         },
+         {
+            "id":1214,
+            "digimon":"Matadrmon",
+            "condition":"with Lilimon"
+         },
+         {
+            "id":890,
+            "digimon":"Whamon Perfect",
+            "condition":""
+         },
+         {
+            "id":1105,
+            "digimon":"Flaremon",
+            "condition":""
+         },
+         {
+            "id":1332,
+            "digimon":"Meicrackmon(Vicious Mode)",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":1338,
+            "digimon":"Imperialdramon(Fighter Mode)",
+            "condition":"with Imperialdramon: Dragon Mode"
+         },
+         {
+            "id":918,
+            "digimon":"Rafflesimon",
+            "condition":"with or without Lotusmon"
+         },
+         {
+            "id":484,
+            "digimon":"Omegamon(Merciful Mode)",
+            "condition":"with Omegamon, Herakle Kabuterimon, Hououmon, Vikemon, Seraphimon and Holydramon"
+         },
+         {
+            "id":400,
+            "digimon":"Imperialdramon(Paladin Mode)",
+            "condition":""
+         },
+         {
+            "id":1405,
+            "digimon":"Rosemon (X-Antibody)",
+            "condition":"with X-Antibody"
+         },
+         {
+            "id":792,
+            "digimon":"Rosemon(Burst Mode)",
+            "condition":"with or without Babamon or Ofanimon, or Dianamon, Mastemon, Minervamon, Ofanimon, or Sakuyamon, or Babamon, Lilamon, Sunflowmon and Lalamon"
+         },
+         {
+            "id":333,
+            "digimon":"Susanoomon",
+            "condition":""
+         },
+         {
+            "id":397,
+            "digimon":"Chaosmon(Valdur Arm)",
+            "condition":""
+         },
+         {
+            "id":686,
+            "digimon":"Chaosmon",
+            "condition":""
+         },
+         {
+            "id":790,
+            "digimon":"Babamon",
+            "condition":""
+         }
+      ]
+   },
+   {
+      "id":1063,
+      "name":"Angewomon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Angewomon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":2,
+            "level":"Perfect"
+         }
+      ],
+      "types":[
+         {
+            "id":3,
+            "type":"Archangel"
+         },
+         {
+            "id":108,
+            "type":"Angel"
+         }
+      ],
+      "attributes":[
+         {
+            "id":3,
+            "attribute":"Vaccine"
+         },
+         {
+            "id":2,
+            "attribute":"Free"
+         }
+      ],
+      "fields":[
+         {
+            "id":1,
+            "field":"Nature Spirits"
+         },
+         {
+            "id":3,
+            "field":"Wind Guardians"
+         },
+         {
+            "id":2,
+            "field":"Virus Busters"
+         }
+      ],
+      "releaseDate":"1998",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"美しい女性の姿をした大天使型デジモン。以前は天使型と分類されていたが、その能力の高さから大天使型と判明した。特徴として、成熟期の天使は６枚の羽を持ち、完全体の天使は８枚の羽を持っている。性格はいたって穏やかだが、まがったことや悪は許しておけず、相手が改心するまで攻撃の手を緩めることはない。その精神とパワーから、デジタルワールドの女神的存在と言われている。必殺技の強力な雷撃『ホーリーアロー』は別名「天誅」ともいわれ、また、美しさと優しさの詰まった必殺光線『ヘブンズチャーム』は、デジモンの悪しき力が強いほど効果を発揮する。 "
+         },
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"An Archangel Digimon with the appearance of a beautiful woman. Although it was previously classified as an Angel-type, it was confirmed as an Archangel-type because of the greatness of its abilities. As their trait, Adult angels have six wings, and Perfect angels have eight wings. Although its personality is extremely gentle, it cannot forgive those who are crooked or evil, and it won't stay its hand from attacking until the opponent converts. Because of its soul and power, it is said to be a being like a goddess of the Digital World. The powerful lightning-strike of its Special Move \"Holy Arrow\" is also known as \"Heaven's Punishment\", and its deadly ray of light \"Heaven's Charm\", which is packed with beauty and affection, demonstrates its strongest efficacy against the evil powers of Digimon. "
+         }
+      ],
+      "skills":[
+         {
+            "id":2759,
+            "skill":"Holy Slap",
+            "translation":"",
+            "description":"Slaps the enemy. "
+         },
+         {
+            "id":2758,
+            "skill":"Holy Charm",
+            "translation":"",
+            "description":"Destroys the enemy by radiating six rings of pink light in a cross-like pattern. "
+         },
+         {
+            "id":2765,
+            "skill":"Holy Attack",
+            "translation":"",
+            "description":"Jumps into the air and then dives diagonally downwards foot-first. "
+         },
+         {
+            "id":2762,
+            "skill":"Angel Wing",
+            "translation":"",
+            "description":"Flaps its wings to gain altitude. Dive-bombs the enemy and attacks with a cartwheel. "
+         },
+         {
+            "id":1512,
+            "skill":"Holy Arrow",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":2764,
+            "skill":"Saint Air",
+            "translation":"",
+            "description":"Creates a halo that radiates rainbow light to harm evil. It can heal allies and absorb their attacks to power up Holy Arrow. Creates a holy tornado. "
+         },
+         {
+            "id":2761,
+            "skill":"Heaven's Cure",
+            "translation":"",
+            "description":"Heals its allies. "
+         },
+         {
+            "id":1309,
+            "skill":"Flying Kick",
+            "translation":"",
+            "description":"Soars into the air, dishing out a kick from above. "
+         },
+         {
+            "id":2763,
+            "skill":"Holy Kick",
+            "translation":"",
+            "description":"Kick-flips upwards. Attacks with a cartwheel. "
+         },
+         {
+            "id":2760,
+            "skill":"Holy Charge Kick",
+            "translation":"",
+            "description":"Charges up, flips and then flies forward foot-first. "
+         },
+         {
+            "id":2767,
+            "skill":"Super Jump",
+            "translation":"",
+            "description":"Uses holy power to shoot upwards into the air. "
+         },
+         {
+            "id":2766,
+            "skill":"Holy Dash",
+            "translation":"",
+            "description":"A sliding kick along the ground. "
+         },
+         {
+            "id":1511,
+            "skill":"Heaven's Charm",
+            "translation":"",
+            "description":"A deadly ray of light which is packed with beauty and affection, demonstratating its strongest efficacy against the evil powers of Digimon. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":946,
+            "digimon":"Garurumon",
+            "condition":"with any Vaccine Adult Digimon of the Pendulum Ver.20th series"
+         },
+         {
+            "id":655,
+            "digimon":"Stingmon (Black)",
+            "condition":""
+         },
+         {
+            "id":1329,
+            "digimon":"Scumon",
+            "condition":""
+         },
+         {
+            "id":216,
+            "digimon":"Tyranomon",
+            "condition":"with Angemon"
+         },
+         {
+            "id":1024,
+            "digimon":"Stingmon",
+            "condition":""
+         },
+         {
+            "id":1191,
+            "digimon":"Sorcerimon",
+            "condition":""
+         },
+         {
+            "id":772,
+            "digimon":"Lopmon",
+            "condition":"with Warp Evolution"
+         },
+         {
+            "id":1140,
+            "digimon":"Wizarmon",
+            "condition":"with Tailmon and Starmon"
+         },
+         {
+            "id":708,
+            "digimon":"Plotmon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":1362,
+            "digimon":"Nefertimon",
+            "condition":""
+         },
+         {
+            "id":361,
+            "digimon":"Tailmon (X-Antibody)",
+            "condition":"with or without Starmon or Starmon X-Antibody"
+         },
+         {
+            "id":346,
+            "digimon":"Tailmon",
+            "condition":"with or without the Crest of Light, Starmon, Starmon X-Antibody, Aquilamon, or Wizarmon and Starmon"
+         },
+         {
+            "id":879,
+            "digimon":"Angemon",
+            "condition":"with or without any Vaccine Adult Digimon of the Pendulum Ver.20th series, Witchmon, Tyranomon or Dobermon"
+         },
+         {
+            "id":1128,
+            "digimon":"Starmon (X-Antibody)",
+            "condition":"with Tailmon or Tailmon X-Antibody"
+         },
+         {
+            "id":174,
+            "digimon":"Monochromon (X-Antibody)",
+            "condition":"with Kabuterimon"
+         },
+         {
+            "id":1351,
+            "digimon":"Meicoomon",
+            "condition":""
+         },
+         {
+            "id":360,
+            "digimon":"Unimon",
+            "condition":""
+         },
+         {
+            "id":824,
+            "digimon":"Pidmon",
+            "condition":""
+         },
+         {
+            "id":1375,
+            "digimon":"Yukidarumon",
+            "condition":""
+         },
+         {
+            "id":1006,
+            "digimon":"Leomon",
+            "condition":""
+         },
+         {
+            "id":1295,
+            "digimon":"Witchmon",
+            "condition":"with Angemon"
+         },
+         {
+            "id":709,
+            "digimon":"Reppamon",
+            "condition":""
+         },
+         {
+            "id":781,
+            "digimon":"Dobermon",
+            "condition":"with Angemon"
+         },
+         {
+            "id":178,
+            "digimon":"Nefertimon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":892,
+            "digimon":"Sangloupmon",
+            "condition":""
+         },
+         {
+            "id":649,
+            "digimon":"Thunderbirmon",
+            "condition":""
+         },
+         {
+            "id":1115,
+            "digimon":"Kabuterimon",
+            "condition":"with Monochromon or Monochromon X-Antibody"
+         },
+         {
+            "id":723,
+            "digimon":"Sunflowmon",
+            "condition":""
+         },
+         {
+            "id":411,
+            "digimon":"Starmon",
+            "condition":"with Tailmon, Tailmon X-Antibody, or any Vaccine Adult Digimon of the Pendulum Ver.20th series or Tailmon and Wizarmon"
+         },
+         {
+            "id":806,
+            "digimon":"Monochromon",
+            "condition":"with Kabuterimon or any Vaccine Adult Digimon of the Pendulum Ver.20th series"
+         },
+         {
+            "id":547,
+            "digimon":"Darcmon",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":541,
+            "digimon":"Clavis Angemon",
+            "condition":""
+         },
+         {
+            "id":1188,
+            "digimon":"Mugendramon",
+            "condition":"with Andromon"
+         },
+         {
+            "id":1405,
+            "digimon":"Rosemon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":988,
+            "digimon":"Holydramon",
+            "condition":"with or without Lilimon, Holy Angemon, Lilamon, or Jyagamon or Atlur Kabuterimon Red, Kyukimon and Airdramon"
+         },
+         {
+            "id":1183,
+            "digimon":"Omegamon",
+            "condition":"with certain Digimon from the Pendulum Ver.20th series"
+         },
+         {
+            "id":525,
+            "digimon":"Shakamon",
+            "condition":""
+         },
+         {
+            "id":1243,
+            "digimon":"Ofanimon",
+            "condition":"with or without Piccolomon and Unimon or Gargomon, Valkyrimon, and Sleipmon"
+         },
+         {
+            "id":903,
+            "digimon":"Mastemon",
+            "condition":"with or without Lady Devimon or Any Purple Lv.5 Digimon from the Digimon Card Game"
+         },
+         {
+            "id":1052,
+            "digimon":"Rasenmon(Fury Mode)",
+            "condition":""
+         },
+         {
+            "id":415,
+            "digimon":"Beelzebumon",
+            "condition":""
+         },
+         {
+            "id":997,
+            "digimon":"Junomon",
+            "condition":""
+         },
+         {
+            "id":1389,
+            "digimon":"Sleipmon",
+            "condition":""
+         },
+         {
+            "id":1292,
+            "digimon":"Rosemon",
+            "condition":""
+         },
+         {
+            "id":215,
+            "digimon":"Marin Angemon",
+            "condition":""
+         },
+         {
+            "id":1245,
+            "digimon":"Venusmon",
+            "condition":""
+         },
+         {
+            "id":1150,
+            "digimon":"Lilithmon",
+            "condition":""
+         },
+         {
+            "id":1055,
+            "digimon":"Baihumon",
+            "condition":"with a Virus or Data Attribute Perfect Digimon from the Digimon Pendulum Z"
+         },
+         {
+            "id":790,
+            "digimon":"Babamon",
+            "condition":""
+         },
+         {
+            "id":1417,
+            "digimon":"War Greymon",
+            "condition":"with Cyberdramon"
+         },
+         {
+            "id":1280,
+            "digimon":"Crossmon",
+            "condition":"with Garudamon"
+         },
+         {
+            "id":137,
+            "digimon":"Valkyrimon",
+            "condition":"with or without Silphymon, Delumon or Owlmon"
+         },
+         {
+            "id":1181,
+            "digimon":"Shine Greymon",
+            "condition":""
+         },
+         {
+            "id":102,
+            "digimon":"Seraphimon",
+            "condition":"with or without Holy Angemon, Shakkoumon and Parrotmon"
+         },
+         {
+            "id":184,
+            "digimon":"Dynasmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":545,
+            "digimon":"Angewomon (X-Antibody)",
+            "condition":"with X-Antibody"
+         },
+         {
+            "id":170,
+            "digimon":"Lady Devimon",
+            "condition":""
+         },
+         {
+            "id":223,
+            "digimon":"Belial Vamdemon",
+            "condition":""
+         },
+         {
+            "id":747,
+            "digimon":"Plesiomon",
+            "condition":"with Whamon Perfect"
+         },
+         {
+            "id":1289,
+            "digimon":"Hououmon",
+            "condition":""
+         },
+         {
+            "id":1324,
+            "digimon":"Lovely Angemon",
+            "condition":""
+         },
+         {
+            "id":658,
+            "digimon":"Darkdramon",
+            "condition":""
+         },
+         {
+            "id":502,
+            "digimon":"Lord Knightmon",
+            "condition":""
+         },
+         {
+            "id":329,
+            "digimon":"Grand Dracumon",
+            "condition":"with Matadrmon"
+         },
+         {
+            "id":589,
+            "digimon":"Ofanimon(Falldown Mode)",
+            "condition":""
+         }
+      ]
+   },
+   {
+      "id":878,
+      "name":"Gomamon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Gomamon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":7,
+            "level":"Child"
+         }
+      ],
+      "types":[
+         {
+            "id":81,
+            "type":"Marine Animal"
+         }
+      ],
+      "attributes":[
+         {
+            "id":3,
+            "attribute":"Vaccine"
+         }
+      ],
+      "fields":[
+         {
+            "id":6,
+            "field":"Deep Savers"
+         }
+      ],
+      "releaseDate":"1998",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A Marine Animal Digimon that became able to move on land, and is covered in temperature-maintaining fur. The short, white fur that covers its body gets longer as it grows, and furthermore, it's said that it turns brown when it grows up. Its personality is a naughty-boy type that fiddles with everything it sees. The red fur growing along its back from the top of its head moves according to Gomamon's emotions, and when it gets angry the fur bristles. Gomamon's claws are strong enough to easily break through solid ice, so you'll have a painful experience if you take it lightly. Its Special Move is commanding its tiny fish followers (Marching Fishes). "
+         },
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"陸上での活動が可能になり、体温を保つ毛皮で覆われた海獣型デジモン。体を覆う短く白い体毛は成長するほど長くなり、更に成長すると茶色く変色していくという。性格は、見るもの全てにちょっかいを出すやんちゃ坊主タイプ。頭から背中にかけて生えている赤い毛はゴマモンの感情に合わせて動き、怒っているときは毛が逆立つ。ゴマモンの爪は硬い氷を簡単に砕くほどで、侮っているといたい目をみる。必殺技は子分の小魚達を操る『マーチングフィッシィーズ』。 "
+         }
+      ],
+      "skills":[
+         {
+            "id":2311,
+            "skill":"Giant Water Current Strike",
+            "translation":"",
+            "description":"A larger, stronger version of Giant Water Current. "
+         },
+         {
+            "id":597,
+            "skill":"Surudoi Tsume",
+            "translation":"Sharp Claw",
+            "description":"Uses its claws to rend the opponent. "
+         },
+         {
+            "id":2312,
+            "skill":"Gomamon Head-Butt",
+            "translation":"",
+            "description":"Launches itself at the enemy head-first. "
+         },
+         {
+            "id":2314,
+            "skill":"Surfer Dive",
+            "translation":"",
+            "description":"Jumps into the air to body slam the enemy. "
+         },
+         {
+            "id":2315,
+            "skill":"Tail Slap",
+            "translation":"",
+            "description":"Kicks the foe while flipping. "
+         },
+         {
+            "id":2172,
+            "skill":"Water Shot",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":2309,
+            "skill":"Sliding Seal",
+            "translation":"",
+            "description":"Slides under opponent's feet, causing his opponent to trip. "
+         },
+         {
+            "id":2318,
+            "skill":"Water Current Throw",
+            "translation":"",
+            "description":"Throws the opponent upwards with its forelegs and a blast of spray. "
+         },
+         {
+            "id":2317,
+            "skill":"Marching Fishes",
+            "translation":"",
+            "description":"Summons a school of colorful flying fish. "
+         },
+         {
+            "id":2044,
+            "skill":"Sharp Edge",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":2316,
+            "skill":"Bubble Barrier",
+            "translation":"",
+            "description":"Encases itself in bubble of water that repels attacks and hurts foes. "
+         },
+         {
+            "id":2310,
+            "skill":"Water Current Ball",
+            "translation":"",
+            "description":"Spits water from its mouth. "
+         },
+         {
+            "id":2313,
+            "skill":"Giant Water Current",
+            "translation":"",
+            "description":"Hits the enemy with a wave of water. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":1240,
+            "digimon":"Tunomon",
+            "condition":""
+         },
+         {
+            "id":26,
+            "digimon":"Pukamon",
+            "condition":""
+         },
+         {
+            "id":755,
+            "digimon":"Poyomon",
+            "condition":""
+         },
+         {
+            "id":532,
+            "digimon":"Wanyamon",
+            "condition":""
+         },
+         {
+            "id":466,
+            "digimon":"Budmon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Digitama",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":58,
+            "digimon":"Vikemon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":946,
+            "digimon":"Garurumon",
+            "condition":"with Gabumon"
+         },
+         {
+            "id":646,
+            "digimon":"Seadramon",
+            "condition":""
+         },
+         {
+            "id":1136,
+            "digimon":"Coelamon",
+            "condition":""
+         },
+         {
+            "id":1024,
+            "digimon":"Stingmon",
+            "condition":""
+         },
+         {
+            "id":731,
+            "digimon":"Octmon",
+            "condition":""
+         },
+         {
+            "id":752,
+            "digimon":"Drimogemon",
+            "condition":"with Gizamon"
+         },
+         {
+            "id":1191,
+            "digimon":"Sorcerimon",
+            "condition":""
+         },
+         {
+            "id":97,
+            "digimon":"Ankylomon",
+            "condition":""
+         },
+         {
+            "id":1375,
+            "digimon":"Yukidarumon",
+            "condition":""
+         },
+         {
+            "id":413,
+            "digimon":"Tortamon",
+            "condition":""
+         },
+         {
+            "id":723,
+            "digimon":"Sunflowmon",
+            "condition":""
+         },
+         {
+            "id":938,
+            "digimon":"Gesomon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":623,
+            "digimon":"Manbomon",
+            "condition":""
+         },
+         {
+            "id":322,
+            "digimon":"Aegisdramon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":793,
+            "digimon":"Mantaraymon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":103,
+            "digimon":"Orcamon",
+            "condition":""
+         },
+         {
+            "id":1303,
+            "digimon":"Growmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1006,
+            "digimon":"Leomon",
+            "condition":""
+         },
+         {
+            "id":1329,
+            "digimon":"Scumon",
+            "condition":""
+         },
+         {
+            "id":493,
+            "digimon":"Mojyamon",
+            "condition":""
+         },
+         {
+            "id":1246,
+            "digimon":"XV-mon",
+            "condition":""
+         },
+         {
+            "id":778,
+            "digimon":"Raremon",
+            "condition":""
+         },
+         {
+            "id":747,
+            "digimon":"Plesiomon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":847,
+            "digimon":"Tylomon",
+            "condition":""
+         },
+         {
+            "id":1351,
+            "digimon":"Meicoomon",
+            "condition":""
+         },
+         {
+            "id":599,
+            "digimon":"Gesomon",
+            "condition":""
+         },
+         {
+            "id":573,
+            "digimon":"Allomon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1248,
+            "digimon":"Gomamon (X-Antibody)",
+            "condition":"with the X-Antibody"
+         },
+         {
+            "id":null,
+            "digimon":"Whamon Adult",
+            "condition":""
+         },
+         {
+            "id":694,
+            "digimon":"Gaogamon",
+            "condition":""
+         },
+         {
+            "id":1342,
+            "digimon":"Rukamon",
+            "condition":"with or without Penmon"
+         },
+         {
+            "id":561,
+            "digimon":"Icemon",
+            "condition":""
+         },
+         {
+            "id":819,
+            "digimon":"Tylomon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":969,
+            "digimon":"Ikkakumon",
+            "condition":""
+         },
+         {
+            "id":992,
+            "digimon":"Urashimamon",
+            "condition":"With the Digimental of Sincerity"
+         },
+         {
+            "id":371,
+            "digimon":"Numemon",
+            "condition":""
+         },
+         {
+            "id":1124,
+            "digimon":"Chackmon",
+            "condition":""
+         },
+         {
+            "id":458,
+            "digimon":"Ebidramon",
+            "condition":""
+         },
+         {
+            "id":340,
+            "digimon":"Strikedramon",
+            "condition":""
+         },
+         {
+            "id":816,
+            "digimon":"Gawappamon",
+            "condition":""
+         }
+      ]
+   },
+   {
+      "id":1190,
+      "name":"Terriermon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Terriermon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":7,
+            "level":"Child"
+         }
+      ],
+      "types":[
+         {
+            "id":21,
+            "type":"Beast"
+         }
+      ],
+      "attributes":[
+         {
+            "id":3,
+            "attribute":"Vaccine"
+         },
+         {
+            "id":6,
+            "attribute":"Data"
+         }
+      ],
+      "fields":[
+         {
+            "id":1,
+            "field":"Nature Spirits"
+         },
+         {
+            "id":3,
+            "field":"Wind Guardians"
+         },
+         {
+            "id":2,
+            "field":"Virus Busters"
+         },
+         {
+            "id":5,
+            "field":"Metal Empire"
+         }
+      ],
+      "releaseDate":"2000",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"With one horn growing from its head, it is a Digimon shrouded in mystery. It can be classified as a Beast Digimon from its body structure, but it's still not understood what kind of evolved form it will take on. Also, it is rumored that it is sometimes born with a twin. It's a very cute type of Digimon, and from its calm behavior it doesn't seem like a \"Combat Species\" Digimon, but in the case of battle, it shows that it is more powerful than it appears. Its Signature Move is generating a tiny tornado by spinning its ears like a propeller (Petit Twister). Its Special Move is spewing out a shot of superheated air (Blazing Fire). Also, it possesses a powerful might in the Unison Technique Double Typhoon that it performs with Lopmon, its twin. "
+         },
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"頭部に１本角を生やした、謎に包まれたデジモン。体構造から獣系のデジモンであることは分類できるが、どのような進化形態を経たのかは依然分かっていない。また、稀に双子で誕生するという噂も存在する。非常に可愛らしいタイプのデジモンで、ゆったりとした行動からはとても“戦闘種族”としてのデジモンを実感することができないが、戦闘の際には、その見た目以上のパワーを発揮する。得意技は両耳をプロペラの様にして小型竜巻を起こす『プチツイスター』。必殺技は高熱の熱気弾を吐き出す『ブレイジングファイア』。また、双子の片割れであるといわれるロップモンとの合体技である『ダブルタイフーン』も強力な威力を持つという。 "
+         }
+      ],
+      "skills":[
+         {
+            "id":344,
+            "skill":"Petit Twister",
+            "translation":"",
+            "description":"Generates a tiny tornado by spinning its ears like a propeller. "
+         },
+         {
+            "id":3059,
+            "skill":"Terrier Punch",
+            "translation":"",
+            "description":"Slaps the enemy with one of its ears. "
+         },
+         {
+            "id":2063,
+            "skill":"Double Typhoon",
+            "translation":"",
+            "description":"A powerful unison technique with Terriermon. "
+         },
+         {
+            "id":3060,
+            "skill":"Kūchū Petit Twister Shot",
+            "translation":"Aerial Petit Twister Shot",
+            "description":" "
+         },
+         {
+            "id":3058,
+            "skill":"Terrier Balloon",
+            "translation":"",
+            "description":"Spreads its ears, enabling it to fall or glide slowly. "
+         },
+         {
+            "id":345,
+            "skill":"Blazing Fire",
+            "translation":"",
+            "description":"Spews out a shot of superheated air. "
+         },
+         {
+            "id":3061,
+            "skill":"Kūchū Petit Twister",
+            "translation":"Aerial Petit Twister",
+            "description":"Uses Petit Twister in midair. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":1373,
+            "digimon":"Gummymon",
+            "condition":""
+         },
+         {
+            "id":745,
+            "digimon":"Pinamon",
+            "condition":""
+         },
+         {
+            "id":1154,
+            "digimon":"Nyaromon",
+            "condition":""
+         },
+         {
+            "id":833,
+            "digimon":"Cupimon",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":999,
+            "digimon":"Culumon",
+            "condition":"with Lopmon, Lunamon and Piccolomon"
+         },
+         {
+            "id":717,
+            "digimon":"Dogmon",
+            "condition":""
+         },
+         {
+            "id":1323,
+            "digimon":"Galgomon",
+            "condition":"with or without Lopmon"
+         },
+         {
+            "id":1378,
+            "digimon":"Rinkmon",
+            "condition":""
+         },
+         {
+            "id":916,
+            "digimon":"Cherubimon (Virtue)",
+            "condition":"with Lopmon"
+         },
+         {
+            "id":547,
+            "digimon":"Darcmon",
+            "condition":""
+         },
+         {
+            "id":879,
+            "digimon":"Angemon",
+            "condition":""
+         },
+         {
+            "id":956,
+            "digimon":"Igamon",
+            "condition":""
+         },
+         {
+            "id":838,
+            "digimon":"Saint Galgomon",
+            "condition":"Warp Evolution with or without Lee Jianliang or Rapidmon and Brachiomon"
+         },
+         {
+            "id":null,
+            "digimon":"Greymon (Black)",
+            "condition":""
+         },
+         {
+            "id":900,
+            "digimon":"Black Tailmon",
+            "condition":""
+         },
+         {
+            "id":216,
+            "digimon":"Tyranomon",
+            "condition":""
+         },
+         {
+            "id":275,
+            "digimon":"Greymon",
+            "condition":""
+         },
+         {
+            "id":579,
+            "digimon":"Revolmon",
+            "condition":""
+         },
+         {
+            "id":988,
+            "digimon":"Holydramon",
+            "condition":"with Tailmon, Patamon, and Kudamon 2006 Anime Version"
+         },
+         {
+            "id":117,
+            "digimon":"Terriermon (X-Antibody)",
+            "condition":"with X-Antibody"
+         },
+         {
+            "id":558,
+            "digimon":"Harpymon",
+            "condition":""
+         },
+         {
+            "id":1070,
+            "digimon":"Thunderballmon",
+            "condition":""
+         },
+         {
+            "id":167,
+            "digimon":"Tankmon",
+            "condition":""
+         },
+         {
+            "id":458,
+            "digimon":"Ebidramon",
+            "condition":""
+         },
+         {
+            "id":175,
+            "digimon":"Togemogumon",
+            "condition":""
+         },
+         {
+            "id":243,
+            "digimon":"Hanumon",
+            "condition":"Jogressed with Bakumon or Goburimon"
+         },
+         {
+            "id":679,
+            "digimon":"Prairiemon",
+            "condition":""
+         },
+         {
+            "id":65,
+            "digimon":"Dark Tyranomon",
+            "condition":""
+         },
+         {
+            "id":391,
+            "digimon":"Seahomon",
+            "condition":""
+         },
+         {
+            "id":827,
+            "digimon":"Stegomon",
+            "condition":""
+         },
+         {
+            "id":1117,
+            "digimon":"Growmon",
+            "condition":"with or without Guilmon"
+         },
+         {
+            "id":949,
+            "digimon":"Geremon",
+            "condition":""
+         },
+         {
+            "id":639,
+            "digimon":"Siesamon",
+            "condition":""
+         },
+         {
+            "id":95,
+            "digimon":"Fangmon",
+            "condition":""
+         },
+         {
+            "id":1392,
+            "digimon":"Wendimon",
+            "condition":""
+         },
+         {
+            "id":278,
+            "digimon":"Löwemon",
+            "condition":""
+         },
+         {
+            "id":144,
+            "digimon":"Gargomon",
+            "condition":""
+         },
+         {
+            "id":355,
+            "digimon":"Magnamon",
+            "condition":"with the Digimental of Miracles"
+         },
+         {
+            "id":1118,
+            "digimon":"Dobermon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1175,
+            "digimon":"Clockmon",
+            "condition":""
+         },
+         {
+            "id":1295,
+            "digimon":"Witchmon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Rapidmon",
+            "condition":"with or without Digimental of Fate"
+         },
+         {
+            "id":437,
+            "digimon":"Devimon",
+            "condition":""
+         },
+         {
+            "id":1344,
+            "digimon":"Sealsdramon",
+            "condition":""
+         },
+         {
+            "id":352,
+            "digimon":"Orgemon",
+            "condition":""
+         },
+         {
+            "id":969,
+            "digimon":"Ikkakumon",
+            "condition":""
+         },
+         {
+            "id":483,
+            "digimon":"Centalmon",
+            "condition":"Jogressed with Kokuwamon or Hagurumon"
+         },
+         {
+            "id":371,
+            "digimon":"Numemon",
+            "condition":""
+         },
+         {
+            "id":1329,
+            "digimon":"Scumon",
+            "condition":""
+         },
+         {
+            "id":1079,
+            "digimon":"Turuiemon",
+            "condition":""
+         },
+         {
+            "id":806,
+            "digimon":"Monochromon",
+            "condition":""
+         },
+         {
+            "id":603,
+            "digimon":"Minotaurmon Adult",
+            "condition":""
+         },
+         {
+            "id":650,
+            "digimon":"Black Galgomon",
+            "condition":""
+         },
+         {
+            "id":511,
+            "digimon":"Dinohumon",
+            "condition":""
+         },
+         {
+            "id":1246,
+            "digimon":"XV-mon",
+            "condition":""
+         },
+         {
+            "id":1140,
+            "digimon":"Wizarmon",
+            "condition":""
+         },
+         {
+            "id":930,
+            "digimon":"Gladimon",
+            "condition":""
+         },
+         {
+            "id":166,
+            "digimon":"Eosmon (Adult)",
+            "condition":""
+         },
+         {
+            "id":346,
+            "digimon":"Tailmon",
+            "condition":""
+         },
+         {
+            "id":1123,
+            "digimon":"Holsmon",
+            "condition":""
+         },
+         {
+            "id":646,
+            "digimon":"Seadramon",
+            "condition":""
+         },
+         {
+            "id":1228,
+            "digimon":"Gorimon",
+            "condition":""
+         },
+         {
+            "id":1351,
+            "digimon":"Meicoomon",
+            "condition":""
+         },
+         {
+            "id":1006,
+            "digimon":"Leomon",
+            "condition":"with Plotmon and Goblimon"
+         },
+         {
+            "id":533,
+            "digimon":"Maildramon",
+            "condition":""
+         }
+      ]
+   },
+   {
+      "id":437,
+      "name":"Devimon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Devimon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":3,
+            "level":"Adult"
+         }
+      ],
+      "types":[
+         {
+            "id":40,
+            "type":"Fallen Angel"
+         }
+      ],
+      "attributes":[
+         {
+            "id":4,
+            "attribute":"Virus"
+         }
+      ],
+      "fields":[
+         {
+            "id":7,
+            "field":"Dark Area"
+         },
+         {
+            "id":8,
+            "field":"Nightmare Soldiers"
+         }
+      ],
+      "releaseDate":"1997",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"漆黒の衣に身を包んだ堕天使型デジモン。元々は光り輝くエンジェモン系デジモンだったが、デジタルワールドの空間の歪に存在するダークエリアに堕ちたことにより堕天使となった。その証である悪のマークが胸に大きく浮かんでいる。狡猾で凶悪な性格だが、非常に優れた知性の持ち主でもある。深紅に輝く両眼に見つめられたものはマインドコントロールされ、デビモンに支配されてしまうと言われている。必殺技の『デスクロウ』は伸縮自在の両腕を伸ばし、相手の体を貫き通す。 "
+         },
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A Fallen Angel Digimon whose body is clad in jet-black cloth. Although it was originally a shining Angemon-species Digimon, by falling to the Dark Area, which exists in a spatial distortion of the Digital World, it became a fallen angel. As proof of that, the Mark of Evil surfaced dramatically on its chest. It has a cunning and fiendish personality, but it also possesses an outstanding intellect. It is said that those who have stared into its two eyes, which shine a deep crimson, are mind-controlled and completely dominated by Devimon. Its Special Move \"Death Claw\" is extending both of its extensible arms, and enforcing its will on the opponent's body. "
+         }
+      ],
+      "skills":[
+         {
+            "id":1248,
+            "skill":"Death Hand",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":1253,
+            "skill":"Death Claw",
+            "translation":"",
+            "description":"Extends its claws to puncture the enemy's body. Can also brainwash them. "
+         },
+         {
+            "id":1249,
+            "skill":"Deadly Nail",
+            "translation":"",
+            "description":"Scratches using the nails on both hands. "
+         },
+         {
+            "id":1250,
+            "skill":"Demon's Ray",
+            "translation":"",
+            "description":"Radiates dark energy from its hands. "
+         },
+         {
+            "id":1251,
+            "skill":"Leather Wing",
+            "translation":"",
+            "description":"Flaps its wings to fire destructive energy from them, summon a dark tornado, or crush enemies with air pressure. "
+         },
+         {
+            "id":1252,
+            "skill":"Hell Contract",
+            "translation":"",
+            "description":"Sends a cloud of cursed Digimoji at the enemy or summons up a cursed contract to confuse them. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":772,
+            "digimon":"Lopmon",
+            "condition":""
+         },
+         {
+            "id":1202,
+            "digimon":"Hagurumon",
+            "condition":""
+         },
+         {
+            "id":839,
+            "digimon":"Algomon (Child)",
+            "condition":""
+         },
+         {
+            "id":1226,
+            "digimon":"Agumon (Black)",
+            "condition":""
+         },
+         {
+            "id":868,
+            "digimon":"Bearmon",
+            "condition":""
+         },
+         {
+            "id":980,
+            "digimon":"Gazimon",
+            "condition":""
+         },
+         {
+            "id":978,
+            "digimon":"Mushmon",
+            "condition":""
+         },
+         {
+            "id":114,
+            "digimon":"Patamon",
+            "condition":""
+         },
+         {
+            "id":289,
+            "digimon":"Agumon",
+            "condition":""
+         },
+         {
+            "id":1092,
+            "digimon":"Ghostmon",
+            "condition":""
+         },
+         {
+            "id":771,
+            "digimon":"Lucemon",
+            "condition":""
+         },
+         {
+            "id":1252,
+            "digimon":"Impmon",
+            "condition":"with Pico Devimon"
+         },
+         {
+            "id":879,
+            "digimon":"Angemon",
+            "condition":"Death Evolution"
+         },
+         {
+            "id":605,
+            "digimon":"Tukaimon",
+            "condition":""
+         },
+         {
+            "id":1190,
+            "digimon":"Terriermon",
+            "condition":""
+         },
+         {
+            "id":204,
+            "digimon":"Goburimon",
+            "condition":""
+         },
+         {
+            "id":1135,
+            "digimon":"Pico Devimon",
+            "condition":"with or without Impmon"
+         },
+         {
+            "id":293,
+            "digimon":"Koemon",
+            "condition":""
+         },
+         {
+            "id":1034,
+            "digimon":"Betamon",
+            "condition":""
+         },
+         {
+            "id":1267,
+            "digimon":"Toy Agumon",
+            "condition":""
+         },
+         {
+            "id":888,
+            "digimon":"Kokuwamon",
+            "condition":""
+         },
+         {
+            "id":1197,
+            "digimon":"Petit Mamon",
+            "condition":""
+         },
+         {
+            "id":1162,
+            "digimon":"Candmon",
+            "condition":""
+         },
+         {
+            "id":1073,
+            "digimon":"Wormmon",
+            "condition":""
+         },
+         {
+            "id":543,
+            "digimon":"Guilmon",
+            "condition":""
+         },
+         {
+            "id":818,
+            "digimon":"Gizamon",
+            "condition":""
+         },
+         {
+            "id":970,
+            "digimon":"Renamon",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":1185,
+            "digimon":"Big Mamemon",
+            "condition":"with Greymon or Revolmon"
+         },
+         {
+            "id":552,
+            "digimon":"Astamon",
+            "condition":"with or without Mad Leomon or Shadramon"
+         },
+         {
+            "id":1360,
+            "digimon":"Ice Devimon",
+            "condition":""
+         },
+         {
+            "id":1385,
+            "digimon":"Andiramon",
+            "condition":""
+         },
+         {
+            "id":644,
+            "digimon":"Bastemon",
+            "condition":""
+         },
+         {
+            "id":1264,
+            "digimon":"Baalmon",
+            "condition":""
+         },
+         {
+            "id":595,
+            "digimon":"Aero V-dramon",
+            "condition":"with V-dramon or XV-mon"
+         },
+         {
+            "id":164,
+            "digimon":"Waru Monzaemon",
+            "condition":"with Jungle Mojyamon or one of Mechanorimon, Guardromon, Tankmon, Clockmon, or Thunderballmon"
+         },
+         {
+            "id":567,
+            "digimon":"Skull Greymon",
+            "condition":""
+         },
+         {
+            "id":954,
+            "digimon":"Vademon",
+            "condition":""
+         },
+         {
+            "id":227,
+            "digimon":"Metal Mamemon",
+            "condition":"with Garurumon, Greymon, Angemon, Leomon, or Tailmon"
+         },
+         {
+            "id":542,
+            "digimon":"Dark Knightmon",
+            "condition":"with Porcupamon"
+         },
+         {
+            "id":170,
+            "digimon":"Lady Devimon",
+            "condition":"with or without Devidramon and Cockatrimon or certain Digimon of the Pendulum series"
+         },
+         {
+            "id":null,
+            "digimon":"Savior Huckmon",
+            "condition":"with Targetmon"
+         },
+         {
+            "id":1088,
+            "digimon":"Mephismon",
+            "condition":""
+         },
+         {
+            "id":80,
+            "digimon":"Neo Devimon",
+            "condition":"with or without Arkadimon's data"
+         },
+         {
+            "id":845,
+            "digimon":"Done Devimon",
+            "condition":""
+         },
+         {
+            "id":861,
+            "digimon":"Crescemon",
+            "condition":""
+         },
+         {
+            "id":464,
+            "digimon":"Deathmon",
+            "condition":"with Phascomon and Barbamon"
+         },
+         {
+            "id":1216,
+            "digimon":"Groundramon",
+            "condition":"with Devidramon"
+         },
+         {
+            "id":1004,
+            "digimon":"Tonosama Gekomon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":782,
+            "digimon":"Megadramon",
+            "condition":"with or without Coredramon Green"
+         },
+         {
+            "id":1319,
+            "digimon":"Marin Devimon",
+            "condition":"with Skull Knightmon"
+         },
+         {
+            "id":1139,
+            "digimon":"Andiramon (Deva)",
+            "condition":""
+         },
+         {
+            "id":234,
+            "digimon":"Infermon",
+            "condition":""
+         },
+         {
+            "id":224,
+            "digimon":"Pajiramon",
+            "condition":""
+         },
+         {
+            "id":219,
+            "digimon":"Skull Satamon",
+            "condition":"with or without Orgemon or Dark Lizamon"
+         },
+         {
+            "id":37,
+            "digimon":"Cyberdramon (2010 Anime Version)",
+            "condition":"with a Vaccine Attribute Adult Digimon from the Vital Bracelet Digital Monster"
+         },
+         {
+            "id":514,
+            "digimon":"Pumpmon",
+            "condition":"with Hanumon, certain Digimon of the Pendulum series, or a Data Attribute Adult Digimon from the Vital Bracelet Digital Monster"
+         },
+         {
+            "id":1268,
+            "digimon":"Megalo Growmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":533,
+            "digimon":"Maildramon",
+            "condition":""
+         },
+         {
+            "id":540,
+            "digimon":"Anomalocarimon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":683,
+            "digimon":"Piccolomon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":688,
+            "digimon":"Neo Vamdemon Darkness Mode (Vampire Army)",
+            "condition":"with Neo Vamdemon and Lady Devimon"
+         },
+         {
+            "id":813,
+            "digimon":"Fantomon",
+            "condition":"with or without Meramon, certain Digimon of the Pendulum series, Bakemon, Meramon, Wizarmon, or a Free Attribute Adult Digimon from the Vital Bracelet Digital Monster"
+         },
+         {
+            "id":1284,
+            "digimon":"Mametyramon",
+            "condition":""
+         },
+         {
+            "id":791,
+            "digimon":"Rapidmon Armor",
+            "condition":""
+         },
+         {
+            "id":534,
+            "digimon":"Doumon",
+            "condition":""
+         },
+         {
+            "id":477,
+            "digimon":"Jokermon",
+            "condition":""
+         },
+         {
+            "id":617,
+            "digimon":"Monzaemon",
+            "condition":""
+         },
+         {
+            "id":648,
+            "digimon":"Phelesmon",
+            "condition":"with Boogiemon"
+         },
+         {
+            "id":1056,
+            "digimon":"Algomon (Perfect)",
+            "condition":"with Zassoumon or with a Virus or Free Attribute Adult Digimon from the Digimon Pendulum Z"
+         },
+         {
+            "id":598,
+            "digimon":"Megalo Growmon (Orange)",
+            "condition":""
+         },
+         {
+            "id":358,
+            "digimon":"Demon",
+            "condition":"with Devidramon"
+         },
+         {
+            "id":349,
+            "digimon":"Dagomon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":1339,
+            "digimon":"Megalo Growmon",
+            "condition":""
+         },
+         {
+            "id":714,
+            "digimon":"Blue Meramon",
+            "condition":""
+         },
+         {
+            "id":706,
+            "digimon":"Metal Greymon",
+            "condition":""
+         },
+         {
+            "id":857,
+            "digimon":"Mummymon",
+            "condition":"with Porcupamon or Nanimon"
+         },
+         {
+            "id":1339,
+            "digimon":"Megalo Growmon",
+            "condition":"with Arresterdramon or Reppamon"
+         },
+         {
+            "id":20,
+            "digimon":"Etemon",
+            "condition":"with Bao Huckmon or Zubaeagermon"
+         },
+         {
+            "id":1104,
+            "digimon":"Death Meramon",
+            "condition":""
+         },
+         {
+            "id":479,
+            "digimon":"Metal Greymon (Virus)",
+            "condition":""
+         },
+         {
+            "id":350,
+            "digimon":"Hangyomon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":1063,
+            "digimon":"Angewomon",
+            "condition":""
+         },
+         {
+            "id":239,
+            "digimon":"Asuramon",
+            "condition":"with Igamon"
+         },
+         {
+            "id":1372,
+            "digimon":"Ginkakumon Promote",
+            "condition":""
+         },
+         {
+            "id":161,
+            "digimon":"Black War Greymon",
+            "condition":""
+         },
+         {
+            "id":536,
+            "digimon":"Chimairamon",
+            "condition":"with or without Kabuterimon or Kabuterimon, Kuwagamon, Greymon and Garurumon or with a Vaccine or Data Attribute Adult Digimon from the Digimon Pendulum Z"
+         },
+         {
+            "id":1336,
+            "digimon":"Sandiramon",
+            "condition":""
+         },
+         {
+            "id":3,
+            "digimon":"Holy Angemon",
+            "condition":""
+         },
+         {
+            "id":40,
+            "digimon":"Beowolfmon",
+            "condition":"with Growmon"
+         },
+         {
+            "id":1163,
+            "digimon":"Kaiser Leomon",
+            "condition":""
+         },
+         {
+            "id":488,
+            "digimon":"Cerberumon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":635,
+            "digimon":"Ancient Sphinxmon",
+            "condition":"Ancient Evolution"
+         },
+         {
+            "id":1198,
+            "digimon":"Vamdemon",
+            "condition":"with or without certain Digimon of the Pendulum series or Devidramon and Bakemon"
+         },
+         {
+            "id":33,
+            "digimon":"Gerbemon",
+            "condition":"with Red Vegimon, Woodmon, Togemon, or Kiwimon"
+         },
+         {
+            "id":585,
+            "digimon":"Gulfmon",
+            "condition":"with Mephismon"
+         },
+         {
+            "id":null,
+            "digimon":"Lucemon Falldown Mode",
+            "condition":"with or without Angemon"
+         }
+      ]
+   },
+   
+   {
+      "id":1006,
+      "name":"Leomon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Leomon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":3,
+            "level":"Adult"
+         }
+      ],
+      "types":[
+         {
+            "id":30,
+            "type":"Beast Man"
+         }
+      ],
+      "attributes":[
+         {
+            "id":3,
+            "attribute":"Vaccine"
+         }
+      ],
+      "fields":[
+         {
+            "id":1,
+            "field":"Nature Spirits"
+         },
+         {
+            "id":2,
+            "field":"Virus Busters"
+         }
+      ],
+      "releaseDate":"1998",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"百獣の王、気高き勇者とも呼ばれる獣人型デジモン。狂暴なデジモン達が多い中、強い意思と正義の心を持っており、数多くの凶悪なデジモンを倒してきた。また、破壊の限りを尽くす“デジモンハンター”のオーガモンとはライバルである。日々の鍛錬で鍛え上げられた強靭な肉体はあらゆる攻撃に耐え、必殺技の究極奥義『獣王拳』で敵の息の根を止めてしまう。「獅子王丸」という意思を持った妖刀を腰に携えている。 "
+         },
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A Beast Man Digimon which is called the \"King of Beasts\", as well as the \"Noble Hero\". While most Digimon are savage, it possesses a strong purpose and a heart of justice, and has defeated a great number of fiendish Digimon. Also, it is a rival to the \"Digimon Hunter\" Orgemon, who runs the whole gamut of destruction. Its tough flesh, tempered well by daily training, can endure any attack, and it chokes the life out of the opponent with its ultimate secret technique, its Special Move \"Jūouken\". It carries a sentient magical sword named \"Shishiou-maru\" on its waist. "
+         }
+      ],
+      "skills":[
+         {
+            "id":2118,
+            "skill":"Jūga-maru",
+            "translation":"Beast Fang",
+            "description":"Uses its longsword Jūga-maru to attack. "
+         },
+         {
+            "id":670,
+            "skill":"Shishi Jūhazan",
+            "translation":"Lion Beast Wave Slash",
+            "description":"Spins the turbines on its arms at top speed and attacks with a punch powerful enough to distort gravity. "
+         },
+         {
+            "id":2632,
+            "skill":"Hasaigeri",
+            "translation":"Crushing Kick",
+            "description":"Attacks the enemy with a roundhouse kick. "
+         },
+         {
+            "id":2629,
+            "skill":"Shishiou-maru",
+            "translation":"Lion King",
+            "description":"Slices at the foe with its sword, Shishiou-maru. "
+         },
+         {
+            "id":146,
+            "skill":"Jūouha",
+            "translation":"Beast King Wave",
+            "description":"Shoots an energy blast from its open hand. "
+         },
+         {
+            "id":287,
+            "skill":"Jūouken",
+            "translation":"Beast King Fist",
+            "description":"Gathers energy in its right hand and shoots a wave of energy in the shape of a lion's head from it. "
+         },
+         {
+            "id":2630,
+            "skill":"Hyakujūken",
+            "translation":"Hundred Beast Fist",
+            "description":"Doing a series of movements with its arm, Leomon sends a barrage of lion heads against its enemy "
+         },
+         {
+            "id":2631,
+            "skill":"Shin Jūouken",
+            "translation":"True Beast King Fist",
+            "description":"After using Jūouken, performs a second Jūouken with its free hand. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":1278,
+            "digimon":"Gaomon",
+            "condition":"with or without Coronamon and Goburimon"
+         },
+         {
+            "id":722,
+            "digimon":"Labramon",
+            "condition":""
+         },
+         {
+            "id":153,
+            "digimon":"Arkadimon Child",
+            "condition":""
+         },
+         {
+            "id":991,
+            "digimon":"Piyomon",
+            "condition":""
+         },
+         {
+            "id":669,
+            "digimon":"Palmon",
+            "condition":""
+         },
+         {
+            "id":1267,
+            "digimon":"Toy Agumon",
+            "condition":""
+         },
+         {
+            "id":1003,
+            "digimon":"Coronamon",
+            "condition":"with Gaomon and Goburimon"
+         },
+         {
+            "id":1190,
+            "digimon":"Terriermon",
+            "condition":"with or without Plotmon and Goblimon"
+         },
+         {
+            "id":114,
+            "digimon":"Patamon",
+            "condition":""
+         },
+         {
+            "id":315,
+            "digimon":"Lalamon",
+            "condition":""
+         },
+         {
+            "id":1226,
+            "digimon":"Agumon (Black)",
+            "condition":""
+         },
+         {
+            "id":1032,
+            "digimon":"Ganimon",
+            "condition":""
+         },
+         {
+            "id":14,
+            "digimon":"Guilmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":980,
+            "digimon":"Gazimon",
+            "condition":""
+         },
+         {
+            "id":736,
+            "digimon":"Gazimon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":289,
+            "digimon":"Agumon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Huckmon",
+            "condition":""
+         },
+         {
+            "id":1282,
+            "digimon":"Agumon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":258,
+            "digimon":"Gabumon (Black)",
+            "condition":""
+         },
+         {
+            "id":394,
+            "digimon":"Gabumon",
+            "condition":""
+         },
+         {
+            "id":878,
+            "digimon":"Gomamon",
+            "condition":""
+         },
+         {
+            "id":868,
+            "digimon":"Bearmon",
+            "condition":""
+         },
+         {
+            "id":670,
+            "digimon":"Agumon (2006 Anime Version)",
+            "condition":""
+         },
+         {
+            "id":204,
+            "digimon":"Goburimon",
+            "condition":"with Gaomon and Coronamon or with Terriermon and Plotmon"
+         },
+         {
+            "id":1369,
+            "digimon":"Palmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":865,
+            "digimon":"Elecmon",
+            "condition":""
+         },
+         {
+            "id":543,
+            "digimon":"Guilmon",
+            "condition":""
+         },
+         {
+            "id":708,
+            "digimon":"Plotmon",
+            "condition":"with or without Terriermon and Goburimon"
+         },
+         {
+            "id":246,
+            "digimon":"Angoramon",
+            "condition":""
+         },
+         {
+            "id":1367,
+            "digimon":"Bakumon",
+            "condition":""
+         },
+         {
+            "id":1403,
+            "digimon":"Gabumon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":970,
+            "digimon":"Renamon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Elecmon (Virus)",
+            "condition":""
+         },
+         {
+            "id":485,
+            "digimon":"Penmon",
+            "condition":""
+         },
+         {
+            "id":104,
+            "digimon":"Liollmon",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":1,
+            "digimon":"Garummon",
+            "condition":""
+         },
+         {
+            "id":376,
+            "digimon":"Vikaralamon",
+            "condition":""
+         },
+         {
+            "id":1130,
+            "digimon":"Ancient Garurumon",
+            "condition":"Ancient Evolution"
+         },
+         {
+            "id":794,
+            "digimon":"Leomon (X-Antibody)",
+            "condition":"with X-Antibody"
+         },
+         {
+            "id":1264,
+            "digimon":"Baalmon",
+            "condition":"with Porcupamon"
+         },
+         {
+            "id":null,
+            "digimon":"Savior Huckmon",
+            "condition":"with Zubaeagermon"
+         },
+         {
+            "id":748,
+            "digimon":"Saber Leomon",
+            "condition":"with or without Warp Evolution or with Grappu Leomon and Zudomon"
+         },
+         {
+            "id":706,
+            "digimon":"Metal Greymon",
+            "condition":""
+         },
+         {
+            "id":99,
+            "digimon":"Panjyamon",
+            "condition":""
+         },
+         {
+            "id":170,
+            "digimon":"Lady Devimon",
+            "condition":""
+         },
+         {
+            "id":595,
+            "digimon":"Aero V-dramon",
+            "condition":"with Birdramon or V-dramon"
+         },
+         {
+            "id":68,
+            "digimon":"Platinum Scumon",
+            "condition":""
+         },
+         {
+            "id":183,
+            "digimon":"Were Garurumon (X-Antibody)",
+            "condition":"with Gryzmon"
+         },
+         {
+            "id":1390,
+            "digimon":"Mamemon",
+            "condition":""
+         },
+         {
+            "id":514,
+            "digimon":"Pumpmon",
+            "condition":"with Bakemon, Devimon, or Dokugumon"
+         },
+         {
+            "id":4,
+            "digimon":"Ancient Beatmon",
+            "condition":"Ancient Evolution"
+         },
+         {
+            "id":469,
+            "digimon":"Blizzarmon",
+            "condition":""
+         },
+         {
+            "id":1216,
+            "digimon":"Groundramon",
+            "condition":"with Coredramon Blue"
+         },
+         {
+            "id":657,
+            "digimon":"Mammon",
+            "condition":"with or without Garurumon"
+         },
+         {
+            "id":1185,
+            "digimon":"Big Mamemon",
+            "condition":"with Guardromon or Mechanorimon"
+         },
+         {
+            "id":1380,
+            "digimon":"Ancient Irismon",
+            "condition":"Ancient Evolution"
+         },
+         {
+            "id":20,
+            "digimon":"Etemon",
+            "condition":""
+         },
+         {
+            "id":3,
+            "digimon":"Holy Angemon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":227,
+            "digimon":"Metal Mamemon",
+            "condition":"with certain Digimon from the Pendulum series"
+         },
+         {
+            "id":1100,
+            "digimon":"Paildramon",
+            "condition":"with or without Any Green Lv.4 Digimon from the Digimon Card Game or Any Blue Lv.4 Digimon from the Digimon Card Game"
+         },
+         {
+            "id":414,
+            "digimon":"Wingdramon",
+            "condition":"with Coredramon Green or Devidramon"
+         },
+         {
+            "id":1033,
+            "digimon":"Were Garurumon (Black)",
+            "condition":""
+         },
+         {
+            "id":70,
+            "digimon":"Andromon",
+            "condition":"with or without Clockmon, Revolmon, or Tankmon"
+         },
+         {
+            "id":67,
+            "digimon":"Were Garurumon",
+            "condition":"with or without Garurumon or certain Digimon of the Pendulum series"
+         },
+         {
+            "id":350,
+            "digimon":"Hangyomon",
+            "condition":"with Rukamon or with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":536,
+            "digimon":"Chimairamon",
+            "condition":""
+         },
+         {
+            "id":1105,
+            "digimon":"Flaremon",
+            "condition":"with Firamon and Strikedramon"
+         },
+         {
+            "id":1063,
+            "digimon":"Angewomon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":1211,
+            "digimon":"Duramon",
+            "condition":"with Bao Huckmon or Targetmon"
+         },
+         {
+            "id":617,
+            "digimon":"Monzaemon",
+            "condition":""
+         },
+         {
+            "id":780,
+            "digimon":"Ancient Megatheriumon",
+            "condition":"Ancient Evolution"
+         },
+         {
+            "id":null,
+            "digimon":"Rapidmon",
+            "condition":"with or without Pegasmon"
+         },
+         {
+            "id":424,
+            "digimon":"Spadamon",
+            "condition":"with Pandamon and Tylinmon"
+         },
+         {
+            "id":782,
+            "digimon":"Megadramon",
+            "condition":"with or without Coredramon Blue"
+         },
+         {
+            "id":641,
+            "digimon":"Grademon",
+            "condition":""
+         },
+         {
+            "id":18,
+            "digimon":"Ancient Troiamon",
+            "condition":"Ancient Evolution"
+         },
+         {
+            "id":890,
+            "digimon":"Whamon Perfect",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":616,
+            "digimon":"Loader Liomon",
+            "condition":"with or without Z'd Garurumon and Reppamon"
+         },
+         {
+            "id":239,
+            "digimon":"Asuramon",
+            "condition":"with certain Digimon from the Pendulum series"
+         },
+         {
+            "id":947,
+            "digimon":"Mad Leomon",
+            "condition":""
+         },
+         {
+            "id":533,
+            "digimon":"Maildramon",
+            "condition":""
+         },
+         {
+            "id":1199,
+            "digimon":"Jyagamon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":64,
+            "digimon":"Shutumon",
+            "condition":""
+         },
+         {
+            "id":683,
+            "digimon":"Piccolomon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":1126,
+            "digimon":"Eosmon (Perfect)",
+            "condition":""
+         },
+         {
+            "id":1001,
+            "digimon":"Dinobeemon",
+            "condition":"with or without Any Green Lv.4 Digimon from the Digimon Card Game or Any Blue Lv.4 Digimon from the Digimon Card Game"
+         },
+         {
+            "id":1094,
+            "digimon":"Garudamon",
+            "condition":"with V-dramon, Togemon, or Kiwimon"
+         },
+         {
+            "id":846,
+            "digimon":"Insekimon",
+            "condition":""
+         },
+         {
+            "id":24,
+            "digimon":"Cyberdramon",
+            "condition":"with Greymon or Thunderballmon"
+         },
+         {
+            "id":1350,
+            "digimon":"Lamortmon",
+            "condition":""
+         },
+         {
+            "id":954,
+            "digimon":"Vademon",
+            "condition":""
+         },
+         {
+            "id":296,
+            "digimon":"Zudomon",
+            "condition":""
+         },
+         {
+            "id":421,
+            "digimon":"Mach Gaogamon",
+            "condition":""
+         },
+         {
+            "id":967,
+            "digimon":"Rize Greymon",
+            "condition":"with Growmon or Reppamon"
+         },
+         {
+            "id":1306,
+            "digimon":"Bolgmon",
+            "condition":""
+         },
+         {
+            "id":1374,
+            "digimon":"DORUguremon",
+            "condition":"with DORUgamon"
+         },
+         {
+            "id":276,
+            "digimon":"Archnemon",
+            "condition":""
+         },
+         {
+            "id":164,
+            "digimon":"Waru Monzaemon",
+            "condition":""
+         },
+         {
+            "id":620,
+            "digimon":"Panjyamon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":474,
+            "digimon":"Minotaurmon",
+            "condition":""
+         },
+         {
+            "id":642,
+            "digimon":"Bancho Leomon",
+            "condition":"with Grappu Leomon"
+         },
+         {
+            "id":231,
+            "digimon":"Grappu Leomon",
+            "condition":"with or without Galgomon and Guardromon"
+         }
+      ]
+   },
+   
+   
+   
+   {
+      "id":1311,
+      "name":"Sakuyamon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Sakuyamon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":4,
+            "level":"Ultimate"
+         }
+      ],
+      "types":[
+         {
+            "id":33,
+            "type":"God Man"
+         }
+      ],
+      "attributes":[
+         {
+            "id":6,
+            "attribute":"Data"
+         }
+      ],
+      "fields":[
+         {
+            "id":1,
+            "field":"Nature Spirits"
+         },
+         {
+            "id":3,
+            "field":"Wind Guardians"
+         },
+         {
+            "id":2,
+            "field":"Virus Busters"
+         },
+         {
+            "id":8,
+            "field":"Nightmare Soldiers"
+         }
+      ],
+      "releaseDate":"2001",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A Digimon that holds the role of a miko, acting as an agent of God's will. Like Taomon, it freely uses Onmyoudou techniques in battle, and has the ability to employ God Beast-species Digimon. It always carries four pipes on the belt around its waist, within which lurk four kuda-gitsune. It is able to use these kuda-gitsune for everything from attacking to gathering information. Just like Holy Angemon's Priest Mode, it is able to change into a Miko Mode which administers Shinto rituals. Its Signature Move is attacking the opponent with the four kuda-gitsune carried on its waist (Izuna). The four kuda-gitsune possess the attributes of \"Fire\", \"Water\", \"Wind\", and \"Thunder\", respectively. Its Special Move is striking the ground with its \"Kongou Shakujou\", spreading a purifying barrier that exorcises evil spirits (Kongoukai Mandara). "
+         },
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"神の意志を代行する巫女の役割を持ったデジモン。タオモン同様、陰陽道の技を駆使して戦い、神獣系のデジモンを使役する能力を持つ。腰のベルトには常に４本の筒を携え、中には４匹の管狐（くだぎつね）が潜んでいる。この管狐を使役し攻撃や情報の収集など、あらゆることに利用することができる。ホーリーエンジェモンの神官形態と同じように神事を司る巫女形態になることもできる。得意技は腰に携えた４匹の管狐で敵を攻撃する『飯綱（いづな）』。この４匹の管狐はそれぞれ「火」「水」「風」「雷」の属性を持っている。必殺技は「金剛錫杖（こんごうしゃくじょう）」を地に打ち付けて邪気を払う浄化結界を張る『金剛界曼荼羅（こんごうかいまんだら）』。 "
+         }
+      ],
+      "skills":[
+         {
+            "id":1549,
+            "skill":"Kofūsatsu",
+            "translation":"Fox Seal Paper",
+            "description":"Uses paper seals to attack the enemy. "
+         },
+         {
+            "id":1234,
+            "skill":"Kongoukai Mandara",
+            "translation":"Diamond Realm Mandala",
+            "description":"Strikes the ground with its \"Kongou Shakujou\", spreading a purifying barrier (in the form of a mandala, golden ring, spherical barrier, cherry blossoms, ball of lightning, or some combination thereof) that exorcises evil spirits. "
+         },
+         {
+            "id":3311,
+            "skill":"Koenkyaku",
+            "translation":"Fox Flame Leg",
+            "description":"Attacks with a flaming kick from the sky. "
+         },
+         {
+            "id":3314,
+            "skill":"Yougetsushū",
+            "translation":"Bewitching Moon Kick",
+            "description":"Attacks with an axe kick. "
+         },
+         {
+            "id":3313,
+            "skill":"Kudagitsune",
+            "translation":"Fox Pipe",
+            "description":"Sends a single fox spirit at the enemy. "
+         },
+         {
+            "id":3315,
+            "skill":"Rairyūkyaku",
+            "translation":"Thunder Dragon Leg",
+            "description":"Drops down like lightning from the sky and attacks with a kick. "
+         },
+         {
+            "id":3312,
+            "skill":"Hikari no Mandara",
+            "translation":"Mandala of Light",
+            "description":"Boosts the abilities of itself and its allies. "
+         },
+         {
+            "id":3309,
+            "skill":"Jouenkobu",
+            "translation":"Purifying Flame Fox Dance",
+            "description":"Summons blue flames to surround and burn the opponent. "
+         },
+         {
+            "id":1235,
+            "skill":"Izuna",
+            "translation":"",
+            "description":"Summons 4 mystical fox spirits that are imbued with the powers of fire, water, wind and thunder that obey and fight for Sakuyamon. "
+         },
+         {
+            "id":3310,
+            "skill":"Kassengeki",
+            "translation":"Sliding Flash Attack",
+            "description":"Attacks by sliding along the ground while standing. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":71,
+            "digimon":"Lilimon",
+            "condition":""
+         },
+         {
+            "id":563,
+            "digimon":"Taomon",
+            "condition":"with or without Renamon and Kabukimon or a Virus Attribute Perfect Digimon from the Vital Bracelet Digital Monster"
+         },
+         {
+            "id":183,
+            "digimon":"Were Garurumon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":261,
+            "digimon":"Taomon (Silver)",
+            "condition":""
+         },
+         {
+            "id":67,
+            "digimon":"Were Garurumon",
+            "condition":""
+         },
+         {
+            "id":970,
+            "digimon":"Renamon",
+            "condition":"Warp Evolution with or without Makino Ruki or with Taomon and Kabukimon"
+         },
+         {
+            "id":873,
+            "digimon":"Ranamon",
+            "condition":""
+         },
+         {
+            "id":425,
+            "digimon":"Silphymon",
+            "condition":""
+         },
+         {
+            "id":1088,
+            "digimon":"Mephismon",
+            "condition":""
+         },
+         {
+            "id":617,
+            "digimon":"Monzaemon",
+            "condition":""
+         },
+         {
+            "id":1159,
+            "digimon":"Kyukimon",
+            "condition":"with Kabukimon"
+         },
+         {
+            "id":1002,
+            "digimon":"Kabukimon",
+            "condition":"with Kyukimon or with Taomon and Renamon"
+         },
+         {
+            "id":534,
+            "digimon":"Doumon",
+            "condition":""
+         },
+         {
+            "id":421,
+            "digimon":"Mach Gaogamon",
+            "condition":""
+         },
+         {
+            "id":446,
+            "digimon":"Vajramon",
+            "condition":""
+         },
+         {
+            "id":699,
+            "digimon":"Kuzuhamon",
+            "condition":"with Digital Translator"
+         },
+         {
+            "id":1033,
+            "digimon":"Were Garurumon (Black)",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":792,
+            "digimon":"Rosemon(Burst Mode)",
+            "condition":"with Rosemon"
+         },
+         {
+            "id":397,
+            "digimon":"Chaosmon(Valdur Arm)",
+            "condition":""
+         },
+         {
+            "id":430,
+            "digimon":"Sakuyamon(Miko Mode)",
+            "condition":""
+         },
+         {
+            "id":5,
+            "digimon":"Dukemon(Crimson Mode)",
+            "condition":"with either Saint Galgomon, Dukemon, Black Saint Galgomon or Chaos Dukemon"
+         },
+         {
+            "id":690,
+            "digimon":"Sakuyamon (X-Antibody)",
+            "condition":"with X-Antibody"
+         },
+         {
+            "id":333,
+            "digimon":"Susanoomon",
+            "condition":""
+         },
+         {
+            "id":699,
+            "digimon":"Kuzuhamon",
+            "condition":""
+         },
+         {
+            "id":null,
+            "digimon":"Omegamon Zwart D",
+            "condition":"with Bancho Leomon or Jijimon"
+         }
+      ]
+   },
+   {
+      "id":114,
+      "name":"Patamon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Patamon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":7,
+            "level":"Child"
+         }
+      ],
+      "types":[
+         {
+            "id":15,
+            "type":"Mammal"
+         }
+      ],
+      "attributes":[
+         {
+            "id":3,
+            "attribute":"Vaccine"
+         },
+         {
+            "id":6,
+            "attribute":"Data"
+         },
+         {
+            "id":2,
+            "attribute":"Free"
+         }
+      ],
+      "fields":[
+         {
+            "id":1,
+            "field":"Nature Spirits"
+         },
+         {
+            "id":3,
+            "field":"Wind Guardians"
+         },
+         {
+            "id":2,
+            "field":"Virus Busters"
+         }
+      ],
+      "releaseDate":"1998",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"大きな耳が特徴的な哺乳類型デジモン。この大きな羽を使って空を飛ぶことができるが、時速１ｋｍのスピードしか出ないため、歩いたほうが断然に早いと言われている。しかし、必死になって飛んでいる姿が可愛いので人気は高い（本人は納得していないらしい）。とても素直な性格で教えたことは良く守る。またパタモンはホーリーリングを身に付けなくても、秘められた聖なる力を発揮することができる、古代種デジモンの遺伝子を受け継いでいるらしい。必殺技は空気を吸い込んで一気に空気弾を吐き出す『エアショット』と大きな両耳で敵を叩く『ハネビンタ』。 "
+         },
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A Mammal Digimon characterized by its large ears. It is able to fly through the air by using them as large wings, but because it only goes at a speed of 1 km/h, it is said that it is definitely faster walking. However, it's very popular because its appearance is cute when it is desperately flying (though it seems that it doesn't feel the same). Due to its extremely obedient personality, its trainers are well-defended. Also, even though Patamon doesn't wear a Holy Ring, it is able to exhibit its hidden holy power, and it appears to have inherited the genes of ancient Digimon. Its Special Moves are sucking in air then spewing an air shot out in one burst (Air Shot), and striking the opponent with its large ears (Hane Binta). "
+         }
+      ],
+      "skills":[
+         {
+            "id":132,
+            "skill":"Tai Atari",
+            "translation":"Body Blow",
+            "description":"Tackles the enemy. "
+         },
+         {
+            "id":334,
+            "skill":"Hane Binta",
+            "translation":"Wing Slap",
+            "description":"Slaps foe with its ears. "
+         },
+         {
+            "id":332,
+            "skill":"Tai Atari Bomb",
+            "translation":"Body Blow Bomb",
+            "description":"An attack where Patamon flies forward while spinning. "
+         },
+         {
+            "id":158,
+            "skill":"Air Shot",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":331,
+            "skill":"Spin Kick",
+            "translation":"",
+            "description":"Spins once on the ground, hitting an enemy with one wing. "
+         },
+         {
+            "id":336,
+            "skill":"Geigeki Air Shot",
+            "translation":"Intercepting Air Shot",
+            "description":"An Air Shot that counters an enemy's attack. "
+         },
+         {
+            "id":335,
+            "skill":"Air Gust",
+            "translation":"",
+            "description":"Inhales in air and spits out multiple clouds. "
+         },
+         {
+            "id":340,
+            "skill":"Kūchū Air Shot",
+            "translation":"Aerial Air Shot",
+            "description":"Fires an Air Shot while airborne. "
+         },
+         {
+            "id":339,
+            "skill":"Glide",
+            "translation":"",
+            "description":"Glides through the air. "
+         },
+         {
+            "id":338,
+            "skill":"Petit Tackle",
+            "translation":"",
+            "description":" "
+         },
+         {
+            "id":329,
+            "skill":"Patapata Hover",
+            "translation":"",
+            "description":"Flies through the sky. "
+         },
+         {
+            "id":330,
+            "skill":"Kūchū Tai Atari Bomb",
+            "translation":"Aerial Body Blow Bomb",
+            "description":"Dive bombs the enemy while spinning. "
+         },
+         {
+            "id":333,
+            "skill":"Sparking Air Shot",
+            "translation":"",
+            "description":"A glittering, powered-up version of Air Shot. "
+         },
+         {
+            "id":328,
+            "skill":"Thousand Wing",
+            "translation":"",
+            "description":"Begins spinning in the air while attacking the enemy with its ears. Can release blades of wind. "
+         },
+         {
+            "id":327,
+            "skill":"Air Slam",
+            "translation":"",
+            "description":"Shoots forward through the air, hitting an enemy. "
+         },
+         {
+            "id":337,
+            "skill":"Aero Slash",
+            "translation":"",
+            "description":"Breathes in air and shoots it out as blades made out of wind. "
+         },
+         {
+            "id":341,
+            "skill":"Pretty Rush",
+            "translation":"",
+            "description":"Runs forward and rams the enemy with its shoulder. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":90,
+            "digimon":"Tokomon",
+            "condition":""
+         },
+         {
+            "id":604,
+            "digimon":"Frimon",
+            "condition":""
+         },
+         {
+            "id":833,
+            "digimon":"Cupimon",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":946,
+            "digimon":"Garurumon",
+            "condition":""
+         },
+         {
+            "id":483,
+            "digimon":"Centalmon",
+            "condition":""
+         },
+         {
+            "id":1228,
+            "digimon":"Gorimon",
+            "condition":""
+         },
+         {
+            "id":764,
+            "digimon":"Snimon",
+            "condition":""
+         },
+         {
+            "id":355,
+            "digimon":"Magnamon",
+            "condition":""
+         },
+         {
+            "id":511,
+            "digimon":"Dinohumon",
+            "condition":""
+         },
+         {
+            "id":579,
+            "digimon":"Revolmon",
+            "condition":""
+         },
+         {
+            "id":580,
+            "digimon":"Devidramon",
+            "condition":""
+         },
+         {
+            "id":879,
+            "digimon":"Angemon",
+            "condition":"with or without Piyomon"
+         },
+         {
+            "id":623,
+            "digimon":"Manbomon",
+            "condition":"with the Digimental of Light"
+         },
+         {
+            "id":837,
+            "digimon":"Diatrymon",
+            "condition":""
+         },
+         {
+            "id":752,
+            "digimon":"Drimogemon",
+            "condition":""
+         },
+         {
+            "id":1006,
+            "digimon":"Leomon",
+            "condition":""
+         },
+         {
+            "id":152,
+            "digimon":"Pteranomon",
+            "condition":""
+         },
+         {
+            "id":360,
+            "digimon":"Unimon",
+            "condition":"with or without Piyomon"
+         },
+         {
+            "id":1329,
+            "digimon":"Scumon",
+            "condition":""
+         },
+         {
+            "id":1124,
+            "digimon":"Chackmon",
+            "condition":"with the Human Spirit of Ice"
+         },
+         {
+            "id":1217,
+            "digimon":"Airdramon",
+            "condition":"with or without V-mon"
+         },
+         {
+            "id":493,
+            "digimon":"Mojyamon",
+            "condition":""
+         },
+         {
+            "id":346,
+            "digimon":"Tailmon",
+            "condition":""
+         },
+         {
+            "id":216,
+            "digimon":"Tyranomon",
+            "condition":""
+         },
+         {
+            "id":900,
+            "digimon":"Black Tailmon",
+            "condition":""
+         },
+         {
+            "id":38,
+            "digimon":"Mimicmon",
+            "condition":""
+         },
+         {
+            "id":612,
+            "digimon":"Rhinomon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1096,
+            "digimon":"Musyamon",
+            "condition":""
+         },
+         {
+            "id":905,
+            "digimon":"Baromon",
+            "condition":"with the Digimental of Courage"
+         },
+         {
+            "id":371,
+            "digimon":"Numemon",
+            "condition":""
+         },
+         {
+            "id":275,
+            "digimon":"Greymon",
+            "condition":""
+         },
+         {
+            "id":547,
+            "digimon":"Darcmon",
+            "condition":""
+         },
+         {
+            "id":988,
+            "digimon":"Holydramon",
+            "condition":"with Tailmon, Terriermon, and Kudamon 2006 Anime Version"
+         },
+         {
+            "id":523,
+            "digimon":"Mothmon",
+            "condition":"with the Digimental of Knowledge"
+         },
+         {
+            "id":187,
+            "digimon":"Shoutmon X3",
+            "condition":""
+         },
+         {
+            "id":1360,
+            "digimon":"Ice Devimon",
+            "condition":"with or without Kuramon"
+         },
+         {
+            "id":73,
+            "digimon":"Growmon (Orange)",
+            "condition":""
+         },
+         {
+            "id":1297,
+            "digimon":"Fladramon",
+            "condition":""
+         },
+         {
+            "id":404,
+            "digimon":"Ponchomon",
+            "condition":"with the Digimental of Purity"
+         },
+         {
+            "id":666,
+            "digimon":"V-dramon",
+            "condition":""
+         },
+         {
+            "id":413,
+            "digimon":"Tortamon",
+            "condition":""
+         },
+         {
+            "id":639,
+            "digimon":"Siesamon",
+            "condition":""
+         },
+         {
+            "id":352,
+            "digimon":"Orgemon",
+            "condition":""
+         },
+         {
+            "id":257,
+            "digimon":"Kyubimon",
+            "condition":""
+         },
+         {
+            "id":102,
+            "digimon":"Seraphimon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":22,
+            "digimon":"Rhinomon",
+            "condition":"with the Digimental of Miracles or Digimental of Fate"
+         },
+         {
+            "id":233,
+            "digimon":"Mantaraymon",
+            "condition":"with the Digimental of Sincerity"
+         },
+         {
+            "id":824,
+            "digimon":"Pidmon",
+            "condition":""
+         },
+         {
+            "id":411,
+            "digimon":"Starmon",
+            "condition":""
+         },
+         {
+            "id":437,
+            "digimon":"Devimon",
+            "condition":""
+         },
+         {
+            "id":3,
+            "digimon":"Holy Angemon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":1351,
+            "digimon":"Meicoomon",
+            "condition":""
+         },
+         {
+            "id":1087,
+            "digimon":"Agnimon",
+            "condition":""
+         },
+         {
+            "id":778,
+            "digimon":"Raremon",
+            "condition":""
+         },
+         {
+            "id":956,
+            "digimon":"Igamon",
+            "condition":""
+         },
+         {
+            "id":362,
+            "digimon":"Nanimon",
+            "condition":""
+         },
+         {
+            "id":709,
+            "digimon":"Reppamon",
+            "condition":""
+         },
+         {
+            "id":475,
+            "digimon":"Birdramon",
+            "condition":""
+         },
+         {
+            "id":1362,
+            "digimon":"Nefertimon",
+            "condition":""
+         },
+         {
+            "id":178,
+            "digimon":"Nefertimon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1330,
+            "digimon":"Swanmon",
+            "condition":""
+         },
+         {
+            "id":550,
+            "digimon":"Lekismon",
+            "condition":""
+         },
+         {
+            "id":999,
+            "digimon":"Culumon",
+            "condition":"with Otamamon, Wormmon and Piccolomon"
+         },
+         {
+            "id":1295,
+            "digimon":"Witchmon",
+            "condition":""
+         },
+         {
+            "id":361,
+            "digimon":"Tailmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":11,
+            "digimon":"Pipismon",
+            "condition":"with the Digimental of Love"
+         },
+         {
+            "id":1177,
+            "digimon":"Cockatrimon",
+            "condition":""
+         },
+         {
+            "id":1140,
+            "digimon":"Wizarmon",
+            "condition":""
+         },
+         {
+            "id":631,
+            "digimon":"Bakemon",
+            "condition":"Death Evolution"
+         },
+         {
+            "id":1024,
+            "digimon":"Stingmon",
+            "condition":""
+         },
+         {
+            "id":331,
+            "digimon":"Liamon",
+            "condition":""
+         },
+         {
+            "id":211,
+            "digimon":"Pteranomon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":827,
+            "digimon":"Stegomon",
+            "condition":"with the Digimental of Friendship"
+         },
+         {
+            "id":1246,
+            "digimon":"XV-mon",
+            "condition":""
+         },
+         {
+            "id":679,
+            "digimon":"Prairiemon",
+            "condition":"with or without the Digimental of Kindness"
+         },
+         {
+            "id":1381,
+            "digimon":"Pegasmon",
+            "condition":"with or without the Digimental of Hope"
+         },
+         {
+            "id":1237,
+            "digimon":"Deltamon",
+            "condition":""
+         },
+         {
+            "id":799,
+            "digimon":"Coatlmon",
+            "condition":""
+         },
+         {
+            "id":949,
+            "digimon":"Geremon",
+            "condition":""
+         },
+         {
+            "id":677,
+            "digimon":"Aquilamon",
+            "condition":""
+         },
+         {
+            "id":77,
+            "digimon":"Shellmon",
+            "condition":""
+         }
+      ]
+   },
+   
+   {
+      "id":170,
+      "name":"Lady Devimon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Lady_Devimon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":2,
+            "level":"Perfect"
+         }
+      ],
+      "types":[
+         {
+            "id":40,
+            "type":"Fallen Angel"
+         }
+      ],
+      "attributes":[
+         {
+            "id":4,
+            "attribute":"Virus"
+         }
+      ],
+      "fields":[
+         {
+            "id":4,
+            "field":"Unknown"
+         },
+         {
+            "id":8,
+            "field":"Nightmare Soldiers"
+         }
+      ],
+      "releaseDate":"1998",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"高貴な存在の女性型堕天使デジモン。その強力無比で高純度のダークサイドパワーのため強力で、個人の端末で育て続けた例は限りなく０に近いといわれている。必殺技『ダークネスウェーブ』は、コウモリのような暗黒の飛翔物を無数に放って相手を焼き尽くす。もう一つの必殺技『プワゾン』は、相手の持つパワーをダークエネルギーと相転移し、敵を内から滅殺する。相手のパワーが大きいほどこの技は完全なものとなる。 "
+         },
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A fallen angel Digimon in the form of a female with noble presence. Because of its strength due to the incomparable purity of its Dark Side Power, it is said that the limits on its spread and growth on personal computers is \"0\". Its Special Move is \"Darkness Wave\", which releases countless creatures of darkness similar to bats which incinerate the opponent. Another Special Move, \"Poison\", uses Dark Energy to reverse the phase of the opponent's own powers, obliterating them from within. The more powerful the opponent is, the more complete the technique is. "
+         }
+      ],
+      "skills":[
+         {
+            "id":519,
+            "skill":"Binta",
+            "translation":"Slap",
+            "description":"Repeatedly slaps the enemy. "
+         },
+         {
+            "id":520,
+            "skill":"Darkness Spear",
+            "translation":"",
+            "description":"Transforms its left arm into a spear and pierces the opponent. "
+         },
+         {
+            "id":521,
+            "skill":"Stun Whip",
+            "translation":"",
+            "description":"Fires a bolt of electricity from its hands. "
+         },
+         {
+            "id":518,
+            "skill":"Poison",
+            "translation":"",
+            "description":"Uses either a magic circle, its breath, a heart, or kicks and claw attacks to convert the opponent's power into dark energy, destroying them from the inside. "
+         },
+         {
+            "id":522,
+            "skill":"Darkness Wave",
+            "translation":"",
+            "description":"Unleashes countless bat-like creatures of darkness that burn the enemy to cinders. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":257,
+            "digimon":"Kyubimon",
+            "condition":""
+         },
+         {
+            "id":1360,
+            "digimon":"Ice Devimon",
+            "condition":""
+         },
+         {
+            "id":1177,
+            "digimon":"Cockatrimon",
+            "condition":"with or without Devidramon or Lekismon or Devimon and Devidramon"
+         },
+         {
+            "id":1295,
+            "digimon":"Witchmon",
+            "condition":""
+         },
+         {
+            "id":1063,
+            "digimon":"Angewomon",
+            "condition":""
+         },
+         {
+            "id":591,
+            "digimon":"Soulmon",
+            "condition":""
+         },
+         {
+            "id":985,
+            "digimon":"Sistermon Noir",
+            "condition":""
+         },
+         {
+            "id":550,
+            "digimon":"Lekismon",
+            "condition":"with Cockatrimon or Devidramon"
+         },
+         {
+            "id":547,
+            "digimon":"Darcmon",
+            "condition":""
+         },
+         {
+            "id":1140,
+            "digimon":"Wizarmon",
+            "condition":""
+         },
+         {
+            "id":1351,
+            "digimon":"Meicoomon",
+            "condition":""
+         },
+         {
+            "id":807,
+            "digimon":"Youkomon",
+            "condition":""
+         },
+         {
+            "id":935,
+            "digimon":"Togemon",
+            "condition":""
+         },
+         {
+            "id":900,
+            "digimon":"Black Tailmon",
+            "condition":""
+         },
+         {
+            "id":346,
+            "digimon":"Tailmon",
+            "condition":""
+         },
+         {
+            "id":580,
+            "digimon":"Devidramon",
+            "condition":"with or without Cockatrimon or Lekismon or Devimon and Cockatrimon"
+         },
+         {
+            "id":640,
+            "digimon":"Evilmon",
+            "condition":""
+         },
+         {
+            "id":1206,
+            "digimon":"Sistermon Ciel",
+            "condition":""
+         },
+         {
+            "id":631,
+            "digimon":"Bakemon",
+            "condition":""
+         },
+         {
+            "id":1085,
+            "digimon":"Yaksamon",
+            "condition":""
+         },
+         {
+            "id":1136,
+            "digimon":"Coelamon",
+            "condition":""
+         },
+         {
+            "id":558,
+            "digimon":"Harpymon",
+            "condition":""
+         },
+         {
+            "id":1008,
+            "digimon":"Golemon",
+            "condition":""
+         },
+         {
+            "id":1006,
+            "digimon":"Leomon",
+            "condition":""
+         },
+         {
+            "id":879,
+            "digimon":"Angemon",
+            "condition":""
+         },
+         {
+            "id":303,
+            "digimon":"Dokugumon",
+            "condition":""
+         },
+         {
+            "id":437,
+            "digimon":"Devimon",
+            "condition":"with or without Devidramon and Cockatrimon"
+         },
+         {
+            "id":1165,
+            "digimon":"Meramon",
+            "condition":""
+         },
+         {
+            "id":639,
+            "digimon":"Siesamon",
+            "condition":""
+         },
+         {
+            "id":677,
+            "digimon":"Aquilamon",
+            "condition":""
+         },
+         {
+            "id":1329,
+            "digimon":"Scumon",
+            "condition":""
+         },
+         {
+            "id":401,
+            "digimon":"Botamon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":1110,
+            "digimon":"Saberdramon",
+            "condition":""
+         },
+         {
+            "id":445,
+            "digimon":"Devitamamon",
+            "condition":"with Digitamamon, Blue Meramon and Dagomon"
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":358,
+            "digimon":"Demon",
+            "condition":"with or without certain Digimon from the Pendulum series, Vamdemon or Vamdemon, Blue Meramon and Dagomon"
+         },
+         {
+            "id":415,
+            "digimon":"Beelzebumon",
+            "condition":""
+         },
+         {
+            "id":979,
+            "digimon":"Metal Garurumon (Black)",
+            "condition":""
+         },
+         {
+            "id":1243,
+            "digimon":"Ofanimon",
+            "condition":""
+         },
+         {
+            "id":1203,
+            "digimon":"Deathmon (Black)",
+            "condition":""
+         },
+         {
+            "id":1150,
+            "digimon":"Lilithmon",
+            "condition":"with or without Archnemon or with or without Archnemon and Scorpiomon"
+         },
+         {
+            "id":null,
+            "digimon":"Imperialdramon",
+            "condition":""
+         },
+         {
+            "id":750,
+            "digimon":"Lady Devimon (X-Antibody)",
+            "condition":"with X-Antibody"
+         },
+         {
+            "id":916,
+            "digimon":"Cherubimon (Virtue)",
+            "condition":""
+         },
+         {
+            "id":739,
+            "digimon":"Minervamon",
+            "condition":""
+         },
+         {
+            "id":274,
+            "digimon":"Marsmon",
+            "condition":""
+         },
+         {
+            "id":102,
+            "digimon":"Seraphimon",
+            "condition":""
+         },
+         {
+            "id":699,
+            "digimon":"Kuzuhamon",
+            "condition":"with or without Hagurumon and Chrysalimon"
+         },
+         {
+            "id":688,
+            "digimon":"Neo Vamdemon Darkness Mode (Vampire Army)",
+            "condition":"with Neo Vamdemon and Devimon"
+         },
+         {
+            "id":1155,
+            "digimon":"Venom Vamdemon",
+            "condition":"with any Perfect Digimon or Vamdemon or Waru Monzaemon"
+         },
+         {
+            "id":1046,
+            "digimon":"Diablomon",
+            "condition":""
+         },
+         {
+            "id":368,
+            "digimon":"Lotusmon",
+            "condition":"with or without Blossomon"
+         },
+         {
+            "id":1395,
+            "digimon":"Piemon",
+            "condition":"with or without Vamdemon or Fantomon"
+         },
+         {
+            "id":1104,
+            "digimon":"Death Meramon",
+            "condition":""
+         },
+         {
+            "id":901,
+            "digimon":"Metal Etemon",
+            "condition":"with Tonosama Gekomon or Okuwamon"
+         },
+         {
+            "id":445,
+            "digimon":"Devitamamon",
+            "condition":"with Digitamamon, Blue Meramon and Dagomon"
+         },
+         {
+            "id":914,
+            "digimon":"Pukumon",
+            "condition":"with Dagomon or Marin Devimon"
+         },
+         {
+            "id":1051,
+            "digimon":"Pinochimon",
+            "condition":"with Jyureimon or Gerbemon"
+         },
+         {
+            "id":903,
+            "digimon":"Mastemon",
+            "condition":"with Angewomon"
+         },
+         {
+            "id":7,
+            "digimon":"Apocalymon",
+            "condition":"with Vamdemon, Pinochimon, Skull Satamon, Evilmon and Pico Devimon"
+         },
+         {
+            "id":658,
+            "digimon":"Darkdramon",
+            "condition":"with Megadramon"
+         },
+         {
+            "id":1292,
+            "digimon":"Rosemon",
+            "condition":""
+         }
+      ]
+   },
+   {
+      "id":292,
+      "name":"Relemon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Relemon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":5,
+            "level":"Baby I"
+         }
+      ],
+      "types":[
+         {
+            "id":6,
+            "type":"Slime"
+         }
+      ],
+      "attributes":[
+         
+      ],
+      "fields":[
+         
+      ],
+      "releaseDate":"2001",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"A mysterious Digimon that is said to only be born on moonlit nights. It is said that Relemon born specifically on the night of the full moon receive it's magical power, and as they grow, are able to use greater and more wondrous abilities than other Digimon. Because it is nocturnal, it seldom appears before people and has a shy personality. It is not able to attack, but it can transform into anything to defend itself, if it is close to the size of its body. However, it can still be found because it can never conceal its tail. "
+         },
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"月夜の晩にしか生まれないと言われる神秘的なデジモン。特に満月の晩に生まれたレレモンは満月の魔力を受け、他のデジモンよりも能力が高く不思議な術が使えるデジモンに成長すると言われている。夜行性で、めったに人の前には姿を現さない恥ずかしがりやな性格。攻撃はできないが、体のサイズに近いものなら、何にでも変化して身を守ることができる。しかし、いつも尻尾だけは隠せずに見つかってしまう。 "
+         }
+      ],
+      "skills":[
+         {
+            "id":867,
+            "skill":"Henshin",
+            "translation":"Transformation",
+            "description":"Transforms into things close to its body size. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":null,
+            "digimon":"Digitama",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":597,
+            "digimon":"Pokomon",
+            "condition":""
+         }
+      ]
+   },
+   {
+      "id":879,
+      "name":"Angemon",
+      "xAntibody":false,
+      "images":[
+         {
+            "href":"https://digimon-api.com/images/digimon/w/Angemon.png",
+            "transparent":true
+         }
+      ],
+      "levels":[
+         {
+            "id":3,
+            "level":"Adult"
+         }
+      ],
+      "types":[
+         {
+            "id":108,
+            "type":"Angel"
+         }
+      ],
+      "attributes":[
+         {
+            "id":3,
+            "attribute":"Vaccine"
+         }
+      ],
+      "fields":[
+         {
+            "id":3,
+            "field":"Wind Guardians"
+         },
+         {
+            "id":2,
+            "field":"Virus Busters"
+         }
+      ],
+      "releaseDate":"1997",
+      "descriptions":[
+         {
+            "origin":"reference_book",
+            "language":"en_us",
+            "description":"An Angel Digimon with six shining wings, whose body is clad in cloth so pure white as to be divine. It is a being of perfected virtue, and although it is called a Digimon that brings happiness, when confronting evil it does not stop attacking, with extreme composure, until the opponent is completely annihilated. On the countless times when the Digital World is visited by a crisis, it is told that it descends to lead Digimon of the same genus, and Devimon, which was won over to the Dark Side, was originally of the same species. Its Special Move is striking the opponent with its fist shining gold (Heaven's Knuckle). "
+         },
+         {
+            "origin":"reference_book",
+            "language":"jap",
+            "description":"光り輝く６枚の翼と、神々しいまでの純白の衣を身に纏った天使デジモン。完全なる善の存在であり、幸福をもたらすデジモンと呼ばれているが、悪に対しては非常に冷徹で完全に相手が消滅するまで、攻撃を止めることはない。デジタルワールドが幾度となく危機に見舞われたとき、同種属のデジモンを率いて降臨したと伝えられており、ダークサイドに引き込まれたデビモンも、もともとは同種族であった。必殺技は黄金に輝く拳で相手を攻撃する『ヘブンズナックル』。 "
+         }
+      ],
+      "skills":[
+         {
+            "id":1056,
+            "skill":"Holy Shot",
+            "translation":"",
+            "description":"Spits a qigong shot from its mouth. "
+         },
+         {
+            "id":2319,
+            "skill":"Halo Attack",
+            "translation":"",
+            "description":"Spins through the air swinging its Holy Rod. "
+         },
+         {
+            "id":2320,
+            "skill":"God Typhoon",
+            "translation":"",
+            "description":"Spins its Holy Rod and/or itself to create a tornado. "
+         },
+         {
+            "id":339,
+            "skill":"Glide",
+            "translation":"",
+            "description":"Glides through the air. "
+         },
+         {
+            "id":2322,
+            "skill":"Staff Sweep",
+            "translation":"",
+            "description":"Trips the opponent with the Holy Rod. "
+         },
+         {
+            "id":2324,
+            "skill":"Heaven's Knuckle",
+            "translation":"",
+            "description":"Gathers holy power in its fist and shoots a beam of holy light from it. "
+         },
+         {
+            "id":2323,
+            "skill":"Holy Rod",
+            "translation":"",
+            "description":"Hits the opponent with its glowing Holy Rod. "
+         },
+         {
+            "id":2321,
+            "skill":"Angel Slam",
+            "translation":"",
+            "description":"Uses its Holy Rod to pick up an enemy and slam them into the ground. "
+         }
+      ],
+      "priorEvolutions":[
+         {
+            "id":1261,
+            "digimon":"Hawkmon",
+            "condition":""
+         },
+         {
+            "id":670,
+            "digimon":"Agumon (2006 Anime Version)",
+            "condition":""
+         },
+         {
+            "id":35,
+            "digimon":"Neamon",
+            "condition":""
+         },
+         {
+            "id":258,
+            "digimon":"Gabumon (Black)",
+            "condition":""
+         },
+         {
+            "id":1226,
+            "digimon":"Agumon (Black)",
+            "condition":""
+         },
+         {
+            "id":1369,
+            "digimon":"Palmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":708,
+            "digimon":"Plotmon",
+            "condition":""
+         },
+         {
+            "id":1403,
+            "digimon":"Gabumon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":171,
+            "digimon":"Psychemon",
+            "condition":""
+         },
+         {
+            "id":1218,
+            "digimon":"Floramon",
+            "condition":""
+         },
+         {
+            "id":771,
+            "digimon":"Lucemon",
+            "condition":""
+         },
+         {
+            "id":394,
+            "digimon":"Gabumon",
+            "condition":""
+         },
+         {
+            "id":865,
+            "digimon":"Elecmon",
+            "condition":""
+         },
+         {
+            "id":1282,
+            "digimon":"Agumon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1278,
+            "digimon":"Gaomon",
+            "condition":""
+         },
+         {
+            "id":1073,
+            "digimon":"Wormmon",
+            "condition":""
+         },
+         {
+            "id":664,
+            "digimon":"V-mon",
+            "condition":""
+         },
+         {
+            "id":1144,
+            "digimon":"Plotmon (X-Antibody)",
+            "condition":""
+         },
+         {
+            "id":1367,
+            "digimon":"Bakumon",
+            "condition":""
+         },
+         {
+            "id":669,
+            "digimon":"Palmon",
+            "condition":""
+         },
+         {
+            "id":1252,
+            "digimon":"Impmon",
+            "condition":""
+         },
+         {
+            "id":114,
+            "digimon":"Patamon",
+            "condition":"with or without Piyomon"
+         },
+         {
+            "id":436,
+            "digimon":"Agumon (Black) (2006 Anime Version)",
+            "condition":""
+         },
+         {
+            "id":1190,
+            "digimon":"Terriermon",
+            "condition":""
+         },
+         {
+            "id":584,
+            "digimon":"Clear Agumon",
+            "condition":""
+         },
+         {
+            "id":1135,
+            "digimon":"Pico Devimon",
+            "condition":""
+         },
+         {
+            "id":289,
+            "digimon":"Agumon",
+            "condition":""
+         },
+         {
+            "id":991,
+            "digimon":"Piyomon",
+            "condition":"with or without Patamon"
+         },
+         {
+            "id":134,
+            "digimon":"Pawn Chessmon (White)",
+            "condition":""
+         },
+         {
+            "id":625,
+            "digimon":"Kudamon (2006 Anime Version)",
+            "condition":""
+         }
+      ],
+      "nextEvolutions":[
+         {
+            "id":714,
+            "digimon":"Blue Meramon",
+            "condition":""
+         },
+         {
+            "id":64,
+            "digimon":"Shutumon",
+            "condition":""
+         },
+         {
+            "id":1216,
+            "digimon":"Groundramon",
+            "condition":"with Coredramon Blue"
+         },
+         {
+            "id":563,
+            "digimon":"Taomon",
+            "condition":""
+         },
+         {
+            "id":1211,
+            "digimon":"Duramon",
+            "condition":"with Bao Huckmon or Targetmon or a Vaccine or Free Attribute Adult Digimon from the Digimon Pendulum Z II"
+         },
+         {
+            "id":68,
+            "digimon":"Platinum Scumon",
+            "condition":""
+         },
+         {
+            "id":533,
+            "digimon":"Maildramon",
+            "condition":""
+         },
+         {
+            "id":1139,
+            "digimon":"Andiramon (Deva)",
+            "condition":"with Tailmon"
+         },
+         {
+            "id":1380,
+            "digimon":"Ancient Irismon",
+            "condition":"Ancient Evolution"
+         },
+         {
+            "id":544,
+            "digimon":"Beelzebumon (2010 Anime Version)",
+            "condition":"with Piemon and Karatenmon"
+         },
+         {
+            "id":null,
+            "digimon":"Savior Huckmon",
+            "condition":"with or without Zubaeagermon"
+         },
+         {
+            "id":514,
+            "digimon":"Pumpmon",
+            "condition":"with Bakemon, Devimon, or Dokugumon"
+         },
+         {
+            "id":67,
+            "digimon":"Were Garurumon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":355,
+            "digimon":"Magnamon",
+            "condition":"with V-mon and Ankylomon"
+         },
+         {
+            "id":1,
+            "digimon":"Garummon",
+            "condition":""
+         },
+         {
+            "id":683,
+            "digimon":"Piccolomon",
+            "condition":"with or without certain Digimon of the Pendulum series"
+         },
+         {
+            "id":1199,
+            "digimon":"Jyagamon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":967,
+            "digimon":"Rize Greymon",
+            "condition":"with Growmon or Reppamon"
+         },
+         {
+            "id":437,
+            "digimon":"Devimon",
+            "condition":"Death Evolution"
+         },
+         {
+            "id":1164,
+            "digimon":"Shakkoumon",
+            "condition":"with or without Armadimon or Ankylomon"
+         },
+         {
+            "id":70,
+            "digimon":"Andromon",
+            "condition":"with or without Clockmon, Revolmon, or Tankmon"
+         },
+         {
+            "id":80,
+            "digimon":"Neo Devimon",
+            "condition":""
+         },
+         {
+            "id":24,
+            "digimon":"Cyberdramon",
+            "condition":"with Greymon or Thunderballmon"
+         },
+         {
+            "id":1124,
+            "digimon":"Chackmon",
+            "condition":"with the Human Spirit of Ice"
+         },
+         {
+            "id":469,
+            "digimon":"Blizzarmon",
+            "condition":""
+         },
+         {
+            "id":1104,
+            "digimon":"Death Meramon",
+            "condition":""
+         },
+         {
+            "id":780,
+            "digimon":"Ancient Megatheriumon",
+            "condition":"Ancient Evolution"
+         },
+         {
+            "id":1160,
+            "digimon":"Lucemon(Falldown Mode)",
+            "condition":"with or without Devimon or Lucemon, Evilmon and Minotaurmon Adult"
+         },
+         {
+            "id":3,
+            "digimon":"Holy Angemon",
+            "condition":"with or without the Crest of Hope or Baalmon or XV-mon"
+         },
+         {
+            "id":1063,
+            "digimon":"Angewomon",
+            "condition":"with or without Witchmon, Tyranomon, or Dobermon or any Vaccine Adult Digimon of the Pendulum Ver.20th series"
+         },
+         {
+            "id":227,
+            "digimon":"Metal Mamemon",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":1185,
+            "digimon":"Big Mamemon",
+            "condition":"with Guardromon or Mechanorimon"
+         },
+         {
+            "id":1001,
+            "digimon":"Dinobeemon",
+            "condition":"with or without Any Green Lv.4 Digimon from the Digimon Card Game"
+         },
+         {
+            "id":890,
+            "digimon":"Whamon Perfect",
+            "condition":"with certain Digimon of the Pendulum series"
+         },
+         {
+            "id":1100,
+            "digimon":"Paildramon",
+            "condition":"with or without Garurumon, Garurumon Black, or Any Green Lv.4 Digimon from the Digimon Card Game"
+         },
+         {
+            "id":1130,
+            "digimon":"Ancient Garurumon",
+            "condition":"Ancient Evolution"
+         },
+         {
+            "id":1289,
+            "digimon":"Hououmon",
+            "condition":""
+         },
+         {
+            "id":644,
+            "digimon":"Bastemon",
+            "condition":""
+         },
+         {
+            "id":595,
+            "digimon":"Aero V-dramon",
+            "condition":"with Birdramon or V-dramon"
+         },
+         {
+            "id":567,
+            "digimon":"Skull Greymon",
+            "condition":""
+         },
+         {
+            "id":782,
+            "digimon":"Megadramon",
+            "condition":"with Coredramon Blue"
+         },
+         {
+            "id":562,
+            "digimon":"Holy Angemon(Priest Mode)",
+            "condition":"with or without Yukidarumon, Yukimi Botamon, and Baihumon"
+         },
+         {
+            "id":176,
+            "digimon":"Hippogriffomon",
+            "condition":""
+         },
+         {
+            "id":954,
+            "digimon":"Vademon",
+            "condition":""
+         },
+         {
+            "id":1264,
+            "digimon":"Baalmon",
+            "condition":"with Porcupamon"
+         },
+         {
+            "id":71,
+            "digimon":"Lilimon",
+            "condition":""
+         },
+         {
+            "id":170,
+            "digimon":"Lady Devimon",
+            "condition":""
+         },
+         {
+            "id":1198,
+            "digimon":"Vamdemon",
+            "condition":""
+         },
+         {
+            "id":536,
+            "digimon":"Chimairamon",
+            "condition":""
+         },
+         {
+            "id":1228,
+            "digimon":"Gorimon",
+            "condition":"with Piyomon"
+         },
+         {
+            "id":102,
+            "digimon":"Seraphimon",
+            "condition":"Warp Evolution"
+         },
+         {
+            "id":239,
+            "digimon":"Asuramon",
+            "condition":"with Greymon, Leomon, or Igamon"
+         },
+         {
+            "id":414,
+            "digimon":"Wingdramon",
+            "condition":"with Coredramon Green or Devidramon"
+         },
+         {
+            "id":1094,
+            "digimon":"Garudamon",
+            "condition":"with or without V-dramon, Togemon, or Kiwimon"
+         },
+         {
+            "id":392,
+            "digimon":"Manticoremon",
+            "condition":"with a Data or Virus Attribute Adult Digimon from the Digimon Pendulum Z II"
+         },
+         {
+            "id":350,
+            "digimon":"Hangyomon",
+            "condition":"with certain Digimon of the Pendulum series"
+         }
+      ]
+   }
+]
