@@ -1,0 +1,23 @@
+body{
+	background-color: hsla(0, 0%, 26%, 1.00) ;
+	color: whitesmoke;
+}
+
+nav {
+	display: flex;
+	gap: 10px;
+}
+
+a {
+	color: wheat;
+}
+
+ul.monsters {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+	gap: 20px;
+}
+
+img {
+	width: 100%;
+}
