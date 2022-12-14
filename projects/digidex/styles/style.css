@@ -1,0 +1,16 @@
+body{
+
+}
+
+nav {
+	display: flex;
+	gap: 10px;
+}
+
+
+
+ul.monsters {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+	gap: 20px;
+}
