@@ -1,33 +1,23 @@
 <%- include('partials/header.ejs') %>
-<h1>List</h1>
-<ul class="monsters">
-	<% monsters.forEach( function (monster) { 
-		%>
-		<li>
-			<a href="monsters/<%=monster.name%>">
-			<h3>
-				<%=monster.name%>
-			</h3>
-			<picture>
-				<img src="<%=monster.images[0].href%>">
-			</picture>
-			<p>
-				<%=monster.levels[0].level%>
-			</p>
-			</a>
-		</li>
-	<% } ) %>
-</ul>
-<%- include('partials/footer.ejs') %>
 
-<li>
-	<h3>
-		
-	</h3>
-	<picture>
-		<img src="">
-	</picture>
-	<p>
-		
-	</p>
-</li>
+	<inner-column>
+		<h1 class="loud-voice">List</h1>
+		<ul class="monsters">
+			<% monsters.forEach( function (monster) { %>
+				<li>		
+					<monster-card>
+						<h3>
+							<%=monster.name%>
+						</h3>
+						<picture>
+							<img src="<%=monster.images[0].href%>">
+						</picture>
+						<a href="monsters/<%=monster.name%>">
+							Read More
+						</a>
+					</monster-card>
+				</li>
+			<% } ) %>
+		</ul>
+	</inner-column>
+<%- include('partials/footer.ejs') %>
