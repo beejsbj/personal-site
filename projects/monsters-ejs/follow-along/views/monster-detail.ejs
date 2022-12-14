@@ -1,3 +1,17 @@
 <%- include('partials/header.ejs') %>
-<h1>Detail</h1>
+<h1><%=monster.name%></h1>
+<picture>
+	<img src="<%=monster.images[0].href%>">
+</picture>
+<p>
+	<%=monster.descriptions[0].description%>
+</p>
+<div>
+	<h3>skills</h3>
+	<ul>
+		<% monster.skills.forEach(function(skill) { %>
+			<li><%=skill.skill%></li>
+		<% }) %>
+	</ul>
+</div>
 <%- include('partials/footer.ejs') %>
