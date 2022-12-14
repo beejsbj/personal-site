@@ -5,9 +5,25 @@ const PORT = 1996;
 
 
 app.get('/', function( request, response ){
-	response.send('<h1>Hello</h1>')
+	// response.render('partials/menu'); doesnt work
+	response.render('home');
 })
 
+app.get('/monsters', function( request, response ){
+	response.render('monsters-list', { monsters });
+})
+
+app.get('/monster', function( request, response ){
+	response.render('monster-detail');
+})
+
+
+//page not found
+app.use(function( request, response ){
+	response
+		.status(404)
+		.render('404', { query: request.url });
+})
 
 app.listen(PORT, function(){
 	console.log('listening to port')
