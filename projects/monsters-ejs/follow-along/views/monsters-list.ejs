@@ -1,0 +1,31 @@
+<%- include('partials/header.ejs') %>
+<h1>List</h1>
+<ul class="monsters">
+	<% monsters.forEach( function (monster) { 
+		console.log(monster)%>
+		<li>
+			<h3>
+				<%=monster.name%>
+			</h3>
+			<picture>
+				<img src="<%=monster.images[0].href%>">
+			</picture>
+			<p>
+				<%=monster.descriptions[0].description%>
+			</p>
+		</li>
+	<% } ) %>
+</ul>
+<%- include('partials/footer.ejs') %>
+
+<li>
+	<h3>
+		
+	</h3>
+	<picture>
+		<img src="">
+	</picture>
+	<p>
+		
+	</p>
+</li>
