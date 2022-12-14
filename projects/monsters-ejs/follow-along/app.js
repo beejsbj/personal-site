@@ -1,4 +1,5 @@
 import express from 'express';
+import monsters from './digidex.json' assert { type: 'json' }
 
 const app = express(); 
 const PORT = 1996;
@@ -6,6 +7,7 @@ const PORT = 1996;
 // app.view("view engine", "ejs"); WRONG
 app.set("view engine", "ejs");
 app.use( express.static('styles') );
+
 
 
 app.get('/', function( request, response ){
@@ -30,5 +32,5 @@ app.use(function( request, response ){
 })
 
 app.listen(PORT, function(){
-	console.log('listening to port')
+	console.log('listening to port');
 })
