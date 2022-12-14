@@ -19,8 +19,11 @@ app.get('/monsters', function( request, response ){
 	response.render('monsters-list', { monsters });
 })
 
-app.get('/monster', function( request, response ){
-	response.render('monster-detail');
+app.get('/monsters/:name', function( request, response ){
+	let monster = monsters.find(function (monster) {
+		return monster.name.toLowerCase() == request.params.name.toLowerCase();
+	})
+	response.render('monster-detail', { monster });
 })
 
 
@@ -34,3 +37,11 @@ app.use(function( request, response ){
 app.listen(PORT, function(){
 	console.log('listening to port');
 })
+
+
+function findDigimon(id) {
+	return monsters.find(function (monster) {
+		return monster.id == id || monster.name.toLowerCase() == id;
+	})
+}
+
