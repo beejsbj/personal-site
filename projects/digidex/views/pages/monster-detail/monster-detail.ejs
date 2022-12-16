@@ -1,0 +1,23 @@
+<%- include('../../partials/header.ejs') %>
+
+
+<section>
+	<inner-column>
+	<h1 class="loud-voice"><%=monster.name%></h1>
+	<%- include('../../modules/graphic-description/graphic-description.ejs') %>
+	
+	<%- include('../../modules/skill-list/skill-list.ejs') %>
+	<evolution-list>
+		<%- include(
+				'../../modules/digi-forms/digi-forms.ejs', 
+				{ evolutions: monster.priorEvolutions }
+			) %>
+		<%- include(
+				'../../modules/digi-forms/digi-forms.ejs', 
+				{ evolutions: monster.nextEvolutions }
+			) %>
+	</evolution-list>	
+</inner-column>
+</section>
+
+<%- include('../../partials/footer.ejs') %>

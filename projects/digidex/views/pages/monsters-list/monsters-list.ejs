@@ -1,12 +1,14 @@
-<%- include('partials/header.ejs') %>
+<%- include('../../partials/header.ejs') %>
 
-	<inner-column>
-		<h1 class="loud-voice">List</h1>
-		<ul class="monsters">
+	<section>
+		<inner-column>
+			<h1 class="loud-voice">List</h1>
+			<ul class="monsters">
+
 			<% monsters.forEach( function (monster) { %>
 				<li>		
 					<monster-card>
-						<h3>
+						<h3 class="attention-voice">
 							<%=monster.name%>
 						</h3>
 						<picture>
@@ -18,6 +20,8 @@
 					</monster-card>
 				</li>
 			<% } ) %>
-		</ul>
-	</inner-column>
-<%- include('partials/footer.ejs') %>
+			
+			</ul>
+		</inner-column>
+	</section>
+<%- include('../../partials/footer.ejs') %>
