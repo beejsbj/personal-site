@@ -15,23 +15,23 @@ app.use(express.static("images"));
 
 app.get("/", function (request, response) {
 	// response.render('partials/menu'); doesnt work
-	response.render("home");
+	response.render("pages/home");
 });
 
 app.get("/monsters", function (request, response) {
-	response.render("monsters-list", { monsters });
+	response.render("pages/monsters-list/monsters-list", { monsters });
 });
 
 app.get("/monsters/:name", function (request, response) {
 	let monster = monsters.find(function (monster) {
 		return monster.name.toLowerCase() == request.params.name.toLowerCase();
 	});
-	response.render("monster-detail", { monsters, monster });
+	response.render("pages/monster-detail/monster-detail", { monsters, monster });
 });
 
 //page not found
 app.use(function (request, response) {
-	response.status(404).render("404", { query: request.url });
+	response.status(404).render("pages/404", { query: request.url });
 });
 
 function findDigimon(id) {
