@@ -1,0 +1,32 @@
+<%
+	function findDigimon(id) {
+		return monsters.find(function (monster) {
+			return monster.id == id || monster.name.toLowerCase() == id;
+		});
+	}
+%>
+<digi-forms class="next-forms">
+			<h3 class="attention-voice">Next forms</h3>
+		<ul>
+			<% 
+				evolutions.forEach(function(evolution) {
+				
+					let digimon = findDigimon(evolution.id);
+					if (!digimon) return;
+
+					let condition = evolution.condition 
+										? 'has-condition' 
+										: ""; 
+				%>
+					<li>
+						<a href="<%=digimon.name%>">
+							<monster-card class="<%=condition%>">
+							<picture>
+							<img src="<%=digimon.images[0].href%>">
+						</picture>
+						</monster-card>
+						</a>
+					</li>
+			<% }) %>
+		</ul>
+		</digi-forms>
