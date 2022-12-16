@@ -1,0 +1,28 @@
+<graphic-description>
+		<p>
+			<%=monster.descriptions[0].description%>
+		</p>
+		<picture>
+			<img src="<%=monster.images[0].href%>">
+		</picture>
+		<data-module>
+		<ul>
+			<li>
+				Digilevel: <%=monster.levels[0].level%>
+			</li>
+			<li>
+				Type: <%=monster.types[0].type%>
+			</li>
+			<li>
+				Attribute: <%=monster.attributes[0].attribute%>
+			</li>
+			<% monster.fields.forEach(function (field) { %>
+					<li class="field">
+						<picture>
+						<img src="https://digimon-api.com/images/etc/fields/<%=field.field%>.png">
+					</picture>
+					</li>
+			<% }) %>
+		</ul>
+	</data-module>
+	</graphic-description>
