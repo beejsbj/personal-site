@@ -1,0 +1,5 @@
+function findDigimon(id) {
+		return monsters.find(function (monster) {
+			return monster.id == id || monster.name.toLowerCase() == id;
+		});
+	}
