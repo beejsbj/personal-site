@@ -1,5 +1,4 @@
-/* P reset */
-/* http://meyerweb.com/eric/tools/css/reset/ 
+/* P reset */ /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
 */
@@ -21,67 +20,79 @@ time, mark, audio, video {
   border: 0;
   font-size: 100%;
   font: inherit;
-  vertical-align: baseline; }
+  vertical-align: baseline;
+}
 
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
-  display: block; }
+  display: block;
+}
 
 body {
-  line-height: 1; }
+  line-height: 1;
+}
 
 ol, ul {
-  list-style: none; }
+  list-style: none;
+}
 
 blockquote, q {
-  quotes: none; }
+  quotes: none;
+}
 
 blockquote:before, blockquote:after,
 q:before, q:after {
-  content: '';
-  content: none; }
+  content: "";
+  content: none;
+}
 
 table {
   border-collapse: collapse;
-  border-spacing: 0; }
+  border-spacing: 0;
+}
 
 /*and stuff like this*/
-/*https://gist.github.com/murtaugh/5247154*/
-/* S etup */
+/*https://gist.github.com/murtaugh/5247154*/ /* S etup */
 html {
-  box-sizing: border-box; }
+  box-sizing: border-box;
+}
 
 *, *:before, *:after {
-  box-sizing: inherit; }
-
-/* https://www.paulirish.com/2012/box-sizing-border-box-ftw */
+  box-sizing: inherit;
+} /* https://www.paulirish.com/2012/box-sizing-border-box-ftw */
 a {
   display: block;
   text-decoration: none;
-  color: inherit; }
+  color: inherit;
+}
 
 p a {
   display: inline;
   color: blue;
-  text-decoration: underline; }
+  text-decoration: underline;
+}
 
 picture {
   display: block;
-  overflow: hidden; }
+  overflow: hidden;
+}
 
 img {
   display: block;
   width: 100%;
-  height: auto; }
+  height: auto;
+}
 
 svg {
   display: block;
-  width: 100%; }
+  width: 100%;
+}
 
 /*selects for custom elements*/
 :where(:not(:defined)) {
-  display: block; }
+  display: block;
+}
 
 /* S setings */
 html {
@@ -95,7 +106,8 @@ html {
   /* or whatevers */
   --paper: hsla(209, 90%, 50%, 1.00);
   /*shadier dodgerblue*/
-  --ink: white; }
+  --ink: black;
+}
 
 @media (prefers-color-scheme: dark) {
   html {
@@ -107,18 +119,21 @@ html {
     --shadow: rgba(0,0,0,.8);
     --corners: 10px;
     /* or whatevers */
-    --paper:  hsla(217, 8%, 13%, 1.00);
+    --paper: hsla(217, 8%, 13%, 1.00);
     --paper2: hsla(217, 6%, 17%, 1.00);
     /*bunker*/
     --ink: hsla(0, 0%, 96%, 1.00);
-    /*whitesmoke*/ } }
-
+    /*whitesmoke*/
+  }
+}
 body * {
-  border: 1px solid #99d1ff;
-  padding: 4px; }
+  border: 1px solid hsl(207deg, 100%, 80%);
+  padding: 4px;
+}
 
 section:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.03); }
+  background-color: rgba(0, 0, 0, 0.03);
+}
 
 /*picture img {
 	mix-blend-mode: darken;
@@ -132,22 +147,21 @@ picture {
 body {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  /* be at least a full viewport height */ }
+  min-height: 100vh; /* be at least a full viewport height */
+}
 
 main {
-  flex-grow: 1;
-  /* fill up available space + push the footer down */ }
+  flex-grow: 1; /* fill up available space + push the footer down */
+}
 
 inner-column {
   display: block;
   width: 98%;
-  max-width: 1100px;
-  /* could be a variable in settings */
+  max-width: 1100px; /* could be a variable in settings */
   margin-right: auto;
   margin-left: auto;
-  padding: 30px 14px;
-  /* a loose default */ }
+  padding: 30px 14px; /* a loose default */
+}
 
 /*.site-header {
 	position: sticky;
@@ -159,103 +173,128 @@ inner-column {
 /* don't think you can... might have to be higher up (the top of) the food chain! */
 .loud-voice {
   font-family: sans-serif;
-  font-size: clamp(36px, 5vw, 60px); }
+  font-size: clamp(36px, 5vw, 60px);
+}
 
 @media (min-width: 600px) {
   .loud-voice {
-    font-weight: 700;
-    /* or variable font */ } }
-
+    font-weight: 700; /* or variable font */
+  }
+}
 .attention-voice {
   font-family: sans-serif;
-  font-size: 30px; }
+  font-size: 30px;
+}
 
 .solid-voice {
   font-family: sans-serif;
   font-size: 1.1rem;
-  font-weight: 700; }
+  font-weight: 700;
+}
 
 .calm-voice, p, li {
   font-family: sans-serif;
   font-size: 1rem;
-  line-height: 1.4; }
+  line-height: 1.4;
+}
 
 :is(.calm-voice, p) em {
-  font-style: italic; }
+  font-style: italic;
+}
 
 :is(.calm-voice, p) strong {
-  font-weight: 700; }
+  font-weight: 700;
+}
 
 /* these would be scoped to section or to an article element */
 /* this is just a loose setting for now */
 /* or smaller group of article-like styles such as a <text-content> custom element */
 p + p {
-  margin-top: 1em; }
+  margin-top: 1em;
+}
 
 h2 + p {
-  margin-top: 20px; }
+  margin-top: 20px;
+}
 
 code {
   font-family: monospace;
   font-size: 1.1em;
-  color: green; }
+  color: green;
+}
 
 /* C omponents */
 /* buttons and icons and smaller reusable bits here */
-/* S tuff (modules) */
+/* S tuff :modules */
 /* S ections and more stuff */
 /* then other contextual styles */
 body {
   background-color: var(--paper);
-  color: var(--ink); }
+  color: var(--ink);
+}
 
 .my-fantastic-image {
   max-width: 300px;
-  border-bottom-right-radius: 30px; }
+  border-bottom-right-radius: 30px;
+}
 
 nav {
   display: flex;
-  gap: 10px; }
+  gap: 10px;
+}
 
 ul.monsters {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 20px; }
+  gap: 20px;
+}
 
 @media (min-width: 700px) {
   graphic-description {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px; } }
-
+    gap: 10px;
+  }
+}
 evolution-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px; }
+  gap: 20px;
+}
 
 evolution-list ul {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; }
+  grid-template-columns: 1fr 1fr 1fr;
+}
 
 .has-condition {
-  border: 3px dashed red; }
+  border: 3px dashed red;
+}
 
 evolution-list li.no-image {
-  display: none; }
+  display: none;
+}
 
 skill-list ul {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr; }
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
 
 data-module {
-  grid-column: 2/-1; }
+  grid-column: 2/-1;
+}
 
 data-module ul {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; }
+  grid-template-columns: 1fr 1fr 1fr;
+}
 
 data-module .field {
-  justify-self: center; }
+  justify-self: center;
+}
 
 data-module .field picture {
-  max-width: 50px; }
+  max-width: 50px;
+}
+
+/*# sourceMappingURL=minified.css.map */
