@@ -7,7 +7,10 @@
 	// Exercise detail page title metadata
 	if (isset($_GET['exercise'])) {
 		$pageData['title'] = "Exercises for Programmers";
-		$pageData['page-title'] = $pageData['title'];
+		$pageData['heading'] = $pageData['title'];
+	}
+	if (isset($_GET['project'])) {
+		$pageData = getProject($_GET['project']);
 	}
 ?>
 
@@ -18,8 +21,8 @@
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<title><?=$pageData['title']?></title>
-		<meta name="description" content="<?=$pageData['metaDesc']?>">
-		<meta property="og:image" content="<?=$pageData['metaImage']?>">
+		<meta name="description" content="<?=$pageData['description']?>">
+		<meta property="og:image" content="<?=$pageData['image']?>">
 		<link rel='stylesheet' href='styles/site.css'>
 	</head>
 	<body>
