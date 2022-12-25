@@ -1,9 +1,9 @@
 {
 	"id": "pageNotFound",
 	"title": "404",
-	"metaImage" : "",
-	"metaDesc" : "",
-	"page-title": "Page not Found.",
+	"image" : "",
+	"description" : "",
+	"heading": "Page not Found.",
 	"sections": [
 		{
 			"module" : "section-test"

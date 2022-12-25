@@ -1,9 +1,9 @@
 {
 	"id": "resume",
 	"title": "Resume",
-	"metaImage" : "",
-	"metaDesc" : "",
-	"page-title": "Resume",
+	"image" : "",
+	"description" : "",
+	"heading": "Resume",
 	"sections": [
 		{
 			"module" : "resume-section",

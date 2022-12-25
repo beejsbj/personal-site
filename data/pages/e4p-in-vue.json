@@ -1,8 +1,8 @@
 {
 	"id": "e4p",
 	"title": "E for P",
-	"metaImage" : "",
-	"metaDesc" : "",
-	"page-title": "E4P in Vue",
+	"image" : "",
+	"description" : "",
+	"heading": "E4P in Vue",
 	"template" : true
 }

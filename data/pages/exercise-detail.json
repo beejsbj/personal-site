@@ -1,9 +1,9 @@
 {
 	"id": "exercise",
 	"title": "Welcome",
-	"metaImage" : "",
-	"metaDesc" : "",
-	"page-title": "Hey there!",
+	"image" : "",
+	"description" : "",
+	"heading": "Hey there!",
 	"sections": [
 		{
 			"module" : "exercise-detail"

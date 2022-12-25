@@ -1,9 +1,10 @@
 {
-	"id": "projects",
-	"title": "Projects",
+	"id": "project",
+	"title": "Project",
+	"template":"project-detail",
 	"image" : "",
 	"description" : "",
-	"heading": "Projects",
+	"heading": "Project",
 	"sections": [
 		{
 			"module" : "generic-text",
@@ -11,10 +12,6 @@
 			"paragraphs": {
 				"Here is where you will find the projects i've been involved in, a mix of personal and student projects." : "notice-voice"
 			}
-		},
-		{
-			"module" : "projects-grid",
-			"heading": "grid of Projects"
 		}
 	]
 }

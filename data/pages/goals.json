@@ -1,9 +1,9 @@
 {
 	"id": "goals",
 	"title": "Goals",
-	"metaImage" : "",
-	"metaDesc" : "",
-	"page-title": "Goals",
+	"image" : "",
+	"description" : "",
+	"heading": "Goals",
 	"sections": [
 		{
 			"heading-class" : "hide",

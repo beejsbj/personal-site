@@ -1,9 +1,9 @@
 {
 	"id": "garden",
 	"title": "Welcome",
-	"metaImage" : "",
-	"metaDesc" : "",
-	"page-title": "Garden",
+	"image" : "",
+	"description" : "",
+	"heading": "Garden",
 
 	"sections": [
 		{

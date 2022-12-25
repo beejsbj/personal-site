@@ -1,9 +1,9 @@
 {
 	"id": "list",
 	"title": "Stuff list",
-	"metaImage" : "",
-	"metaDesc" : "",
-	"page-title": "Lots and lots of them",
+	"image" : "",
+	"description" : "",
+	"heading": "Lots and lots of them",
 	"sections": [
 		{
 			"module" : "things-grid",

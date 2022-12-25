@@ -1,9 +1,9 @@
 {
 	"id": "about",
 	"title": "About",
-	"metaImage" : "",
-	"metaDesc" : "",
-	"page-title": "About",
+	"image" : "",
+	"description" : "",
+	"heading": "About",
 	"sections": [
 		{
 			"module" : "about-module",
