@@ -1,6 +1,6 @@
 <?php 
 	$sectionHeading = $section['heading'] ?? "This is the Projects module";
-	$projects = getPageData('projects-list');
+	$projects = getProjects();
 	
 
 	$currentPage = currentPage();
@@ -23,7 +23,8 @@
 <projects-grid>
 	<?php 
 	 	foreach ($projects as $project) {
-	 		$title = $project['title']  ?? "Project Title";
+	 		$heading = $project['heading']  ?? "Project Title";
+	 		$id = $project['id'] ?? "garden";
 	 		$description = $project['description'] ?? "this is the Project Descripton";
 	 		$image = $project['image'] ?? "square.jpg"; 
 	 		$url = $project['url'] ?? "?page=layout-garden";
@@ -31,7 +32,7 @@
 
 	 		<project-card>
 				<h1 class="attention-voice">
-					<?=$title?>
+					<?=$heading?>
 				</h1>
 				<p class="whisper-voice">
 					<?=$description?>
@@ -46,7 +47,7 @@
 						}
 					?>
 				</ul>
-				<a class="button" href="<?=$url?>"><span>LINK</span></a>
+				<a class="button" href="?page=project&project=<?=$id?>"><span>MORE</span></a>
 			</project-card>
  	<?php } ?>
 </projects-grid>
