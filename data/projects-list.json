@@ -1,6 +1,7 @@
 [
 	{
-		"title": "Layout&nbspGarden",
+		"heading": "Layout&nbspGarden",
+		"id": "garden",
 		"description": "This here is a garden of different several layouts, showcasing responsiveness across different viewports",
 		"image": "landscape.jpg",
 		"url" : "?page=layout-garden",
@@ -12,7 +13,8 @@
 		"tags": ["feature"]
 	},
 	{
-		"title": "Exercises&nbsp4 Programmers",
+		"heading": "Exercises&nbsp4 Programmers",
+		"id": "e4p",
 		"description": "A book of 57 exercises recommended by my mentor, Derek. A great book to learn and reinforce programming fundamentals",
 		"image": "landscape.jpg",
 		"url" : "?page=e4p",
@@ -25,7 +27,8 @@
 		"tags": ["feature"]
 	},
 	{
-		"title": "Quantumon",
+		"heading": "Quantumon",
+		"id": "quantumon",
 		"description": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle.",
 		"image": "landscape.jpg",
 		"url" : "projects/quantumon",
@@ -36,7 +39,8 @@
 		"tags": ["api3"]
 	},
 	{
-		"title": "Theme Challenge",
+		"heading": "Theme Challenge",
+		"id": "theme-challenge",
 		"description": "This was a fun challenge, where we were given a code base and were instructed to only use CSS to get a website to fit within chosen industry",
 		"image": "landscape.jpg",
 		"url" : "projects/theme-challenge",
@@ -47,7 +51,8 @@
 		]
 	},
 	{
-		"title": "Lottery App",
+		"heading": "Lottery App",
+		"id": "lottery",
 		"description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
 		"image": "landscape.jpg",
 		"url" : "https://api3-lottery.netlify.app",
@@ -59,7 +64,8 @@
 		"tags": ["api3"]
 	},
 	{
-		"title": "Roulette App",
+		"heading": "Roulette App",
+		"id": "roulette",
 		"description": "Back for more gambling. this had some bumps, but I really ended up liking the aesthetic I came up with!",
 		"image": "landscape.jpg",
 		"url" : "https://api3-roulette.netlify.app/",
@@ -71,7 +77,8 @@
 		"tags": ["api3"]
 	},
 	{
-		"title": "Flash Cards",
+		"heading": "Flash Cards",
+		"id": "flashcards",
 		"description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
 		"image": "landscape.jpg",
 		"url" : "projects/flashcards",
