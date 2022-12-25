@@ -3,7 +3,7 @@
 	$headerJson = file_get_contents("data/modules/header.json");
 	$headerData = json_decode($headerJson, true);
 	$sections = $headerData;
-	$sectionHeading = $pageData['page-title'];
+	$sectionHeading = $pageData['heading'];
 	foreach ($sections as $section) {
 		$module = $section['module'] ?? "generic-text";
 ?>

@@ -21,7 +21,7 @@
 	<section class="header-section">
 		<inner-column>
 			<h1 class="booming-voice">
-				<?=$pageData['page-title']?>
+				<?=$pageData['heading']?>
 			</h1>
 	</inner-column>
 	</section>
