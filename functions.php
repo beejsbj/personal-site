@@ -60,14 +60,27 @@ function renderPage ($data) {
 	$pageData = $data;
 	$page = currentPage();
 	if (isset($pageData['template'])) {
-			include("templates/pages/$page/$page.php");
+			$template = $pageData['template'];
+			include("templates/pages/$template/$template.php");
 	} else {
 		include("templates/pages/standard.php");
 	}
 }
 
+function getProjects(){
+	$json = file_get_contents("data/projects-list.json");
+	$data = json_decode($json, true);
+	return $data;
+}
 
-
+function getProject($id){
+	$projects = getProjects();
+	foreach ($projects as $project) {
+		if ($project['id'] == $id) {
+			return $project;
+		}
+	}
+}
 
 
 
