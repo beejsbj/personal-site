@@ -1,6 +1,6 @@
 <?php 
 // if heading exists condition
-	$exLink = $_GET['exercise'] ?? "saying-hello";
+	$exLink = $_GET['exercise'] ?? "01-saying-hello";
 	$exerciseName = getTitleCase( substr($exLink, 3) );
 	$funcName = getCamelCase( $exerciseName );
 ?>
@@ -16,7 +16,9 @@
 				<input type="radio" name="e4p-lang" value="js"  id="option-js">
 				<label for="option-js">JS</label>
 			</radio-option>
-			<a href="?page=e4p-in-vue#<?=$funcName?>" target="vueforms">Vue</a>
+			<a href="?page=e4p-in-vue#<?=$funcName?>" target="vueforms" class="new-tab">
+				Vue <?php include('images/new-tab.php'); ?>
+			</a>
 		</toggle-switch>
 		
 	</actions-component>
