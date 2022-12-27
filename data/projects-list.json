@@ -14,21 +14,6 @@
 		"tags": ["feature"]
 	},
 	{
-		"title": "Exercises 4 Programmers",
-		"heading": "Exercises&nbsp4 Programmers",
-		"id": "e4p",
-		"description": "A book of 57 exercises recommended by my mentor, Derek. A great book to learn and reinforce programming fundamentals",
-		"image": "landscape.jpg",
-		"url" : "?page=e4p",
-		"tools" : [
-			"HTML",
-			"CSS",
-			"PHP",
-			"JS"
-		],
-		"tags": ["feature"]
-	},
-	{
 		"title": "Quantumon",
 		"heading": "Quantumon",
 		"id": "quantumon",
@@ -67,13 +52,28 @@
 		"heading": "Theme Challenge",
 		"id": "theme-challenge",
 		"description": "This was a fun challenge, where we were given a code base and were instructed to only use CSS to get a website to fit within chosen industry",
-		"image": "landscape.jpg",
+		"image": "weed-leaf.jpg",
 		"url" : "projects/theme-challenge",
 		"tools" : [
 			"HTML",
 			"CSS",
 			"PHP"
 		]
+	},
+	{
+		"title": "Exercises 4 Programmers",
+		"heading": "Exercises&nbsp4 Programmers",
+		"id": "e4p",
+		"description": "A book of 57 exercises recommended by my mentor, Derek. A great book to learn and reinforce programming fundamentals",
+		"image": "e4p.png",
+		"url" : "?page=e4p",
+		"tools" : [
+			"HTML",
+			"CSS",
+			"PHP",
+			"JS"
+		],
+		"tags": ["feature"]
 	},
 	{
 		"title": "Lottery App",
@@ -108,7 +108,7 @@
 		"heading": "Flash Cards",
 		"id": "flashcards",
 		"description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
-		"image": "landscape.jpg",
+		"image": "flashcards.png",
 		"url" : "projects/flashcards",
 		"tools" : [
 			"HTML",
