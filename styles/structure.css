@@ -53,3 +53,10 @@ inner-column.tight {
 inner-column.wide {
 	max-width: var(--wide);
 }
+
+@media (max-width: 500px) {
+	inner-column.none-below-500 {
+		padding: initial;
+		width: 100%;
+	}
+}
