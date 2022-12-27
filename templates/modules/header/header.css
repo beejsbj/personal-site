@@ -35,7 +35,7 @@ header .circle {
 	}
 	header .circle {
 		position: absolute;
-		top: 40%;
+		top: 50%;
 		right: initial;
 		width: 40vw;
 		left: -300px;
@@ -52,7 +52,8 @@ header .circle {
 
 @media (min-width: 2000px) {
 	header .circle {
-		left: -600px;
-		width: 1200px;
+		left: -700px;
+		width: 1100px;
+		position: fixed;
 	}
 }
