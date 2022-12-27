@@ -3,6 +3,7 @@
 	$currentPage = currentPage();
 	$currentTheme = currentTheme();
 	$pageData = getPageData($currentPage);
+	$template = $pageData['template'] ?? '';
 
 	// Exercise detail page title metadata
 	if (isset($_GET['exercise'])) {
@@ -29,7 +30,7 @@
 		<?php include('templates/modules/header/header.php'); ?>
 
 		<main class="page-content">
-		<?php renderPage($pageData); ?> <!-- dynamic page rending -->
+		<?php renderPage($pageData, $template); ?> <!-- dynamic page rending -->
 		</main>
 
 		<?php include('templates/modules/footer/footer.php'); ?>
