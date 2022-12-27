@@ -56,11 +56,10 @@ function getPageData($page){
 
 
 
-function renderPage ($data) {
+function renderPage ($data, $template = '') {
 	$pageData = $data;
 	$page = currentPage();
-	if (isset($pageData['template'])) {
-			$template = $pageData['template'];
+	if ($template) {
 			include("templates/pages/$template/$template.php");
 	} else {
 		include("templates/pages/standard.php");
