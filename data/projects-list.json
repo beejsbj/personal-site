@@ -3,7 +3,7 @@
 		"title": "Layout Garden",
 		"heading": "Layout&nbspGarden",
 		"id": "garden",
-		"description": "This here is a garden of different several layouts, showcasing responsiveness across different viewports",
+		"description": "This here is a garden of responsive layouts. Try resizing the layout to see it in action!",
 		"image": "garden.png",
 		"url" : "?page=layout-garden",
 		"tools" : [
@@ -41,9 +41,63 @@
 			},
 			{
 				"heading": "Goals",
+				"heading-class" : "attention-voice float",
 				"paragraphs": {
 					"This is the goals paragraphs and it is the one for this" : ""
 				}
+			},
+			{
+				"heading": "Section",
+				"paragraphs": {
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam." : "",
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." : ""
+				}
+			},
+			{
+				"module": "graphic-layout",
+				"class": "layout-one",
+				"image1": "landscape.jpg",
+				"image2": "landscape.jpg",
+				"paragraph1": "this is the intro paragraphs and it is the one for this"
+			},
+			{
+				"heading": "Section",
+				"paragraphs": {
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam." : "",
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." : "",
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." : ""
+				}
+			},
+			{
+				"module": "graphic-layout",
+				"class": "layout-one",
+				"image1": "landscape.jpg",
+				"image2": "landscape.jpg",
+				"paragraph1": "this is the intro paragraphs and it is the one for this"
+			},
+			{
+				"module": "menu-module",
+				"menu": "project",
+				"links": [
+					{
+						"id" : "live",
+						"name": "Live&nbspLink",
+						"slug": "https://quantumon.xyz/",
+						"target": "live"
+					},
+					{
+						"id" : "github",
+						"name": "Github",
+						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
+						"target": "github"
+					},
+					{
+						"id" : "article",
+						"name": "More...",
+						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
+						"target": "article"
+					}
+				]
 			}
 		]
 	},
@@ -64,7 +118,7 @@
 		"title": "Exercises 4 Programmers",
 		"heading": "Exercises&nbsp4 Programmers",
 		"id": "e4p",
-		"description": "A book of 57 exercises recommended by my mentor, Derek. A great book to learn and reinforce programming fundamentals",
+		"description": "A book of 57 exercises recommended by Derek. A great book to learn and reinforce programming fundamentals",
 		"image": "e4p.png",
 		"url" : "?page=e4p",
 		"tools" : [
