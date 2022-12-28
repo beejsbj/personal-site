@@ -16,7 +16,7 @@
 ?>
 
 <!doctype html>
-<html lang='en' class='special-magic no-js <?=$pageData['id']?> <?=$currentTheme?>-theme'>
+<html lang='en' class='special-magic no-js <?=$pageData['id']?> >
 
 	<head>
 		<meta charset='utf-8'>
@@ -24,7 +24,7 @@
 		<title><?=$pageData['title']?></title>
 		<meta name="description" content="<?=$pageData['description']?>">
 		<meta property="og:image" content="<?=$pageData['image']?>">
-		<link rel='stylesheet' href='styles/site.css'>
+		<link rel='stylesheet' href='styles/<?=$currentTheme?>/site.css'>
 	</head>
 	<body>
 		<?php include('templates/modules/header/header.php'); ?>
