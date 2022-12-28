@@ -2,8 +2,13 @@
 <?php
 	$menu = $section['menu'] ?? $menu ?? 'test'; 
 
-	$menuJson = file_get_contents("data/components/$menu-menu.json");
-	$menuData = json_decode($menuJson, true);
+	if (file_exists("data/components/$menu-menu.json")){
+		$menuJson = file_get_contents("data/components/$menu-menu.json");
+		$menuData = json_decode($menuJson, true);
+	} else {
+		$menuData = $section['links'];
+	}
+	
 	 
 ?>
 
@@ -12,6 +17,8 @@
 		<?php foreach ($menuData as $menuItem) {
 			$class = $menuItem['class'] ?? ""; 
 			$slug = $menuItem['slug']; 
+			$name = $menuItem['name'];
+			$target = $menuItem['target'] ?? "";
 			if ($menu == 'site') {
 				$class = activePage($menuItem['class']);
 				$slug = $menuItem['slug'] . "&theme=" . currentTheme();
@@ -25,8 +32,9 @@
 				<a 
 					class="<?=$class?>" 
 					href="<?=$slug?>"
+					target="<?=$target?>"
 				>
-					<span><?=$menuItem['name']?></span>
+					<span><?=$name?></span>
 				</a>
 			</li>
 		<?php } ?>
