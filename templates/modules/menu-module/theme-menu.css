@@ -57,7 +57,6 @@
 		right: -5%;
 		bottom: 5%;
 	}
-
 }
 
 @media (min-width: 750px) {
@@ -78,7 +77,6 @@
 
 @media (min-width: 1000px) {
 	.theme-menu {
-
 		right: initial;
 		left: -40px;
 		top: -40px;

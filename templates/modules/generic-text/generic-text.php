@@ -2,6 +2,7 @@
 <?php 
 // if heading exists condition
 	$sectionHeading = $sectionHeading ?? ($section['heading'] ?? "This is the Generic text module");
+	
 	$headingClass = $section['heading-class'] ?? "attention-voice";
 	$paragraphs = $section['paragraphs'] ?? ["this is the generic text paragraph" => "hide"];
 ?>
