@@ -3,7 +3,7 @@
 		"title": "Layout Garden",
 		"heading": "Layout&nbspGarden",
 		"id": "garden",
-		"description": "This here is a garden of responsive layouts. Try resizing the layout to see it in action!",
+		"description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout to see the layout adapt!",
 		"image": "garden.png",
 		"url" : "?page=layout-garden",
 		"tools" : [
@@ -40,6 +40,7 @@
 				"paragraph1": "this is the intro paragraphs and it is the one for this"
 			},
 			{
+				"section-class": "float",
 				"heading": "Goals",
 				"heading-class" : "attention-voice float",
 				"paragraphs": {
@@ -93,7 +94,7 @@
 					},
 					{
 						"id" : "article",
-						"name": "More...",
+						"name": "Read...",
 						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
 						"target": "article"
 					}
