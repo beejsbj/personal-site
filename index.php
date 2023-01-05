@@ -1,5 +1,6 @@
 <?php 
 	include('functions.php'); 
+
 	$currentPage = currentPage();
 	$currentTheme = currentTheme();
 	$pageData = getPageData($currentPage);
@@ -24,7 +25,7 @@
 		<title><?=$pageData['title']?></title>
 		<meta name="description" content="<?=$pageData['description']?>">
 		<meta property="og:image" content="<?=$pageData['image']?>">
-		<link rel='stylesheet' href='styles/<?=$currentTheme?>/site.css'>
+		<link rel='stylesheet' href='<?=$slugLength?>styles/<?=$currentTheme?>/site.css'>
 	</head>
 	<body>
 		<?php include('templates/modules/header/header.php'); ?>

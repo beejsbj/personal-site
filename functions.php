@@ -168,3 +168,19 @@ function getTitleCase($title) {
 function exExists($slug){
 	return	file_exists("projects/e4p/exercises/$slug.php");
 }
+
+
+
+// $siteSlug = explode('/', $_SERVER['QUERY_STRING']);
+// format($siteSlug);
+// $page = $siteSlug[0];
+// $detail = $siteSlug[1];
+// $slugLength = 0;
+// echo $page;
+// echo $detail;
+// $slugLength = str_repeat("../", count($siteSlug));
+// echo $slugLength;
+
+echo $_GET['page'];
+
+

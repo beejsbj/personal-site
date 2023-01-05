@@ -1,0 +1,11 @@
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ([0-9a-zA-Z_-]+)$ ?page=$1 [L,QSA]
+RewriteRule ^projects/([0-9a-zA-Z_-]+)$ ?page=$1 [L,QSA]
+RewriteRule ^projects/([0-9a-zA-Z_-]+)$ ?page=$1 [L,QSA]
+RewriteRule ^projects/([0-9a-zA-Z_-]+)$ ?page=$1 [L,QSA]
+
+
+
