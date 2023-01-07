@@ -3,12 +3,12 @@
 		"id" : "theme0",
 		"class" : "default",
 		"name" : "Default",
-		"slug" : "&theme=default"
+		"slug" : "default"
 	},
 	{
 		"id" : "theme1",
 		"class" : "pe-site",
 		"name" : "PE site",
-		"slug" : "&theme=pe-site"
+		"slug" : "pe-site"
 	}
 ]
