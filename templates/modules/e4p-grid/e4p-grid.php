@@ -42,7 +42,7 @@
 				 		}
 				 		?>
 						<li>
-							<a href="?page=exercise-detail&exercise=<?=$exSlug?>">
+							<a href="exercise/<?=$exSlug?>">
 								<?=$exName?>
 							</a>
 							<p><?=$exDesc?></p>
