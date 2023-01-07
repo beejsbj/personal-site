@@ -1,8 +1,6 @@
 <?php 
 	$sectionHeading = $section['heading'] ?? "This is the Projects module";
 	$projects = getProjects();
-	
-
 	$currentPage = currentPage();
 
 
@@ -27,7 +25,7 @@
 	 		$id = $project['id'] ?? "garden";
 	 		$description = $project['description'] ?? "this is the Project Descripton";
 	 		$image = $project['image'] ?? "square.jpg"; 
-	 		$url = $project['url'] ?? "?page=layout-garden";
+	 		$url = $project['url'] ?? "?page=project&project=$id";
 	 		$tools = $project['tools'] ?? "['HTML', 'CSS']"; ?>
 
 	 		<project-card>
@@ -47,7 +45,7 @@
 						}
 					?>
 				</ul>
-				<a class="button" href="?page=project&project=<?=$id?>"><span>MORE</span></a>
+				<a class="button" href="<?=$url?>"><span>MORE</span></a>
 			</project-card>
  	<?php } ?>
 </projects-grid>
