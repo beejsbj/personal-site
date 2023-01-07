@@ -3,24 +3,24 @@
 		"id" : "site0",
 		"class" : "home",
 		"name" : "Home",
-		"slug" : "?page=home"
+		"slug" : "home"
 	},
 	{
 		"id" : "site1",
 		"class" : "about",
 		"name" : "About",
-		"slug" : "?page=about"
+		"slug" : "about"
 	},
 	{
 		"id" : "site2",
 		"class" : "projects",
 		"name" : "Projects",
-		"slug" : "?page=projects"
+		"slug" : "projects"
 	},
 	{
 		"id" : "site3",
 		"class" : "style-guide",
 		"name" : "Style Guide",
-		"slug" : "?page=style-guide"
+		"slug" : "style-guide"
 	}
 ]
