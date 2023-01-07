@@ -3,15 +3,34 @@
 		"title": "Layout Garden",
 		"heading": "Layout&nbspGarden",
 		"id": "garden",
-		"description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout to see the layout adapt!",
+		"description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout adapt!",
 		"image": "garden.png",
-		"url" : "?page=layout-garden",
 		"tools" : [
 			"HTML",
 			"CSS",
 			"PHP"
 		],
-		"tags": ["feature"]
+		"tags": ["feature"],
+		"sections": [
+			{
+				"heading-class" : "hide",
+				"paragraphs": {
+					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+				}
+			},
+			{
+				"module": "menu-module",
+				"menu": "project",
+				"links": [
+					{
+						"id" : "live",
+						"name": "Live&nbspLink",
+						"slug": "?page=garden",
+						"target": "live"
+					}
+				]
+			}
+		]
 	},
 	{
 		"title": "Quantumon",
@@ -19,7 +38,6 @@
 		"id": "quantumon",
 		"description": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle.",
 		"image": "quantumon.png",
-		"url" : "projects/quantumon",
 		"tools" : [
 			"HTML",
 			"CSS"
@@ -108,11 +126,43 @@
 		"id": "theme-challenge",
 		"description": "This was a fun challenge, where we were given a code base and were instructed to only use CSS to get a website to fit within chosen industry",
 		"image": "weed-leaf.jpg",
-		"url" : "projects/theme-challenge",
+		"url" : "https://buroojs.substack.com/p/theme-challenge",
 		"tools" : [
 			"HTML",
 			"CSS",
 			"PHP"
+		],
+		"sections": [
+			{
+				"heading-class" : "hide",
+				"paragraphs": {
+					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+				}
+			},
+			{
+				"module": "menu-module",
+				"menu": "project",
+				"links": [
+					{
+						"id" : "live",
+						"name": "Live&nbspLink",
+						"slug": "projects/theme-challenge",
+						"target": "live"
+					},
+					{
+						"id" : "github",
+						"name": "Github",
+						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
+						"target": "github"
+					},
+					{
+						"id" : "article",
+						"name": "Read...",
+						"slug": "https://buroojs.substack.com/p/theme-challenge",
+						"target": "article"
+					}
+				]
+			}
 		]
 	},
 	{
@@ -121,14 +171,45 @@
 		"id": "e4p",
 		"description": "A book of 57 exercises recommended by Derek. A great book to learn and reinforce programming fundamentals",
 		"image": "e4p.png",
-		"url" : "?page=e4p",
 		"tools" : [
 			"HTML",
 			"CSS",
 			"PHP",
 			"JS"
 		],
-		"tags": ["feature"]
+		"tags": ["feature"],
+		"sections": [
+			{
+				"heading-class" : "hide",
+				"paragraphs": {
+					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+				}
+			},
+			{
+				"module": "menu-module",
+				"menu": "project",
+				"links": [
+					{
+						"id" : "live",
+						"name": "Live&nbspLink",
+						"slug": "?page=e4p",
+						"target": "live"
+					},
+					{
+						"id" : "github",
+						"name": "Github",
+						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/e4p",
+						"target": "github"
+					},
+					{
+						"id" : "article",
+						"name": "Read...",
+						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
+						"target": "article"
+					}
+				]
+			}
+		]
 	},
 	{
 		"title": "Lottery App",
@@ -136,13 +217,38 @@
 		"id": "lottery",
 		"description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
 		"image": "lottery-app.jpg",
-		"url" : "https://api3-lottery.netlify.app",
 		"tools" : [
 			"HTML",
 			"CSS",
 			"JS"
 		],
-		"tags": ["api3"]
+		"tags": ["api3"],
+		"sections": [
+			{
+				"heading-class" : "hide",
+				"paragraphs": {
+					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+				}
+			},
+			{
+				"module": "menu-module",
+				"menu": "project",
+				"links": [
+					{
+						"id" : "live",
+						"name": "Live&nbspLink",
+						"slug": "https://api3-lottery.netlify.app",
+						"target": "live"
+					},
+					{
+						"id" : "github",
+						"name": "Github",
+						"slug": "https://github.com/beejsbj/lottery-app",
+						"target": "github"
+					}
+				]
+			}
+		]
 	},
 	{
 		"title": "Roulette App",
@@ -150,13 +256,38 @@
 		"id": "roulette",
 		"description": "Back for more gambling. this had some bumps, but I really ended up liking the aesthetic I came up with!",
 		"image": "roulette-app.jpg",
-		"url" : "https://api3-roulette.netlify.app/",
 		"tools" : [
 			"HTML",
 			"CSS",
 			"JS"
 		],
-		"tags": ["api3"]
+		"tags": ["api3"],
+		"sections": [
+			{
+				"heading-class" : "hide",
+				"paragraphs": {
+					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+				}
+			},
+			{
+				"module": "menu-module",
+				"menu": "project",
+				"links": [
+					{
+						"id" : "live",
+						"name": "Live&nbspLink",
+						"slug": "https://api3-roulette.netlify.app/",
+						"target": "live"
+					},
+					{
+						"id" : "github",
+						"name": "Github",
+						"slug": "https://github.com/beejsbj/roulette-app",
+						"target": "github"
+					}
+				]
+			}
+		]
 	},
 	{
 		"title": "Flash Cards",
@@ -164,13 +295,44 @@
 		"id": "flashcards",
 		"description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
 		"image": "flashcards.png",
-		"url" : "projects/flashcards",
 		"tools" : [
 			"HTML",
 			"CSS",
 			"JS"
 		],
-		"tags": ["feature"]
+		"tags": ["feature"],
+		"sections": [
+			{
+				"heading-class" : "hide",
+				"paragraphs": {
+					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+				}
+			},
+			{
+				"module": "menu-module",
+				"menu": "project",
+				"links": [
+					{
+						"id" : "live",
+						"name": "Live&nbspLink",
+						"slug": "projects/flashcards",
+						"target": "live"
+					},
+					{
+						"id" : "github",
+						"name": "Github",
+						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
+						"target": "github"
+					},
+					{
+						"id" : "article",
+						"name": "Read...",
+						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
+						"target": "article"
+					}
+				]
+			}
+		]
 	}
 
 ]
