@@ -21,11 +21,11 @@
 			$target = $menuItem['target'] ?? "";
 			if ($menu == 'site') {
 				$class = activePage($menuItem['class']);
-				$slug = $menuItem['slug'] . "&theme=" . currentTheme();
+				$slug = $menuItem['slug'] . "/?theme=" . currentTheme();
 			}
 			if ($menu == 'theme') {
 				$class = activeTheme($menuItem['class']);
-				$slug = "?page=" . currentPage() . $menuItem['slug'];
+				$slug = currentPage() . "/?theme=" . $menuItem['slug'];
 			}
 			?>
 			<li>
