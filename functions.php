@@ -26,17 +26,29 @@ function queryString(){
 	return $_SERVER['QUERY_STRING'];
 }
 
-
-
 ////////////routing////////////// 
 
 //get page name
-function currentPage(){ 
-	if (isset($_GET['page'])) {
-	 	return $_GET['page'];
-	 } else {
-	 	return 'home';
-	 }
+function currentPage(){
+	$siteSlug = explode('/', queryString());
+	$_GET['page'] = $siteSlug[0] ?? 'home';
+	if (isset($siteSlug[1])) {
+		if ($siteSlug[0] == 'projects') {
+			$_GET['page'] = 'project';
+			$_GET['project'] = $siteSlug[1];
+		}
+
+		if ($siteSlug[0] == 'exercise') {
+			$_GET['page'] = 'exercise-detail';
+			$_GET['exercise'] = $siteSlug[1];
+		}
+
+		if ($siteSlug[0] == 'garden') {
+			$_GET['page'] = 'layout-detail';
+			$_GET['layout'] = $siteSlug[1];
+		}
+	}
+	return $_GET['page']; 
 }
 
 
@@ -171,16 +183,10 @@ function exExists($slug){
 
 
 
-// $siteSlug = explode('/', $_SERVER['QUERY_STRING']);
-// format($siteSlug);
-// $page = $siteSlug[0];
-// $detail = $siteSlug[1];
-// $slugLength = 0;
-// echo $page;
-// echo $detail;
-// $slugLength = str_repeat("../", count($siteSlug));
-// echo $slugLength;
 
-echo $_GET['page'];
+// $siteSlug = explode('/', $_SERVER['QUERY_STRING']);
+
+
+
 
 
