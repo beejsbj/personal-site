@@ -25,27 +25,28 @@ showErrors();
 function queryString(){
 	return $_SERVER['QUERY_STRING'];
 }
-
+// format($_SERVER);
 ////////////routing////////////// 
 
 //get page name
 function currentPage(){
-	$siteSlug = explode('/', queryString());
-	$_GET['page'] = $siteSlug[0] ?? 'home';
-	if (isset($siteSlug[1])) {
-		if ($siteSlug[0] == 'projects') {
-			$_GET['page'] = 'project';
-			$_GET['project'] = $siteSlug[1];
+	$siteSlug = explode('/', $_SERVER['REQUEST_URI']);
+	$_GET['page'] = $siteSlug[2] ? $siteSlug[2] : 'home';
+
+	if (isset($siteSlug[3])) {
+		if ($siteSlug[2] == 'project') {
+			// $_GET['page'] = 'project';
+			$_GET['project'] = $siteSlug[3];
 		}
 
-		if ($siteSlug[0] == 'exercise') {
+		if ($siteSlug[2] == 'exercise') {
 			$_GET['page'] = 'exercise-detail';
-			$_GET['exercise'] = $siteSlug[1];
+			$_GET['exercise'] = $siteSlug[3];
 		}
 
-		if ($siteSlug[0] == 'garden') {
+		if ($siteSlug[2] == 'garden') {
 			$_GET['page'] = 'layout-detail';
-			$_GET['layout'] = $siteSlug[1];
+			$_GET['layout'] = $siteSlug[3];
 		}
 	}
 	return $_GET['page']; 
