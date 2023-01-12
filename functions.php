@@ -8,6 +8,7 @@ function showErrors() {
 showErrors();
 
 
+
 // to print formatted arrays that are legible.
   function format($variable) {
     echo "<pre>";
@@ -20,6 +21,9 @@ showErrors();
     echo "</pre>";
   }
 
+function getDirname() {
+	return dirname($_SERVER['SCRIPT_NAME']);
+}
 
   //show query string
 function queryString(){

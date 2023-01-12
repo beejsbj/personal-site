@@ -1,6 +1,6 @@
 <?php 
 	include('functions.php'); 
-	$__dirname = dirname($_SERVER['SCRIPT_NAME']);
+	$__dirname = getDirname();
 	$siteSlug = explode('/', queryString());
 	$currentPage = currentPage();
 	$currentTheme = currentTheme();
