@@ -25,6 +25,7 @@ function getDirname() {
 	return dirname($_SERVER['SCRIPT_NAME']);
 }
 
+
   //show query string
 function queryString(){
 	return $_SERVER['QUERY_STRING'];
