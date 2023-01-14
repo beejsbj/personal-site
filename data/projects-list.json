@@ -5,7 +5,7 @@
 		"id": "garden",
 		"description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout adapt!",
 		"image": "garden.png",
-		"url" : "?page=garden", //remove for case study #todo
+		"url" : "?page=garden",
 		"tools" : [
 			"HTML",
 			"CSS",
@@ -38,7 +38,7 @@
 		"id": "quantumon",
 		"description": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle.",
 		"image": "quantumon.png",
-		"url" : "projects/quantumon", //remove for case study #todo
+		"url" : "projects/quantumon",
 		"tools" : [
 			"HTML",
 			"CSS"
@@ -127,7 +127,7 @@
 		"id": "theme-challenge",
 		"description": "This was a fun challenge, where we were given a code base and were instructed to only use CSS to get a website to fit within chosen industry",
 		"image": "weed-leaf.jpg",
-		"url" : "https://buroojs.substack.com/p/theme-challenge", //remove for case study #todo
+		"url" : "https://buroojs.substack.com/p/theme-challenge",
 		"tools" : [
 			"HTML",
 			"CSS",
@@ -172,7 +172,7 @@
 		"id": "e4p",
 		"description": "A book of 57 exercises recommended by Derek. A great book to learn and reinforce programming fundamentals",
 		"image": "e4p.png",
-		"url" : "?page=e4p", //remove for case study #todo
+		"url" : "?page=e4p",
 		"tools" : [
 			"HTML",
 			"CSS",
@@ -218,7 +218,7 @@
 		"id": "lottery",
 		"description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
 		"image": "lottery-app.jpg",
-		"url" : "https://api3-lottery.netlify.app/", //remove for case study #todo
+		"url" : "https://api3-lottery.netlify.app/",
 		"tools" : [
 			"HTML",
 			"CSS",
@@ -258,7 +258,7 @@
 		"id": "roulette",
 		"description": "Back for more gambling. this had some bumps, but I really ended up liking the aesthetic I came up with!",
 		"image": "roulette-app.jpg",
-		"url" : "https://api3-roulette.netlify.app/", //remove for case study #todo
+		"url" : "https://api3-roulette.netlify.app/",
 		"tools" : [
 			"HTML",
 			"CSS",
@@ -298,7 +298,6 @@
 		"id": "flashcards",
 		"description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
 		"image": "flashcards.png",
-		"url" : "projects/flashcards", //r //remove for case study #todo
 		"tools" : [
 			"HTML",
 			"CSS",

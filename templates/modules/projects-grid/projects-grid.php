@@ -2,7 +2,7 @@
 	$sectionHeading = $section['heading'] ?? "This is the Projects module";
 	$projects = getProjects();
 	$currentPage = currentPage();
-
+	
 
 	if ($currentPage != 'projects') {
 		$projects = projectFilter($projects, 'feature');
