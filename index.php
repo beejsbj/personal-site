@@ -2,10 +2,12 @@
 	include('functions.php'); 
 	$__dirname = getDirname();
 	$siteSlug = explode('/', queryString());
-	$currentPage = currentPage();
+	// $currentPage = currentPrettyPage(); //pretty
+	$currentPage = currentPage(); // ugly 
 	$currentTheme = currentTheme();
 	$pageData = getPageData($currentPage);
 	$template = $pageData['template'] ?? '';
+
 
 	// Exercise detail page title metadata
 	if (isset($_GET['exercise'])) {
@@ -44,3 +46,5 @@
 <?php //format($pageData);?>
 
 <!-- test -->
+
+
