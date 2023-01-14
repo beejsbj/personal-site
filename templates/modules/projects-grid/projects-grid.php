@@ -25,7 +25,9 @@
 	 		$id = $project['id'] ?? "garden";
 	 		$description = $project['description'] ?? "this is the Project Descripton";
 	 		$image = $project['image'] ?? "square.jpg"; 
-	 		$url = $project['url'] ?? "project/$id";
+	 		// $url = $project['url'] ?? "project/$id"; //pretty
+	 		$url = $project['url'] ?? "?page=project&project=$id"; //ugly
+
 	 		$tools = $project['tools'] ?? "['HTML', 'CSS']"; ?>
 
 	 		<project-card>
