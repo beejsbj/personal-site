@@ -34,7 +34,7 @@ function queryString(){
 ////////////routing////////////// 
 
 //get page name
-function currentPage(){
+function currentPrettyPage(){
 	$siteSlug = explode('/', $_SERVER['REQUEST_URI']);
 	$_GET['page'] = $siteSlug[2] ? $siteSlug[2] : 'home';
 
@@ -55,6 +55,14 @@ function currentPage(){
 		}
 	}
 	return $_GET['page']; 
+}
+
+function currentPage(){ 
+	if (isset($_GET['page'])) {
+	 	return $_GET['page'];
+	 } else {
+	 	return 'home';
+	 }
 }
 
 
@@ -101,11 +109,6 @@ function getProject($id){
 
 
 
-
-
-
-
-
 function activePage($current){
 	
   if (currentPage() == $current) {
@@ -118,7 +121,6 @@ function activeTheme($current){
     return "active";
   } 
 }
-
 
 
 function currentTheme(){ 
