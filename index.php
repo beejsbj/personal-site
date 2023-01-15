@@ -25,7 +25,7 @@
 <html lang='en' class='special-magic no-js <?=$pageData['id']?>' >
 
 	<head>
-		<base href="<?=BASE_URL?>/" />
+		<base href="<?=$__dirname?>/" />
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<title><?=$pageData['title']?></title>
