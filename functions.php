@@ -198,3 +198,4 @@ function exExists($slug){
 
 
 
+format($_SERVER);
