@@ -1,11 +1,12 @@
 <?php 
 	include('config.php'); 
 	include('functions.php'); 
-	echo getDirname();
+
+	echo $_SERVER['SCRIPT_URI'];
 	$__dirname = getDirname();
 	$siteSlug = explode('/', queryString());
-	// $currentPage = currentPrettyPage(); //pretty
-	$currentPage = currentPage(); // ugly 
+	$currentPage = currentPrettyPage(); //pretty
+	// $currentPage = currentPage(); // ugly 
 	$currentTheme = currentTheme();
 	$pageData = getPageData($currentPage);
 	$template = $pageData['template'] ?? '';
@@ -25,7 +26,7 @@
 <html lang='en' class='special-magic no-js <?=$pageData['id']?>' >
 
 	<head>
-		<base href="<?=$__dirname?>/" />
+		<base href="<?=BASE_URL?>/" />
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<title><?=$pageData['title']?></title>
