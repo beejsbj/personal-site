@@ -1,10 +1,19 @@
+# turn rewriting on
 RewriteEngine On
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# /projects  →  ?page=projects
+# getting tangled up with the next one?
 
-RewriteRule ^(.*)$ index.php?$1 [QSA]
-RewriteRule projects(/)?$ index.php?$1 [QSA]
+# /page-name →                              ?page=page-name
+RewriteRule ^([0-9a-zA-Z_-]+)$              ?page=$1 [NC,L]
+
+RewriteRule projects(/)?$ ?page=projects [QSA]
+
+# /projects/project-name  →                 ?page=project&slug=project-slug
+RewriteRule ^projects/([0-9a-zA-Z_-]+)$     ?page=project&project=$1 [NC,L]
+
+
+
 
 
 

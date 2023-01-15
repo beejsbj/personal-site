@@ -1,12 +1,11 @@
 <?php 
-	include('config.php'); 
+	// include('config.php'); 
 	include('functions.php'); 
 
-	echo $_SERVER['SCRIPT_URI'];
 	$__dirname = getDirname();
 	$siteSlug = explode('/', queryString());
-	$currentPage = currentPrettyPage(); //pretty
-	// $currentPage = currentPage(); // ugly 
+	// $currentPage = currentPrettyPage(); //pretty
+	$currentPage = currentPage(); // ugly 
 	$currentTheme = currentTheme();
 	$pageData = getPageData($currentPage);
 	$template = $pageData['template'] ?? '';
