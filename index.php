@@ -1,6 +1,7 @@
 <?php 
 	include('config.php'); 
 	include('functions.php'); 
+	echo getDirname();
 	$__dirname = getDirname();
 	$siteSlug = explode('/', queryString());
 	// $currentPage = currentPrettyPage(); //pretty
