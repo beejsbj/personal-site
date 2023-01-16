@@ -84,6 +84,13 @@ function getProject($id){
 	}
 }
 
+function getExercise($id){
+	$json = file_get_contents("data/exercises-list.json");
+	$exercises = json_decode($json, true);
+	$exercise = $exercises[ $id - 1 ] ?? $exercises[57];
+	return $exercise;
+}
+
 
 
 function activePage($current){
