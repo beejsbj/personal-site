@@ -1,11 +1,6 @@
 # turn rewriting on
 RewriteEngine On
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-# /projects  →  ?page=projects
-# getting tangled up with the next one?
 
 # /page-name →                              ?page=page-name
 RewriteRule ^([0-9a-zA-Z_-]+)$              ?page=$1 [QSA]
@@ -18,3 +13,6 @@ RewriteRule ^projects/([0-9a-zA-Z_-]+)$     ?page=project&project=$1 [QSA]
 RewriteRule ^garden/([0-9a-zA-Z_-]+)$     ?page=layout-detail&layout=$1 [QSA]
 
 RewriteRule ^e4p/([0-9a-zA-Z_-]+)$     ?page=exercise-detail&exercise=$1 [QSA]
+
+RewriteRule ^([0-9a-zA-Z_-]+)/([0-9a-zA-Z_-]+)     ?page=pageNotFound [QSA]
+
