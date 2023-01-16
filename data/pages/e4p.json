@@ -13,349 +13,54 @@
 					"heading": "Input, Processing, and Output",
 					"svg" : "svg name",
 					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-					"exercises" : [
-						{
-							"number" : "01",
-							"name" : "Saying Hello",
-							"description" : "A program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "02",
-							"name" : "Counting the Number of Characters",
-							"description" : "A program that prompts for an input string and displays the number of characters the string contains."
-						},
-						{
-							"number" : "03",
-							"name" : "Printing Quotes",
-							"description" : "A program that prompts for a quote and an author and displays it"
-						},
-						{
-							"number" : "04",
-							"name" : "Mad Lib",
-							"description" : "A simple mad-lib program that prompts for a noun, verb, adverb, and adjective and injects them into a story."
-						},
-						{
-							"number" : "05",
-							"name" : "Simple Math",
-							"description" : "A program that prompts for two numbers. and displays the sum, difference, product, and quotient of those numbers"
-						},
-						{
-							"number" : "06",
-							"name" : "Retirement Calculator",
-							"description" : "A program that determines how many years you have left until retirement and the year you can retire."
-						}
-					]
+					"exercises" : [1, 2, 3, 4, 5, 6]
 				},
 				{
 					"heading": "Calculations",
 					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-					"exercises" : [
-						{
-							"number" : "07",
-							"name" : "Area of a Rectangular Room",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "08",
-							"name" : "Pizza Party",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "09",
-							"name" : "Paint Calculator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "10",
-							"name" : "Self-Checkout",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "11",
-							"name" : "Currency Conversion",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "12",
-							"name" : "Computing Simple Interest",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "13",
-							"name" : "Determining Compound Interest",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						}
-					],
+					"exercises" : [7, 8, 9, 10, 11, 12, 13],
 					"svg" : "svg name"
 				},
 				{
 					"heading": "Making Decisions",
 					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-					"exercises" : [
-						{
-							"number" : "14",
-							"name" : "Tax Calculator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "15",
-							"name" : "Password Validation",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "16",
-							"name" : "Legal Driving Age",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "17",
-							"name" : "Blood Alcohol Calculator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "18",
-							"name" : "Temperature Converter",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "19",
-							"name" : "BMI Calculator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "20",
-							"name" : "Multistate Sales Tax Calculator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "21",
-							"name" : "Numbers to Names",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "22",
-							"name" : "Comparing Numbers",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "23",
-							"name" : "Troubleshooting Car Issues",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						}
-					],
+					"exercises" : [14, 15, 16, 17, 18, 19, 20, 21, 23],
 					"svg" : "svg name"
 				},
 				{
 					"heading": "Functions",
 					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-					"exercises" : [
-						{
-							"number" : "24",
-							"name" : "Anagram Checker",
-							"description" : "a program that compares two strings and determines if the two strings are anagrams."
-						},
-						{
-							"number" : "25",
-							"name" : "Password Strength Indicator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "26",
-							"name" : "Credit Card Payment Calculator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "27",
-							"name" : "Validating Inputs",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						}
-					],
+					"exercises" : [24, 25, 26, 27],
 					"svg" : "svg name"
 				},
 				{
 					"heading": "Repetition",
 					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-					"exercises" : [
-						{
-							"number" : "28",
-							"name" : "Adding Numbers",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "29",
-							"name" : "Handling Bad Input",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "30",
-							"name" : "Multiplication Table",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "31",
-							"name" : "Karvonen Heart Rate",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "32",
-							"name" : "Guess the Number Game",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						}
-					],
+					"exercises" : [28, 29, 30, 31, 32],
 					"svg" : "svg name"
 				},
 				{
 					"heading": "Data Structures",
 					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-					"exercises" : [
-						{
-							"number" : "33",
-							"name" : "Magic 8 Ball",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "34",
-							"name" : "Employee List Removal",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "35",
-							"name" : "Picking a Winner",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "36",
-							"name" : "Computing Statistics",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "37",
-							"name" : "Password Generator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "38",
-							"name" : "Filtering Values",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "39",
-							"name" : "Sorting Records",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "40",
-							"name" : "Filtering Records",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						}
-					],
+					"exercises" : [33, 34, 35, 36, 37, 38, 39, 40],
 					"svg" : "svg name"
 				},
 				{
 					"heading": "Working with Files",
 					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-					"exercises" : [
-						{
-							"number" : "41",
-							"name" : "Name Sorter",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "42",
-							"name" : "Parsing a Data File",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "43",
-							"name" : "Website Generator",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "44",
-							"name" : "Product Search",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "45",
-							"name" : "Word Finder",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "46",
-							"name" : "Word Frequency Finder",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						}
-					],
+					"exercises" : [41, 42, 43, 44, 45, 46],
 					"svg" : "svg name"
 				},
 				{
 					"heading": "Working with External Services",
 					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-					"exercises" : [
-						{
-							"number" : "47",
-							"name" : "Who's in Space?",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "48",
-							"name" : "Grabbing the Weather",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "49",
-							"name" : "Flickr Photo Search",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "50",
-							"name" : "Movie Recommendations",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "51",
-							"name" : "Pushing Notes to Firebase",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "52",
-							"name" : "Creating Your Own Time Service",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						}
-					],
+					"exercises" : [47, 48, 49, 50 ,51, 52],
 					"svg" : "svg name"
 				},
 				{
 					"heading": "Full Programs",
 					"description": "this is where we get into more complex maths. We learn to deal formulas, conversions and rounding money",
-					"exercises" : [
-						{
-							"number" : "53",
-							"name" : "Todo List",
-							"slug" : "projects/todo-app",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "54",
-							"name" : "URL Shortener",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "55",
-							"name" : "Text Sharing",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "56",
-							"name" : "Tracking Inventory",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						},
-						{
-							"number" : "57",
-							"name" : "Trivia App",
-							"description" : "a program that prompts for your name and prints a greeting using your name."
-						}
-					],
+					"exercises" : [53, 54, 55, 56, 57],
 					"svg" : "svg name"
 				}
 			]
