@@ -5,7 +5,7 @@
 		"id": "garden",
 		"description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout adapt!",
 		"image": "garden.png",
-		"url" : "?page=garden",
+		"url" : "garden",
 		"tools" : [
 			"HTML",
 			"CSS",
@@ -172,7 +172,7 @@
 		"id": "e4p",
 		"description": "A book of 57 exercises recommended by Derek. A great book to learn and reinforce programming fundamentals",
 		"image": "e4p.png",
-		"url" : "?page=e4p",
+		"url" : "e4p",
 		"tools" : [
 			"HTML",
 			"CSS",
