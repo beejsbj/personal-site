@@ -1,8 +1,16 @@
 <?php 
 // if heading exists condition
-	$exLink = $_GET['exercise'] ?? "01-saying-hello";
-	$exerciseName = getTitleCase( substr($exLink, 3) );
+	$exercise = $_GET['exercise'] ?? 1;
+	$exercise = getExercise($_GET['exercise']);
+	$exerciseName = $exercise['name'];
+	$exerciseSlug = $exercise['number'] . "-" . getKebabCase($exerciseName);
+
 	$funcName = getCamelCase( $exerciseName );
+
+	if ( !exExists($exerciseSlug) ) {
+		$notFoundHeading = 'Exercise';
+		include('templates/pages/pageNotFound.php');
+	} else {
 ?>
 <exercise-detail>
 	<actions-component>
@@ -28,7 +36,7 @@
 	
 	<exercise-form>
 		<h3 class="attention-voice">PHP</h3>
-		<?php include("projects/e4p/exercises/$exLink.php"); ?>
+		<?php include("projects/e4p/exercises/$exerciseSlug.php"); ?>
 	</exercise-form>
 </exercise-detail>
 
@@ -40,3 +48,4 @@
 	} 
 </script>
 <script src="projects/e4p/e4p.js"></script>
+<?php } ?>
