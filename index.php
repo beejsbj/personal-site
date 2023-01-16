@@ -10,12 +10,11 @@
 	
 
 	// Exercise detail page title metadata
-	if (isset($_GET['exercise'])) {
-		$pageData['title'] = "Exercises for Programmers";
-		$pageData['heading'] = $pageData['title'];
+	if (isset($_GET['exercise']) && $_GET['exercise'] > 57) {
+		$pageData = getPageData('notfound');
 	}
 	if (isset($_GET['project'])) {
-		$pageData = getProject($_GET['project']);
+		$pageData = getProject($_GET['project']) ?? getPageData('notfound');
 	}
 ?>
 
