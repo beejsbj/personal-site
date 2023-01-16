@@ -17,6 +17,7 @@
 			$chapterSvg = $chapter['svg']  ?? "xyz.svg";
 			$chapterExercises = $chapter['exercises'] ?? [1, 2, 3, 4];?>
 
+
 			<e4p-chapter>
 				<h1 class='attention-voice'>
 					<?=$chapterHeading?>
@@ -31,18 +32,20 @@
 
 				<ul>
 				<?php
-				 	foreach ($chapterExercises as $exercise) {
-				 		$exNumber = $exercise['number']  ?? "exercise Number";
-				 		$exName = $exercise['name'] ?? "exercise name";
-				 		$exDesc = $exercise['description']  ?? "exercise chapterDesc";
-				 		$exSlug = $exercise['slug'] ?? "$exNumber-" . getKebabCase($exName);
+					foreach ($chapterExercises as $i) {
+						$exercise = getExercise($i);
+				 		$exNumber = $exercise['number'];
+				 		$exName = $exercise['name'];
+				 		$exDesc = $exercise['description'];
+				 		$exSlug = $exercise['slug'] ?? "e4p/$exNumber";
+				 		$exFileName = "$exNumber-" . getKebabCase($exName);
 
-				 		if (!exExists($exSlug) && !isset($exercise['slug'])) {
+				 		if (!exExists($exFileName) && !isset($exercise['slug'])) {
 				 			continue;
 				 		}
 				 		?>
 						<li>
-							<a href="e4p/<?=$exSlug?>">
+							<a href="<?=$exSlug?>">
 								<?=$exName?>
 							</a>
 							<p><?=$exDesc?></p>
