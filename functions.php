@@ -167,12 +167,3 @@ function exExists($slug){
 }
 
 
-
-
-// $siteSlug = explode('/', $_SERVER['QUERY_STRING']);
-
-
-
-
-
-// format($_SERVER);

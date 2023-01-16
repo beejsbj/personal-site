@@ -2,8 +2,7 @@
 
 	include('functions.php'); 
 
-	$__dirname = getDirname();
-	$siteSlug = explode('/', queryString());
+	$__dirname = dirname($_SERVER['SCRIPT_NAME']);
 	$currentPage = currentPage(); // ugly 
 	$currentTheme = currentTheme();
 	$pageData = getPageData($currentPage);
@@ -24,7 +23,7 @@
 <html lang='en' class='special-magic no-js <?=$pageData['id']?>' >
 
 	<head>
-		<base href="<?=$__dirname?>/" />
+		<base href="<?=$__dirname?>/">
 		<meta charset='utf-8'>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<title><?=$pageData['title']?></title>

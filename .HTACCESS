@@ -7,16 +7,7 @@ RewriteEngine On
 # /page-name →                              ?page=page-name
 RewriteRule ^([0-9a-zA-Z_-]+)$              ?page=$1 [NC,L]
 
+RewriteRule projects(/)?$ ?page=projects [NC,L]
 
-# /projects/project-name  →                 ?page=project&slug=project-slug
-RewriteRule ^projects/([0-9a-zA-Z_-]+)$     ?page=project&project=$1 [NC,L]
-
-
-
-
-
-
-
-
-
-
+# /projects/project-name  →                 ?page=projects&slug=project-slug
+RewriteRule ^projects/([0-9a-zA-Z_-]+)$     ?page=project&slug=$1 [NC,L]
