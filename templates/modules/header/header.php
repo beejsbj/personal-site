@@ -1,4 +1,6 @@
- 
+<?php
+	$pageHeading = $pageData['heading'] ?? 'NA';
+?>
 
 
 <header>
@@ -21,7 +23,7 @@
 	<section class="header-section">
 		<inner-column>
 			<h1 class="booming-voice">
-				<?=$pageData['heading']?>
+				<?=$pageHeading?>
 			</h1>
 	</inner-column>
 	</section>
