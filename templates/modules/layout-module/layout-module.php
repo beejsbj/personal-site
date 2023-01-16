@@ -1,6 +1,11 @@
 <?php
 
 
-$id = $siteSlug[3] ?? $section['id'] ?? rand(1, 4);
+$id = $_GET['layout'] ?? $section['id'] ?? rand(1, 4);
 
-include("templates/modules/layout$id/layout$id.php");
+if ( file_exists("templates/modules/layout$id/layout$id.php") ) {
+	include("templates/modules/layout$id/layout$id.php");
+} else {
+	$notFoundHeading = 'Layout';
+	include('templates/pages/pageNotFound.php');
+}
