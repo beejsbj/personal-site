@@ -1,10 +1,9 @@
 <?php 
-	// include('config.php'); 
+
 	include('functions.php'); 
 
 	$__dirname = getDirname();
 	$siteSlug = explode('/', queryString());
-	// $currentPage = currentPrettyPage(); //pretty
 	$currentPage = currentPage(); // ugly 
 	$currentTheme = currentTheme();
 	$pageData = getPageData($currentPage);

@@ -34,29 +34,6 @@ function queryString(){
 ////////////routing////////////// 
 
 //get page name
-function currentPrettyPage(){
-	$siteSlug = explode('/', $_SERVER['REQUEST_URI']);
-	$_GET['page'] = $siteSlug[2] ? $siteSlug[2] : 'home';
-
-	if (isset($siteSlug[3])) {
-		if ($siteSlug[2] == 'project') {
-			// $_GET['page'] = 'project';
-			$_GET['project'] = $siteSlug[3];
-		}
-
-		if ($siteSlug[2] == 'exercise') {
-			$_GET['page'] = 'exercise-detail';
-			$_GET['exercise'] = $siteSlug[3];
-		}
-
-		if ($siteSlug[2] == 'garden') {
-			$_GET['page'] = 'layout-detail';
-			$_GET['layout'] = $siteSlug[3];
-		}
-	}
-	return $_GET['page']; 
-}
-
 function currentPage(){ 
 	if (isset($_GET['page'])) {
 	 	return $_GET['page'];
@@ -198,4 +175,4 @@ function exExists($slug){
 
 
 
-format($_SERVER);
+// format($_SERVER);
