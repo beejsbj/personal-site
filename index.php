@@ -7,7 +7,7 @@
 	$currentTheme = currentTheme();
 	$pageData = getPageData($currentPage);
 	$template = $pageData['template'] ?? '';
-
+	
 
 	// Exercise detail page title metadata
 	if (isset($_GET['exercise'])) {
