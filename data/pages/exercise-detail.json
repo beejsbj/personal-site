@@ -1,9 +1,9 @@
 {
 	"id": "exercise",
-	"title": "Welcome",
+	"title": "Exercises for Programmers",
 	"image" : "",
 	"description" : "",
-	"heading": "Hey there!",
+	"heading": "Exercises for Programmers",
 	"sections": [
 		{
 			"module" : "exercise-detail"
