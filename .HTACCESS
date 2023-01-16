@@ -12,7 +12,7 @@ RewriteRule ^([0-9a-zA-Z_-]+)$              ?page=$1 [QSA]
 
 RewriteRule projects(/)?$ ?page=projects [QSA]
 
-# /projects/project-name  →                 ?page=projects&slug=project-slug
+
 RewriteRule ^projects/([0-9a-zA-Z_-]+)$     ?page=project&project=$1 [QSA]
 
 RewriteRule ^garden/([0-9a-zA-Z_-]+)$     ?page=layout-detail&layout=$1 [QSA]

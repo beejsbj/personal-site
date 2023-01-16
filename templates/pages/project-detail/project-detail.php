@@ -1,5 +1,4 @@
 <?php
-	$project = getProject($_GET['project']);
 	$sectionsArr = $pageData['sections'] ?? [1];
 ?>
 
