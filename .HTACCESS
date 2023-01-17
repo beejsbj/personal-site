@@ -1,5 +1,6 @@
 # turn rewriting on
-RewriteEngine On
+RewriteEngine Off
+
 
 
 # /page-name →                              ?page=page-name

@@ -21,14 +21,14 @@
 			$target = $menuItem['target'] ?? "";
 			if ($menu == 'site') {
 				$class = activePage($menuItem['class']);
-				$slug = $menuItem['slug'] . "?theme=" . currentTheme(); //pretty
-				// $slug = "?page=" . $menuItem['slug'] . "&theme=" . currentTheme(); //ugly
+				// $slug = $menuItem['slug'] . "?theme=" . currentTheme(); //pretty
+				$slug = "?page=" . $menuItem['slug'] . "&theme=" . currentTheme(); //ugly
 
 			}
 			if ($menu == 'theme') {
 				$class = activeTheme($menuItem['class']);
-				$slug = currentPage() . "?theme=" . $menuItem['slug']; //pretty
-				// $slug = "?theme=" . $menuItem['slug'] . "&page=" . currentPage(); //ugly
+				// $slug = currentPage() . "?theme=" . $menuItem['slug']; //pretty
+				$slug = "?theme=" . $menuItem['slug'] . "&page=" . currentPage(); //ugly
 
 			}
 			?>

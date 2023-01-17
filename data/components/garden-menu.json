@@ -2,27 +2,27 @@
 	{
 		"id" : "garden0",
 		"name" : "Garden Home",
-		"slug" : "./garden"
+		"slug" : "?page=garden"
 	},
 	{
 		"id" : "garden1",
 		"name" : "Layout 1",
-		"slug" : "./garden/1"
+		"slug" : "?page=layout-detail&layout=1"
 	},
 	{
 		"id" : "garden2",
 		"name" : "Layout 2",
-		"slug" : "./garden/2"
+		"slug" : "?page=layout-detail&layout=2"
 	},
 	{
 		"id" : "garden3",
 		"name" : "Layout 3",
-		"slug" : "./garden/3"
+		"slug" : "?page=layout-detail&layout=3"
 	},
 	{
 		"id" : "garden4",
 		"name" : "Layout 4",
-		"slug" : "./garden/4"
+		"slug" : "?page=layout-detail&layout=4"
 	},
 	{
 		"id" : "oldGarden",

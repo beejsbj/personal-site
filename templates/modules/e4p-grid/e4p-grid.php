@@ -37,7 +37,9 @@
 				 		$exNumber = $exercise['number'];
 				 		$exName = $exercise['name'];
 				 		$exDesc = $exercise['description'];
-				 		$exSlug = $exercise['slug'] ?? "e4p/$exNumber";
+				 		// $exSlug = $exercise['slug'] ?? "e4p/$exNumber"; //pretty
+				 		$exSlug = $exercise['slug'] ?? "?page=exercise-detail&exercise=$exNumber"; //ugly
+
 				 		$exFileName = "$exNumber-" . getKebabCase($exName);
 
 				 		if (!exExists($exFileName) && !isset($exercise['slug'])) {
