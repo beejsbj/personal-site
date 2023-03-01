@@ -5,18 +5,14 @@
 		"id": "garden",
 		"description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout adapt!",
 		"image": "garden.png",
-		"url" : "?page=garden",
-		"tools" : [
-			"HTML",
-			"CSS",
-			"PHP"
-		],
+		"url": "?page=garden",
+		"tools": ["HTML", "CSS", "PHP"],
 		"tags": ["feature"],
 		"sections": [
 			{
-				"heading-class" : "hide",
+				"heading-class": "hide",
 				"paragraphs": {
-					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+					"this is the intro paragraphs and it is the one for this": "calm-voice"
 				}
 			},
 			{
@@ -24,7 +20,7 @@
 				"menu": "project",
 				"links": [
 					{
-						"id" : "live",
+						"id": "live",
 						"name": "Live&nbspLink",
 						"slug": "garden"
 					}
@@ -38,17 +34,14 @@
 		"id": "quantumon",
 		"description": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle.",
 		"image": "quantumon.png",
-		"url" : "projects/quantumon",
-		"tools" : [
-			"HTML",
-			"CSS"
-		],
+		"url": "projects/quantumon",
+		"tools": ["HTML", "CSS"],
 		"tags": ["api3"],
 		"sections": [
 			{
-				"heading-class" : "hide",
+				"heading-class": "hide",
 				"paragraphs": {
-					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+					"this is the intro paragraphs and it is the one for this": "calm-voice"
 				}
 			},
 			{
@@ -61,16 +54,16 @@
 			{
 				"section-class": "float",
 				"heading": "Goals",
-				"heading-class" : "attention-voice float",
+				"heading-class": "attention-voice float",
 				"paragraphs": {
-					"This is the goals paragraphs and it is the one for this" : ""
+					"This is the goals paragraphs and it is the one for this": ""
 				}
 			},
 			{
 				"heading": "Section",
 				"paragraphs": {
-					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam." : "",
-					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." : ""
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.": "",
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.": ""
 				}
 			},
 			{
@@ -83,9 +76,9 @@
 			{
 				"heading": "Section",
 				"paragraphs": {
-					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam." : "",
-					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." : "",
-					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." : ""
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.": "",
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.": "",
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.": ""
 				}
 			},
 			{
@@ -100,19 +93,19 @@
 				"menu": "project",
 				"links": [
 					{
-						"id" : "live",
+						"id": "live",
 						"name": "Live&nbspLink",
 						"slug": "https://quantumon.xyz/",
 						"target": "live"
 					},
 					{
-						"id" : "github",
+						"id": "github",
 						"name": "Github",
 						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
 						"target": "github"
 					},
 					{
-						"id" : "article",
+						"id": "article",
 						"name": "Read...",
 						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
 						"target": "article"
@@ -127,17 +120,13 @@
 		"id": "theme-challenge",
 		"description": "This was a fun challenge, where we were given a code base and were instructed to only use CSS to get a website to fit within chosen industry",
 		"image": "weed-leaf.jpg",
-		"url" : "https://buroojs.substack.com/p/theme-challenge",
-		"tools" : [
-			"HTML",
-			"CSS",
-			"PHP"
-		],
+		"url": "https://buroojs.substack.com/p/theme-challenge",
+		"tools": ["HTML", "CSS", "PHP"],
 		"sections": [
 			{
-				"heading-class" : "hide",
+				"heading-class": "hide",
 				"paragraphs": {
-					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+					"this is the intro paragraphs and it is the one for this": "calm-voice"
 				}
 			},
 			{
@@ -145,19 +134,19 @@
 				"menu": "project",
 				"links": [
 					{
-						"id" : "live",
+						"id": "live",
 						"name": "Live&nbspLink",
 						"slug": "projects/theme-challenge",
 						"target": "live"
 					},
 					{
-						"id" : "github",
+						"id": "github",
 						"name": "Github",
 						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
 						"target": "github"
 					},
 					{
-						"id" : "article",
+						"id": "article",
 						"name": "Read...",
 						"slug": "https://buroojs.substack.com/p/theme-challenge",
 						"target": "article"
@@ -172,19 +161,14 @@
 		"id": "e4p",
 		"description": "A book of 57 exercises recommended by Derek. A great book to learn and reinforce programming fundamentals",
 		"image": "e4p.png",
-		"url" : "?page=e4p",
-		"tools" : [
-			"HTML",
-			"CSS",
-			"PHP",
-			"JS"
-		],
+		"url": "?page=e4p",
+		"tools": ["HTML", "CSS", "PHP", "JS", "Vue"],
 		"tags": ["feature"],
 		"sections": [
 			{
-				"heading-class" : "hide",
+				"heading-class": "hide",
 				"paragraphs": {
-					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+					"this is the intro paragraphs and it is the one for this": "calm-voice"
 				}
 			},
 			{
@@ -192,18 +176,18 @@
 				"menu": "project",
 				"links": [
 					{
-						"id" : "live",
+						"id": "live",
 						"name": "Live&nbspLink",
 						"slug": "e4p"
 					},
 					{
-						"id" : "github",
+						"id": "github",
 						"name": "Github",
 						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/e4p",
 						"target": "github"
 					},
 					{
-						"id" : "article",
+						"id": "article",
 						"name": "Read...",
 						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
 						"target": "article"
@@ -218,18 +202,14 @@
 		"id": "lottery",
 		"description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
 		"image": "lottery-app.jpg",
-		"url" : "https://api3-lottery.netlify.app/",
-		"tools" : [
-			"HTML",
-			"CSS",
-			"JS"
-		],
+		"url": "https://api3-lottery.netlify.app/",
+		"tools": ["HTML", "CSS", "JS", "React"],
 		"tags": ["api3"],
 		"sections": [
 			{
-				"heading-class" : "hide",
+				"heading-class": "hide",
 				"paragraphs": {
-					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+					"this is the intro paragraphs and it is the one for this": "calm-voice"
 				}
 			},
 			{
@@ -237,13 +217,13 @@
 				"menu": "project",
 				"links": [
 					{
-						"id" : "live",
+						"id": "live",
 						"name": "Live&nbspLink",
 						"slug": "https://api3-lottery.netlify.app",
 						"target": "live"
 					},
 					{
-						"id" : "github",
+						"id": "github",
 						"name": "Github",
 						"slug": "https://github.com/beejsbj/lottery-app",
 						"target": "github"
@@ -258,18 +238,14 @@
 		"id": "roulette",
 		"description": "Back for more gambling. this had some bumps, but I really ended up liking the aesthetic I came up with!",
 		"image": "roulette-app.jpg",
-		"url" : "https://api3-roulette.netlify.app/",
-		"tools" : [
-			"HTML",
-			"CSS",
-			"JS"
-		],
+		"url": "https://api3-roulette.netlify.app/",
+		"tools": ["HTML", "CSS", "JS", "React"],
 		"tags": ["api3"],
 		"sections": [
 			{
-				"heading-class" : "hide",
+				"heading-class": "hide",
 				"paragraphs": {
-					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+					"this is the intro paragraphs and it is the one for this": "calm-voice"
 				}
 			},
 			{
@@ -277,13 +253,13 @@
 				"menu": "project",
 				"links": [
 					{
-						"id" : "live",
+						"id": "live",
 						"name": "Live&nbspLink",
 						"slug": "https://api3-roulette.netlify.app/",
 						"target": "live"
 					},
 					{
-						"id" : "github",
+						"id": "github",
 						"name": "Github",
 						"slug": "https://github.com/beejsbj/roulette-app",
 						"target": "github"
@@ -297,18 +273,15 @@
 		"heading": "Flash Cards",
 		"id": "flashcards",
 		"description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
+		"url": "projects/flashcards",
 		"image": "flashcards.png",
-		"tools" : [
-			"HTML",
-			"CSS",
-			"JS"
-		],
+		"tools": ["HTML", "CSS", "JS"],
 		"tags": ["feature"],
 		"sections": [
 			{
-				"heading-class" : "hide",
+				"heading-class": "hide",
 				"paragraphs": {
-					"this is the intro paragraphs and it is the one for this" : "calm-voice"
+					"this is the intro paragraphs and it is the one for this": "calm-voice"
 				}
 			},
 			{
@@ -316,19 +289,19 @@
 				"menu": "project",
 				"links": [
 					{
-						"id" : "live",
+						"id": "live",
 						"name": "Live&nbspLink",
 						"slug": "projects/flashcards",
 						"target": "live"
 					},
 					{
-						"id" : "github",
+						"id": "github",
 						"name": "Github",
 						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
 						"target": "github"
 					},
 					{
-						"id" : "article",
+						"id": "article",
 						"name": "Read...",
 						"slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
 						"target": "article"
@@ -337,5 +310,4 @@
 			}
 		]
 	}
-
 ]
