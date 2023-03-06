@@ -74,9 +74,18 @@ $sectionHeading = $section['heading'] ?? "This is the E4P module";
 		if (event.target.matches("e4p-chapter li a")) {
 			var $paragraph = event.target.closest('li').querySelector('p');
 			var $aside = event.target.closest('e4p-chapter').querySelector("aside p");
+
 			$aside.innerHTML = $paragraph.innerHTML;
+			$aside.classList.add('active-aside');
+
+			//remove class when stopping hovering
+			event.target.addEventListener("mouseleave", function(event) {
+				$aside.classList.remove('active-aside');
+			});
+
 		}
 	});
+
 
 	$chaptersList = document.querySelectorAll('e4p-chapter ul')
 	$chaptersList.forEach(function(list) {
