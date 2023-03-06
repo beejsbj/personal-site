@@ -78,6 +78,8 @@ $sectionHeading = $section['heading'] ?? "This is the E4P module";
 			$aside.innerHTML = $paragraph.innerHTML;
 			$aside.classList.add('active-aside');
 
+
+
 			//remove class when stopping hovering
 			event.target.addEventListener("mouseleave", function(event) {
 				$aside.classList.remove('active-aside');
