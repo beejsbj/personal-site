@@ -117,15 +117,10 @@ e4p-chapter aside p {
 		font-size: clamp(1.50rem, calc(0.91rem + 2.93vw), 3.00rem);
 		;
 		/*grid-row: span 2 / -1;*/
-		/*pushing header down*/
+		pushing header down
 	}
 
 	e4p-chapter aside {
-		/*position: absolute;
-		top: 50%;
-		transform: translateY(-50%);
-		right: 0;
-		max-width: 40ch;*/
 		display: block;
 		text-align: right;
 		order: 4;
