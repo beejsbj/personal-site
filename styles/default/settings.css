@@ -21,6 +21,8 @@ html {
 	--paper: var(--white);
 	--ink: var(--black);
 
+	--font1: 'Newsreader', serif;
+	--font2: 'Lato', sans-serif;
 }
 
 
