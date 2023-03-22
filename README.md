@@ -26,10 +26,10 @@ check it out at: burooj.dev
 <hr>
 
 #### todo
-* [ ] make images for each of the projects
+* [x] make images for each of the projects
 * [ ] get feedback for site after adding images 
 * [ ] write case study/project detail pages
-* [ ] update resume/goals content
+* [x] update resume/goals content
 * [ ] display tools used for each project
 * [ ] create CSS theme based on perpetual education style-guide
 * [ ] create CSS theme based on persona 5 visual design
