@@ -9,9 +9,18 @@ function animateIndividualMagnetic() {
   let children = document.querySelectorAll(".default-theme .site-menu a");
 
   children.forEach(function (child) {
+    let span = child.querySelector("span");
+
     child.addEventListener("mouseenter", function (event) {
       gsap.to(this, {
         duration: 0.3,
+      });
+
+      gsap.to(span, {
+        duration: 0.3,
+        x: 0,
+        y: 0,
+        scale: 0.85,
       });
     });
 
@@ -20,8 +29,6 @@ function animateIndividualMagnetic() {
     });
 
     child.addEventListener("mouseleave", function (e) {
-      let span = child.querySelector("span");
-
       gsap.to(child, {
         duration: 0.3,
         x: 0,
@@ -34,6 +41,7 @@ function animateIndividualMagnetic() {
         duration: 0.4,
         x: 0,
         y: 0,
+        scale: 1,
         ease: "elastic.out(1.1, 0.4)",
       });
     });
@@ -43,7 +51,7 @@ function animateIndividualMagnetic() {
     parallaxIt(e, child, 80);
 
     let span = child.querySelector("span");
-    parallaxIt(e, span, 50);
+    parallaxIt(e, span, 30);
   }
 
   function parallaxIt(e, target, movement) {
