@@ -33,7 +33,6 @@ function animateIndividualMagnetic() {
         duration: 0.3,
         x: 0,
         y: 0,
-
         ease: "elastic.out(1.1, 0.4)",
       });
 
