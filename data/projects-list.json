@@ -202,7 +202,7 @@
 		"id": "lottery",
 		"description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
 		"image": "lottery-app.jpg",
-		"url": "https://api3-lottery.netlify.app/",
+		"url": "https://qrng-lottery.netlify.app/",
 		"tools": ["HTML", "CSS", "JS", "React"],
 		"tags": ["api3"],
 		"sections": [
@@ -238,7 +238,7 @@
 		"id": "roulette",
 		"description": "Back for more gambling. this had some bumps, but I really ended up liking the aesthetic I came up with!",
 		"image": "roulette-app.jpg",
-		"url": "https://api3-roulette.netlify.app/",
+		"url": "https://qrng-roulette.netlify.app/",
 		"tools": ["HTML", "CSS", "JS", "React"],
 		"tags": ["api3"],
 		"sections": [
