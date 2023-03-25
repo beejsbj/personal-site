@@ -33,7 +33,7 @@ function animateIndividualMagnetic() {
         duration: 0.3,
         x: 0,
         y: 0,
-        ease: "elastic.out(1.1, 0.4)",
+        ease: "elastic.out(0.7, 0.4)",
       });
 
       gsap.to(span, {
@@ -41,22 +41,23 @@ function animateIndividualMagnetic() {
         x: 0,
         y: 0,
         scale: 1,
-        ease: "elastic.out(1.1, 0.4)",
+        ease: "elastic.out(0.7, 0.4)",
       });
     });
   });
 
   function callParallax(e, child) {
-    parallaxIt(e, child, 80);
+    parallaxIt(e, child, 70);
 
     let span = child.querySelector("span");
-    parallaxIt(e, span, 30);
+    parallaxIt(e, span, 20);
   }
 
   function parallaxIt(e, target, movement) {
     let boundingRect = target.getBoundingClientRect();
-    let relX = e.pageX - boundingRect.left;
-    let relY = e.pageY - boundingRect.top;
+    //  console.log(e);
+    let relX = e.clientX - boundingRect.left;
+    let relY = e.clientY - boundingRect.top;
 
     gsap.to(target, {
       duration: 0.3,
