@@ -1,14 +1,14 @@
 [
-	{
-		"id" : "theme0",
-		"class" : "default",
-		"name" : "Default",
-		"slug" : "default"
-	},
-	{
-		"id" : "theme1",
-		"class" : "pe-site",
-		"name" : "PE site",
-		"slug" : "pe-site"
-	}
+  {
+    "id": "theme0",
+    "activePage": "default",
+    "name": "Default",
+    "slug": "default"
+  },
+  {
+    "id": "theme1",
+    "activePage": "pe-site",
+    "name": "PE site",
+    "slug": "pe-site"
+  }
 ]

@@ -1,6 +1,6 @@
 <?php
 
-$menus = $section['menus'] ?? ["test", "test", "test"];
+$menus = $section['menus'] ?? ["theme", "site", "test"];
 $menusID = $section['id'] ?? "";
 
 echo "<menu-group id='$menusID' >";

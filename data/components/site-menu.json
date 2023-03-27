@@ -1,26 +1,30 @@
 [
-	{
-		"id" : "site0",
-		"class" : "home",
-		"name" : "Home",
-		"slug" : "home"
-	},
-	{
-		"id" : "site1",
-		"class" : "about",
-		"name" : "About",
-		"slug" : "about"
-	},
-	{
-		"id" : "site2",
-		"class" : "projects",
-		"name" : "Projects",
-		"slug" : "projects"
-	},
-	{
-		"id" : "site3",
-		"class" : "style-guide",
-		"name" : "Style Guide",
-		"slug" : "style-guide"
-	}
+  {
+    "id": "site0",
+    "activePage": "home",
+    "class": "magnetic",
+    "name": "Home",
+    "slug": "home"
+  },
+  {
+    "id": "site1",
+    "activePage": "about",
+    "class": "magnetic",
+    "name": "About",
+    "slug": "about"
+  },
+  {
+    "id": "site2",
+    "activePage": "projects",
+    "class": "magnetic",
+    "name": "Projects",
+    "slug": "projects"
+  },
+  {
+    "id": "site3",
+    "activePage": "style-guide",
+    "class": "magnetic",
+    "name": "Style Guide",
+    "slug": "style-guide"
+  }
 ]
