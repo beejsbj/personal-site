@@ -1,42 +1,45 @@
 // check if window is above 1000px
-if (window.innerWidth > 1000) {
+if (window.innerWidth > 1000 || true) {
+  console.log("window is above 1000px", window.innerWidth);
   animateIndividualMagnetic();
 }
 
 //functions
 
 function animateIndividualMagnetic() {
-  let children = document.querySelectorAll(".default-theme .site-menu a");
+  let magnets = document.querySelectorAll(".magnetic:not(:has(.magnetic))");
 
-  children.forEach(function (child) {
-    let span = child.querySelector("span");
+  magnets.forEach(function (magnet) {
+    let child = magnet.querySelector("*");
 
-    child.addEventListener("mouseenter", function (event) {
+    magnet.addEventListener("mouseenter", function (event) {
       gsap.to(this, {
-        duration: 0.3,
+        duration: 0.4,
+        ease: "power2.out",
       });
 
-      gsap.to(span, {
-        duration: 0.3,
+      gsap.to(child, {
+        duration: 0.4,
         x: 0,
         y: 0,
-        scale: 0.85,
+        scale: 0.9,
+        ease: "elastic.out(0.7, 0.4)",
       });
     });
 
-    child.addEventListener("mousemove", function (e) {
-      callParallax(e, child);
+    magnet.addEventListener("mousemove", function (e) {
+      callParallax(e, magnet);
     });
 
-    child.addEventListener("mouseleave", function (e) {
-      gsap.to(child, {
+    magnet.addEventListener("mouseleave", function (e) {
+      gsap.to(magnet, {
         duration: 0.3,
         x: 0,
         y: 0,
         ease: "elastic.out(0.7, 0.4)",
       });
 
-      gsap.to(span, {
+      gsap.to(child, {
         duration: 0.4,
         x: 0,
         y: 0,
@@ -46,11 +49,11 @@ function animateIndividualMagnetic() {
     });
   });
 
-  function callParallax(e, child) {
-    parallaxIt(e, child, 70);
+  function callParallax(e, magnet) {
+    parallaxIt(e, magnet, 70);
 
-    let span = child.querySelector("span");
-    parallaxIt(e, span, 20);
+    let child = magnet.querySelector("*");
+    parallaxIt(e, child, 20);
   }
 
   function parallaxIt(e, target, movement) {
