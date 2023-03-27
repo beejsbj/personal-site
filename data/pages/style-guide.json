@@ -1,67 +1,66 @@
 {
-	"id": "style-guide",
-	"title": "Style Guide",
-	"image" : "",
-	"description" : "",
-	"heading": "Style Guide",
+  "id": "style-guide",
+  "title": "Style Guide",
+  "image": "",
+  "description": "",
+  "heading": "Style Guide",
 
-	"sections": [
-		
-		{
-			"module" : "generic-text"
-		},
-		{
-			"module" : "layout-module"
-		},
-		{
-			"heading": "Type Classes",
-			"heading-class" : "hide",
-			"paragraphs": {
-				"Type Class: this is whisper-voice" : "whisper-voice",
-				"Type Class: this is calm-voice" : "calm-voice",
-				"Type Class: this is solid-voice" : "solid-voice",
-				"Type Class: this is teaser-voice" : "teaser-voice",
-				"Type Class: this is firm-voice" : "firm-voice",
-				"Type Class: this is notice-voice" : "notice-voice",
-				"Type Class: this is attention-voice" : "attention-voice",
-				"Type Class: this is loud-voice" : "loud-voice",
-				"Type Class: this is booming-voice" : "booming-voice"
-			}
-		},
-		{
-			"module" : "projects-grid"
-		},
-		{
-			"module" : "about-module"
-		},
-		{
-			"module" : "contact-list"
-		},
-		{
-			"module" : "menu-module",
-			"menu" : "test"
-		},
-		{
-			"module" : "multi-menus",
-			"id" : "style-guide-menu-group"
-		},
-		{
-			"module" : "e4p-grid"
-		},
-		{
-			"module" : "exercise-detail"
-		},
-		{
-			"module" : "image-grid"
-		},
-		{
-			"module" : "things-grid"
-		},
-		{
-			"module" : "goals-list"
-		},
-		{
-			"module" : "resume-section"
-		}
-	]
+  "sections": [
+    {
+      "module": "generic-text"
+    },
+    {
+      "module": "layout-module"
+    },
+    {
+      "heading": "Type Classes",
+      "heading-class": "hide",
+      "paragraphs": {
+        "Type Class: this is whisper-voice": "whisper-voice",
+        "Type Class: this is calm-voice": "calm-voice",
+        "Type Class: this is solid-voice": "solid-voice",
+        "Type Class: this is teaser-voice": "teaser-voice",
+        "Type Class: this is firm-voice": "firm-voice",
+        "Type Class: this is notice-voice": "notice-voice",
+        "Type Class: this is attention-voice": "attention-voice",
+        "Type Class: this is loud-voice": "loud-voice",
+        "Type Class: this is booming-voice": "booming-voice"
+      }
+    },
+    {
+      "module": "projects-grid"
+    },
+    {
+      "module": "about-module"
+    },
+    {
+      "module": "contact-list"
+    },
+    {
+      "module": "menu-module",
+      "menu": "test"
+    },
+    {
+      "module": "multi-menus",
+      "id": "style-guide-menu-group"
+    },
+    {
+      "module": "e4p-grid"
+    },
+    {
+      "module": "exercise-detail"
+    },
+    {
+      "module": "image-grid"
+    },
+    {
+      "module": "things-grid"
+    },
+    {
+      "module": "goals-list"
+    },
+    {
+      "module": "resume-section"
+    }
+  ]
 }
