@@ -1,49 +1,49 @@
 header {
-	overflow-x: hidden;
+  overflow-x: hidden;
 }
 header .menus inner-column {
-	display: none;
-	padding: 0;
+  display: none;
+  padding: 0;
 }
 
 header .circle {
-	position: absolute;
-	fill: var(--dark-color);
-	right: -90px;
-	top: -90px;
-	width: 200px;
-	z-index: -99;
+  position: absolute;
+  fill: var(--dark-color);
+  right: -90px;
+  top: -90px;
+  width: 200px;
+  z-index: 1;
 }
 
 @media (min-width: 500px) {
-	.header-section > inner-column {
-		display: grid;
-		grid-template-columns: repeat(12, 1fr);
-	}
-	.header-section > inner-column > h1 {
-		grid-column: 2 / -1;
-		z-index: 1;
-	}
-	header .circle {
-		position: absolute;
-		width: 300px;
-		right: -90px;
-		top: -160px;
-	}
+  .header-section > inner-column {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .header-section > inner-column > h1 {
+    grid-column: 1 / -1;
+    z-index: 1;
+  }
+  header .circle {
+    position: absolute;
+    width: 300px;
+    right: -90px;
+    top: -160px;
+  }
 }
 
 @media (min-width: 750px) {
-	header .menus inner-column {
-		display: block;
-	}
-	header .circle {
-		position: absolute;
-		top: 50%;
-		right: initial;
-		width: 40vw;
-		left: -300px;
-		display: block;
-	}
+  header .menus inner-column {
+    display: block;
+  }
+  header .circle {
+    position: absolute;
+    top: 50%;
+    right: initial;
+    width: 40vw;
+    left: -350px;
+    display: block;
+  }
 }
 
 @media (min-width: 1000px) {
@@ -53,9 +53,9 @@ header .circle {
 }
 
 @media (min-width: 2000px) {
-	header .circle {
-		left: -700px;
-		width: 1100px;
-		position: fixed;
-	}
+  header .circle {
+    left: -700px;
+    width: 1100px;
+    position: fixed;
+  }
 }
