@@ -7,7 +7,7 @@
   padding: 100px;
   transform: scale(1.1);
   transition: 0.3s;
-  z-index: 2;
+  z-index: 3;
 }
 .site-menu ul {
   display: grid;
@@ -62,12 +62,20 @@
   }
   footer .site-menu {
     top: 100px;
+    right: 0vw;
+  }
+  header .site-menu {
+    right: 0vw;
   }
 }
 
 @media (min-width: 1000px) {
   .site-menu {
     background-color: initial;
+  }
+  header .site-menu,
+  footer .site-menu {
+    right: 4vw;
   }
   .site-menu::after,
   .site-menu::before {

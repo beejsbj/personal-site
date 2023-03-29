@@ -1,6 +1,6 @@
 <?php
 $menu = $section['menu'] ?? $menu ?? 'test';
-$class = $menu == 'site' || $menu == 'theme' ? "magnetic $menu" : '';
+$class = $menu == 'site' || $menu == 'theme' ? "magnetic $menu" : $menu;
 
 
 if (file_exists("data/components/$menu-menu.json")) {
