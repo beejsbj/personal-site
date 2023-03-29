@@ -40,6 +40,7 @@ if (isset($_GET['project'])) {
 
 	<?php include('templates/modules/footer/footer.php'); ?>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
 	<script type="module" src="scripts/<?= $currentTheme ?>/index.js"></script>
 </body>
 
