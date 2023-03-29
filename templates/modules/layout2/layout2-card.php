@@ -1,5 +1,5 @@
 <layout-card>
-	<picture>
+	<picture class="magnetic">
 		<?php include('images/shapes.php'); ?>
 	</picture>
 	<h2 class="attention-voice"> Heading level 2 small </h2>

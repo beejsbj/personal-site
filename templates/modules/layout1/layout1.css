@@ -1,82 +1,77 @@
-
-
 .layout1 {
-	/*border-top: 3px solid var(--dark-color);*/
-	
+  /*border-top: 3px solid var(--dark-color);*/
 }
 
 layout-module.layout1 {
-	display: grid;
-	gap: 40px;
+  display: grid;
+  gap: 40px;
 }
 
 layout-module.layout1 layout-header {
-	display: block;
-	max-width: 70ch;
+  display: block;
+  max-width: 70ch;
 }
 
 layout-module.layout1 .image-grid {
-	display: grid;
-	gap: 15px;
+  display: grid;
+  gap: 15px;
 }
 
 layout-module.layout1 layout-card {
-	display: block;
-	/*background-color: wheat;*/
-	border-top: 3px solid grey;
-	padding: 20px 0;
+  display: block;
+  /*background-color: wheat;*/
+  border-top: 3px solid grey;
+  padding: 20px 0;
 }
 
 /*break point 1 - medium*/
 @media (min-width: 650px) {
-	layout-module.layout1 .card-list {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 15px;
-	}
+  layout-module.layout1 .card-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
 
-	layout-module.layout1 .image-grid {
-		grid-template-columns: 1fr 1fr;
-	}
-
-
+  layout-module.layout1 .image-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 /*breakpoint 2 - large*/
 @media (min-width: 1100px) {
-	layout-module.layout1 {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 40px;
-	}
+  layout-module.layout1 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
 
-	layout-module.layout1 layout-header {
-		grid-column: 1 / 2;
-	}
+  layout-module.layout1 layout-header {
+    grid-column: 1 / 2;
+  }
 
-	layout-module.layout1 .card-list {
-		grid-column: 1 / 2;
-		grid-row: 2 / 3;
-	}
+  layout-module.layout1 .card-list {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+  }
 
-	layout-module.layout1 .image-grid {
-		grid-row: 2 / 3;
-	}
+  layout-module.layout1 .image-grid {
+    grid-row: 2 / 3;
+    align-items: start;
+  }
+  layout-module.layout1 .image-grid li:nth-child(1),
+  layout-module.layout1 .image-grid li:nth-child(2) {
+    align-self: end;
+  }
 }
 
-
-
-
-
-
 .shapes #circle {
-	fill:var(--dark-color);
-	stroke:black;
-	stroke-width:2px;
+  fill: var(--dark-color);
+  stroke: black;
+  stroke-width: 2px;
 }
 
 .shapes #rectangle {
-	fill:var(--light-color);
-	stroke:black;
-	stroke-width:2.03px;
+  fill: var(--light-color);
+  stroke: black;
+  stroke-width: 2.03px;
 }
