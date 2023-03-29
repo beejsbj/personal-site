@@ -26,37 +26,48 @@
 
 /* then other contextual styles */
 body {
-	background-color: var(--paper);
-	color: var(--ink);
-	padding-top: 100px;
-	overflow-x: hidden;
+  background-color: var(--paper);
+  color: var(--ink);
+  padding-top: 100px;
+  overflow-x: hidden;
 }
 
 .my-fantastic-image {
-	max-width: 300px;
-	border-bottom-right-radius: 30px;
+  max-width: 300px;
+  border-bottom-right-radius: 30px;
 }
 
 .hide {
-	display: none;
+  display: none;
 }
 .hide-opacity {
-	opacity: 0;
+  opacity: 0;
 }
 
 @media (max-width: 900px) {
-	.hide-below-900 {
-		display: none;
-	}
+  .hide-below-900 {
+    display: none;
+  }
 }
 
 body main {
-	display: grid;
-	gap: 30px;
+  display: grid;
+  gap: 30px;
 }
 
 html.style-guide main section inner-column {
-	border-top: 1px solid black;
+  border-top: 1px solid black;
 
-	padding-top: 40px;
+  padding-top: 40px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+html::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
