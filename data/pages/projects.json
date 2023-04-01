@@ -1,20 +1,23 @@
 {
-	"id": "projects",
-	"title": "Projects",
-	"image" : "",
-	"description" : "",
-	"heading": "Projects",
-	"sections": [
-		{
-			"module" : "generic-text",
-			"heading-class" : "hide",
-			"paragraphs": {
-				"Here is where you will find the projects i've been involved in, a mix of personal and student projects." : "notice-voice"
-			}
-		},
-		{
-			"module" : "projects-grid",
-			"heading": "grid of Projects"
-		}
-	]
+  "id": "projects",
+  "title": "Projects",
+  "image": "",
+  "description": "",
+  "heading": "Projects",
+  "sections": [
+    {
+      "module": "generic-text",
+      "heading-class": "hide",
+      "paragraphs": [
+        {
+          "voice": "notice-voice",
+          "text": "Here is where you will find the projects i've been involved in, a mix of personal and student projects."
+        }
+      ]
+    },
+    {
+      "module": "projects-grid",
+      "heading": "grid of Projects"
+    }
+  ]
 }
