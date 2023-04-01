@@ -20,7 +20,7 @@ $pageHeading = $pageData['heading'] ?? 'NA';
 		</inner-column>
 	</section>
 
-	<section class="header-section">
+	<section class="header-section page-title">
 		<inner-column>
 			<h1 class="booming-voice">
 				<?= $pageHeading ?>
