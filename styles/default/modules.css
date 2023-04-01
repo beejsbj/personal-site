@@ -1,44 +1,29 @@
 /*header*/
-@import '../../templates/modules/header/header.css';
-
+@import "../../templates/modules/header/header.css";
 
 /*menus*/
 
+@import "../../templates/modules/multi-menus/multi-menus.css";
+@import "../../templates/modules/menu-module/menu-module.css";
 
-@import '../../templates/modules/multi-menus/multi-menus.css';
-@import '../../templates/modules/menu-module/menu-module.css';
+@import "../../templates/modules/projects-grid/projects-grid.css";
+@import "../../templates/modules/e4p-grid/e4p-grid.css";
+@import "../../templates/modules/exercise-detail/exercise-detail.css";
 
+@import "../../templates/modules/about-module/about-module.css";
+@import "../../templates/modules/contact-list/contact-list.css";
 
-
-
-
-
-
-@import '../../templates/modules/projects-grid/projects-grid.css';
-@import '../../templates/modules/e4p-grid/e4p-grid.css';
-@import '../../templates/modules/exercise-detail/exercise-detail.css';
-
-@import '../../templates/modules/about-module/about-module.css';
-@import '../../templates/modules/contact-list/contact-list.css';
-
-@import '../../templates/modules/goals-list/goals-list.css';
-@import '../../templates/modules/resume-section/resume-section.css';
+@import "../../templates/modules/goals-list/goals-list.css";
+@import "../../templates/modules/resume-section/resume-section.css";
 
 /*layout garden components*/
-@import '../../templates/modules/layout1/layout1.css';
-@import '../../templates/modules/layout2/layout2.css';
-@import '../../templates/modules/layout3/layout3.css';
-@import '../../templates/modules/layout4/layout4.css';
-@import '../../templates/modules/graphic-layout/graphic-layout.css';
+@import "../../templates/modules/layout1/layout1.css";
+@import "../../templates/modules/layout2/layout2.css";
+@import "../../templates/modules/layout3/layout3.css";
+@import "../../templates/modules/layout4/layout4.css";
+@import "../../templates/modules/graphic-layout/graphic-layout.css";
 
-
+@import "../../templates/modules/voices-guide/voices-guide.css";
 
 /*footer*/
-@import '../../templates/modules/footer/footer.css';
-
-
-
-
-
-
-
+@import "../../templates/modules/footer/footer.css";

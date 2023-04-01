@@ -1,51 +1,47 @@
-
 html {
   box-sizing: border-box;
-	scroll-behavior: smooth;
-	
+  scroll-behavior: smooth;
 }
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
   scroll-margin-top: 200px;
 } /* https://www.paulirish.com/2012/box-sizing-border-box-ftw */
 
 a {
-	display: block;
-	text-decoration: none;
+  display: block;
+  text-decoration: none;
 }
 
 p a,
 li a {
-	display: inline;
+  display: inline;
 }
 
 picture {
-	display: block;
-	overflow: hidden;
+  display: block;
+  overflow: hidden;
 }
 
 img {
-	display: block;
-	width: 100%;
-	height: auto;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 svg {
   display: block;
   width: 100%;
-
 }
 text-content {
-	display: block;
+  display: block;
 }
 
-
 code {
-    display: block;
-    background-color: black;
-    padding: 10px;
+  display: block;
 }
 
 :where(:not(:defined)) {
-	display: grid;
+  display: grid;
 }

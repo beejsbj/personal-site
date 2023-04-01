@@ -1,69 +1,65 @@
 /* Should we pull in @fonts here? */
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,200;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600;1,6..72,700;1,6..72,800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,200;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600;1,6..72,700;1,6..72,800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
 
 .booming-voice {
-	font-family: var(--font1), serif;
-	font-size: 40px;
-	font-weight: 700;
-	color: var(--dark-color);
+  font-family: var(--font1), serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--dark-color);
 }
 
-
 .loud-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
-	color: var(--dark-color);
-	font-weight: 100;
+  font-family: var(--font2), sans-serif;
+  font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
+  color: var(--dark-color);
+  font-weight: 100;
 }
 
 @media (min-width: 700px) {
-	.booming-voice {
-		font-weight: 700;
-		font-size: clamp(4.00rem, calc(3.61rem + 1.95vw), 5.00rem);
-		/* or variable font */
-	}
-	.loud-voice {
-		font-weight: 100;
-	}
+  .booming-voice {
+    font-weight: 700;
+    font-size: clamp(4rem, calc(3.61rem + 1.95vw), 5rem);
+    /* or variable font */
+  }
+  .loud-voice {
+    font-weight: 100;
+  }
 }
 
 .attention-voice {
-	font-family: var(--font1), serif;
-	font-weight: 300;
-	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);
-	color: var(--dark-highlight);
-	font-style: italic;
+  font-family: var(--font1), serif;
+  font-weight: 300;
+  font-size: clamp(1.5rem, calc(1.3rem + 0.98vw), 2rem);
+  color: var(--dark-highlight);
+  font-style: italic;
 }
-
-
 
 .notice-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: 1rem;
-	line-height: 1.4;
+  font-family: var(--font2), sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
 }
 @media (min-width: 700px) {
-	.notice-voice {
-		font-size: 1.2rem;
-	}
+  .notice-voice {
+    font-size: 1.2rem;
+  }
 }
 
 .solid-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: 14px;
-	font-weight: 900;
+  font-family: var(--font2), sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  max-width: 70ch;
 }
 
-
-
 .firm-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: 0.9rem;
-	line-height: 1.4;
-	text-transform: uppercase;
-	font-weight: 700;
-
+  font-family: var(--font2), sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+  font-weight: 700;
+  max-width: 70ch;
 }
 
 .calm-voice,
@@ -73,44 +69,44 @@ a,
 button,
 label,
 input {
-	font-family: var(--font2), sans-serif;
-	font-size: 1rem;
-	line-height: 1.4;
+  font-family: var(--font2), sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
 :is(.calm-voice, p, li) em {
-	font-style: italic;
+  font-style: italic;
 }
 
 :is(.calm-voice, p, li) strong {
-	font-weight: 700;
+  font-weight: 700;
 }
 
 .whisper-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: 0.9rem;
-	color: gray;
+  font-family: var(--font2), sans-serif;
+  font-size: 0.9rem;
+  color: gray;
 }
 
 .teaser-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: 14px;
-	color: var(--dark-highlight);
-	text-transform: uppercase;
+  font-family: var(--font2), sans-serif;
+  font-size: 14px;
+  color: var(--dark-highlight);
+  text-transform: uppercase;
 }
 
 /* these would be scoped to section or to an article element */
 /* this is just a loose setting for now */
-p+p {
-	margin-top: 1em;
+p + p {
+  margin-top: 1em;
 }
 
-h2+p {
-	margin-top: 20px;
+h2 + p {
+  margin-top: 20px;
 }
 
 code {
-	font-family: monospace;
-	font-size: 1.1em;
-	color: green;
+  font-family: monospace;
+  font-size: 1.1em;
+  color: green;
 }
