@@ -1,0 +1,5 @@
+footer {
+  --ink: var(--green);
+  color: var(--ink);
+  background-color: var(--black);
+}
