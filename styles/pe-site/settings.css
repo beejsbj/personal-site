@@ -1,50 +1,43 @@
-
 html {
-	/* Black and white */
-	--black: hsla(0, 0%, 7%, 1.00);
-	--white: hsla(0, 0%, 100%, 1.00);
-	--gray: hsla(0, 0%, 53%, 1.00);
-	--gray-light: hsla(0, 0%, 80%, 1.00);
-	--gray-lighter: hsla(0, 0%, 98%, 1.00);
-	--gray-dark: hsla(0, 0%, 27%, 1.00);
+  /* Black and white */
+  --black: hsla(0, 0%, 7%, 1);
+  --white: hsla(0, 0%, 100%, 1);
+  --gray: hsla(0, 0%, 53%, 1);
+  --gray-light: hsla(0, 0%, 80%, 1);
+  --gray-lighter: hsla(0, 0%, 98%, 1);
+  --gray-dark: hsla(0, 0%, 27%, 1);
 
-	/* Colors */
-	--cyan: hsla(190, 58%, 79%, 1.00);
-	--red:hsla(358, 85%, 78%, 1.00);
-	--orange: hsla(30, 72%, 75%, 1.00);
-	--yellow:hsla(55, 93%, 80%, 1.00);
-	--green: hsla(143, 39%, 76%, 1.00);
-	--blue: hsla(207, 66%, 77%, 1.00);
-	--purple: hsla(320, 46%, 74%, 1.00);
+  /* Colors */
+  --cyan: hsla(190, 58%, 79%, 1);
+  --red: hsla(358, 85%, 78%, 1);
+  --orange: hsla(30, 72%, 75%, 1);
+  --yellow: hsla(55, 93%, 80%, 1);
+  --green: hsla(143, 39%, 76%, 1);
+  --blue: hsla(207, 66%, 77%, 1);
+  --purple: hsla(320, 46%, 74%, 1);
 
-	/* old plastic */
-	--wheat:hsla(37, 22%, 61%, 1.00);
-	--wheat-light:hsla(37, 68%, 93%, 1.00);
-	--wheat-dark:hsla(41, 27%, 38%, 1.00);
-	--wheat-darker:hsla(38, 34%, 33%, 1.00);
+  /* old plastic */
+  --wheat: hsla(37, 22%, 61%, 1);
+  --wheat-light: hsla(37, 68%, 93%, 1);
+  --wheat-dark: hsla(41, 27%, 38%, 1);
+  --wheat-darker: hsla(38, 34%, 33%, 1);
 
+  --color: hsla(206, 66%, 77%, 1);
+  --highlight: hsla(190, 90%, 60%, 1);
 
+  --shadow: 3px 3px 5px 2px rgb(17 17 17 / 20%);
 
+  --corners: 6px; /* or whatevers */
 
+  --paper: white;
+  --ink: var(--black);
 
-
-	--color: hsla(206, 66%, 77%, 1.00);
-	--highlight: hsla(190, 90%, 60%, 1.00);
-
-	--shadow: 3px 3px 5px 2px rgb(17 17 17 / 20%);
-
-	--corners: 6px; /* or whatevers */
-
-	--paper: hsla(209, 90%, 50%, 1.00); /*shadier dodgerblue*/
-	--ink: white;
-
-
-	--font1: Georgia, serif;
-	--font2: Helvetica, sans-serif;
+  --font1: "Helvetica Neue", Helvetica, sans-serif;
+  --font2: Georgia, serif;
 }
 
 @media (prefers-color-scheme: dark) {
-	/* html {
+  /* html {
 		--black: #111111;
 		--white: #efefef;
 
@@ -57,10 +50,9 @@ html {
 
 		--corners: 10px; /* or whatevers */
 
-		/* --paper:  hsla(217, 8%, 13%, 1.00);  */
-		/* --paper2: hsla(217, 6%, 17%, 1.00);  bunker */
-		/* --ink: hsla(0, 0%, 96%, 1.00);  whitesmoke */
+  /* --paper:  hsla(217, 8%, 13%, 1.00);  */
+  /* --paper2: hsla(217, 6%, 17%, 1.00);  bunker */
+  /* --ink: hsla(0, 0%, 96%, 1.00);  whitesmoke */
 
-
-	} 
+  /* }  */
 }

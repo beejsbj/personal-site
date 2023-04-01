@@ -2,104 +2,119 @@
 /* don't think you can... might have to be higher up (the top of) the food chain! */
 
 .booming-voice {
-	font-family: var(--font1), serif;
-	font-size: 40px;
-	font-weight: 700;
+  /* huge-voice */
+  font-family: var(--font1);
+  font-size: 40px;
+  font-weight: 700;
+  word-wrap: break-word;
 }
 
-.loud-voice	{
-	font-family: var(--font1), sans-serif;
-	font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
-
-
+.loud-voice {
+  font-family: var(--font1);
+  font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
+  font-weight: 700;
+  max-width: 50ch;
+  word-wrap: break-word;
 }
 @media (min-width: 700px) {
-	.booming-voice {
-		font-weight: 700;
-		font-size: clamp(4.00rem, calc(3.61rem + 1.95vw), 5.00rem);
-		/* or variable font */
-	}
-	
+  .booming-voice {
+    font-weight: 700;
+    /* or variable font */
+    font-size: clamp(2.25rem, calc(0.87rem + 6.88vw), 6.25rem);
+  }
 }
 
-.attention-voice	{
-	font-family: var(--font1), serif;
-	font-weight: 300;
-	font-size: clamp(1.50rem, calc(1.30rem + 0.98vw), 2.00rem);
-	font-style: italic;
+.attention-voice {
+  /* or strong-voice */
+  font-family: var(--font1);
+  font-weight: 300;
+  font-size: clamp(1.5rem, calc(1.3rem + 0.98vw), 2rem);
 }
 
 .notice-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: 1rem;
-	line-height: 1.4;
+  font-family: var(--font2);
+  font-size: 1rem;
+  line-height: 1.4;
 }
 @media (min-width: 700px) {
-	.notice-voice {
-		font-size: 1.2rem;
-	}
+  .notice-voice {
+    font-size: 1.2rem;
+  }
 }
 .solid-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: 14px;
-	font-weight: 900;
+  font-family: var(--font2);
+  font-size: 14px;
+  font-weight: 900;
 }
 
-
-
 .firm-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: 0.9rem;
-	line-height: 1.4;
-	text-transform: uppercase;
-	font-weight: 700;
-
+  /* or stout-voice */
+  font-family: var(--font1);
+  font-size: 1.2rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 700;
+  max-width: 65ch;
+  word-wrap: break-word;
+}
+@media (min-width: 700px) {
+  .firm-voice {
+    font-size: 1.5rem;
+  }
 }
 
 .calm-voice,
 p,
 li {
-	font-family: var(--font1), sans-serif;
-	font-size: 1rem;
-	line-height: 1.6;
-	word-wrap: break-word;
+  font-family: var(--font1);
+  font-size: 1rem;
+  line-height: 1.6;
+  word-wrap: break-word;
 }
 
 :is(.calm-voice, p) em {
-	font-style: italic;
+  font-style: italic;
 }
 
 :is(.calm-voice, p) strong {
-	font-weight: 700;
+  font-weight: 700;
 }
 
 .whisper-voice {
-	font-family: var(--font1), sans-serif;
-	font-size: 10px;
-	line-height: 1.5;
-	word-wrap: break-word;
+  font-family: var(--font1);
+  font-size: 10px;
+  line-height: 1.5;
+  word-wrap: break-word;
 }
 
 .teaser-voice {
-	font-family: var(--font2), sans-serif;
-	font-size: 14px;
-	text-transform: uppercase;
+  font-family: var(--font2);
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
+mark {
+  background-color: hsl(56deg, 92%, 80%, 0.6);
+}
 
 /* these would be scoped to section or to an article element */
 /* this is just a loose setting for now */
 /* or smaller group of article-like styles such as a <text-content> custom element */
 p + p {
-	margin-top: 1em;
+  margin-top: 1em;
 }
 
 h2 + p {
-	margin-top: 20px;
+  margin-top: 20px;
 }
 
 code {
-	font-family: monospace;
-	font-size: 1.1em;
-	color: green;
+  font-family: monospace;
+  font-size: 1.1em;
+  color: green;
+}
+code.block {
+  background-color: black;
+  padding: 10px;
 }
