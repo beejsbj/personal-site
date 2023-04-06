@@ -6,3 +6,16 @@ if (window.innerWidth > 1000) {
   animateMagnet();
 }
 animateChapters();
+
+gsap.fromTo(
+  "header * , main *, footer *",
+  {
+    opacity: 0,
+  },
+  {
+    opacity: 1,
+    duration: 0.5,
+    stagger: 0.5 / 40,
+    ease: "power2.in",
+  }
+);

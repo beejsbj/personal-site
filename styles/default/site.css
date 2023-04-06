@@ -71,3 +71,24 @@ html {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+header {
+  animation: fade-in 0.5s ease-in both;
+}
+
+main {
+  animation: fade-in 2s ease-in both;
+}
+
+footer {
+  animation: fade-in 4s ease-in both;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
