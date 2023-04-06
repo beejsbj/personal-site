@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="mainStyle.css">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Maths</title>
+    <h1>Simple Math</h1>
+</head>
+<body>
+    <div class="InputWrapper">
+        <input type="text" id="first" placeholder="What is the first number?"><br><br><br>
+    </div>
+
+    <div class="InputWrapper">
+        <input type="text" id="second" placeholder="What is the second number?"><br>
+    </div>
+
+    <div class="buttonWrapper">
+        <button onclick="myMain()">Math us!</button><br>
+    </div>
+
+    <div class="outputWrapper">
+        <p id="output"></p>
+    </div>
+
+    <script>
+        function myMain(){
+            let first = Number(document.getElementById('first').value);
+            let second = Number(document.getElementById('second').value);
+            let output = document.getElementById('output').innerHTML;
+            
+            if ((!first || !second || first < 0 || second <= 0)){
+                alert('Please only type in postive numbers');
+            } else {
+    
+                let sum = first + second;
+                let difference = first - second;
+                let product = first * second;
+                let quotient = first / second;
+    
+    
+                document.getElementById('output').innerHTML = `
+                    ${first} + ${second} = ${sum} 
+                    <br>
+                    ${first} - ${second} = ${difference} 
+                    <br>
+                    ${first} * ${second} = ${product} 
+                    <br>
+                     ${first} ÷ ${second} = ${quotient} 
+                    `
+            }
+    }
+    </script>
+</body>
+</html>
+
+
+

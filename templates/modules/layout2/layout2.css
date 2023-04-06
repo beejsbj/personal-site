@@ -1,128 +1,57 @@
-
-
-layout-module.layout2 {
-	
+.layout2 layout-card {
+  display: block;
+  padding: 20px 0;
 }
 
-layout-module.layout2 {
-	display: grid;
-	gap: 40px;
+.layout2 layout-card picture {
+  max-width: 30px;
+  margin-bottom: 10px;
 }
 
-layout-module.layout2 layout-header {
-	display: block;
-	max-width: 70ch;
+.layout2 special-block {
+  /*todo, change name*/
+  display: block;
+  position: relative;
+  padding: 20px 0;
+  max-width: 50ch;
 }
 
-
-layout-module.layout2 layout-card {
-	display: block;
-	padding: 20px 0;
+.layout2 special-block::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 3px;
+  background-color: var(--light-color);
+  z-index: -1;
+  border-radius: var(--corners);
 }
-
-layout-module.layout2 layout-card picture {
-	max-width: 30px;
-	margin-bottom: 10px;
-}
-
-layout-module.layout2 special-block { /*todo, change name*/
-	display: block;
-	position: relative;
-	padding: 20px 0;
-	max-width: 50ch;
-
-}
-
-layout-module.layout2 special-block::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 60%;
-	height: 3px;
-	background-color: var(--light-color);
-	z-index: -1;
-	border-radius: var(--corners);
-
-}
-
-
-
-
-
 
 /*break point 1 - medium*/
 @media (min-width: 650px) {
-	layout-module.layout2 .card-list {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 15px;
-	}
+  .layout2 .card-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
 
+  .layout2 layout-card {
+    border: solid 3px black;
+    border-radius: var(--corners);
+    padding: 30px;
+  }
 
-	layout-module.layout2 layout-card {
-		border: solid 3px black;
-		border-radius: var(--corners);
-		padding: 30px;
+  .layout2 layout-card p {
+    max-width: 50ch;
+  }
 
-	}
+  .layout2 special-block {
+    padding: 30px;
+  }
 
-	layout-module.layout2 layout-card p {
-		max-width: 50ch;
-	}
-
-	layout-module.layout2 special-block {
-		padding: 30px;
-
-	}
-
-	layout-module.layout2 special-block::before {
-		width: 65ch;
-		height: 100%;
-	}
-
+  .layout2 special-block::before {
+    width: 65ch;
+    height: 100%;
+  }
 }
-
-/*breakpoint 2 - large*/
-@media (min-width: 1155px) {
-	
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.shapes #circle {
-	fill:var(--dark-color);
-	stroke:black;
-	stroke-width:2px;
-}
-
-.shapes #rectangle {
-	fill:var(--light-color);
-	stroke:black;
-	stroke-width:2.03px;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-

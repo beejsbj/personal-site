@@ -10,6 +10,8 @@ header .menus {
 
 header .page-title {
   padding: 60px 10px;
+  /* background-color: var(--ink); */
+  /* color: var(--paper); */
 }
 
 header .menus inner-column {

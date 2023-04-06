@@ -1,0 +1,29 @@
+/*layout module*/
+@import "../layout1/layout1.css";
+@import "../layout2/layout2.css";
+@import "../layout3/layout3.css";
+@import "../layout4/layout4.css";
+
+layout-module {
+  display: grid;
+  gap: 40px;
+}
+
+layout-module layout-header {
+  display: block;
+  max-width: 70ch;
+}
+
+.shapes #circle {
+  fill: var(--dark-color);
+  stroke: black;
+  stroke-width: 2px;
+}
+
+.shapes #rectangle {
+  fill: var(--light-color);
+  stroke: black;
+  stroke-width: 2.03px;
+}
+
+/*layout garden components*/

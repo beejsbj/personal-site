@@ -15,12 +15,8 @@
 
 @import "../../templates/modules/goals-list/goals-list.css";
 @import "../../templates/modules/resume-section/resume-section.css";
+@import "../../templates/modules/layout-module/layout-module.css";
 
-/*layout garden components*/
-@import "../../templates/modules/layout1/layout1.css";
-@import "../../templates/modules/layout2/layout2.css";
-@import "../../templates/modules/layout3/layout3.css";
-@import "../../templates/modules/layout4/layout4.css";
 @import "../../templates/modules/graphic-layout/graphic-layout.css";
 
 @import "../../templates/modules/voices-guide/voices-guide.css";

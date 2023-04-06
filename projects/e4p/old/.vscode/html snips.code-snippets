@@ -1,0 +1,54 @@
+{
+	// Place your 57 exercises workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+
+
+
+	"buttonDiv":{
+		"scope": "html",
+		"prefix": "butt",
+		"body": ["<div class=\"buttonWrapper\">",
+				"\t<button onclick=\"myMain()\">$1</button><br>",
+				"</div>"]
+	},
+
+	"inputDiv": {
+		"prefix": "in",
+		"body": [
+		  "<div class=\"InputWrapper\">",
+		  "\t<input type=\"text\" id=\"$1\" placeholder=\"$2\"><br><br>",
+		  "</div>"
+		],
+		"description": "inputDiv"
+	  },
+
+	  "outputDiv": {
+		"prefix": "out",
+		"body": [
+		  "<div class=\"outputWrapper\">",
+		  "\t<p id=\"output\"></p>",
+		  "</div>"
+		],
+		"description": "outputDiv"
+	  }
+
+
+
+
+
+}
+

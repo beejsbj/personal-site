@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="mainStyle.css">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counting the Number of Characters</title>
+    <h1>Character Counter</h1>
+</head>
+<body>
+
+    <div class="InputWrapper">
+        <input type="text" id="string" placeholder="What is the input string?" oninput="myMain()"><br>
+    </div>
+    
+
+    <div class="buttonWrapper">
+        <button onclick="myMain()">Submit</button><br>
+    </div>
+
+
+    <div class="outputWrapper">
+        <p id="output"></p>
+    </div>
+
+
+
+    <script>
+
+
+        function myMain(){
+            const string = document.getElementById('string');
+            const output = document.getElementById('output');
+
+            output.innerHTML = `"${string.value}" has ${string.value.length} characters.`;
+
+
+        }
+        
+    </script>
+
+
+    
+</body>
+</html>

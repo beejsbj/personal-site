@@ -1,0 +1,40 @@
+<h2>Challenge 7</h2>
+
+<style>
+    body {
+        background-color: #DBF9FC;
+    }
+    .example { 
+        background-color: rgb(255, 122, 89); 
+    } 
+</style>
+
+<script src="ex7.js"></script>
+
+<input type="radio" name="units" id="meter" value="meter">
+<label for="meter">Meter</label>
+
+<input type="radio" name="units" id="feet" value="feet">
+<label for="meter">Feet</label>
+<br>
+<br>
+<br>
+
+<label for="length">What is the length of the room?</label><br>
+<input type="text" id="length" oninput="numCheck()"><br>
+<br>
+<label for="width">What is the width of the room?</label><br>
+<input type="text" id="width" oninput="numCheck()"><br>
+<br>
+
+
+
+
+<br>
+
+<button onclick="numCheck()">Submit</button>
+<br>
+
+<div style="background-color:#484848">
+  <p id="output"></p>
+</div>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="mainStyle.css">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saying Hello</title>
+    <h1>Saying Hello</h1>
+</head>
+<body>
+    
+
+    <div class="InputWrapper">
+        <input type="text" id="name" placeholder="What is your name?"><br>
+    </div>
+
+
+    <div class="buttonWrapper">
+        <button onclick="myFunction()">Enter</button>
+    </div>
+
+    <br>
+    <br>
+
+
+    <div class="outputWrapper">
+        <p id="output"></p>
+    </div>
+
+    <script>
+        const greetings = {
+            naruto: 'Yo, Did ya complete the Rasengan yet?',
+            beth: 'Heya B, Hows Jerry doing?',
+            brian: 'Good day Brian!!',
+            burooj: 'welcome back, your majesty',
+            ali: 'What do you wanna do today?'
+        };
+        function myFunction(){
+            const name   = document.getElementById('name');
+            const output = document.getElementById('output');
+
+            if (greetings[name.value.toLowerCase()] === undefined){
+                output.innerHTML = `Hello, ${name.value}, nice to meet you!`;
+
+            } else {
+                output.innerHTML = greetings[name.value.toLowerCase()];
+            }
+
+            
+        }
+    </script>
+
+
+
+</body>
+</html>

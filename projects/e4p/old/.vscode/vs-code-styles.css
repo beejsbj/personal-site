@@ -1,0 +1,25 @@
+/* Set italics and comments to the script font */
+
+/* 
+.comment:not(.punctuation) {
+    font-family: 'Script12 BT';
+    font-size: 1.5em;
+} */
+
+.mtk16 {    /*main terms like for/while/if/var*/
+  font-family: "Waltograph";
+  font-size: 1.750em;
+}
+
+/* .mtk15,P
+.mtk18 {  /* comments 
+  font-family: "Script12 BT";
+  font-size: 1.25em;
+  font-style: normal;
+}
+*/
+.mtk8 {               /*strings*/
+  font-family: "Caroni";
+  font-size: 1.35em;
+
+}

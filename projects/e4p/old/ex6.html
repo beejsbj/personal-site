@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="mainStyle.css">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculating whenyouwill Retire</title>
+    <h1>Retirement Calculator</h1>
+</head>
+<body>
+    <div class="InputWrapper">
+        <input type="text" id="currAge" placeholder="What is your current age?"><br><br>
+    </div>
+
+    <div class="InputWrapper">
+        <input type="text" id="retireAge" placeholder="Desired retirement age?"><br>
+    </div>
+
+    <div class="buttonWrapper">
+        <button onclick="myMain()">Click to Age</button><br>
+    </div>
+
+    <div class="outputWrapper">
+        <p id="output"></p>
+    </div>
+
+    <script>
+        function myMain(){
+        
+            const today = new Date();
+            const currYear = today.getFullYear();
+            
+            let currAge = Number(document.getElementById('currAge').value);
+            let retireAge = Number(document.getElementById('retireAge').value);
+            let output = document.getElementById('output').innerHTML;
+            
+            let yearsTillRetire = retireAge - currAge;
+            
+            if (yearsTillRetire <= 0){
+                document.getElementById('output').innerHTML = "You can retire now!! Congrats!"
+            } else {
+    
+                document.getElementById('output').innerHTML = `You have ${yearsTillRetire} years left until you can retire.
+                            It's ${currYear}, so you can retire in ${currYear + yearsTillRetire}.`
+            }
+        
+        }
+    </script>
+</body>
+</html>
+
+

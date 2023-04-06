@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="mainStyle.css">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libbing Madly</title>
+  <h1>Mad Lib</h1>
+</head>
+<body>
+
+  <div class="InputWrapper">
+    <input type="text" id="noun" placeholder="Enter a Noun"><br><br>
+  </div>
+
+  <div class="InputWrapper">
+    <input type="text" id="verb" placeholder="Enter a Verb"><br><br>
+  </div>
+
+  <div class="InputWrapper">
+    <input type="text" id="adv" placeholder="Enter an Adverb"><br><br>
+  </div>
+
+  <div class="InputWrapper">
+    <input type="text" id="adj" placeholder="Enter an Adjective"><br>
+  </div>
+
+  <div class="buttonWrapper">
+    <button onclick="myMain()">Submit</button><br>
+  </div>
+
+  
+<div class="outputWrapper">
+  <p id="output"></p>
+</div>
+
+<script>
+  function myMain(){
+  let noun = document.getElementById('noun').value;
+  let verb = document.getElementById('verb').value;
+  let adj = document.getElementById('adj').value;
+  let adv = document.getElementById('adv').value;
+  
+  document.getElementById('output').innerHTML = `Do you ${verb} your ${adj} ${noun} ${adv}? That's hilarious!`
+}
+</script>
+</body>
+</html>
+
+
+
+
+  
+    

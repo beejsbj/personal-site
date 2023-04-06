@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="mainStyle.css">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Printing Quotes</title>
+    <h1>Printing Quotes</h1>
+</head>
+<body>
+
+
+    <div class="InputWrapper">
+        <input type="text" id="person" placeholder="Who said it?"><br>
+    </div>
+    
+
+    <div class="buttonWrapper">
+        <button onclick="myMain()">Submit</button><br>
+    </div>
+
+
+    <div class="outputWrapper">
+        <p id="output"></p>
+    </div>
+
+
+
+    <script>
+
+
+        function myMain(){
+            const quotes = {
+                'Dalinar Kholin':[
+                    'Sometimes a hypocrite is nothing more than a man in the process of changing.',
+                    'To love the journey is to accept no such end. I have found, through painful experience, that the most important step a person can take is always the next one.',
+                    'The most important step a man can take. It\'s not the first one, is it?<br> It\'s the next one. Always the next step',
+                    'Accept the pain, but don\'t accept that you deserved it.',
+                    'I will take responsibility for what I have done,”... “If I must fall, I will rise each time a better man.',
+                    'Yes, I began my journey alone, and I ended it alone.<br> But that does not mean that I walked alone.'
+                ],
+                'Barack Obama': [
+                    'I have always believed that hope is that stubborn thing inside us that insists, despite all the evidence to the contrary, that something better awaits us so long as we have the courage to keep reaching, to keep working, to keep fighting.',
+                    'Change doesn\'t come from Washington. Change comes to Washington.',
+                    'I think that I have the capacity to get people to recognize themselves in each other.'
+                ],
+                'Obi-Wan Kenobi': [
+                    'The truth is often what we make of it; you heard what you wanted to hear, believed what you wanted to believe.',
+                    'These aren\'t the droids you\'re looking for.',
+                    'Be mindful of your thoughts, Anakin, they betray you.',
+                    'May The Force Be With You.'
+                ],
+                'Iroh': [
+                    'Sometimes life is like this dark tunnel. You can\'t always see the light at the end of the tunnel, but if you just keep moving... you will come to a better place.',
+                    'Sometimes the best way to solve your own problems is to help someone else',
+                    'When you\'re in your darkest place, you give yourself hope and that\'s inner strength.',
+                    'Life happens wherever you are, whether you make it or not.',
+                    'Good times become good memories, but bad times become good lessons',
+                    'Sharing tea with a fascinating stranger is one of life\'s true delights.',
+                    'Goodbye, everyone. Today, destiny is our friend. I know it'
+                ],
+                'Ursula K. Le Guin': [
+                    'People who deny the existence of dragons are often eaten by dragons. From within.',
+                    'We read books to find out who we are. What other people, real or imaginary, do and think and feel... is an essential guide to our understanding of what we ourselves are and may become.',
+                    'The only thing that makes life possible is permanent, intolerable uncertainty: not knowing what comes next.',
+                    'It is good to have an end to journey toward; but it is the journey that matters, in the end.'
+                ]
+            }   
+            const person = document.getElementById('person');
+            const output = document.getElementById('output');
+
+
+
+
+            output.innerHTML = `<i>${quotes[person.value][Math.floor(Math.random() * quotes[person.value].length)]}<i>
+            <br><br>
+                                        —  <b>${person.value}<b>`;
+        }
+        
+    </script>
+
+
+    
+</body>
+</html>

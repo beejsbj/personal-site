@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="mainStyle.css">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Printer</title>
+    <h1>Printing Quotes</h1>
+</head>
+<body>
+
+    <div class="InputWrapper">
+        <input type="text" id="quote" placeholder="What is the quote?"><br><br>
+    </div>
+
+    <div class="InputWrapper">
+        <input type="text" id="person" placeholder="Who said it?"><br>
+    </div>
+    
+
+    <div class="buttonWrapper">
+        <button onclick="myMain()">Submit</button><br>
+    </div>
+
+
+    <div class="outputWrapper">
+        <p id="output"></p>
+    </div>
+
+
+
+    <script>
+
+
+        function myMain(){
+            const quote = document.getElementById('quote');
+            const person = document.getElementById('person');
+
+            const output = document.getElementById('output');
+
+
+
+            output.innerHTML = `<i>${quote.value}<i>
+            <br><br>
+                                        —  <b>${person.value}<b>`;
+
+
+        }
+        
+    </script>
+
+
+    
+</body>
+</html>

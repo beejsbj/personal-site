@@ -1,2 +1,7 @@
 @import "../../templates/modules/header/pe-header.css";
+
+@import "../../templates/modules/layout-module/layout-module.css";
+@import "../../templates/modules/graphic-layout/graphic-layout.css";
+
+/*footer*/
 @import "../../templates/modules/footer/pe-footer.css";

@@ -26,14 +26,6 @@ button {
   cursor: pointer;
 }
 
-.hover-hide {
-  opacity: 0;
-}
-
-.hover-hide:hover {
-  opacity: 1;
-}
-
 .bubble {
   background-color: var(--light-color);
   border-radius: 50%;

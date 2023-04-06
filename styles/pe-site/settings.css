@@ -22,8 +22,12 @@ html {
   --wheat-dark: hsla(41, 27%, 38%, 1);
   --wheat-darker: hsla(38, 34%, 33%, 1);
 
+  /* settings */
   --color: hsla(206, 66%, 77%, 1);
   --highlight: hsla(190, 90%, 60%, 1);
+
+  --dark-color: var(--red);
+  --light-color: var(--green);
 
   --shadow: 3px 3px 5px 2px rgb(17 17 17 / 20%);
 

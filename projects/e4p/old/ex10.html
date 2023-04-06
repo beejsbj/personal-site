@@ -1,0 +1,35 @@
+<h2>Challenge 10</h2>
+<link rel="stylesheet" href="challenge10.css">
+<script src="ex10.js"></script>
+<div>
+    <br>
+    <label for="itemprice">Enter price of the item: </label>
+    <input type="text" id="itemprice" oninput="numCheck()">
+    <br>
+    <label for="itemquantity">Enter quantity of the item: </label>
+    <input type="text" id="itemquantity" oninput="numCheck()">
+    <br>
+    <br>
+</div>
+<br>
+
+
+<button id="add" onclick="itemLister()">Add to list</button>
+<button id="reset" onclick="resetter()">Reset List</button>
+<br>
+
+<div>
+<p id="itemlist"></p>
+</div>
+<br>
+
+
+<button id="submit" onclick="selfCheckout()">Calculate Totals</button>
+<br>
+<div>
+<p id="output"></p>
+
+</div>
+
+
+

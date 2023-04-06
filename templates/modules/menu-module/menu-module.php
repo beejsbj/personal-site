@@ -20,8 +20,8 @@ if (file_exists("data/components/$menu-menu.json")) {
 			$slug = $menuItem['slug'];
 			$name = $menuItem['name'];
 			$target = $menuItem['target'] ?? "";
-			if ($menu == 'site') {
-				$class = "$class " . activePage($menuItem['activePage']);
+			if ($menu == 'site' || $menu == 'garden') {
+				$class = "$class " . activePage($menuItem['activePage'] ?? false);
 				// $slug = $menuItem['slug'] . "?theme=" . currentTheme(); //pretty
 				$slug = "?page=" . $menuItem['slug'] . "&theme=" . currentTheme(); //ugly
 
