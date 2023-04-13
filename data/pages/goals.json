@@ -1,54 +1,59 @@
 {
-	"id": "goals",
-	"title": "Goals",
-	"image": "",
-	"description": "",
-	"heading": "Goals",
-	"sections": [
-		{
-			"heading-class": "hide",
-			"paragraphs": {
-				"I'm supposed to be selfish here.": "calm-voice",
-				"Honestly, when I think back to just 5 years ago, things were incredibly different. its crazy, crazy how much and how little things can change. Not enough people talk about how time feels.": "calm-voice",
-				"I'm supposed to be selfish here.": "calm-voice"
-			}
-		},
-		{
-			"module": "goals-list",
-			"heading": "5-year vision",
-			"goals": [
-				" <em>In 5 years I'll be <strong>31</strong></em>",
-				" Working a job I enjoy and Im <em>really</em> loving web design, heres hoping society doesnt collapse and I lose the chance to work this skill, also AI",
-				"Be making <em>atleast</em> 80k anually.",
-				"Living my Digital nomads dream, Travelling to cool places, challenging myself with new things, meeting my scattered family and friends",
-				"Be invested in some adult proving things like an apartment",
-				"Be a god at Piano and play <a href='https://www.youtube.com/watch?v=HV1CMDhemt0'>this!</a>",
-				"Half-way to retirement, or part timing. So thatd include having a handful passive income streams set up.",
-				"Finally get to see the release of persona 6!"
-			]
-		},
-		{
-			"module": "goals-list",
-			"heading": "6 Month",
-			"goals": [
-				"Have a Job, full time, ideally remote, that nets me atleast 25/hr",
-				"Be clear of my student Debt",
-				"Travel to india and attend my cousin sister's wedding!!"
-			]
-		},
-		{
-			"module": "goals-list",
-			"heading": "End of the month",
-			"goals": [
-				"<s>update goals and resume</s>",
-				"finish the hunger buster vue3 project",
-				"Finish up the case studies for my flashcard app, the lottery/roulette and Hunger Buster",
-				"Write up the CSS to make the PE site theme for my portfolio",
-				"Finish up my portfolio",
-				"Push Derek and Brian to provide all study hall data, or letting me do it",
-				"write up Ivy's job doc",
-				"after finishing up my portfolio, applying to a bunch of local web development and desgin studios"
-			]
-		}
-	]
+  "id": "goals",
+  "title": "Goals",
+  "image": "",
+  "description": "",
+  "heading": "Goals",
+  "sections": [
+    {
+      "heading-class": "hide",
+      "paragraphs": [
+        {
+          "voice": "notice-voice",
+          "text": "I'm supposed to be selfish here."
+        },
+        {
+          "voice": "notice-voice",
+          "text": "Honestly, when I think back to just 5 years ago, things were incredibly different. its crazy, crazy how much and how little things can change. Not enough people talk about how time feels."
+        }
+      ]
+    },
+    {
+      "module": "goals-list",
+      "heading": "5-year vision",
+      "goals": [
+        " <em>In 5 years I'll be <strong>31</strong></em>",
+        " Working a job I enjoy and Im <em>really</em> loving web design, heres hoping society doesnt collapse and I lose the chance to work this skill, also AI",
+        "Be making <em>atleast</em> 80k anually.",
+        "Living my Digital nomads dream, Travelling to cool places, challenging myself with new things, meeting my scattered family and friends",
+        "Be invested in some adult proving things like an apartment",
+        "Be a god at Piano and play <a href='https://www.youtube.com/watch?v=HV1CMDhemt0'>this!</a>",
+        "Half-way to retirement, or part timing. So thatd include having a handful passive income streams set up.",
+        "Finally get to see the release of persona 6!"
+      ]
+    },
+    {
+      "module": "goals-list",
+      "heading": "6 Month",
+      "goals": [
+        "Have a Job, full time, ideally remote, that nets me atleast 25/hr",
+        "Be clear of my student Debt",
+        "Travel to india and attend my cousin sister's wedding!!"
+      ]
+    },
+    {
+      "module": "goals-list",
+      "heading": "End of the month",
+      "goals": [
+        "<s>update goals and resume</s>",
+        "finish the hunger buster vue3 project",
+        "Finish up the case studies for my flashcard app, the lottery/roulette and Hunger Buster",
+        "Write up the CSS to make the PE site theme for my portfolio",
+        "Finish up my portfolio",
+        "Push Derek and Brian to provide all study hall data, or letting me do it",
+        "write up Ivy's job doc",
+        "after finishing up my portfolio, applying to a bunch of local web development and desgin studios"
+      ]
+    }
+  ]
 }

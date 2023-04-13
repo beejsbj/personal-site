@@ -1,10 +1,14 @@
 <?php
+session_start();
 
 include('functions.php');
+$_SESSION['theme'] = currentTheme();
+
+
 
 $__dirname = dirname($_SERVER['SCRIPT_NAME']);
 $currentPage = currentPage(); // ugly 
-$currentTheme = currentTheme();
+$currentTheme = $_SESSION['theme'];
 $pageData = getPageData($currentPage);
 $template = $pageData['template'] ?? '';
 
@@ -29,6 +33,8 @@ if (isset($_GET['project'])) {
 	<meta name="description" content="<?= $pageData['description'] ?>">
 	<meta property="og:image" content="<?= $pageData['image'] ?>">
 	<link rel='stylesheet' href='styles/<?= $currentTheme ?>/site.css'>
+
+	<link rel="icon" href="images/circle.svg" />
 </head>
 
 <body>

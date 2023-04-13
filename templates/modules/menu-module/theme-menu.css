@@ -47,6 +47,14 @@
   /*top: -5px;*/
 }
 
+.pe-circle {
+  display: inline;
+  max-width: 16px;
+  position: relative;
+  top: 2px;
+  fill: var(--link);
+}
+
 @media (min-width: 500px) {
   .theme-menu {
     transform: scale(1);

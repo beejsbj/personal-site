@@ -1,5 +1,6 @@
 voices-guide {
-  gap: 1rem;
+  display: grid;
+  gap: 2rem;
 }
 
 voice-card + voice-card {

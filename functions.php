@@ -120,11 +120,20 @@ function activeTheme($current)
 
 function currentTheme()
 {
-	if (isset($_GET['theme'])) {
-		return $_GET['theme'];
-	} else {
-		return 'default';
+	$theme = "default";
+
+
+
+	if (isset($_SESSION['theme'])) {
+		$theme = $_SESSION['theme'];
 	}
+
+	if (isset($_GET['theme'])) {
+		$theme = $_GET['theme'];
+	}
+
+	$_SESSION['theme'] = $theme;
+	return $theme;
 }
 
 function projectFilter($projects, $tag)

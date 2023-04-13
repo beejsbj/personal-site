@@ -74,6 +74,7 @@ html {
 
 header {
   animation: fade-in 0.5s ease-in both;
+  z-index: 1;
 }
 
 main {

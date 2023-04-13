@@ -3,9 +3,15 @@ header {
 }
 
 header .menus {
-  border-bottom: 1px solid var(--gray-light);
-  position: sticky;
+  position: fixed;
+  width: 100%;
   top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+
+  border-bottom: 1px solid var(--gray-light);
+  background-color: var(--paper);
 }
 
 header .page-title {
@@ -26,12 +32,21 @@ header .site-menu {
 
 header ul {
   display: flex;
-  gap: 10px;
+  /* gap: 10px; */
 }
 
 header a {
   white-space: nowrap;
   position: relative;
+  color: var(--ink);
+  padding: 5px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+header a.active {
+  color: var(--light-color);
 }
 
 header a.active::after {
@@ -50,23 +65,41 @@ header a.active::after {
 
 header .circle {
   display: block;
-  max-width: 10px;
+  max-width: 50px;
   position: absolute;
   right: 0;
   top: 0;
+  z-index: 2;
 }
 
-@media (min-width: 500px) {
+.pe-circle {
+  display: inline;
+  max-width: 16px;
+  position: relative;
+  top: 3px;
+}
+
+@media (min-width: 550px) {
+  header a {
+    padding: 5px 15px;
+  }
+
+  header .circle {
+    max-width: 30px;
+  }
+
   header .menus inner-column {
     grid-template-columns: 1fr 1fr;
   }
 
-  header .circle {
-    top: 0px;
-    right: 50%;
-  }
-
   header .site-menu ul {
     justify-content: end;
+  }
+}
+
+@media (min-width: 750px) {
+  header .circle {
+    top: 12px;
+    right: 50%;
   }
 }

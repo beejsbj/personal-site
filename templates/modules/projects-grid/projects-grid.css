@@ -13,6 +13,10 @@ project-card {
   z-index: 5;
 }
 
+project-card picture {
+  aspect-ratio: 1.55/1;
+}
+
 project-card .tools {
   display: none;
   gap: 10px;

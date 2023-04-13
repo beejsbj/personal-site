@@ -73,17 +73,17 @@ li {
   word-wrap: break-word;
 }
 
-:is(.calm-voice, p) em {
+:is(.calm-voice, p, li, a) em {
   font-style: italic;
 }
 
-:is(.calm-voice, p) strong {
+:is(.calm-voice, p, li, a) strong {
   font-weight: 700;
 }
 
 .whisper-voice {
   font-family: var(--font1);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
   word-wrap: break-word;
 }

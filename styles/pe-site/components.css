@@ -1,7 +1,11 @@
 /* buttons and icons and smaller reusable bits here */
 
+a {
+  color: var(--blue);
+}
 a:hover {
   color: var(--green);
+  fill: var(--green);
 }
 
 @import "forms.css";

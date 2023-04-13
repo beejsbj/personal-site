@@ -7,6 +7,8 @@ if (window.innerWidth > 1000) {
 }
 animateChapters();
 
+gsap.registerPlugin(ScrollTrigger);
+
 gsap.fromTo(
   "header * , main *, footer *",
   {
@@ -17,5 +19,14 @@ gsap.fromTo(
     duration: 0.5,
     stagger: 0.5 / 40,
     ease: "power2.in",
+    clearProps: "opacity",
+    //  scrollTrigger: {
+    //    trigger: "main",
+    //    start: "top center",
+    //    toggleActions: "play reset none none",
+    //    end: "max - 100px",
+    //    scrub: true,
+    //    markers: true,
+    //  },
   }
 );

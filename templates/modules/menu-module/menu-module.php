@@ -22,8 +22,8 @@ if (file_exists("data/components/$menu-menu.json")) {
 			$target = $menuItem['target'] ?? "";
 			if ($menu == 'site' || $menu == 'garden') {
 				$class = "$class " . activePage($menuItem['activePage'] ?? false);
-				// $slug = $menuItem['slug'] . "?theme=" . currentTheme(); //pretty
-				$slug = "?page=" . $menuItem['slug'] . "&theme=" . currentTheme(); //ugly
+				// $slug = $menuItem['slug']; //pretty
+				$slug = "?page=" . $menuItem['slug']; //ugly
 
 			}
 			if ($menu == 'theme') {

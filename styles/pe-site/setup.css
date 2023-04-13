@@ -1,32 +1,35 @@
-
 html {
   box-sizing: border-box;
+  scroll-behavior: smooth;
 }
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
+  scroll-margin-top: 200px;
 } /* https://www.paulirish.com/2012/box-sizing-border-box-ftw */
 
 a {
-	display: block;
-	text-decoration: none;
-	color: inherit;
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 
-p a {
-	display: inline;
-	color: blue;
-	text-decoration: underline;
+p a,
+li a {
+  display: inline;
+  /* text-decoration: underline; */
 }
 
 picture {
-	display: block;
-	overflow: hidden;
+  display: block;
+  overflow: hidden;
 }
 
 img {
-	display: block;
-	width: 100%;
-	height: auto;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 svg {
@@ -34,7 +37,6 @@ svg {
   width: 100%;
 }
 
-
 :where(:not(:defined)) {
-	display: block;
+  display: block;
 }
