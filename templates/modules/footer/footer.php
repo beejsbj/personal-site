@@ -1,7 +1,6 @@
 <footer>
-	<svg class="circle magnetic" viewBox="0 0 100 100">
-		<circle cx="50" cy="50" r="40" />
-	</svg>
+	<?php include('images/circle.svg'); ?>
+
 	<inner-column class="menus">
 		<?php
 		$menu = "site";
