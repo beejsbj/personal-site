@@ -2,16 +2,18 @@
   display: grid;
   grid-template-columns: auto 1fr 1fr;
   position: relative;
+  gap: 30px;
 }
 
 #style-guide-menu-group .site-menu {
   position: relative;
-  top: -10px;
+  top: unset;
+  right: unset;
 }
 
 #style-guide-menu-group .theme-menu {
   position: relative;
-  top: 10px;
+  top: unset;
 }
 
 .style-guide .things-grid ul {

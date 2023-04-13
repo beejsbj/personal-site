@@ -1,293 +1,293 @@
 [
-	{
-		"number": "01",
-		"name": "Saying Hello",
-		"description": "A program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "02",
-		"name": "Counting the Number of Characters",
-		"description": "A program that prompts for an input string and displays the number of characters the string contains."
-	},
-	{
-		"number": "03",
-		"name": "Printing Quotes",
-		"description": "A program that prompts for a quote and an author and displays it"
-	},
-	{
-		"number": "04",
-		"name": "Mad Lib",
-		"description": "A simple mad-lib program that prompts for a noun, verb, adverb, and adjective and injects them into a story."
-	},
-	{
-		"number": "05",
-		"name": "Simple Math",
-		"description": "A program that prompts for two numbers. and displays the sum, difference, product, and quotient of those numbers"
-	},
-	{
-		"number": "06",
-		"name": "Retirement Calculator",
-		"description": "A program that determines how many years you have left until retirement and the year you can retire."
-	},
-	{
-		"number": "07",
-		"name": "Area of a Rectangular Room",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "08",
-		"name": "Pizza Party",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "09",
-		"name": "Paint Calculator",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "10",
-		"name": "Self-Checkout",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "11",
-		"name": "Currency Conversion",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "12",
-		"name": "Computing Simple Interest",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "13",
-		"name": "Determining Compound Interest",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "14",
-		"name": "Tax Calculator",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "15",
-		"name": "Password Validation",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "16",
-		"name": "Legal Driving Age",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "17",
-		"name": "Blood Alcohol Calculator",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "18",
-		"name": "Temperature Converter",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "19",
-		"name": "BMI Calculator",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "20",
-		"name": "Multistate Sales Tax Calculator",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "21",
-		"name": "Numbers to Names",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "22",
-		"name": "Comparing Numbers",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "23",
-		"name": "Troubleshooting Car Issues",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "24",
-		"name": "Anagram Checker",
-		"description": "a program that compares two strings and determines if the two strings are anagrams."
-	},
-	{
-		"number": "25",
-		"name": "Password Strength Indicator",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "26",
-		"name": "Credit Card Payment Calculator",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "27",
-		"name": "Validating Inputs",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "28",
-		"name": "Adding Numbers",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "29",
-		"name": "Handling Bad Input",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "30",
-		"name": "Multiplication Table",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "31",
-		"name": "Karvonen Heart Rate",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "32",
-		"name": "Guess the Number Game",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "33",
-		"name": "Magic 8 Ball",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "34",
-		"name": "Employee List Removal",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "35",
-		"name": "Picking a Winner",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "36",
-		"name": "Computing Statistics",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "37",
-		"name": "Password Generator",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "38",
-		"name": "Filtering Values",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "39",
-		"name": "Sorting Records",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "40",
-		"name": "Filtering Records",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "41",
-		"name": "Name Sorter",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "42",
-		"name": "Parsing a Data File",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "43",
-		"name": "Website Generator",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "44",
-		"name": "Product Search",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "45",
-		"name": "Word Finder",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "46",
-		"name": "Word Frequency Finder",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "47",
-		"name": "Who's in Space?",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "48",
-		"name": "Grabbing the Weather",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "49",
-		"name": "Flickr Photo Search",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "50",
-		"name": "Movie Recommendations",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "51",
-		"name": "Pushing Notes to Firebase",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "52",
-		"name": "Creating Your Own Time Service",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "53",
-		"name": "Todo List",
-		"slug": "projects/todo-app",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "54",
-		"name": "URL Shortener",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "55",
-		"name": "Text Sharing",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "56",
-		"name": "Tracking Inventory",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "57",
-		"name": "Trivia App",
-		"description": "a program that prompts for your name and prints a greeting using your name."
-	},
-	{
-		"number": "0",
-		"name": "Exercise Not Found",
-		"description": "404 You have strayed, This exercise doesn't exist!"
-	}
+  {
+    "number": "01",
+    "name": "Saying Hello",
+    "description": "Greets user with a message by prompting them to enter their name in this program."
+  },
+  {
+    "number": "02",
+    "name": "Counting the Number of Characters",
+    "description": "Input a string, and this program will count the number of characters in the string, giving you an accurate character count."
+  },
+  {
+    "number": "03",
+    "name": "Printing Quotes",
+    "description": "With this program, enter your favorite quote and author name to display an inspiring quote."
+  },
+  {
+    "number": "04",
+    "name": "Mad Lib",
+    "description": " Input a noun, verb, adverb, and adjective to insert into a story and create a hilarious mad lib."
+  },
+  {
+    "number": "05",
+    "name": "Simple Math",
+    "description": "Prompt the user to input two numbers and this program will display various operation with the two numbers."
+  },
+  {
+    "number": "06",
+    "name": "Retirement Calculator",
+    "description": "Find out how long you have until retirement with this program. Based on your age and retirement age input, it will calculate the year you can retire."
+  },
+  {
+    "number": "07",
+    "name": "Area of a Rectangular Room",
+    "description": "This program allows you to calculate the area of a rectangular room by inputting the length and width in feet, and it will provide you with the area in both square feet and square meters."
+  },
+  {
+    "number": "08",
+    "name": "Pizza Party",
+    "description": "Calculate the number of slices of pizza each person at a party can have, based on the number of people, pizzas, and slices per pizza."
+  },
+  {
+    "number": "09",
+    "name": "Paint Calculator",
+    "description": "Input the length and width of a room, as well as the number of coats you plan to apply, and this program will calculate the amount of paint you need to purchase."
+  },
+  {
+    "number": "10",
+    "name": "Self-Checkout",
+    "description": "A program that calculates the subtotal, tax, and total of a shopping cart for multiple items, with each item having its own price and quantity input."
+  },
+  {
+    "number": "11",
+    "name": "Currency Conversion",
+    "description": "This program allows you to convert an amount of money from one currency to another."
+  },
+  {
+    "number": "12",
+    "name": "Computing Simple Interest",
+    "description": "Input the amount of principal, the rate of interest, and the number of years, and this program will calculate the simple interest, total amount, and total interest."
+  },
+  {
+    "number": "13",
+    "name": "Determining Compound Interest",
+    "description": "This program allows you to calculate the compound interest earned over a specific number of years, given the initial principal, interest rate, and compounding frequency."
+  },
+  {
+    "number": "14",
+    "name": "Tax Calculator",
+    "description": "Input the order amount and the state where the order is shipped, and this program will calculate the total cost, including tax, for the order."
+  },
+  {
+    "number": "15",
+    "name": "Password Validation",
+    "description": "Prompt the user to input a password, and this program will validate it based on certain criteria, such as length, the inclusion of special characters, and more."
+  },
+  {
+    "number": "16",
+    "name": "Legal Driving Age",
+    "description": "Determines whether a user is old enough to legally drive based on their age."
+  },
+  {
+    "number": "17",
+    "name": "Blood Alcohol Calculator",
+    "description": "Calculates a user's blood alcohol content (BAC) based on gender, weight, hours, and number of drinks."
+  },
+  {
+    "number": "18",
+    "name": "Temperature Converter",
+    "description": "a program that converts temperatures between Kelvin, Celsius, and Fahrenheit."
+  },
+  {
+    "number": "18",
+    "name": "BMI Calculator",
+    "description": "Calculates a user's Body Mass Index (BMI) based on their height and weight."
+  },
+  {
+    "number": "20",
+    "name": "Multistate Sales Tax Calculator",
+    "description": "Calculates the total sales tax for a purchase in a state, given the state's tax rate and the county's tax rate."
+  },
+  {
+    "number": "21",
+    "name": "Numbers to Names",
+    "description": "A program that prompts for a number from 1 to 12 and displays the corresponding month name."
+  },
+  {
+    "number": "22",
+    "name": "Comparing Numbers",
+    "description": "Compares two numbers and determines which one is larger, or if they are equal."
+  },
+  {
+    "number": "23",
+    "name": "Troubleshooting Car Issues",
+    "description": "A program that asks a series of questions to determine the cause of a car issue."
+  },
+  {
+    "number": "24",
+    "name": "Anagram Checker",
+    "description": "Checks whether two user-entered strings are anagrams (contain the same characters in a different order)."
+  },
+  {
+    "number": "25",
+    "name": "Password Strength Indicator",
+    "description": "Generates a random password and rates its strength based on length and characters used."
+  },
+  {
+    "number": "26",
+    "name": "Credit Card Payment Calculator",
+    "description": "Calculates the monthly payment for a credit card based on the balance, APR, and monthly payment."
+  },
+  {
+    "number": "27",
+    "name": "Validating Inputs",
+    "description": "A program that asks for your name and makes sure you don't try any funny business with invalid characters or input. Then greet you with a friendly message!"
+  },
+  {
+    "number": "28",
+    "name": "Adding Numbers",
+    "description": "Prompts you numbers and adds them as you keep inputting them."
+  },
+  {
+    "number": "29",
+    "name": "Handling Bad Input",
+    "description": "Prompt the user for their name, and if the input is empty, display an error message. Otherwise, greet the user using their name."
+  },
+  {
+    "number": "30",
+    "name": "Multiplication Table",
+    "description": "a program that prompts the user for an integer, and then display a multiplication table for that integer from 1-12."
+  },
+  {
+    "number": "31",
+    "name": "Karvonen Heart Rate",
+    "description": "The user is asked for their age and resting heart rate, and then display heart rate ranges for different intensities according to the Karvonen formula."
+  },
+  {
+    "number": "32",
+    "name": "Guess the Number Game",
+    "description": "Generate a random number, and prompt the user for their guess. Continuously display feedback to the user until the correct guess is made."
+  },
+  {
+    "number": "33",
+    "name": "Magic 8 Ball",
+    "description": "Prompt the user for a yes-or-no question, and then display a randomly selected answer from a pre-defined set of possible answers, like a real Magic 8 Ball."
+  },
+  {
+    "number": "34",
+    "name": "Employee List Removal",
+    "description": "Create a list of employees, and prompt the user for a name to remove. Remove the name and display the updated list of employees."
+  },
+  {
+    "number": "35",
+    "name": "Picking a Winner",
+    "description": "Create a list of names, randomly select a winner, and display the name of the lucky person. It's like drawing a winner from a hat, but with code!"
+  },
+  {
+    "number": "36",
+    "name": "Computing Statistics",
+    "description": "Asks user for a list of numbers, and then displays the average, minimum, maximum, and standard deviation of those numbers."
+  },
+  {
+    "number": "37",
+    "name": "Password Generator",
+    "description": "Asks user for number of characters, special characters, and numbers, and then generates a random password for the user."
+  },
+  {
+    "number": "38",
+    "name": "Filtering Values",
+    "description": "Prompts for a list of numbers, and then prints out only the filtered numbers."
+  },
+  {
+    "number": "39",
+    "name": "Sorting Records",
+    "description": "A program that sorts a list of employees by last name, position, and separation date."
+  },
+  {
+    "number": "40",
+    "name": "Filtering Records",
+    "description": "A program that prompts for a search string and then displays all records that contain the search string."
+  },
+  {
+    "number": "41",
+    "name": "Name Sorter",
+    "description": "Prints a list of names in alphabetical order from a file."
+  },
+  {
+    "number": "42",
+    "name": "Parsing a Data File",
+    "description": "A program that parses a csv file and prints the data in a table format."
+  },
+  {
+    "number": "43",
+    "name": "Website Generator",
+    "description": "Prompts the user for information about a website, and then generates an index.html file for the site."
+  },
+  {
+    "number": "44",
+    "name": "Product Search",
+    "description": "A program that prompts for a product name and then retrieves the current price and quantity for that product."
+  },
+  {
+    "number": "45",
+    "name": "Word Finder",
+    "description": "Search through a file and find all occurrences of a word or phrase and replace it with another word or phrase"
+  },
+  {
+    "number": "46",
+    "name": "Word Frequency Finder",
+    "description": "Create a histogram displaying the word frequencies in a given file."
+  },
+  {
+    "number": "47",
+    "name": "Who's in Space?",
+    "description": "A program connects to the NASA API and returns the names of people who are currently in space."
+  },
+  {
+    "number": "48",
+    "name": "Grabbing the Weather",
+    "description": "A program that prompts for a city name and returns the current weather for that city."
+  },
+  {
+    "number": "49",
+    "name": "Flickr Photo Search",
+    "description": "A program that prompts for a search term and then displays the first 5 photos matching that term."
+  },
+  {
+    "number": "50",
+    "name": "Movie Recommendations",
+    "description": "A program that prompts for a movie title and then displays the movie's information and a list of recommended movies."
+  },
+  {
+    "number": "51",
+    "name": "Pushing Notes to Firebase",
+    "description": "A program that prompts for a note title and note text, and then saves the note to Firebase."
+  },
+  {
+    "number": "52",
+    "name": "Creating Your Own Time Service",
+    "description": "Creates a web service that returns the current time in a JSON format. A client program then consumes the JSON data and displays the time. "
+  },
+  {
+    "number": "53",
+    "name": "Todo List",
+    "slug": "projects/todo-app",
+    "description": "App that prompts for a task and then stores it in a list. The user can enter tasks repeatedly, and the list is displayed each time the user enters a task."
+  },
+  {
+    "number": "54",
+    "name": "URL Shortener",
+    "description": "A program that prompts for a URL and then creates a shortened URL."
+  },
+  {
+    "number": "55",
+    "name": "Text Sharing",
+    "description": "This app allows users to share text snippets with each other. Users can create a unique URL for each snippet, and then share that URL with others. When a user visits the URL, they'll see the text snippet."
+  },
+  {
+    "number": "56",
+    "name": "Tracking Inventory",
+    "description": "A program that tracks an inventory of products stored in a JSON. Will print out in HTML and CSV formats."
+  },
+  {
+    "number": "57",
+    "name": "Trivia App",
+    "description": "A multiple choice trivia game that reads a question and multiple answers, and then the user selects the correct answer."
+  },
+  {
+    "number": "0",
+    "name": "Exercise Not Found",
+    "description": "404 You have strayed, This exercise doesn't exist!"
+  }
 ]
