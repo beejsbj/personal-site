@@ -11,7 +11,15 @@
       "paragraphs": [
         {
           "voice": "notice-voice",
-          "text": "Here is where you will find the projects i've been involved in, a mix of personal and student projects."
+          "text": "Welcome to my Projects page! Here, you'll find a collection of my recent web development projects, each one demonstrating my skills in design, programming, and problem-solving. "
+        },
+        {
+          "voice": "notice-voice",
+          "text": "From creating responsive and user-friendly websites to building complex web applications, I take pride in my attention to detail for the projects I work on."
+        },
+        {
+          "voice": "notice-voice",
+          "text": "Please take some time to explore my portfolio and see the diverse range of projects I have worked on. I hope you enjoy seeing my passion for web development shine through in each project."
         }
       ]
     },

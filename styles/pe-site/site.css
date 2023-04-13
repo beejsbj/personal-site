@@ -74,12 +74,18 @@ body {
   gap: 10px;
 }
 
-main .generic-text:nth-of-type(1) {
+main .generic-text:nth-of-type(2) {
   background-color: var(--gray-lighter);
   border-top: 1px solid var(--gray-light);
   border-bottom: 1px solid var(--gray-light);
 }
-main .generic-text:nth-of-type(1) inner-column {
+main .generic-text:nth-of-type(2) inner-column {
   padding-top: 80px;
   padding-bottom: 80px;
+}
+
+.page-title {
+  padding: 60px 10px;
+  /* background-color: var(--ink); */
+  /* color: var(--paper); */
 }

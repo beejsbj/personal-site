@@ -5,7 +5,9 @@ $pageHeading = $pageData['heading'] ?? 'NA';
 
 <header>
 
-	<?php include('images/circle.svg'); ?>
+	<div class="overflow-hidden">
+		<?php include('images/circle.svg'); ?>
+	</div>
 
 	<section class="header-section menus">
 		<inner-column>
@@ -18,13 +20,7 @@ $pageHeading = $pageData['heading'] ?? 'NA';
 		</inner-column>
 	</section>
 
-	<section class="header-section page-title">
-		<inner-column>
-			<h1 class="booming-voice">
-				<?= $pageHeading ?>
-			</h1>
-		</inner-column>
-	</section>
+
 </header>
 
 

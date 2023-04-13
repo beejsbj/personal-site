@@ -36,3 +36,10 @@ footer .circle {
     width: 600px;
   }
 }
+
+/* media rule for non phones */
+@media (min-height: 890px) and (min-width: 500px) {
+  footer .site-menu {
+    display: none;
+  }
+}

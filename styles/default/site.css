@@ -25,11 +25,10 @@
 @import "animation.css";
 
 /* then other contextual styles */
+
 body {
   background-color: var(--paper);
   color: var(--ink);
-  padding-top: 100px;
-  overflow-x: hidden;
 }
 
 .my-fantastic-image {
@@ -42,6 +41,11 @@ body {
 }
 .hide-opacity {
   opacity: 0;
+}
+
+.overflow-hidden {
+  /* overflow-x: hidden;
+  position: relative; */
 }
 
 @media (max-width: 900px) {

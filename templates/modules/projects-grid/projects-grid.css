@@ -227,6 +227,7 @@ project-card p::after {
 
   project-card:nth-of-type(even) .heading {
     text-align: right;
+    transform: scaleX(-1);
   }
 
   project-card picture {

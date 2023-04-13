@@ -13,6 +13,8 @@ $pageData = getPageData($currentPage);
 $template = $pageData['template'] ?? '';
 
 
+
+
 // Exercise detail page title metadata
 if (isset($_GET['exercise']) && $_GET['exercise'] > 57) {
 	$pageData = getPageData('notfound');
@@ -41,6 +43,14 @@ if (isset($_GET['project'])) {
 	<?php include('templates/modules/header/header.php'); ?>
 
 	<main class="page-content">
+		<section class="page-title">
+			<inner-column>
+				<h1 class="booming-voice">
+					<?= $pageData['heading'] ?? 'NA' ?>
+				</h1>
+			</inner-column>
+		</section>
+
 		<?php renderPage($pageData, $template); ?> <!-- dynamic page rending -->
 	</main>
 

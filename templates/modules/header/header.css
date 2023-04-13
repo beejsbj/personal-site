@@ -1,5 +1,12 @@
 header {
-  overflow-x: hidden;
+  overflow: hidden;
+
+  padding-top: 100px;
+}
+@media (max-width: 750px) {
+  header {
+    position: relative;
+  }
 }
 header .menus inner-column {
   display: none;
@@ -28,7 +35,7 @@ header .circle {
     position: absolute;
     width: 300px;
     right: -90px;
-    top: -160px;
+    top: -180px;
   }
 }
 
