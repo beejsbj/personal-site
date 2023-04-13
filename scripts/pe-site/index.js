@@ -9,3 +9,13 @@
 //     $headerCircle.style.setProperty("--right", e.target.offsetRight + "px");
 //   });
 // });
+
+let $headerCircle = document.querySelector("header .circle");
+$headerCircle.onclick = (e) => {
+  e.preventDefault();
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: "smooth",
+  });
+};

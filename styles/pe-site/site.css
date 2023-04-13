@@ -26,6 +26,7 @@
 body {
   background-color: var(--paper);
   color: var(--ink);
+  overflow: auto;
 }
 
 .hide {

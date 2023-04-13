@@ -1,15 +1,7 @@
 header {
-  position: relative;
-}
-
-header .menus {
-  position: fixed;
-  width: 100%;
+  position: sticky;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
-
+  z-index: 7;
   border-bottom: 1px solid var(--gray-light);
   background-color: var(--paper);
 }
@@ -40,7 +32,7 @@ header a {
 }
 
 header a.active {
-  color: var(--light-color);
+  color: var(--green);
 }
 
 header a.active::after {
@@ -49,7 +41,7 @@ header a.active::after {
   aspect-ratio: 1/1;
   border-radius: 50%;
   width: 10px;
-  background: var(--ink);
+  background: var(--green);
 
   position: absolute;
   bottom: -7px;
@@ -64,6 +56,7 @@ header .circle {
   right: 0;
   top: 0;
   z-index: 2;
+  cursor: pointer;
 }
 
 .pe-circle {
