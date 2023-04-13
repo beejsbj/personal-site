@@ -1,54 +1,46 @@
-
 html {
+  --standard: 1140px;
+  --tight: 800px;
+  --wide: 1400px;
 
-	--standard: 1140px;
-	--tight: 800px;
-	--wide: 1400px;
+  --black: #111111;
+  --white: #efefef;
 
+  --neutral-stuffs: gray;
 
-	--black: #111111;
-	--white: #efefef;
+  --color: #9ec9eb;
+  --highlight: #aadee9;
 
-	--neutral-stuffs: gray;
+  --shadow: rgba(0, 0, 0, 0.8);
 
-	--color: #9ec9eb;
-	--highlight: #aadee9;
+  --corners: 10px; /* or whatevers */
 
-	--shadow: rgba(0,0,0,.8);
+  --paper: var(--white);
+  --ink: var(--black);
 
-	--corners: 10px; /* or whatevers */
-
-	--paper: var(--white);
-	--ink: var(--black);
-
-	--font1: 'Newsreader', serif;
-	--font2: 'Lato', sans-serif;
+  --font1: "Newsreader", serif;
+  --font2: "Lato", sans-serif;
 }
 
-
 html {
-	--paper: hsla(47, 11%, 83%, 1.00);
-	--paper2: hsla(47, 48%, 83%, 1.00);
-	--ink: hsla(3, 58%, 10%, 1.00);
-	--link: hsla(219, 51%, 41%, 1.00);
+  --paper: hsla(47, 11%, 85%, 1);
+  --paper2: hsla(47, 48%, 83%, 1);
+  --ink: hsla(3, 58%, 10%, 1);
+  --link: hsla(219, 51%, 41%, 1);
 
-	--dark-color: hsla(3, 58%, 31%, 1.00); /*also for bold*/
-	--dark-highlight: hsla(3, 38%, 53%, 1.00); /*//also for italics*/
-	
-	--light-color: hsla(30, 65%, 71%, 1.00); /*subdued*/
-	--light-highlight: hsla(30, 77%, 62%, 1.00); /*louder*/
-	
+  --dark-color: hsla(3, 58%, 31%, 1); /*also for bold*/
+  --dark-highlight: hsla(3, 38%, 53%, 1); /*//also for italics*/
 
+  --light-color: hsla(30, 65%, 71%, 1); /*subdued*/
+  --light-highlight: hsla(30, 77%, 62%, 1); /*louder*/
 }
 
 @media (prefers-color-scheme: dark) {
-	html {
-	--ink: hsla(47, 11%, 83%, 1.00);
-	--paper: hsla(3, 58%, 5%, 1.00);
+  html {
+    --ink: hsla(47, 11%, 83%, 1);
+    --paper: hsla(3, 58%, 5%, 1);
 
-	--dark-color: hsla(3, 38%, 53%, 1.00); /*using dark-highlight*/
-	--dark-highlight: hsla(30, 65%, 71%, 1.00); /*//using light-highlight*/
-	
-
-	}
+    --dark-color: hsla(3, 38%, 53%, 1); /*using dark-highlight*/
+    --dark-highlight: hsla(30, 65%, 71%, 1); /*//using light-highlight*/
+  }
 }

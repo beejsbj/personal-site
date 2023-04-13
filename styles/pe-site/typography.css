@@ -92,6 +92,7 @@ li {
   font-family: var(--font2);
   font-size: 14px;
   text-transform: uppercase;
+  line-height: 1.4;
 }
 
 mark {

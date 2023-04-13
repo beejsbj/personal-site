@@ -22,19 +22,25 @@ if (isset($_GET['tags'])) {
 	<?php
 	foreach ($projects as $project) {
 		$heading = $project['heading']  ?? "Project Title";
+		$date = $project['date'] ?? "2022-06-13";
 		$id = $project['id'] ?? "garden";
 		$description = $project['description'] ?? "this is the Project Descripton";
-		$image = $project['image'][$_SESSION['theme']] ?? "landscape.jpg";
+		$image = $project['images'][$_SESSION['theme']]['thumbnail'] ?? $project['image'] ?? "landscape.jpg";
+
+
 		// $url = $project['url'] ?? "projects/$id"; //pretty
 		$url = $project['url'] ?? "?page=project&project=$id"; //ugly
 
 		$tools = $project['tools'] ?? "['HTML', 'CSS']"; ?>
 
 		<project-card>
-			<h1 class="attention-voice">
+			<h2 class="attention-voice heading">
 				<?= $heading ?>
-			</h1>
-			<p class="whisper-voice">
+			</h2>
+			<h3 class="teaser-voice date">
+				<?= $date ?>
+			</h3>
+			<p class="calm-voice description">
 				<?= $description ?>
 			</p>
 			<picture>

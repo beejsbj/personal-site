@@ -86,6 +86,7 @@ input {
   font-family: var(--font2), sans-serif;
   font-size: 0.9rem;
   color: gray;
+  line-height: 1.4;
 }
 
 .teaser-voice {

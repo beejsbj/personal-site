@@ -1,9 +1,10 @@
 [
   {
     "title": "Layout Garden",
+    "date": "2021-05-18",
     "heading": "Layout&nbspGarden",
     "id": "garden",
-    "description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout adapt!",
+    "description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout adapt to it!",
     "image": "garden.png",
     "images": {
       "default": {
@@ -38,6 +39,7 @@
   },
   {
     "title": "Quantumon",
+    "date": "2021-05-28",
     "heading": "Quantumon",
     "id": "quantumon",
     "description": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle.",
@@ -131,9 +133,10 @@
   },
   {
     "title": "Theme Challenge",
+    "date": "2022-06-24",
     "heading": "Theme Challenge",
     "id": "theme-challenge",
-    "description": "This was a fun challenge, where we were given a code base and were instructed to only use CSS to get a website to fit within chosen industry",
+    "description": "A fun challenge, where we were given a code base and could only use CSS to get a website to fit within chosen industry",
     "image": "weed-leaf.jpg",
     "images": {
       "default": {
@@ -229,6 +232,7 @@
   },
   {
     "title": "Lottery App",
+    "date": "2022-09-12",
     "heading": "Lottery App",
     "id": "lottery",
     "description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
@@ -273,6 +277,7 @@
   },
   {
     "title": "Roulette App",
+    "date": "2022-09-25",
     "heading": "Roulette App",
     "id": "roulette",
     "description": "Back for more gambling. this had some bumps, but I really ended up liking the aesthetic I came up with!",
@@ -317,6 +322,7 @@
   },
   {
     "title": "Flash Cards",
+    "date": "2022-10-03",
     "heading": "Flash Cards",
     "id": "flashcards",
     "description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
