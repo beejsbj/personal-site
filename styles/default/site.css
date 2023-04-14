@@ -59,9 +59,8 @@ body main {
   gap: 30px;
 }
 
-html.style-guide main section inner-column {
+html.style-guide main > section + section {
   border-top: 1px solid black;
-
   padding-top: 40px;
 }
 
@@ -96,4 +95,8 @@ footer {
   100% {
     opacity: 1;
   }
+}
+
+.last-updated inner-column {
+  padding: 10px;
 }

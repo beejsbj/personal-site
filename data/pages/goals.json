@@ -6,6 +6,10 @@
   "heading": "Goals",
   "sections": [
     {
+      "module": "last-updated",
+      "filepath": "data/pages/goals.json"
+    },
+    {
       "heading-class": "hide",
       "paragraphs": [
         {
@@ -18,6 +22,7 @@
         }
       ]
     },
+
     {
       "module": "goals-list",
       "heading": "5-year vision",

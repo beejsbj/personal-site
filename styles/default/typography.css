@@ -98,11 +98,11 @@ input {
 
 /* these would be scoped to section or to an article element */
 /* this is just a loose setting for now */
-p + p {
+p:not(.hide) + p {
   margin-top: 1em;
 }
 
-h2 + p {
+h2:not(.hide) + p {
   margin-top: 20px;
 }
 

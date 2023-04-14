@@ -75,18 +75,27 @@ body {
   gap: 10px;
 }
 
-main .generic-text:nth-of-type(2) {
+:is(.page-title, .last-updated) + .generic-text {
   background-color: var(--gray-lighter);
   border-top: 1px solid var(--gray-light);
   border-bottom: 1px solid var(--gray-light);
 }
-main .generic-text:nth-of-type(2) inner-column {
+:is(.page-title, .last-updated) + .generic-text inner-column {
   padding-top: 80px;
   padding-bottom: 80px;
 }
 
-.page-title {
+.page-title inner-column {
   padding: 60px 10px;
   /* background-color: var(--ink); */
   /* color: var(--paper); */
+}
+@media (min-width: 900px) {
+  .page-title inner-column {
+    padding: 70px 10px;
+  }
+}
+
+.last-updated inner-column {
+  padding: 10px;
 }

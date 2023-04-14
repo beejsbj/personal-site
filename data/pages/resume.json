@@ -1,65 +1,69 @@
 {
-	"id": "resume",
-	"title": "Resume",
-	"image": "",
-	"description": "",
-	"heading": "Resume",
-	"sections": [
-		{
-			"module": "resume-section",
-			"heading": "Education",
-			"experiences": [
-				{
-					"role": "Bacelor of Computer Science",
-					"place": "Ontario Tech University",
-					"dates": ["June 2022"],
-					"specialNote": "In Progress"
-				},
-				{
-					"role": "Design for the Web",
-					"place": "Perpetual Education",
-					"dates": ["Feb 2022", "Feb 2023"],
-					"duties": [
-						"Learned the history and foundations of web development and design"
-					],
-					"specialNote": "An online program that teaches the entire web design and development process from idea to completion."
-				},
-				{
-					"role": "Junior IT Analyst Program",
-					"place": "NPower Canada",
-					"dates": ["Sep 2020", "Dec 2020"],
-					"specialNote": "14-week intensive online class training on the fundamentals of computer technology, and project management essentials"
-				}
-			]
-		},
-		{
-			"module": "resume-section",
-			"heading": "Work",
-			"experiences": [
-				{
-					"role": "Customer Support Agent (Rogers)",
-					"place": "HGS Canada",
-					"dates": ["Jan 2021", "Oct 2021"],
-					"duties": [
-						"Handled nonstop barrage of back-to-back calls and dealt with Customers to satisfaction",
-						"This experience greatly helped me cultivate the ability to deal with varying types of personalities and taught me to deescalate them if need be while maintaining professional decorum",
-						"Maintained an amicable work relationship with my colleagues even while working through home, helping them out anytime they might have needed additional support."
-					]
-				},
-				{
-					"role": "Web Development",
-					"place": "API3",
-					"dates": ["Aug 2022", "Apr 2023"],
-					"duties": [
-						"Built a brocure welcome site for Quantumon with HTML and CSS",
-						"Designed and Developed a Lottery and Roulette interactive app using JS, HTML, CSS",
-						"Ported the Lottery and Roulette to React",
-						"Currently working on a project to connect the frontends to the backend"
-					],
-					"skills": ["HTML", "CSS", "Javascript", "React", "Node"],
-					"specialNote": "Freelance Project Contract"
-				}
-			]
-		}
-	]
+  "id": "resume",
+  "title": "Resume",
+  "image": "",
+  "description": "",
+  "heading": "Resume",
+  "sections": [
+    {
+      "module": "last-updated",
+      "filepath": "data/pages/resume.json"
+    },
+    {
+      "module": "resume-section",
+      "heading": "Education",
+      "experiences": [
+        {
+          "role": "Bacelor of Computer Science",
+          "place": "Ontario Tech University",
+          "dates": ["June 2022"],
+          "specialNote": "In Progress"
+        },
+        {
+          "role": "Design for the Web",
+          "place": "Perpetual Education",
+          "dates": ["Feb 2022", "Feb 2023"],
+          "duties": [
+            "Learned the history and foundations of web development and design"
+          ],
+          "specialNote": "An online program that teaches the entire web design and development process from idea to completion."
+        },
+        {
+          "role": "Junior IT Analyst Program",
+          "place": "NPower Canada",
+          "dates": ["Sep 2020", "Dec 2020"],
+          "specialNote": "14-week intensive online class training on the fundamentals of computer technology, and project management essentials"
+        }
+      ]
+    },
+    {
+      "module": "resume-section",
+      "heading": "Work",
+      "experiences": [
+        {
+          "role": "Customer Support Agent (Rogers)",
+          "place": "HGS Canada",
+          "dates": ["Jan 2021", "Oct 2021"],
+          "duties": [
+            "Handled nonstop barrage of back-to-back calls and dealt with Customers to satisfaction",
+            "This experience greatly helped me cultivate the ability to deal with varying types of personalities and taught me to deescalate them if need be while maintaining professional decorum",
+            "Maintained an amicable work relationship with my colleagues even while working through home, helping them out anytime they might have needed additional support."
+          ]
+        },
+        {
+          "role": "Web Development",
+          "place": "API3",
+          "dates": ["Aug 2022", "Apr 2023"],
+          "duties": [
+            "Built a brocure welcome site for Quantumon with HTML and CSS",
+            "Designed and Developed a Lottery and Roulette interactive app using JS, HTML, CSS",
+            "Ported the Lottery and Roulette to React",
+            "Currently working on a project to connect the frontends to the backend"
+          ],
+          "skills": ["HTML", "CSS", "Javascript", "React", "Node"],
+          "specialNote": "Freelance Project Contract"
+        }
+      ]
+    }
+  ]
 }

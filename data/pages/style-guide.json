@@ -7,8 +7,19 @@
 
   "sections": [
     {
-      "module": "layout-module"
+      "module": "last-updated",
+      "filepath": "data/pages/style-guide.json"
     },
+    {
+      "heading-class": "hide",
+      "paragraphs": [
+        {
+          "voice": "notice-voice",
+          "text": "This is the style guide for the site. It's a work in progress, but it's a good place to reference for how everything I use in the site works in one place."
+        }
+      ]
+    },
+
     {
       "module": "voices-guide",
       "voices": [
@@ -23,6 +34,10 @@
         "booming-voice"
       ]
     },
+    {
+      "module": "layout-module"
+    },
+
     {
       "module": "projects-grid"
     },

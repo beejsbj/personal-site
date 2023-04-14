@@ -42,7 +42,7 @@
   }
 }
 .solid-voice {
-  font-family: var(--font2);
+  font-family: var(--font1);
   font-size: 14px;
   font-weight: 900;
 }
@@ -59,7 +59,7 @@
   word-wrap: break-word;
 }
 @media (min-width: 700px) {
-  .firm-voice {
+  :not(.hide) .firm-voice {
     font-size: 1.5rem;
   }
 }
@@ -67,7 +67,7 @@
 .calm-voice,
 p,
 li {
-  font-family: var(--font1);
+  font-family: var(--font2);
   font-size: 1rem;
   line-height: 1.6;
   word-wrap: break-word;
@@ -82,14 +82,14 @@ li {
 }
 
 .whisper-voice {
-  font-family: var(--font1);
+  font-family: var(--font2);
   font-size: 12px;
   line-height: 1.5;
   word-wrap: break-word;
 }
 
 .teaser-voice {
-  font-family: var(--font2);
+  font-family: var(--font1);
   font-size: 14px;
   text-transform: uppercase;
   line-height: 1.4;
@@ -102,11 +102,11 @@ mark {
 /* these would be scoped to section or to an article element */
 /* this is just a loose setting for now */
 /* or smaller group of article-like styles such as a <text-content> custom element */
-p + p {
+p:not(.hide) + p {
   margin-top: 1em;
 }
 
-h2 + p {
+h2:not(.hide) + p {
   margin-top: 20px;
 }
 

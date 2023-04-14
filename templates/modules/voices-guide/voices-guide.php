@@ -2,6 +2,7 @@
 
 
 <voices-guide>
+	<h2 class="loud-voice">Type Voices</h2>
 	<?php foreach ($voices as $voice) { ?>
 		<voice-card>
 			<code>

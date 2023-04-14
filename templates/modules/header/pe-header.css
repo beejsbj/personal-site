@@ -26,6 +26,8 @@ header a {
   position: relative;
   color: var(--ink);
   padding: 5px;
+
+  font-family: var(--font1);
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.02em;
