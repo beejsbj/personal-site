@@ -10,8 +10,8 @@
 //   });
 // });
 
-let $headerCircle = document.querySelector("header .circle");
-$headerCircle.onclick = (e) => {
+let $circle = document.querySelector(".circle");
+$circle.onclick = (e) => {
   e.preventDefault();
   window.scrollTo({
     top: 0,

@@ -25,7 +25,7 @@ if (isset($_GET['project'])) {
 ?>
 
 <!doctype html>
-<html lang='en' class='special-magic no-js <?= $pageData['id'] ?> <?= "$currentTheme-theme" ?>'>
+<html lang='en' data-barba="wrapper" class='special-magic no-js <?= $pageData['id'] ?> <?= "$currentTheme-theme" ?>'>
 
 <head>
 	<base href="<?= $__dirname ?>/">
@@ -37,24 +37,37 @@ if (isset($_GET['project'])) {
 	<link rel='stylesheet' href='styles/<?= $currentTheme ?>/site.css'>
 
 	<link rel="icon" href="images/circle.svg" />
+
+	<script src="https://unpkg.com/@barba/core"></script>
+
 </head>
 
 <body>
 	<?php include('templates/modules/header/header.php'); ?>
 
-	<main class="page-content">
+	<main class="page-content" data-barba="container" data-barba-namespace="<?= $pageData['heading'] ?>">
 		<section class="page-title">
 			<inner-column>
-				<h1 class="booming-voice">
+				<p class="booming-voice">
 					<?= $pageData['heading'] ?? 'NA' ?>
-				</h1>
+				</p>
 			</inner-column>
 		</section>
 
 		<?php renderPage($pageData, $template); ?> <!-- dynamic page rending -->
+
 	</main>
 
 	<?php include('templates/modules/footer/footer.php'); ?>
+
+	<div class="page-loader">
+		<h1 class="booming-voice">
+
+		</h1>
+	</div>
+
+
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
 	<script type="module" src="scripts/<?= $currentTheme ?>/index.js"></script>

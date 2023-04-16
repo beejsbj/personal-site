@@ -1,8 +1,14 @@
 #style-guide-menu-group {
   display: grid;
-  grid-template-columns: auto 1fr 1fr;
   position: relative;
   gap: 30px;
+  justify-items: left;
+}
+@media (min-width: 900px) {
+  #style-guide-menu-group {
+    grid-template-columns: auto 1fr 1fr;
+    justify-items: unset;
+  }
 }
 
 #style-guide-menu-group .site-menu {

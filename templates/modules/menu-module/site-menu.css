@@ -124,7 +124,7 @@
 
   .site-menu a.active {
     background-color: var(--dark-color);
-    outline: 5px solid var(--light-highlight);
+    outline: 5px solid var(--light-color);
     color: var(--light-color);
   }
   /*animation*/
