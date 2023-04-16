@@ -108,8 +108,7 @@ footer {
 
 .page-loader {
   position: fixed;
-  bottom: 0;
-  left: 0;
+
   z-index: 99999999;
   height: 0;
   width: 0;
@@ -126,11 +125,11 @@ footer {
   --content: "🗣";
 }
 
-@media (min-width: 900px) {
+/* @media (min-width: 900px) {
   .page-loader {
     bottom: unset;
     left: unset;
     top: 0;
     right: 0;
   }
-}
+} */

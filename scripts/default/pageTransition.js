@@ -18,16 +18,42 @@ export default function pageTransition() {
   //   });
 
   function leaveAnimation(data) {
+    //
+    let bodyRect = document.body.getBoundingClientRect();
+    let elemRect = data.trigger.getBoundingClientRect();
+    let top = elemRect.top - bodyRect.top;
+    let left = elemRect.left - bodyRect.left;
+    console.log(top, left);
+
     const leaveTimeline = gsap.timeline();
     return leaveTimeline
+      .set(".page-loader", {
+        top: top,
+        left: left,
+        height: "50px",
+        width: "50px",
+      })
+      .to(".page-loader", {
+        opacity: 1,
+
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        duration: 1,
+        ease: "elastic.out(0.5, 0.35)",
+      })
       .to(".page-loader", {
         height: "100vh",
         width: "100vw",
-        opacity: 1,
         borderRadius: "0",
         duration: 0.5,
         ease: "expo.in",
       })
+      .to(".page-loader", {
+        backgroundColor: "var(--highlight)",
+        ease: "expo.in",
+      })
+
       .to(".page-loader .booming-voice", {
         display: "block",
         color: "var(--paper)",
@@ -76,9 +102,10 @@ export default function pageTransition() {
         width: "0",
         borderRadius: "50%",
         duration: 0.5,
-        opacity: 0,
+        //   opacity: 0,
 
         ease: "expo.out",
+        clearProps: "all",
       });
   }
 }
