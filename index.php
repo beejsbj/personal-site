@@ -25,7 +25,7 @@ if (isset($_GET['project'])) {
 ?>
 
 <!doctype html>
-<html lang='en' data-barba="wrapper" class='special-magic no-js <?= $pageData['id'] ?> <?= "$currentTheme-theme" ?>'>
+<html lang='en' class='special-magic no-js <?= $pageData['id'] ?> <?= "$currentTheme-theme" ?>'>
 
 <head>
 	<base href="<?= $__dirname ?>/">
@@ -38,11 +38,10 @@ if (isset($_GET['project'])) {
 
 	<link rel="icon" href="images/circle.svg" />
 
-	<script src="https://unpkg.com/@barba/core"></script>
 
 </head>
 
-<body>
+<body data-barba="wrapper">
 	<?php include('templates/modules/header/header.php'); ?>
 
 	<main class="page-content" data-barba="container" data-barba-namespace="<?= $pageData['heading'] ?>">
@@ -70,6 +69,8 @@ if (isset($_GET['project'])) {
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+	<script src="https://unpkg.com/@barba/core"></script>
+
 	<script type="module" src="scripts/<?= $currentTheme ?>/index.js"></script>
 </body>
 

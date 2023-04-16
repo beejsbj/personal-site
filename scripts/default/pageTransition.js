@@ -13,12 +13,17 @@ export default function pageTransition() {
     ],
   });
 
+  //   barba.hooks.beforeEnter((data) => {
+  //     document.querySelector("html").innerHTML = data.next.html;
+  //   });
+
   function leaveAnimation(data) {
     const leaveTimeline = gsap.timeline();
     return leaveTimeline
       .to(".page-loader", {
         height: "100vh",
         width: "100vw",
+        opacity: 1,
         borderRadius: "0",
         duration: 0.5,
         ease: "expo.in",
@@ -35,6 +40,7 @@ export default function pageTransition() {
         },
       })
       .to(data.current.container, {
+        duration: 0.5,
         display: "none",
       });
   }
@@ -43,19 +49,26 @@ export default function pageTransition() {
     const enterTimeline = gsap.timeline();
     return enterTimeline
 
-      .to(".page-loader", {
-        backgroundColor: "var(--highlight)",
-        duration: 0.5,
-      })
-      .to(".page-loader", {
-        backgroundColor: "var(--color)",
-        duration: 0.5,
-      })
       .to(".page-loader .booming-voice", {
         display: "none",
         duration: 0.1,
         onComplete: function () {
-          document.querySelector("html").innerHTML = data.next.html;
+          //  console.log(data.next);
+          // create element from next html string
+          const parser = new DOMParser();
+          const nextDoc = parser.parseFromString(data.next.html, "text/html");
+
+          const $htmlClass = nextDoc.querySelector("html").classList;
+          const $head = nextDoc.querySelector("head");
+          const $header = nextDoc.querySelector("header");
+          const $main = nextDoc.querySelector("main");
+          const $footer = nextDoc.querySelector("footer");
+
+          document.querySelector("html").classList = $htmlClass;
+          document.querySelector("head").innerHTML = $head.innerHTML;
+          document.querySelector("header").innerHTML = $header.innerHTML;
+          document.querySelector("main").innerHTML = $main.innerHTML;
+          document.querySelector("footer").innerHTML = $footer.innerHTML;
         },
       })
       .to(".page-loader", {
@@ -63,6 +76,8 @@ export default function pageTransition() {
         width: "0",
         borderRadius: "50%",
         duration: 0.5,
+        opacity: 0,
+
         ease: "expo.out",
       });
   }

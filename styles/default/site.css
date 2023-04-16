@@ -116,6 +116,7 @@ footer {
   overflow: hidden;
   border-radius: 50%;
   background-color: var(--color);
+  opacity: 0;
 
   display: grid;
   place-items: center;
