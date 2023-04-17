@@ -38,7 +38,7 @@ if (isset($_GET['project'])) {
 
 	<link rel="icon" href="images/circle.svg" />
 
-
+	<script defer type="module" src="scripts/<?= $currentTheme ?>/index.js"></script>
 </head>
 
 <body data-barba="wrapper">
@@ -69,9 +69,10 @@ if (isset($_GET['project'])) {
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/MotionPathPlugin.min.js"></script>
 	<script src="https://unpkg.com/@barba/core"></script>
 
-	<script type="module" src="scripts/<?= $currentTheme ?>/index.js"></script>
+
 </body>
 
 </html>

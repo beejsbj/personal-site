@@ -1,4 +1,6 @@
 export default function pageTransition() {
+  gsap.registerPlugin(MotionPathPlugin);
+
   barba.init({
     transitions: [
       {
@@ -23,34 +25,39 @@ export default function pageTransition() {
     let elemRect = data.trigger.getBoundingClientRect();
     let top = elemRect.top - bodyRect.top;
     let left = elemRect.left - bodyRect.left;
+
     console.log(top, left);
 
     const leaveTimeline = gsap.timeline();
     return leaveTimeline
       .set(".page-loader", {
-        top: top,
-        left: left,
+        y: top,
+        x: left,
         height: "50px",
         width: "50px",
-      })
-      .to(".page-loader", {
         opacity: 1,
-
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        duration: 1,
-        ease: "elastic.out(0.5, 0.35)",
       })
       .to(".page-loader", {
+        motionPath: {
+          path: [
+            { x: left, y: top },
+            { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+          ],
+          fromCurrent: false,
+          curviness: 3,
+        },
+        opacity: 1,
+        duration: 0.5,
+        ease: "elastic.out(0.2, 0.3)",
+      })
+
+      .to(".page-loader", {
+        x: 0,
+        y: 0,
         height: "100vh",
         width: "100vw",
         borderRadius: "0",
         duration: 0.5,
-        ease: "expo.in",
-      })
-      .to(".page-loader", {
-        backgroundColor: "var(--highlight)",
         ease: "expo.in",
       })
 
@@ -65,6 +72,10 @@ export default function pageTransition() {
           });
         },
       })
+      .to(".page-loader", {
+        backgroundColor: "var(--highlight)",
+        ease: "expo.out",
+      })
       .to(data.current.container, {
         duration: 0.5,
         display: "none",
@@ -72,6 +83,11 @@ export default function pageTransition() {
   }
 
   function enterAnimation(data) {
+    let bodyRect = document.body.getBoundingClientRect();
+    let elemRect = data.trigger.getBoundingClientRect();
+    let top = elemRect.top - bodyRect.top;
+    let left = elemRect.left - bodyRect.left;
+
     const enterTimeline = gsap.timeline();
     return enterTimeline
 
@@ -98,6 +114,8 @@ export default function pageTransition() {
         },
       })
       .to(".page-loader", {
+        x: left,
+        y: top,
         height: "0",
         width: "0",
         borderRadius: "50%",
