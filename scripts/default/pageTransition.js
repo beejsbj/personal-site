@@ -26,8 +26,6 @@ export default function pageTransition() {
     let top = elemRect.top - bodyRect.top;
     let left = elemRect.left - bodyRect.left;
 
-    console.log(top, left);
-
     const leaveTimeline = gsap.timeline();
     return leaveTimeline
       .set(".page-loader", {
@@ -64,7 +62,7 @@ export default function pageTransition() {
       .to(".page-loader .booming-voice", {
         display: "block",
         color: "var(--paper)",
-        onComplete: function () {
+        onStart: function () {
           this.targets()[0].innerHTML = data.next.namespace;
           window.scrollTo({
             top: 0,
