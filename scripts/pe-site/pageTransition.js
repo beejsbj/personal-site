@@ -28,6 +28,13 @@ export default function pageTransition() {
 	 <div class="cyan"></div>
 	 <div class="blue"></div>
 	 <div class="purple"></div>
+	 <div class="red"></div>
+    <div class="orange"></div>
+		<div class="yellow"></div>
+	 <div class="green"></div>
+	 <div class="cyan"></div>
+	 <div class="blue"></div>
+	 <div class="purple"></div>
 	 `;
 
   function leaveAnimation(data) {
@@ -44,10 +51,10 @@ export default function pageTransition() {
       .to(".page-loader div", {
         x: "0%",
         duration: 1,
+
         stagger: {
           from: "end",
           each: 0.1,
-          //   ease: "power2.in",
         },
         onComplete: function () {
           // create element from next html string
@@ -68,7 +75,7 @@ export default function pageTransition() {
         },
       })
       .to(data.current.container, {
-        duration: 0.5,
+        duration: 0.01,
         display: "none",
       });
   }

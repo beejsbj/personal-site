@@ -107,14 +107,20 @@ body {
   width: 0px;
 
   opacity: 1;
-  pointer-events: none;
+  /* pointer-events: none; */
 
   display: grid;
   /* background-color: var(--ink); */
 }
 .page-loader div {
-  border-top: 15px solid var(--ink);
-  border-bottom: 15px solid var(--ink);
+  border-top: 5px solid var(--ink);
+  border-bottom: 5px solid var(--ink);
+}
+@media (min-width: 900px) {
+  .page-loader div {
+    border-top: 10px solid var(--ink);
+    border-bottom: 10px solid var(--ink);
+  }
 }
 
 .page-loader .red {
