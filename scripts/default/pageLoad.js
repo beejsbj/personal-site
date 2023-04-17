@@ -1,4 +1,10 @@
 export default function pageLoad(duration) {
+  const params = new URL(document.location).searchParams;
+  const page = params.get("page");
+  if (page !== "home") {
+    return;
+  }
+
   const pageLoad = gsap.timeline();
 
   pageLoad
@@ -13,14 +19,6 @@ export default function pageLoad(duration) {
         stagger: duration / 1.25,
         ease: "expo.in",
         clearProps: "opacity",
-        //  scrollTrigger: {
-        //    trigger: "main",
-        //    start: "top center",
-        //    toggleActions: "play reset none none",
-        //    end: "max - 100px",
-        //    scrub: true,
-        //    markers: true,
-        //  },
       }
     )
     .fromTo(
