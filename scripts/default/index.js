@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 scrollToEnd();
 pageTransition();
 animateChapters();
-pageLoad();
+pageLoad(0.5);
 
 // check if window is above 1000px
 if (window.innerWidth > 1000) {

@@ -23,14 +23,15 @@ export default function pageTransition() {
     //
     let bodyRect = document.body.getBoundingClientRect();
     let elemRect = data.trigger.getBoundingClientRect();
-    let top = elemRect.top - bodyRect.top;
-    let left = elemRect.left - bodyRect.left;
+    //  get center of the element
+    let triggerX = elemRect.left - bodyRect.left + elemRect.width / 2;
+    let triggerY = elemRect.top - bodyRect.top + elemRect.height / 2;
 
     const leaveTimeline = gsap.timeline();
     return leaveTimeline
       .set(".page-loader", {
-        y: top,
-        x: left,
+        y: triggerY,
+        x: triggerX,
         height: "50px",
         width: "50px",
         opacity: 1,
@@ -38,10 +39,16 @@ export default function pageTransition() {
       .to(".page-loader", {
         motionPath: {
           path: [
-            { x: left, y: top },
-            { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+            {
+              x: triggerX,
+              y: triggerY,
+            },
+            {
+              x: window.innerWidth / 2,
+              y: window.innerHeight / 2,
+            },
           ],
-          fromCurrent: false,
+          //  fromCurrent: false,
           curviness: 3,
         },
         opacity: 1,
@@ -54,16 +61,20 @@ export default function pageTransition() {
         y: 0,
         height: "100vh",
         width: "100vw",
-        borderRadius: "0",
+
         duration: 0.5,
         ease: "expo.in",
+      })
+      .to(".page-loader", {
+        borderRadius: "0",
+        duration: 0.1,
       })
 
       .to(".page-loader .booming-voice", {
         display: "block",
         color: "var(--paper)",
         onStart: function () {
-          this.targets()[0].innerHTML = data.next.namespace;
+          this.targets()[0].innerHTML = data.trigger.innerHTML;
           window.scrollTo({
             top: 0,
             left: 0,
@@ -83,8 +94,8 @@ export default function pageTransition() {
   function enterAnimation(data) {
     let bodyRect = document.body.getBoundingClientRect();
     let elemRect = data.trigger.getBoundingClientRect();
-    let top = elemRect.top - bodyRect.top;
-    let left = elemRect.left - bodyRect.left;
+    let triggerX = elemRect.left - bodyRect.left + elemRect.width / 2;
+    let triggerY = elemRect.top - bodyRect.top + elemRect.height / 2;
 
     const enterTimeline = gsap.timeline();
     return enterTimeline
@@ -112,8 +123,8 @@ export default function pageTransition() {
         },
       })
       .to(".page-loader", {
-        x: left,
-        y: top,
+        x: triggerX,
+        y: triggerY,
         height: "0",
         width: "0",
         borderRadius: "50%",

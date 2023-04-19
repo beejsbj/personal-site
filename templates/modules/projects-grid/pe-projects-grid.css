@@ -1,0 +1,77 @@
+projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 50px;
+  align-items: start;
+}
+@media (min-width: 700px) {
+  projects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
+}
+
+project-card {
+  padding: 20px;
+  display: grid;
+  gap: 20px;
+  border: 6px solid var(--ink);
+  position: relative;
+  background-color: var(--paper);
+}
+@media (min-width: 450px) {
+  project-card {
+    /* grid-template-columns: 1fr 0.3fr; */
+  }
+}
+project-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: inherit;
+  transform: translate(-20px, 20px) rotate(0.5deg);
+  background-color: inherit;
+  z-index: -1;
+}
+
+project-card h2.heading {
+  font-size: clamp(2.25rem, calc(1.66rem + 2.93vw), 3.75rem);
+  font-weight: 700;
+  max-width: 50ch;
+  word-wrap: break-word;
+}
+
+project-card picture {
+  filter: saturate(0);
+}
+
+project-card .tools {
+  display: flex;
+  gap: 0.5rem;
+  padding: 2px 8px;
+
+  position: absolute;
+  top: -1.2rem;
+  left: 20px;
+
+  background-color: var(--ink);
+
+  color: var(--paper);
+  --font2: var(--font1);
+}
+
+project-card a.button {
+  font-size: 25px;
+  color: var(--ink);
+  font-weight: 700;
+  border-bottom: 1px solid var(--ink);
+}
+project-card a.button::before {
+  content: "READ ";
+}
+
+project-card:hover {
+  --paper: var(--blue);
+}

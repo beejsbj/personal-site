@@ -6,6 +6,11 @@
   "heading": "About",
   "sections": [
     {
+      "module": "generic-text",
+      "heading": "A blurb about me…",
+      "heading-class": "attention-voice"
+    },
+    {
       "module": "about-module",
       "heading": "A blurb about me…",
 

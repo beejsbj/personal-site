@@ -2,7 +2,7 @@
   {
     "title": "Layout Garden",
     "date": "2021-05-18",
-    "heading": "Layout&nbspGarden",
+    "heading": "Layout Garden",
     "id": "garden",
     "description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout adapt to it!",
     "image": "garden.png",
@@ -30,7 +30,7 @@
         "links": [
           {
             "id": "live",
-            "name": "Live&nbspLink",
+            "name": "Live Link",
             "slug": "garden"
           }
         ]
@@ -48,9 +48,7 @@
       "default": {
         "thumbnail": "quantumon.png"
       },
-      "pe-site": {
-        "thumbnail": ""
-      }
+      "pe-site": {}
     },
     "url": "projects/quantumon",
     "tools": ["HTML", "CSS"],
@@ -111,7 +109,7 @@
         "links": [
           {
             "id": "live",
-            "name": "Live&nbspLink",
+            "name": "Live Link",
             "slug": "https://quantumon.xyz/",
             "target": "live"
           },
@@ -142,9 +140,7 @@
       "default": {
         "thumbnail": "weed-leaf.jpg"
       },
-      "pe-site": {
-        "thumbnail": ""
-      }
+      "pe-site": {}
     },
     "url": "https://buroojs.substack.com/p/theme-challenge",
     "tools": ["HTML", "CSS", "PHP"],
@@ -161,7 +157,7 @@
         "links": [
           {
             "id": "live",
-            "name": "Live&nbspLink",
+            "name": "Live Link",
             "slug": "projects/theme-challenge",
             "target": "live"
           },
@@ -183,7 +179,7 @@
   },
   {
     "title": "Exercises 4 Programmers",
-    "heading": "Exercises&nbspfor Programmers",
+    "heading": "Exercises for Programmers",
     "id": "e4p",
     "description": "A book of 57 exercises recommended by Derek. A great book to learn and reinforce programming fundamentals",
     "image": "e4p.png",
@@ -211,7 +207,7 @@
         "links": [
           {
             "id": "live",
-            "name": "Live&nbspLink",
+            "name": "Live Link",
             "slug": "e4p"
           },
           {
@@ -241,9 +237,7 @@
       "default": {
         "thumbnail": "lottery-app.jpg"
       },
-      "pe-site": {
-        "thumbnail": ""
-      }
+      "pe-site": {}
     },
     "url": "https://qrng-lottery.netlify.app/",
     "tools": ["HTML", "CSS", "JS", "React"],
@@ -261,7 +255,7 @@
         "links": [
           {
             "id": "live",
-            "name": "Live&nbspLink",
+            "name": "Live Link",
             "slug": "https://api3-lottery.netlify.app",
             "target": "live"
           },
@@ -286,9 +280,7 @@
       "default": {
         "thumbnail": "roulette-app.jpg"
       },
-      "pe-site": {
-        "thumbnail": ""
-      }
+      "pe-site": {}
     },
     "url": "https://qrng-roulette.netlify.app/",
     "tools": ["HTML", "CSS", "JS", "React"],
@@ -306,7 +298,7 @@
         "links": [
           {
             "id": "live",
-            "name": "Live&nbspLink",
+            "name": "Live Link",
             "slug": "https://api3-roulette.netlify.app/",
             "target": "live"
           },
@@ -332,9 +324,7 @@
       "default": {
         "thumbnail": "flashcards.png"
       },
-      "pe-site": {
-        "thumbnail": ""
-      }
+      "pe-site": {}
     },
     "tools": ["HTML", "CSS", "JS"],
     "tags": ["feature"],
@@ -351,7 +341,7 @@
         "links": [
           {
             "id": "live",
-            "name": "Live&nbspLink",
+            "name": "Live Link",
             "slug": "projects/flashcards",
             "target": "live"
           },

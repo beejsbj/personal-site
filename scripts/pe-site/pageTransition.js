@@ -55,6 +55,7 @@ export default function pageTransition() {
         stagger: {
           from: "end",
           each: 0.1,
+          ease: "circ.out",
         },
         onComplete: function () {
           // create element from next html string

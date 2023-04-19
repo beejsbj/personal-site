@@ -1,20 +1,20 @@
 {
-	"id": "home",
-	"title": "Welcome",
-	"image" : "",
-	"description" : "",
-	"heading": "Hey there!",
+  "id": "home",
+  "title": "Welcome",
+  "image": "",
+  "description": "",
+  "heading": "Hey there!",
 
-	"sections": [
-		{
-			"heading": "My name is Burooj",
-			"paragraphs": {
-				"and I make places on the web, woo!" : "calm-voice"
-			}
-		},
-		{
-			"module" : "projects-grid",
-			"intro-paragraph" : "Here's some im proud to share front and center!"
-		}
-	]
+  "sections": [
+    {
+      "heading": "My name is Burooj",
+      "paragraphs": {
+        "and I make places on the web, woo!": "calm-voice"
+      }
+    },
+    {
+      "module": "projects-grid",
+      "intro-paragraph": "Here's some im proud to share front and center!"
+    }
+  ]
 }

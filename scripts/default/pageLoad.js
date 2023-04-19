@@ -1,6 +1,7 @@
 export default function pageLoad(duration) {
   const params = new URL(document.location).searchParams;
-  const page = params.get("page");
+  const page = params.get("page") ?? "home";
+
   if (page !== "home") {
     return;
   }
