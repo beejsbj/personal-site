@@ -50,11 +50,11 @@ export default function pageTransition() {
       })
       .to(".page-loader div", {
         x: "0%",
-        duration: 1,
+        duration: 0.5,
 
         stagger: {
           from: "end",
-          each: 0.1,
+          each: 0.05,
           ease: "circ.out",
         },
         onComplete: function () {
@@ -86,10 +86,10 @@ export default function pageTransition() {
     return enterTimeline
       .to(".page-loader div", {
         x: "-100%",
-        duration: 1,
+        duration: 0.5,
         stagger: {
           from: "end",
-          each: 0.1,
+          each: 0.05,
           //   ease: "power2.in",
         },
       })
