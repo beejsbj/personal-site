@@ -55,21 +55,20 @@ export default function pageTransition() {
         duration: 0.5,
         ease: "elastic.out(0.2, 0.3)",
       })
-
       .to(".page-loader", {
-        x: 0,
-        y: 0,
-        height: "100vh",
-        width: "100vw",
+        x: "-50vw",
+        y: "-50vh",
 
-        duration: 0.5,
+        height: "200vh",
+        width: "200vw",
+
+        duration: 0.3,
         ease: "expo.in",
       })
       .to(".page-loader", {
         borderRadius: "0",
-        duration: 0.1,
+        duration: 0.01,
       })
-
       .to(".page-loader .booming-voice", {
         display: "block",
         color: "var(--paper)",
@@ -86,7 +85,7 @@ export default function pageTransition() {
         ease: "expo.out",
       })
       .to(data.current.container, {
-        duration: 0.5,
+        duration: 0.01,
         display: "none",
       });
   }
@@ -102,7 +101,7 @@ export default function pageTransition() {
 
       .to(".page-loader .booming-voice", {
         display: "none",
-        duration: 0.1,
+        duration: 0.01,
         onComplete: function () {
           //  console.log(data.next);
           // create element from next html string
@@ -128,9 +127,7 @@ export default function pageTransition() {
         height: "0",
         width: "0",
         borderRadius: "50%",
-        duration: 0.5,
-        //   opacity: 0,
-
+        duration: 0.3,
         ease: "expo.out",
         clearProps: "all",
       });
