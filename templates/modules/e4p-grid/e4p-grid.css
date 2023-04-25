@@ -15,7 +15,7 @@ e4p-chapter {
 e4p-chapter::after,
 e4p-chapter::before {
 	content: "";
-	background-color: var(--light-color);
+	background-color: var(--highlight);
 	position: absolute;
 	left: 0px;
 	bottom: -15px;
@@ -40,7 +40,7 @@ e4p-chapter > .whisper-voice {
 
 e4p-chapter > .whisper-voice::after {
 	content: "";
-	background-color: var(--light-color);
+	background-color: var(--highlight);
 	position: absolute;
 	left: -10px;
 	top: 5px;
@@ -70,7 +70,7 @@ e4p-chapter ul li p {
 e4p-chapter ul li::after {
 	position: absolute;
 	content: "";
-	background-color: var(--light-color);
+	background-color: var(--highlight);
 	left: -10px;
 	top: 40%;
 	height: 5px;
@@ -82,7 +82,7 @@ e4p-chapter ul li::after {
 e4p-chapter ul li:hover::after {
 	height: 5px;
 	width: 5px;
-	background-color: var(--dark-highlight);
+	background-color: var(--shade);
 	transform: scale(1.2) rotate(270deg);
 	z-index: 99;
 }
@@ -183,7 +183,7 @@ e4p-chapter aside p {
 	e4p-chapter ul::after {
 		position: absolute;
 		content: "";
-		background-color: var(--light-color);
+		background-color: var(--highlight);
 		left: -10px;
 		top: 0;
 		height: 100%;

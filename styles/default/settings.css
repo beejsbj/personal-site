@@ -3,10 +3,11 @@ html {
   --tight: 800px;
   --wide: 1400px;
 
-  --black: #111111;
-  --white: #efefef;
+  --black: hsla(0, 0%, 20%, 1);
+  --white: hsla(47, 11%, 85%, 1);
 
-  --neutral-stuffs: gray;
+  --gray: hsla(0, 0%, 27%, 1);
+  --light-gray: hsla(0, 0%, 31%, 1);
 
   --color: #9ec9eb;
   --highlight: #aadee9;
@@ -23,19 +24,15 @@ html {
 }
 
 html {
-  --paper: hsla(47, 11%, 85%, 1);
+  --paper: var(--white);
   --paper2: hsla(47, 48%, 83%, 1);
-  --ink: hsla(3, 58%, 10%, 1);
-  --link: hsla(219, 51%, 41%, 1);
+  --ink: var(--black);
 
-  --dark-color: hsla(3, 58%, 31%, 1); /*also for bold*/
-  --dark-highlight: hsla(3, 38%, 53%, 1); /*//also for italics*/
-
-  --light-color: hsla(30, 65%, 71%, 1); /*subdued*/
-  --light-highlight: hsla(30, 77%, 62%, 1); /*louder*/
-
-  --color: hsla(3, 58%, 31%, 1);
+  --shade: hsla(3, 58%, 31%, 1); /*also for bold*/
+  --color: hsla(3, 50%, 53%, 1); /*//also for italics*/
   --highlight: hsla(30, 65%, 71%, 1);
+
+  --blue: hsla(219, 51%, 41%, 1);
 }
 
 html {
@@ -53,10 +50,11 @@ html {
 
 @media (prefers-color-scheme: dark) {
   html {
-    --ink: hsla(47, 11%, 83%, 1);
-    --paper: hsla(3, 58%, 5%, 1);
+    --ink: var(--white);
+    --paper: var(--black);
 
-    --dark-color: hsla(3, 38%, 53%, 1); /*using dark-highlight*/
-    --dark-highlight: hsla(30, 65%, 71%, 1); /*//using light-highlight*/
+    --shade: var(--ink);
+    --highlight: hsla(3, 50%, 53%, 1); /*using dark-highlight*/
+    --color: hsla(30, 65%, 71%, 1); /*//using light-highlight*/
   }
 }

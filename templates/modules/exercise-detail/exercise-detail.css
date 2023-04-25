@@ -1,53 +1,50 @@
 exercise-detail {
-	display: grid;
-	gap: 40px;
-	justify-items: start;
+  display: grid;
+  gap: 40px;
+  justify-items: start;
 }
 
 exercise-detail > exercise-form h3 {
-	text-transform: uppercase;
+  text-transform: uppercase;
 }
 
 exercise-detail output span {
-	color: var(--dark-highlight);
+  color: var(--shade);
 }
-
-
 
 exercise-detail actions-component {
-	display: grid;
-	gap: 30px;
-
+  display: grid;
+  gap: 30px;
 }
 toggle-switch.radio-list {
-	gap: 40px;
+  gap: 40px;
 }
 
 exercise-form {
-	gap: 30px;
+  gap: 30px;
 }
 
 @media (min-width: 500px) {
-	exercise-detail {
-		grid-column: 2 / end;
-		grid-template-columns: 1fr 1fr;
-	}
+  exercise-detail {
+    grid-column: 2 / end;
+    grid-template-columns: 1fr 1fr;
+  }
 
-	exercise-detail exercise-form {
-		grid-column: span 2;
-	}
+  exercise-detail exercise-form {
+    grid-column: span 2;
+  }
 
-	exercise-detail h2 {
-		grid-column: 1 / end;
-	}
+  exercise-detail h2 {
+    grid-column: 1 / end;
+  }
 }
 
 @media (min-width: 700px) {
-	exercise-detail {
-		grid-column: 2 / end;
-	}
-	exercise-detail .e4p-js {
-		grid-row: 4;
-		grid-column: 2;
-	}
+  exercise-detail {
+    grid-column: 2 / end;
+  }
+  exercise-detail .e4p-js {
+    grid-row: 4;
+    grid-column: 2;
+  }
 }

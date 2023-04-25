@@ -23,7 +23,7 @@
   left: 0;
   width: 60%;
   height: 3px;
-  background-color: var(--light-color);
+  background-color: var(--highlight);
   z-index: -1;
   border-radius: var(--corners);
 }

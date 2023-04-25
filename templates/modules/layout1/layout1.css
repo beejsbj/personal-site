@@ -51,13 +51,13 @@
 }
 
 .shapes #circle {
-  fill: var(--dark-color);
+  fill: var(--color);
   stroke: black;
   stroke-width: 2px;
 }
 
 .shapes #rectangle {
-  fill: var(--light-color);
+  fill: var(--highlight);
   stroke: black;
   stroke-width: 2.03px;
 }

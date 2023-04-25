@@ -114,6 +114,7 @@ footer {
   width: 0px;
   overflow: hidden;
   border-radius: 50%;
+  aspect-ratio: 1 / 1;
   background-color: var(--color);
   opacity: 0;
 

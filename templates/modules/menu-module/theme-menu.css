@@ -1,5 +1,5 @@
 .theme-menu {
-  background-color: var(--light-color);
+  background-color: var(--highlight);
   position: absolute;
   border-radius: 50%;
   right: 0%;
@@ -31,7 +31,7 @@
   position: absolute;
   top: 0px;
   left: 0px;
-  background-color: var(--light-color);
+  background-color: var(--highlight);
   border-radius: 50%;
   z-index: -1;
   transition: 0.2s;
@@ -52,7 +52,7 @@
   max-width: 16px;
   position: relative;
   top: 2px;
-  fill: var(--link);
+  fill: var(--shade);
 }
 
 @media (min-width: 500px) {

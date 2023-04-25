@@ -1,68 +1,63 @@
-
 form {
-	display: grid;
-	gap:  20px;
-	justify-items: start;
-	/*max-width: 800px;*/
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+  /*max-width: 800px;*/
 }
 
-
-
-
 .input-field {
-	display: grid;
-	gap:  10px;
-	justify-self: stretch;
-
+  display: grid;
+  gap: 10px;
+  justify-self: stretch;
 }
 
 form input {
-	order: 2;
-	background-color: var(--paper2);
-	padding: 5px;
-	width: 100%;
+  order: 2;
+  background-color: var(--paper2);
+  padding: 5px;
+  width: 100%;
 }
 
 form input::placeholder {
-	opacity: 0.1;
+  opacity: 0.1;
 }
 
 form output {
-	background-color: var(--paper2);
-	padding: 20px;
-	width: 100%;
+  background-color: var(--paper2);
+  padding: 20px;
+  width: 100%;
 }
 .radio-list {
-	width: 100%;
+  width: 100%;
 }
 
 .radio-list,
 .radio-list .input-field {
-	display: flex;
-	gap: 20px;
-	align-items: center;
+  display: flex;
+  gap: 20px;
+  align-items: center;
 }
 
 .radio-list input {
-	display: none;
+  display: none;
 }
 
 .radio-list label {
-	cursor: pointer;
-	position: relative;
+  cursor: pointer;
+  position: relative;
 }
 
 .radio-list input:checked + label::after {
-	content: "";
-	position: absolute;
-	bottom: 0px;
-	left: -10px;
-/*	transform: translate(-50%, -50%);*/
-	z-index: -1;
+  content: "";
+  position: absolute;
+  bottom: 0px;
+  left: -10px;
+  /*	transform: translate(-50%, -50%);*/
+  z-index: -1;
 
-	width: 30px;
-	height: 30px;
-	border-radius: 50%;
-	background-color: var(--light-color);
-	animation: bounce-in-top 0.2s ease-in;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--highlight);
+  animation: bounce-in-top 0.2s ease-in;
 }

@@ -30,7 +30,7 @@ project-card .tools {
 /*project-card .tools li {
 	position: relative;
 	border-radius: 50%;
-	background-color: var(--light-color);
+	background-color: var(--highlight);
 	padding: 20px;
 	font-size: 12px;
 }
@@ -50,7 +50,7 @@ project-card .button {
 project-card::after,
 project-card::before {
   content: "";
-  background-color: var(--light-color);
+  background-color: var(--highlight);
   position: absolute;
   right: -10px;
   bottom: -10px;
@@ -73,7 +73,7 @@ project-card p {
 
 project-card p::after {
   content: "";
-  background-color: var(--light-color);
+  background-color: var(--highlight);
   position: absolute;
   left: -10px;
   top: 5px;
@@ -196,7 +196,9 @@ project-card p::after {
 @media (min-width: 1500px) {
   project-card {
     grid-template-rows: 0.1fr 1fr;
-  }
+
+  }		
+	}
 
   project-card:nth-of-type(3n + 1) {
     grid-column: 1 / span 12;
@@ -219,6 +221,8 @@ project-card p::after {
     text-orientation: initial;
     grid-column: 1 / -1;
     grid-row: 1 / span 1;
+
+
   }
 
   project-card:nth-of-type(3n + 1) .heading {

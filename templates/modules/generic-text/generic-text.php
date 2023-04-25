@@ -1,7 +1,7 @@
 <?php
 
 $sectionHeading = $section['heading'] ?? $sectionHeading ?? "this is the generic text heading";
-$headingClass = $section['heading-class'] ?? "attention-voice";
+$headingClass = $section['heading-class'] ??  $headingClass ?? "attention-voice";
 $paragraphsClass = $section['paragraphsClass'] ?? "hide";
 $paragraphs = $section['paragraphs'] ?? [["text" => "this is the first paragraph"], ["text" => "this is the second paragraph"]];
 
