@@ -196,9 +196,8 @@ project-card p::after {
 @media (min-width: 1500px) {
   project-card {
     grid-template-rows: 0.1fr 1fr;
-
-  }		
-	}
+    /* box shadow vignette */
+  }
 
   project-card:nth-of-type(3n + 1) {
     grid-column: 1 / span 12;
@@ -221,8 +220,6 @@ project-card p::after {
     text-orientation: initial;
     grid-column: 1 / -1;
     grid-row: 1 / span 1;
-
-
   }
 
   project-card:nth-of-type(3n + 1) .heading {
