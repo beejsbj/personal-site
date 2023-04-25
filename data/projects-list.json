@@ -50,7 +50,7 @@
       },
       "pe-site": {}
     },
-    "url": "projects/quantumon",
+    "url": "https://burooj.dev/projects/quantumon",
     "tools": ["HTML", "CSS"],
     "tags": ["api3"],
     "sections": [
@@ -318,7 +318,7 @@
     "heading": "Flash Cards",
     "id": "flashcards",
     "description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
-    "url": "projects/flashcards",
+    "url": "https://burooj.dev/projects/flashcards",
     "image": "flashcards.png",
     "images": {
       "default": {
