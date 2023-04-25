@@ -1,19 +1,19 @@
 /* P reset */
-@import 'preset.css';
+@import "preset.css";
 /* S etup */
-@import 'setup.css';
+@import "setup.css";
 /* S setings */
-@import 'settings.css';
-@import 'developer-styles.css';
+@import "settings.css";
+@import "developer-styles.css";
 /* S tructure */
-@import 'structure.css';
+@import "structure.css";
 /* T ypography */
-@import 'typography.css';
+@import "typography.css";
 /* C omponents */
-@import 'components.css';
-@import 'forms.css';
+@import "components.css";
+@import "forms.css";
 /* S tuff (modules) */
-@import 'modules.css';
+@import "modules.css";
 
 /* S ections and more stuff */
 /* then other contextual styles */
@@ -25,16 +25,7 @@ body {
 
 .page-content {
   /*background-color: hsla(211, 100%, 35%, 1.00);*/
-  
 }
-
-
-
-
-
-
-
-
 
 .my-fantastic-image {
   max-width: 300px;
@@ -50,30 +41,12 @@ body {
   pointer-events: none;
 }
 .ship {
-  width: 1000px;
+  width: clamp(300px, 50vw, 600px);
   height: auto;
   position: absolute;
-  top: -700px;
-  left: 55%;
+  bottom: 80px;
+  left: 50vw;
   animation: rock-boat 9s ease-in-out infinite;
-}
-
-@media(max-width: 2000px) {
-  .ship {
-    width: 450px;
-    height: auto;
-    position: absolute;
-    top: -250px;
-    left: 65%;
-    animation: rock-boat 9s ease-in-out infinite;
-  }
-}
-
-@media(max-width: 400px) {
-  .ship {
-    display: none;
-
-  }
 }
 
 @keyframes rock-boat {
@@ -89,26 +62,25 @@ body {
 
   75% {
     transform: rotate(-5deg);
-    
   }
-
 }
 
-
-
 .wave {
-  background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/85486/wave.svg) repeat-x;
+  background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/85486/wave.svg)
+    repeat-x;
   position: absolute;
   top: -198px;
   width: 100%;
   height: 198px;
-  animation: wave 6s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite, swell 7s ease reverse -1.25s infinite;
+  animation: wave 6s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite,
+    swell 7s ease reverse -1.25s infinite;
   transform: translate3d(0, 0, 0);
 }
 
 .wave:nth-of-type(2) {
   /*top: -175px;*/
-  animation: wave 8s cubic-bezier(0.36, 0.45, 0.63, 0.53) -.125s infinite, swell 7s ease -1.25s infinite;
+  animation: wave 8s cubic-bezier(0.36, 0.45, 0.63, 0.53) -0.125s infinite,
+    swell 7s ease -1.25s infinite;
   animation-delay: -1s;
   opacity: 1;
 }
@@ -125,7 +97,6 @@ body {
 
 svg :is(#flags) {
   animation: flagWave ease-in-out 1s infinite;
-
 }
 
 @keyframes flagWave {
@@ -135,7 +106,6 @@ svg :is(#flags) {
     /*transform: skew(1deg);*/
   }
 }
-
 
 /*
 @keyframes swell {
