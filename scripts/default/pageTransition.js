@@ -15,10 +15,6 @@ export default function pageTransition() {
     ],
   });
 
-  //   barba.hooks.beforeEnter((data) => {
-  //     document.querySelector("html").innerHTML = data.next.html;
-  //   });
-
   function leaveAnimation(data) {
     //
     let bodyRect = document.body.getBoundingClientRect();

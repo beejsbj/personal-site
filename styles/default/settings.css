@@ -5,6 +5,7 @@ html {
 
   --black: hsla(0, 0%, 20%, 1);
   --white: hsla(47, 11%, 85%, 1);
+  /* --white: hsla(45, 72%, 93%, 1.00) */
 
   --gray: hsla(0, 0%, 27%, 1);
   --light-gray: hsla(0, 0%, 31%, 1);
@@ -29,8 +30,10 @@ html {
   --ink: var(--black);
 
   --shade: hsla(3, 58%, 31%, 1); /*also for bold*/
-  --color: hsla(3, 50%, 53%, 1); /*//also for italics*/
+  /* --shade: var(--white); */
+  --color: hsla(11, 59%, 56%, 1); /*//also for italics*/
   --highlight: hsla(30, 65%, 71%, 1);
+  /* --highlight: var(--color); */
 
   --blue: hsla(219, 51%, 41%, 1);
 }
