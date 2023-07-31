@@ -5,5 +5,5 @@ $headingClass = "hide"
 ?>
 <about-module>
 	<?php include('templates/modules/generic-text/generic-text.php') ?>
-	<?php include('templates/modules/image-grid/image-grid.php') ?>
+	<?php include('templates/components/fan-images/fan-images.php') ?>
 </about-module>
