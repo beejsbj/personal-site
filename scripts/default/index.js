@@ -11,9 +11,9 @@ gsap.registerPlugin(ScrollTrigger);
 //
 
 scrollToEnd();
-pageTransition();
+// pageTransition();
 
-pageLoad(0.5);
+// pageLoad(0.5);
 
 barba.hooks.beforeEnter((data) => {
   animateChapters();
@@ -21,5 +21,5 @@ barba.hooks.beforeEnter((data) => {
 
 // check if window is above 1000px
 if (window.innerWidth > 1000) {
-  animateMagnet();
+  //   animateMagnet();
 }
