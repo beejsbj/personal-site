@@ -1,5 +1,6 @@
 article {
   display: grid;
+  align-items: start;
   grid-template-columns: repeat(12, 1fr);
 }
 article > * {
@@ -12,93 +13,9 @@ article > * {
     width: 100%;
   }
 }
-.menu-module {
-  position: relative;
-}
-.menu-module inner-column {
-  padding-bottom: 50px;
-}
-.project-menu a {
-  background-color: var(--highlight);
-  border-radius: 50%;
-  padding: 40px;
-  position: absolute;
-  transition: 0.2s;
-  --top: 0px;
-  --right: 0px;
-}
-
-.project-menu li:nth-of-type(1) a {
-  top: calc(var(--top) + 60px);
-  right: calc(var(--right) + 60px);
-  transform: scale(1.1);
-}
-.project-menu li:nth-of-type(2) a {
-  top: calc(var(--top) + 20px);
-  right: calc(var(--right) + 10px);
-
-  transform: scale(1);
-}
-.project-menu li:nth-of-type(3) a {
-  top: calc(var(--top) + 110px);
-  right: calc(var(--right) + 30px);
-  transform: scale(0.8);
-}
-
-.project-menu a span {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 99;
-}
-
-.project-menu a:hover {
-  background-color: var(--color);
-  color: var(--highlight);
-}
-
-/*animation*/
-.project-menu a::after,
-.project-menu a::before {
-  content: "";
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-
-  border-radius: 50%;
-  z-index: -10;
-  transition: 0.2s;
-}
-
-.project-menu a:hover::after {
-  background-color: var(--color);
-  animation: blob infinite 15s ease-in-out alternate-reverse;
-  /*animation-delay: -5s;*/
-  /*top: 5px;*/
-}
-.project-menu a:hover::before {
-  background-color: var(--color);
-  animation: blob infinite 25s linear alternate;
-  /*top: -5px;*/
-}
 
 @media (min-width: 750px) {
-  /*section.graphic-layout {
-		grid-column: 2 / 10;
-	}
-	section.generic-text {
-		grid-column: 2 / 10;
-	}
-	section.float {
-		grid-column: 10 / -1;
-		align-self: center;
-	}*/
-  .project-menu a {
-    /*position: fixed;
-		--top: 600px;
-		--right: 30px;*/
+  section.generic-text {
+    grid-column: 2 / 10;
   }
 }
