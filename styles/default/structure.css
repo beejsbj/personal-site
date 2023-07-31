@@ -1,36 +1,35 @@
-
 body {
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh; /* be at least a full viewport height */
-} 
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* be at least a full viewport height */
+}
 
 main {
-	flex-grow: 1; /* fill up available space + push the footer down */
+  flex-grow: 1; /* fill up available space + push the footer down */
 }
 
 inner-column {
-	display: block;
-	width: 98%;
-	max-width: var(--tight); /* could be a variable in settings */
-	margin-right: auto;
-	margin-left: auto;
-	padding: 15px 10px; /* a loose default */
+  display: block;
+  width: 98%;
+  max-width: var(--standard); /* could be a variable in settings */
+  margin-right: auto;
+  margin-left: auto;
+  padding: 15px 10px; /* a loose default */
 }
 
 inner-column.menus {
-	padding: initial;
+  padding: initial;
 }
 
-@media(min-width: 500px) {
-	section > inner-column {
-		display: grid;
-		grid-template-columns: repeat(12, 1fr);
-	}
+@media (min-width: 500px) {
+  section > inner-column {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+  }
 
-	:where(section > inner-column > *) {
-		grid-column: span 12;
-	}
+  :where(section > inner-column > *) {
+    grid-column: span 12;
+  }
 }
 
 /*.site-header {
@@ -39,24 +38,23 @@ inner-column.menus {
 	z-index: 5;
 }*/
 
-@media (min-width: 1500px){
-	inner-column {
-		max-width: var(--standard);
-	}
+@media (min-width: 1500px) {
+  inner-column {
+    max-width: var(--standard);
+  }
 }
 
 inner-column.tight {
-	max-width: var(--tight);
+  max-width: var(--tight);
 }
 
-
 inner-column.wide {
-	max-width: var(--wide);
+  max-width: var(--wide);
 }
 
 @media (max-width: 500px) {
-	inner-column.none-below-500 {
-		padding: initial;
-		width: 100%;
-	}
+  inner-column.none-below-500 {
+    padding: initial;
+    width: 100%;
+  }
 }

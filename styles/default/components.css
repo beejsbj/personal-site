@@ -15,10 +15,10 @@ a {
   transition: 0.2s;
 }
 
-/* a.button {
+a.blob-button {
   background-color: var(--color);
   color: var(--paper);
-} */
+}
 
 button {
   padding: 5px 15px;
@@ -54,4 +54,19 @@ a.new-tab svg.new-tab {
 
 a.text {
   padding: 10px;
+}
+
+a:has(.external-link) {
+  position: relative;
+}
+
+.external-link {
+  max-width: 10px;
+  position: absolute;
+  right: 25px;
+  top: 25px;
+  transition: 0.2s;
+}
+a:hover .external-link {
+  transform: translate(5px, -5px) scale(1.3);
 }

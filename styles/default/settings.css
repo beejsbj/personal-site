@@ -22,6 +22,17 @@ html {
 
   --font1: "Newsreader", serif;
   --font2: "Lato", sans-serif;
+
+  --step--2: clamp(0.63rem, calc(0.71rem + -0.08vw), 0.69rem);
+  --step--1: clamp(0.83rem, calc(0.83rem + 0.01vw), 0.84rem);
+  --step-0: clamp(1rem, calc(0.97rem + 0.16vw), 1.13rem);
+  --step-1: clamp(1.2rem, calc(1.13rem + 0.37vw), 1.5rem);
+  --step-2: clamp(1.44rem, calc(1.3rem + 0.7vw), 2rem);
+  --step-3: clamp(1.73rem, calc(1.49rem + 1.17vw), 2.66rem);
+  --step-4: clamp(2.07rem, calc(1.7rem + 1.85vw), 3.55rem);
+  --step-5: clamp(2.49rem, calc(1.93rem + 2.81vw), 4.74rem);
+  --step-6: clamp(2.99rem, calc(2.16rem + 4.16vw), 6.31rem);
+  --step-7: clamp(3.58rem, calc(2.38rem + 6.04vw), 8.41rem);
 }
 
 html {
