@@ -4,9 +4,7 @@ $sectionHeading = $section['heading'] ?? "This is the E4P module";
 
 ?>
 
-<h2 class="loud-voice">
-	<?= $sectionHeading ?>
-</h2>
+
 <e4p-grid>
 
 	<?php
