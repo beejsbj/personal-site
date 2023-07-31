@@ -19,7 +19,10 @@ if (file_exists("data/components/$menu-menu.json")) {
 			$class = $menuItem['class'] ?? "";
 			$slug = $menuItem['slug'];
 			$name = $menuItem['name'];
-			$target = $menuItem['target'] ?? "";
+			$target = $menuItem['target'] ?? NULL;
+
+
+
 			if ($menu == 'site' || $menu == 'garden') {
 				$class = "$class " . activePage($menuItem['activePage'] ?? false);
 				// $slug = $menuItem['slug']; //pretty
@@ -36,6 +39,9 @@ if (file_exists("data/components/$menu-menu.json")) {
 			<li>
 				<a class="<?= $class ?>" href="<?= $slug ?>" target="<?= $target ?>">
 					<span><?= $name ?></span>
+					<picture class="external-link <?= $target == NULL ? 'hide' : '' ?>">
+						<img src="images/diagonal-arrow.svg" alt="">
+					</picture>
 				</a>
 			</li>
 		<?php } ?>

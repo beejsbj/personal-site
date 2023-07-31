@@ -8,6 +8,8 @@
   transform: scale(0.95);
   transition: 0.2s;
   z-index: 2;
+
+  display: none;
 }
 .theme-menu ul {
   display: grid;
