@@ -14,7 +14,6 @@
         "thumbnail": ""
       }
     },
-    "url": "?page=garden",
     "tools": ["HTML", "CSS", "PHP"],
     "tags": ["feature"],
     "sections": [
@@ -40,6 +39,8 @@
   {
     "title": "Quantumon",
     "date": "2021-05-28",
+    "role": "Design & Development",
+    "location": "Remote @API3",
     "heading": "Quantumon",
     "id": "quantumon",
     "description": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle.",
@@ -50,58 +51,11 @@
       },
       "pe-site": {}
     },
-    "url": "https://burooj.dev/projects/quantumon",
     "tools": ["HTML", "CSS"],
     "tags": ["api3"],
     "sections": [
       {
-        "heading-class": "hide",
-        "paragraphs": {
-          "this is the intro paragraphs and it is the one for this": "calm-voice"
-        }
-      },
-      {
-        "module": "graphic-layout",
-        "class": "layout-one",
-        "image1": "landscape.jpg",
-        "image2": "landscape.jpg",
-        "paragraph1": "this is the intro paragraphs and it is the one for this"
-      },
-      {
-        "section-class": "float",
-        "heading": "Goals",
-        "heading-class": "attention-voice float",
-        "paragraphs": {
-          "This is the goals paragraphs and it is the one for this": ""
-        }
-      },
-      {
-        "heading": "Section",
-        "paragraphs": {
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.": "",
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.": ""
-        }
-      },
-      {
-        "module": "graphic-layout",
-        "class": "layout-one",
-        "image1": "landscape.jpg",
-        "image2": "landscape.jpg",
-        "paragraph1": "this is the intro paragraphs and it is the one for this"
-      },
-      {
-        "heading": "Section",
-        "paragraphs": {
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.": "",
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.": ""
-        }
-      },
-      {
-        "module": "graphic-layout",
-        "class": "layout-one",
-        "image1": "landscape.jpg",
-        "image2": "landscape.jpg",
-        "paragraph1": "this is the intro paragraphs and it is the one for this"
+        "module": "project-meta"
       },
       {
         "module": "menu-module",
@@ -109,7 +63,7 @@
         "links": [
           {
             "id": "live",
-            "name": "Live Link",
+            "name": "See Live",
             "slug": "https://quantumon.xyz/",
             "target": "live"
           },
@@ -126,6 +80,83 @@
             "target": "article"
           }
         ]
+      },
+      {
+        "heading-class": "hide",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle."
+          }
+        ]
+      },
+      {
+        "module": "graphic-layout",
+        "class": "layout-1",
+        "image1": "quantumon.png",
+        "caption": "this is the intro paragraphs and it is the one for this"
+      },
+      {
+        "module": "goals-list",
+        "heading": "Goals",
+        "goals": [
+          "Finding the best fonts for the website to evoke quantum playfulness",
+          "Building out the site in a way that is easy to maintain and update",
+          "Use an external package to build a carousel",
+          "Have the site be responsive and mobile friendly"
+        ]
+      },
+      {
+        "heading": "Section",
+        "heading-class": "attention-voice",
+
+        "paragraphs": [
+          {
+            "voice": "",
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+          },
+          {
+            "voice": "",
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+          },
+          {
+            "voice": "",
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+          }
+        ]
+      },
+      {
+        "module": "graphic-layout",
+        "class": "layout-one",
+        "image1": "quantumon-desktop-1.png",
+        "image2": "quantumon-mobile-1.png",
+        "paragraph1": "this is the intro paragraphs and it is the one for this"
+      },
+      {
+        "heading": "Section",
+        "heading-class": "attention-voice",
+
+        "paragraphs": [
+          {
+            "voice": "",
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+          },
+          {
+            "voice": "",
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+          },
+          {
+            "voice": "",
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+          }
+        ]
+      },
+      {
+        "module": "graphic-layout",
+        "class": "layout-one",
+        "image1": "quantumon-desktop-1.png",
+        "image2": "quantumon-mobile-1.png",
+        "paragraph1": "this is the intro paragraphs and it is the one for this"
       }
     ]
   },
@@ -142,7 +173,6 @@
       },
       "pe-site": {}
     },
-    "url": "https://buroojs.substack.com/p/theme-challenge",
     "tools": ["HTML", "CSS", "PHP"],
     "sections": [
       {
@@ -191,7 +221,6 @@
         "thumbnail": ""
       }
     },
-    "url": "?page=e4p",
     "tools": ["HTML", "CSS", "PHP", "JS", "Vue"],
     "tags": ["feature"],
     "sections": [
@@ -239,7 +268,6 @@
       },
       "pe-site": {}
     },
-    "url": "https://qrng-lottery.netlify.app/",
     "tools": ["HTML", "CSS", "JS", "React"],
     "tags": ["api3"],
     "sections": [
@@ -282,7 +310,6 @@
       },
       "pe-site": {}
     },
-    "url": "https://qrng-roulette.netlify.app/",
     "tools": ["HTML", "CSS", "JS", "React"],
     "tags": ["api3"],
     "sections": [
@@ -318,7 +345,6 @@
     "heading": "Flash Cards",
     "id": "flashcards",
     "description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
-    "url": "https://burooj.dev/projects/flashcards",
     "image": "flashcards.png",
     "images": {
       "default": {
