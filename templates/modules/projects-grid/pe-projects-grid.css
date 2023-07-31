@@ -1,12 +1,15 @@
 projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 50px;
   align-items: start;
+  gap: 50px;
 }
 @media (min-width: 700px) {
   projects-grid {
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    /* display: block;
+    column-count: 2;
+    column-gap: 50px; */
   }
 }
 

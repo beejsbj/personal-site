@@ -97,6 +97,7 @@ project-card p::after {
     text-orientation: sideways;
     order: 1;
     grid-column: span 1;
+    mix-blend-mode: difference;
     /*grid-row: span 2 / -1;*/
     /*pushing header down*/
   }

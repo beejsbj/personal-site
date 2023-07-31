@@ -44,7 +44,7 @@ if (isset($_GET['tags'])) {
 				<?= $description ?>
 			</p>
 			<picture>
-				<img src="images/<?= $image ?>" alt="">
+				<img src="images/projects/<?= $image ?>" alt="">
 			</picture>
 			<ul class="tools">
 				<?php
