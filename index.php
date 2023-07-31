@@ -25,7 +25,7 @@ if (isset($_GET['project'])) {
 ?>
 
 <!doctype html>
-<html lang='en' class='special-magic no-js <?= $pageData['id'] ?> <?= "$currentTheme-theme" ?>'>
+<html lang='en' class='special-magic no-js <?= "$currentPage-page" ?> <?= $pageData['id'] ?> <?= "$currentTheme-theme" ?>'>
 
 <head>
 	<base href="<?= $__dirname ?>/">
@@ -47,9 +47,9 @@ if (isset($_GET['project'])) {
 	<main class="page-content" data-barba="container" data-barba-namespace="<?= $pageData['heading'] ?>">
 		<section class="page-title">
 			<inner-column>
-				<p class="booming-voice">
+				<h1 class="booming-voice">
 					<?= $pageData['heading'] ?? 'NA' ?>
-				</p>
+				</h1>
 			</inner-column>
 		</section>
 
