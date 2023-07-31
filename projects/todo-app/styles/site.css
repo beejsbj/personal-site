@@ -26,120 +26,110 @@
 
 /* then other contextual styles */
 body {
-	padding-top: 50px;
-	background-color: var(--paper);
-	background-image: url('../images/leafs-corner.png');
-	background-repeat: no-repeat;
-	background-position: 00px 0px;
-	background-size: 80%;
-	background-size: 40%;
-	color: var(--ink);
+  padding-top: 50px;
+  background-color: var(--paper);
+  background-image: url("../images/leafs-corner.png");
+  background-repeat: no-repeat;
+  background-position: 00px 0px;
+  background-size: 80%;
+  background-size: 40%;
+  color: var(--ink);
 }
 
 .hide {
-	display: none;
+  display: none;
 }
 
 .booming-voice {
-	text-align: center;
-	padding: 10px 20px;
-	mask-image: url('../images/brush-stroke.svg');
-	-webkit-mask-image: url('../images/brush-stroke.svg');
-	-webkit-mask-size: contain;
-	-webkit-mask-position: center center;
-	-webkit-mask-repeat: no-repeat;
-	background-color: var(--highlight);
+  text-align: center;
+  padding: 10px 20px;
+  mask-image: url("../images/brush-stroke.svg");
+  -webkit-mask-image: url("../images/brush-stroke.svg");
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center center;
+  -webkit-mask-repeat: no-repeat;
+  background-color: var(--highlight);
 }
 
 todo-app {
-	display: flex;
-	gap: 30px;
-	background-color: var(--paper);
-	align-items: start;
-	padding: 20px;
-	overflow-x: scroll;
-	scroll-snap-type: x mandatory;
+  display: flex;
+  gap: 30px;
+  background-color: var(--paper);
+  align-items: start;
+  padding: 20px;
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
 }
 
 todo-list {
-	/* 	outline: 3px solid blue; */
-	padding: 15px;
-	background-color: var(--color-light);
-	position: relative;
-	display: grid;
-	gap: 20px;
-	align-content: center;
-	border-radius: var(--corners);
-	min-width: 90vw;
-	scroll-snap-align: center;
+  /* 	outline: 3px solid blue; */
+  padding: 15px;
+  background-color: var(--color-light);
+  position: relative;
+  display: grid;
+  gap: 20px;
+  align-content: center;
+  border-radius: var(--corners);
+  min-width: 90vw;
+  scroll-snap-align: center;
 }
-
-
 
 todo-list h2 {
-	text-align: center;
-	justify-self: center;
-	padding: 10px 60px;
+  text-align: center;
+  justify-self: center;
+  padding: 10px 60px;
 
-	/*background-image*/
-	background-color: var(--color);
-	mask-image: url('../images/brush-stroke.svg');
-	-webkit-mask-image: url('../images/brush-stroke.svg');
-	-webkit-mask-size: contain;
-	-webkit-mask-position: center center;
-	-webkit-mask-repeat: no-repeat;
-	transform: translateY(-35px);
+  /*background-image*/
+  background-color: var(--color);
+  mask-image: url("../images/brush-stroke.svg");
+  -webkit-mask-image: url("../images/brush-stroke.svg");
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center center;
+  -webkit-mask-repeat: no-repeat;
+  transform: translateY(-35px);
 }
 todo-list h2:has(.edit-text) {
-	padding: 5px 0;
+  padding: 5px 0;
 }
-
 
 todo-list output-field ul {
-	display: grid;
-	gap: 30px;
-	justify-items: space-between;
+  display: grid;
+  gap: 30px;
+  justify-items: space-between;
 }
 
-
 todo-card {
+  padding: 10px 0;
+  display: grid;
+  gap: 10px;
 
-
-	padding: 10px 0;
-	display: grid;
-	gap: 10px;
-
-	border-bottom: 2px dotted var(--ink);
-	grid-template-columns: 0.1fr 1fr;
-	align-items: end;
-	position: relative;
-
+  border-bottom: 2px dotted var(--ink);
+  grid-template-columns: 0.1fr 1fr;
+  align-items: end;
+  position: relative;
 }
 
 todo-card h3.calm-voice {
-	justify-self: start;
+  justify-self: start;
 }
 
 todo-card.complete {
-	opacity: 0.5;
-
+  opacity: 0.5;
 }
 
 todo-card.complete h3.calm-voice {
-	/*text-decoration: 3px wavy line-through hsla(0, 100%, 50%, 1);*/
+  /*text-decoration: 3px wavy line-through hsla(0, 100%, 50%, 1);*/
 }
 
-@media(min-width: 660px) {
-	todo-app {
-		overflow-x: initial;
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-		grid-template-rows: masonry;
+@media (min-width: 660px) {
+  todo-app {
+    overflow-x: initial;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-rows: masonry;
+  }
 
-
-	}
-
-	todo-list {
-		min-width: initial;
-	}
+  todo-list {
+    min-width: initial;
+  }
 }
