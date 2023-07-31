@@ -51,6 +51,10 @@ header .circle {
     left: -350px;
     display: block;
   }
+  .project-page header .circle {
+    top: -23vw;
+    left: -23vw;
+  }
 }
 
 @media (min-width: 1000px) {
