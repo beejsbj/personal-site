@@ -8,3 +8,14 @@ goals-module li {
   padding: 10px;
   margin: 10px 0;
 }
+
+/* /// */
+
+@media (min-width: 1000px) {
+  .project-page .goals-list {
+    grid-column: 10 / -1;
+    align-self: start;
+    position: sticky;
+    top: 35vh;
+  }
+}
