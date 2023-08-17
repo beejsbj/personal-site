@@ -17,6 +17,8 @@ a {
 p a,
 li a {
   display: inline;
+  font-size: inherit;
+  text-decoration: underline;
 }
 
 picture {
@@ -40,6 +42,10 @@ text-content {
 
 code {
   display: block;
+}
+
+:is(p, li) > code {
+  display: inline;
 }
 
 :where(:not(:defined)) {

@@ -15,7 +15,7 @@ header .menus inner-column {
 
 header .circle {
   position: absolute;
-  fill: var(--shade);
+  fill: var(--color);
   right: -90px;
   top: -90px;
   width: 200px;

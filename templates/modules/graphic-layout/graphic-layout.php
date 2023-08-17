@@ -1,19 +1,16 @@
 <?php
-$class = $section['section-class'] ?? "layout-1";
-$image1 = "images/projects/" . $section['image1'] ?? "images/" . $pageData['image'] ?? 'images/landscape.jpg';
-$image2 = isset($section['image2']) ? "images/projects/" . $section['image2'] : NULL;
+
+$image = "images/projects/" . $section['image'] ?? "images/" . $pageData['image'] ?? 'images/landscape.jpg';
+$device = $section['device'] ?? "desktop";
 $caption = $section['caption'] ?? "";
 
 ?>
 
 
-<graphic-layout class="<?= $class ?>">
-	<div class="<?= $image2 == NULL ? 'one-image' : 'two-images' ?>">
+<graphic-layout>
+	<div>
 		<picture>
-			<img src="<?= $image1 ?>">
-		</picture>
-		<picture class="<?= $image2 == NULL ? 'hide' : '' ?>">
-			<img src="<?= $image2 ?>">
+			<img src="<?= $image ?>">
 		</picture>
 	</div>
 	<p class="whisper-voice caption">
@@ -31,15 +28,12 @@ $caption = $section['caption'] ?? "";
 
 	}
 
-	graphic-layout .two-images {
-		grid-template-columns: 1fr 0.5fr;
-	}
 
 	graphic-layout .one-image {
 		grid-template-columns: 1fr;
 	}
 
-	graphic-layout.layout-1 div {
+	graphic-layout div {
 		display: grid;
 		gap: 0.5rem;
 

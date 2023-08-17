@@ -4,7 +4,7 @@ footer {
   overflow: hidden;
 }
 footer .circle {
-  fill: var(--shade);
+  fill: var(--color);
   position: absolute;
   top: 0px;
   right: initial;

@@ -51,7 +51,7 @@
 }
 
 .shapes #circle {
-  fill: var(--color);
+  fill: var(--color-tertiary);
   stroke: black;
   stroke-width: 2px;
 }

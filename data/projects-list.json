@@ -92,8 +92,8 @@
       },
       {
         "module": "graphic-layout",
-        "class": "layout-1",
-        "image1": "quantumon.png",
+        "image": "quantumon.png",
+        "device": "desktop",
         "caption": "this is the intro paragraphs and it is the one for this"
       },
       {
@@ -127,9 +127,8 @@
       },
       {
         "module": "graphic-layout",
-        "class": "layout-one",
-        "image1": "quantumon-desktop-1.png",
-        "image2": "quantumon-mobile-1.png",
+        "image": "quantumon-desktop-1.png",
+        "device": "desktop",
         "paragraph1": "this is the intro paragraphs and it is the one for this"
       },
       {
@@ -153,9 +152,8 @@
       },
       {
         "module": "graphic-layout",
-        "class": "layout-one",
-        "image1": "quantumon-desktop-1.png",
-        "image2": "quantumon-mobile-1.png",
+        "image": "quantumon-desktop-1.png",
+        "device": "desktop",
         "paragraph1": "this is the intro paragraphs and it is the one for this"
       }
     ]
@@ -237,7 +235,7 @@
           {
             "id": "live",
             "name": "Live Link",
-            "slug": "e4p"
+            "slug": "?page=e4p"
           },
           {
             "id": "github",

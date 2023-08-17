@@ -21,6 +21,10 @@
     },
 
     {
+      "module": "color-guide"
+    },
+
+    {
       "module": "voices-guide",
       "voices": [
         "whisper-voice",
@@ -33,45 +37,6 @@
         "loud-voice",
         "booming-voice"
       ]
-    },
-    {
-      "module": "layout-module"
-    },
-
-    {
-      "module": "projects-grid"
-    },
-    {
-      "module": "about-module"
-    },
-    {
-      "module": "contact-list"
-    },
-    {
-      "module": "menu-module",
-      "menu": "test"
-    },
-    {
-      "module": "multi-menus",
-      "id": "style-guide-menu-group"
-    },
-    {
-      "module": "e4p-grid"
-    },
-    {
-      "module": "exercise-detail"
-    },
-    {
-      "module": "image-grid"
-    },
-    {
-      "module": "things-grid"
-    },
-    {
-      "module": "goals-list"
-    },
-    {
-      "module": "resume-section"
     }
   ]
 }

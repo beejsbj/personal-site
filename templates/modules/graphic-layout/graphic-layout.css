@@ -2,6 +2,7 @@ article {
   display: grid;
   align-items: start;
   grid-template-columns: repeat(12, 1fr);
+  gap: 3rem;
 }
 article > * {
   grid-column: 1 / -1;
@@ -15,7 +16,7 @@ article > * {
 }
 
 @media (min-width: 750px) {
-  section.generic-text {
+  .project-page section.generic-text {
     grid-column: 2 / 10;
   }
 }

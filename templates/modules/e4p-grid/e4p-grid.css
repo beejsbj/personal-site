@@ -82,7 +82,7 @@ e4p-chapter ul li::after {
 e4p-chapter ul li:hover::after {
 	height: 5px;
 	width: 5px;
-	background-color: var(--shade);
+	background-color: var(--color);
 	transform: scale(1.2) rotate(270deg);
 	z-index: 99;
 }

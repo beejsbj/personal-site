@@ -9,7 +9,7 @@ exercise-detail > exercise-form h3 {
 }
 
 exercise-detail output span {
-  color: var(--shade);
+  color: var(--color);
 }
 
 exercise-detail actions-component {

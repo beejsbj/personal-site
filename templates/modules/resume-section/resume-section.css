@@ -3,7 +3,8 @@ resume-section > h2 {
 }
 
 resume-card {
-  background-image: linear-gradient(90deg, var(--highlight), var(--paper));
+  background-image: var(--gradient-highlight);
+
   border-radius: 10px;
   padding: 10px;
   margin: 10px 0;
@@ -18,8 +19,9 @@ resume-card li {
 
 resume-card blockquote {
   font-size: 0.8rem;
-  color: var(--ink);
-  background-image: linear-gradient(90deg, var(--shade), var(--paper));
+  color: var(--paper);
+  background-image: var(--gradient-color);
+
   border-radius: 10px;
   padding: 10px;
   margin: 10px 0;

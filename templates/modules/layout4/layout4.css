@@ -29,7 +29,7 @@
 
 .layout4 details summary:after {
   content: "＋";
-  color: var(--color);
+  color: var(--color-tertiary);
   font-size: 2.5rem;
   font-weight: 400;
 

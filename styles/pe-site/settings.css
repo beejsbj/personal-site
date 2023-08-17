@@ -62,7 +62,7 @@ html {
 
 		--neutral-stuffs: gray;
 
-		--color: hsla(206, 66%, 47%, 1.00);
+		--color-tertiary: hsla(206, 66%, 47%, 1.00);
 		--highlight: hsla(190, 90%, 40%, 1.00);
 
 		--shadow: rgba(0,0,0,.8);

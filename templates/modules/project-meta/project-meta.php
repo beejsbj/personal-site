@@ -64,7 +64,7 @@
 
 	project-meta h3 {
 		padding-bottom: 3px;
-		border-bottom: 1px solid var(--color);
+		border-bottom: 1px solid var(--color-tertiary);
 
 
 	}

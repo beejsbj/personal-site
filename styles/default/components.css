@@ -1,6 +1,28 @@
+/* textures and patterns */
+.checkers {
+  background: var(--checkers);
+  background-size: 10px;
+
+  filter: hue-rotate(var(--hue-rotate));
+}
+
+.diagnol {
+  background: var(--diagnol);
+  background-size: 10px;
+  filter: hue-rotate(var(--hue-rotate));
+}
+
+.points {
+  background: var(--points);
+  background-size: 10px;
+
+  filter: hue-rotate(var(--hue-rotate));
+}
+
 /* buttons and icons and smaller reusable bits here */
+
 a {
-  color: var(--shade);
+  color: var(--color);
 }
 
 .button {
@@ -11,19 +33,19 @@ a {
 
 .button:hover {
   color: var(--highlight);
-  background-color: var(--color);
+  background-color: var(--color-tertiary);
   transition: 0.2s;
 }
 
 a.blob-button {
-  background-color: var(--color);
+  background-color: var(--color-tertiary);
   color: var(--paper);
 }
 
 button {
   padding: 5px 15px;
   color: var(--paper);
-  background-color: var(--color);
+  background-color: var(--color-tertiary);
   cursor: pointer;
 }
 
@@ -46,7 +68,7 @@ a.new-tab {
 
 a.new-tab svg.new-tab {
   max-width: 20px;
-  fill: var(--color);
+  fill: var(--color-tertiary);
   position: relative;
   top: 3px;
   right: 4px;
@@ -61,7 +83,7 @@ a:has(.external-link) {
 }
 
 .external-link {
-  max-width: 10px;
+  max-width: 20px;
   position: absolute;
   right: 25px;
   top: 25px;
