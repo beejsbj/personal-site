@@ -22,7 +22,7 @@ if (isset($_GET['tags'])) {
 	<?php
 	foreach ($projects as $project) {
 		$heading = $project['heading']  ?? "Project Title";
-		$date = $project['date'] ?? "2022-06-13";
+		$date = $project['date'] ?? "2022-06";
 		$id = $project['id'] ?? "garden";
 		$description = $project['description'] ?? "this is the Project Descripton";
 		$image = $project['images'][$_SESSION['theme']]['thumbnail'] ?? $project['image'] ?? "landscape.jpg";
@@ -36,12 +36,14 @@ if (isset($_GET['tags'])) {
 		<project-card>
 			<h2 class="attention-voice heading">
 				<?= $heading ?>
+
 			</h2>
 			<h3 class="teaser-voice date">
 				<?= $date ?>
 			</h3>
 			<p class="calm-voice description">
 				<?= $description ?>
+
 			</p>
 			<picture>
 				<img src="images/projects/<?= $image ?>" alt="">

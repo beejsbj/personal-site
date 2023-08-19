@@ -96,11 +96,11 @@ strong {
 /* these would be scoped to section or to an article element */
 /* this is just a loose setting for now */
 p:not(.hide) + p {
-  margin-top: 1.5em;
+  margin-top: 0.5em;
 }
 
 h2:not(.hide) + p {
-  margin-top: 20px;
+  margin-top: 1em;
 }
 
 code {

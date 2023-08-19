@@ -129,7 +129,7 @@ project-card p::after {
 
   project-card .date {
     display: none;
-    position: absolute;
+    /* position: absolute; */
   }
 }
 

@@ -24,13 +24,7 @@ footer .circle {
   }
 }
 @media (min-width: 2000px) {
-  footer {
-    overflow: initial;
-  }
   footer .circle {
-    transform: translateX(-30%);
-
-    width: 250vw;
   }
 
   .project-page footer {

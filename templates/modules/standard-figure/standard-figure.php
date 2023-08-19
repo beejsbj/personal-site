@@ -10,9 +10,8 @@ $caption = $section['caption'] ?? "";
 		<picture>
 			<img src="images/<?= $image ?>" alt="">
 		</picture>
-		<figcaption>
+		<figcaption class="whisper-voice caption">
 			<?= $caption ?>
 		</figcaption>
 	</figure>
-	<p>description of figure and why it matter</p>
 </standard-figure>

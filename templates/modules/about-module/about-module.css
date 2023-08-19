@@ -6,6 +6,7 @@ about-module {
   display: grid;
   gap: 20px;
   align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
 about-module .calm-voice {
@@ -34,7 +35,7 @@ about-module .calm-voice {
   }
 
   about-module {
-    grid-template-columns: 1fr 0.4fr;
+    /* grid-template-columns: 1fr 0.4fr; */
   }
   about-module text-content {
     /* order: 2; */
@@ -43,6 +44,6 @@ about-module .calm-voice {
 
 @media (min-width: 1500px) {
   about-module {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   }
 }

@@ -145,12 +145,14 @@ $colors = [
 
 
 <color-guide>
-	<h2 class="attention-voice">Colors</h2>
-	<p>
-		These are the colors used in the app. They are defined in
-		<code>settings.css</code> and are available as CSS variables which are
-		used throughout the app.
-	</p>
+	<text-content>
+		<h2 class="attention-voice">Colors</h2>
+		<p>
+			These are the colors used in the app. They are defined in
+			<code>settings.css</code> and are available as CSS variables which are
+			used throughout the app.
+		</p>
+	</text-content>
 
 
 	<?php foreach ($colors as $colorGroup) { ?>
@@ -218,7 +220,7 @@ $colors = [
 		width: 100%;
 		height: 100px;
 
-		border: 1px solid var(--gray);
+		/* border: 1px solid var(--gray); */
 		border-radius: var(--corners);
 		margin-bottom: 0.5rem;
 
