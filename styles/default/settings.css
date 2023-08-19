@@ -116,11 +116,11 @@ html {
 /* dark mode */
 @media (prefers-color-scheme: dark) {
   html {
-    --ink: var(--white);
-    --paper: var(--black);
+    /* --ink: var(--white); */
+    /* --paper: var(--black); */
 
-    --color: var(--ink);
-    --highlight: hsla(3, 50%, 53%, 1); /*using dark-highlight*/
-    --color-tertiary: hsla(30, 65%, 71%, 1); /*//using light-highlight*/
+    /* --color: var(--ink); */
+    /* --highlight: hsla(3, 50%, 53%, 1);  */
+    /* --color-tertiary: hsla(30, 65%, 71%, 1);  */
   }
 }

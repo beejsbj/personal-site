@@ -25,7 +25,8 @@
 @import "animation.css";
 
 /* then other contextual styles */
-
+html {
+}
 body {
   background-color: var(--paper);
   color: var(--ink);

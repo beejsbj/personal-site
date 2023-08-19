@@ -2,34 +2,81 @@ html {
   /* Black and white */
   --black: hsla(0, 0%, 7%, 1);
   --white: hsla(0, 0%, 100%, 1);
-  --gray: hsla(0, 0%, 53%, 1);
-  --gray-light: hsla(0, 0%, 80%, 1);
-  --gray-lighter: hsla(0, 0%, 98%, 1);
-  --gray-dark: hsla(0, 0%, 27%, 1);
+
+  --hue: 0;
+
+  --gray: hsla(var(--hue), 0%, 50%, 1);
+  --gray-light: hsla(var(--hue), 0%, 65%, 1);
+  --gray-lighter: hsla(var(--hue), 0%, 85%, 1);
+
+  --gray-dark: hsla(var(--hue), 0%, 35%, 1);
+  --gray-darker: hsla(var(--hue), 0%, 20%, 1);
 
   /* Colors */
-  --cyan: hsla(190, 58%, 79%, 1);
-  --red: hsla(358, 85%, 78%, 1);
-  --orange: hsla(30, 72%, 75%, 1);
-  --yellow: hsla(55, 93%, 80%, 1);
-  --green: hsla(143, 39%, 76%, 1);
-  --blue: hsla(207, 66%, 77%, 1);
-  --purple: hsla(320, 46%, 74%, 1);
-
-  /* old plastic */
-  --wheat: hsla(37, 22%, 61%, 1);
-  --wheat-light: hsla(37, 68%, 93%, 1);
-  --wheat-dark: hsla(41, 27%, 38%, 1);
-  --wheat-darker: hsla(38, 34%, 33%, 1);
+  --red: hsla(calc(var(--hue)), 85%, 78%, 1);
+  --orange: hsla(calc(var(--hue) + 30), 72%, 75%, 1);
+  --yellow: hsla(calc(var(--hue) + 55), 93%, 80%, 1);
+  --green: hsla(calc(var(--hue) + 140), 39%, 76%, 1);
+  --cyan: hsla(calc(var(--hue) + 190), 58%, 79%, 1);
+  --blue: hsla(calc(var(--hue) + 210), 66%, 77%, 1);
+  --purple: hsla(calc(var(--hue) + 320), 46%, 74%, 1);
 
   /* settings */
-  --color: hsla(206, 66%, 77%, 1);
-  --highlight: hsla(190, 90%, 60%, 1);
+  --color: hsla(calc(var(--hue) + 140), 39%, 76%, 1);
+  --color-light: hsla(calc(var(--hue) + 140), 39%, 86%, 1);
+  --color-lighter: hsla(calc(var(--hue) + 140), 59%, 90%, 1);
+  --color-lightest: hsla(calc(var(--hue) + 140), 59%, 96%, 1);
 
-  --dark-color: var(--red);
-  --light-color: var(--blue);
-  --dark-highlight: var(--orange);
-  --light-highlight: var(--cyan);
+  --color-dark: hsla(calc(var(--hue) + 140), 39%, 66%, 1);
+  --color-darker: hsla(calc(var(--hue) + 140), 39%, 46%, 1);
+  --color-darkest: hsla(calc(var(--hue) + 140), 39%, 26%, 1);
+
+  --highlight: hsla(calc(var(--hue) + 190), 58%, 79%, 1);
+  --highlight-light: hsla(calc(var(--hue) + 190), 68%, 84%, 1);
+  --highlight-lighter: hsla(calc(var(--hue) + 190), 78%, 89%, 1);
+  --highlight-lightest: hsla(calc(var(--hue) + 190), 78%, 94%, 1);
+
+  --highlight-dark: hsla(calc(var(--hue) + 190), 58%, 69%, 1);
+  --highlight-darker: hsla(calc(var(--hue) + 190), 58%, 49%, 1);
+  --highlight-darkest: hsla(calc(var(--hue) + 190), 58%, 29%, 1);
+
+  --color-tertiary: hsla(calc(var(--hue)), 85%, 78%, 1);
+
+  --success: hsla(calc(var(--hue) + 160), 100%, 50%, 1);
+  --warning: hsla(calc(var(--hue)), 100%, 50%, 1);
+
+  /* Gradients */
+  --gradient-direction: 45deg;
+
+  --gradient-dark: linear-gradient(
+    var(--gradient-direction),
+    var(--ink),
+    var(--gray-dark)
+  );
+
+  --gradient-light: linear-gradient(
+    var(--gradient-direction),
+    var(--gray-light) 35%,
+    var(--white)
+  );
+
+  --gradient-color: linear-gradient(
+    var(--gradient-direction),
+    var(--color) 35%,
+    var(--paper)
+  );
+
+  --gradient-color-dark: linear-gradient(
+    var(--gradient-direction),
+    var(--ink) 35%,
+    var(--color)
+  );
+
+  --gradient-highlight: linear-gradient(
+    var(--gradient-direction),
+    var(--highlight),
+    var(--paper)
+  );
 
   /* Textures */
   --brick-wall: url("https://www.transparenttextures.com/patterns/brick-wall.png");
