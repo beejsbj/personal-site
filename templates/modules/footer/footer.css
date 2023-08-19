@@ -1,5 +1,5 @@
 footer {
-  padding: 200px 0;
+  padding: 150px 0;
   position: relative;
   overflow: hidden;
 }
@@ -16,11 +16,11 @@ footer .circle {
 
 @media (min-width: 1320px) {
   footer .circle {
-    top: 0px;
-    right: -200px;
+    top: 25%;
+    left: 50%;
     left: initial;
     display: block;
-    width: 800px;
+    width: 150vw;
   }
 }
 @media (min-width: 2000px) {
@@ -28,12 +28,14 @@ footer .circle {
     overflow: initial;
   }
   footer .circle {
-    top: initial;
-    bottom: 0px;
-    right: -200px;
-    left: initial;
-    display: block;
-    width: 600px;
+    transform: translateX(-30%);
+
+    width: 250vw;
+  }
+
+  .project-page footer {
+    max-height: 20vh;
+    overflow: hidden;
   }
 }
 

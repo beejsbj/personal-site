@@ -51,10 +51,14 @@
 		display: grid;
 		grid-gap: 1rem;
 
-		@media (min-width: 768px) {
+
+
+	}
+
+	@media (min-width: 768px) {
+		project-meta {
 			grid-template-columns: repeat(3, 1fr);
 		}
-
 	}
 
 	project-meta meta-card {

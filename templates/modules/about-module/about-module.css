@@ -46,7 +46,3 @@ about-module .calm-voice {
     grid-template-columns: 1fr 1fr;
   }
 }
-
-.about header .circle {
-  left: -400px;
-}
