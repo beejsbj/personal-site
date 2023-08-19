@@ -57,10 +57,7 @@ $colors = [
 			'name' => 'Primary Lighter',
 			'variable' => '--color-lighter',
 		],
-		[
-			'name' => 'Primary Lightest',
-			'variable' => '--color-lightest',
-		],
+
 	],
 	[
 		[
@@ -71,10 +68,7 @@ $colors = [
 			'name' => 'Primary Darker',
 			'variable' => '--color-darker',
 		],
-		[
-			'name' => 'Primary Darkest',
-			'variable' => '--color-darkest',
-		],
+
 	],
 	[
 		[
@@ -85,10 +79,7 @@ $colors = [
 			'name' => 'Secondary Lighter',
 			'variable' => '--highlight-lighter',
 		],
-		[
-			'name' => 'Secondary Lightest',
-			'variable' => '--highlight-lightest',
-		],
+
 	],
 	[
 		[
@@ -99,10 +90,7 @@ $colors = [
 			'name' => 'Secondary Darker',
 			'variable' => '--highlight-darker',
 		],
-		[
-			'name' => 'Secondary Darkest',
-			'variable' => '--highlight-darkest',
-		],
+
 	],
 
 	[
@@ -195,8 +183,8 @@ $colors = [
 </color-guide>
 
 <script>
-	const colorSlider = document.querySelector('.color-slider input');
-	const colorSliderLabelSpan = document.querySelector('.color-slider label span');
+	const colorSlider = document.querySelector('color-guide .color-slider input');
+	const colorSliderLabelSpan = document.querySelector('color-guide .color-slider label span');
 
 	colorSlider.addEventListener('input', (e) => {
 		const hue = e.target.value;
