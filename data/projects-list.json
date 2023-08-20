@@ -1,7 +1,7 @@
 [
   {
     "title": "Layout Garden",
-    "date": "2021-05-18",
+    "date": "2021-05",
     "heading": "Layout Garden",
     "id": "garden",
     "description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout adapt to it!",
@@ -38,7 +38,7 @@
   },
   {
     "title": "Quantumon",
-    "date": "2021-05-28",
+    "date": "2021-05",
     "role": "Design & Development",
     "location": "Remote @API3",
     "heading": "Quantumon",
@@ -91,11 +91,11 @@
         ]
       },
       {
-        "module": "graphic-layout",
-        "image": "quantumon.png",
-        "device": "desktop",
+        "module": "standard-figure",
+        "image": "projects/quantumon.png",
         "caption": "this is the intro paragraphs and it is the one for this"
       },
+
       {
         "module": "goals-list",
         "heading": "Goals",
@@ -126,9 +126,9 @@
         ]
       },
       {
-        "module": "graphic-layout",
-        "image": "quantumon-desktop-1.png",
-        "device": "desktop",
+        "module": "frame-image",
+        "image": "quantumon-mobile.mp4",
+        "device": "mobile",
         "paragraph1": "this is the intro paragraphs and it is the one for this"
       },
       {
@@ -151,16 +151,16 @@
         ]
       },
       {
-        "module": "graphic-layout",
-        "image": "quantumon-desktop-1.png",
-        "device": "desktop",
-        "paragraph1": "this is the intro paragraphs and it is the one for this"
+        "module": "frame-image",
+        "image": "quantumon-laptop.mp4",
+        "device": "laptop",
+        "caption": "this is the intro paragraphs and it is the one for this"
       }
     ]
   },
   {
     "title": "Theme Challenge",
-    "date": "2022-06-24",
+    "date": "2022-06",
     "heading": "Theme Challenge",
     "id": "theme-challenge",
     "description": "A fun challenge, where we were given a code base and could only use CSS to get a website to fit within chosen industry",
@@ -255,7 +255,7 @@
   },
   {
     "title": "Lottery App",
-    "date": "2022-09-12",
+    "date": "2022-09",
     "heading": "Lottery App",
     "id": "lottery",
     "description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
@@ -297,7 +297,7 @@
   },
   {
     "title": "Roulette App",
-    "date": "2022-09-25",
+    "date": "2022-09",
     "heading": "Roulette App",
     "id": "roulette",
     "description": "Back for more gambling. this had some bumps, but I really ended up liking the aesthetic I came up with!",
@@ -339,7 +339,7 @@
   },
   {
     "title": "Flash Cards",
-    "date": "2022-10-03",
+    "date": "2022-10",
     "heading": "Flash Cards",
     "id": "flashcards",
     "description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",

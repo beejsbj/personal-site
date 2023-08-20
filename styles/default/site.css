@@ -138,3 +138,20 @@ footer {
     right: 0;
   }
 } */
+
+@media (min-width: 750px) {
+  .project-page section.generic-text {
+  }
+}
+@media (min-width: 1000px) {
+  .project-page article {
+    display: grid;
+    align-items: start;
+    grid-template-columns: repeat(12, 1fr);
+    /* gap: 3rem; */
+  }
+  .project-page article > * {
+    grid-column: 1 / -1;
+    grid-column: 2 / 10;
+  }
+}
