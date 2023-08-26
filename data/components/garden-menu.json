@@ -2,32 +2,32 @@
   {
     "id": "garden0",
     "name": "Garden Home",
-    "slug": "garden"
+    "slug": "?page=garden"
   },
   {
     "id": "garden1",
     "name": "Layout 1",
-    "slug": "layout-detail&layout=1"
+    "slug": "?page=layout-detail&layout=1"
   },
   {
     "id": "garden2",
     "name": "Layout 2",
-    "slug": "layout-detail&layout=2"
+    "slug": "?page=layout-detail&layout=2"
   },
   {
     "id": "garden3",
     "name": "Layout 3",
-    "slug": "layout-detail&layout=3"
+    "slug": "?page=layout-detail&layout=3"
   },
   {
     "id": "garden4",
     "name": "Layout 4",
-    "slug": "layout-detail&layout=4"
+    "slug": "?page=layout-detail&layout=4"
   },
   {
     "id": "oldGarden",
     "class": "hover-hide",
     "name": "Old Garden",
-    "slug": "projects/old-garden"
+    "slug": "https://burooj.dev/projects/old-garden"
   }
 ]
