@@ -23,7 +23,7 @@ if (file_exists("data/components/$menu-menu.json")) {
 
 
 
-			if ($menu == 'site' || $menu == 'garden') {
+			if ($menu == 'site') {
 				$class = "$class " . activePage($menuItem['activePage'] ?? false);
 				// $slug = $menuItem['slug']; //pretty
 				$slug = "?page=" . $menuItem['slug']; //ugly
@@ -33,6 +33,12 @@ if (file_exists("data/components/$menu-menu.json")) {
 				$class = "$class " . activeTheme($menuItem['activePage']);
 				// $slug = currentPage() . "?theme=" . $menuItem['slug']; //pretty
 				$slug = "?theme=" . $menuItem['slug'] . "&page=" . currentPage(); //ugly
+
+			}
+			if ($menu == 'garden') {
+				$class = "$class " . activePage($menuItem['activePage'] ?? false);
+				// $slug = $menuItem['slug']; //pretty
+				$slug =  $menuItem['slug']; //ugly
 
 			}
 		?>

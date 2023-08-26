@@ -22,7 +22,7 @@
 }
 
 .project-menu a {
-  white-space: nowrap;
+  /* white-space: nowrap; */
   border-radius: 50%;
   aspect-ratio: 1 /1;
   display: grid;
@@ -33,6 +33,7 @@
   transition: 0.2s;
   --top: 0px;
   --right: 0px;
+  text-align: center;
 }
 
 .project-menu a:hover {

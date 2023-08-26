@@ -95,6 +95,7 @@
     right: 20px;
     top: -70px;
     transform: scale(1.2);
+    animation: float 6s ease-in-out infinite;
   }
 
   /* about */
@@ -102,12 +103,14 @@
     right: -70px;
     top: -95px;
     transform: scale(0.85);
+    animation: float 4s -2s ease-in-out infinite;
   }
 
   /* projects */
   .site-menu li:nth-of-type(3) a {
     right: -100px;
     top: -20px;
+    animation: float 6s -4s ease-in-out infinite;
   }
 
   /* style guide */
@@ -115,6 +118,7 @@
     right: -20px;
     top: 20px;
     transform: scale(1.1);
+    animation: float 8s -4s ease-in-out infinite;
   }
 
   .site-menu a span {
