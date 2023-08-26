@@ -38,8 +38,9 @@ body {
 }
 
 .hide {
-  display: none;
+  display: none !important;
 }
+
 .hide-opacity {
   opacity: 0;
 }
@@ -59,7 +60,7 @@ body main {
   display: grid;
   gap: 30px;
 }
-html.style-guide main {
+html:is(.style-guide, .garden) main {
   display: block;
 }
 
@@ -91,15 +92,6 @@ main {
 footer {
   animation: fade-in 4s ease-in both;
 } */
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
 
 .last-updated inner-column {
   padding: 10px;
