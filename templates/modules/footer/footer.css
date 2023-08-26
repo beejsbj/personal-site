@@ -25,6 +25,7 @@ footer .circle {
 }
 @media (min-width: 2000px) {
   footer .circle {
+    animation: float 5s ease-in-out infinite alternate;
   }
 
   .project-page footer {

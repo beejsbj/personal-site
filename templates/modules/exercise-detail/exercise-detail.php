@@ -25,7 +25,7 @@ if (!exExists($exerciseSlug)) {
 					<input type="radio" name="e4p-lang" value="js" id="option-js">
 					<label for="option-js">JS</label>
 				</radio-option>
-				<a href="?page=e4p-in-vue#<?= $funcName ?>" target="vueforms" class="new-tab">
+				<a href="?page=e4p-in-vue#<?= $funcName ?>" target="vueforms" class="new-tab hide">
 					Vue <?php include('images/new-tab.php'); ?>
 				</a>
 			</toggle-switch>

@@ -21,24 +21,44 @@ frame-image {
 }
 
 @media (min-width: 768px) {
-  frame-image:has(picture:not(.mobile-frame)) {
+  frame-image:has(picture:not(.mobile-frame, .tablet-frame)) {
     place-items: unset;
+  }
+  frame-image picture.tablet-frame {
+    width: 600px;
   }
 }
 
 frame-image picture {
   position: relative;
+  overflow: hidden;
 }
 
-frame-image picture.mobile-frame {
-  overflow: hidden;
+frame-image picture:is(.mobile-frame, .tablet-frame) {
   border-radius: 55px;
 }
 
+frame-image picture:is(.mobile-frame, .tablet-frame) img {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+frame-image picture img {
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
 frame-image picture video {
+  width: 100%;
   position: absolute;
-  inset: 0;
+
   top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: -1;
+}
+
+frame-image picture:is(.mobile-frame, .tablet-frame) video {
+  width: 95%;
 }
