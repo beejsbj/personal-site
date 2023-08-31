@@ -32,7 +32,7 @@ $images = $section['images'] ?? [1, 2, 3];
 
 	fan-images :is(.card-group,
 		.big-card) {
-		width: 40vmin;
+		width: 100%;
 	}
 
 	fan-images .card-group {
@@ -40,11 +40,7 @@ $images = $section['images'] ?? [1, 2, 3];
 		transition: transform 400ms ease;
 	}
 
-	@media (min-width: 1000px) {
-		fan-images .card-group {
-			left: 5vmin;
-		}
-	}
+
 
 	fan-images .card {
 		background-color: rgba(255, 255, 255, 0.05);

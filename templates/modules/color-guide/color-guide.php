@@ -40,16 +40,6 @@ $colors = [
 			'variable' => '--color',
 		],
 		[
-			'name' => 'Secondary',
-			'variable' => '--highlight',
-		],
-		[
-			'name' => 'Tertiary',
-			'variable' => '--color-tertiary',
-		],
-	],
-	[
-		[
 			'name' => 'Primary Light',
 			'variable' => '--color-light',
 		],
@@ -57,9 +47,6 @@ $colors = [
 			'name' => 'Primary Lighter',
 			'variable' => '--color-lighter',
 		],
-
-	],
-	[
 		[
 			'name' => 'Primary Dark',
 			'variable' => '--color-dark',
@@ -72,6 +59,10 @@ $colors = [
 	],
 	[
 		[
+			'name' => 'Secondary',
+			'variable' => '--highlight',
+		],
+		[
 			'name' => 'Secondary Light',
 			'variable' => '--highlight-light',
 		],
@@ -80,8 +71,7 @@ $colors = [
 			'variable' => '--highlight-lighter',
 		],
 
-	],
-	[
+
 		[
 			'name' => 'Secondary Dark',
 			'variable' => '--highlight-dark',
@@ -91,6 +81,14 @@ $colors = [
 			'variable' => '--highlight-darker',
 		],
 
+	],
+	[
+
+
+		[
+			'name' => 'Tertiary',
+			'variable' => '--color-tertiary',
+		],
 	],
 
 	[
@@ -211,7 +209,7 @@ $colors = [
 
 	@media (min-width: 768px) {
 		color-guide .colors {
-			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 			--gap: 3rem;
 		}
 	}
