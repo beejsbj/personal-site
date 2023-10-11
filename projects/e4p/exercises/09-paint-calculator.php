@@ -1,9 +1,5 @@
-
-
-
-    
 <?php
- 
+
 
 
 
@@ -16,7 +12,7 @@
 
 
 $class = "hide";
- // $class = "output-field";
+// $class = "output-field";
 
 
 
@@ -32,40 +28,38 @@ $convertToGalConst = 350;
 
 
 
-if (isset($_POST['submitted'])){ 
-    if ((isset($_POST['length'])) && (isset($_POST['width']))) {
-        if (($_POST['length'] != '') && ($_POST['width'] != '')) {
+if (isset($_POST['submitted'])) {
+	if ((isset($_POST['length'])) && (isset($_POST['width']))) {
+		if (($_POST['length'] != '') && ($_POST['width'] != '')) {
 
 
 
 
-            $length = floatval($_POST['length']);
-            $width = floatval($_POST['width']);
+			$length = floatval($_POST['length']);
+			$width = floatval($_POST['width']);
 
 
 
 
-            $area = ceil($length * $width);
-            $gallons = ceil($area / $convertToGalConst);
+			$area = ceil($length * $width);
+			$gallons = ceil($area / $convertToGalConst);
 
-            $output = "You will need to purchase <span>$gallons</span> gallons of paint to cover <span>$area</span> square feet";
-            
-
-        
+			$output = "You will need to purchase <span>$gallons</span> gallons of paint to cover <span>$area</span> square feet";
 
 
 
 
 
-            $class = "output-field";
 
-        }
 
-    }
+
+			$class = "output-field";
+		}
+	}
 }
 
 
-    
+
 
 
 
@@ -75,69 +69,24 @@ if (isset($_POST['submitted'])){
 
 
 <form id="e4p" autocomplete='off' method="POST">
-    <div class="input-field">
-        <input id="lengthid" type="number" class="text-number-input" required name="length" placeholder="length??" value="<?=$length?>" step="0.1" min="1">
-        <label for="lengthid"> What is the length?</label>
-    </div>
+	<div class="input-field">
+		<input id="lengthid" type="number" class="text-number-input" required name="length" placeholder="length??" value="<?= $length ?>" step="0.1" min="1">
+		<label class="firm-voice" for="lengthid"> What is the length?</label>
+	</div>
 
-    <div class="input-field">
-        <input id="widthid" type="number" class="text-number-input" required name="width" placeholder="width??" value="<?=$width?>" step="0.1"  min="1">
-        <label for="widthid"> What is the width?</label>
-    </div>
-
-
-    <button type="submit" name="submitted">
-        Calculator
-    </button>
+	<div class="input-field">
+		<input id="widthid" type="number" class="text-number-input" required name="width" placeholder="width??" value="<?= $width ?>" step="0.1" min="1">
+		<label class="firm-voice" for="widthid"> What is the width?</label>
+	</div>
 
 
-    <output class="<?=$class?>" >
-	 <p><?=$output?></p>
-</output>
-    
+	<button type="submit" name="submitted">
+		Calculator
+	</button>
+
+
+	<output class="<?= $class ?>">
+		<p><?= $output ?></p>
+	</output>
+
 </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

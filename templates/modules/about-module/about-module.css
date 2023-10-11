@@ -1,6 +1,9 @@
 .about main {
   /* display: block; */
 }
+.about-module {
+  overflow: hidden;
+}
 
 about-module {
   display: grid;

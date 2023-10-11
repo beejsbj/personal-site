@@ -11,15 +11,15 @@
 
 	print $message. -->
 
-    <style>
-    	h1 {
-    		font-size: clamp(70px, 8vw, 150px);
-    	}
-    </style>
+<style>
+	h1 {
+		font-size: clamp(70px, 8vw, 150px);
+	}
+</style>
 
-    
+
 <?php
- 
+
 
 
 
@@ -36,14 +36,15 @@ $output = '';
 $count = 0;
 
 
-function charCounter($string) {
+function charCounter($string)
+{
 	$counter = 0;
 
 	for ($i = 0; $i < strlen($string); $i++) {  //tara dog
 
 		$char = $string[$i]; // 
 
-		if ($char != ' ') { 
+		if ($char != ' ') {
 			$counter++;
 		}
 	}
@@ -53,12 +54,12 @@ function charCounter($string) {
 
 
 if (isset($_POST['submitted'])) {
-	
+
 	if (isset($_POST['inputString'])) {
 
-		if ($_POST['inputString'] != ''){
+		if ($_POST['inputString'] != '') {
 
-			
+
 
 			$inputString = $_POST['inputString'];
 
@@ -70,35 +71,26 @@ if (isset($_POST['submitted'])) {
 
 			$class = "output-field";
 		}
-
-
-
-
 	}
-
 }
 
 ?>
 
 <form id="e4p" autocomplete='off' method="POST">
 
-    <div class="input-field">
-        <input id="stringID" type="text" class="text-number-input" required name="inputString" placeholder="What is the input string?" value="<?=$inputString?>">
-        <label for="stringID">What is the input string?</label>
-    </div>
+	<div class="input-field">
+		<input id="stringID" type="text" class="text-number-input" required name="inputString" placeholder="What is the input string?" value="<?= $inputString ?>">
+		<label class="firm-voice" for="stringID">What is the input string?</label>
+	</div>
 
 
-    <button type="submit" name="submitted">
-        Count
-    </button>
+	<button type="submit" name="submitted">
+		Count
+	</button>
 
 
-    <output class="<?=$class?>" >
-	 <p><?=$output?></p>
-</output>
-    
+	<output class="<?= $class ?>">
+		<p><?= $output ?></p>
+	</output>
+
 </form>
-
-
-
-

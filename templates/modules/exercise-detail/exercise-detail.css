@@ -4,7 +4,17 @@ exercise-detail {
   justify-items: start;
 }
 
-exercise-detail > exercise-form h3 {
+exercise-detail actions-component {
+  position: relative;
+}
+
+exercise-detail actions-component .php-js-heading {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  opacity: 0.2;
+  pointer-events: none;
   text-transform: uppercase;
 }
 
@@ -14,7 +24,7 @@ exercise-detail output span {
 
 exercise-detail actions-component {
   display: grid;
-  gap: var(--space-l);
+  gap: var(--space-s);
 }
 toggle-switch.radio-list {
   gap: var(--space-xl);

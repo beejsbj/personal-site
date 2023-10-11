@@ -26,29 +26,30 @@
 
 
 
-    <style>
-        sup {
-            /*color: yellow;*/
-            vertical-align: top;
-            font-size: 1.3rem;
-            margin: 1px;
-        }
-        sub {
-            /*color: yellow;*/
-            vertical-align: bottom;
-            font-size: 1.3rem;
-            margin: 1px
-        }
-    </style>
+<style>
+	sup {
+		/*color: yellow;*/
+		vertical-align: top;
+		font-size: 1.3rem;
+		margin: 1px;
+	}
+
+	sub {
+		/*color: yellow;*/
+		vertical-align: bottom;
+		font-size: 1.3rem;
+		margin: 1px
+	}
+</style>
 
 
 
 
 
 
-    
+
 <?php
- 
+
 
 
 
@@ -56,7 +57,7 @@
 
 
 $class = "hide";
- // $class = "output-field";
+// $class = "output-field";
 
 
 $first = '';
@@ -71,22 +72,22 @@ $quotient = 0;
 
 
 
-if (isset($_POST['submitted'])){
-    
-    if ((isset($_POST['first'])) && (isset($_POST['second']))) {
-        
+if (isset($_POST['submitted'])) {
+
+	if ((isset($_POST['first'])) && (isset($_POST['second']))) {
 
 
-        if (($_POST['first'] != '') && ($_POST['second'] != '')) {
 
-            $first = floatval($_POST['first']);
-            $second = floatval($_POST['second']);
-            $sum = $first + $second;
-            $difference = $first - $second;
-            $product = $first * $second;
-            $quotient = round($first / $second, 2);
+		if (($_POST['first'] != '') && ($_POST['second'] != '')) {
 
-            $output = "<span>$first</span> + <span>$second</span> = $sum<br>
+			$first = floatval($_POST['first']);
+			$second = floatval($_POST['second']);
+			$sum = $first + $second;
+			$difference = $first - $second;
+			$product = $first * $second;
+			$quotient = round($first / $second, 2);
+
+			$output = "<span>$first</span> + <span>$second</span> = $sum<br>
                         <span>$first</span> - <span>$second</span> = $difference<br>
                         <span>$first</span> * <span>$second</span> = $product<br>
                         <span>$first</span> / <span>$second</span> = $quotient<br>";
@@ -97,16 +98,9 @@ if (isset($_POST['submitted'])){
 
 
 
-            $class = "output-field";
-
-        }
-
-    }
-
-           
-           
-
-
+			$class = "output-field";
+		}
+	}
 }
 ?>
 
@@ -115,26 +109,23 @@ if (isset($_POST['submitted'])){
 
 <form id="e4p" autocomplete='off' method="POST">
 
-    <div class="input-field">
-        <input id="first-id" type="number" class="text-number-input" required name="first" placeholder="first number?" value="<?=$first?>" step="0.01">
-        <label for="first-id">What is the first number?</label>
-    </div>
-    <div class="input-field">
-        <input id="second-id" type="number" class="text-number-input" required name="second" placeholder="second number?" value="<?=$second?>" step="0.01">
-        <label for="second-id">What is the second number?</label>
-    </div>
+	<div class="input-field">
+		<input id="first-id" type="number" class="text-number-input" required name="first" placeholder="first number?" value="<?= $first ?>" step="0.01">
+		<label class="firm-voice" for="first-id">What is the first number?</label>
+	</div>
+	<div class="input-field">
+		<input id="second-id" type="number" class="text-number-input" required name="second" placeholder="second number?" value="<?= $second ?>" step="0.01">
+		<label class="firm-voice" for="second-id">What is the second number?</label>
+	</div>
 
 
-    <button type="submit" name="submitted">
-        <sub>+</sub><sup>-</sup>Mathify!<sup>×</sup><sub>÷</sub>
-    </button>
+	<button type="submit" name="submitted">
+		<sub>+</sub><sup>-</sup>Mathify!<sup>×</sup><sub>÷</sub>
+	</button>
 
 
-    <output class="<?=$class?>" >
-	 <p><?=$output?></p>
-</output>
-    
+	<output class="<?= $class ?>">
+		<p><?= $output ?></p>
+	</output>
+
 </form>
-
-
-

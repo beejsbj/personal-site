@@ -22,8 +22,12 @@ $images = $section['images'] ?? [1, 2, 3];
 		margin: 0px;
 		display: grid;
 		place-items: center;
+		padding: var(--space-xl);
+
 
 	}
+
+
 
 	fan-images :is(.card-group, .card) {
 		aspect-ratio: 1;

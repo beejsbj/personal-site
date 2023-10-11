@@ -16,7 +16,7 @@ if (!exExists($exerciseSlug)) {
 	<exercise-detail>
 		<actions-component>
 			<a class="" href="?page=e4p"><span>BACK</span></a>
-			<toggle-switch class='radio-list'>
+			<toggle-switch class='radio-list horizontal'>
 				<radio-option>
 					<input type="radio" name="e4p-lang" value="php" id="option-php">
 					<label for="option-php">PHP</label>
@@ -29,14 +29,14 @@ if (!exExists($exerciseSlug)) {
 					Vue <?php include('images/new-tab.php'); ?>
 				</a>
 			</toggle-switch>
-
+			<h3 class="loud-voice php-js-heading">PHP</h3>
 		</actions-component>
-		<h2 class="loud-voice">
+
+		<h2 class="attention-voice">
 			<?= $exerciseName ?>
 		</h2>
 
 		<exercise-form>
-			<h3 class="attention-voice">PHP</h3>
 			<?php include("projects/e4p/exercises/$exerciseSlug.php"); ?>
 		</exercise-form>
 	</exercise-detail>
