@@ -7,7 +7,7 @@
 
 .layout3 layout-header {
 	background-color: black;
-	padding: 80px 20px;
+	padding: var(--space-3xl) var(--space-s);
 
 	color: white;
 	transition: 0.2s;
@@ -19,16 +19,16 @@
 }
 
 .layout3 .card-list {
-	padding: 20px;
+	padding: var(--space-s);
 }
 .layout3 layout-card {
 	display: block;
-	padding: 20px 0;
+	padding: var(--space-s) 0;
 }
 
 .layout3 layout-card picture {
 	max-width: 30px;
-	margin-bottom: 15px;
+	margin-bottom: var(--space-s);
 }
 
 .layout3 layout-card picture #rectangle {
@@ -46,12 +46,12 @@
 	}
 
 	.layout3 layout-header {
-		padding-bottom: 100px;
+		padding-bottom: var(--space-3xl);
 	}
 
 	.layout3 .card-list {
 		display: grid;
-		gap: 20px;
+		gap: var(--space-s);
 
 		transform: translateY(-120px);
 		transition: 0.2s;
@@ -61,7 +61,7 @@
 	.layout3 layout-card {
 		/*border: solid 3px black;*/
 		border-radius: var(--corners);
-		padding: 40px;
+		padding: var(--space-xl);
 		background-color: white;
 
 	}
@@ -105,15 +105,15 @@
 		display: block;
 	}
 	.layout3 layout-header {
-		padding-bottom: 200px;
+		padding-bottom: calc(var(--space-3xl) * 2);
 	}
 	.layout3 .card-list {
 		grid-template-columns: 1fr 1fr 1fr;
 	}
 
 	.layout3 layout-card {
-		padding-top: 60px;
-		padding-bottom: 60px;
+		padding-top: var(--space-2xl);
+		padding-bottom: var(--space-2xl);
 	}
 }
 

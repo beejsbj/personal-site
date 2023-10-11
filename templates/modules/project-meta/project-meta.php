@@ -49,7 +49,7 @@
 
 	project-meta {
 		display: grid;
-		grid-gap: 1rem;
+		grid-gap: var(--space-s);
 
 
 
@@ -63,12 +63,12 @@
 
 	project-meta meta-card {
 		display: grid;
-		gap: 0.5rem;
+		gap: var(--space-2xs);
 	}
 
 	project-meta h3 {
-		padding-bottom: 3px;
-		border-bottom: 1px solid var(--color-tertiary);
+		padding-bottom: 0.25em;
+		border-bottom: var(--line-width-thin) solid var(--color-tertiary);
 
 
 	}

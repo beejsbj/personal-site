@@ -6,7 +6,7 @@
 
 layout-module {
   display: grid;
-  gap: 40px;
+  gap: var(--space-xl);
 }
 
 layout-module layout-header {

@@ -1,5 +1,5 @@
 footer {
-  padding: 150px 0;
+  padding: calc(1.5 * var(--space-3xl)) 0;
   position: relative;
   overflow: hidden;
 }

@@ -1,13 +1,13 @@
 .layout1 .image-grid {
   display: grid;
-  gap: 15px;
+  gap: var(--space-s);
 }
 
 .layout1 layout-card {
   display: block;
   /*background-color: wheat;*/
   border-top: 3px solid grey;
-  padding: 20px 0;
+  padding: var(--space-m) 0;
 }
 
 /*break point 1 - medium*/
@@ -15,7 +15,7 @@
   .layout1 .card-list {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: var(--space-s);
   }
 
   .layout1 .image-grid {
@@ -28,7 +28,7 @@
   .layout1 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 40px;
+    gap: var(--space-xl);
   }
 
   .layout1 layout-header {

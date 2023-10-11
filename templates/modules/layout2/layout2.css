@@ -1,6 +1,6 @@
 .layout2 layout-card {
   display: block;
-  padding: 20px 0;
+  padding: var(--space-s) 0;
 }
 
 .layout2 layout-card picture {
@@ -12,7 +12,7 @@
   /*todo, change name*/
   display: block;
   position: relative;
-  padding: 20px 0;
+  padding: var(--space-s) 0;
   max-width: 50ch;
 }
 
@@ -33,13 +33,13 @@
   .layout2 .card-list {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: var(--space-s);
   }
 
   .layout2 layout-card {
     border: solid 3px black;
     border-radius: var(--corners);
-    padding: 30px;
+    padding: var(--space-l);
   }
 
   .layout2 layout-card p {
@@ -47,7 +47,7 @@
   }
 
   .layout2 special-block {
-    padding: 30px;
+    padding: var(--space-l);
   }
 
   .layout2 special-block::before {

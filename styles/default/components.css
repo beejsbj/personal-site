@@ -26,7 +26,7 @@ a {
 }
 
 .button {
-  padding: 5px 15px;
+  padding: 0.25em 1em;
   background-color: var(--highlight);
   cursor: pointer;
 }
@@ -43,7 +43,7 @@ a.blob-button {
 }
 
 button {
-  padding: 5px 15px;
+  padding: 0.25em 1em;
   color: var(--paper);
   background-color: var(--color-tertiary);
   cursor: pointer;
@@ -52,7 +52,7 @@ button {
 .bubble {
   background-color: var(--highlight);
   border-radius: 50%;
-  padding: 30px;
+  padding: 1.8em;
   position: relative;
 }
 .bubble span {
@@ -75,7 +75,7 @@ a.new-tab svg.new-tab {
 }
 
 a.text {
-  padding: 10px;
+  padding: 0.5em;
 }
 
 a:has(.external-link) {

@@ -32,11 +32,6 @@ body {
   color: var(--ink);
 }
 
-.my-fantastic-image {
-  max-width: 300px;
-  border-bottom-right-radius: 30px;
-}
-
 .hide {
   display: none !important;
 }
@@ -58,7 +53,7 @@ body {
 
 body main {
   display: grid;
-  gap: 30px;
+  gap: var(--space-l);
 }
 html:is(.style-guide, .garden) main {
   display: block;
@@ -94,7 +89,7 @@ footer {
 } */
 
 .last-updated inner-column {
-  padding: 10px;
+  padding: var(--space-2xs);
 }
 
 .last-updated,

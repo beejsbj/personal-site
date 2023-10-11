@@ -1,12 +1,12 @@
 contact-list {
   display: grid;
-  gap: 20px;
+  gap: var(--space-m);
 }
 
 contact-list ul {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: var(--space-xs);
 }
 
 .contact-list {

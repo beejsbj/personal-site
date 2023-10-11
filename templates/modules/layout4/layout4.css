@@ -8,21 +8,21 @@
 
 .layout4 .flex-container {
   display: grid;
-  gap: 40px;
+  gap: var(--space-xl);
 }
 
 .layout4 layout-header {
-  margin-bottom: 40px;
+  margin-bottom: var(--space-xl);
 }
 
 .layout4 layout-card {
   display: block;
-  padding: 20px 0;
+  padding: var(--space-m) 0;
 }
 
 .layout4 layout-card summary {
   border-bottom: 3px solid black;
-  margin-bottom: 15px;
+  margin-bottom: var(--space-s);
   cursor: pointer;
   position: relative;
 }
@@ -56,7 +56,7 @@
   }
 
   .layout4 special-block {
-    padding: 30px;
+    padding: var(--space-l);
   }
 
   .layout4 special-block::before {

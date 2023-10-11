@@ -4,7 +4,7 @@
   border-radius: 50%;
   right: 0%;
   bottom: 5%;
-  padding: 100px;
+  padding: var(--space-3xl);
   transform: scale(0.95);
   transition: 0.2s;
   z-index: 2;
@@ -13,7 +13,7 @@
 }
 .theme-menu ul {
   display: grid;
-  gap: 5px;
+  gap: var(--space-3xs);
 
   position: absolute;
   top: 50%;

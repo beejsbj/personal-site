@@ -4,14 +4,14 @@
   border-radius: 50%;
   left: -5%;
   top: 10%;
-  padding: 100px;
+  padding: var(--space-3xl);
   transform: scale(1.1);
   transition: 0.3s;
   z-index: 3;
 }
 .site-menu ul {
   display: grid;
-  gap: 5px;
+  gap: var(--space-3xs);
 
   position: absolute;
   top: 50%;
@@ -85,7 +85,7 @@
   .site-menu a {
     background-color: var(--highlight);
     border-radius: 50%;
-    padding: 40px;
+    padding: var(--space-xl);
     position: absolute;
     transition: background-color color 0.3s;
   }

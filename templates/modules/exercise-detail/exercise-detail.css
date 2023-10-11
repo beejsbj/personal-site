@@ -1,6 +1,6 @@
 exercise-detail {
   display: grid;
-  gap: 40px;
+  gap: var(--space-xl);
   justify-items: start;
 }
 
@@ -14,14 +14,14 @@ exercise-detail output span {
 
 exercise-detail actions-component {
   display: grid;
-  gap: 30px;
+  gap: var(--space-l);
 }
 toggle-switch.radio-list {
-  gap: 40px;
+  gap: var(--space-xl);
 }
 
 exercise-form {
-  gap: 30px;
+  gap: var(--space-l);
 }
 
 @media (min-width: 500px) {

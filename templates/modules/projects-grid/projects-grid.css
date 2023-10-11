@@ -1,13 +1,13 @@
 projects-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  row-gap: 60px;
-  margin-top: 80px;
+  row-gap: var(--space-2xl);
+  margin-top: var(--space-3xl);
 }
 
 project-card {
   display: grid;
-  gap: 10px;
+  gap: var(--space-2xs);
   position: relative;
   grid-column: span 12;
   z-index: 5;
@@ -27,7 +27,7 @@ project-card picture img {
 
 project-card .tools {
   display: none;
-  gap: 10px;
+  gap: var(--space-2xs);
   position: absolute;
   bottom: 0;
   right: 0px;
@@ -195,7 +195,7 @@ project-card p::after {
     grid-column: span 1;
     align-self: end;
     text-align: center;
-    padding: 15px 20px;
+    padding: var(--space-s) var(--space-m);
   }
 }
 

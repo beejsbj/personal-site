@@ -2,9 +2,32 @@
 @import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,200;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600;1,6..72,700;1,6..72,800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
 
+html {
+  /* typography */
+
+  --font1: "Newsreader", serif;
+  --font2: "Lato", sans-serif;
+
+  /* @link https://utopia.fyi/type/calculator?c=320,16,1.2,1500,16,1.5,7,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+  --step--2: clamp(0.4444rem, 0.7622rem + -0.339vw, 0.6944rem);
+  --step--1: clamp(0.6669rem, 0.8782rem + -0.2254vw, 0.8331rem);
+  --step-0: clamp(1rem, 1rem + 0vw, 1rem);
+  --step-1: clamp(1.2rem, 1.1186rem + 0.4068vw, 1.5rem);
+  --step-2: clamp(1.44rem, 1.2203rem + 1.0983vw, 2.25rem);
+  --step-3: clamp(1.7281rem, 1.2815rem + 2.2331vw, 3.375rem);
+  --step-4: clamp(2.0738rem, 1.2632rem + 4.0525vw, 5.0625rem);
+  --step-5: clamp(2.4881rem, 1.1035rem + 6.9229vw, 7.5938rem);
+  --step-6: clamp(2.9863rem, 0.7071rem + 11.3958vw, 11.3906rem);
+  --step-7: clamp(3.5831rem, -0.0787rem + 18.3093vw, 17.0863rem);
+
+  --weight-light: 200;
+  --weight-medium: 500;
+  --weight-heavy: 800;
+}
+
 .booming-voice {
   font-family: var(--font1), serif;
-  font-size: var(--step-6);
+  font-size: var(--step-5);
   font-weight: var(--weight-heavy);
 
   color: var(--color);
@@ -12,7 +35,7 @@
 }
 @media (min-width: 750px) {
   .booming-voice {
-    font-size: var(--step-7);
+    /* font-size: var(--step-7); */
   }
 }
 
@@ -87,7 +110,7 @@ strong {
 
 .teaser-voice {
   font-family: var(--font2), sans-serif;
-  font-size: var(--step--1);
+  font-size: var(--step-0);
   color: var(--color);
   text-transform: uppercase;
   font-weight: var(--weight-medium);
