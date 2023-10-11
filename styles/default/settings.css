@@ -1,79 +1,10 @@
+@import "colors.css";
+
 html {
+  /* inner column width */
   --standard: 1140px;
   --tight: 800px;
   --wide: 1400px;
-
-  /* colors */
-  --hue: 3;
-
-  --black: hsla(0, 0%, 10%, 1);
-  --white: hsla(calc(var(--hue) + 44), 11%, 85%, 1);
-
-  --paper: var(--white);
-  --ink: var(--black);
-
-  --gray: hsla(var(--hue), 0%, 50%, 1);
-  --gray-light: hsla(var(--hue), 0%, 65%, 1);
-  --gray-lighter: hsla(var(--hue), 0%, 80%, 1);
-
-  --gray-dark: hsla(var(--hue), 0%, 35%, 1);
-  --gray-darker: hsla(var(--hue), 0%, 20%, 1);
-
-  --color: hsla(var(--hue), 60%, 31%, 1); /*also for bold*/
-  --color-light: hsla(var(--hue), 60%, 41%, 1);
-  --color-lighter: hsla(var(--hue), 60%, 56%, 1);
-  --color-lightest: hsla(var(--hue), 60%, 70%, 1);
-
-  --color-dark: hsla(var(--hue), 60%, 25%, 1);
-  --color-darker: hsla(var(--hue), 60%, 20%, 1);
-  --color-darkest: hsla(var(--hue), 60%, 15%, 1);
-
-  --highlight: hsla(calc(var(--hue) + 27), 60%, 71%, 1);
-  --highlight-light: hsla(calc(var(--hue) + 27), 60%, 81%, 1);
-  --highlight-lighter: hsla(calc(var(--hue) + 27), 60%, 91%, 1);
-  --highlight-lightest: hsla(calc(var(--hue) + 27), 60%, 96%, 1);
-
-  --highlight-dark: hsla(calc(var(--hue) + 27), 60%, 61%, 1);
-  --highlight-darker: hsla(calc(var(--hue) + 27), 60%, 51%, 1);
-  --highlight-darkest: hsla(calc(var(--hue) + 27), 60%, 41%, 1);
-
-  --color-tertiary: var(--color-lighter); /*//also for italics*/
-
-  --success: hsla(calc(var(--hue) + 160), 85%, 50%, 1);
-  --warning: hsla(calc(var(--hue) / var(--hue)), 85%, 50%, 1);
-
-  /* Gradients */
-  --gradient-direction: 90deg;
-
-  --gradient-dark: linear-gradient(
-    var(--gradient-direction),
-    var(--ink),
-    var(--gray-dark)
-  );
-
-  --gradient-light: linear-gradient(
-    var(--gradient-direction),
-    var(--gray-light) 35%,
-    var(--white)
-  );
-
-  --gradient-color: linear-gradient(
-    var(--gradient-direction),
-    var(--color) 35%,
-    var(--paper)
-  );
-
-  --gradient-color-dark: linear-gradient(
-    var(--gradient-direction),
-    var(--ink) 35%,
-    var(--color)
-  );
-
-  --gradient-highlight: linear-gradient(
-    var(--gradient-direction),
-    var(--highlight),
-    var(--paper)
-  );
 
   /* Textures */
   --brick-wall: url("https://www.transparenttextures.com/patterns/brick-wall.png");
@@ -86,14 +17,14 @@ html {
 
   --points: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23000000' fill-opacity='0.2' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
 
-  /*  */
-
-  --shadow: rgba(0, 0, 0, 0.8);
-
+  /* Borders and Lines */
   --line-width-thin: 2px;
   --line-width-thick: 5px;
-
   --corners: 10px; /* or whatevers */
+  --border: var(--line-width-thin) solid var(--ink);
+
+  /* Shadows */
+  --shadow: rgba(0, 0, 0, 0.8);
 
   /* @link https://utopia.fyi/space/calculator?c=320,16,1.2,1500,16,1.5,7,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
   --space-3xs: clamp(0.25rem, 0.25rem + 0vw, 0.25rem);

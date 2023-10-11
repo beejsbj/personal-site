@@ -4,7 +4,7 @@ html.goals text-content {
 
 goals-module li {
   background-image: var(--gradient-highlight);
-  border-radius: 10px;
+  border-radius: var(--corners);
   padding: var(--space-2xs);
   margin: var(--space-2xs) 0;
 }

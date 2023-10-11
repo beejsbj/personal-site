@@ -6,7 +6,7 @@
 .layout1 layout-card {
   display: block;
   /*background-color: wheat;*/
-  border-top: 3px solid grey;
+  border-top: var(--border);
   padding: var(--space-m) 0;
 }
 

@@ -17,7 +17,7 @@ project-card {
   padding: 20px;
   display: grid;
   gap: 20px;
-  border: 6px solid var(--ink);
+  border: var(--border);
   position: relative;
   background-color: var(--paper);
 }
@@ -69,7 +69,7 @@ project-card a.button {
   font-size: 25px;
   color: var(--ink);
   font-weight: 700;
-  border-bottom: 1px solid var(--ink);
+  border-bottom: var(--border);
 }
 project-card a.button::before {
   content: "READ ";

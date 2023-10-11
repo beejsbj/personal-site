@@ -1,0 +1,20 @@
+/* textures and patterns */
+.checkers {
+  background: var(--checkers);
+  background-size: 10px;
+
+  filter: hue-rotate(var(--hue-rotate));
+}
+
+.diagnol {
+  background: var(--diagnol);
+  background-size: 10px;
+  filter: hue-rotate(var(--hue-rotate));
+}
+
+.points {
+  background: var(--points);
+  background-size: 10px;
+
+  filter: hue-rotate(var(--hue-rotate));
+}

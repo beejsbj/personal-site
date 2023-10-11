@@ -68,7 +68,7 @@
 
 	project-meta h3 {
 		padding-bottom: 0.25em;
-		border-bottom: var(--line-width-thin) solid var(--color-tertiary);
+		border-bottom: var(--border);
 
 
 	}

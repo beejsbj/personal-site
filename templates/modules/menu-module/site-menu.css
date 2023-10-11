@@ -136,7 +136,7 @@
 
   .site-menu a.active {
     background-color: var(--color);
-    outline: 5px solid var(--highlight);
+    outline: var(--line-width-thick) solid var(--highlight);
     color: var(--highlight);
   }
   /*animation*/

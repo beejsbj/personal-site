@@ -20,8 +20,6 @@ $images = $section['images'] ?? [1, 2, 3];
 <style>
 	fan-images {
 		margin: 0px;
-		/* height: 100vh; */
-
 		display: grid;
 		place-items: center;
 
@@ -65,6 +63,7 @@ $images = $section['images'] ?? [1, 2, 3];
 		transform: translate(-50%, -50%);
 		box-shadow: -1vmin 1vmin 2vmin rgba(0, 0, 0, 0.25);
 		pointer-events: none;
+
 
 	}
 
@@ -113,7 +112,7 @@ $images = $section['images'] ?? [1, 2, 3];
 	}
 
 	fan-images .card-group:hover>.big-card:nth-child(2) {
-		transform: translate(-75%, 16%) rotate(-24deg);
+		transform: translate(-75%, -16%) rotate(-24deg);
 	}
 
 	fan-images .card-group:hover>.big-card:nth-child(4) {
@@ -121,7 +120,7 @@ $images = $section['images'] ?? [1, 2, 3];
 	}
 
 	fan-images .card-group:hover>.big-card:nth-child(6) {
-		transform: translate(25%, 8%) rotate(8deg);
+		transform: translate(25%, -8%) rotate(8deg);
 	}
 
 	fan-images .card-group:hover>.big-card:nth-child(8) {
@@ -129,22 +128,22 @@ $images = $section['images'] ?? [1, 2, 3];
 	}
 
 	fan-images .card-group:hover>.little-card:nth-child(1) {
-		transform: translate(200%, -160%) rotate(-15deg);
-		z-index: 1;
+		transform: translate(200%, -200%) rotate(-15deg);
+
 	}
 
 	fan-images .card-group:hover>.little-card:nth-child(3) {
-		transform: translate(160%, 170%) rotate(15deg);
-		z-index: 1;
+		transform: translate(140%, 200%) rotate(15deg);
+
 	}
 
 	fan-images .card-group:hover>.little-card:nth-child(5) {
 		transform: translate(-200%, -170%) rotate(15deg);
-		z-index: 1;
+
 	}
 
 	fan-images .card-group:hover>.little-card:nth-child(7) {
 		transform: translate(-280%, 140%) rotate(-15deg);
-		z-index: 1;
+
 	}
 </style>

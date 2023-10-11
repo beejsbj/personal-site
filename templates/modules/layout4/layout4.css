@@ -21,7 +21,7 @@
 }
 
 .layout4 layout-card summary {
-  border-bottom: 3px solid black;
+  border-bottom: var(--border);
   margin-bottom: var(--space-s);
   cursor: pointer;
   position: relative;

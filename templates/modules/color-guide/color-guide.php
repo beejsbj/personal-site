@@ -233,6 +233,6 @@ $colors = [
 	}
 
 	color-guide form-field {
-		max-width: 50%;
+		max-width: min(100%, 300px);
 	}
 </style>

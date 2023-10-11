@@ -5,5 +5,5 @@ voices-guide {
 
 voice-card + voice-card {
   padding-top: var(--space-s);
-  border-top: var(--line-width-thin) solid var(--ink);
+  border-top: var(--border);
 }

@@ -37,7 +37,7 @@
   }
 
   .layout2 layout-card {
-    border: solid 3px black;
+    border: var(--border);
     border-radius: var(--corners);
     padding: var(--space-l);
   }
