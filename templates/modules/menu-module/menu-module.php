@@ -43,7 +43,7 @@ if (file_exists("data/components/$menu-menu.json")) {
 			}
 		?>
 			<li>
-				<a class="<?= $class ?>" href="<?= $slug ?>" target="<?= $target ?>">
+				<a class="<?= $class ?> button bubble" href="<?= $slug ?>" target="<?= $target ?>">
 					<span><?= $name ?></span>
 					<picture class="external-link <?= $target == NULL ? 'hide' : '' ?>">
 						<img src="images/diagonal-arrow.svg" alt="">
