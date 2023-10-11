@@ -10,6 +10,8 @@ $images = $section['images'] ?? [1, 2, 3];
 		<div class="big-card card"></div>
 		<div class="little-card card"></div>
 		<div class="big-card card"></div>
+		<div class="little-card card"></div>
+		<div class="big-card card"></div>
 
 	</div>
 </fan-images>
@@ -63,6 +65,7 @@ $images = $section['images'] ?? [1, 2, 3];
 		transform: translate(-50%, -50%);
 		box-shadow: -1vmin 1vmin 2vmin rgba(0, 0, 0, 0.25);
 		pointer-events: none;
+
 	}
 
 	fan-images .big-card:nth-child(2) {
@@ -127,17 +130,21 @@ $images = $section['images'] ?? [1, 2, 3];
 
 	fan-images .card-group:hover>.little-card:nth-child(1) {
 		transform: translate(200%, -160%) rotate(-15deg);
+		z-index: 1;
 	}
 
 	fan-images .card-group:hover>.little-card:nth-child(3) {
 		transform: translate(160%, 170%) rotate(15deg);
+		z-index: 1;
 	}
 
 	fan-images .card-group:hover>.little-card:nth-child(5) {
 		transform: translate(-200%, -170%) rotate(15deg);
+		z-index: 1;
 	}
 
 	fan-images .card-group:hover>.little-card:nth-child(7) {
 		transform: translate(-280%, 140%) rotate(-15deg);
+		z-index: 1;
 	}
 </style>

@@ -197,8 +197,8 @@ $colors = [
 <style>
 	color-guide {
 		display: grid;
-		gap: 3rem;
-		--gap: 1rem;
+		gap: var(--space-xl);
+		--gap: var(--space-s);
 	}
 
 	color-guide .colors {
@@ -210,7 +210,7 @@ $colors = [
 	@media (min-width: 768px) {
 		color-guide .colors {
 			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-			--gap: 3rem;
+			--gap: var(--space-xl);
 		}
 	}
 
@@ -220,7 +220,7 @@ $colors = [
 
 		/* border: 1px solid var(--gray); */
 		border-radius: var(--corners);
-		margin-bottom: 0.5rem;
+		margin-bottom: var(--space-2xs);
 
 		display: grid;
 		place-items: center;
