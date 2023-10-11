@@ -45,6 +45,15 @@ html {
   font-weight: var(--weight-light);
 }
 
+.firm-voice {
+  font-family: var(--font2), sans-serif;
+  font-size: var(--step-1);
+  line-height: 1.4;
+  font-weight: var(--weight-heavy);
+
+  max-width: 70ch;
+}
+
 .attention-voice {
   font-family: var(--font2), serif;
   font-weight: var(--weight-light);
@@ -69,16 +78,6 @@ html {
   max-width: 70ch;
 }
 
-.firm-voice {
-  font-family: var(--font2), sans-serif;
-  font-size: var(--step-0);
-  line-height: 1.4;
-  text-transform: uppercase;
-  font-weight: var(--weight-heavy);
-
-  max-width: 70ch;
-}
-
 .calm-voice,
 p,
 li,
@@ -88,7 +87,7 @@ label,
 input {
   font-family: var(--font2), sans-serif;
   font-size: var(--step-0);
-  line-height: 1.6;
+  line-height: 1.4;
   font-weight: var(--weight-medium);
 }
 

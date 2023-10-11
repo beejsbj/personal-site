@@ -53,7 +53,7 @@ body {
 
 body main {
   display: grid;
-  gap: var(--space-l);
+  /* gap: var(--space-l); */
 }
 html:is(.style-guide, .garden) main {
   display: block;

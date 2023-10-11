@@ -1,60 +1,138 @@
+@import "utilities.css";
+
 /* buttons and icons and smaller reusable bits here */
 
+button,
 a {
-  color: var(--color);
-}
-
-.button {
-  padding: 0.25em 1em;
-  background-color: var(--highlight);
   cursor: pointer;
-}
-
-.button:hover {
-  color: var(--highlight);
-  background-color: var(--color-tertiary);
   transition: 0.2s;
 }
 
-a.blob-button {
-  background-color: var(--color-tertiary);
-  color: var(--paper);
-}
-
-button {
-  padding: 0.25em 1em;
-  color: var(--paper);
-  background-color: var(--color-tertiary);
-  cursor: pointer;
-}
-
-.bubble {
+/*  */
+.button {
+  padding: 0.5em 1em;
   background-color: var(--highlight);
+  color: var(--color);
+}
+
+.button:is(:hover, :focus-visible) {
+  color: var(--highlight);
+  background-color: var(--color-light);
+}
+
+.button:active {
+  background: var(--color);
+}
+
+/*  */
+.button.outline {
+  background: var(--paper);
+  color: var(--color);
+  border: var(--line-width-thin) solid var(--color);
+  padding: 0.5em 1em;
+}
+
+.button.outline:is(:hover, :focus-visible) {
+  border-color: var(--highlight);
+  color: var(--highlight);
+}
+
+.button.outline:active {
+  background: var(--highlight);
+  color: var(--color);
+}
+
+/*  */
+
+.button.bubble {
+  background-color: var(--highlight);
+  aspect-ratio: 1/1;
   border-radius: 50%;
-  padding: 1.8em;
+  padding: 1.5em;
+  position: relative;
+
+  display: grid;
+  place-items: center;
+}
+
+.button.bubble:is(:hover, :focus-visible) {
+  color: var(--highlight);
+  background-color: var(--color-light);
+}
+
+.button.bubble:active {
+  background: var(--color);
+}
+
+/*  */
+.button.icon {
+  background-color: var(--paper);
+
+  border: var(--line-width-thin) solid var(--highlight);
+
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+
+  /* padding: 0.75em; */
+  position: relative;
+
+  display: grid;
+  place-items: center;
+}
+
+.button.icon:is(:hover, :focus-visible) {
+  border-color: var(--color);
+}
+
+.button.icon:active {
+}
+
+/* Text buttons and acnhors  */
+:is(button, a).text {
+  padding: 0.5em 1em;
+  background: none;
+  border: none;
+  color: var(--color);
+  --link-hover: var(--color-lighter);
+  --link-active: var(--highlight-darker);
+
   position: relative;
 }
-.bubble span {
+
+:is(button, a).text:is(:hover, :focus-visible) {
+  color: var(--link-hover) !important;
+}
+
+:is(button, a).text:active {
+  color: var(--link-active) !important;
+}
+
+:is(button, a).text::before {
+  --decoration-size: 0.5em;
+  content: "";
   position: absolute;
-  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  width: var(--decoration-size);
+  height: var(--decoration-size);
+  background-color: currentColor;
+  transition: 0.2s;
+  bottom: 0;
+}
+p .text::before {
+  bottom: -2px;
 }
 
-a.new-tab {
-  display: flex;
+:is(button, a).text:is(:hover, :focus-visible)::before {
+  width: 100%;
+  height: var(--line-width-thin);
 }
 
-a.new-tab svg.new-tab {
-  max-width: 20px;
-  fill: var(--color-tertiary);
-  position: relative;
-  top: 3px;
-  right: 4px;
-}
-
-a.text {
-  padding: 0.5em;
+:is(button, a).text:active::before {
+  width: 1.5em;
+  height: 1.5em;
+  opacity: 0.75;
 }
 
 a:has(.external-link) {

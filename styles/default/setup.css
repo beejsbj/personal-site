@@ -16,9 +16,13 @@ a {
 
 p a,
 li a {
-  display: inline;
+  display: inline-block;
   font-size: inherit;
-  text-decoration: underline;
+}
+
+p a.text {
+  padding: 0 !important;
+  /* white-space: nowrap; */
 }
 
 picture {
@@ -37,6 +41,7 @@ svg {
   display: block;
   width: 100%;
 }
+
 text-content {
   display: block;
 }
