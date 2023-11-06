@@ -1,7 +1,7 @@
 <home-section>
 
 	<h1 class="loud-voice">
-		my name is burooj
+		burooj here!
 	</h1>
 	<p>
 		hello world
