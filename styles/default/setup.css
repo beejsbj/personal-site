@@ -14,15 +14,10 @@ a {
   text-decoration: none;
 }
 
-p a,
-li a {
+:is(p, li) a.text {
   display: inline-block;
   font-size: inherit;
-}
-
-p a.text {
   padding: 0 !important;
-  /* white-space: nowrap; */
 }
 
 picture {

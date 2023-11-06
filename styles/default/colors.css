@@ -33,14 +33,12 @@ html {
   --highlight-darker: hsla(calc(var(--hue) + 27), 60%, 51%, 1);
   --highlight-darkest: hsla(calc(var(--hue) + 27), 60%, 41%, 1);
 
-  --color-tertiary: var(
-    --color-lighter
-  ); /*//also for italics*/
-	
-	  --success: hsla(calc(var(--hue) + 160), 85%, 50%, 1);
-	  --warning: hsla(calc(var(--hue) / var(--hue)), 85%, 50%, 1);
-	
-	  /* Gradients */
+  --color-tertiary: hsla(calc(var(--hue) + 217), 100%, 80%, 1);
+
+  --success: hsla(calc(var(--hue) + 160), 100%, 50%, 1);
+  --warning: hsla(calc(var(--hue) / var(--hue)), 100%, 50%, 1);
+
+  /* Gradients */
   --gradient-direction: 90deg;
 
   --gradient-dark: linear-gradient(

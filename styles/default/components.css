@@ -11,13 +11,14 @@ a {
 /*  */
 .button {
   padding: 0.5em 1em;
-  background-color: var(--highlight);
+  background: var(--highlight);
   color: var(--color);
 }
 
 .button:is(:hover, :focus-visible) {
   color: var(--highlight);
-  background-color: var(--color-light);
+  background: var(--color-light);
+  scale: 1.1;
 }
 
 .button:active {
@@ -45,7 +46,7 @@ a {
 /*  */
 
 .button.bubble {
-  background-color: var(--highlight);
+  background: var(--highlight);
   aspect-ratio: 1/1;
   border-radius: 50%;
   padding: 1.5em;
@@ -53,11 +54,13 @@ a {
 
   display: grid;
   place-items: center;
+
+  box-shadow: -1vmin 1vmin 2vmin rgba(0, 0, 0, 0.25);
 }
 
 .button.bubble:is(:hover, :focus-visible) {
   color: var(--highlight);
-  background-color: var(--color-light);
+  background: var(--color-light);
 }
 
 .button.bubble:active {
@@ -66,22 +69,29 @@ a {
 
 /*  */
 .button.icon {
-  background-color: var(--paper);
-
-  border: var(--line-width-thin) solid var(--highlight);
+  background: var(--color);
 
   aspect-ratio: 1 / 1;
   border-radius: 50%;
 
-  /* padding: 0.75em; */
+  padding: 0.5em;
   position: relative;
 
   display: grid;
   place-items: center;
+  max-width: 2rem;
+}
+
+.button.icon picture {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+}
+
+.button.icon picture img {
+  object-fit: contain;
 }
 
 .button.icon:is(:hover, :focus-visible) {
-  border-color: var(--color);
 }
 
 .button.icon:active {
@@ -116,7 +126,7 @@ a {
   transform: translateX(-50%);
   width: var(--decoration-size);
   height: var(--decoration-size);
-  background-color: currentColor;
+  background: currentColor;
   transition: 0.2s;
   bottom: 0;
 }
