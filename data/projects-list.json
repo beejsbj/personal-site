@@ -29,11 +29,13 @@
           {
             "id": "live",
             "name": "Garden",
+            "class": "magnetic button bubble",
             "slug": "?page=garden"
           },
           {
             "id": "live",
             "name": "Style Guide",
+            "class": "magnetic button bubble",
             "slug": "?page=style-guide"
           }
         ]
@@ -102,18 +104,21 @@
           {
             "id": "live",
             "name": "See Live",
+            "class": "magnetic button bubble",
             "slug": "https://quantumon.xyz/",
             "target": "live"
           },
           {
             "id": "github",
             "name": "Github",
+            "class": "magnetic button bubble",
             "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
             "target": "github"
           },
           {
             "id": "article",
             "name": "Read...",
+            "class": "magnetic button bubble",
             "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
             "target": "article"
           }
@@ -228,17 +233,20 @@
           {
             "id": "live",
             "name": "Live Link",
+            "class": "magnetic button bubble",
             "slug": "?page=e4p"
           },
           {
             "id": "github",
             "name": "Github",
+            "class": "magnetic button bubble",
             "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/e4p",
             "target": "github"
           },
           {
             "id": "article",
             "name": "Read...",
+            "class": "magnetic button bubble",
             "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
             "target": "article"
           }
@@ -309,24 +317,28 @@
           {
             "id": "Demo",
             "name": " Demo",
+            "class": "magnetic button bubble",
             "slug": "https://demo-lottery.netlify.app/",
             "target": "Demo"
           },
           {
             "id": "live",
             "name": " Live",
+            "class": "magnetic button bubble",
             "slug": "https://qrng-lottery.netlify.app/",
             "target": "live"
           },
           {
             "id": "github",
             "name": "Github",
+            "class": "magnetic button bubble",
             "slug": "",
             "target": "github"
           },
           {
             "id": "article",
             "name": "Read...",
+            "class": "magnetic button bubble",
             "slug": "https://github.com/beejsbj/qrng-lottery",
             "target": "article"
           },
@@ -334,6 +346,7 @@
           {
             "id": "Old",
             "name": " Old",
+            "class": "magnetic button bubble",
             "slug": "https://api3-lottery-old.netlify.app/",
             "target": "Old"
           }
@@ -452,24 +465,28 @@
           {
             "id": "Demo",
             "name": " Demo",
+            "class": "magnetic button bubble",
             "slug": "https://demo-roulette-api3.netlify.app",
             "target": "Demo"
           },
           {
             "id": "live",
             "name": " Live",
+            "class": "magnetic button bubble",
             "slug": "https://qrng-roulette.netlify.app/",
             "target": "live"
           },
           {
             "id": "github",
             "name": "Github",
+            "class": "magnetic button bubble",
             "slug": "",
             "target": "github"
           },
           {
             "id": "article",
             "name": "Read...",
+            "class": "magnetic button bubble",
             "slug": "https://github.com/beejsbj/qrng-roulette",
             "target": "article"
           },
@@ -477,6 +494,7 @@
           {
             "id": "Old",
             "name": " Old",
+            "class": "magnetic button bubble",
             "slug": "https://api3-roulette-old.netlify.app/",
             "target": "Old"
           }
@@ -589,18 +607,21 @@
           {
             "id": "live",
             "name": "Live Link",
+            "class": "magnetic button bubble",
             "slug": "projects/flashcards",
             "target": "live"
           },
           {
             "id": "github",
             "name": "Github",
+            "class": "magnetic button bubble",
             "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
             "target": "github"
           },
           {
             "id": "article",
             "name": "Read...",
+            "class": "magnetic button bubble",
             "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
             "target": "article"
           }
@@ -670,6 +691,7 @@
           {
             "id": "live",
             "name": "Live Link",
+            "class": "magnetic button bubble",
             "slug": "https://ecosystem.api3.org/",
             "target": "live"
           }
@@ -738,18 +760,21 @@
             "id": "live",
             "name": "Live Link",
             "slug": "projects/theme-challenge",
+            "class": "magnetic button bubble",
             "target": "live"
           },
           {
             "id": "github",
             "name": "Github",
             "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
+            "class": "magnetic button bubble",
             "target": "github"
           },
           {
             "id": "article",
             "name": "Read...",
             "slug": "https://buroojs.substack.com/p/theme-challenge",
+            "class": "magnetic button bubble",
             "target": "article"
           }
         ]
