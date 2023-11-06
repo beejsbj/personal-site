@@ -11,6 +11,9 @@
       "paragraphs": {
         "and I make places on the web, woo!": "calm-voice"
       }
+    },
+    {
+      "module": "home-section-1"
     }
   ]
 }
