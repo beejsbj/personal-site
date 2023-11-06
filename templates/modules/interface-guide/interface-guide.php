@@ -16,6 +16,7 @@ $buttons = [
 	[
 		'name' => '✅',
 		'class' => 'button icon',
+		'image' => 'skull1.jpg',
 	],
 	[
 		'name' => 'Text Link',
@@ -43,7 +44,15 @@ $buttons = [
 		<?php foreach ($buttons as $button) { ?>
 			<li>
 				<button class="<?= $button['class'] ?>">
-					<?= $button['name'] ?>
+					<?php if (isset($button['image'])) { ?>
+						<picture>
+							<img src="images/<?= $button['image'] ?>" alt="">
+						</picture>
+
+					<?php } else { ?>
+
+						<?= $button['name'] ?>
+					<?php } ?>
 				</button>
 			</li>
 		<?php } ?>

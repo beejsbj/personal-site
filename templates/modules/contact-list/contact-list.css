@@ -1,6 +1,7 @@
 contact-list {
   display: grid;
   gap: var(--space-m);
+  justify-items: start;
 }
 
 contact-list ul {

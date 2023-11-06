@@ -14,8 +14,14 @@ if (!exExists($exerciseSlug)) {
 } else {
 ?>
 	<exercise-detail>
+		<a class="button icon" href="?page=e4p">
+
+			<picture class="back-icon">
+
+				<img src="images/icons/back.svg" alt="">
+			</picture>
+		</a>
 		<actions-component>
-			<a class="" href="?page=e4p"><span>BACK</span></a>
 			<toggle-switch class='radio-list horizontal'>
 				<radio-option>
 					<input type="radio" name="e4p-lang" value="php" id="option-php">

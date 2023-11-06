@@ -152,6 +152,7 @@ e4p-chapter aside p {
     /*top: 0px;*/
     left: initial;
     right: 0px;
+    /* #fixme */
   }
 
   e4p-chapter::after,

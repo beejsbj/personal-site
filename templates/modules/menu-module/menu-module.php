@@ -16,7 +16,7 @@ if (file_exists("data/components/$menu-menu.json")) {
 
 		<?php foreach ($menuData as $menuItem) {
 
-			$class = $menuItem['class'] ?? "";
+			$class = $menuItem['class'] ?? "text";
 			$slug = $menuItem['slug'];
 			$name = $menuItem['name'];
 			$target = $menuItem['target'] ?? NULL;
@@ -43,7 +43,7 @@ if (file_exists("data/components/$menu-menu.json")) {
 			}
 		?>
 			<li>
-				<a class="<?= $class ?> button bubble" href="<?= $slug ?>" target="<?= $target ?>">
+				<a class="<?= $class ?> " href="<?= $slug ?>" target="<?= $target ?>">
 					<span><?= $name ?></span>
 					<picture class="external-link <?= $target == NULL ? 'hide' : '' ?>">
 						<img src="images/diagonal-arrow.svg" alt="">

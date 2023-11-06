@@ -12,8 +12,8 @@ exercise-detail actions-component .php-js-heading {
   position: absolute;
   top: 50%;
   left: 0;
-  transform: translateY(-50%);
-  opacity: 0.2;
+  transform: translateY(-60%);
+  opacity: 0.3;
   pointer-events: none;
   text-transform: uppercase;
 }
@@ -37,15 +37,15 @@ exercise-form {
 @media (min-width: 500px) {
   exercise-detail {
     grid-column: 2 / end;
-    grid-template-columns: 1fr 1fr;
+    /* grid-template-columns: 1fr 1fr; */
   }
 
   exercise-detail exercise-form {
-    grid-column: span 2;
+    /* grid-column: span 2; */
   }
 
   exercise-detail h2 {
-    grid-column: 1 / end;
+    /* grid-column: 1 / end; */
   }
 }
 

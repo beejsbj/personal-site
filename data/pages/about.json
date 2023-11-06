@@ -73,13 +73,6 @@
           "caption": ""
         }
       ]
-    },
-    {
-      "module": "contact-list",
-      "heading": "Find more of me below:",
-      "heading-class": "attention-voice",
-      "paragraphs": { "": "hide" },
-      "menu": "contact"
     }
   ]
 }

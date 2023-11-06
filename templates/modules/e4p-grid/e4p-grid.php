@@ -49,7 +49,7 @@ $sectionHeading = $section['heading'] ?? "This is the E4P module";
 					}
 				?>
 					<li>
-						<a href="<?= $exSlug ?>">
+						<a class="text" href="<?= $exSlug ?>">
 							<?= $exName ?>
 						</a>
 						<p>
