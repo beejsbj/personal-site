@@ -28,13 +28,12 @@ if (isset($_GET['project'])) {
 <html lang='en' class='special-magic no-js <?= "$currentPage-page" ?> <?= $pageData['id'] ?> <?= "$currentTheme-theme" ?>'>
 
 <head>
-	<base href="<?= $__dirname ?>/">
 	<meta charset='utf-8'>
 	<meta name='viewport' content='width=device-width, initial-scale=1'>
 	<title><?= $pageData['title'] ?></title>
 	<meta name="description" content="<?= $pageData['description'] ?>">
 	<meta property="og:image" content="<?= $pageData['image'] ?>">
-	<link rel='stylesheet' href='/styles/<?= $currentTheme ?>/site.css'>
+	<link rel='stylesheet' href='styles/<?= $currentTheme ?>/site.css'>
 
 	<link rel="icon" href="images/circle.svg" />
 
