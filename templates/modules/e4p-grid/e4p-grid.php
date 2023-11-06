@@ -31,33 +31,34 @@ $sectionHeading = $section['heading'] ?? "This is the E4P module";
 			<aside>
 				<p class="whisper-voice"></p>
 			</aside>
+			<nav>
+				<ul>
+					<?php
+					foreach ($chapterExercises as $i) {
+						$exercise = getExercise($i);
+						$exNumber = $exercise['number'];
+						$exName = $exercise['name'];
+						$exDesc = $exercise['description'];
+						// $exSlug = $exercise['slug'] ?? "e4p/$exNumber"; //pretty
+						$exSlug = $exercise['slug'] ?? "?page=exercise-detail&exercise=$exNumber"; //ugly
 
-			<ul>
-				<?php
-				foreach ($chapterExercises as $i) {
-					$exercise = getExercise($i);
-					$exNumber = $exercise['number'];
-					$exName = $exercise['name'];
-					$exDesc = $exercise['description'];
-					// $exSlug = $exercise['slug'] ?? "e4p/$exNumber"; //pretty
-					$exSlug = $exercise['slug'] ?? "?page=exercise-detail&exercise=$exNumber"; //ugly
+						$exFileName = "$exNumber-" . getKebabCase($exName);
 
-					$exFileName = "$exNumber-" . getKebabCase($exName);
-
-					if (!exExists($exFileName) && !isset($exercise['slug'])) {
-						continue;
-					}
-				?>
-					<li>
-						<a class="text" href="<?= $exSlug ?>">
-							<?= $exName ?>
-						</a>
-						<p>
-							<?= $exDesc ?>
-						</p>
-					</li>
-				<?php } ?>
-			</ul>
+						if (!exExists($exFileName) && !isset($exercise['slug'])) {
+							continue;
+						}
+					?>
+						<li>
+							<a class="text" href="<?= $exSlug ?>">
+								<?= $exName ?>
+							</a>
+							<p>
+								<?= $exDesc ?>
+							</p>
+						</li>
+					<?php } ?>
+				</ul>
+			</nav>
 			<picture>
 				<?php
 				include "images/e4p-chapter-svgs/$chapterSvg"

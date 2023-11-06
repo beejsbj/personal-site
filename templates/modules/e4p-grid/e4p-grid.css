@@ -56,11 +56,13 @@ e4p-chapter ul {
   display: grid;
   gap: var(--space-2xs);
   transition: 0.2s;
+  justify-items: start;
 }
 
 e4p-chapter ul li {
   position: relative;
   left: var(--space-2xs);
+  padding: 0 !important;
 }
 
 e4p-chapter ul li p {
@@ -123,7 +125,7 @@ e4p-chapter aside p {
     grid-column: 8 / -1;
   }
 
-  e4p-chapter ul {
+  e4p-chapter nav {
     order: 3;
     grid-column: 2 / span 6;
     justify-content: space-between;
@@ -147,9 +149,6 @@ e4p-chapter aside p {
   }
 
   e4p-chapter a {
-    /*display: none;*/
-    bottom: 50px;
-    /*top: 0px;*/
     left: initial;
     right: 0px;
     /* #fixme */
@@ -172,14 +171,14 @@ e4p-chapter aside p {
 
   e4p-chapter ul {
     position: relative;
-    left: 10px;
+    left: calc(var(--space-2xs));
   }
 
   e4p-chapter ul::after {
     position: absolute;
     content: "";
     background-color: var(--highlight);
-    left: -10px;
+    left: calc(var(--space-2xs) * -1);
     top: 0;
     height: 100%;
     width: 5px;
@@ -214,7 +213,7 @@ e4p-chapter aside p {
   e4p-chapter:nth-of-type(even) {
     grid-column: span 10 / -1;
   }
-  e4p-chapter :is(h1, .whisper-voice, ul) {
+  e4p-chapter :is(h1, .whisper-voice, nav) {
     grid-column: 3 / 10;
   }
   e4p-chapter aside {
