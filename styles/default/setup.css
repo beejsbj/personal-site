@@ -14,7 +14,7 @@ a {
   text-decoration: none;
 }
 
-:is(p, li) a.text {
+:is(p, li) :is(a, .text) {
   display: inline-block;
   font-size: inherit;
   padding: 0 !important;
