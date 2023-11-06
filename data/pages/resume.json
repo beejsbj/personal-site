@@ -45,7 +45,7 @@
           "place": "Perpetual Education",
           "dates": ["Oct 2021", "Aug 2023"],
           "duties": [
-            "Built a <a href='http://projects:8888/personal-site/?page=project&project=flashcards'> Flashcards</a> webapp to allow students to study from the Study Hall database",
+            "Built a <a class='text' href='http://projects:8888/personal-site/?page=project&project=flashcards'> Flashcards</a> webapp to allow students to study from the Study Hall database",
             "Helped with taks like refactoring and #todo for the new Perpetual Education website"
           ]
         },
@@ -54,9 +54,9 @@
           "place": "API3",
           "dates": ["Aug 2022", "Aug 2023"],
           "duties": [
-            "Built a brochure welcome site for <a href='http://projects:8888/personal-site/?page=project&project=quantumon'> Quantumon</a>  with HTML and CSS",
-            "Designed and Developed a <a href='http://projects:8888/personal-site/?page=project&project=lottery'> Lottery</a> and <a href='http://projects:8888/personal-site/?page=project&project=roulette'> Roulette</a>  interactive app using JS, HTML, CSS and React and connected it to the Ethereum Blockchain",
-            "Adapted the design of the main API3 site to develop the <a href='http://projects:8888/personal-site/?page=project&project=api3-ecosystem'> API3 Ecosystem</a>  website, where Developers can showcase their dApps"
+            "Built a brochure welcome site for <a class='text' href='http://projects:8888/personal-site/?page=project&project=quantumon'> Quantumon</a>  with HTML and CSS",
+            "Designed and Developed a <a class='text' href='http://projects:8888/personal-site/?page=project&project=lottery'> Lottery</a> and <a class='text' href='http://projects:8888/personal-site/?page=project&project=roulette'> Roulette</a>  interactive app using JS, HTML, CSS and React and connected it to the Ethereum Blockchain",
+            "Adapted the design of the main API3 site to develop the <a class='text' href='http://projects:8888/personal-site/?page=project&project=api3-ecosystem'> API3 Ecosystem</a>  website, where Developers can showcase their dApps"
           ],
           "skills": ["HTML", "CSS", "Javascript", "React", "Nuxt3"],
           "specialNote": "Freelance Project Contract"
