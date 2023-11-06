@@ -23,15 +23,17 @@ $images = $section['images'] ?? [1, 2, 3];
 		display: grid;
 		place-items: center;
 		padding: var(--space-xl);
-
+		position: relative;
 
 	}
+
+
+	fan-images .card-group {}
 
 
 
 	fan-images :is(.card-group, .card) {
 		aspect-ratio: 1;
-
 	}
 
 	fan-images :is(.card-group,
@@ -42,9 +44,8 @@ $images = $section['images'] ?? [1, 2, 3];
 	fan-images .card-group {
 		position: relative;
 		transition: transform 400ms ease;
+		max-width: 70%;
 	}
-
-
 
 	fan-images .card {
 		background-color: rgba(255, 255, 255, 0.05);
@@ -67,8 +68,7 @@ $images = $section['images'] ?? [1, 2, 3];
 		transform: translate(-50%, -50%);
 		box-shadow: -1vmin 1vmin 2vmin rgba(0, 0, 0, 0.25);
 		pointer-events: none;
-
-
+		/* z-index: 5; */
 	}
 
 	fan-images .big-card:nth-child(2) {
@@ -111,43 +111,43 @@ $images = $section['images'] ?? [1, 2, 3];
 
 	}
 
-	fan-images .card-group:hover>.card {
+	fan-images .card-group>.card {
 		box-shadow: -2vmin 2vmin 3vmin rgba(0, 0, 0, 0.4);
 	}
 
-	fan-images .card-group:hover>.big-card:nth-child(2) {
+	fan-images .card-group>.big-card:nth-child(2) {
 		transform: translate(-75%, -16%) rotate(-24deg);
 	}
 
-	fan-images .card-group:hover>.big-card:nth-child(4) {
+	fan-images .card-group>.big-card:nth-child(4) {
 		transform: translate(-25%, 8%) rotate(-8deg);
 	}
 
-	fan-images .card-group:hover>.big-card:nth-child(6) {
+	fan-images .card-group>.big-card:nth-child(6) {
 		transform: translate(25%, -8%) rotate(8deg);
 	}
 
-	fan-images .card-group:hover>.big-card:nth-child(8) {
+	fan-images .card-group>.big-card:nth-child(8) {
 		transform: translate(75%, 16%) rotate(24deg);
 	}
 
-	fan-images .card-group:hover>.little-card:nth-child(1) {
-		transform: translate(200%, -200%) rotate(-15deg);
+	fan-images .card-group>.little-card:nth-child(1) {
+		transform: translate(200%, -150%) rotate(-15deg);
 
 	}
 
-	fan-images .card-group:hover>.little-card:nth-child(3) {
-		transform: translate(140%, 200%) rotate(15deg);
+	fan-images .card-group>.little-card:nth-child(3) {
+		transform: translate(0%, 120%) rotate(15deg);
 
 	}
 
-	fan-images .card-group:hover>.little-card:nth-child(5) {
-		transform: translate(-200%, -170%) rotate(15deg);
+	fan-images .card-group>.little-card:nth-child(5) {
+		transform: translate(-150%, -180%) rotate(15deg);
 
 	}
 
-	fan-images .card-group:hover>.little-card:nth-child(7) {
-		transform: translate(-280%, 140%) rotate(-15deg);
+	fan-images .card-group>.little-card:nth-child(7) {
+		transform: translate(-200%, 100%) rotate(-15deg);
 
 	}
 </style>
