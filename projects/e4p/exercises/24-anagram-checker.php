@@ -39,7 +39,7 @@ if (isset($_POST['submitted'])) {
 		<input id="string2-ID" type="text" class="text-number-input" class="text-number-input" required name="string2" placeholder="string2??" value="<?= $string2 ?>">
 		<label class="firm-voice" for="string2-ID">Enter the second string</label>
 	</div>
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 		Check
 	</button>
 	<output class="<?= $class ?>">

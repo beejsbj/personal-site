@@ -143,7 +143,7 @@ if (isset($_POST['submitted'])) {
 	</item-field>
 
 
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 		Checkout
 	</button>
 

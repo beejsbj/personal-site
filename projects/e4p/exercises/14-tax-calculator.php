@@ -55,7 +55,7 @@ if (isset($_POST["submitted"])) {
 		<input id="state-ID" type="text" class="text-number-input" required name="state" placeholder="state??" value="<?= $state ?>">
 		<label class="firm-voice" for="state-ID">What is the state?</label>
 	</div>
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 		Taxify
 	</button>
 	<output class="<?= $class ?>">

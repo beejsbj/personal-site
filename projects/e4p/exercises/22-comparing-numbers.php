@@ -32,7 +32,7 @@ if (isset($_POST['submitted'])) {
 		<label class="firm-voice" for="third-ID">Enter the third number</label>
 	</div>
 
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 		Compare
 	</button>
 

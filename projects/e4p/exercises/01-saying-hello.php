@@ -46,7 +46,7 @@ if (isset($_POST['submitted'])) {
 		<input id="nme" type="text" class="text-number-input" required required name="userName" placeholder="What is your name?">
 		<label class="firm-voice" for="nme">What is your name?</label>
 	</div>
-	<button type="submit" name="submitted"> Who? </button>
+	<button type="submit" class="button" name="submitted"> Who? </button>
 	<output class="<?= $class ?>">
 		<p><?= $output ?></p>
 	</output>

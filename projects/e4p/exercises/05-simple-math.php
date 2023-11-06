@@ -119,7 +119,7 @@ if (isset($_POST['submitted'])) {
 	</div>
 
 
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 		<sub>+</sub><sup>-</sup>Mathify!<sup>×</sup><sub>÷</sub>
 	</button>
 

@@ -60,7 +60,7 @@
  		<input id="county-ID" type="text" class="text-number-input" required name="county" placeholder="county??" value="<?= $county ?>">
  		<label class="firm-voice" for="county-ID">if WI, enter county?</label>
  	</div>
- 	<button type="submit" name="submitted">
+ 	<button type="submit" class="button" name="submitted">
  		Taxify
  	</button>
  	<output class="<?= $class ?>">

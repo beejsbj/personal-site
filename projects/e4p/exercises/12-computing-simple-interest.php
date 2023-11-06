@@ -73,7 +73,7 @@ if (isset($_POST['submitted'])) {
 		<input id="time-ID" type="number" class="text-number-input" required name="time" placeholder="time?" value="<?= $time ?>" min="1" step="1">
 		<label class="firm-voice" for="time-ID">Enter the number of years</label>
 	</div>
-	<button type="submit" name="submitted"> Compute </button>
+	<button type="submit" class="button" name="submitted"> Compute </button>
 	<output class="<?= $class ?>">
 		<p><?= $output ?></p>
 	</output>

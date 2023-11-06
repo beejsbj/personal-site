@@ -67,7 +67,7 @@ if (isset($_POST['submitted'])) {
 		<input id="rate-fromID" type="number" class="text-number-input" required name="rateFrom" placeholder="Euros?" min="0.000001" step="0.000001">
 		<label class="firm-voice" for="rate-fromID">What is the exchange rate?</label>
 	</div>
-	<button type="submit" name="submitted"> Convert </button>
+	<button type="submit" class="button" name="submitted"> Convert </button>
 	<output class="<?= $class ?>">
 		<p><?= $output ?></p>
 	</output>

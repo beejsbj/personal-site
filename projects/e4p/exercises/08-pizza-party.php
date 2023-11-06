@@ -69,7 +69,7 @@ if (isset($_POST["submitted"])) {
 		<input id="slices" type="number" class="text-number-input" required name="slicesPerPizza" placeholder="How many slices?" value="<?= $slicesPerPizza ?>">
 		<label class="firm-voice" for="slices">How many slices does each pizza have?</label>
 	</div>
-	<button type="submit" name="submitted"> Slice! </button>
+	<button type="submit" class="button" name="submitted"> Slice! </button>
 	<output class="<?= $class ?>">
 		<p><?= $output ?></p>
 	</output>

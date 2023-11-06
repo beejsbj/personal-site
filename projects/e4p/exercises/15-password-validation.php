@@ -66,7 +66,7 @@ if (
 	</div>
 
 
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 		Validate
 	</button>
 

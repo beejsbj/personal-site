@@ -64,7 +64,7 @@ if (isset($_POST['submitted'])) {
 	</div>
 
 
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 		Print
 	</button>
 

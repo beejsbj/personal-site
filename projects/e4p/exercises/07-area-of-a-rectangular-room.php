@@ -112,11 +112,11 @@ if (isset($_POST['submitted'])) {
 	<div class="input-field radio-list horizontal">
 		<div class="input-field">
 			<input id="ifeet" type="radio" name="unitChoice" value="feet" checked>
-			<label  for="ifeet">feet</label>
+			<label for="ifeet">feet</label>
 		</div>
 		<div class="input-field">
 			<input id="imeter" type="radio" name="unitChoice" value="meter">
-			<label  for="imeter">meter</label>
+			<label for="imeter">meter</label>
 		</div>
 	</div>
 	<div class="input-field">
@@ -127,7 +127,7 @@ if (isset($_POST['submitted'])) {
 		<input id="width" type="number" class="text-number-input" required name="width" placeholder="width??" value="<?= $width ?>" step="0.01" min="1">
 		<label class="firm-voice" for="width"> What is the width of the room?</label>
 	</div>
-	<button type="submit" name="submitted"> Calculate </button>
+	<button type="submit" class="button" name="submitted"> Calculate </button>
 	<output class="<?= $class ?>">
 		<p><?= $output ?></p>
 	</output>

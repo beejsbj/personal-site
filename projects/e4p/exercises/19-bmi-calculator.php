@@ -56,7 +56,7 @@ if (
 		<label class="firm-voice" for="weight-ID"> Weight: <span></span>
 		</label>
 	</div>
-	<button type="submit" name="submitted"> BMIBMI </button>
+	<button type="submit" class="button" name="submitted"> BMIBMI </button>
 	<output class="<?= $class ?>">
 		<p><?= $output ?></p>
 	</output>

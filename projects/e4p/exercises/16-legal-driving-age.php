@@ -66,7 +66,7 @@ if (isset($_POST["submitted"]) && isset($_POST["age"]) && $_POST["age"] != "") {
 		<input id="age-ID" type="number" class="text-number-input" required name="age" placeholder="aGe??!!?" min="1" step="1" value="<?= $age ?>">
 		<label class="firm-voice" for="age-ID">What is your age?</label>
 	</div>
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 		Legalize
 	</button>
 	<output class="<?= $class ?>">

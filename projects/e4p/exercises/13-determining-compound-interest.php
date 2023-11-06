@@ -81,7 +81,7 @@ if (isset($_POST['submitted'])) {
 		<input id="number-ID" type="number" class="text-number-input" required name="number" placeholder="Compound number?" value="<?= $number ?>" min="1" step="1">
 		<label class="firm-voice" for="number-ID">Times interest is compounded per year?</label>
 	</div>
-	<button type="submit" name="submitted"> Determine </button>
+	<button type="submit" class="button" name="submitted"> Determine </button>
 	<output class="<?= $class ?>">
 		<p><?= $output ?></p>
 	</output>

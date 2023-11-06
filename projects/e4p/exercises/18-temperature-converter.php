@@ -75,7 +75,7 @@ if (
 		<label class="firm-voice" for="temperature-ID">temperature in selected unit?</label>
 	</div>
 
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 		Convert
 	</button>
 	<output class="<?= $class ?>">

@@ -13,7 +13,7 @@ if (isset($_POST['submitted'])) {
 		<input id="input1-ID" type="text" class="text-number-input" class="text-number-input" required name="input1" placeholder="input1??" value="<?= $input1 ?>">
 		<label class="firm-voice" for="input1-ID"></label>
 	</div>
-	<button type="submit" name="submitted">
+	<button type="submit" class="button" name="submitted">
 	</button>
 	<output class="<?= $class ?>">
 		<p><?= $output ?></p>
