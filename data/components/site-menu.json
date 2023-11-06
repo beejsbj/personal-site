@@ -2,28 +2,28 @@
   {
     "id": "site0",
     "activePage": "home",
-    "class": "magnetic",
+    "class": "magnetic button bubble",
     "name": "Home",
     "slug": "home"
   },
   {
     "id": "site1",
     "activePage": "about",
-    "class": "magnetic",
+    "class": "magnetic button bubble",
     "name": "About",
     "slug": "about"
   },
   {
     "id": "site2",
     "activePage": "projects",
-    "class": "magnetic",
+    "class": "magnetic button bubble",
     "name": "Projects",
     "slug": "projects"
   },
   {
     "id": "site3",
     "activePage": "style-guide",
-    "class": "magnetic",
+    "class": "magnetic button bubble",
     "name": "Style Guide",
     "slug": "style-guide"
   },
