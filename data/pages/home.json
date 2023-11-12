@@ -3,13 +3,14 @@
   "title": "Welcome",
   "image": "",
   "description": "",
-  "heading": "Hey there!",
+  "heading": "Hello",
 
   "sections": [
     {
-      "heading": "My name is Burooj",
+      "heading": "Burooj Here!",
+      "heading-class": "loud-voice",
       "paragraphs": {
-        "and I make places on the web, woo!": "calm-voice"
+        "and I make places on the web, woo!": "loud-voice"
       }
     },
     {
