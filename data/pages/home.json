@@ -7,14 +7,10 @@
 
   "sections": [
     {
-      "heading": "Burooj Here!",
-      "heading-class": "loud-voice",
-      "paragraphs": {
-        "and I make places on the web, woo!": "loud-voice"
-      }
+      "module": "home-section-1"
     },
     {
-      "module": "home-section-1"
+      "module": "home-section-2"
     }
   ]
 }

@@ -143,3 +143,20 @@ footer {
     grid-column: 2 / 10;
   }
 }
+
+/* home */
+home-section {
+  position: relative;
+  min-height: 80vmin;
+  align-content: start;
+  gap: var(--space-xl);
+  text-align: center;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+home-section > * {
+  grid-column: 1/-1;
+}

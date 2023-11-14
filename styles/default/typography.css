@@ -34,8 +34,8 @@ html {
   line-height: 1.1;
 }
 @media (min-width: 750px) {
-  .booming-voice {
-    /* font-size: var(--step-7); */
+  .home .booming-voice {
+    /* font-size: var(--step-5); */
   }
 }
 
