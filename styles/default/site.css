@@ -147,10 +147,9 @@ footer {
 /* home */
 home-section {
   position: relative;
-  min-height: 80vmin;
+  /* min-height: 80vmin; */
   align-content: start;
-  gap: var(--space-xl);
-  text-align: center;
+  gap: var(--space-s);
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(12, 1fr);

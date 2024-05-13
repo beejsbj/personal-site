@@ -1,14 +1,12 @@
 <home-section class="one">
 
 	<h1 class="booming-voice">
-		Hello
+		Hey There!
 	</h1>
 
-	<h2 class="booming-voice">
-		<picture>
-			<img src="images/burooj1.jpg" alt="">
-		</picture>
-		<span>Burooj here!</span>
+	<h2 class="loud-voice">
+
+		<strong>Burooj here!</strong>
 	</h2>
 
 	<div class="dev-signer">
@@ -45,7 +43,6 @@
 	}
 
 	home-section.one h1 {
-		grid-column: 1/8;
 		font-size: var(--step-6);
 	}
 
@@ -53,17 +50,8 @@
 
 
 
-	home-section.one h2 {
-		grid-column: 2/-1;
-		display: grid;
-		grid-template-columns: 0.3fr 1fr;
-		align-items: center;
-		gap: var(--space-s);
-	}
 
-	home-section.one h2 picture {
-		border-radius: 50%;
-	}
+
 
 
 
@@ -84,22 +72,5 @@
 		font-size: var(--step-4);
 		font-weight: 700;
 
-	}
-
-	home-section.one graphic-diptych {
-		display: grid;
-		grid-template-columns: 1fr 0.8fr;
-	}
-
-	home-section.one .arrow {
-		border-radius: 50%;
-		position: absolute;
-		grid-row: 3;
-		grid-column: 10;
-		bottom: -30%;
-
-		@media (max-width: 768px) {
-			display: none;
-		}
 	}
 </style>

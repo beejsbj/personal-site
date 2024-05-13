@@ -10,15 +10,21 @@ a {
 
 /*  */
 .button {
-  padding: 0.5em 1em;
+  padding: 1em;
+  /* aspect-ratio: 1/1; */
+  width: 20%;
+  border-radius: 25%;
   background: var(--highlight);
   color: var(--color);
+  transition: 0.2s;
 }
 
 .button:is(:hover, :focus-visible) {
   color: var(--highlight);
   background: var(--color-light);
   scale: 1.1;
+  width: unset;
+  /* aspect-ratio: unset; */
 }
 
 .button:active {
@@ -49,6 +55,7 @@ a {
   background: var(--highlight);
   aspect-ratio: 1/1;
   border-radius: 50%;
+  width: unset;
   padding: 1.5em;
   position: relative;
 

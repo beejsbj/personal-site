@@ -10,9 +10,7 @@
     {
       "module": "home-section-1"
     },
-    {
-      "module": "home-section-2"
-    },
+
     {
       "module": "generic-text",
       "heading": "My Portfolio",
@@ -36,11 +34,6 @@
     {
       "module": "projects-grid",
       "heading": "grid of Projects"
-    },
-    {
-      "module": "generic-text",
-      "heading": "A blurb about me…",
-      "heading-class": "loud-voice"
     },
     {
       "module": "about-module",
@@ -105,6 +98,9 @@
           "caption": ""
         }
       ]
+    },
+    {
+      "module": "home-section-2"
     }
   ]
 }
