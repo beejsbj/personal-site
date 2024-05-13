@@ -30,7 +30,7 @@ body {
 }
 
 .hide {
-  display: none;
+  display: none !important;
 }
 .hide-opacity {
   opacity: 0;

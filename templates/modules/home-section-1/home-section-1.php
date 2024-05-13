@@ -11,9 +11,11 @@
 		<span>Burooj here!</span>
 	</h2>
 
-	<p class="notice-voice">
-		{Web Dev/Signer}
-	</p>
+	<div class="dev-signer">
+		<span class="brace">{</span>
+		<span class="notice-voice">Web Dev/signer</span>
+		<span class="brace">}</span>
+	</div>
 
 
 	<picture class="arrow">
@@ -54,7 +56,7 @@
 	home-section.one h2 {
 		grid-column: 2/-1;
 		display: grid;
-		grid-template-columns: 0.2fr 1fr;
+		grid-template-columns: 0.3fr 1fr;
 		align-items: center;
 		gap: var(--space-s);
 	}
@@ -63,9 +65,25 @@
 		border-radius: 50%;
 	}
 
-	home-section.one p {
-		font-size: var(--step-2);
+
+
+
+	.dev-signer {
 		grid-column: 1/5;
+
+		display: flex;
+		align-items: center;
+		gap: var(--space-2xs);
+		font-family: var(--font1);
+		font-size: var(--step-2);
+	}
+
+	.dev-signer .brace {
+
+		color: var(--color);
+		font-size: var(--step-4);
+		font-weight: 700;
+
 	}
 
 	home-section.one graphic-diptych {

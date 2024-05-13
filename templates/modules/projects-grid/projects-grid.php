@@ -1,12 +1,11 @@
 <?php
 $sectionHeading = $section['heading'] ?? "This is the Projects module";
+$projectCount = $section['count'] ?? 100;
 $projects = getProjects();
 $currentPage = currentPage();
 
 
-if ($currentPage != 'projects') {
-	$projects = projectFilter($projects, 'feature');
-}
+
 
 if (isset($_GET['tags'])) {
 	if ($_GET['tags'] == 'api3') {
@@ -20,7 +19,10 @@ if (isset($_GET['tags'])) {
 
 <projects-grid>
 	<?php
-	foreach ($projects as $project) {
+	foreach ($projects as $index => $project) {
+		if ($index >= $projectCount) {
+			break;
+		}
 		$heading = $project['heading']  ?? "Project Title";
 		$date = $project['date'] ?? "2022-06";
 		$id = $project['id'] ?? "garden";
@@ -32,6 +34,7 @@ if (isset($_GET['tags'])) {
 		$url = $project['url'] ?? "?page=project&project=$id"; //ugly
 
 		$tools = $project['tools'] ?? "['HTML', 'CSS']"; ?>
+
 
 		<project-card>
 			<h2 class="attention-voice heading">

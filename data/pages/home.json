@@ -1,5 +1,6 @@
 {
   "id": "home",
+  "_id": { "$oid": "661dace8fdefeea57b3f7ef1" },
   "title": "Welcome",
   "image": "",
   "description": "",
@@ -11,6 +12,99 @@
     },
     {
       "module": "home-section-2"
+    },
+    {
+      "module": "generic-text",
+      "heading": "My Portfolio",
+      "heading-class": "loud-voice",
+
+      "paragraphs": [
+        {
+          "voice": "notice-voice",
+          "text": "Here, you'll find a collection of my recent web development projects, each one demonstrating my skills in design, programming, and problem-solving. "
+        },
+        {
+          "voice": "notice-voice",
+          "text": "From creating responsive and user-friendly websites to building complex web applications, I take pride in my attention to detail for the projects I work on."
+        },
+        {
+          "voice": "notice-voice",
+          "text": "Please take some time to explore my portfolio and see the diverse range of projects I have worked on. I hope you enjoy seeing my passion for web development shine through in each project."
+        }
+      ]
+    },
+    {
+      "module": "projects-grid",
+      "heading": "grid of Projects"
+    },
+    {
+      "module": "generic-text",
+      "heading": "A blurb about me…",
+      "heading-class": "loud-voice"
+    },
+    {
+      "module": "about-module",
+
+      "paragraphs": [
+        {
+          "voice": "calm-voice",
+          "text": "Crafting an engaging <em>About Me</em> section is never easy, but let me give it a shot. My journey into web development began last year when I joined a remote program at Perpetual Education. Since then, I've discovered a passion for creating functional, beautiful, and engaging websites that captivate audiences and tell a story."
+        },
+        {
+          "voice": "calm-voice",
+          "text": "As a computer science and psychology student, I'm fascinated by the intersection of cognitive science and storytelling in web development. Understanding how people think, process information, and make decisions is essential to creating websites that resonate with users and drive meaningful engagement."
+        },
+        {
+          "voice": "calm-voice",
+          "text": "In my free time, I enjoy gaming, and I see coding as just another form of gaming - one that pays! Thoughtfully designing interfaces that create a truly immersive experience is essential to both gaming and web development."
+        },
+        {
+          "voice": "calm-voice",
+          "text": "Whether you're seeking a sleek, modern website that tells a compelling story or need help optimizing an existing one, I'm excited to collaborate with you. As someone who's still new to web development, I recognize that I have much to learn. However, I'm eager to continue honing my skills and creating websites that captivate audiences. Let's work together to create something truly special that not only captures your vision but also delights your audience."
+        }
+      ],
+      "images": [
+        {
+          "slug": "burooj1.jpg",
+          "name": "",
+          "caption": ""
+        },
+        {
+          "slug": "burooj2.jpg",
+          "name": "",
+          "caption": ""
+        },
+        {
+          "slug": "burooj3.jpg",
+          "name": "",
+          "caption": ""
+        },
+        {
+          "slug": "burooj4.jpg",
+          "name": "",
+          "caption": ""
+        },
+        {
+          "slug": "burooj5.jpg",
+          "name": "",
+          "caption": ""
+        },
+        {
+          "slug": "burooj6.jpg",
+          "name": "",
+          "caption": ""
+        },
+        {
+          "slug": "burooj7.jpg",
+          "name": "",
+          "caption": ""
+        },
+        {
+          "slug": "burooj8.jpg",
+          "name": "",
+          "caption": ""
+        }
+      ]
     }
   ]
 }
