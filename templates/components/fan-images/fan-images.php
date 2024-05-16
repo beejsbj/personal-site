@@ -57,12 +57,12 @@ $images = $section['images'] ?? [1, 2, 3];
 	}
 
 	fan-images .big-card {
-		border-radius: 50%;
+		/* border-radius: 50%; */
 	}
 
 	fan-images .little-card {
 		width: 12vmin;
-		border-radius: 50%;
+		/* border-radius: 50%; */
 		left: 50%;
 		top: 50%;
 		transform: translate(-50%, -50%);

@@ -6,6 +6,12 @@
 @import "../../templates/modules/multi-menus/multi-menus.css";
 @import "../../templates/modules/menu-module/menu-module.css";
 
+/*  */
+@import "../../templates/modules/home-section-1/home-section-1.css";
+@import "../../templates/modules/home-section-2/home-section-2.css";
+
+/*  */
+
 @import "../../templates/modules/projects-grid/projects-grid.css";
 @import "../../templates/modules/e4p-grid/e4p-grid.css";
 @import "../../templates/modules/exercise-detail/exercise-detail.css";

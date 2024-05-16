@@ -5,7 +5,7 @@ $pageHeading = $pageData['heading'] ?? 'NA';
 
 <header>
 
-	<div class="overflow-hidden">
+	<div class="overflodw-hidden">
 		<?php include('images/circle.svg'); ?>
 	</div>
 
@@ -14,6 +14,12 @@ $pageHeading = $pageData['heading'] ?? 'NA';
 			<?php
 			$menu = "site";
 			include('templates/modules/menu-module/menu-module.php');
+
+
+			$menu = "theme";
+			include('templates/modules/menu-module/menu-module.php');
+
+
 			?>
 		</inner-column>
 	</section>

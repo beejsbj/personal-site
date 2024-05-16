@@ -149,3 +149,7 @@ body {
   display: none;
   --content: "🗣";
 }
+
+home-section.two {
+  display: none;
+}

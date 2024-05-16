@@ -31,13 +31,13 @@
     "id": "site4",
     "activePage": "gaols",
     "class": "hide",
+
     "name": "/goals",
     "slug": "goals"
   },
   {
     "id": "site5",
     "activePage": "resume",
-    "class": "hide",
     "name": "/resume",
     "slug": "resume"
   }

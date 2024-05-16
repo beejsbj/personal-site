@@ -20,6 +20,7 @@ project-card {
   border: var(--border);
   position: relative;
   background-color: var(--paper);
+  border: 5px solid var(--ink);
 }
 @media (min-width: 450px) {
   project-card {

@@ -79,3 +79,7 @@ header .circle {
     /* position: fixed; */
   }
 }
+
+.theme-menu {
+  display: none;
+}

@@ -1,18 +1,18 @@
 <home-section class="one">
 
-	<h1 class="booming-voice">
-		Hey There!
+	<h1 class="loud-voice">
+		<strong>Hey There!</strong>
 	</h1>
 
-	<h2 class="loud-voice">
+	<h2 class="booming-voice">
 
-		<strong>Burooj here!</strong>
+		Burooj here!
 	</h2>
 
 	<div class="dev-signer">
-		<span class="brace">{</span>
-		<span class="notice-voice">Web Dev/signer</span>
-		<span class="brace">}</span>
+		<!-- <span class="brace">{</span> -->
+		<span class="">Web Dev/signer</span>
+		<!-- <span class="brace">}</span> -->
 	</div>
 
 
@@ -35,42 +35,3 @@
 
 
 </home-section>
-
-
-<style>
-	.home .page-title {
-		display: none;
-	}
-
-	home-section.one h1 {
-		font-size: var(--step-6);
-	}
-
-
-
-
-
-
-
-
-
-
-
-	.dev-signer {
-		grid-column: 1/5;
-
-		display: flex;
-		align-items: center;
-		gap: var(--space-2xs);
-		font-family: var(--font1);
-		font-size: var(--step-2);
-	}
-
-	.dev-signer .brace {
-
-		color: var(--color);
-		font-size: var(--step-4);
-		font-weight: 700;
-
-	}
-</style>
