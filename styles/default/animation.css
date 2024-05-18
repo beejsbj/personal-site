@@ -1,3 +1,25 @@
+/* swupanimation */
+
+html {
+  --origin-x: calc(var(--click-x, 0.5) * 100%);
+  --origin-y: calc(var(--click-y, 0.5) * 100%);
+}
+
+html.is-changing .transition-reveal {
+  transition: clip-path 1s cubic-bezier(0.5, 0, 0.15, 1),
+    mask-position 1s cubic-bezier(0.5, 0, 0.15, 1),
+    -webkit-mask-position 1s cubic-bezier(0.5, 0, 0.15, 1);
+  background: var(--highlight);
+}
+
+html.to-circle .transition-reveal {
+  clip-path: circle(75% at 50% 50%);
+}
+
+html.to-circle .transition-reveal.is-next-container {
+  clip-path: circle(0% at var(--origin-x) var(--origin-y));
+}
+
 @keyframes blob {
   0% {
     transform: rotate(0deg) skew(5deg);

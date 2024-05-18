@@ -2,13 +2,12 @@
 $menu = $section['menu'] ?? $menu ?? 'test';
 $class = $menu == 'site' || $menu == 'theme' ? "magnetic $menu" : $menu;
 
-$currentTheme = $_GET['theme'] ?? 'default';
 
 
 if (file_exists("data/components/$menu-menu.json")) {
 
 
-	if ($currentTheme == 'default') {
+	if (!$currentTheme) {
 		$menuJson = file_get_contents("data/components/theme-menu.json");
 	} else {
 		$menuJson = file_get_contents("data/components/$menu-menu.json");
@@ -33,7 +32,7 @@ if (file_exists("data/components/$menu-menu.json")) {
 
 			if ($menu == 'site') {
 
-				if ($currentTheme == 'default') {
+				if (!$currentTheme) {
 					$class = "$class " . activeTheme($menuItem['activePage']);
 					// $slug = currentPage() . "?theme=" . $menuItem['slug']; //pretty
 					$slug = "?theme=" . $menuItem['slug'] . "&page=" . currentPage(); //ugly
@@ -57,11 +56,15 @@ if (file_exists("data/components/$menu-menu.json")) {
 			}
 		?>
 			<li>
-				<a class="<?= $class ?> " href="<?= $slug ?>" target="<?= $target ?>">
+				<a class="<?= $class ?> " href="<?= $slug ?>" target="<?= $target ?>" data-swup-animation="circle">
 					<span><?= $name ?></span>
-					<picture class="external-link <?= $target == NULL ? 'hide' : '' ?>">
-						<img src="images/diagonal-arrow.svg" alt="">
-					</picture>
+
+
+					<?php if ($target != NULL) { ?>
+						<picture class="external-link">
+							<img src="images/diagonal-arrow.svg" alt="">
+						</picture>
+					<?php } ?>
 				</a>
 			</li>
 		<?php } ?>

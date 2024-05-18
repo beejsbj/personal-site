@@ -1,6 +1,5 @@
 export default function pageTransition() {
   //   return;
-  gsap.registerPlugin(MotionPathPlugin);
 
   barba.init({
     transitions: [

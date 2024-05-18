@@ -10,7 +10,7 @@
     "id": "theme1",
     "activePage": "pe-site",
     "class": "magnetic button bubble",
-    "name": "P<svg class='pe-circle' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' /></svg>E",
+    "name": "<span>P</span><svg class='pe-circle' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' /></svg><span>E</span>",
     "slug": "pe-site"
   }
 ]

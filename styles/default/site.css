@@ -25,8 +25,7 @@
 @import "animation.css";
 
 /* then other contextual styles */
-html {
-}
+
 body {
   background: var(--paper);
 
@@ -39,6 +38,10 @@ body {
 
 .hide-opacity {
   opacity: 0;
+}
+
+.site-menu {
+  /* display: none; */
 }
 
 .overflow-hidden {
@@ -56,11 +59,11 @@ body main {
   display: grid;
   /* gap: var(--space-l); */
 }
-html:is(.style-guide, .garden) main {
+body:is(.style-guide, .garden) main {
   display: block;
 }
 
-html.style-guide main > section + section {
+body.style-guide main > section + section {
   /* border-top: 0.0625rem solid black; */
   /* border-bottom: 0.0625rem solid black; */
 }

@@ -10,8 +10,8 @@ export default function scrollAnimation() {
     scrollTrigger: {
       trigger: "home-section.one",
       scrub: true,
-      start: "top top",
-      end: "bottom top",
+      start: "center 25%",
+      end: "bottom 25%",
       markers: true,
     },
     top: "1000px",

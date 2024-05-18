@@ -150,6 +150,6 @@ body {
   --content: "🗣";
 }
 
-home-section.two {
+.home-page main > *:not(.home-section-1) {
   display: none;
 }

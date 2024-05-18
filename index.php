@@ -25,7 +25,7 @@ if (isset($_GET['project'])) {
 ?>
 
 <!doctype html>
-<html lang='en' class='special-magic no-js <?= "$currentPage-page" ?> <?= $pageData['id'] ?> <?= "$currentTheme-theme" ?>'>
+<html lang='en' class='special-magic no-js'>
 
 <head>
 	<meta charset='utf-8'>
@@ -40,10 +40,10 @@ if (isset($_GET['project'])) {
 	<script defer type="module" src="scripts/<?= $currentTheme ?>/index.js"></script>
 </head>
 
-<body data-barba="wrapper">
+<body class="<?= "$currentPage-page" ?> <?= "$currentTheme-theme" ?>">
 	<?php include('templates/modules/header/header.php'); ?>
 
-	<main class="page-content" data-barba="container" data-barba-namespace="<?= $pageData['heading'] ?>">
+	<main class="page-content transition-reveal" id="swup">
 		<section class="page-title">
 			<inner-column>
 				<h1 class="booming-voice">
@@ -66,10 +66,11 @@ if (isset($_GET['project'])) {
 
 
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/MotionPathPlugin.min.js"></script>
-	<script src="https://unpkg.com/@barba/core"></script>
+	<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/MotionPathPlugin.min.js"></script>
+	<!-- <script src="https://unpkg.com/@barba/core"></script> -->
 
 
 </body>
