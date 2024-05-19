@@ -23,10 +23,15 @@ swup.hooks.on("visit:start", (context) => {
   let x = 0.5;
   let y = 0.5;
   const event = context.trigger.event;
+
   if (event && typeof event.clientX === "number") {
-    console.log(event.clientX);
-    x = event.clientX / window.innerWidth;
-    y = event.clientY / window.innerHeight;
+    const target = event.target;
+    const rect = target.getBoundingClientRect();
+    x = rect.left + rect.width / 2;
+    y = rect.top + rect.height / 2;
+    console.log(x, y);
+    //  x = event.clientX / window.innerWidth;
+    //  y = event.clientY / window.innerHeight;
   }
   document.documentElement.style.setProperty("--click-x", x);
   document.documentElement.style.setProperty("--click-y", y);

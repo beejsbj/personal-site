@@ -1,8 +1,8 @@
 /* swupanimation */
 
 html {
-  --origin-x: calc(var(--click-x, 0.5) * 100%);
-  --origin-y: calc(var(--click-y, 0.5) * 100%);
+  --origin-x: calc(var(--click-x, 0.5) * 1px);
+  --origin-y: calc(var(--click-y, 0.5) * 1px);
 }
 
 html.is-changing .transition-reveal {

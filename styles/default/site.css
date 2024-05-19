@@ -41,7 +41,7 @@ body {
 }
 
 .site-menu {
-  /* display: none; */
+  display: none;
 }
 
 .overflow-hidden {
