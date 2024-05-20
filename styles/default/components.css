@@ -83,8 +83,6 @@ a {
   padding: 1.5em;
   position: relative;
 
-  white-space: nowrap;
-
   display: grid;
   place-items: center;
 

@@ -2,7 +2,7 @@ home-section.one {
   display: block;
 }
 
-h1.loud-voice {
+home-section.one h1.loud-voice {
   font-size: var(--step-5);
 }
 
@@ -10,14 +10,14 @@ h1.loud-voice {
   display: none;
 }
 
-.booming-voice {
+home-section.one .booming-voice {
   font-size: var(--step-6);
   white-space: nowrap;
   margin-top: var(--space-2xl);
   /* margin-bottom: var(--space-xs); */
 }
 
-.dev-signer {
+home-section.one .dev-signer {
   grid-column: 1/ -1;
 
   display: flex;
@@ -28,7 +28,7 @@ h1.loud-voice {
   color: var(--color);
 }
 
-.dev-signer .brace {
+home-section.one .dev-signer .brace {
   display: hide;
   font-size: var(--step-4);
   font-weight: 700;
