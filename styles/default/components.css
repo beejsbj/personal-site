@@ -92,6 +92,7 @@ a {
 .button.bubble:is(:hover, :focus-visible) {
   color: var(--highlight);
   background: var(--color-light);
+  text-decoration: none;
 }
 
 .button.bubble:active {
