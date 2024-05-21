@@ -1,6 +1,13 @@
 @import "../../templates/modules/header/pe-header.css";
 
+/*  */
+@import "../../templates/modules/home-section-1/pe-home-section-1.css";
+@import "../../templates/modules/home-section-2/pe-home-section-2.css";
+
+/*  */
+
 @import "../../templates/modules/goals-list/pe-goals-list.css";
+@import "../../templates/modules/about-module/pe-about-module.css";
 @import "../../templates/modules/projects-grid/pe-projects-grid.css";
 
 @import "../../templates/modules/layout-module/layout-module.css";

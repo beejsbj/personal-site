@@ -41,6 +41,8 @@
 		section.project-meta {
 			grid-column: 2 / 10;
 			z-index: 999;
+
+
 		}
 
 

@@ -1,60 +1,139 @@
-
 /* Mayers Reset ** http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
 	*/
 
-	html, body, div, span, applet, object, iframe,
-	h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-	a, abbr, acronym, address, big, cite, code,
-	del, dfn, em, img, ins, kbd, q, s, samp,
-	small, strike, strong, sub, sup, tt, var,
-	b, u, i, center,
-	dl, dt, dd, ol, ul, li,
-	fieldset, form, label, legend,
-	table, caption, tbody, tfoot, thead, tr, th, td,
-	article, aside, canvas, details, embed, 
-	figure, figcaption, footer, header, hgroup, 
-	menu, nav, output, ruby, section, summary,
-	time, mark, audio, video {
-		margin: 0;
-		padding: 0;
-		border: 0;
-		font-size: 100%;
-		font: inherit;
-		vertical-align: baseline;
-	}
-	/* HTML5 display-role reset for older browsers */
-	article, aside, details, figcaption, figure, 
-	footer, header, hgroup, menu, nav, section {
-		display: block;
-	}
-	body {
-		line-height: 1;
-	}
-	ol, ul {
-		list-style: none;
-	}
-	blockquote, q {
-		quotes: none;
-	}
-	blockquote:before, blockquote:after,
-	q:before, q:after {
-		content: '';
-		content: none;
-	}
-	table {
-		border-collapse: collapse;
-		border-spacing: 0;
-	}
-
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol,
+ul {
+	list-style: none;
+}
+blockquote,
+q {
+	quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+	content: "";
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
 
 * {
 	box-sizing: border-box;
 }
 
 body * {
-/*	border: 2px green solid;
+	/*	border: 2px green solid;
 	margin: 2px;
 	padding: 2px;*/
 }
@@ -72,17 +151,15 @@ body {
 	padding: 90px 0;
 }
 
-
 /*******MISC*******/
 
-
 p {
-   color: black;
-  font-size: 1.2em;
-  font-weight: 350;
-  line-height: 1.5;
-  letter-spacing: 0.08em;
-  margin: 20px 0;
+	color: black;
+	font-size: 1.2em;
+	font-weight: 350;
+	line-height: 1.5;
+	letter-spacing: 0.08em;
+	margin: 20px 0;
 }
 
 span {
@@ -114,7 +191,7 @@ h3 {
 
 .site-header {
 	background-color: wheat;
-	background-image: url(../../assets/images/garage-door-bg.jpg);
+	background-image: url(garage-door-bg.jpg);
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-position: center center;
@@ -127,37 +204,29 @@ h3 {
 	color: ghostwhite;
 }
 
-
 .site-header li {
 	display: inline-block;
 	padding: 20px;
 	margin: 5px;
-	
+
 	border-radius: 3px;
 }
 
 .site-header li:hover {
-	background-color: #D7A955;
+	background-color: #d7a955;
 	transition: 0.3s;
 }
 
 .site-header a {
 	font-size: 1.2em;
 	color: white;
-	
-	
 }
-
 
 /******landing******/
 
-
 .landing {
 	background-color: wheat;
-
 }
-
-
 
 .landing h2 {
 	color: blue;
@@ -165,19 +234,13 @@ h3 {
 
 .landing img {
 	width: clamp(150px, 15vw, 250px);
-
 }
 
 /*****about******/
 
-
 .about {
 	background-color: #9f5231;
-
-
 }
-
-
 
 .about h2,
 .about h3 {
@@ -186,7 +249,6 @@ h3 {
 
 .about img {
 	width: clamp(150px, 15vw, 250px);
-
 }
 
 /*****contact******/

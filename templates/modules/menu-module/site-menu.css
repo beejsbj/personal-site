@@ -74,12 +74,12 @@
   header .site-menu ul {
     grid-template-columns: 1fr;
   }
-  html:not(.home-page) header .site-menu {
+  body:not(.home-page) header .site-menu {
     right: 1vw;
     position: fixed;
     top: 10vh;
   }
-  html:not(.home-page) footer .site-menu {
+  body:not(.home-page) footer .site-menu {
     display: none;
   }
 }

@@ -10,37 +10,67 @@ a {
 
 /*  */
 .button {
-  padding: 0.5em 1em;
-  background: var(--highlight);
+  padding: 1em;
   color: var(--color);
+  transition: 0.2s;
+  /* z-index: 1; */
+  position: relative;
+  isolation: isolate;
 }
 
 .button:is(:hover, :focus-visible) {
   color: var(--highlight);
-  background: var(--color-light);
-  scale: 1.1;
 }
 
 .button:active {
   background: var(--color);
 }
 
-/*  */
-.button.outline {
-  background: var(--paper);
-  color: var(--color);
-  border: var(--line-width-thin) solid var(--color);
-  padding: 0.5em 1em;
+.button::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: currentColor;
+  transition: 0.2s;
+  height: 3em;
+  width: 3em;
+  background: var(--highlight);
+  z-index: -1;
+  box-shadow: -1vmin 1vmin 2vmin rgba(0, 0, 0, 0.25);
 }
 
-.button.outline:is(:hover, :focus-visible) {
-  border-color: var(--highlight);
+.button:is(:hover, :focus-visible)::before {
   color: var(--highlight);
+  background: var(--color-light);
+  aspect-ratio: unset;
+  width: 100%;
+  border-radius: 3em;
+
+  /* aspect-ratio: unset; */
+}
+
+/*  */
+.button.outline {
+  color: var(--color);
+  padding: 0.5em 1em;
 }
 
 .button.outline:active {
   background: var(--highlight);
   color: var(--color);
+}
+
+.button.outline::before {
+  background: unset;
+  border: var(--line-width-thin) solid var(--highlight);
+}
+
+.button.outline:is(:hover, :focus-visible)::before {
+  background: unset;
+  border-color: var(--color);
 }
 
 /*  */
@@ -49,6 +79,7 @@ a {
   background: var(--highlight);
   aspect-ratio: 1/1;
   border-radius: 50%;
+  width: unset;
   padding: 1.5em;
   position: relative;
 
@@ -61,10 +92,14 @@ a {
 .button.bubble:is(:hover, :focus-visible) {
   color: var(--highlight);
   background: var(--color-light);
+  text-decoration: none;
 }
 
 .button.bubble:active {
   background: var(--color);
+}
+.button.bubble::before {
+  display: none;
 }
 
 /*  */
@@ -80,6 +115,7 @@ a {
   display: grid;
   place-items: center;
   max-width: 2rem;
+  box-shadow: -1vmin 1vmin 2vmin rgba(0, 0, 0, 0.25);
 }
 
 .button.icon picture {
@@ -94,7 +130,8 @@ a {
 .button.icon:is(:hover, :focus-visible) {
 }
 
-.button.icon:active {
+.button.icon::before {
+  display: none;
 }
 
 /* Text buttons and acnhors  */

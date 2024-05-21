@@ -3,8 +3,15 @@ $menu = $section['menu'] ?? $menu ?? 'test';
 $class = $menu == 'site' || $menu == 'theme' ? "magnetic $menu" : $menu;
 
 
+
 if (file_exists("data/components/$menu-menu.json")) {
-	$menuJson = file_get_contents("data/components/$menu-menu.json");
+
+
+	if (!$currentTheme) {
+		$menuJson = file_get_contents("data/components/theme-menu.json");
+	} else {
+		$menuJson = file_get_contents("data/components/$menu-menu.json");
+	}
 	$menuData = json_decode($menuJson, true);
 } else {
 	$menuData = $section['links'];
@@ -24,10 +31,16 @@ if (file_exists("data/components/$menu-menu.json")) {
 
 
 			if ($menu == 'site') {
-				$class = "$class " . activePage($menuItem['activePage'] ?? false);
-				// $slug = $menuItem['slug']; //pretty
-				$slug = "?page=" . $menuItem['slug']; //ugly
 
+				if (!$currentTheme) {
+					$class = "$class " . activeTheme($menuItem['activePage']);
+					// $slug = currentPage() . "?theme=" . $menuItem['slug']; //pretty
+					$slug = "?theme=" . $menuItem['slug'] . "&page=" . currentPage(); //ugly
+				} else {
+					$class = "$class " . activePage($menuItem['activePage'] ?? false);
+					// $slug = $menuItem['slug']; //pretty
+					$slug = "?page=" . $menuItem['slug']; //ugly
+				}
 			}
 			if ($menu == 'theme') {
 				$class = "$class " . activeTheme($menuItem['activePage']);
@@ -43,11 +56,15 @@ if (file_exists("data/components/$menu-menu.json")) {
 			}
 		?>
 			<li>
-				<a class="<?= $class ?> " href="<?= $slug ?>" target="<?= $target ?>">
+				<a class="<?= $class ?> " href="<?= $slug ?>" target="<?= $target ?>" data-swup-animation="circle">
 					<span><?= $name ?></span>
-					<picture class="external-link <?= $target == NULL ? 'hide' : '' ?>">
-						<img src="images/diagonal-arrow.svg" alt="">
-					</picture>
+
+
+					<?php if ($target != NULL) { ?>
+						<picture class="external-link">
+							<img src="images/diagonal-arrow.svg" alt="">
+						</picture>
+					<?php } ?>
 				</a>
 			</li>
 		<?php } ?>

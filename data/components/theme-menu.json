@@ -2,13 +2,15 @@
   {
     "id": "theme0",
     "activePage": "default",
+    "class": "magnetic button bubble",
     "name": "Default",
     "slug": "default"
   },
   {
     "id": "theme1",
     "activePage": "pe-site",
-    "name": "P<svg class='pe-circle' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' /></svg>E",
+    "class": "magnetic button bubble",
+    "name": "<span>P</span><svg class='pe-circle' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' /></svg><span>E</span>",
     "slug": "pe-site"
   }
 ]

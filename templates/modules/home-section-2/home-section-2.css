@@ -1,0 +1,9 @@
+home-section.two .notice-voice {
+  font-size: var(--step-2);
+  justify-self: center;
+}
+
+home-section.two > a {
+  font-size: var(--step-4);
+  justify-self: center;
+}

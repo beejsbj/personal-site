@@ -30,7 +30,7 @@ body {
 }
 
 .hide {
-  display: none;
+  display: none !important;
 }
 .hide-opacity {
   opacity: 0;
@@ -148,4 +148,8 @@ body {
 .page-loader .booming-voice {
   display: none;
   --content: "🗣";
+}
+
+.home-page main > *:not(.home-section-1) {
+  display: none;
 }

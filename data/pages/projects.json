@@ -8,6 +8,7 @@
     {
       "module": "generic-text",
       "heading-class": "hide",
+
       "paragraphs": [
         {
           "voice": "notice-voice",

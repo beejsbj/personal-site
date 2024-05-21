@@ -1,0 +1,35 @@
+home-section.one {
+  display: block;
+}
+
+home-section.one h1.loud-voice {
+  font-size: var(--step-5);
+}
+
+.home-page .page-title {
+  display: none;
+}
+
+home-section.one .booming-voice {
+  font-size: var(--step-6);
+  white-space: nowrap;
+  margin-top: var(--space-2xl);
+  /* margin-bottom: var(--space-xs); */
+}
+
+home-section.one .dev-signer {
+  grid-column: 1/ -1;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-family: var(--font2);
+  font-size: var(--step-3);
+  color: var(--color);
+}
+
+home-section.one .dev-signer .brace {
+  display: hide;
+  font-size: var(--step-4);
+  font-weight: 700;
+}

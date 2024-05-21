@@ -1,19 +1,19 @@
 <home-section class="one">
 
-	<h1 class="booming-voice">
-		Hello
+	<h1 class="loud-voice">
+		<strong>Hey There!</strong>
 	</h1>
 
 	<h2 class="booming-voice">
-		<picture>
-			<img src="images/burooj1.jpg" alt="">
-		</picture>
-		<span>Burooj here!</span>
+
+		Burooj here!
 	</h2>
 
-	<p class="notice-voice">
-		{Web Dev/Signer}
-	</p>
+	<div class="dev-signer">
+		<!-- <span class="brace">{</span> -->
+		<span class="">Web Dev/signer</span>
+		<!-- <span class="brace">}</span> -->
+	</div>
 
 
 	<picture class="arrow">
@@ -35,53 +35,3 @@
 
 
 </home-section>
-
-
-<style>
-	.home .page-title {
-		display: none;
-	}
-
-	home-section.one h1 {
-		grid-column: 1/8;
-		font-size: var(--step-6);
-	}
-
-
-
-
-
-	home-section.one h2 {
-		grid-column: 2/-1;
-		display: grid;
-		grid-template-columns: 0.2fr 1fr;
-		align-items: center;
-		gap: var(--space-s);
-	}
-
-	home-section.one h2 picture {
-		border-radius: 50%;
-	}
-
-	home-section.one p {
-		font-size: var(--step-2);
-		grid-column: 1/5;
-	}
-
-	home-section.one graphic-diptych {
-		display: grid;
-		grid-template-columns: 1fr 0.8fr;
-	}
-
-	home-section.one .arrow {
-		border-radius: 50%;
-		position: absolute;
-		grid-row: 3;
-		grid-column: 10;
-		bottom: -30%;
-
-		@media (max-width: 768px) {
-			display: none;
-		}
-	}
-</style>

@@ -2,8 +2,12 @@ header {
   overflow: hidden;
 
   --header-height: var(--space-3xl);
-  padding-top: var(--header-height);
+
   max-width: 100vw;
+}
+
+main {
+  padding-top: var(--header-height);
 }
 @media (max-width: 750px) {
   header {
@@ -78,4 +82,8 @@ header .circle {
     /* left: -700px; */
     /* position: fixed; */
   }
+}
+
+.theme-menu {
+  /* display: none; */
 }

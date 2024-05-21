@@ -18,12 +18,19 @@ $images = $section['images'] ?? [1, 2, 3];
 
 
 <style>
+	body.default-theme fan-images {
+		--border-radius: 50%;
+	}
+
 	fan-images {
 		margin: 0px;
 		display: grid;
 		place-items: center;
 		padding: var(--space-xl);
 		position: relative;
+
+
+
 
 	}
 
@@ -57,12 +64,12 @@ $images = $section['images'] ?? [1, 2, 3];
 	}
 
 	fan-images .big-card {
-		border-radius: 50%;
+		border-radius: var(--border-radius);
 	}
 
 	fan-images .little-card {
 		width: 12vmin;
-		border-radius: 50%;
+		border-radius: var(--border-radius);
 		left: 50%;
 		top: 50%;
 		transform: translate(-50%, -50%);
