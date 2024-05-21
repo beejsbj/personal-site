@@ -7,7 +7,7 @@ $_SESSION['theme'] = currentTheme();
 
 
 $__dirname = dirname($_SERVER['SCRIPT_NAME']);
-$currentPage = currentPage(); // ugly 
+$currentPage = currentPage();
 $currentTheme = $_SESSION['theme'];
 $pageData = getPageData($currentPage);
 $template = $pageData['template'] ?? '';
