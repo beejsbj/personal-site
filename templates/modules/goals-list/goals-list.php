@@ -5,7 +5,7 @@ $sectionHeading = $section['heading'] ?? "This is the goals module";
 
 
 <goals-module>
-	<h2 class="loud-voice">
+	<h2 class="attention-voice">
 		<?= $sectionHeading ?>
 	</h2>
 	<ul>

@@ -28,6 +28,11 @@ if (isset($_GET['tags'])) {
 		$id = $project['id'] ?? "garden";
 		$description = $project['description'] ?? "this is the Project Descripton";
 		$image = $project['images'][$_SESSION['theme']]['thumbnail'] ?? $project['image'] ?? "landscape.jpg";
+		$isHidden = $project['hide'] ?? false;
+
+		if ($isHidden) {
+			continue;
+		}
 
 
 		// $url = $project['url'] ?? "projects/$id"; //pretty

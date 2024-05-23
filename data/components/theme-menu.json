@@ -8,13 +8,6 @@
   },
   {
     "id": "theme1",
-    "activePage": "default",
-    "class": "text",
-    "name": "Default",
-    "slug": "default"
-  },
-  {
-    "id": "theme2",
     "activePage": "pe-site",
     "class": "text",
     "name": "<span>P</span><svg class='pe-circle' style='display: inline; max-width: 1em; position: relative; top: 3px;' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' /></svg><span>E</span>",

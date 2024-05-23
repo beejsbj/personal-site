@@ -1,5 +1,68 @@
 [
   {
+    "title": "API3 Ecosystem",
+    "date": "Current",
+    "heading": "API3 Ecosystem",
+    "role": "Development",
+    "location": "Remote @API3",
+    "id": "api3-ecosystem",
+    "description": "An Ecosystem website for API3, where dApp Developers can showcase their dApps to the community",
+    "image": "api3-ecosystem.jpg",
+    "images": {
+      "default": {
+        "thumbnail": "api3-ecosystem.jpg"
+      },
+      "pe-site": {}
+    },
+    "tools": ["Nuxt3"],
+    "sections": [
+      {
+        "module": "project-meta"
+      },
+      {
+        "module": "menu-module",
+        "menu": "project",
+        "links": [
+          {
+            "id": "live",
+            "name": "Live Link",
+            "class": "text",
+            "slug": "https://ecosystem.api3.org/",
+            "target": "live"
+          }
+        ]
+      },
+      {
+        "heading-class": "hide",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Currently Working here"
+          }
+        ]
+      },
+      {
+        "module": "standard-figure",
+        "image": "projects/api3-ecosystem.jpg",
+        "caption": "this is the intro paragraphs and it is the one for this"
+      },
+
+      {
+        "module": "goals-list",
+        "heading": "Goals",
+        "goals": [
+          "Adapt the design of the base api3 site, and differentiate it to be it's own thing",
+          "Create an in-app form for developers to submit their dApps",
+          "Create an appealing landing page",
+          "Allow api3 to upload articles and read them in-app",
+          "Create a page for each dApp, where the developer can update the information and add screenshots",
+          "Create a style guide for the site",
+          "Use Nuxt3 to allow server side rendering and improve SEO"
+        ]
+      }
+    ]
+  },
+  {
     "title": "Layout Garden",
     "date": "2021-05",
     "heading": "Layout Garden",
@@ -29,13 +92,13 @@
           {
             "id": "live",
             "name": "Garden",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "?page=garden"
           },
           {
             "id": "live",
             "name": "Style Guide",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "?page=style-guide"
           }
         ]
@@ -49,11 +112,6 @@
           }
         ]
       },
-      {
-        "module": "standard-figure",
-        "image": "projects/garden.png",
-        "caption": "this is the intro paragraphs and it is the one for this"
-      },
 
       {
         "module": "goals-list",
@@ -63,16 +121,6 @@
           "The components need to be responsive and mobile friendly",
           "The site needs to be easy to maintain and update"
         ]
-      },
-      {
-        "module": "frame-image",
-        "video": "garden-laptop.mp4",
-        "device": "laptop"
-      },
-      {
-        "module": "frame-image",
-        "video": "style-guide-laptop.mp4",
-        "device": "laptop"
       }
     ]
   },
@@ -104,41 +152,23 @@
           {
             "id": "live",
             "name": "See Live",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "https://quantumon.xyz/",
             "target": "live"
           },
           {
             "id": "github",
             "name": "Github",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
             "target": "github"
-          },
-          {
-            "id": "article",
-            "name": "Read...",
-            "class": "magnetic button bubble",
-            "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
-            "target": "article"
-          }
-        ]
-      },
-      {
-        "heading-class": "hide",
-        "paragraphs": [
-          {
-            "voice": "notice-voice",
-            "text": "#todo My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle."
           }
         ]
       },
       {
         "module": "standard-figure",
-        "image": "projects/quantumon.png",
-        "caption": "this is the intro paragraphs and it is the one for this"
+        "image": "projects/quantumon.png"
       },
-
       {
         "module": "goals-list",
         "heading": "Goals",
@@ -148,61 +178,12 @@
           "Use an external package to build a carousel",
           "Have the site be responsive and mobile friendly"
         ]
-      },
-      {
-        "heading": "Section",
-        "heading-class": "attention-voice",
-
-        "paragraphs": [
-          {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
-          },
-          {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
-          },
-          {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
-          }
-        ]
-      },
-      {
-        "module": "frame-image",
-        "video": "quantumon-mobile.mp4",
-        "device": "mobile",
-        "paragraph1": "this is the intro paragraphs and it is the one for this"
-      },
-      {
-        "heading": "Section",
-        "heading-class": "attention-voice",
-
-        "paragraphs": [
-          {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
-          },
-          {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
-          },
-          {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
-          }
-        ]
-      },
-      {
-        "module": "frame-image",
-        "video": "quantumon-laptop.mp4",
-        "device": "laptop",
-        "caption": "this is the intro paragraphs and it is the one for this"
       }
     ]
   },
 
   {
+    "hide": true,
     "title": "Exercises 4 Programmers",
     "heading": "Exercises for Programmers",
     "role": "Design & Development",
@@ -233,40 +214,18 @@
           {
             "id": "live",
             "name": "Live Link",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "?page=e4p"
           },
           {
             "id": "github",
             "name": "Github",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/e4p",
             "target": "github"
-          },
-          {
-            "id": "article",
-            "name": "Read...",
-            "class": "magnetic button bubble",
-            "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
-            "target": "article"
           }
         ]
       },
-      {
-        "heading-class": "hide",
-        "paragraphs": [
-          {
-            "voice": "notice-voice",
-            "text": "#todo "
-          }
-        ]
-      },
-      {
-        "module": "standard-figure",
-        "image": "projects/e4p.png",
-        "caption": "this is the intro paragraphs and it is the one for this"
-      },
-
       {
         "module": "goals-list",
         "heading": "Goals",
@@ -276,16 +235,6 @@
           "Build out the exercises in JS",
           "Build out the exercises in Vue"
         ]
-      },
-      {
-        "module": "frame-image",
-        "video": "e4p-mobile.mp4",
-        "device": "mobile"
-      },
-      {
-        "module": "frame-image",
-        "video": "e4p-laptop.mp4",
-        "device": "laptop"
       }
     ]
   },
@@ -317,36 +266,29 @@
           {
             "id": "Demo",
             "name": " Demo",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "https://demo-lottery.netlify.app/",
             "target": "Demo"
           },
           {
             "id": "live",
             "name": " Live",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "https://qrng-lottery.netlify.app/",
             "target": "live"
           },
           {
             "id": "github",
             "name": "Github",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "",
             "target": "github"
-          },
-          {
-            "id": "article",
-            "name": "Read...",
-            "class": "magnetic button bubble",
-            "slug": "https://github.com/beejsbj/qrng-lottery",
-            "target": "article"
           },
 
           {
             "id": "Old",
             "name": " Old",
-            "class": "magnetic button bubble",
+            "class": "text",
             "slug": "https://api3-lottery-old.netlify.app/",
             "target": "Old"
           }
@@ -357,7 +299,7 @@
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "#todo My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle."
+            "text": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle."
           }
         ]
       },
@@ -376,69 +318,79 @@
           "Build out the logic for the lottery app and the UI animations",
           "Port it to React and connect to web3 so the app works on the blockchain"
         ]
+      }
+    ]
+  },
+  {
+    "title": "Flash Cards",
+    "date": "2022-11",
+    "heading": "Flash Cards",
+    "role": "Design & Development",
+    "location": "Remote @Perpetual Education",
+    "id": "flashcards",
+    "description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
+    "image": "flashcards.png",
+    "images": {
+      "default": {
+        "thumbnail": "flashcards.png"
+      },
+      "pe-site": {}
+    },
+    "tools": ["HTML", "CSS", "JS"],
+    "tags": ["feature"],
+    "sections": [
+      {
+        "module": "project-meta"
       },
       {
-        "heading": "Section",
-        "heading-class": "attention-voice",
-
-        "paragraphs": [
+        "module": "menu-module",
+        "menu": "project",
+        "links": [
           {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+            "id": "live",
+            "name": "Live Link",
+            "class": "text",
+            "slug": "projects/flashcards",
+            "target": "live"
           },
           {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
-          },
-          {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+            "id": "github",
+            "name": "Github",
+            "class": "text",
+            "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
+            "target": "github"
           }
         ]
       },
       {
-        "module": "frame-image",
-        "video": "lottery-mobile.mp4",
-        "device": "mobile"
-      },
-      {
-        "module": "frame-image",
-        "video": "lottery-tablet.mp4",
-        "device": "tablet"
-      },
-      {
-        "heading": "Section",
-        "heading-class": "attention-voice",
-
+        "heading-class": "hide",
         "paragraphs": [
           {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
-          },
-          {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
-          },
-          {
-            "voice": "",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+            "voice": "notice-voice",
+            "text": "A student Project made during my time with Perpetual Education."
           }
         ]
       },
       {
-        "module": "frame-image",
-        "video": "lottery-roll-submit.mp4",
-        "device": "laptop"
+        "module": "standard-figure",
+        "image": "projects/flashcards.png"
       },
+
       {
-        "module": "frame-image",
-        "video": "lottery-reset.mp4",
-        "device": "laptop"
+        "module": "goals-list",
+        "heading": "Goals",
+        "goals": [
+          "Build out a Flashcard app with vanilla JS, using Classes and data fetched from an API",
+          "Design the Frontend and map out how the interactions will flow through all page faces",
+          "Build out the logic for the interactions",
+          "Account for the User's history and store their previous attempts(local storage)"
+        ]
       }
     ]
   },
   {
     "title": "Roulette App",
+    "hide": true,
     "date": "2022-10",
     "heading": "Roulette App",
     "role": "Design & Development",
@@ -576,233 +528,6 @@
         "module": "frame-image",
         "video": "roulette-laptop-spin.mp4",
         "device": "laptop"
-      }
-    ]
-  },
-  {
-    "title": "Flash Cards",
-    "date": "2022-11",
-    "heading": "Flash Cards",
-    "role": "Design & Development",
-    "location": "Remote @Perpetual Education",
-    "id": "flashcards",
-    "description": "Our Javascript app project, This idea came about after spending a lot of time with supermemo. ",
-    "image": "flashcards.png",
-    "images": {
-      "default": {
-        "thumbnail": "flashcards.png"
-      },
-      "pe-site": {}
-    },
-    "tools": ["HTML", "CSS", "JS"],
-    "tags": ["feature"],
-    "sections": [
-      {
-        "module": "project-meta"
-      },
-      {
-        "module": "menu-module",
-        "menu": "project",
-        "links": [
-          {
-            "id": "live",
-            "name": "Live Link",
-            "class": "magnetic button bubble",
-            "slug": "projects/flashcards",
-            "target": "live"
-          },
-          {
-            "id": "github",
-            "name": "Github",
-            "class": "magnetic button bubble",
-            "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
-            "target": "github"
-          },
-          {
-            "id": "article",
-            "name": "Read...",
-            "class": "magnetic button bubble",
-            "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
-            "target": "article"
-          }
-        ]
-      },
-      {
-        "heading-class": "hide",
-        "paragraphs": [
-          {
-            "voice": "notice-voice",
-            "text": "#todo "
-          }
-        ]
-      },
-      {
-        "module": "standard-figure",
-        "image": "projects/flashcards.png",
-        "caption": "this is the intro paragraphs and it is the one for this"
-      },
-
-      {
-        "module": "goals-list",
-        "heading": "Goals",
-        "goals": [
-          "Build out a Flashcard app with vanilla JS, using Classes and data fetched from an API",
-          "Design the Frontend and map out how the interactions will flow through all page faces",
-          "Build out the logic for the interactions",
-          "Account for the User's history and store their previous attempts(local storage)"
-        ]
-      },
-      {
-        "module": "frame-image",
-        "video": "flashcards-mobile.mp4",
-        "device": "mobile"
-      },
-      {
-        "module": "frame-image",
-        "video": "flashcards-laptop.mp4",
-        "device": "laptop"
-      }
-    ]
-  },
-  {
-    "title": "API3 Ecosystem",
-    "date": "2023-06",
-    "heading": "API3 Ecosystem",
-    "role": "Development",
-    "location": "Remote @API3",
-    "id": "api3-ecosystem",
-    "description": "An Ecosystem website for API3, where dApp Developers can showcase their dApps to the community",
-    "image": "api3-ecosystem.jpg",
-    "images": {
-      "default": {
-        "thumbnail": "api3-ecosystem.jpg"
-      },
-      "pe-site": {}
-    },
-    "tools": ["Nuxt3"],
-    "sections": [
-      {
-        "module": "project-meta"
-      },
-      {
-        "module": "menu-module",
-        "menu": "project",
-        "links": [
-          {
-            "id": "live",
-            "name": "Live Link",
-            "class": "magnetic button bubble",
-            "slug": "https://ecosystem.api3.org/",
-            "target": "live"
-          }
-        ]
-      },
-      {
-        "heading-class": "hide",
-        "paragraphs": [
-          {
-            "voice": "notice-voice",
-            "text": "#todo "
-          }
-        ]
-      },
-      {
-        "module": "standard-figure",
-        "image": "projects/api3-ecosystem.jpg",
-        "caption": "this is the intro paragraphs and it is the one for this"
-      },
-
-      {
-        "module": "goals-list",
-        "heading": "Goals",
-        "goals": [
-          "Adapt the design of the base api3 site, and differentiate it to be it's own thing",
-          "Create an in-app form for developers to submit their dApps",
-          "Create an appealing landing page",
-          "Allow api3 to upload articles and read them in-app",
-          "Create a page for each dApp, where the developer can update the information and add screenshots",
-          "Create a style guide for the site",
-          "Use Nuxt3 to allow server side rendering and improve SEO"
-        ]
-      },
-      {
-        "module": "frame-image",
-        "video": "api3-ecosystem-laptop.mp4",
-        "device": "laptop"
-      }
-    ]
-  },
-  {
-    "title": "Theme Challenge",
-    "date": "2022-06",
-    "heading": "Theme Challenge",
-    "role": "Design & Development",
-    "location": "Remote @Perpetual Education",
-    "id": "theme-challenge",
-    "description": "A fun challenge, where we were given a code base and could only use CSS to get a website to fit within chosen industry",
-    "image": "weed-leaf.jpg",
-    "images": {
-      "default": {
-        "thumbnail": "weed-leaf.jpg"
-      },
-      "pe-site": {}
-    },
-    "tools": ["HTML", "CSS", "PHP"],
-    "sections": [
-      {
-        "module": "project-meta"
-      },
-      {
-        "module": "menu-module",
-        "menu": "project",
-        "links": [
-          {
-            "id": "live",
-            "name": "Live Link",
-            "slug": "projects/theme-challenge",
-            "class": "magnetic button bubble",
-            "target": "live"
-          },
-          {
-            "id": "github",
-            "name": "Github",
-            "slug": "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon",
-            "class": "magnetic button bubble",
-            "target": "github"
-          },
-          {
-            "id": "article",
-            "name": "Read...",
-            "slug": "https://buroojs.substack.com/p/theme-challenge",
-            "class": "magnetic button bubble",
-            "target": "article"
-          }
-        ]
-      },
-      {
-        "heading-class": "hide",
-        "paragraphs": [
-          {
-            "voice": "notice-voice",
-            "text": "#todo "
-          }
-        ]
-      },
-      {
-        "module": "standard-figure",
-        "image": "projects/quantumon.png",
-        "caption": "this is the intro paragraphs and it is the one for this"
-      },
-
-      {
-        "module": "goals-list",
-        "heading": "Goals",
-        "goals": [
-          "Find and Research the industry and see how the competetion designs their sites.",
-          "Find the best fonts and colors for the website to evoke the industry",
-          "Make a style tile to help guide the design process",
-          "Site needs to be built without modifying the HTML"
-        ]
       }
     ]
   }

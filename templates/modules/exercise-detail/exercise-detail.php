@@ -14,12 +14,8 @@ if (!exExists($exerciseSlug)) {
 } else {
 ?>
 	<exercise-detail>
-		<a class="button icon" href="?page=e4p">
-
-			<picture class="back-icon">
-
-				<img src="images/icons/back.svg" alt="">
-			</picture>
+		<a class="text" href="?page=e4p">
+			Back to List
 		</a>
 		<actions-component>
 			<toggle-switch class='radio-list horizontal'>

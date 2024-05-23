@@ -13,11 +13,8 @@ $device =  $section['device'] ?? "laptop";
 	<picture class="<?= "$device-frame" ?>">
 
 		<?php if (isset($section['video'])) { ?>
-			<img src="images/<?= "$device-frame.svg"  ?>">
 			<video src="<?= "$video" ?>" autoplay loop></video>
 
-		<?php } else { ?>
-			<img src="images/<?= "$device-frame.svg" ?>" style="background-image: url('<?= $image ?>');">
 		<?php } ?>
 	</picture>
 </frame-image>

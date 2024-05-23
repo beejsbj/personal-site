@@ -1,6 +1,6 @@
 <style>
 	home-section {
-		min-height: 70vh;
+		min-height: 60vh;
 		display: grid;
 		align-content: center;
 	}

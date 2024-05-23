@@ -3,7 +3,7 @@
 // format($pageData);
 
 
-
+$when = $pageData['date'] == 'Current' ? 'Current' : substr($pageData['date'], 0, 4);
 ?>
 
 <project-meta>
@@ -30,7 +30,7 @@
 			when?
 		</h3>
 		<p class="notice-voice">
-			<?= substr($pageData['date'], 0, 4) ?>
+			<?= $when ?>
 		</p>
 
 	</meta-card>
