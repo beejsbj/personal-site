@@ -1,9 +1,0 @@
-voices-guide {
-  display: grid;
-  gap: var(--space-l);
-}
-
-voice-card + voice-card {
-  padding-top: var(--space-s);
-  border-top: var(--border);
-}

@@ -24,30 +24,19 @@
       "module": "color-guide"
     },
     {
-      "module": "space-guide"
+      "module": "misc-guide"
     },
-
     {
-      "module": "form-guide"
+      "module": "spacing-guide"
     },
-
     {
       "module": "interface-guide"
     },
-
     {
-      "module": "voices-guide",
-      "voices": [
-        "whisper-voice",
-        "calm-voice",
-        "solid-voice",
-        "teaser-voice",
-        "firm-voice",
-        "notice-voice",
-        "attention-voice",
-        "loud-voice",
-        "booming-voice"
-      ]
+      "module": "typography-guide"
+    },
+    {
+      "module": "voices-guide"
     }
   ]
 }

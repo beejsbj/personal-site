@@ -19,8 +19,8 @@ html {
   /* #todo use relative colors  */
   /* Colors */
   --lightness: 80%;
-  --chroma: 80%;
-  --hue: 0;
+  --chroma: 20%;
+  --hue: 120;
 
   --color: oklch(var(--lightness) var(--chroma) var(--hue));
   --color-light: color-mix(
@@ -169,7 +169,7 @@ html {
 
 @media (prefers-color-scheme: dark) {
   html {
-    --hue: 83;
+    --hue: 29;
   }
 
   [data-theme="light"] {
@@ -179,7 +179,7 @@ html {
 
 @media (prefers-color-scheme: light) {
   html {
-    --hue: 29;
+    --hue: 200;
   }
 
   [data-theme="dark"] {
