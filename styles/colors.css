@@ -1,0 +1,188 @@
+html {
+  /* Black and white */
+  --black: oklch(0% 0% 0);
+  --white: oklch(100% 0% 0);
+
+  --paper: var(--white);
+  --ink: var(--black);
+
+  --gray: oklch(50% 0% 0);
+
+  --gray-light: oklch(65% 0% 0);
+  --gray-lighter: oklch(80% 0% 0);
+  --gray-lightest: oklch(95% 0% 0);
+
+  --gray-dark: oklch(35% 0% 0);
+  --gray-darker: oklch(20% 0% 0);
+  --gray-darkest: oklch(5% 0% 0);
+
+  /* #todo use relative colors  */
+  /* Colors */
+  --lightness: 80%;
+  --chroma: 80%;
+  --hue: 0;
+
+  --color: oklch(var(--lightness) var(--chroma) var(--hue));
+  --color-light: color-mix(
+    in oklch,
+    var(--color),
+    oklch(100% var(--chroma) var(--hue))
+  );
+  --color-lighter: color-mix(
+    in oklch,
+    var(--color-light),
+    oklch(100% var(--chroma) var(--hue))
+  );
+  --color-lightest: color-mix(
+    in oklch,
+    var(--color-lighter),
+    oklch(100% var(--chroma) var(--hue))
+  );
+  --color-dark: color-mix(
+    in oklch,
+    var(--color),
+    oklch(0% var(--chroma) var(--hue))
+  );
+  --color-darker: color-mix(
+    in oklch,
+    var(--color-dark),
+    oklch(0% var(--chroma) var(--hue))
+  );
+  --color-darkest: color-mix(
+    in oklch,
+    var(--color-darker),
+    oklch(0% var(--chroma) var(--hue))
+  );
+
+  /* Highlight */
+  --highlight-lightness: 60%;
+  --highlight-chroma: 90%;
+  --highlight-hue: calc(var(--hue) + 120);
+
+  --highlight: oklch(
+    var(--highlight-lightness) var(--highlight-chroma) var(--highlight-hue)
+  );
+
+  --highlight-light: color-mix(
+    in oklch,
+    var(--highlight),
+    oklch(100% var(--highlight-chroma) var(--highlight-hue))
+  );
+  --highlight-lighter: color-mix(
+    in oklch,
+    var(--highlight-light),
+    oklch(100% var(--highlight-chroma) var(--highlight-hue))
+  );
+  --highlight-lightest: color-mix(
+    in oklch,
+    var(--highlight-lighter),
+    oklch(100% var(--highlight-chroma) var(--highlight-hue))
+  );
+  --highlight-dark: color-mix(
+    in oklch,
+    var(--highlight),
+    oklch(0% var(--highlight-chroma) var(--highlight-hue))
+  );
+  --highlight-darker: color-mix(
+    in oklch,
+    var(--highlight-dark),
+    oklch(0% var(--highlight-chroma) var(--highlight-hue))
+  );
+  --highlight-darkest: color-mix(
+    in oklch,
+    var(--highlight-darker),
+    oklch(0% var(--highlight-chroma) var(--highlight-hue))
+  );
+
+  /*  Accent */
+  --accent-lightness: 50%;
+  --accent-hue: calc(var(--hue) - 120);
+  --accent-chroma: 77%;
+
+  --accent: oklch(
+    var(--accent-lightness) var(--accent-chroma) var(--accent-hue)
+  );
+
+  --accent-light: color-mix(
+    in oklch,
+    var(--accent),
+    oklch(100% var(--accent-chroma) var(--accent-hue))
+  );
+
+  --accent-lighter: color-mix(
+    in oklch,
+    var(--accent-light),
+    oklch(100% var(--accent-chroma) var(--accent-hue))
+  );
+
+  --accent-lightest: color-mix(
+    in oklch,
+    var(--accent-lighter),
+    oklch(100% var(--accent-chroma) var(--accent-hue))
+  );
+
+  --accent-dark: color-mix(
+    in oklch,
+    var(--accent),
+    oklch(0% var(--accent-chroma) var(--accent-hue))
+  );
+
+  --accent-darker: color-mix(
+    in oklch,
+    var(--accent-dark),
+    oklch(0% var(--accent-chroma) var(--accent-hue))
+  );
+
+  --accent-darkest: color-mix(
+    in oklch,
+    var(--accent-darker),
+    oklch(0% var(--accent-chroma) var(--accent-hue))
+  );
+
+  --success: oklch(95% 100% 160);
+  --warning: oklch(95% 100% 110);
+  --error: oklch(95% 100% 45);
+  --info: oklch(95% 100% 200);
+
+  /* Gradients */
+
+  --gradient-direction: 130deg;
+
+  --gradient-dark: linear-gradient(
+    var(--gradient-direction),
+    var(--paper) 35%,
+    var(--gray-darker)
+  );
+
+  --gradient-light: linear-gradient(
+    var(--gradient-direction),
+    var(--gray-light) 35%,
+    var(--white)
+  );
+
+  --gradient-color: linear-gradient(
+    var(--gradient-direction),
+    var(--color) 35%,
+    var(--highlight)
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    --hue: 83;
+  }
+
+  [data-theme="light"] {
+    --hue: 29;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  html {
+    --hue: 29;
+  }
+
+  [data-theme="dark"] {
+    --hue: 83;
+  }
+}

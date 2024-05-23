@@ -1,0 +1,151 @@
+/* buttons and icons and smaller reusable bits here */
+
+@import "forms.css";
+
+/* Buttons */
+
+button,
+a {
+  background: none;
+  cursor: pointer;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  outline: unset;
+}
+
+:is(button, a):is(:disabled, .disabled) {
+  filter: grayscale(1) saturate(0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* primary button */
+
+.button {
+  padding: 1em 2em;
+  position: relative;
+  user-select: none;
+  text-align: center;
+  white-space: nowrap;
+  background: var(--color-lighter);
+  border-radius: var(--corners);
+}
+
+.button:is(:hover, .hover, :focus-visible, .focus) {
+  background: var(--color-light);
+  transition: 0.1s;
+  scale: 1.05;
+}
+
+.button:is(:active, .active) {
+  background: var(--color);
+  transform: scale(0.95);
+}
+
+/* outline button / seconadry button */
+
+.button.outline {
+  background: none;
+  border: var(--border-light);
+}
+
+.button.outline:is(:hover, :focus-visible, .hover) {
+  color: var(--highlight);
+  border-color: var(--highlight);
+}
+.button.outline:active {
+  color: var(--highlight-light);
+  border-color: var(--highlight-light);
+}
+
+/* icon-button */
+
+.button.icon {
+  padding: 0.5em;
+  aspect-ratio: var(--ratio-square);
+  line-height: 0;
+  border-radius: var(--corners-round);
+}
+
+/* Text buttons and acnhors  */
+:is(button, a).text {
+  padding: 0.5em 1em;
+  background: none;
+  border: none;
+  color: var(--highlight);
+}
+p :is(button, a).text {
+  padding: 0;
+}
+.text:is(:hover, :focus-visible) {
+  color: var(--color) !important;
+}
+.text:active {
+  color: var(--color-dark) !important;
+}
+
+/* loading buttons */
+
+.button:is([data-loading], .loading) {
+  filter: brightness(1.1);
+  pointer-events: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.button:is([data-loading], .loading)::before {
+  content: "";
+  margin-right: 0;
+
+  border: 0 solid transparent;
+  border-radius: 1.28571428em;
+
+  height: 1.28571428em;
+  width: 0;
+
+  transition: width 0.25s, border 0.25s, margin-right 0.25s;
+}
+
+.button:is([data-loading], .loading)::before {
+  animation: rotate 0.5s linear infinite;
+  margin-right: 0.75em;
+  width: 1.28571428em;
+  border: 0.1428571429em solid currentColor;
+  border-right-color: transparent;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+/* scrollbar */
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: var(--line-width); /* Firefox */
+}
+/* This part is for the scrollbar track / */
+*::-webkit-scrollbar {
+  width: var(--line-width);
+  height: var(--line-width);
+}
+
+/* / This part is for the track (the part that the thumb slides across) / */
+::-webkit-scrollbar-track {
+  box-shadow: var(--shadow);
+  border-radius: var(--corners);
+}
+
+/* / This part is for the thumb (the part you drag) / */
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-color);
+  border-radius: var(--corners);
+}
+
+/* / This part is for the thumb when it's being hovered over  */
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.2);
+}

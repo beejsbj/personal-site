@@ -1,0 +1,119 @@
+/* P reset */
+@import "preset.css";
+
+/* S etup */
+@import "setup.css";
+
+/* S setings */
+@import "settings.css";
+@import "developer-styles.css";
+
+/* S tructure */
+@import "structure.css";
+
+/* T ypography */
+@import "typography.css";
+
+/* C omponents */
+@import "components.css";
+
+/* S tuff (modules) */
+@import "modules.css";
+
+/* S ections and more stuff */
+@import "utilities.css";
+
+/* then other contextual styles */
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+.home-page .page-title {
+  display: none;
+}
+
+header nav ul {
+  margin-top: var(--space-m);
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: var(--space-s);
+}
+
+header mast-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.footer-menus {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* about */
+
+about-module {
+  display: grid;
+  gap: var(--space-l);
+
+  h2 {
+    grid-column: 1/-1;
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+projects-grid {
+  display: grid;
+  gap: var(--space-l);
+
+  h2 {
+    grid-column: 1/-1;
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+project-card {
+  ul.tools {
+    display: flex;
+    gap: var(--space-s);
+  }
+}
+
+/*  */
+goals-module {
+  li {
+    list-style: circle;
+    list-style-position: inside;
+  }
+}
+
+/*  */
+
+resume-section {
+  ul.resume-section {
+    margin-top: var(--space-l);
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  resume-card {
+    li {
+      list-style: circle;
+      list-style-position: inside;
+    }
+  }
+}
+
+blockquote {
+  padding: var(--space-m);
+  border-radius: var(--corners);
+  background-color: var(--gray-lightest);
+}

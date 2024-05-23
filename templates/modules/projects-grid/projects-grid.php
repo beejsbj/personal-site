@@ -41,7 +41,7 @@ if (isset($_GET['tags'])) {
 				<?= $heading ?>
 
 			</h2>
-			<h3 class="teaser-voice date">
+			<h3 class="solid-voice date">
 				<?= $date ?>
 			</h3>
 			<p class="calm-voice description">

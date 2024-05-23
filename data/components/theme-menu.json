@@ -1,16 +1,23 @@
 [
   {
     "id": "theme0",
+    "activePage": "none",
+    "class": "text",
+    "name": "None",
+    "slug": "none"
+  },
+  {
+    "id": "theme1",
     "activePage": "default",
-    "class": "magnetic button bubble",
+    "class": "text",
     "name": "Default",
     "slug": "default"
   },
   {
-    "id": "theme1",
+    "id": "theme2",
     "activePage": "pe-site",
-    "class": "magnetic button bubble",
-    "name": "<span>P</span><svg class='pe-circle' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' /></svg><span>E</span>",
+    "class": "text",
+    "name": "<span>P</span><svg class='pe-circle' style='display: inline; max-width: 1em; position: relative; top: 3px;' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' /></svg><span>E</span>",
     "slug": "pe-site"
   }
 ]

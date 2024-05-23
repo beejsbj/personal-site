@@ -4,27 +4,24 @@ $pageHeading = $pageData['heading'] ?? 'NA';
 
 
 <header>
-
-	<div class="overflodw-hidden">
-		<?php include('images/circle.svg'); ?>
-	</div>
-
 	<section class="header-section menus">
 		<inner-column>
-			<?php
-			$menu = "site";
-			include('templates/modules/menu-module/menu-module.php');
+			<mast-head>
+
+				<?php
+				$menu = "theme";
+				include('templates/modules/menu-module/menu-module.php');
 
 
-			$menu = "theme";
-			include('templates/modules/menu-module/menu-module.php');
+				$menu = "site";
+				include('templates/modules/menu-module/menu-module.php');
+
+				?>
 
 
-			?>
+			</mast-head>
 		</inner-column>
 	</section>
-
-
 </header>
 
 

@@ -2,15 +2,23 @@
 session_start();
 
 include('functions.php');
-$_SESSION['theme'] = currentTheme();
+
 
 
 
 $__dirname = dirname($_SERVER['SCRIPT_NAME']);
 $currentPage = currentPage();
-$currentTheme = $_SESSION['theme'];
+$currentTheme = currentTheme();
 $pageData = getPageData($currentPage);
 $template = $pageData['template'] ?? '';
+
+$themeSheet = "<link rel='stylesheet' href='styles/site.css'>";
+
+
+
+if ($currentTheme != 'none') {
+	$themeSheet = "<link rel='stylesheet' href='styles/$currentTheme/site.css'>";
+}
 
 
 
@@ -33,7 +41,7 @@ if (isset($_GET['project'])) {
 	<title><?= $pageData['title'] ?></title>
 	<meta name="description" content="<?= $pageData['description'] ?>">
 	<meta property="og:image" content="<?= $pageData['image'] ?>">
-	<link rel='stylesheet' href='styles/<?= $currentTheme ?>/site.css'>
+	<?= $themeSheet ?>
 
 	<link rel="icon" href="images/circle.svg" />
 

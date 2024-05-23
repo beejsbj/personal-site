@@ -8,5 +8,7 @@ $headingClass = "hide"
 		A Blurb About me
 	</h2>
 	<?php include('templates/modules/generic-text/generic-text.php') ?>
-	<?php include('templates/components/fan-images/fan-images.php') ?>
+	<picture>
+		<img src="images/burooj4.jpg" alt="">
+	</picture>
 </about-module>

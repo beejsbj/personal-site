@@ -1,0 +1,136 @@
+/* Should we pull in @fonts here? */
+/* don't think you can... might have to be higher up (the top of) the food chain! */
+
+html {
+  /* Family */
+  --font-head: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
+    Noto Sans, sans-serif;
+  --font-body: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
+    Noto Sans, sans-serif;
+
+  /* Size */
+  /* @link https://utopia.fyi/type/calculator?c=320,16,1.2,1600,18,1.5,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+  /* Step -3: 8.192px → 7.5994px */
+  --font-size--3: clamp(0.475rem, 0.5213rem + -0.0463vi, 0.512rem);
+  /* Step -2: 10.24px → 10.1301px */
+  --font-size--2: clamp(0.6331rem, 0.6417rem + -0.0086vi, 0.64rem);
+  /* Step -1: 12.8px → 13.5034px */
+  --font-size--1: clamp(0.8rem, 0.789rem + 0.055vi, 0.844rem);
+  /* Step 0: 16px → 18px */
+  --font-size-0: clamp(1rem, 0.9688rem + 0.1563vi, 1.125rem);
+  /* Step 1: 20px → 23.994px */
+  --font-size-1: clamp(1.25rem, 1.1876rem + 0.312vi, 1.4996rem);
+  /* Step 2: 25px → 31.984px */
+  --font-size-2: clamp(1.5625rem, 1.4534rem + 0.5456vi, 1.999rem);
+  /* Step 3: 31.25px → 42.6347px */
+  --font-size-3: clamp(1.9531rem, 1.7752rem + 0.8894vi, 2.6647rem);
+  /* Step 4: 39.0625px → 56.832px */
+  --font-size-4: clamp(2.4414rem, 2.1638rem + 1.3882vi, 3.552rem);
+  /* Step 5: 48.8281px → 75.7571px */
+  --font-size-5: clamp(3.0518rem, 2.631rem + 2.1038vi, 4.7348rem);
+  /* Step 6: 61.0352px → 100.9842px */
+  --font-size-6: clamp(3.8147rem, 3.1905rem + 3.121vi, 6.3115rem);
+  /* Step 7: 76.2939px → 134.6119px */
+  --font-size-7: clamp(4.7684rem, 3.8572rem + 4.5561vi, 8.4132rem);
+
+  /* Weight */
+  --weight-heavy: 700;
+  --weight-regular: 400;
+  --weight-light: 200;
+
+  /* Line Height */
+  --line-height-head: 1.2;
+  --line-height-body: 1.6;
+
+  /* letter spacing */
+  --letter-spacing-head: 0.05em;
+  --letter-spacing-body: 0.02em;
+}
+
+.booming-voice {
+  font-family: var(--font-head);
+  font-size: var(--font-size-7);
+  font-weight: var(--weight-heavy);
+  line-height: var(--line-height-head);
+}
+
+.loud-voice {
+  font-family: var(--font-body);
+  font-size: var(--font-size-4);
+  line-height: var(--line-height-head);
+}
+
+.attention-voice {
+  font-family: var(--font-body);
+  font-size: var(--font-size-3);
+  line-height: var(--line-height-head);
+}
+
+.firm-voice {
+  font-family: var(--font-body);
+  font-size: var(--font-size-2);
+  line-height: var(--line-height-head);
+}
+
+.notice-voice {
+  font-family: var(--font-body);
+  font-size: var(--font-size-1);
+  line-height: var(--line-height-body);
+}
+
+.calm-voice,
+p,
+li,
+label {
+  font-family: var(--font-body);
+  font-size: var(--font-size-0);
+  line-height: var(--line-height-body);
+  text-wrap: pretty;
+}
+
+em {
+  font-style: italic;
+}
+
+strong {
+  font-weight: var(--weight-heavy);
+}
+
+.whisper-voice {
+  font-family: var(--font-body);
+  font-size: var(--font-size--1);
+  color: var(--gray, #999);
+  line-height: var(--line-height-body);
+}
+
+.solid-voice {
+  font-family: var(--font-body);
+  font-size: var(--font-size--1);
+  font-weight: var(--weight-heavy);
+  line-height: var(--line-height-body);
+}
+
+.micro-voice {
+  font-family: var(--font-body);
+  font-size: var(--font-size--2);
+  line-height: var(--line-height-body);
+}
+
+/* these would be scoped to section or to an article element */
+/* this is just a loose setting for now */
+/* or smaller group of article-like styles such as a <text-content> custom element */
+p + p {
+  margin-top: 1em; /* Using em since its tied to an element with a set Font Size */
+}
+
+h2 + p {
+  margin-top: 1.25em;
+}
+
+code {
+  font-family: monospace;
+  font-size: var(--font-size--1);
+  color: var(--gray-lighter);
+  background: var(--gray-dark);
+  padding: 0.25em;
+}

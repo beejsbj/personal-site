@@ -1,21 +1,33 @@
+<style>
+	home-section {
+		min-height: 70vh;
+		display: grid;
+		align-content: center;
+	}
+</style>
+
 <home-section class="one">
 
-	<h1 class="loud-voice">
+	<h1 class="attention-voice">
 		<strong>Hey There!</strong>
 	</h1>
 
 	<h2 class="booming-voice">
-
 		Burooj here!
 	</h2>
 
-	<div class="dev-signer">
-		<!-- <span class="brace">{</span> -->
+	<div class="dev-signer notice-voice">
+		<span class="brace">{</span>
 		<span class="">Web Dev/signer</span>
-		<!-- <span class="brace">}</span> -->
+		<span class="brace">}</span>
 	</div>
 
 
+	<p>
+		Welcome to my home on the internet. Feel Free to look around!
+	</p>
+
+	<!-- 
 	<picture class="arrow">
 		<svg width="112px" height="492px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-miterlimit:5;">
 			<g transform="matrix(1,0,0,1,-44620.4,-20329.5)">
@@ -28,10 +40,6 @@
 			</g>
 		</svg>
 
-	</picture>
-
-
-
-
+	</picture> -->
 
 </home-section>

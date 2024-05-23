@@ -2,43 +2,44 @@
   {
     "id": "site0",
     "activePage": "home",
-    "class": "magnetic button bubble",
+    "class": "text",
     "name": "Home",
     "slug": "home"
   },
   {
     "id": "site1",
     "activePage": "about",
-    "class": "magnetic button bubble",
+    "class": "text",
     "name": "About",
     "slug": "about"
   },
   {
     "id": "site2",
     "activePage": "projects",
-    "class": "magnetic button bubble",
+    "class": "text",
     "name": "Projects",
     "slug": "projects"
   },
   {
     "id": "site3",
     "activePage": "style-guide",
-    "class": "magnetic button bubble",
+    "class": "text",
     "name": "Style Guide",
     "slug": "style-guide"
   },
   {
     "id": "site4",
     "activePage": "gaols",
-    "class": "hide",
-
-    "name": "/goals",
+    "class": "text",
+    "name": "Goals",
     "slug": "goals"
   },
   {
     "id": "site5",
     "activePage": "resume",
-    "name": "/resume",
+    "class": "text",
+
+    "name": "Resume",
     "slug": "resume"
   }
 ]

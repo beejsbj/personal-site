@@ -120,7 +120,7 @@ function activeTheme($current)
 
 function currentTheme()
 {
-	$theme = "default";
+	$theme = "none";
 
 
 
