@@ -1,0 +1,11 @@
+text-content.generic-list {
+  ul {
+    display: grid;
+    gap: var(--space-2xs);
+    padding: var(--space-xs);
+  }
+
+  li {
+    list-style-type: circle;
+  }
+}

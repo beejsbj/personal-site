@@ -69,7 +69,7 @@
     "role": "Design & Development",
     "location": "Remote @Perpetual Education",
     "id": "garden",
-    "description": "This here is a garden of responsive layouts. Try resizing the viewport to see the layout adapt to it!",
+    "description": "Layout Garden is a responsive layout showcase project developed during my time at Perpetual Education. The project was a hands-on exercise in building adaptive, flexible layouts that respond smoothly to different viewport sizes—all within a single-page application.",
     "image": "garden.png",
     "images": {
       "default": {
@@ -104,22 +104,58 @@
         ]
       },
       {
-        "heading-class": "hide",
+        "heading": "Challenges and Solutions",
+        "heading-class": "attention-voice",
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "#todo"
+            "text": "Challenge - Maintaining Consistency Across Breakpoints: Achieving a smooth and visually consistent experience across all breakpoints required meticulous planning and testing. To overcome this, I relied heavily on CSS Grid and Flexbox, which offered the necessary flexibility and control."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Balancing Aesthetics with Functionality: Keeping the garden both visually appealing and functional was another key challenge. By connecting the layouts to design tokens, I could make aesthetic adjustments quickly without needing to rewrite base styles."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Solution - Leveraging Design Tokens for Efficiency: Using custom properties and design tokens, I created a reusable and modifiable layout system. This approach allowed for easy theme updates and color adjustments without disrupting the layout structure."
           }
         ]
       },
-
+      {
+        "heading": "Learning Outcomes",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Responsive Design Techniques: This project deepened my understanding of CSS layout techniques, especially the combination of Flexbox, Grid, and media queries to create fluid, adaptable designs."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Working with Design Systems: I gained practical experience integrating a design system into a live project, leveraging custom properties and design tokens to ensure consistency and scalability."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Problem-Solving for Real-World Application: Creating a maintainable design that functions as a living document reinforced the importance of building scalable, user-centric solutions."
+          }
+        ]
+      },
+      {
+        "heading": "Final Thoughts",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Layout Garden not only taught me the intricacies of responsive design but also the power of an organized design system. This project underscored how design tokens can serve as a bridge between aesthetics and functionality, making it easier to iterate, theme, and maintain."
+          }
+        ]
+      },
       {
         "module": "goals-list",
         "heading": "Goals",
         "goals": [
-          "The site needs to be have a foundational design system, where components can be reused and modified easily",
-          "The components need to be responsive and mobile friendly",
-          "The site needs to be easy to maintain and update"
+          "Master responsive design by creating a cohesive layout system that fluidly adjusts across various devices, demonstrating key principles of responsive web design.",
+          "Integrate the layout with a foundational design system using CSS custom properties and design tokens, enabling easy updates and modifications.",
+          "Ensure the layout remains user-friendly and maintainable, allowing for straightforward adjustments and future scalability."
         ]
       }
     ]
@@ -181,9 +217,8 @@
       }
     ]
   },
-
   {
-    "hide": true,
+    "hide": false,
     "title": "Exercises 4 Programmers",
     "heading": "Exercises for Programmers",
     "role": "Design & Development",
@@ -191,7 +226,7 @@
     "date": "2021-08",
 
     "id": "e4p",
-    "description": "A book of 57 exercises recommended by Derek. A great book to learn and reinforce programming fundamentals",
+    "description": "Exercises for Programmers was a project inspired by the book Exercises for Programmers by Brian P. Hogan—a classic resource for learning and reinforcing core programming fundamentals. I worked through and built out exercises from this book to deepen my skills in multiple languages and frameworks. Each exercise not only served as coding practice but also pushed me to think more critically about problem-solving, clean code, and software design.",
     "image": "e4p.png",
     "images": {
       "default": {
@@ -230,22 +265,86 @@
         "module": "goals-list",
         "heading": "Goals",
         "goals": [
-          "Practice Exersise for Programmers",
-          "Build out the exercises in PHP",
-          "Build out the exercises in JS",
-          "Build out the exercises in Vue"
+          "Reinforce core programming concepts through practical exercises, enhancing skills in algorithms, logic, and data handling.",
+          "Build out solutions in multiple languages including PHP, JavaScript, and Vue, adapting each exercise to fit the syntax and features of each language.",
+          "Create a structured, reusable codebase that makes it easy to revisit, test, and improve each solution over time."
+        ]
+      },
+      {
+        "heading": "Overview",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Working through Exercises for Programmers was like a coding bootcamp I could dive into anytime, anywhere. Each challenge in the book focuses on practical tasks—things like calculating loan payments, creating simple calculators, or tracking sales figures. These exercises gave me the chance to dig into real-world coding scenarios where I could implement logic, refactor, and improve as I went along. I approached each problem by first planning a basic structure, coding a rough solution, and then iterating to make it cleaner and more efficient."
+          }
+        ]
+      },
+      {
+        "module": "generic-list",
+        "heading": "Key Features:",
+        "paragraphs": [
+          "Multi-Language Builds: I tackled each exercise in PHP, JavaScript, and Vue, adapting code for the quirks and advantages of each language.",
+          "Focus on Reusability: I built the solutions in a modular way, making it easier to test each function separately, which is especially useful when expanding or debugging.",
+          "Practice-Driven Learning: Each exercise served as a mini-project, challenging me to think critically and come up with solutions that are not just functional but also follow best practices."
+        ]
+      },
+      {
+        "heading": "Challenges and Solutions",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Adapting Exercises Across Different Languages: Each language has its own nuances and best practices, so coding the same exercise in PHP, JavaScript, and Vue forced me to rethink and rewrite parts of the code to fit the strengths of each language. This gave me hands-on experience with the unique syntax, error handling, and structure of each language."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Building Reusable, Clean Code: Making each solution modular and easy to maintain was a top priority. The exercises taught me to break down problems into smaller, more manageable functions, which made the code cleaner and more flexible."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Solution - Embracing Incremental Improvements: I often started with a simple, quick solution and then refined it. This iterative process helped me understand not only the 'what' of programming but also the 'why' behind clean code and reusable functions."
+          }
+        ]
+      },
+      {
+        "heading": "Learning Outcomes",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Solidifying Programming Fundamentals: Each exercise reinforced foundational skills—like loops, conditionals, and basic data structures—giving me a stronger base to build on."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Cross-Language Development Skills: Switching between PHP, JavaScript, and Vue honed my ability to adapt code to different languages, each with its own syntax, strengths, and quirks."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Problem-Solving with Modular Code: Breaking down problems into smaller, reusable functions not only improved my problem-solving skills but also showed me the value of creating maintainable code."
+          }
+        ]
+      },
+      {
+        "heading": "Final Thoughts",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Exercises for Programmers was more than just coding practice; it was a mindset shift toward creating clean, efficient, and reusable code. This project taught me that good programming isn’t just about getting things to work—it’s about making sure the code is well-designed, maintainable, and adaptable for future projects."
+          }
         ]
       }
     ]
   },
   {
-    "title": "Lottery App",
+    "title": "QRNG Demo Apps",
     "date": "2022-09",
-    "heading": "Lottery App",
+    "heading": "QRNG Demo Apps",
     "role": "Design & Development",
     "location": "Remote @API3",
-    "id": "lottery",
-    "description": "Second gig lets goooo. This was pretty fun. First dive into JS DOM manipulation and <em>really</em> working with functions",
+    "id": "qrng",
+    "description": "The Lottery App and Roulette App were demo projects developed to showcase the true randomness of QRNG (Quantum Random Number Generation). I was given creative freedom to design and implement these apps, allowing me to explore bold aesthetics, interactive elements, and cutting-edge technologies. Originally built in vanilla JavaScript, both projects were later ported to React for seamless integration with Web3 and blockchain functionalities.",
     "image": "lottery-app.jpg",
     "images": {
       "default": {
@@ -264,59 +363,127 @@
         "menu": "project",
         "links": [
           {
-            "id": "Demo",
-            "name": " Demo",
+            "id": "demo-lottery",
+            "name": " Demo Lottery",
             "class": "text",
             "slug": "https://demo-lottery.netlify.app/",
-            "target": "Demo"
+            "target": "demo-lot"
           },
           {
-            "id": "live",
-            "name": " Live",
+            "id": "demo-roullete",
+            "name": "Demo Roullete",
             "class": "text",
-            "slug": "https://qrng-lottery.netlify.app/",
-            "target": "live"
+            "slug": "https://demo-roulette-api3.netlify.app",
+            "target": "demo-roul"
           },
           {
             "id": "github",
             "name": "Github",
             "class": "text",
-            "slug": "",
+            "slug": "https://github.com/beejsbj/qrng-roulette",
             "target": "github"
-          },
-
-          {
-            "id": "Old",
-            "name": " Old",
-            "class": "text",
-            "slug": "https://api3-lottery-old.netlify.app/",
-            "target": "Old"
           }
         ]
       },
       {
-        "heading-class": "hide",
+        "heading": "Lottery App",
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle."
+            "text": "Inspired by the dynamic aesthetic of Persona 5, a favorite game of mine, the Lottery App was designed to be a bold, engaging experience. Users can either manually select five numbers from 1 to 50 or opt for a randomly generated set. The app also allows users to choose the number of entries they’d like, all of which are then linked to a smart contract via Metamask. The smart contract holds entries for a week before selecting a winner and distributing the winnings."
           }
+        ]
+      },
+      {
+        "module": "generic-list",
+        "heading": "Key Features:",
+        "paragraphs": [
+          "Number Selection & Random Generation: Users can select their numbers or use a random number generator.",
+          "Metamask Integration: This allows users to connect their wallets and securely submit their entries, which are then processed on the blockchain.",
+          "Countdown Timer: Using a customized countdown package, I styled it with CSS to match the app’s theme and provide a visual countdown to the winner announcement.",
+          "CSS Animations: To bring the app to life, I used extensive CSS animations that animate different elements, making the user experience visually captivating."
         ]
       },
       {
         "module": "standard-figure",
         "image": "projects/lottery-app.jpg"
       },
-
+      {
+        "heading": "Roulette App",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "The Roulette App takes inspiration from a “hole-in-the-wall” bar with vibrant neon lighting throughout the interface. This app provides an immersive experience where users can spin a digital roulette wheel, visually represented with SVG and animated with JavaScript. Built with the same intent of showcasing QRNG’s randomness, this app gives users a lively, interactive way to engage with quantum-based randomness."
+          }
+        ]
+      },
+      {
+        "module": "generic-list",
+        "heading": "Key Features:",
+        "paragraphs": [
+          "SVG-Based Roulette Wheel: The wheel was crafted in SVG, allowing for clean, scalable graphics that integrate seamlessly with the app’s aesthetics.",
+          "JavaScript-Powered Interactions: The spinning functionality was implemented with JavaScript, creating a smooth, interactive experience for users.",
+          "Themed Design with Neon Lighting: CSS animations and custom styles create an atmospheric experience, reflecting the theme of a neon-lit bar."
+        ]
+      },
+      {
+        "module": "standard-figure",
+        "image": "projects/roulette-app.jpg"
+      },
+      {
+        "heading": "Challenges and Solutions",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Implementing Metamask Integration: Integrating Metamask for user authentication and transaction handling required research and testing to ensure security and ease of use. I overcame this by using Web3 libraries and closely following blockchain security best practices."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Designing Engaging, Responsive Animations: Bringing both apps to life through animations and interactivity was essential. I solved this by creating CSS animations and using JavaScript to dynamically control elements like the SVG wheel spin."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Solution - Using SVG for Smooth Graphics: I implemented the roulette wheel with SVG, which allowed for clean, scalable visuals and integrated seamlessly with JavaScript interactions for a polished, immersive user experience."
+          }
+        ]
+      },
+      {
+        "heading": "Learning Outcomes",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Web3 and Blockchain Integration: This project provided hands-on experience with Web3 technologies, particularly in handling blockchain transactions and secure user authentication with Metamask."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Advanced CSS and JavaScript Animation Techniques: Creating interactive, animated components across both apps expanded my skills in CSS animations and JavaScript-based interactions, enhancing the user experience."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Designing Themed User Interfaces: Through the Persona 5-inspired aesthetic of the Lottery App and the neon theme of the Roulette App, I learned how to create cohesive, engaging themes that reinforce the brand and functionality of an application."
+          }
+        ]
+      },
+      {
+        "heading": "Final Thoughts",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "The QRNG demo projects allowed me to combine creativity with technical depth, from integrating Web3 and blockchain features to developing visually immersive, animated interfaces. These apps demonstrate how design and technology can converge to create engaging and functional user experiences."
+          }
+        ]
+      },
       {
         "module": "goals-list",
         "heading": "Goals",
         "goals": [
-          "Research how Lottery apps work",
-          "Apply the persona 5 design language to the site",
-          "The site needs to be responsive and mobile friendly",
-          "Build out the logic for the lottery app and the UI animations",
-          "Port it to React and connect to web3 so the app works on the blockchain"
+          "Showcase the true randomness of Quantum Random Number Generation (QRNG) through interactive demo applications.",
+          "Design and implement engaging, themed user interfaces for both apps, utilizing CSS animations and SVG elements to enhance user experience.",
+          "Integrate Web3 functionality via Metamask for user interaction and enable blockchain-driven features.",
+          "Develop reusable, responsive components in React for better scalability and maintainability across devices."
         ]
       }
     ]
@@ -362,12 +529,14 @@
           }
         ]
       },
+
       {
-        "heading-class": "hide",
+        "heading": "Overview",
+        "heading-class": "attention-voice",
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "A student Project made during my time with Perpetual Education."
+            "text": "This Flash Card app was a JavaScript project assignment from Perpetual Education. At the time, I was interested in the concept of spaced repetition and wanted to create a tool that could aid students in learning. The app fetches questions and answers directly from the PE Study Hall question bank, giving users a personalized and interactive learning experience. I designed a simple spaced repetition system using four review intervals: 1 day, 3 days, 7 days, and 14 days. If users remember an answer, the card progresses to the next review interval; if not, it moves to an earlier interval, reinforcing learning over time."
           }
         ]
       },
@@ -375,7 +544,6 @@
         "module": "standard-figure",
         "image": "projects/flashcards.png"
       },
-
       {
         "module": "goals-list",
         "heading": "Goals",
@@ -384,6 +552,61 @@
           "Design the Frontend and map out how the interactions will flow through all page faces",
           "Build out the logic for the interactions",
           "Account for the User's history and store their previous attempts(local storage)"
+        ]
+      },
+      {
+        "module": "generic-list",
+        "heading": "Key Features:",
+        "paragraphs": [
+          "Integrated with the PE Study Hall question bank to pull real questions and answers for student review.",
+          "Custom-built spaced repetition system using four intervals (1, 3, 7, and 14 days) to optimize retention based on user performance.",
+          "Simple, PE-inspired design that reflects the aesthetic of the Perpetual Education website."
+        ]
+      },
+      {
+        "heading": "Challenges and Solutions",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Creating an Effective Spaced Repetition System: Building a spaced repetition algorithm required a solid understanding of how learning intervals impact retention. I solved this by implementing a simplified interval system, with cards moving forward or backward based on user performance."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Integrating with the PE Study Hall Database: Pulling content directly from the PE question bank presented technical challenges. I used JavaScript to fetch and display the data dynamically, creating a seamless learning experience for users."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Solution - Streamlined Design with PE Aesthetic: I wanted the app to feel like an extension of the PE site. By mirroring the minimalist style of PE, I created a cohesive design that blends smoothly with the broader PE ecosystem."
+          }
+        ]
+      },
+      {
+        "heading": "Learning Outcomes",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Applying Spaced Repetition Theory in Practice: This project deepened my understanding of spaced repetition as a learning method and gave me the chance to implement it in a practical application."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Database Integration and Data Fetching: Integrating with the PE question bank helped me learn to work with external data sources, fetching and displaying data dynamically with JavaScript."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "User-Focused Interactive Design: Creating an interactive learning tool taught me to think from the user's perspective, focusing on simplicity, accessibility, and the overall learning experience."
+          }
+        ]
+      },
+      {
+        "heading": "Final Thoughts",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Building the Flash Cards app was a rewarding experience that combined my interest in spaced repetition with the chance to develop a useful educational tool. This project reinforced my belief in the power of interactive, personalized learning experiences and gave me valuable insights into designing tools that help users retain knowledge effectively."
+          }
         ]
       }
     ]
@@ -528,6 +751,226 @@
         "module": "frame-image",
         "video": "roulette-laptop-spin.mp4",
         "device": "laptop"
+      }
+    ]
+  },
+  {
+    "title": "Pizza Nano",
+    "date": "2024-09",
+    "heading": "Pizza Nano",
+    "role": "Design & Development",
+    "location": "Local Family-Owned Pizzeria",
+    "id": "pizza-nano",
+    "description": "A website designed and built for a local, family-owned pizzeria, focused on showcasing their brand and menu in a simple, elegant way.",
+    "image": "pizza-nano.png",
+    "images": {
+      "default": {
+        "thumbnail": "pizza-nano.png"
+      }
+    },
+    "tools": ["HTML", "CSS"],
+    "tags": ["client project", "local business"],
+    "sections": [
+      {
+        "module": "project-meta"
+      },
+      {
+        "module": "menu-module",
+        "menu": "project",
+        "links": [
+          {
+            "id": "live",
+            "name": "Live Link",
+            "class": "text",
+            "slug": "https://pizzanano.ca",
+            "target": "live"
+          }
+        ]
+      },
+      {
+        "heading": "Overview",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Pizza Nano is a simple, elegant website I built for a local, family-owned pizzeria. The goal was to create a visually appealing site that reflects the warmth and authenticity of their business, with a focus on simplicity and user-friendliness. The site consists of a homepage and a menu page listing all their offerings, making it easy for customers to view what’s available. Built using only HTML and CSS, the site highlights the brand’s charm and lets the food take center stage."
+          }
+        ]
+      },
+      {
+        "module": "goals-list",
+        "heading": "Goals",
+        "goals": [
+          "Design a simple, visually appealing website that reflects the charm and authenticity of a family-owned pizzeria.",
+          "Create a clean, easy-to-navigate menu page where customers can view all menu items at a glance.",
+          "Ensure the website is fully responsive, providing a seamless experience on both desktop and mobile devices.",
+          "Build the site using only HTML and CSS to keep it lightweight and maintainable for the client."
+        ]
+      },
+      {
+        "module": "generic-list",
+        "heading": "Key Features:",
+        "paragraphs": [
+          "Beautiful, minimalistic design that reflects the family-owned nature of the business.",
+          "Simple two-page structure with a homepage and a dedicated menu page, making it easy for customers to navigate.",
+          "Responsive layout built with HTML and CSS to ensure the site looks great on both desktop and mobile devices."
+        ]
+      },
+      {
+        "heading": "Challenges and Solutions",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Creating a Visually Appealing Design with Minimal Resources: With just HTML and CSS, I aimed to create a design that felt professional and inviting without relying on complex frameworks or JavaScript. I used carefully chosen fonts, colors, and spacing to achieve a balanced and appealing layout."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Structuring the Menu Page Effectively: Presenting a menu that’s easy to read and navigate is essential for a restaurant site. I organized the menu items in a clean, straightforward layout using CSS grid and flexbox for responsiveness, ensuring that each item was easy to scan on both desktop and mobile."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Solution - Focus on Simple, Responsive Design: By using a mobile-first design approach and optimizing the layout with CSS, I ensured that the site was accessible and visually appealing on all devices, making the menu and homepage intuitive for all users."
+          }
+        ]
+      },
+      {
+        "heading": "Learning Outcomes",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Refining Skills in HTML and CSS: Building this site solely with HTML and CSS strengthened my understanding of layout techniques, styling, and responsive design without relying on additional libraries."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Client-Focused Design: Working on this project helped me understand the importance of capturing a brand’s personality and aligning it with the client’s vision to create a site that feels personal and authentic."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Mobile-First Approach: This project reinforced the value of designing for mobile from the start, ensuring that the site performs well across different devices and screen sizes."
+          }
+        ]
+      },
+      {
+        "heading": "Final Thoughts",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "The Pizza nano project was a great opportunity to create a meaningful, client-focused design for a local business. By focusing on simplicity and visual appeal, I was able to deliver a site that not only meets the needs of the client but also provides a user-friendly experience that reflects the warmth and personality of the family-owned pizzeria."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Bengaluru DeSci World",
+    "date": "2024-2",
+    "heading": "Bengaluru DeSci World",
+    "role": "Design & Development",
+    "location": "Remote",
+    "id": "desci-bengaluru",
+    "description": "A visually engaging website for the DeSci World event in Bengaluru, blending the aesthetics of DeSci World with Indian cultural elements to create an immersive event experience.",
+    "image": "desci-bengaluru.png",
+    "images": {
+      "default": {
+        "thumbnail": "desci-bengaluru.png"
+      }
+    },
+    "tools": ["HTML", "CSS", "JavaScript"],
+    "tags": ["event site"],
+    "sections": [
+      {
+        "module": "project-meta"
+      },
+      {
+        "module": "menu-module",
+        "menu": "project",
+        "links": [
+          {
+            "id": "live",
+            "name": "Live Link",
+            "class": "text",
+            "slug": "https://desci-bangalore.netlify.app/",
+            "target": "live"
+          }
+        ]
+      },
+      {
+        "heading": "Overview",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "The Bengaluru DeSci World website was created to promote and showcase an event held in Bengaluru, India, focused on decentralized science (DeSci). The primary goal was to develop a site that reflected both the global aesthetics of DeSci World and local Indian cultural elements. To achieve this, I designed a theme toggle feature, allowing users to switch between DeSci World’s color palette and a vibrant Indian-inspired theme. The design heavily incorporates CSS animations to bring the page to life and enhance user engagement."
+          }
+        ]
+      },
+      {
+        "module": "goals-list",
+        "heading": "Goals",
+        "goals": [
+          "Create a visually engaging event site that combines DeSci World's aesthetics with local Indian cultural elements.",
+          "Develop a theme toggle feature that allows users to switch between global and Indian-inspired themes seamlessly.",
+          "Use CSS animations to make the website dynamic and visually interesting without heavily relying on JavaScript.",
+          "Ensure the website is responsive and accessible across various devices, from desktops to mobile."
+        ]
+      },
+      {
+        "module": "generic-list",
+        "heading": "Key Features:",
+        "paragraphs": [
+          "Dual-theme toggle to switch between DeSci World aesthetics and Indian-inspired colors, enhancing the site’s cultural relevance.",
+          "CSS animations throughout the page to add movement and visual interest, creating a dynamic experience for users.",
+          "Responsive design to ensure the site looks and functions well across all devices, from desktops to mobile."
+        ]
+      },
+      {
+        "heading": "Challenges and Solutions",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Blending Global and Local Aesthetics: Combining the futuristic, tech-focused aesthetic of DeSci World with Indian cultural elements was key. I addressed this by implementing a theme toggle that allows users to switch between these two styles, while maintaining cohesion across the design."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Challenge - Adding Interactivity with Limited JavaScript: The goal was to create a visually engaging site using primarily CSS and minimal JavaScript. I achieved this by leveraging CSS animations and transitions to add visual elements, keeping the code lightweight and maintainable."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Solution - CSS-Driven Animations and Cohesive Design Elements: By focusing on CSS animations, I created a lively, engaging site without heavy reliance on JavaScript. This kept the site fast, visually appealing, and in line with the event’s modern yet locally inspired theme."
+          }
+        ]
+      },
+      {
+        "heading": "Learning Outcomes",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Designing for Cultural Relevance: This project taught me the importance of understanding and incorporating local aesthetics, especially for events with a strong cultural connection."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Advanced CSS Techniques for Animation: By focusing on CSS animations, I improved my skills in creating engaging, interactive visuals without needing complex JavaScript solutions."
+          },
+          {
+            "voice": "notice-voice",
+            "text": "Balancing Aesthetics and Functionality: Creating a theme toggle that works across different aesthetics while maintaining a cohesive design strengthened my understanding of user-focused design and responsive theming."
+          }
+        ]
+      },
+      {
+        "heading": "Final Thoughts",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "The Bengaluru DeSci World project was a unique opportunity to blend modern tech aesthetics with cultural elements, creating an engaging site that captures the essence of both DeSci and Bengaluru. This project highlighted the power of CSS in building interactive designs and reinforced the importance of cultural adaptability in web design."
+          }
+        ]
       }
     ]
   }
