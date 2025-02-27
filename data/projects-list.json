@@ -1,7 +1,7 @@
 [
   {
     "title": "API3 Ecosystem",
-    "date": "Current",
+    "date": "Nov 2024",
     "heading": "API3 Ecosystem",
     "role": "Development",
     "location": "Remote @API3",
@@ -15,6 +15,7 @@
       "pe-site": {}
     },
     "tools": ["Nuxt3"],
+    "tags": ["api3"],
     "sections": [
       {
         "module": "project-meta"
@@ -33,6 +34,10 @@
         ]
       },
       {
+        "module": "article-grid",
+        "tag": "api3"
+      },
+      {
         "heading-class": "hide",
         "paragraphs": [
           {
@@ -45,26 +50,12 @@
         "module": "standard-figure",
         "image": "projects/api3-ecosystem.jpg",
         "caption": "this is the intro paragraphs and it is the one for this"
-      },
-
-      {
-        "module": "goals-list",
-        "heading": "Goals",
-        "goals": [
-          "Adapt the design of the base api3 site, and differentiate it to be it's own thing",
-          "Create an in-app form for developers to submit their dApps",
-          "Create an appealing landing page",
-          "Allow api3 to upload articles and read them in-app",
-          "Create a page for each dApp, where the developer can update the information and add screenshots",
-          "Create a style guide for the site",
-          "Use Nuxt3 to allow server side rendering and improve SEO"
-        ]
       }
     ]
   },
   {
     "title": "Layout Garden",
-    "date": "2021-05",
+    "date": "May 2021",
     "heading": "Layout Garden",
     "role": "Design & Development",
     "location": "Remote @Perpetual Education",
@@ -80,7 +71,7 @@
       }
     },
     "tools": ["HTML", "CSS", "PHP"],
-    "tags": ["feature"],
+    "tags": ["feature", "student-work"],
     "sections": [
       {
         "module": "project-meta"
@@ -101,6 +92,15 @@
             "class": "text",
             "slug": "?page=style-guide"
           }
+        ]
+      },
+      {
+        "module": "goals-list",
+        "heading": "Goals",
+        "goals": [
+          "Master responsive design by creating a cohesive layout system that fluidly adjusts across various devices, demonstrating key principles of responsive web design.",
+          "Integrate the layout with a foundational design system using CSS custom properties and design tokens, enabling easy updates and modifications.",
+          "Ensure the layout remains user-friendly and maintainable, allowing for straightforward adjustments and future scalability."
         ]
       },
       {
@@ -148,21 +148,13 @@
             "text": "Layout Garden not only taught me the intricacies of responsive design but also the power of an organized design system. This project underscored how design tokens can serve as a bridge between aesthetics and functionality, making it easier to iterate, theme, and maintain."
           }
         ]
-      },
-      {
-        "module": "goals-list",
-        "heading": "Goals",
-        "goals": [
-          "Master responsive design by creating a cohesive layout system that fluidly adjusts across various devices, demonstrating key principles of responsive web design.",
-          "Integrate the layout with a foundational design system using CSS custom properties and design tokens, enabling easy updates and modifications.",
-          "Ensure the layout remains user-friendly and maintainable, allowing for straightforward adjustments and future scalability."
-        ]
       }
     ]
   },
   {
+    "hide": true,
     "title": "Quantumon",
-    "date": "2021-05",
+    "date": "May 2021",
     "role": "Design & Development",
     "location": "Remote @API3",
     "heading": "Quantumon",
@@ -223,7 +215,7 @@
     "heading": "Exercises for Programmers",
     "role": "Design & Development",
     "location": "Remote @Perpetual Education",
-    "date": "2021-08",
+    "date": "Aug 2021",
 
     "id": "e4p",
     "description": "Exercises for Programmers was a project inspired by the book Exercises for Programmers by Brian P. Hogan—a classic resource for learning and reinforcing core programming fundamentals. I worked through and built out exercises from this book to deepen my skills in multiple languages and frameworks. Each exercise not only served as coding practice but also pushed me to think more critically about problem-solving, clean code, and software design.",
@@ -237,7 +229,7 @@
       }
     },
     "tools": ["HTML", "CSS", "PHP", "JS", "Vue"],
-    "tags": ["feature"],
+    "tags": ["feature", "student-work"],
     "sections": [
       {
         "module": "project-meta"
@@ -339,7 +331,7 @@
   },
   {
     "title": "QRNG Demo Apps",
-    "date": "2022-09",
+    "date": "Sep 2022",
     "heading": "QRNG Demo Apps",
     "role": "Design & Development",
     "location": "Remote @API3",
@@ -383,6 +375,16 @@
             "slug": "https://github.com/beejsbj/qrng-roulette",
             "target": "github"
           }
+        ]
+      },
+      {
+        "module": "goals-list",
+        "heading": "Goals",
+        "goals": [
+          "Showcase the true randomness of Quantum Random Number Generation (QRNG) through interactive demo applications.",
+          "Design and implement engaging, themed user interfaces for both apps, utilizing CSS animations and SVG elements to enhance user experience.",
+          "Integrate Web3 functionality via Metamask for user interaction and enable blockchain-driven features.",
+          "Develop reusable, responsive components in React for better scalability and maintainability across devices."
         ]
       },
       {
@@ -475,22 +477,12 @@
             "text": "The QRNG demo projects allowed me to combine creativity with technical depth, from integrating Web3 and blockchain features to developing visually immersive, animated interfaces. These apps demonstrate how design and technology can converge to create engaging and functional user experiences."
           }
         ]
-      },
-      {
-        "module": "goals-list",
-        "heading": "Goals",
-        "goals": [
-          "Showcase the true randomness of Quantum Random Number Generation (QRNG) through interactive demo applications.",
-          "Design and implement engaging, themed user interfaces for both apps, utilizing CSS animations and SVG elements to enhance user experience.",
-          "Integrate Web3 functionality via Metamask for user interaction and enable blockchain-driven features.",
-          "Develop reusable, responsive components in React for better scalability and maintainability across devices."
-        ]
       }
     ]
   },
   {
     "title": "Flash Cards",
-    "date": "2022-11",
+    "date": "Nov 2022",
     "heading": "Flash Cards",
     "role": "Design & Development",
     "location": "Remote @Perpetual Education",
@@ -504,7 +496,7 @@
       "pe-site": {}
     },
     "tools": ["HTML", "CSS", "JS"],
-    "tags": ["feature"],
+    "tags": ["feature", "student-work"],
     "sections": [
       {
         "module": "project-meta"
@@ -614,7 +606,7 @@
   {
     "title": "Roulette App",
     "hide": true,
-    "date": "2022-10",
+    "date": "Oct 2022",
     "heading": "Roulette App",
     "role": "Design & Development",
     "location": "Remote @API3",
@@ -756,7 +748,7 @@
   },
   {
     "title": "Pizza Nano",
-    "date": "2024-09",
+    "date": "Sep 2024",
     "heading": "Pizza Nano",
     "role": "Design & Development",
     "location": "Local Family-Owned Pizzeria",
@@ -769,7 +761,7 @@
       }
     },
     "tools": ["HTML", "CSS"],
-    "tags": ["client project", "local business"],
+    "tags": ["freelance", "local business"],
     "sections": [
       {
         "module": "project-meta"
@@ -788,16 +780,6 @@
         ]
       },
       {
-        "heading": "Overview",
-        "heading-class": "attention-voice",
-        "paragraphs": [
-          {
-            "voice": "notice-voice",
-            "text": "Pizza Nano is a simple, elegant website I built for a local, family-owned pizzeria. The goal was to create a visually appealing site that reflects the warmth and authenticity of their business, with a focus on simplicity and user-friendliness. The site consists of a homepage and a menu page listing all their offerings, making it easy for customers to view what’s available. Built using only HTML and CSS, the site highlights the brand’s charm and lets the food take center stage."
-          }
-        ]
-      },
-      {
         "module": "goals-list",
         "heading": "Goals",
         "goals": [
@@ -805,6 +787,16 @@
           "Create a clean, easy-to-navigate menu page where customers can view all menu items at a glance.",
           "Ensure the website is fully responsive, providing a seamless experience on both desktop and mobile devices.",
           "Build the site using only HTML and CSS to keep it lightweight and maintainable for the client."
+        ]
+      },
+      {
+        "heading": "Overview",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "Pizza Nano is a simple, elegant website I built for a local, family-owned pizzeria. The goal was to create a visually appealing site that reflects the warmth and authenticity of their business, with a focus on simplicity and user-friendliness. The site consists of a homepage and a menu page listing all their offerings, making it easy for customers to view what’s available. Built using only HTML and CSS, the site highlights the brand’s charm and lets the food take center stage."
+          }
         ]
       },
       {
@@ -866,7 +858,7 @@
   },
   {
     "title": "Bengaluru DeSci World",
-    "date": "2024-2",
+    "date": "Feb 2024",
     "heading": "Bengaluru DeSci World",
     "role": "Design & Development",
     "location": "Remote",
@@ -879,7 +871,7 @@
       }
     },
     "tools": ["HTML", "CSS", "JavaScript"],
-    "tags": ["event site"],
+    "tags": ["freelance"],
     "sections": [
       {
         "module": "project-meta"
@@ -898,16 +890,6 @@
         ]
       },
       {
-        "heading": "Overview",
-        "heading-class": "attention-voice",
-        "paragraphs": [
-          {
-            "voice": "notice-voice",
-            "text": "The Bengaluru DeSci World website was created to promote and showcase an event held in Bengaluru, India, focused on decentralized science (DeSci). The primary goal was to develop a site that reflected both the global aesthetics of DeSci World and local Indian cultural elements. To achieve this, I designed a theme toggle feature, allowing users to switch between DeSci World’s color palette and a vibrant Indian-inspired theme. The design heavily incorporates CSS animations to bring the page to life and enhance user engagement."
-          }
-        ]
-      },
-      {
         "module": "goals-list",
         "heading": "Goals",
         "goals": [
@@ -915,6 +897,16 @@
           "Develop a theme toggle feature that allows users to switch between global and Indian-inspired themes seamlessly.",
           "Use CSS animations to make the website dynamic and visually interesting without heavily relying on JavaScript.",
           "Ensure the website is responsive and accessible across various devices, from desktops to mobile."
+        ]
+      },
+      {
+        "heading": "Overview",
+        "heading-class": "attention-voice",
+        "paragraphs": [
+          {
+            "voice": "notice-voice",
+            "text": "The Bengaluru DeSci World website was created to promote and showcase an event held in Bengaluru, India, focused on decentralized science (DeSci). The primary goal was to develop a site that reflected both the global aesthetics of DeSci World and local Indian cultural elements. To achieve this, I designed a theme toggle feature, allowing users to switch between DeSci World’s color palette and a vibrant Indian-inspired theme. The design heavily incorporates CSS animations to bring the page to life and enhance user engagement."
+          }
         ]
       },
       {

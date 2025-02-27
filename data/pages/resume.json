@@ -14,19 +14,10 @@
       "heading": "Education",
       "experiences": [
         {
-          "role": "Bacelor of Computer Science",
+          "role": "Bachelor of Computer Science",
           "place": "Ontario Tech University",
           "dates": ["June 2022"],
           "specialNote": "In Progress"
-        },
-        {
-          "role": "Design for the Web",
-          "place": "Perpetual Education",
-          "dates": ["Feb 2022", "Oct 2023"],
-          "duties": [
-            "Learned the history and foundations of web development and design"
-          ],
-          "specialNote": "An online program that teaches the entire web design and development process from idea to completion."
         },
         {
           "role": "Junior IT Analyst Program",
@@ -41,25 +32,57 @@
       "heading": "Work",
       "experiences": [
         {
-          "role": "Web Design & Development Intern",
-          "place": "Perpetual Education",
-          "dates": ["Oct 2021", "Aug 2023"],
+          "role": "Frontend Developer",
+          "place": "API3",
+          "dates": ["January 2022", "November 2024"],
           "duties": [
-            "Built a <a class='text' href='http://projects:8888/personal-site/?page=project&project=flashcards'> Flashcards</a> webapp to allow students to study from the Study Hall database",
-            "Helped with taks like refactoring and #todo for the new Perpetual Education website"
+            "Led development for the API3 Ecosystem website, building engaging and responsive interfaces with Vue.js 3 and Nuxt.js",
+            "Developed complex data visualizations for Oracle Extractable Value (OEV) data, enabling users to explore blockchain information with advanced zoom and scaling options",
+            "Optimized website performance with state-of-the-art SSR/CSR strategies and enhanced state management, improving load times and responsiveness",
+            "Built multiple Web3 projects using React.js, including features like RainbowKit wallet integrations and secure blockchain interactions"
+          ],
+          "skills": [
+            "Vue.js",
+            "Nuxt.js",
+            "React.js",
+            "HTML",
+            "CSS",
+            "JavaScript"
           ]
         },
         {
-          "role": "Web Design & Development",
-          "place": "API3",
-          "dates": ["Aug 2022", "Aug 2023"],
+          "role": "Freelance Web Developer",
+          "place": "Self-Employed",
+          "dates": ["September 2023", "Present"],
           "duties": [
-            "Built a brochure welcome site for <a class='text' href='http://projects:8888/personal-site/?page=project&project=quantumon'> Quantumon</a>  with HTML and CSS",
-            "Designed and Developed a <a class='text' href='http://projects:8888/personal-site/?page=project&project=lottery'> Lottery</a> and <a class='text' href='http://projects:8888/personal-site/?page=project&project=roulette'> Roulette</a>  interactive app using JS, HTML, CSS and React and connected it to the Ethereum Blockchain",
-            "Adapted the design of the main API3 site to develop the <a class='text' href='http://projects:8888/personal-site/?page=project&project=api3-ecosystem'> API3 Ecosystem</a>  website, where Developers can showcase their dApps"
+            "Designed and developed <a class='text' href='?page=project&project=pizza-nano'>Pizza Nano's website</a>, creating a simple yet elegant online presence for a local family-owned pizzeria",
+            "Built the <a class='text' href='?page=project&project=desci-bengaluru'>Bengaluru DeSci World event website</a>, incorporating dual-theme functionality to blend global tech aesthetics with local Indian cultural elements"
           ],
-          "skills": ["HTML", "CSS", "Javascript", "React", "Nuxt3"],
-          "specialNote": "Freelance Project Contract"
+          "skills": [
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "Responsive Design",
+            "UI/UX Design"
+          ]
+        },
+        {
+          "role": "Web Design & Development Intern",
+          "place": "Perpetual Education",
+          "dates": ["February 2021", "August 2021"],
+          "duties": [
+            "Completed a rigorous web design bootcamp, gaining hands-on experience in responsive, mobile-first design systems and modern web development techniques",
+            "Received mentorship while working on professional projects, honing skills in risk-taking, resilience, and adaptability to bring design concepts into real-world application"
+          ],
+          "skills": [
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "PHP",
+            "Figma",
+            "WordPress",
+            "Responsive Design"
+          ]
         }
       ]
     }

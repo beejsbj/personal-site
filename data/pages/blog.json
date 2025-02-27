@@ -1,0 +1,14 @@
+{
+  "id": "blog",
+  "_id": { "$oid": "661dace8fdefeea57b3f7ef1" },
+  "title": "Blog",
+  "image": "",
+  "description": "",
+  "heading": "Blog",
+
+  "sections": [
+    {
+      "module": "article-grid"
+    }
+  ]
+}

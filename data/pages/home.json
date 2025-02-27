@@ -1,6 +1,5 @@
 {
   "id": "home",
-  "_id": { "$oid": "661dace8fdefeea57b3f7ef1" },
   "title": "Welcome",
   "image": "",
   "description": "",

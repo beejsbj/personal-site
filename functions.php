@@ -172,8 +172,31 @@ function getTitleCase($title)
 	// Our array of 'small words' which shouldn't be capitalised if
 	// they aren't the first word. Add your own words to taste.
 	$smallwordsarray = [
-		'of', 'a', 'the', 'and', 'an', 'or', 'nor', 'but', 'is', 'if', 'then', 'else', 'when',
-		'at', 'from', 'by', 'on', 'off', 'for', 'in', 'out', 'over', 'to', 'into', 'with'
+		'of',
+		'a',
+		'the',
+		'and',
+		'an',
+		'or',
+		'nor',
+		'but',
+		'is',
+		'if',
+		'then',
+		'else',
+		'when',
+		'at',
+		'from',
+		'by',
+		'on',
+		'off',
+		'for',
+		'in',
+		'out',
+		'over',
+		'to',
+		'into',
+		'with'
 	];
 
 	// Split the string into separate words
@@ -197,4 +220,63 @@ function getTitleCase($title)
 function exExists($slug)
 {
 	return	file_exists("projects/e4p/exercises/$slug.php");
+}
+
+
+
+// get substack articles
+
+function get_substack_articles($substack_url, $limit = 6, $tag = null)
+{
+	// Construct the RSS feed URL (Substack provides RSS feeds at /feed)
+	$rss_url = rtrim($substack_url, '/') . '/feed';
+
+	// Fetch the RSS feed
+	$rss_content = file_get_contents($rss_url);
+	if (!$rss_content) {
+		return [];
+	}
+
+	// Parse the XML
+	$xml = simplexml_load_string($rss_content);
+	if (!$xml) {
+		return [];
+	}
+
+	$articles = [];
+	$count = 0;
+
+	foreach ($xml->channel->item as $item) {
+		if ($count >= $limit) break;
+
+		// Get categories/tags for the item
+		$item_tags = [];
+		if ($item->category) {
+			foreach ($item->category as $category) {
+				$item_tags[] = strtolower((string)$category);
+			}
+		}
+
+		// Skip if tag is specified and article doesn't have that tag
+		if ($tag && !in_array(strtolower($tag), $item_tags)) {
+			continue;
+		}
+
+		// Extract the first image from the content if available
+		$content = (string)$item->children('content', true);
+		preg_match('/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $content, $image);
+
+		$articles[] = [
+			'title' => htmlspecialchars((string)$item->title),
+			'link' => htmlspecialchars((string)$item->link),
+			'date' => htmlspecialchars(date('M j, Y', strtotime((string)$item->pubDate))),
+			'image' => isset($image['src']) ? htmlspecialchars($image['src']) : '',
+			'description' => htmlspecialchars(html_entity_decode(substr(strip_tags((string)$item->description), 0, 150) . '...')),
+			'tags' => array_map('htmlspecialchars', $item_tags)
+		];
+
+		$count++;
+	}
+
+	return $articles;
 }
