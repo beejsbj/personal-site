@@ -225,8 +225,7 @@ function exExists($slug)
 
 
 // get substack articles
-
-function get_substack_articles($substack_url, $limit = 6, $tag = null)
+function get_substack_articles($substack_url, $limit = 6)
 {
 	// Construct the RSS feed URL (Substack provides RSS feeds at /feed)
 	$rss_url = rtrim($substack_url, '/') . '/feed';
@@ -244,39 +243,30 @@ function get_substack_articles($substack_url, $limit = 6, $tag = null)
 	}
 
 	$articles = [];
-	$count = 0;
 
+	// Collect all articles first
 	foreach ($xml->channel->item as $item) {
-		if ($count >= $limit) break;
-
-		// Get categories/tags for the item
-		$item_tags = [];
-		if ($item->category) {
-			foreach ($item->category as $category) {
-				$item_tags[] = strtolower((string)$category);
-			}
-		}
-
-		// Skip if tag is specified and article doesn't have that tag
-		if ($tag && !in_array(strtolower($tag), $item_tags)) {
-			continue;
-		}
-
 		// Extract the first image from the content if available
 		$content = (string)$item->children('content', true);
 		preg_match('/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $content, $image);
 
+		$pubDate = strtotime((string)$item->pubDate);
+
 		$articles[] = [
 			'title' => htmlspecialchars((string)$item->title),
 			'link' => htmlspecialchars((string)$item->link),
-			'date' => htmlspecialchars(date('M j, Y', strtotime((string)$item->pubDate))),
+			'date' => htmlspecialchars(date('M j, Y', $pubDate)),
+			'timestamp' => $pubDate, // Store timestamp for sorting
 			'image' => isset($image['src']) ? htmlspecialchars($image['src']) : '',
-			'description' => htmlspecialchars(html_entity_decode(substr(strip_tags((string)$item->description), 0, 150) . '...')),
-			'tags' => array_map('htmlspecialchars', $item_tags)
+			'description' => htmlspecialchars(html_entity_decode(substr(strip_tags((string)$item->description), 0, 150) . '...'))
 		];
-
-		$count++;
 	}
 
-	return $articles;
+	// Sort articles by date (newest first)
+	usort($articles, function ($a, $b) {
+		return $b['timestamp'] - $a['timestamp'];
+	});
+
+	// Return only the requested number of articles
+	return array_slice($articles, 0, $limit);
 }

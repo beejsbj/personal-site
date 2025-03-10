@@ -1,9 +1,10 @@
 <?php
-$tag = $section['tag'] ?? null;
+
 
 // Usage
 $substack_url = 'https://buroojs.substack.com'; // Replace with your Substack URL
-$articles = get_substack_articles($substack_url, 9, $tag);
+$articles = $section['articles'] ?? get_substack_articles($substack_url, 9);
+
 ?>
 
 <ul>
@@ -21,10 +22,10 @@ $articles = get_substack_articles($substack_url, 9, $tag);
 						<h3 class="solid-voice">
 							<?php echo $article['title']; ?>
 						</h3>
-						<p class="whisper-voice">
+						<p class="micro-voice">
 							<?php echo $article['date']; ?>
 						</p>
-						<p>
+						<p class="whisper-voice">
 							<?php echo $article['description']; ?>
 						</p>
 					</div>

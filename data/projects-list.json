@@ -35,7 +35,43 @@
       },
       {
         "module": "article-grid",
-        "tag": "api3"
+        "articles": [
+          {
+            "title": "Let's Create a FormKit Plugin Together!",
+            "link": "https://buroojs.substack.com/p/lets-create-a-formkit-plugin-together",
+            "date": "Nov 24, 2024",
+            "image": "https://substackcdn.com/image/fetch/w_1250,h_833,c_fill,f_webp,q_auto:good,fl_progressive:steep,g_center/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fd81df343-d08f-4d27-b9f5-66d5f224d82f_1000x563.jpeg",
+            "description": "I've been learning how to make FormKit plugins and want to walk you through creating one from scratch...."
+          },
+          {
+            "title": "Building API3’s OEV Comparison Tool: Interactive Data Visualization Done Right",
+            "link": "https://buroojs.substack.com/p/building-api3s-oev-comparison-tool",
+            "date": "Nov 14, 2024",
+            "image": "https://substackcdn.com/image/fetch/w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fc89c1074-2ef7-4018-9ae3-58a1e370a5cb_800x447.gif",
+            "description": "Visualizing blockchain data in a way that’s accessible and engaging is no easy task...."
+          },
+          {
+            "title": "Customizing dApp Submission with FormKit: Building a Multi-Step Form for API3",
+            "link": "https://buroojs.substack.com/p/customizing-dapp-submission-with",
+            "date": "Nov 14, 2024",
+            "image": "https://substackcdn.com/image/fetch/w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F3beeae0a-b3ca-4c6d-a783-dda37ebe2ab6_3352x2694.png",
+            "description": "Creating a smooth, on-brand experience for dApp submissions can be tough, especially when the form needs to look and feel like a seamless part of your..."
+          },
+          {
+            "title": "Animating the API3 Ecosystem with GSAP and SVGs",
+            "link": "https://buroojs.substack.com/p/animating-the-api3-ecosystem-with",
+            "date": "Nov 14, 2024",
+            "image": "https://substackcdn.com/image/fetch/w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F087e6ed2-e887-412f-95c1-ebe5e4864669_800x447.gif",
+            "description": "Creating a site that feels alive takes more than static content—it’s about the small, dynamic touches that guide users, highlight importan..."
+          },
+          {
+            "title": "Pinia State Management in the API3 Ecosystem",
+            "link": "https://buroojs.substack.com/p/pinia-state-management-in-the-api3",
+            "date": "Nov 14, 2024",
+            "image": "",
+            "description": "Building API3’s Ecosystem hub was a balancing act between user experience, performance, and real-time data interactions...."
+          }
+        ]
       },
       {
         "heading-class": "hide",
