@@ -33,6 +33,11 @@
           }
         ]
       },
+
+      {
+        "module": "standard-figure",
+        "image": "projects/api3-ecosystem.jpg"
+      },
       {
         "module": "article-grid",
         "articles": [
@@ -72,20 +77,6 @@
             "description": "Building API3’s Ecosystem hub was a balancing act between user experience, performance, and real-time data interactions...."
           }
         ]
-      },
-      {
-        "heading-class": "hide",
-        "paragraphs": [
-          {
-            "voice": "notice-voice",
-            "text": "Currently Working here"
-          }
-        ]
-      },
-      {
-        "module": "standard-figure",
-        "image": "projects/api3-ecosystem.jpg",
-        "caption": "this is the intro paragraphs and it is the one for this"
       }
     ]
   },
