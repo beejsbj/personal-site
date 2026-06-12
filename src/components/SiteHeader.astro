@@ -1,0 +1,45 @@
+---
+interface NavItem {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+interface Props {
+  nav: NavItem[];
+  currentPath: string;
+}
+
+const { nav, currentPath } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="site-header__inner shell">
+    <a class="site-header__brand" href="/">
+      <span class="site-header__mark">BR</span>
+      <span class="site-header__name">Burooj Rashid</span>
+    </a>
+
+    <nav aria-label="Primary" class="site-nav">
+      <ul class="site-nav__list">
+        {
+          nav.map((item) => {
+            const active = !item.external && (item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href));
+            return (
+              <li>
+                <a
+                  class:list={["site-nav__link", active && "is-active"]}
+                  href={item.href}
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noreferrer" : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+  </div>
+</header>

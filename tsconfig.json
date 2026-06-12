@@ -1,0 +1,25 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.astro",
+    "src/**/*.vue",
+    "src/**/*.md",
+    "src/**/*.json",
+    "astro.config.mjs"
+  ],
+  "exclude": [
+    "node_modules",
+    ".astro",
+    "dist",
+    ".output",
+    "projects",
+    "templates",
+    "data",
+    "styles",
+    "images",
+    "assets",
+    "about",
+    "public/styles"
+  ]
+}

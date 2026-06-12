@@ -1,0 +1,143 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/garden",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/garden/:slug",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/e4p",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/e4p/:slug",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/style-guide",
+      "destination": "/lab/style-guide",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": "(?<project>.*)"
+        }
+      ],
+      "destination": "/projects/:project",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "garden"
+        }
+      ],
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "layout-detail"
+        }
+      ],
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "e4p"
+        }
+      ],
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "exercise-detail"
+        }
+      ],
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "style-guide"
+        }
+      ],
+      "destination": "/lab/style-guide",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "about"
+        }
+      ],
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "projects"
+        }
+      ],
+      "destination": "/projects",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "resume"
+        }
+      ],
+      "destination": "/resume",
+      "permanent": true
+    }
+  ]
+}

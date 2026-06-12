@@ -1,0 +1,20 @@
+[data-theme="pe-site"] {
+  --color-page: #f3f7f1;
+  --color-surface: #fbfffa;
+  --color-surface-strong: #fbfffa;
+  --color-text: #1b271f;
+  --color-text-soft: #546257;
+  --color-border: rgba(27, 39, 31, 0.14);
+  --color-accent: #2e7d63;
+  --color-accent-strong: #256851;
+  --color-accent-contrast: #f4fffb;
+  --color-accent-soft: rgba(46, 125, 99, 0.1);
+  --color-panel: #f8fdf7;
+  --color-loader-1: #2e7d63;
+  --color-loader-2: #63a46c;
+  --color-loader-3: #d7e89e;
+  --color-loader-4: #b8d8d8;
+  --color-loader-5: #6f86c7;
+  --color-loader-6: #25324b;
+  --page-glow: radial-gradient(circle at top, rgba(46, 125, 99, 0.1), transparent 44%);
+}

@@ -1,0 +1,23 @@
+:root,
+[data-theme="default"] {
+  --color-page: #f7f4ee;
+  --color-surface: #fcfaf6;
+  --color-surface-strong: #fffdfa;
+  --color-text: #171513;
+  --color-text-soft: #615950;
+  --color-border: rgba(23, 21, 19, 0.12);
+  --color-accent: #c75335;
+  --color-accent-strong: #ad452c;
+  --color-accent-contrast: #fff8f2;
+  --color-accent-soft: rgba(199, 83, 53, 0.08);
+  --color-panel: #fcfaf6;
+  --color-loader-1: #c75335;
+  --color-loader-2: #ee9b56;
+  --color-loader-3: #f2d783;
+  --color-loader-4: #97b697;
+  --color-loader-5: #4e6978;
+  --color-loader-6: #281f2d;
+  --page-glow: radial-gradient(circle at top, rgba(199, 83, 53, 0.08), transparent 44%);
+  --page-grid: linear-gradient(rgba(24, 23, 26, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 23, 26, 0.06) 1px, transparent 1px);
+}

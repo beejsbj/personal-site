@@ -1,0 +1,45 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import LabCard from "../../components/LabCard.astro";
+
+const entries: CollectionEntry<"lab">[] = (await getCollection("lab"))
+  .filter((entry: CollectionEntry<"lab">) => !entry.data.hidden)
+  .sort(
+    (left: CollectionEntry<"lab">, right: CollectionEntry<"lab">) =>
+      left.data.order - right.data.order,
+  );
+---
+
+<BaseLayout
+  title="Lab"
+  description="Experiments, student work, and design-system explorations by Burooj Rashid."
+  pageClass="page-lab"
+>
+  <section class="shell page-section page-section--header">
+    <PageHeader
+      eyebrow="Lab"
+      title="The experiments stay visible, just in the right room."
+      intro="This is where the earlier work, design-system thinking, and more exploratory pieces live."
+    />
+  </section>
+
+  <section class="shell page-section">
+    <div class="lab-grid lab-grid--dense">
+      {
+        entries.map((entry) => (
+          <LabCard
+            href={`/lab/${entry.slug}`}
+            title={entry.data.title}
+            summary={entry.data.summary}
+            type={entry.data.type}
+            sourceEra={entry.data.sourceEra}
+            cover={entry.data.cover}
+          />
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

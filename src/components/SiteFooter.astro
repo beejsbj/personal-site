@@ -1,0 +1,50 @@
+---
+interface SocialLink {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  social: SocialLink[];
+  writingUrl: string;
+  email: string;
+}
+
+const { social, writingUrl, email } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner shell">
+    <div class="site-footer__intro">
+      <p class="site-footer__eyebrow">Keep in touch</p>
+      <h2 class="site-footer__title">Have something interesting in mind?</h2>
+      <p class="site-footer__copy">
+        I like projects with a clear point of view, strong collaboration, and room for craft.
+      </p>
+    </div>
+
+    <div class="site-footer__meta">
+      <a class="site-footer__email" href={`mailto:${email}`}>{email}</a>
+
+      <ul class="site-footer__social">
+        {
+          social.map((item) => (
+            <li>
+              <a href={item.href} target="_blank" rel="noreferrer">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={writingUrl} target="_blank" rel="noreferrer">
+            Writing
+          </a>
+        </li>
+      </ul>
+
+      <p class="site-footer__legal">© {year} Burooj Rashid</p>
+    </div>
+  </div>
+</footer>
