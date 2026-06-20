@@ -363,7 +363,7 @@
     "role": "Design & Development",
     "location": "Remote @API3",
     "id": "qrng",
-    "description": "The Lottery App and Roulette App were demo projects developed to showcase QRNG (Quantum Random Number Generation) through expressive, interactive game interfaces. I was given creative freedom to design and implement these apps, allowing me to explore bold aesthetics, animation, Web3 interaction patterns, and demoable contract-style flows. The Lottery app now preserves the feel of the original wallet and contract experience as a polished local simulation deployed on Vercel.",
+    "description": "The Lottery App and Roulette App were demo projects developed to showcase QRNG (Quantum Random Number Generation) through expressive, interactive game interfaces. I was given creative freedom to design and implement these apps, allowing me to explore bold aesthetics, animation, Web3 interaction patterns, and demoable contract-style flows. Both apps now preserve the feel of the original wallet and contract experience as polished Vercel-hosted simulations.",
     "image": "lottery-app.jpg",
     "images": {
       "default": {
@@ -399,7 +399,7 @@
             "id": "demo-roulette",
             "name": "Roulette Demo",
             "class": "text",
-            "slug": "https://demo-roulette-api3.netlify.app",
+            "slug": "https://qrng-roulette.vercel.app/",
             "target": "demo-roulette"
           },
           {
@@ -417,7 +417,7 @@
         "goals": [
           "Showcase the true randomness of Quantum Random Number Generation (QRNG) through interactive demo applications.",
           "Design and implement engaging, themed user interfaces for both apps, utilizing CSS animations and SVG elements to enhance user experience.",
-          "Integrate Web3 functionality via Metamask for user interaction and enable blockchain-driven features.",
+          "Preserve the Web3 interaction model with convincing wallet, transaction, contract-call, and QRNG fulfillment states after the original live infrastructure was retired.",
           "Develop reusable, responsive components in React for better scalability and maintainability across devices."
         ]
       },
@@ -449,7 +449,7 @@
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "The Roulette App takes inspiration from a “hole-in-the-wall” bar with vibrant neon lighting throughout the interface. This app provides an immersive experience where users can spin a digital roulette wheel, visually represented with SVG and animated with JavaScript. Built with the same intent of showcasing QRNG’s randomness, this app gives users a lively, interactive way to engage with quantum-based randomness."
+            "text": "The Roulette App takes inspiration from a “hole-in-the-wall” bar with vibrant neon lighting throughout the interface. The current showcase keeps the old QRNG/Web3 feeling alive through a fake wallet connect, mocked transaction submission, pending confirmations, contract-call readout, QRNG request and fulfillment, and a roulette reveal that settles on the simulated random result."
           }
         ]
       },
@@ -458,8 +458,8 @@
         "heading": "Key Features:",
         "paragraphs": [
           "SVG-Based Roulette Wheel: The wheel was crafted in SVG, allowing for clean, scalable graphics that integrate seamlessly with the app’s aesthetics.",
-          "JavaScript-Powered Interactions: The spinning functionality was implemented with JavaScript, creating a smooth, interactive experience for users.",
-          "Themed Design with Neon Lighting: CSS animations and custom styles create an atmospheric experience, reflecting the theme of a neon-lit bar."
+          "Simulated Web3 Flow: The demo walks through wallet connection, transaction hash generation, block confirmations, mocked QRNG fulfillment, and a final win/loss receipt.",
+          "Themed Design with Neon Lighting: CSS animations, GSAP-driven reveal timing, and custom styles create an atmospheric neon casino experience."
         ]
       },
       {
@@ -472,7 +472,7 @@
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "Challenge - Preserving the Web3 Feeling Without Live Infrastructure: The original API3 and contract setup was no longer available, so the Lottery app needed to keep the wallet, transaction, receipt, and contract-state rhythm without relying on retired infrastructure. I solved this by turning the chain interaction into a local simulator with believable prompts, hashes, confirmations, and receipt history."
+            "text": "Challenge - Preserving the Web3 Feeling Without Live Infrastructure: The original API3 and contract setup was no longer available, so the demos needed to keep the wallet, transaction, receipt, and contract-state rhythm without relying on retired infrastructure. I solved this by turning the chain interaction into local simulators with believable prompts, hashes, confirmations, QRNG events, and receipts."
           },
           {
             "voice": "notice-voice",
@@ -508,7 +508,7 @@
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "The QRNG demo projects allowed me to combine creativity with technical depth, from Web3 interaction patterns to visually immersive, animated interfaces. The Lottery demo is now preserved as a Vercel-hosted showcase of that contract-flow feeling, while keeping the experience reliable enough to demo without depending on old infrastructure."
+            "text": "The QRNG demo projects allowed me to combine creativity with technical depth, from Web3 interaction patterns to visually immersive, animated interfaces. The Lottery and Roulette demos are now preserved as Vercel-hosted showcases of that contract-flow feeling, while keeping the experiences reliable enough to demo without depending on old infrastructure."
           }
         ]
       }
@@ -667,21 +667,21 @@
             "id": "Demo",
             "name": " Demo",
             "class": "magnetic button bubble",
-            "slug": "https://demo-roulette-api3.netlify.app",
+            "slug": "https://qrng-roulette.vercel.app/",
             "target": "Demo"
           },
           {
             "id": "live",
             "name": " Live",
             "class": "magnetic button bubble",
-            "slug": "https://qrng-roulette.netlify.app/",
+            "slug": "https://qrng-roulette.vercel.app/",
             "target": "live"
           },
           {
             "id": "github",
             "name": "Github",
             "class": "magnetic button bubble",
-            "slug": "",
+            "slug": "https://github.com/beejsbj/qrng-roulette",
             "target": "github"
           },
           {
@@ -690,14 +690,6 @@
             "class": "magnetic button bubble",
             "slug": "https://github.com/beejsbj/qrng-roulette",
             "target": "article"
-          },
-
-          {
-            "id": "Old",
-            "name": " Old",
-            "class": "magnetic button bubble",
-            "slug": "https://api3-roulette-old.netlify.app/",
-            "target": "Old"
           }
         ]
       },
