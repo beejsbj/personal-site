@@ -363,7 +363,7 @@
     "role": "Design & Development",
     "location": "Remote @API3",
     "id": "qrng",
-    "description": "The Lottery App and Roulette App were demo projects developed to showcase the true randomness of QRNG (Quantum Random Number Generation). I was given creative freedom to design and implement these apps, allowing me to explore bold aesthetics, interactive elements, and cutting-edge technologies. Originally built in vanilla JavaScript, both projects were later ported to React for seamless integration with Web3 and blockchain functionalities.",
+    "description": "The Lottery App and Roulette App were demo projects developed to showcase QRNG (Quantum Random Number Generation) through expressive, interactive game interfaces. I was given creative freedom to design and implement these apps, allowing me to explore bold aesthetics, animation, Web3 interaction patterns, and demoable contract-style flows. The Lottery app now preserves the feel of the original wallet and contract experience as a polished local simulation deployed on Vercel.",
     "image": "lottery-app.jpg",
     "images": {
       "default": {
@@ -383,24 +383,31 @@
         "links": [
           {
             "id": "demo-lottery",
-            "name": " Demo Lottery",
+            "name": "Lottery Demo",
             "class": "text",
-            "slug": "https://demo-lottery.netlify.app/",
-            "target": "demo-lot"
+            "slug": "https://qrng-lottery.vercel.app/",
+            "target": "demo-lottery"
           },
           {
-            "id": "demo-roullete",
-            "name": "Demo Roullete",
+            "id": "github-lottery",
+            "name": "Lottery Source",
+            "class": "text",
+            "slug": "https://github.com/beejsbj/qrng-lottery",
+            "target": "github-lottery"
+          },
+          {
+            "id": "demo-roulette",
+            "name": "Roulette Demo",
             "class": "text",
             "slug": "https://demo-roulette-api3.netlify.app",
-            "target": "demo-roul"
+            "target": "demo-roulette"
           },
           {
-            "id": "github",
-            "name": "Github",
+            "id": "github-roulette",
+            "name": "Roulette Source",
             "class": "text",
             "slug": "https://github.com/beejsbj/qrng-roulette",
-            "target": "github"
+            "target": "github-roulette"
           }
         ]
       },
@@ -419,7 +426,7 @@
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "Inspired by the dynamic aesthetic of Persona 5, a favorite game of mine, the Lottery App was designed to be a bold, engaging experience. Users can either manually select five numbers from 1 to 50 or opt for a randomly generated set. The app also allows users to choose the number of entries they’d like, all of which are then linked to a smart contract via Metamask. The smart contract holds entries for a week before selecting a winner and distributing the winnings."
+            "text": "Inspired by the dynamic aesthetic of Persona 5, a favorite game of mine, the Lottery App was designed to be a bold, engaging experience. Users can manually select five numbers from 1 to 50 or roll a randomized set, choose the number of tickets, and move through a convincing demo wallet flow. The current version simulates extension prompts, transaction hashes, pending confirmations, receipts, and contract-like state changes without depending on the original live chain infrastructure."
           }
         ]
       },
@@ -428,9 +435,9 @@
         "heading": "Key Features:",
         "paragraphs": [
           "Number Selection & Random Generation: Users can select their numbers or use a random number generator.",
-          "Metamask Integration: This allows users to connect their wallets and securely submit their entries, which are then processed on the blockchain.",
+          "Demo Wallet Flow: A fake Web3 extension guides users through connection, approval, transaction submission, confirmations, and receipt history.",
           "Countdown Timer: Using a customized countdown package, I styled it with CSS to match the app’s theme and provide a visual countdown to the winner announcement.",
-          "CSS Animations: To bring the app to life, I used extensive CSS animations that animate different elements, making the user experience visually captivating."
+          "CSS Animations and Sound Cues: Stamped tickets, countdown ticks, receipt states, and control sounds help the app feel physical and theatrical."
         ]
       },
       {
@@ -465,7 +472,7 @@
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "Challenge - Implementing Metamask Integration: Integrating Metamask for user authentication and transaction handling required research and testing to ensure security and ease of use. I overcame this by using Web3 libraries and closely following blockchain security best practices."
+            "text": "Challenge - Preserving the Web3 Feeling Without Live Infrastructure: The original API3 and contract setup was no longer available, so the Lottery app needed to keep the wallet, transaction, receipt, and contract-state rhythm without relying on retired infrastructure. I solved this by turning the chain interaction into a local simulator with believable prompts, hashes, confirmations, and receipt history."
           },
           {
             "voice": "notice-voice",
@@ -483,7 +490,7 @@
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "Web3 and Blockchain Integration: This project provided hands-on experience with Web3 technologies, particularly in handling blockchain transactions and secure user authentication with Metamask."
+            "text": "Web3 Interaction Design: This project taught me how much of a contract-backed experience is conveyed through timing, states, receipts, transaction language, and user trust—not only through live infrastructure."
           },
           {
             "voice": "notice-voice",
@@ -501,7 +508,7 @@
         "paragraphs": [
           {
             "voice": "notice-voice",
-            "text": "The QRNG demo projects allowed me to combine creativity with technical depth, from integrating Web3 and blockchain features to developing visually immersive, animated interfaces. These apps demonstrate how design and technology can converge to create engaging and functional user experiences."
+            "text": "The QRNG demo projects allowed me to combine creativity with technical depth, from Web3 interaction patterns to visually immersive, animated interfaces. The Lottery demo is now preserved as a Vercel-hosted showcase of that contract-flow feeling, while keeping the experience reliable enough to demo without depending on old infrastructure."
           }
         ]
       }
