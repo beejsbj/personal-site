@@ -28,7 +28,7 @@
             "id": "live",
             "name": "Showcase",
             "class": "text",
-            "slug": "https://ecosystem-website-git-main-beejsbjs-projects.vercel.app/",
+            "slug": "https://ecosystem-website.vercel.app/",
             "target": "live"
           },
           {
