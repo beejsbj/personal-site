@@ -26,10 +26,17 @@
         "links": [
           {
             "id": "live",
-            "name": "Live Link",
+            "name": "Showcase",
             "class": "text",
-            "slug": "https://ecosystem.api3.org/",
+            "slug": "https://ecosystem-website-git-codex-bjs-105-st-76c838-beejsbjs-projects.vercel.app/",
             "target": "live"
+          },
+          {
+            "id": "source",
+            "name": "Source",
+            "class": "text",
+            "slug": "https://github.com/beejsbj/ecosystem-website",
+            "target": "source"
           }
         ]
       },
