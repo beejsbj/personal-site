@@ -4,6 +4,28 @@ Status: draft for `BJS-39`.
 
 `BJS-39` defines the base personal-site content model and launch finish line before the prism/theming work resumes.
 
+## Answer Card
+
+Use this to settle the model quickly.
+
+Recommended answer:
+
+- Site job: understand my work.
+- Launch nav: Home, Work, Writing, About, Contact.
+- Resume/CV: supporting link, not primary nav.
+- Public work: professional, freelance, and selected learning projects.
+- Case studies: fuller project detail pages, not a separate type yet.
+- Notes/current thinking: later.
+- Labs/one-offs/self-hosted work: later unless a specific entry is promoted.
+- Theme/lens UI: hidden for base launch; keep only a future hook.
+
+Burooj can settle `BJS-39` by answering:
+
+1. Accept the recommended answer, or name what changes.
+2. Promote any of labs, one-offs, self-hosted work, or current thinking into base launch.
+3. Choose `Work` vs `Projects` as the public nav label.
+4. Choose whether Contact is a standalone page, footer/menu surface, or both.
+
 ## Boundary
 
 - The base site is the normal portfolio surface.
