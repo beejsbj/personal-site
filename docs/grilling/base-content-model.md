@@ -237,6 +237,20 @@ The base site is launchable when:
 - Style Guide, Garden, E4P, Goals, and other dev/archive pages are either intentionally public or removed from primary navigation.
 - Prism/lens work remains out of scope except for preserving the base structure it will later wrap.
 
+## BJS-42 Handoff
+
+If Burooj accepts the recommended default, `BJS-42` can build the first base slice with these assumptions:
+
+- Use the normal portfolio as the first screen; do not include prism reveal, lure, face travel, or lens navigation.
+- Treat `Work` as the public label for projects unless Burooj prefers `Projects`.
+- Build around a small set of content types: Page, Project, Writing Entry, Resume Entry, and Contact Link.
+- Keep project details flexible enough to become case studies without introducing a second case-study collection yet.
+- Keep style-guide/dev/archive pages out of primary navigation unless Burooj explicitly wants one public.
+- Preserve a future theme/lens boundary in naming and structure, but do not expose theme controls at launch.
+- Treat any labs, one-offs, self-hosted work, and undertext/wiki material as later taxonomy unless Burooj promotes specific entries.
+
+This handoff is provisional until the decision slots below are confirmed.
+
 ## Decision Slots
 
 Fill these before treating `BJS-39` as settled.
@@ -250,6 +264,14 @@ Options:
 - Enter my world.
 
 Decision:
+
+- TBD
+
+Recommended provisional decision:
+
+- Understand my work.
+
+Confirmed by Burooj:
 
 - TBD
 
@@ -267,6 +289,18 @@ Decision:
 
 - TBD
 
+Recommended provisional decision:
+
+- Home
+- Work
+- Writing
+- About
+- Contact
+
+Confirmed by Burooj:
+
+- TBD
+
 ### Resume/CV
 
 Options:
@@ -276,6 +310,14 @@ Options:
 - Omit from first launch.
 
 Decision:
+
+- TBD
+
+Recommended provisional decision:
+
+- Supporting link from About/Contact/footer.
+
+Confirmed by Burooj:
 
 - TBD
 
@@ -291,6 +333,14 @@ Decision:
 
 - TBD
 
+Recommended provisional decision:
+
+- Professional, freelance, and selected learning projects.
+
+Confirmed by Burooj:
+
+- TBD
+
 ### Case Studies
 
 Options:
@@ -300,6 +350,14 @@ Options:
 - Later.
 
 Decision:
+
+- TBD
+
+Recommended provisional decision:
+
+- Fuller project detail pages.
+
+Confirmed by Burooj:
 
 - TBD
 
@@ -315,6 +373,14 @@ Decision:
 
 - TBD
 
+Recommended provisional decision:
+
+- Public writing only.
+
+Confirmed by Burooj:
+
+- TBD
+
 ### Theme/Lens Visibility
 
 Options:
@@ -324,6 +390,14 @@ Options:
 - No theme work in base launch.
 
 Decision:
+
+- TBD
+
+Recommended provisional decision:
+
+- Invisible hook only.
+
+Confirmed by Burooj:
 
 - TBD
 
