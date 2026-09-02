@@ -1,5 +1,59 @@
 [
   {
+    "title": "Conduit Market",
+    "date": "Jul 2025",
+    "heading": "Conduit Market",
+    "role": "Frontend Engineering & Design System",
+    "location": "Remote @Conduit Market",
+    "id": "conduit-market",
+    "description": "A Bitcoin-native marketplace client I helped build in 2025, spanning the design system, storefront UI, cart and checkout flows, forms, responsive interactions, and application infrastructure.",
+    "image": "conduit-market.jpg",
+    "images": {
+      "default": {
+        "thumbnail": "conduit-market.jpg"
+      },
+      "pe-site": {}
+    },
+    "tools": ["React", "TypeScript", "Tailwind CSS", "Zustand", "Nostr"],
+    "tags": ["conduit", "feature"],
+    "sections": [
+      {
+        "module": "project-meta"
+      },
+      {
+        "module": "menu-module",
+        "menu": "project",
+        "links": [
+          {
+            "id": "live",
+            "name": "Showcase",
+            "class": "text",
+            "slug": "https://conduit-market-showcase.vercel.app/",
+            "target": "live"
+          },
+          {
+            "id": "source",
+            "name": "Source",
+            "class": "text",
+            "slug": "https://github.com/beejsbj/conduit-market-client/tree/portfolio/showcase-2025",
+            "target": "source"
+          },
+          {
+            "id": "current",
+            "name": "Current Conduit",
+            "class": "text",
+            "slug": "https://conduit.market/",
+            "target": "current"
+          }
+        ]
+      },
+      {
+        "module": "standard-figure",
+        "image": "projects/conduit-market.jpg"
+      }
+    ]
+  },
+  {
     "title": "API3 Ecosystem",
     "date": "Nov 2024",
     "heading": "API3 Ecosystem",
