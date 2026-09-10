@@ -5,7 +5,7 @@
 @import "./core/reset.css";
 @import "./core/tokens.css";
 @import "./themes/default/index.css";
-@import "./themes/pe-site/index.css";
 @import "./core/base.css";
 @import "./core/layout.css";
 @import "./core/utilities.css";
+@import "./pages/home.css";

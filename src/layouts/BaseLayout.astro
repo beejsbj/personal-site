@@ -45,22 +45,6 @@ const socialImage = new URL(image, siteBaseUrl).toString();
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <ClientRouter />
-    <script is:inline>
-      const themeKey = "portfolio-theme";
-      const root = document.documentElement;
-      const applyTheme = () => {
-        const storedTheme = localStorage.getItem(themeKey) || "default";
-        root.dataset.theme = storedTheme;
-      };
-
-      applyTheme();
-      document.addEventListener("astro:after-swap", applyTheme);
-
-      window.__setPortfolioTheme = (theme) => {
-        localStorage.setItem(themeKey, theme);
-        applyTheme();
-      };
-    </script>
   </head>
 
   <body class={pageClass}>
