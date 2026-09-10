@@ -32,6 +32,7 @@ const { nav, currentPath } = Astro.props;
                 <a
                   class:list={["site-nav__link", active && "is-active"]}
                   href={item.href}
+                  aria-current={active ? "page" : undefined}
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noreferrer" : undefined}
                 >

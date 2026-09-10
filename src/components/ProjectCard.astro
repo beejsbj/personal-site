@@ -16,9 +16,9 @@ const visibleTools = tools.slice(0, 3);
 ---
 
 <article class:list={["project-card", featured && "is-featured"]}>
-  <a class="project-card__media" href={href}>
+  <div class="project-card__media">
     <img src={cover} alt={`${title} project cover`} loading="lazy" decoding="async" />
-  </a>
+  </div>
 
   <div class="project-card__body">
     <div class="project-card__meta">

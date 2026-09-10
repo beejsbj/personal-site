@@ -17,6 +17,41 @@
       "permanent": true
     },
     {
+      "source": "/projects/garden",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/projects/e4p",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/projects/flashcards",
+      "destination": "/lab/flashcards",
+      "permanent": true
+    },
+    {
+      "source": "/projects/quantumon",
+      "destination": "/lab",
+      "permanent": true
+    },
+    {
+      "source": "/projects/roulette",
+      "destination": "/lab",
+      "permanent": true
+    },
+    {
+      "source": "/projects/pizza-nano",
+      "destination": "/projects",
+      "permanent": true
+    },
+    {
+      "source": "/projects/desci-bengaluru",
+      "destination": "/projects",
+      "permanent": true
+    },
+    {
       "source": "/e4p",
       "destination": "/lab/e4p",
       "permanent": true

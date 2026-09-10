@@ -12,9 +12,9 @@ const { href, title, summary, type, sourceEra, cover } = Astro.props;
 ---
 
 <article class="lab-card">
-  <a class="lab-card__media" href={href}>
+  <div class="lab-card__media">
     <img src={cover} alt={`${title} cover`} loading="lazy" decoding="async" />
-  </a>
+  </div>
 
   <div class="lab-card__body">
     <p class="lab-card__meta">{type} · {sourceEra}</p>

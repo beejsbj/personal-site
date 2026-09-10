@@ -49,8 +49,9 @@ const socialImage = new URL(image, siteBaseUrl).toString();
   </head>
 
   <body class={pageClass}>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <SiteHeader nav={site.nav} currentPath={Astro.url.pathname} />
-    <main>
+    <main id="main-content" tabindex="-1">
       <slot />
     </main>
     <SiteFooter social={site.social} writingUrl={site.writingUrl} email={site.email} />

@@ -7,18 +7,16 @@ interface Props {
   role: string;
   tools: string[];
   cover: string;
-  loading?: "eager" | "lazy";
 }
 
-const { href, title, summary, dateLabel, role, tools, cover, loading = "lazy" } =
-  Astro.props;
+const { href, title, summary, dateLabel, role, tools, cover } = Astro.props;
 const visibleTools = tools.slice(0, 4);
 ---
 
 <article class="project-row">
-  <a class="project-row__media" href={href}>
-    <img src={cover} alt={`${title} project cover`} loading={loading} decoding="async" />
-  </a>
+  <div class="project-row__media">
+    <img src={cover} alt={`${title} project cover`} loading="lazy" decoding="async" />
+  </div>
 
   <div class="project-row__body">
     <div class="project-row__meta">
