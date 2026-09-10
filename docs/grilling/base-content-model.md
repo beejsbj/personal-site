@@ -56,6 +56,21 @@ For the first version, recommend a few curated entries using the same content st
 
 Select actual existing content for these groups and assemble a first homepage for review. Preserve older content while curating what is featured. Do not reopen the audience question as if unanswered: the earlier hiring-facing introduction remains relevant, broadened here by showing ongoing activity and small work.
 
+### Grilling Exit and First Implementation Slice
+
+Burooj confirmed that the current site's writing can supply rough source language for the introduction and About/Now content. Reuse its themes and phrases where they remain true; do not preserve stale time-relative or novice claims merely because they already exist.
+
+The next phase is implementation under BJS-42. Build one runnable, content-complete homepage preview from the reusable Astro scaffold and migrated content, updating its old homepage framing to match the accepted direction here:
+
+- introduction and direct contact/profile paths;
+- at least three short, source-grounded project stories in the main area;
+- About/Now content;
+- a distinct area with a few manually curated, dated updates;
+- access to Lab and Writing, with Writing allowed to be empty;
+- one default visual treatment, with prism and update automation deferred.
+
+Completion evidence for this slice is a running preview, fresh build/check results, and desktop/mobile review evidence. The precise layout, initial project selection, and labels are reversible implementation choices and do not require another shaping round before a first reviewable version exists.
+
 ## Historical Provisional Draft
 
 The material below preserves the earlier BJS-39 proposal and its unanswered slots. It is not evidence that Burooj accepted those defaults. In particular, its blanket deferral of labs, one-offs, and self-hosted work is superseded above.
