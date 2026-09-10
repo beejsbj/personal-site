@@ -1,10 +1,49 @@
 # Base Content Model
 
-Status: draft for `BJS-39`.
+Status: revised direction for `BJS-39`; first-version content proposal below remains subject to refinement.
 
 `BJS-39` defines the base personal-site content model and launch finish line before the prism/theming work resumes.
 
-## Answer Card
+## Current Direction — Resumption After History Review
+
+This section supersedes conflicting recommendations in the historical draft below. Source: Burooj's clarification in the current personal-site session, following the repo, branch, and session-history audit.
+
+### Confirmed Direction
+
+- The base homepage should show who Burooj is, established work, and what he is doing now across the web.
+- Small GitHub projects, experiments, and bjslab belong in that public picture; they are not categorically deferred until after launch.
+- The base page should remain largely simple. The later prism layer carries the more elaborate interactive experience.
+- Ship a basic version soon. This branch defines the content for that first surface; it should not become an indefinite planning exercise.
+- The Astro rebuild was not completely abandoned: new ideas led to a new branch. Its earlier approved plan is historical input and reusable work, not a binding specification for this version.
+
+### Proposed First Version
+
+A homepage with four content groups:
+
+1. **Introduction:** portrait, short description of Burooj, and direct contact/profile links.
+2. **Selected work:** a small selection of substantial projects, linking to existing detail or case-study material.
+3. **Currently:** a short account of ongoing interests and work, including bjslab where relevant.
+4. **Recent updates:** dated, linked notes about things made, published, or changed across GitHub and other public surfaces. Small work can appear here without requiring a full case study.
+
+Writing and Resume/CV can be reachable through links for this slice; final navigation labels and separate-page placement remain proposals, not confirmed decisions.
+
+Burooj suggested a dashboard-like composition with updates on the right and portrait/about material alongside it. Treat this as a visual direction to try, not an approved fixed layout. On narrow screens the same content should read in a simple sequence.
+
+### Update Content and Automation
+
+Recommended update fields: date, short factual text, source link, and optional related project. A project is the enduring subject; an update records something that happened to it. Several updates may refer to one project.
+
+For the first version, recommend a few curated entries using the same content structure that agents can update later. This trades immediate automation for a faster useful launch. Agent-maintained updates are part of the desired direction, but source integration and publishing behavior have not yet been decided. Avoid making a raw commit log the default reading experience.
+
+### Immediate Next Work
+
+Select actual existing content for these groups and assemble a first homepage for review. Preserve older content while curating what is featured. Do not reopen the audience question as if unanswered: the earlier hiring-facing introduction remains relevant, broadened here by showing ongoing activity and small work.
+
+## Historical Provisional Draft
+
+The material below preserves the earlier BJS-39 proposal and its unanswered slots. It is not evidence that Burooj accepted those defaults. In particular, its blanket deferral of labs, one-offs, and self-hosted work is superseded above.
+
+### Original Answer Card
 
 Use this to settle the model quickly.
 
