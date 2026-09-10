@@ -1,0 +1,23 @@
+:root {
+  --font-sans: "Space Grotesk", sans-serif;
+  --font-serif: "Newsreader Variable", serif;
+
+  --space-2xs: clamp(0.32rem, 0.4vw, 0.45rem);
+  --space-xs: clamp(0.55rem, 0.7vw, 0.75rem);
+  --space-s: clamp(0.82rem, 0.95vw, 1rem);
+  --space-m: clamp(1.05rem, 1.2vw, 1.28rem);
+  --space-l: clamp(1.4rem, 1.7vw, 1.75rem);
+  --space-xl: clamp(2rem, 3vw, 2.8rem);
+  --space-2xl: clamp(3rem, 5vw, 4.4rem);
+
+  --radius-s: 14px;
+  --radius-m: 20px;
+  --radius-round: 999px;
+  --shadow-soft: 0 10px 28px rgba(14, 17, 17, 0.06);
+  --shell-width: min(1040px, calc(100vw - 1.5rem));
+  --reading-width: 62ch;
+
+  --duration-fast: 140ms;
+  --duration-base: 220ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}

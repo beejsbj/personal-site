@@ -1,0 +1,59 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import MediaRail from "../../components/MediaRail.astro";
+
+export async function getStaticPaths() {
+  const entries = (await getCollection("lab")).filter(
+    (entry: CollectionEntry<"lab">) => !entry.data.hidden,
+  );
+  return entries.map((entry: CollectionEntry<"lab">) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const labEntry = entry as CollectionEntry<"lab">;
+const { Content } = await labEntry.render();
+---
+
+<BaseLayout
+  title={labEntry.data.title}
+  description={labEntry.data.summary}
+  image={labEntry.data.cover}
+  pageClass="page-entry"
+>
+  <section class="shell entry-page">
+    <PageHeader eyebrow="Lab" title={labEntry.data.title} intro={labEntry.data.summary} />
+
+    <div class="entry-page__meta">
+      <div>
+        <span class="entry-page__label">Type</span>
+        <p>{labEntry.data.type}</p>
+      </div>
+      <div>
+        <span class="entry-page__label">Era</span>
+        <p>{labEntry.data.sourceEra}</p>
+      </div>
+    </div>
+
+    {labEntry.data.links.length > 0 && (
+      <div class="entry-page__links">
+        {labEntry.data.links.map((link: { label: string; url: string }) => (
+          <a class="button button--ghost" href={link.url} target="_blank" rel="noreferrer">
+            {link.label}
+          </a>
+        ))}
+      </div>
+    )}
+
+    <MediaRail media={labEntry.data.media} />
+
+    <article class="prose">
+      <Content />
+    </article>
+  </section>
+</BaseLayout>

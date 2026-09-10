@@ -1,0 +1,37 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  summary: string;
+  dateLabel: string;
+  role: string;
+  tools: string[];
+  cover: string;
+}
+
+const { href, title, summary, dateLabel, role, tools, cover } = Astro.props;
+const visibleTools = tools.slice(0, 4);
+---
+
+<article class="project-row">
+  <div class="project-row__media">
+    <img src={cover} alt={`${title} project cover`} loading="lazy" decoding="async" />
+  </div>
+
+  <div class="project-row__body">
+    <div class="project-row__meta">
+      <span>{dateLabel}</span>
+      <span>{role}</span>
+    </div>
+
+    <h3 class="project-row__title">
+      <a href={href}>{title}</a>
+    </h3>
+
+    <p class="project-row__summary">{summary}</p>
+
+    <ul class="pill-list" aria-label={`${title} tools`}>
+      {visibleTools.map((tool) => <li>{tool}</li>)}
+    </ul>
+  </div>
+</article>

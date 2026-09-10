@@ -1,0 +1,11 @@
+@import "@fontsource/space-grotesk/400.css";
+@import "@fontsource/space-grotesk/500.css";
+@import "@fontsource/space-grotesk/700.css";
+@import "@fontsource-variable/newsreader";
+@import "./core/reset.css";
+@import "./core/tokens.css";
+@import "./themes/default/index.css";
+@import "./core/base.css";
+@import "./core/layout.css";
+@import "./core/utilities.css";
+@import "./pages/home.css";

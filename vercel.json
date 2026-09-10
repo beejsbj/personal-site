@@ -1,0 +1,288 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/garden",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/garden/:slug",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/projects/old-garden",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/projects/garden",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/projects/e4p",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/projects/flashcards",
+      "destination": "/lab/flashcards",
+      "permanent": true
+    },
+    {
+      "source": "/projects/quantumon",
+      "destination": "/lab",
+      "permanent": true
+    },
+    {
+      "source": "/projects/roulette",
+      "destination": "/lab",
+      "permanent": true
+    },
+    {
+      "source": "/projects/pizza-nano",
+      "destination": "/projects",
+      "permanent": true
+    },
+    {
+      "source": "/projects/desci-bengaluru",
+      "destination": "/projects",
+      "permanent": true
+    },
+    {
+      "source": "/e4p",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/e4p/:slug",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/style-guide",
+      "destination": "/lab/style-guide",
+      "permanent": true
+    },
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "https://buroojs.substack.com",
+      "permanent": true
+    },
+    {
+      "source": "/layout-detail",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/exercise-detail",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/e4p-in-vue",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "blog"
+        }
+      ],
+      "destination": "https://buroojs.substack.com",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": "(?<labProject>garden|e4p|flashcards)"
+        }
+      ],
+      "destination": "/lab/:labProject",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": "quantumon|roulette"
+        }
+      ],
+      "destination": "/lab",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": "pizza-nano|desci-bengaluru"
+        }
+      ],
+      "destination": "/projects",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": "(?<project>conduit-market|api3-ecosystem|qrng)"
+        }
+      ],
+      "destination": "/projects/:project",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": ".*"
+        }
+      ],
+      "destination": "/projects",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "garden"
+        }
+      ],
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "layout-detail"
+        }
+      ],
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "e4p|e4p-in-vue"
+        }
+      ],
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "exercise-detail"
+        }
+      ],
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "style-guide"
+        }
+      ],
+      "destination": "/lab/style-guide",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "about"
+        }
+      ],
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "projects"
+        }
+      ],
+      "destination": "/projects",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "resume"
+        }
+      ],
+      "destination": "/resume",
+      "permanent": true
+    }
+  ]
+}

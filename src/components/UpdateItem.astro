@@ -1,0 +1,31 @@
+---
+interface Props {
+  title: string;
+  date: string;
+  dateLabel: string;
+  summary: string;
+  href: string;
+  linkLabel: string;
+  relatedProject?: string;
+}
+
+const { title, date, dateLabel, summary, href, linkLabel, relatedProject } = Astro.props;
+const external = href.startsWith("http");
+---
+
+<article class="update-item">
+  <time class="update-item__date" datetime={date}>{dateLabel}</time>
+  <div class="update-item__body">
+    {relatedProject && <p class="update-item__project">{relatedProject}</p>}
+    <h3 class="update-item__title">{title}</h3>
+    <p class="update-item__summary">{summary}</p>
+    <a
+      class="update-item__link"
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+    >
+      {linkLabel}<span aria-hidden="true">{external ? " ↗" : " →"}</span>
+    </a>
+  </div>
+</article>
