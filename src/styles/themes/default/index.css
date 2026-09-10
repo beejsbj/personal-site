@@ -17,6 +17,20 @@
   --color-loader-4: #97b697;
   --color-loader-5: #4e6978;
   --color-loader-6: #281f2d;
+  --home-rule: rgba(23, 21, 19, 0.16);
+  --home-ink: #201d19;
+  --home-signal: #d35f3d;
+  --home-signal-soft: #f0c9b9;
+  --home-contact-surface: rgba(255, 253, 250, 0.62);
+  --home-path-surface: rgba(255, 253, 250, 0.54);
+  --home-portrait-dot: rgba(211, 95, 61, 0.34);
+  --home-portrait-wash: rgba(211, 95, 61, 0.04);
+  --home-orbit-line: rgba(247, 244, 238, 0.2);
+  --home-orbit-outer: rgba(247, 244, 238, 0.035);
+  --home-orbit-inner: rgba(247, 244, 238, 0.025);
+  --home-inverse-soft: rgba(247, 244, 238, 0.72);
+  --home-live: #b9e695;
+  --home-live-halo: rgba(185, 230, 149, 0.13);
   --page-glow: radial-gradient(circle at top, rgba(199, 83, 53, 0.08), transparent 44%);
   --page-grid: linear-gradient(rgba(24, 23, 26, 0.06) 1px, transparent 1px),
     linear-gradient(90deg, rgba(24, 23, 26, 0.06) 1px, transparent 1px);

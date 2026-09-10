@@ -24,7 +24,9 @@ const { nav, currentPath } = Astro.props;
       <ul class="site-nav__list">
         {
           nav.map((item) => {
-            const active = !item.external && (item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href));
+            const active =
+              !item.external &&
+              (item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href));
             return (
               <li>
                 <a

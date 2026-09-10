@@ -10,7 +10,8 @@ interface Props {
   loading?: "eager" | "lazy";
 }
 
-const { href, title, summary, dateLabel, role, tools, cover, loading = "lazy" } = Astro.props;
+const { href, title, summary, dateLabel, role, tools, cover, loading = "lazy" } =
+  Astro.props;
 const visibleTools = tools.slice(0, 4);
 ---
 

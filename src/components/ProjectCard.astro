@@ -10,7 +10,8 @@ interface Props {
   featured?: boolean;
 }
 
-const { href, title, summary, dateLabel, role, tools, cover, featured = false } = Astro.props;
+const { href, title, summary, dateLabel, role, tools, cover, featured = false } =
+  Astro.props;
 const visibleTools = tools.slice(0, 3);
 ---
 

@@ -13,8 +13,12 @@ const projects: CollectionEntry<"projects">[] = (await getCollection("projects")
     (left: CollectionEntry<"projects">, right: CollectionEntry<"projects">) =>
       left.data.order - right.data.order,
   );
-const featuredProjects = projects.filter((project: CollectionEntry<"projects">) => project.data.featured);
-const archiveProjects = projects.filter((project: CollectionEntry<"projects">) => !project.data.featured);
+const featuredProjects = projects.filter(
+  (project: CollectionEntry<"projects">) => project.data.featured,
+);
+const archiveProjects = projects.filter(
+  (project: CollectionEntry<"projects">) => !project.data.featured,
+);
 ---
 
 <BaseLayout

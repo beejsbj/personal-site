@@ -149,12 +149,25 @@ function sectionToMarkdown(section) {
   if (!section.module || section.module === "project-meta") {
     if (section.heading && Array.isArray(section.paragraphs)) {
       chunks.push(`## ${cleanText(section.heading)}`);
-      chunks.push(section.paragraphs.map((paragraph) => cleanText(paragraph.text || paragraph)).join("\n\n"));
+      chunks.push(
+        section.paragraphs
+          .map((paragraph) => cleanText(paragraph.text || paragraph))
+          .join("\n\n"),
+      );
     }
   }
 
-  if (Array.isArray(section.paragraphs) && section.module !== "generic-list" && !section.heading && section.module !== "project-meta") {
-    chunks.push(section.paragraphs.map((paragraph) => cleanText(paragraph.text || paragraph)).join("\n\n"));
+  if (
+    Array.isArray(section.paragraphs) &&
+    section.module !== "generic-list" &&
+    !section.heading &&
+    section.module !== "project-meta"
+  ) {
+    chunks.push(
+      section.paragraphs
+        .map((paragraph) => cleanText(paragraph.text || paragraph))
+        .join("\n\n"),
+    );
   }
 
   return chunks.filter(Boolean).join("\n\n");

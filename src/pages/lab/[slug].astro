@@ -18,7 +18,12 @@ const labEntry = entry as CollectionEntry<"lab">;
 const { Content } = await labEntry.render();
 ---
 
-<BaseLayout title={labEntry.data.title} description={labEntry.data.summary} image={labEntry.data.cover} pageClass="page-entry">
+<BaseLayout
+  title={labEntry.data.title}
+  description={labEntry.data.summary}
+  image={labEntry.data.cover}
+  pageClass="page-entry"
+>
   <section class="shell entry-page">
     <PageHeader eyebrow="Lab" title={labEntry.data.title} intro={labEntry.data.summary} />
 
