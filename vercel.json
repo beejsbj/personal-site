@@ -67,6 +67,31 @@
       "permanent": true
     },
     {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "https://buroojs.substack.com",
+      "permanent": true
+    },
+    {
+      "source": "/layout-detail",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
+      "source": "/exercise-detail",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
+      "source": "/e4p-in-vue",
+      "destination": "/lab/e4p",
+      "permanent": true
+    },
+    {
       "source": "/",
       "has": [
         {
