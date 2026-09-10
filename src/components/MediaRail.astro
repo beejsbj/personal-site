@@ -1,0 +1,33 @@
+---
+interface MediaItem {
+  type: "image" | "video";
+  src: string;
+  alt?: string;
+  caption?: string;
+}
+
+interface Props {
+  media: MediaItem[];
+}
+
+const { media = [] } = Astro.props;
+---
+
+{
+  media.length > 0 && (
+    <div class="media-rail">
+      {media.map((item) => (
+        <figure class="media-rail__item">
+          {item.type === "video" ? (
+            <video controls muted playsinline preload="metadata">
+              <source src={item.src} />
+            </video>
+          ) : (
+            <img src={item.src} alt={item.alt || ""} loading="lazy" />
+          )}
+          {item.caption && <figcaption>{item.caption}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  )
+}

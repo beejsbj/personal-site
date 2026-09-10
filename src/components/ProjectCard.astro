@@ -1,0 +1,38 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  summary: string;
+  dateLabel: string;
+  role: string;
+  tools: string[];
+  cover: string;
+  featured?: boolean;
+}
+
+const { href, title, summary, dateLabel, role, tools, cover, featured = false } = Astro.props;
+const visibleTools = tools.slice(0, 3);
+---
+
+<article class:list={["project-card", featured && "is-featured"]}>
+  <a class="project-card__media" href={href}>
+    <img src={cover} alt={`${title} project cover`} loading="lazy" decoding="async" />
+  </a>
+
+  <div class="project-card__body">
+    <div class="project-card__meta">
+      <span>{dateLabel}</span>
+      <span>{role}</span>
+    </div>
+
+    <h3 class="project-card__title">
+      <a href={href}>{title}</a>
+    </h3>
+
+    <p class="project-card__summary">{summary}</p>
+
+    <ul class="pill-list" aria-label={`${title} tools`}>
+      {visibleTools.map((tool) => <li>{tool}</li>)}
+    </ul>
+  </div>
+</article>

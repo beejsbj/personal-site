@@ -1,0 +1,62 @@
+.shell {
+  width: var(--shell-width);
+  margin-inline: auto;
+}
+
+.page-section {
+  padding-block: var(--space-xl);
+}
+
+.page-section--header {
+  padding-block: calc(var(--space-xl) + 0.5rem) var(--space-l);
+}
+
+.page-section--intro {
+  padding-top: 0;
+}
+
+.page-section--copy {
+  display: grid;
+  gap: var(--space-l);
+  padding-block: var(--space-xl) var(--space-2xl);
+}
+
+.card-grid,
+.lab-grid {
+  display: grid;
+  gap: var(--space-m);
+}
+
+.project-row-list {
+  display: grid;
+  gap: var(--space-m);
+}
+
+.collection-block {
+  display: grid;
+  gap: var(--space-m);
+}
+
+.collection-block + .collection-block {
+  margin-top: var(--space-xl);
+}
+
+.entry-page {
+  display: grid;
+  gap: var(--space-l);
+  padding-block: var(--space-xl) var(--space-2xl);
+}
+
+@media (min-width: 760px) {
+  .card-grid--dense,
+  .lab-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .lab-grid--compact,
+  .lab-grid--dense {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

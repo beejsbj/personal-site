@@ -1,0 +1,148 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHeader from "../components/PageHeader.astro";
+import SectionIntro from "../components/SectionIntro.astro";
+import ProjectRow from "../components/ProjectRow.astro";
+import LabCard from "../components/LabCard.astro";
+
+const legacyPage = Astro.url.searchParams.get("page");
+if (legacyPage === "project") {
+  const projectId = Astro.url.searchParams.get("project");
+  if (projectId) {
+    return Astro.redirect(`/projects/${projectId}`, 301);
+  }
+}
+
+if (legacyPage === "garden" || legacyPage === "layout-detail") {
+  return Astro.redirect("/lab/garden", 301);
+}
+
+if (legacyPage === "e4p" || legacyPage === "exercise-detail" || legacyPage === "e4p-in-vue") {
+  return Astro.redirect("/lab/e4p", 301);
+}
+
+if (legacyPage === "style-guide") {
+  return Astro.redirect("/lab/style-guide", 301);
+}
+
+if (legacyPage === "about" || legacyPage === "projects" || legacyPage === "resume") {
+  return Astro.redirect(`/${legacyPage}`, 301);
+}
+
+const homeEntry = await getEntry("pages", "home");
+if (!homeEntry) {
+  throw new Error("Missing home content entry.");
+}
+const { Content } = await homeEntry.render();
+const featuredProjects: CollectionEntry<"projects">[] = (await getCollection("projects"))
+  .filter((entry: CollectionEntry<"projects">) => !entry.data.hidden && entry.data.featured)
+  .sort(
+    (left: CollectionEntry<"projects">, right: CollectionEntry<"projects">) =>
+      left.data.order - right.data.order,
+  )
+  .slice(0, 3);
+const labEntries: CollectionEntry<"lab">[] = (await getCollection("lab"))
+  .filter((entry: CollectionEntry<"lab">) => !entry.data.hidden)
+  .sort(
+    (left: CollectionEntry<"lab">, right: CollectionEntry<"lab">) =>
+      left.data.order - right.data.order,
+  )
+  .slice(0, 3);
+---
+
+<BaseLayout
+  title={homeEntry.data.title}
+  description={homeEntry.data.description}
+  pageClass="page-home"
+>
+  <section class="shell page-section page-section--header">
+    <PageHeader
+      eyebrow={homeEntry.data.eyebrow}
+      title={homeEntry.data.headline}
+      intro={homeEntry.data.intro}
+    >
+      <Fragment slot="actions">
+        <a class="button button--solid" href="/projects">See selected work</a>
+        <a class="button button--ghost" href="/lab">Enter the lab</a>
+      </Fragment>
+
+      <Fragment slot="aside">
+        <p class="page-header__meta-label">Open to</p>
+        <p class="page-header__meta-copy">{homeEntry.data.availability}</p>
+
+        <p class="page-header__meta-label">Current focus</p>
+        <ul class="page-header__list">
+          <li>Expressive frontend systems</li>
+          <li>Motion-led landing pages</li>
+          <li>Lean architecture with room to grow</li>
+        </ul>
+      </Fragment>
+    </PageHeader>
+  </section>
+
+  <section class="shell page-section page-section--intro">
+    <div class="home-intro">
+      <div class="prose prose--home">
+        <Content />
+      </div>
+
+      <aside class="home-intro__aside">
+        <p class="home-intro__eyebrow">Approach</p>
+        <p class="home-intro__note">
+          The goal is a portfolio that stays lean enough to update quickly, while still leaving room for experiments and stronger ideas later.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="shell page-section">
+    <SectionIntro
+      eyebrow="Selected work"
+      title="Projects I would actually send first"
+      intro="A smaller set of projects with better framing, less noise, and clearer signals about how I work."
+      compact
+    />
+
+    <div class="project-row-list">
+      {
+        featuredProjects.map((project) => (
+          <ProjectRow
+            href={`/projects/${project.slug}`}
+            title={project.data.title}
+            summary={project.data.summary}
+            dateLabel={project.data.dateLabel}
+            role={project.data.role}
+            tools={project.data.tools}
+            cover={project.data.cover}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="shell page-section page-section--lab">
+    <SectionIntro
+      eyebrow="Lab"
+      title="The archive stays visible"
+      intro="Student work, design-system experiments, and the ideas that shaped this rebuild live nearby without crowding the main portfolio."
+      compact
+    />
+
+    <div class="lab-grid lab-grid--compact">
+      {
+        labEntries.map((entry) => (
+          <LabCard
+            href={`/lab/${entry.slug}`}
+            title={entry.data.title}
+            summary={entry.data.summary}
+            type={entry.data.type}
+            sourceEra={entry.data.sourceEra}
+            cover={entry.data.cover}
+          />
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

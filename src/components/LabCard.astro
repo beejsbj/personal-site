@@ -1,0 +1,26 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  summary: string;
+  type: string;
+  sourceEra: string;
+  cover: string;
+}
+
+const { href, title, summary, type, sourceEra, cover } = Astro.props;
+---
+
+<article class="lab-card">
+  <a class="lab-card__media" href={href}>
+    <img src={cover} alt={`${title} cover`} loading="lazy" decoding="async" />
+  </a>
+
+  <div class="lab-card__body">
+    <p class="lab-card__meta">{type} · {sourceEra}</p>
+    <h3 class="lab-card__title">
+      <a href={href}>{title}</a>
+    </h3>
+    <p class="lab-card__summary">{summary}</p>
+  </div>
+</article>
