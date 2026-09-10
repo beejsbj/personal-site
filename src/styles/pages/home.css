@@ -391,6 +391,12 @@
   color: var(--color-page);
 }
 
+.current-card__link:hover,
+.current-card__link:focus-visible {
+  color: var(--color-page);
+  outline-color: var(--color-page);
+}
+
 .updates-card {
   border-bottom: 1px solid var(--home-rule);
 }

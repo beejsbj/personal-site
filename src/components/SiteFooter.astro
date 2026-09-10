@@ -11,6 +11,7 @@ interface Props {
 }
 
 const { social, writingUrl, email } = Astro.props;
+const footerSocial = social.filter((item) => item.href !== `mailto:${email}`);
 const year = new Date().getFullYear();
 ---
 
@@ -29,7 +30,7 @@ const year = new Date().getFullYear();
 
       <ul class="site-footer__social">
         {
-          social.map((item) => (
+          footerSocial.map((item) => (
             <li>
               <a href={item.href} target="_blank" rel="noreferrer">
                 {item.label}

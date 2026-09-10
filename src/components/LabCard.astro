@@ -18,9 +18,9 @@ const { href, title, summary, type, sourceEra, cover } = Astro.props;
 
   <div class="lab-card__body">
     <p class="lab-card__meta">{type} · {sourceEra}</p>
-    <h3 class="lab-card__title">
+    <h2 class="lab-card__title">
       <a href={href}>{title}</a>
-    </h3>
+    </h2>
     <p class="lab-card__summary">{summary}</p>
   </div>
 </article>
