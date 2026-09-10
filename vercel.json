@@ -12,6 +12,11 @@
       "permanent": true
     },
     {
+      "source": "/projects/old-garden",
+      "destination": "/lab/garden",
+      "permanent": true
+    },
+    {
       "source": "/e4p",
       "destination": "/lab/e4p",
       "permanent": true
@@ -24,6 +29,18 @@
     {
       "source": "/style-guide",
       "destination": "/lab/style-guide",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "blog"
+        }
+      ],
+      "destination": "https://buroojs.substack.com",
       "permanent": true
     },
     {
