@@ -20,6 +20,21 @@ This section supersedes conflicting recommendations in the historical draft belo
 
 ### Proposed First Version
 
+### Accepted Scope and Live Board Reconciliation
+
+Read the personal-site project's current and settled issues and their comments, plus referenced BJS-262, BJS-105, and BJS-106. Live board review found:
+
+- [BJS-39](https://linear.app/bjs-projects/issue/BJS-39) records Burooj's September 10 acceptance of Projects (optional case studies), Writing (notes/essays, allowed empty at launch), Lab (experiments/one-offs), and About/Now. The accepted minimum is About/Now plus at least three short project stories and one default lens.
+- [BJS-42](https://linear.app/bjs-projects/issue/BJS-42) routes first-release shaping and implementation to this thread. Its earlier PHP-only constraint was explicitly withdrawn; existing Astro work remains an input to implementation judgment.
+- Burooj subsequently accepted this thread's three recommendations: select representative projects mixing substantial and smaller distinctive work; focus updates on building, writing, experiments and occasional learning; launch with real content and manually seeded updates before automation.
+- These content collections do not prescribe four top-level navigation items or four separate launch pages. The homepage composition remains the presentation question.
+- [BJS-262](https://linear.app/bjs-projects/issue/BJS-262) adds job-readiness context, meaningful title/meta, and project candidates Conduit, Flo8 (when live), and chat-scrobbler. GitHub pinning is a later external action, not authorized by this read-only review.
+- [BJS-300](https://linear.app/bjs-projects/issue/BJS-300) contains an unresolved historical public HTTP/3-access report. Reverify at release time; do not infer current failure from the old issue.
+
+No board state or comments were changed during this review. The historical draft below is not the current approval record.
+
+### Homepage Composition
+
 A homepage with four content groups:
 
 1. **Introduction:** portrait, short description of Burooj, and direct contact/profile links.
