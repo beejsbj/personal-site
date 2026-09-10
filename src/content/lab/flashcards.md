@@ -6,10 +6,7 @@ sourceEra: "Student work"
 cover: "/images/projects/flashcards.png"
 links:
   -
-    label: "Live Link"
-    url: "/projects/flashcards"
-  -
-    label: "Github"
+    label: "Source"
     url: "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards"
 media:
   -

@@ -6,7 +6,9 @@ import PageHeader from "../../components/PageHeader.astro";
 import MediaRail from "../../components/MediaRail.astro";
 
 export async function getStaticPaths() {
-  const entries = await getCollection("projects");
+  const entries = (await getCollection("projects")).filter(
+    (entry: CollectionEntry<"projects">) => !entry.data.hidden,
+  );
   return entries.map((entry: CollectionEntry<"projects">) => ({
     params: { slug: entry.slug },
     props: { entry },

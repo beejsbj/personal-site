@@ -37,10 +37,78 @@
         {
           "type": "query",
           "key": "project",
-          "value": "(?<project>.*)"
+          "value": "(?<labProject>garden|e4p|flashcards)"
+        }
+      ],
+      "destination": "/lab/:labProject",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": "quantumon|roulette"
+        }
+      ],
+      "destination": "/lab",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": "pizza-nano|desci-bengaluru"
+        }
+      ],
+      "destination": "/projects",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": "(?<project>conduit-market|api3-ecosystem|qrng)"
         }
       ],
       "destination": "/projects/:project",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "project"
+        },
+        {
+          "type": "query",
+          "key": "project",
+          "value": ".*"
+        }
+      ],
+      "destination": "/projects",
       "permanent": true
     },
     {

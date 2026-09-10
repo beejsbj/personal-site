@@ -10,30 +10,6 @@ interface ProfileLink {
   href: string;
 }
 
-const legacyPage = Astro.url.searchParams.get("page");
-if (legacyPage === "project") {
-  const projectId = Astro.url.searchParams.get("project");
-  if (projectId) {
-    return Astro.redirect(`/projects/${projectId}`, 301);
-  }
-}
-
-if (legacyPage === "garden" || legacyPage === "layout-detail") {
-  return Astro.redirect("/lab/garden", 301);
-}
-
-if (legacyPage === "e4p" || legacyPage === "exercise-detail" || legacyPage === "e4p-in-vue") {
-  return Astro.redirect("/lab/e4p", 301);
-}
-
-if (legacyPage === "style-guide") {
-  return Astro.redirect("/lab/style-guide", 301);
-}
-
-if (legacyPage === "about" || legacyPage === "projects" || legacyPage === "resume") {
-  return Astro.redirect(`/${legacyPage}`, 301);
-}
-
 const homeEntry = await getEntry("pages", "home");
 if (!homeEntry) {
   throw new Error("Missing home content entry.");
