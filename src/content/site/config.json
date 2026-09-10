@@ -3,15 +3,20 @@
   "siteTitle": "Burooj Rashid | Frontend Developer",
   "siteDescription": "A lean portfolio and lab for Burooj Rashid, focused on expressive frontend work, motion, and thoughtful web design.",
   "email": "burooj.bj@gmail.com",
-  "writingUrl": "https://beejsbj.substack.com",
+  "writingUrl": "https://buroojs.substack.com",
   "nav": [
-    {
-      "label": "Home",
-      "href": "/"
-    },
     {
       "label": "Projects",
       "href": "/projects"
+    },
+    {
+      "label": "Lab",
+      "href": "/lab"
+    },
+    {
+      "label": "Writing",
+      "href": "https://buroojs.substack.com",
+      "external": true
     },
     {
       "label": "About",
@@ -20,15 +25,6 @@
     {
       "label": "Resume",
       "href": "/resume"
-    },
-    {
-      "label": "Lab",
-      "href": "/lab"
-    },
-    {
-      "label": "Writing",
-      "href": "https://beejsbj.substack.com",
-      "external": true
     }
   ],
   "social": [

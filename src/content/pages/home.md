@@ -1,12 +1,11 @@
 ---
 title: Burooj Rashid | Frontend Developer
-description: A lean portfolio of selected frontend work, motion-driven interfaces, and experiments by Burooj Rashid.
+description: Selected frontend work, interface experiments, and living systems by Burooj Rashid.
 eyebrow: Frontend Developer
-headline: I build websites that feel alive without becoming a maintenance problem.
-intro: Design-minded frontend work shaped by motion, storytelling, and systems that stay clear when the project grows.
-availability: Open to frontend roles, freelance collaborations, and thoughtful web work.
+headline: I build useful interfaces with a strong point of view.
+intro: I build expressive web interfaces where interaction, storytelling, and maintainable systems meet.
 ---
 
-I care about the part of frontend work where visual taste and implementation discipline meet. The goal is not just to make something look good, but to make it feel clear, alive, and easy to keep improving.
+I care about the part of frontend work where visual taste and implementation discipline meet. The goal is not only to make something look good, but to make it clear, alive, and easy to keep improving.
 
-This portfolio is a cleaner rebuild of years of client work, experiments, and student-era projects. The main work lives in **Projects**. The messier, more exploratory thread lives in **Lab**.
+This site brings lasting **Projects** together with the smaller experiments in **Lab** and dated notes about what is changing now.

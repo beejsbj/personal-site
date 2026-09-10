@@ -9,7 +9,7 @@ tools:
   - "HTML"
   - "CSS"
   - "JavaScript"
-featured: true
+featured: false
 status: "selected"
 cover: "/images/projects/desci-bengaluru.png"
 links:
@@ -24,7 +24,7 @@ media:
 order: 2
 tags:
   - "freelance"
-hidden: false
+hidden: true
 ---
 
 ## Goals

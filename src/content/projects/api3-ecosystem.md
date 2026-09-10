@@ -1,6 +1,6 @@
 ---
 title: "API3 Ecosystem"
-summary: "An Ecosystem website for API3, where dApp Developers can showcase their dApps to the community"
+summary: "A discovery site where developers could publish and explore dApps in the API3 ecosystem, combining product UI, data-rich browsing, and supporting content."
 year: 2024
 dateLabel: "Nov 2024"
 role: "Development"
@@ -12,14 +12,17 @@ status: "selected"
 cover: "/images/projects/api3-ecosystem.jpg"
 links:
   -
-    label: "Live Link"
-    url: "https://ecosystem.api3.org/"
+    label: "Showcase"
+    url: "https://ecosystem-website.vercel.app/"
+  -
+    label: "Source"
+    url: "https://github.com/beejsbj/ecosystem-website"
 media:
   -
     type: "image"
     src: "/images/projects/api3-ecosystem.jpg"
     alt: "API3 Ecosystem cover image"
-order: 1
+order: 2
 tags:
   - "api3"
 hidden: false

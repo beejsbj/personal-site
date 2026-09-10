@@ -51,6 +51,16 @@ const labSchema = z.object({
   hidden: z.boolean().default(false),
 });
 
+const updateSchema = z.object({
+  title: z.string(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  dateLabel: z.string(),
+  summary: z.string(),
+  href: z.string().min(1),
+  linkLabel: z.string(),
+  relatedProject: z.string().optional(),
+});
+
 const siteSchema = z.object({
   name: z.string(),
   siteTitle: z.string(),
@@ -87,6 +97,11 @@ const lab = defineCollection({
   schema: labSchema,
 });
 
+const updates = defineCollection({
+  type: "content",
+  schema: updateSchema,
+});
+
 const site = defineCollection({
   type: "data",
   schema: siteSchema,
@@ -96,5 +111,6 @@ export const collections = {
   pages,
   projects,
   lab,
+  updates,
   site,
 };

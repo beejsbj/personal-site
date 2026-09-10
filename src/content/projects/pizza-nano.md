@@ -8,7 +8,7 @@ location: "Local Family-Owned Pizzeria"
 tools:
   - "HTML"
   - "CSS"
-featured: true
+featured: false
 status: "selected"
 cover: "/images/projects/pizza-nano.png"
 links:
@@ -24,7 +24,7 @@ order: 3
 tags:
   - "freelance"
   - "local business"
-hidden: false
+hidden: true
 ---
 
 ## Goals
