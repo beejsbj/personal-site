@@ -11,6 +11,8 @@ This section supersedes conflicting recommendations in the historical draft belo
 ### Confirmed Direction
 
 - The base homepage should show who Burooj is, established work, and what he is doing now across the web.
+- Projects and updates are distinct: projects are lasting work; updates describe activity and may link to projects. Burooj explicitly confirmed this distinction during the resumed grill-with-docs session.
+- Projects belong in or below the homepage's main area, alongside the introduction rather than being represented only through the updates feed.
 - Small GitHub projects, experiments, and bjslab belong in that public picture; they are not categorically deferred until after launch.
 - The base page should remain largely simple. The later prism layer carries the more elaborate interactive experience.
 - Ship a basic version soon. This branch defines the content for that first surface; it should not become an indefinite planning exercise.
