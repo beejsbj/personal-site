@@ -31,10 +31,14 @@ media:
     type: "image"
     src: "/images/projects/lottery-app.jpg"
     alt: "QRNG lottery demo interface"
+    width: 2000
+    height: 1288
   -
     type: "image"
     src: "/images/projects/roulette-app.jpg"
     alt: "QRNG roulette demo interface"
+    width: 2000
+    height: 1287
 order: 3
 tags:
   - "api3"

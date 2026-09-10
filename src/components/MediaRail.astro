@@ -4,6 +4,8 @@ interface MediaItem {
   src: string;
   alt?: string;
   caption?: string;
+  width?: number;
+  height?: number;
 }
 
 interface Props {
@@ -23,7 +25,14 @@ const { media = [] } = Astro.props;
               <source src={item.src} />
             </video>
           ) : (
-            <img src={item.src} alt={item.alt || ""} loading="lazy" />
+            <img
+              src={item.src}
+              alt={item.alt || ""}
+              width={item.width}
+              height={item.height}
+              loading="lazy"
+              decoding="async"
+            />
           )}
           {item.caption && <figcaption>{item.caption}</figcaption>}
         </figure>

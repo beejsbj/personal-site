@@ -21,7 +21,7 @@ const siteBaseUrl = "https://burooj.dev";
 const {
   title = site.siteTitle,
   description = site.siteDescription,
-  image = "/images/circle.svg",
+  image = "/images/burooj4.jpg",
   pageClass = "page-default",
 } = Astro.props;
 
@@ -44,6 +44,7 @@ const socialImage = new URL(image, siteBaseUrl).toString();
     <meta property="og:image" content={socialImage} />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={socialImage} />
     <ClientRouter />
   </head>
 

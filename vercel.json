@@ -141,7 +141,7 @@
         {
           "type": "query",
           "key": "page",
-          "value": "e4p"
+          "value": "e4p|e4p-in-vue"
         }
       ],
       "destination": "/lab/e4p",

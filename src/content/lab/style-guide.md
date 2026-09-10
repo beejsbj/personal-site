@@ -9,6 +9,8 @@ media:
   - type: image
     src: /images/background/square.jpg
     alt: Abstract background from the original style guide era
+    width: 2000
+    height: 2000
 order: 6
 hidden: false
 ---

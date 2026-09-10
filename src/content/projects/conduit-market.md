@@ -29,6 +29,8 @@ media:
     type: "image"
     src: "/images/projects/conduit-market.jpg"
     alt: "Conduit Market storefront interface"
+    width: 670
+    height: 458
 order: 1
 tags:
   - "conduit"

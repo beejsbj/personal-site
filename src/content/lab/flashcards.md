@@ -13,6 +13,8 @@ media:
     type: "image"
     src: "/images/projects/flashcards.png"
     alt: "Flash Cards cover image"
+    width: 2000
+    height: 1287
 order: 3
 hidden: false
 ---

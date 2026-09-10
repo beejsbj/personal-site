@@ -10,6 +10,8 @@ const mediaSchema = z.object({
   src: z.string(),
   alt: z.string().optional(),
   caption: z.string().optional(),
+  width: z.number().int().positive().optional(),
+  height: z.number().int().positive().optional(),
 });
 
 const pageSchema = z.object({

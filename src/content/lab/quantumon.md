@@ -16,6 +16,8 @@ media:
     type: "image"
     src: "/images/projects/quantumon.png"
     alt: "Quantumon cover image"
+    width: 2000
+    height: 1287
 order: 4
 hidden: true
 ---

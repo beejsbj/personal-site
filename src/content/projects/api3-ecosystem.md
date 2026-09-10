@@ -22,6 +22,8 @@ media:
     type: "image"
     src: "/images/projects/api3-ecosystem.jpg"
     alt: "API3 Ecosystem cover image"
+    width: 1200
+    height: 662
 order: 2
 tags:
   - "api3"

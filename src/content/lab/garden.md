@@ -10,6 +10,8 @@ media:
     type: "image"
     src: "/images/projects/garden.png"
     alt: "Layout Garden cover image"
+    width: 2000
+    height: 1287
 order: 1
 hidden: false
 ---

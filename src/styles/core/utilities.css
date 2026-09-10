@@ -415,6 +415,12 @@
   margin-top: 0.45rem;
 }
 
+.prose a {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
 .entry-page__meta {
   display: grid;
   gap: var(--space-s);

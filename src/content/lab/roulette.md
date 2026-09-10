@@ -22,6 +22,8 @@ media:
     type: "image"
     src: "/images/projects/roulette-app.jpg"
     alt: "Roulette App cover image"
+    width: 2000
+    height: 1287
 order: 5
 hidden: true
 ---

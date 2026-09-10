@@ -13,6 +13,8 @@ media:
     type: "image"
     src: "/images/projects/e4p.png"
     alt: "Exercises for Programmers cover image"
+    width: 2000
+    height: 1287
 order: 2
 hidden: false
 ---
