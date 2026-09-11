@@ -1,6 +1,10 @@
 ---
 // BJS-427: three throwaway homepage layouts on /?variant=A|B|C.
 // Only mounted in development; production retains the BJS-42 homepage.
+import '@fontsource/lato/300.css';
+import '@fontsource/lato/400.css';
+import '@fontsource/lato/700.css';
+import '@fontsource-variable/newsreader';
 import VariantA from './VariantA.astro';
 import VariantB from './VariantB.astro';
 import VariantC from './VariantC.astro';
@@ -24,18 +28,18 @@ const data = Astro.props as PrototypeData;
       <div data-variant-panel="C" hidden><VariantC {...data} /></div>
     </main>
     <nav class="prototype-switcher" aria-label="Design iteration switcher">
-      <div class="prototype-caption"><span>Design study</span><output aria-live="polite" id="prototype-label">A · Open home</output></div>
+      <div class="prototype-caption"><span>Design study</span><output aria-live="polite" id="prototype-label">A · Warm welcome</output></div>
       <div class="prototype-controls">
         <button type="button" data-cycle="-1" aria-label="Previous iteration">←</button>
-        <button type="button" data-variant="A" aria-pressed="true">A<span> Open home</span></button>
-        <button type="button" data-variant="B" aria-pressed="false">B<span> Personal desk</span></button>
-        <button type="button" data-variant="C" aria-pressed="false">C<span> Project index</span></button>
+        <button type="button" data-variant="A" aria-pressed="true">A<span> Warm welcome</span></button>
+        <button type="button" data-variant="B" aria-pressed="false">B<span> Living desk</span></button>
+        <button type="button" data-variant="C" aria-pressed="false">C<span> Circular index</span></button>
         <button type="button" data-cycle="1" aria-label="Next iteration">→</button>
       </div>
       <a class="prototype-baseline" href="/?variant=original">BJS-42 version ↗</a>
     </nav>
     <script>
-      const labels: Record<string, string> = { A: 'Open home', B: 'Personal desk', C: 'Project index' };
+      const labels: Record<string, string> = { A: 'Warm welcome', B: 'Living desk', C: 'Circular index' };
       const keys = Object.keys(labels);
       let current = 'A';
       function showVariant(key: string, updateUrl = true) {
@@ -77,24 +81,25 @@ const data = Astro.props as PrototypeData;
 </html>
 
 <style is:global>
-  body.prototype-comparison { margin: 0; background: #fff; color: #171c18; font-family: system-ui, sans-serif; }
+  body.prototype-comparison { margin: 0; background: #d9d7d0; color: #302320; font-family: 'Lato', sans-serif; }
   :where(.prototype-comparison *) { box-sizing: border-box; }
-  body.prototype-comparison :is(h1, h2, h3, h4) { font-family: inherit; }
+  body.prototype-comparison { --prototype-display: 'Newsreader Variable', serif; }
   body.prototype-comparison :is(h1, h2, h3) a { font-size: inherit; font-weight: inherit; }
   body.prototype-comparison figcaption { padding: 0; }
   :where(.prototype-comparison p, .prototype-comparison li, .prototype-comparison a, .prototype-comparison button) { font-size: inherit; color: inherit; }
   .prototype-comparison [hidden] { display: none !important; }
-  .prototype-skip { position: fixed; top: -100px; left: 20px; z-index: 10000; padding: 12px; background: white; color: #087443; }
+  .prototype-skip { position: fixed; top: -100px; left: 20px; z-index: 10000; padding: 12px; background: white; color: #7c2621; }
   .prototype-skip:focus { top: 10px; }
-  .prototype-switcher { position: fixed; z-index: 1000; left: 50%; bottom: 18px; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 24px); display: flex; align-items: center; gap: 18px; padding: 11px 15px; background: #17221b; color: white; border-radius: 12px; box-shadow: 0 6px 30px #0003; font-family: system-ui, sans-serif; }
+  .prototype-switcher { position: fixed; z-index: 1000; left: 50%; bottom: 18px; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 24px); display: flex; align-items: center; gap: 18px; padding: 11px 15px; background: #28211e; color: white; border-radius: 12px; box-shadow: 0 6px 30px #0003; font-family: system-ui, sans-serif; }
   .prototype-caption { display: grid; gap: 2px; min-width: 140px; }
-  .prototype-caption > span { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: #bac8bd; }
+  .prototype-caption > span { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: #c5b7af; }
   #prototype-label { font-size: 13px; font-weight: 600; }
   .prototype-controls { display: flex; align-items: center; gap: 4px; }
   .prototype-controls button { padding: 9px 10px; border: 1px solid transparent; color: white; background: transparent; border-radius: 5px; cursor: pointer; font: 13px/1.4 system-ui, sans-serif; min-height: 38px; }
-  .prototype-controls button:hover { background: #35493b; }
-  .prototype-controls button[aria-pressed="true"] { color: #17221b; background: #c4efcc; }
-  .prototype-controls button:focus-visible, .prototype-baseline:focus-visible { outline: 2px solid #c4efcc; outline-offset: 3px; }
-  .prototype-baseline { color: #d2dfd5; font-size: 11px; white-space: nowrap; }
+  .prototype-controls button:hover { background: #50403a; }
+  .prototype-controls button[aria-pressed="true"] { color: #28211e; background: #ebbc91; }
+  .prototype-controls button:focus-visible, .prototype-baseline:focus-visible { outline: 2px solid #ebbc91; outline-offset: 3px; }
+  .prototype-baseline { color: #e5dcd5; font-size: 11px; white-space: nowrap; }
   @media(max-width: 780px) { .prototype-controls button span { display: none; } .prototype-baseline { display: none; } .prototype-switcher { gap: 10px; padding: 9px 12px; } .prototype-caption { min-width: 136px; } .prototype-controls button { min-width: 30px; padding-inline: 8px; } }
+  @media(max-width: 420px) { .prototype-switcher { flex-direction: column; gap: 5px; } .prototype-caption { text-align: center; } .prototype-caption > span { display: none; } .prototype-controls button { min-width: 40px; } }
 </style>

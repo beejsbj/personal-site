@@ -1,44 +1,41 @@
 ---
 import type { PrototypeData } from './types';
-
 const { projects, updates, site } = Astro.props as PrototypeData;
 ---
 
 <div class="desk">
   <div class="desk-inner">
     <header class="desk-header">
-      <a class="desk-home" href="/" aria-label={`${site.name}, home`}><span class="desk-circle" aria-hidden="true"></span> Burooj.</a>
+      <a class="desk-home" href="/" aria-label={`${site.name}, home`}>Burooj.</a>
       <nav aria-label="Main navigation">
-        <a href="#b-projects">Projects</a>
-        <a href="/lab">Lab</a>
-        <a href={site.writingUrl}>Writing</a>
-        <a href="/about">About</a>
-        <a href="/resume">Résumé <span aria-hidden="true">↗</span></a>
+        <a class="nav-projects" href="#b-projects">Projects</a>
+        <a class="nav-about" href="/about">About</a>
+        <a class="nav-lab" href="/lab">Lab</a>
+        <a class="nav-writing" href={site.writingUrl}>Writing</a>
       </nav>
     </header>
-
     <div class="desk-top">
       <section class="desk-intro" aria-labelledby="b-title">
         <div class="desk-greeting">
-          <div>
+          <div class="desk-greeting-copy">
             <p class="hello">Hey there!</p>
-            <h1 id="b-title">Burooj<br />here!</h1>
+            <h1 id="b-title">Burooj here!</h1>
+            <p class="desk-role">{`{ Web Dev/signer }`}</p>
           </div>
-          <img class="desk-portrait" src="/images/burooj4.jpg" alt="Burooj Rashid" width="168" height="200" fetchpriority="high" />
+          <div class="desk-portrait-frame"><img class="desk-portrait" src="/images/burooj4.jpg" alt="Burooj Rashid" width="155" height="155" fetchpriority="high" /></div>
         </div>
-        <p class="desk-role">{`{ Web Dev/signer }`}</p>
         <p class="desk-welcome">Welcome to my home on the internet.<br />Feel free to look around!</p>
         <div class="desk-social" aria-label="Find me online">
-          {site.social.filter(link => ['GitHub', 'LinkedIn', 'Email'].includes(link.label)).map((link) => <a href={link.href}>{link.label} <span aria-hidden="true">↗</span></a>)}
+          {site.social.map((link) => <a href={link.href}>{link.label} <span aria-hidden="true">↗</span></a>)}
+          <a href="/resume">Résumé <span aria-hidden="true">↗</span></a>
         </div>
         <div class="desk-current">
-          <h2><span class="current-dot" aria-hidden="true"></span> Currently</h2>
-          <p>I’m maintaining <a href="/about">bjslab</a>, my home-lab environment for the tools and services I use.</p>
+          <h2>Currently</h2>
+          <p>I’m maintaining <a href="/lab">bjslab</a>, my home-lab environment for the tools and services I use.</p>
         </div>
       </section>
-
       <aside class="desk-updates" aria-labelledby="b-updates">
-        <div class="desk-side-heading"><h2 id="b-updates">Recent updates</h2><span aria-hidden="true">↙</span></div>
+        <h2 id="b-updates">Recent updates</h2>
         <ol class="desk-update-list">
           {updates.map((update) => (
             <li>
@@ -51,164 +48,159 @@ const { projects, updates, site } = Astro.props as PrototypeData;
         </ol>
       </aside>
     </div>
-
     <section class="desk-projects" aria-labelledby="b-projects">
-      <div class="desk-section-heading">
-        <h2 id="b-projects">Selected projects<span class="green-period">.</span></h2>
-        <a href="/projects">All projects <span aria-hidden="true">→</span></a>
-      </div>
+      <div class="desk-section-heading"><h2 id="b-projects">Selected projects</h2><a href="/projects">All projects <span aria-hidden="true">↗</span></a></div>
       <div class="desk-project-list">
-        {projects.map((project, index) => (
+        {projects.map((project) => (
           <article class="desk-project">
-            <a class="desk-project-image" href={project.href} aria-label={`View ${project.title}`}>
-              <img src={project.cover} alt="" loading="lazy" decoding="async" width="440" height="300" />
-            </a>
+            <a class="desk-project-image" href={project.href} aria-label={`View ${project.title}`}><img src={project.cover} alt="" loading="lazy" decoding="async" width="600" height="440" /></a>
             <div class="desk-project-copy">
-              <p class="desk-project-meta">{project.role}<span aria-hidden="true"> / </span>{project.dateLabel}</p>
+              <p class="desk-project-meta">{project.role}<span aria-hidden="true"> · </span>{project.dateLabel}</p>
               <h3><a href={project.href}>{project.title} <span aria-hidden="true">↗</span></a></h3>
               <p class="desk-project-summary">{project.summary}</p>
-              <ul class="desk-tools" aria-label={`${project.title} tools`}>
-                {project.tools.map((tool) => <li>{tool}</li>)}
-              </ul>
+              <ul class="desk-tools" aria-label={`${project.title} tools`}>{project.tools.map((tool) => <li>{tool}</li>)}</ul>
             </div>
-            <span class="desk-project-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
           </article>
         ))}
       </div>
     </section>
-
     <section class="desk-elsewhere" aria-label="More to explore">
-      <div>
-        <h2><a href="/lab">Lab <span aria-hidden="true">↗</span></a></h2>
-        <p>bjslab, small projects, and things I’m trying out.</p>
-      </div>
-      <div>
-        <h2><a href={site.writingUrl}>Writing <span aria-hidden="true">↗</span></a></h2>
-        <p>Notes and things I’m thinking about.</p>
-      </div>
+      <div><a class="elsewhere-circle" href="/lab">Lab <span aria-hidden="true">↗</span></a><p>bjslab, small projects, and things I’m trying out.</p></div>
+      <div><a class="elsewhere-circle" href={site.writingUrl}>Writing <span aria-hidden="true">↗</span></a><p>Notes and things I’m thinking about.</p></div>
     </section>
-
-    <footer class="desk-footer">
-      <p>{site.name}</p>
-      <a href={`mailto:${site.email}`}>{site.email} <span aria-hidden="true">↗</span></a>
-      <a href="#b-title">Back to top ↑</a>
-    </footer>
+    <footer class="desk-footer"><p>{site.name}</p><a href={`mailto:${site.email}`}>{site.email} <span aria-hidden="true">↗</span></a><a href="#b-title">Back to top ↑</a></footer>
   </div>
 </div>
 
 <style>
-  .desk {
-    --desk-green: #087443;
-    --desk-ink: #171917;
-    --desk-muted: #606660;
-    --desk-line: #d9dfd9;
-    color: var(--desk-ink);
-    background: #fff;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    text-align: left;
-  }
-  .desk-inner { width: min(1180px, calc(100% - 96px)); margin-inline: auto; }
+  .desk { --wine: #7c2621; --paper: #d9d7d0; --peach: #e5b483; --ink: #27231f; --muted: #61574f; --line: #b6a99c; position: relative; overflow: clip; isolation: isolate; background: var(--paper); color: var(--ink); font: 16px/1.5 'Lato', sans-serif; text-align: left; }
+  .desk::before { content: ''; position: absolute; z-index: -1; width: 440px; height: 440px; border-radius: 50%; background: var(--wine); left: -359px; top: -174px; pointer-events: none; }
+  .desk::after { content: ''; position: absolute; z-index: -1; right: -320px; bottom: -575px; width: 600px; height: 600px; border-radius: 50%; background: var(--wine); pointer-events: none; }
+  .desk-inner { width: min(1180px, calc(100% - 112px)); margin-inline: auto; }
   .desk :is(h1, h2, h3, p, ol, ul) { margin: 0; }
-  .desk a { color: var(--desk-green); text-decoration-thickness: 1px; text-underline-offset: 4px; }
-  .desk a:hover { color: #033e23; text-decoration: underline; }
-  .desk a:focus-visible { outline: 3px solid var(--desk-green); outline-offset: 5px; }
-  .desk-header { min-height: 103px; display: flex; align-items: center; justify-content: space-between; gap: 30px; border-bottom: 1px solid var(--desk-line); }
-  .desk-home { display: inline-flex; align-items: center; gap: 10px; color: var(--desk-ink) !important; font-size: 25px; font-weight: 800; letter-spacing: -1px; text-decoration: none; }
-  .desk-circle { width: 15px; height: 15px; border: 3px solid var(--desk-green); border-radius: 50%; }
-  .desk-header nav { display: flex; flex-wrap: wrap; gap: 26px; }
-  .desk-header nav a { font-size: 15px; font-weight: 600; text-decoration: none; }
-  .desk-top { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 78px; padding-block: 58px 65px; }
-  .desk-greeting { display: flex; align-items: center; justify-content: space-between; gap: 25px; }
-  .hello { font-size: 24px; font-weight: 600; letter-spacing: -.5px; }
-  .desk h1 { margin-top: 10px; font-size: clamp(62px, 6.5vw, 88px); line-height: .95; font-weight: 800; letter-spacing: -5px; }
-  .desk-portrait { display: block; width: 168px; height: 200px; max-width: 35%; object-fit: cover; object-position: center 30%; }
-  .desk-role { margin-top: 29px !important; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 20px; font-weight: 600; letter-spacing: -.6px; }
-  .desk-welcome { margin-top: 17px !important; font-size: 20px; line-height: 1.55; }
-  .desk-social { display: flex; flex-wrap: wrap; column-gap: 22px; row-gap: 10px; margin-top: 24px; }
-  .desk-social a { font-size: 15px; font-weight: 600; }
-  .desk-current { margin-top: 39px; padding-top: 21px; border-top: 1px solid var(--desk-line); display: grid; grid-template-columns: 106px minmax(0, 1fr); gap: 20px; }
-  .desk-current h2 { font-size: 14px; display: flex; align-items: baseline; gap: 8px; line-height: 1.6; }
-  .current-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--desk-green); flex-shrink: 0; }
-  .desk-current p { font-size: 15px; line-height: 1.6; color: #424842; }
-  .desk-updates { border-left: 1px solid var(--desk-line); padding-left: 31px; }
-  .desk-side-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--desk-ink); }
-  .desk-side-heading h2 { font-size: 18px; letter-spacing: -.35px; }
-  .desk-side-heading > span { font-size: 22px; line-height: 1; color: var(--desk-green); }
+  .desk :is(h1, h2, h3) { font-family: 'Newsreader Variable', serif; font-weight: 600; }
+  .desk a { color: var(--wine); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .desk a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+  .desk a:focus-visible { outline: 3px solid var(--wine); outline-offset: 5px; }
+  .desk-header { min-height: 142px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+  .desk-home { font-family: 'Newsreader Variable', serif; font-size: 32px; font-weight: 650; letter-spacing: -.9px; text-decoration: none; }
+  .desk-header nav { display: flex; align-items: center; gap: 8px; padding-block: 12px; }
+  .desk-header nav a { display: grid; place-items: center; border-radius: 50%; flex-shrink: 0; background: var(--peach); font-size: 14px; line-height: 1.1; font-weight: 700; text-decoration: none; box-shadow: 0 5px 0 #7c262112; }
+  .desk-header nav a:hover { box-shadow: 0 5px 0 #7c262140; text-decoration: underline; }
+  .nav-projects { width: 83px; height: 83px; }
+  .nav-about { width: 66px; height: 66px; align-self: flex-start; }
+  .nav-lab { width: 58px; height: 58px; align-self: flex-end; }
+  .nav-writing { width: 74px; height: 74px; }
+  .desk-top { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 65px; padding-block: 15px 51px; }
+  .desk-intro { padding-top: 14px; }
+  .desk-greeting { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .desk-greeting-copy { min-width: 0; }
+  .hello { font-size: 27px; font-weight: 800; letter-spacing: -.5px; }
+  .desk h1 { margin-top: 12px; font-size: clamp(60px, 5.8vw, 80px); font-weight: 700; line-height: .99; letter-spacing: -3px; color: var(--wine); }
+  .desk-role { margin-top: 20px !important; font-size: 21px; color: var(--wine); font-weight: 400; }
+  .desk-portrait-frame { flex-shrink: 0; width: 153px; height: 153px; padding: 8px; border: 1px solid var(--wine); border-radius: 50%; position: relative; }
+  .desk-portrait-frame::before { content: ''; position: absolute; width: 40px; height: 40px; border-radius: 50%; background: var(--peach); right: -5px; top: -7px; z-index: -1; }
+  .desk-portrait { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center 28%; }
+  .desk-welcome { margin-top: 31px !important; font-size: 19px; line-height: 1.6; }
+  .desk-social { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 23px; }
+  .desk-social a { font-size: 15px; }
+  .desk-current { margin-top: 35px; padding: 21px 23px; border-left: 3px solid var(--wine); background: repeating-linear-gradient(135deg, transparent 0 4px, #7c262109 4px 5px); }
+  .desk-current h2 { font-size: 25px; font-weight: 500; font-style: italic; color: var(--wine); }
+  .desk-current p { margin-top: 7px; font-size: 15px; line-height: 1.55; max-width: 530px; }
+  .desk-updates { padding: 6px 0 0 27px; border-left: 1px solid var(--line); }
+  .desk-updates > h2 { font-size: 29px; line-height: 1.1; color: var(--wine); padding-bottom: 12px; }
   .desk-update-list { padding: 0; list-style: none; }
-  .desk-update-list li { padding-block: 19px; border-bottom: 1px solid var(--desk-line); }
-  .desk-update-list li:last-child { border-bottom: 0; padding-bottom: 0; }
-  .desk-update-list time { color: var(--desk-muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; }
-  .desk-update-list h3 { margin-top: 5px; font-size: 16px; line-height: 1.35; letter-spacing: -.2px; }
-  .desk-update-list h3 a { color: var(--desk-ink); text-decoration: none; }
-  .desk-update-list p { margin-top: 7px; font-size: 14px; line-height: 1.5; color: #535a53; }
-  .desk-update-link { display: inline-block; margin-top: 8px; font-size: 14px; font-weight: 600; }
-  .desk-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; border-top: 2px solid var(--desk-ink); padding-top: 22px; padding-bottom: 7px; }
-  .desk-section-heading h2 { font-size: clamp(27px, 3.1vw, 38px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.15; }
-  .green-period { color: var(--desk-green); }
-  .desk-section-heading > a { flex-shrink: 0; font-size: 14px; font-weight: 600; }
-  .desk-project { display: grid; grid-template-columns: 240px minmax(0, 1fr) 32px; gap: 32px; padding-block: 27px; border-bottom: 1px solid var(--desk-line); align-items: center; }
-  .desk-project-image { display: block; background: #f1f3f1; }
-  .desk-project-image img { display: block; width: 100%; height: auto; aspect-ratio: 1.48; object-fit: cover; }
-  .desk-project-meta { font-size: 14px; color: var(--desk-muted); line-height: 1.6; }
-  .desk-project-meta span { padding-inline: 4px; }
-  .desk-project h3 { margin-top: 7px; font-size: 26px; line-height: 1.15; letter-spacing: -.8px; }
-  .desk-project h3 a { color: var(--desk-ink); text-decoration: none; }
-  .desk-project h3 span { color: var(--desk-green); font-size: 23px; }
-  .desk-project-summary { margin-top: 10px !important; max-width: 650px; color: #424842; font-size: 15px; line-height: 1.6; }
-  .desk-tools { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 13px !important; }
-  .desk-tools li { font-size: 14px; color: var(--desk-muted); }
-  .desk-project-number { align-self: start; color: var(--desk-muted); font-size: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; text-align: right; }
-  .desk-elsewhere { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding-block: 43px 49px; }
-  .desk-elsewhere h2 { font-size: 25px; letter-spacing: -.8px; }
-  .desk-elsewhere h2 a { text-decoration: none; }
-  .desk-elsewhere p { margin-top: 7px; color: #535a53; font-size: 15px; }
-  .desk-footer { border-top: 1px solid var(--desk-line); display: flex; flex-wrap: wrap; gap: 18px 34px; align-items: center; padding-block: 24px 34px; font-size: 14px; }
+  .desk-update-list li { padding-block: 16px; border-top: 1px solid var(--line); }
+  .desk-update-list li:last-child { padding-bottom: 0; }
+  .desk-update-list time { color: var(--muted); font-size: 14px; }
+  .desk-update-list h3 { margin-top: 5px; font-family: 'Lato', sans-serif; font-size: 16px; font-weight: 700; line-height: 1.35; }
+  .desk-update-list h3 a { color: var(--ink); text-decoration: none; }
+  .desk-update-list h3 a:hover { text-decoration: underline; }
+  .desk-update-list p { margin-top: 7px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+  .desk-update-link { display: inline-block; margin-top: 8px; font-size: 14px; }
+  .desk-projects { border-top: 1px solid var(--wine); padding-top: 24px; }
+  .desk-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding-bottom: 25px; }
+  .desk-section-heading h2 { font-size: 43px; color: var(--wine); letter-spacing: -1.2px; line-height: 1.1; }
+  .desk-section-heading > a { flex-shrink: 0; font-size: 15px; }
+  .desk-project-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; }
+  .desk-project { min-width: 0; }
+  .desk-project-image { display: block; background: #cbc6bb; border-bottom: 5px solid var(--peach); }
+  .desk-project-image img { display: block; width: 100%; height: auto; aspect-ratio: 1.38; object-fit: cover; }
+  .desk-project-copy { padding-top: 17px; }
+  .desk-project-meta { font-size: 14px; color: var(--muted); line-height: 1.5; }
+  .desk-project h3 { margin-top: 10px; font-size: 32px; line-height: 1.02; letter-spacing: -.8px; }
+  .desk-project h3 a { text-decoration: none; }
+  .desk-project h3 a:hover { text-decoration: underline; }
+  .desk-project h3 span { font-family: 'Lato', sans-serif; font-size: 20px; white-space: nowrap; }
+  .desk-project-summary { margin-top: 13px !important; font-size: 15px; line-height: 1.6; }
+  .desk-tools { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 13px; margin-top: 14px !important; }
+  .desk-tools li { font-size: 14px; color: var(--muted); }
+  .desk-elsewhere { display: grid; grid-template-columns: 1fr 1fr; gap: 54px; padding-block: 47px; margin-top: 42px; border-top: 1px solid var(--line); }
+  .desk-elsewhere > div { display: flex; align-items: center; gap: 24px; }
+  .elsewhere-circle { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 99px; height: 99px; flex-shrink: 0; background: var(--peach); border-radius: 50%; text-decoration: none; font-size: 17px; font-weight: 700; }
+  .elsewhere-circle span { font-weight: 400; }
+  .desk-elsewhere p { font-size: 17px; max-width: 240px; }
+  .desk-footer { border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 18px 34px; align-items: center; padding-block: 24px 38px; font-size: 14px; }
   .desk-footer p { font-weight: 700; margin-right: auto; }
   .desk-footer a { overflow-wrap: anywhere; }
-  @media (max-width: 1080px) {
-    .desk-inner { width: calc(100% - 64px); }
-    .desk-top { gap: 40px; grid-template-columns: minmax(0, 1fr) 290px; }
-    .desk-updates { padding-left: 25px; }
-    .desk h1 { font-size: 70px; letter-spacing: -4px; }
-    .desk-portrait { width: 138px; height: 176px; }
-    .desk-current { grid-template-columns: 1fr; gap: 8px; }
+  @media (max-width: 1100px) {
+    .desk-inner { width: calc(100% - 80px); }
+    .desk-top { gap: 36px; grid-template-columns: minmax(0, 1fr) 280px; }
+    .desk-updates { padding-left: 23px; }
+    .desk h1 { max-width: 350px; font-size: 68px; }
+    .desk-portrait-frame { width: 123px; height: 123px; }
+    .desk-project-list { gap: 24px; }
+    .desk-project h3 { font-size: 29px; }
   }
-  @media (max-width: 790px) {
-    .desk-inner { width: calc(100% - 44px); }
-    .desk-header { align-items: flex-start; flex-direction: column; justify-content: center; padding-block: 24px; gap: 16px; }
-    .desk-header nav { gap: 12px 22px; }
-    .desk-top { grid-template-columns: 1fr; gap: 35px; padding-block: 35px 45px; }
-    .desk h1 { font-size: clamp(64px, 12vw, 88px); }
-    .desk-portrait { max-width: 35%; width: 168px; height: 200px; }
-    .desk-current { grid-template-columns: 106px minmax(0, 1fr); gap: 16px; margin-top: 30px; }
-    .desk-updates { border-left: 0; padding-left: 0; }
-    .desk-update-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
-    .desk-update-list li:last-child { border-bottom: 1px solid var(--desk-line); padding-bottom: 19px; }
-    .desk-project { grid-template-columns: 190px minmax(0, 1fr); gap: 23px; }
-    .desk-project-number { display: none; }
-    .desk-project h3 { font-size: 23px; }
+  @media (max-width: 830px) {
+    .desk-inner { width: calc(100% - 48px); }
+    .desk::before { left: -425px; top: -187px; }
+    .desk-top { grid-template-columns: 1fr; gap: 33px; padding-bottom: 40px; }
+    .desk h1 { max-width: none; font-size: 75px; }
+    .desk-portrait-frame { width: 150px; height: 150px; }
+    .desk-current { margin-top: 25px; }
+    .desk-updates { border-left: 0; padding: 0; }
+    .desk-update-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+    .desk-update-list h3 { font-size: 15px; }
+    .desk-project-list { grid-template-columns: 1fr 1fr; }
+    .desk-project:last-child { grid-column: 1/-1; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 10px; }
+    .desk-project:last-child .desk-project-copy { padding-top: 0; }
+    .desk-elsewhere { gap: 30px; }
+    .desk-elsewhere > div { gap: 16px; }
+    .desk-elsewhere p { font-size: 15px; }
+    .elsewhere-circle { width: 82px; height: 82px; font-size: 15px; }
   }
-  @media (max-width: 520px) {
-    .desk-header nav { gap: 12px 18px; }
-    .desk-header nav a { font-size: 14px; }
-    .hello { font-size: 21px; }
-    .desk-greeting { gap: 12px; }
-    .desk h1 { font-size: 66px; letter-spacing: -3.5px; }
-    .desk-portrait { width: 115px; height: 150px; }
-    .desk-role { font-size: 18px; margin-top: 24px !important; }
-    .desk-welcome { font-size: 18px; }
-    .desk-current { grid-template-columns: 1fr; gap: 8px; }
-    .desk-update-list { grid-template-columns: 1fr; }
-    .desk-update-list li { padding-block: 17px; }
-    .desk-section-heading { align-items: flex-start; }
-    .desk-section-heading h2 { font-size: 28px; max-width: 190px; }
-    .desk-section-heading > a { padding-top: 5px; font-size: 14px; }
-    .desk-project { grid-template-columns: 1fr; gap: 18px; padding-block: 25px; }
-    .desk-project-image img { aspect-ratio: 1.6; }
-    .desk-project h3 { font-size: 25px; }
-    .desk-elsewhere { gap: 26px; grid-template-columns: 1fr; padding-block: 32px; }
-    .desk-footer { align-items: flex-start; flex-direction: column; gap: 12px; }
+  @media (max-width: 560px) {
+    .desk-header { min-height: 0; padding-block: 27px 15px; flex-direction: column; align-items: flex-start; gap: 8px; }
+    .desk-header nav { gap: 11px; width: 100%; justify-content: flex-start; padding-block: 6px; }
+    .nav-projects { width: 72px; height: 72px; }
+    .nav-about { width: 62px; height: 62px; }
+    .nav-lab { width: 54px; height: 54px; }
+    .nav-writing { width: 66px; height: 66px; }
+    .desk-greeting { gap: 9px; align-items: center; }
+    .hello { font-size: 24px; }
+    .desk h1 { max-width: 240px; font-size: clamp(52px, 12vw, 65px); letter-spacing: -2px; }
+    .desk-portrait-frame { width: 94px; height: 94px; padding: 5px; }
+    .desk-portrait-frame::before { width: 28px; height: 28px; }
+    .desk-role { font-size: 17px; margin-top: 13px !important; }
+    .desk-welcome { margin-top: 25px !important; font-size: 17px; }
+    .desk-social { gap: 10px 16px; margin-top: 17px; }
+    .desk-social a { font-size: 14px; }
+    .desk-current { padding: 18px; }
+    .desk-update-list { grid-template-columns: 1fr; gap: 0; }
+    .desk-update-list h3 { font-size: 16px; }
+    .desk-section-heading { align-items: center; }
+    .desk-section-heading h2 { max-width: 210px; font-size: 35px; }
+    .desk-section-heading > a { font-size: 14px; }
+    .desk-project-list { grid-template-columns: 1fr; gap: 33px; }
+    .desk-project:last-child { grid-column: auto; display: block; margin-top: 0; }
+    .desk-project:last-child .desk-project-copy { padding-top: 17px; }
+    .desk-project-image img { aspect-ratio: 1.5; }
+    .desk-project h3 { font-size: 33px; }
+    .desk-elsewhere { grid-template-columns: 1fr; padding-block: 30px; gap: 24px; }
+    .desk-elsewhere p { max-width: 220px; font-size: 16px; }
+    .desk-footer { flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 35px; }
+    .desk::after { width: 420px; height: 420px; bottom: -345px; right: -350px; }
   }
+  @media (max-width: 360px) { .desk-header nav { gap: 6px; } .desk-portrait-frame { width: 78px; height: 78px; } .desk h1 { font-size: 49px; } }
 </style>
