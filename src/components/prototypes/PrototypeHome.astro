@@ -1,0 +1,100 @@
+---
+// BJS-427: three throwaway homepage layouts on /?variant=A|B|C.
+// Only mounted in development; production retains the BJS-42 homepage.
+import VariantA from './VariantA.astro';
+import VariantB from './VariantB.astro';
+import VariantC from './VariantC.astro';
+import type { PrototypeData } from './types';
+const data = Astro.props as PrototypeData;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Burooj — three base iterations</title>
+    <link rel="icon" href="/images/circle.svg" />
+  </head>
+  <body class="prototype-comparison">
+    <a href="#prototype-content" class="prototype-skip">Skip to content</a>
+    <main id="prototype-content" tabindex="-1">
+      <div data-variant-panel="A"><VariantA {...data} /></div>
+      <div data-variant-panel="B" hidden><VariantB {...data} /></div>
+      <div data-variant-panel="C" hidden><VariantC {...data} /></div>
+    </main>
+    <nav class="prototype-switcher" aria-label="Design iteration switcher">
+      <div class="prototype-caption"><span>Design study</span><output aria-live="polite" id="prototype-label">A · Open home</output></div>
+      <div class="prototype-controls">
+        <button type="button" data-cycle="-1" aria-label="Previous iteration">←</button>
+        <button type="button" data-variant="A" aria-pressed="true">A<span> Open home</span></button>
+        <button type="button" data-variant="B" aria-pressed="false">B<span> Personal desk</span></button>
+        <button type="button" data-variant="C" aria-pressed="false">C<span> Project index</span></button>
+        <button type="button" data-cycle="1" aria-label="Next iteration">→</button>
+      </div>
+      <a class="prototype-baseline" href="/?variant=original">BJS-42 version ↗</a>
+    </nav>
+    <script>
+      const labels: Record<string, string> = { A: 'Open home', B: 'Personal desk', C: 'Project index' };
+      const keys = Object.keys(labels);
+      let current = 'A';
+      function showVariant(key: string, updateUrl = true) {
+        current = keys.includes(key) ? key : 'A';
+        document.querySelectorAll<HTMLElement>('[data-variant-panel]').forEach(panel => {
+          panel.hidden = panel.dataset.variantPanel !== current;
+        });
+        document.querySelectorAll<HTMLButtonElement>('[data-variant]').forEach(button => {
+          button.setAttribute('aria-pressed', String(button.dataset.variant === current));
+        });
+        const label = document.getElementById('prototype-label');
+        if (label) label.textContent = `${current} · ${labels[current]}`;
+        document.title = `${current} · ${labels[current]} — Burooj`;
+        if (updateUrl) {
+          const url = new URL(location.href);
+          url.searchParams.set('variant', current);
+          history.replaceState(null, '', url);
+        }
+      }
+      const cycle = (delta: number) => showVariant(keys[(keys.indexOf(current) + delta + keys.length) % keys.length]);
+      document.querySelectorAll<HTMLButtonElement>('[data-variant]').forEach(button => {
+        button.addEventListener('click', () => showVariant(button.dataset.variant ?? 'A'));
+      });
+      document.querySelectorAll<HTMLButtonElement>('[data-cycle]').forEach(button => {
+        button.addEventListener('click', () => cycle(Number(button.dataset.cycle)));
+      });
+      document.addEventListener('keydown', event => {
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+        if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+          event.preventDefault();
+          cycle(event.key === 'ArrowRight' ? 1 : -1);
+        }
+      });
+      window.addEventListener('popstate', () => showVariant(new URL(location.href).searchParams.get('variant') ?? 'A', false));
+      showVariant(new URL(location.href).searchParams.get('variant') ?? 'A');
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  body.prototype-comparison { margin: 0; background: #fff; color: #171c18; font-family: system-ui, sans-serif; }
+  :where(.prototype-comparison *) { box-sizing: border-box; }
+  body.prototype-comparison :is(h1, h2, h3, h4) { font-family: inherit; }
+  body.prototype-comparison :is(h1, h2, h3) a { font-size: inherit; font-weight: inherit; }
+  body.prototype-comparison figcaption { padding: 0; }
+  :where(.prototype-comparison p, .prototype-comparison li, .prototype-comparison a, .prototype-comparison button) { font-size: inherit; color: inherit; }
+  .prototype-comparison [hidden] { display: none !important; }
+  .prototype-skip { position: fixed; top: -100px; left: 20px; z-index: 10000; padding: 12px; background: white; color: #087443; }
+  .prototype-skip:focus { top: 10px; }
+  .prototype-switcher { position: fixed; z-index: 1000; left: 50%; bottom: 18px; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 24px); display: flex; align-items: center; gap: 18px; padding: 11px 15px; background: #17221b; color: white; border-radius: 12px; box-shadow: 0 6px 30px #0003; font-family: system-ui, sans-serif; }
+  .prototype-caption { display: grid; gap: 2px; min-width: 140px; }
+  .prototype-caption > span { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: #bac8bd; }
+  #prototype-label { font-size: 13px; font-weight: 600; }
+  .prototype-controls { display: flex; align-items: center; gap: 4px; }
+  .prototype-controls button { padding: 9px 10px; border: 1px solid transparent; color: white; background: transparent; border-radius: 5px; cursor: pointer; font: 13px/1.4 system-ui, sans-serif; min-height: 38px; }
+  .prototype-controls button:hover { background: #35493b; }
+  .prototype-controls button[aria-pressed="true"] { color: #17221b; background: #c4efcc; }
+  .prototype-controls button:focus-visible, .prototype-baseline:focus-visible { outline: 2px solid #c4efcc; outline-offset: 3px; }
+  .prototype-baseline { color: #d2dfd5; font-size: 11px; white-space: nowrap; }
+  @media(max-width: 780px) { .prototype-controls button span { display: none; } .prototype-baseline { display: none; } .prototype-switcher { gap: 10px; padding: 9px 12px; } .prototype-caption { min-width: 136px; } .prototype-controls button { min-width: 30px; padding-inline: 8px; } }
+</style>

@@ -1,0 +1,209 @@
+---
+import type { PrototypeData } from './types';
+
+const { projects, updates, site } = Astro.props as PrototypeData;
+---
+
+<div class="index-home">
+  <div class="directory-layout">
+    <aside class="identity" aria-label="About Burooj and site navigation">
+      <div class="identity-top">
+        <a class="home-mark" href="#c-home" aria-label="Back to introduction">burooj<span aria-hidden="true">{'{ }'}</span></a>
+        <div class="introduction" id="c-home">
+          <img class="portrait" src="/images/burooj4.jpg" alt="Burooj Rashid wearing round sunglasses" width="1080" height="1920" />
+          <p class="greeting">Hey there!</p>
+          <h1>Burooj here!</h1>
+          <p class="occupation">{'{ Web Dev/signer }'}</p>
+          <p class="welcome">Welcome to my home on the internet. Feel free to look around!</p>
+        </div>
+
+        <nav class="directory-nav" aria-label="Site navigation">
+          <a href="/projects"><span>Projects</span><span aria-hidden="true">↗</span></a>
+          <a href="/lab"><span>Lab</span><span aria-hidden="true">↗</span></a>
+          <a href={site.writingUrl}><span>Writing</span><span aria-hidden="true">↗</span></a>
+          <a href="/about"><span>About me</span><span aria-hidden="true">↗</span></a>
+          <a href="/resume"><span>Resume</span><span aria-hidden="true">↗</span></a>
+        </nav>
+
+        <div class="social-links" aria-label="Elsewhere on the web">
+          {site.social.map((link) => <a href={link.href}>{link.label}</a>)}
+        </div>
+      </div>
+      <a class="email" href={`mailto:${site.email}`}>{site.email}</a>
+    </aside>
+
+    <div class="directory-content">
+      <section class="projects" aria-labelledby="c-projects">
+        <header class="section-header">
+          <h2 id="c-projects">Selected projects<span aria-hidden="true">{' { }'}</span></h2>
+          <a href="/projects">View all <span aria-hidden="true">↗</span></a>
+        </header>
+        <div class="project-list">
+          {projects.map((project, index) => (
+            <article class="project-entry">
+              <div class="project-heading">
+                <span class="project-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                <h3><a href={project.href}>{project.title}<span class="project-arrow" aria-hidden="true">↗</span></a></h3>
+              </div>
+              <div class="project-details">
+                <div class="project-copy">
+                  <p class="project-meta">{project.role} <span aria-hidden="true">/</span> {project.dateLabel}</p>
+                  <p class="project-summary">{project.summary}</p>
+                  <ul class="project-tools" aria-label={`${project.title} tools`}>
+                    {project.tools.map((tool) => <li>{tool}</li>)}
+                  </ul>
+                </div>
+                <a class="project-preview" href={project.href} aria-label={`View ${project.title}`}>
+                  <img src={project.cover} alt="" loading={index === 0 ? 'eager' : 'lazy'} decoding="async" width="640" height="400" />
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="currently" aria-labelledby="c-currently">
+        <h2 id="c-currently">Currently</h2>
+        <div>
+          <p>I’m maintaining <a href="/lab">bjslab</a>, my home-lab environment for the tools and services I use.</p>
+          <a class="text-link" href="/about">More about me <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section class="updates" aria-labelledby="c-updates">
+        <header class="section-header">
+          <h2 id="c-updates">Recent updates<span aria-hidden="true">{' { }'}</span></h2>
+        </header>
+        <div class="update-list">
+          {updates.map((update) => (
+            <article class="update-entry">
+              <time datetime={update.date}>{update.dateLabel}</time>
+              <div>
+                <h3>{update.title}</h3>
+                <p>{update.summary}</p>
+                <a href={update.href}>{update.linkLabel} <span aria-hidden="true">↗</span></a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="other-pages" aria-label="Lab and writing">
+        <a href="/lab"><strong>Lab <span aria-hidden="true">↗</span></strong><span>Experiments, small projects, and things I’m trying out.</span></a>
+        <a href={site.writingUrl}><strong>Writing <span aria-hidden="true">↗</span></strong><span>Notes and thoughts from around the web.</span></a>
+      </section>
+    </div>
+  </div>
+
+  <footer class="index-footer">
+    <span>{site.name}</span>
+    <a href="#c-home">Back to top <span aria-hidden="true">↑</span></a>
+  </footer>
+</div>
+
+<style>
+  .index-home {
+    --green: #087443;
+    --ink: #181a18;
+    --muted: #626762;
+    --rule: #d8ded8;
+    background: #fff;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    padding: 58px clamp(24px, 5vw, 80px) 24px;
+  }
+  .index-home a { color: var(--green); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .index-home a:hover { text-decoration: underline; }
+  .index-home a:focus-visible { outline: 3px solid var(--green); outline-offset: 5px; border-radius: 1px; }
+  .index-home h1, .index-home h2, .index-home h3, .index-home p { margin: 0; }
+  .directory-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: clamp(42px, 7vw, 108px); max-width: 1250px; margin: 0 auto; }
+  .identity { min-width: 0; align-self: start; position: sticky; top: 32px; }
+  .home-mark { display: inline-flex; align-items: center; gap: 13px; font-size: 23px; font-weight: 800; letter-spacing: -1px; text-decoration: none; }
+  .home-mark span { font-weight: 500; letter-spacing: -2px; font-size: 27px; }
+  .introduction { padding-top: 53px; scroll-margin-top: 36px; }
+  .portrait { display: block; width: 86px; height: 100px; object-fit: cover; object-position: 50% 42%; margin-bottom: 29px; border-radius: 2px; }
+  .greeting { font-size: 20px; font-weight: 500; }
+  .index-home h1 { margin-top: 2px; font-size: 41px; line-height: 1.13; letter-spacing: -1.9px; font-weight: 800; }
+  .occupation { margin-top: 11px !important; color: var(--green); font-weight: 650; font-size: 17px; }
+  .welcome { margin-top: 20px !important; max-width: 250px; line-height: 1.6; }
+  .directory-nav { display: grid; margin-top: 31px; border-top: 1px solid var(--rule); padding-top: 9px; }
+  .directory-nav a { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; font-size: 17px; font-weight: 650; text-decoration: none; }
+  .directory-nav a > span:last-child { font-weight: 400; font-size: 18px; }
+  .social-links { display: flex; flex-wrap: wrap; column-gap: 15px; row-gap: 6px; margin-top: 26px; }
+  .social-links a { font-size: 14px; }
+  .email { display: inline-block; margin-top: 20px; font-size: 14px; overflow-wrap: anywhere; }
+  .directory-content { min-width: 0; }
+  .section-header { display: flex; gap: 16px; justify-content: space-between; align-items: baseline; padding: 4px 0 20px; border-bottom: 2px solid var(--ink); }
+  .section-header h2 { font-size: 19px; line-height: 1.3; font-weight: 750; letter-spacing: -.3px; }
+  .section-header h2 span { color: var(--green); margin-left: 5px; font-weight: 500; }
+  .section-header > a { font-size: 14px; white-space: nowrap; }
+  .project-entry { padding: 25px 0 27px; border-bottom: 1px solid var(--rule); }
+  .project-heading { display: flex; align-items: baseline; gap: 16px; }
+  .project-number { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; width: 21px; flex-shrink: 0; }
+  .project-heading h3 { flex: 1; font-size: clamp(26px, 2.5vw, 35px); line-height: 1.15; letter-spacing: -1.1px; font-weight: 750; }
+  .project-heading h3 a { display: flex; justify-content: space-between; gap: 12px; text-decoration: none; }
+  .project-arrow { font-size: 25px; font-weight: 400; flex-shrink: 0; }
+  .project-details { display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 30px; margin: 17px 0 0 37px; }
+  .project-meta { color: var(--muted); font-size: 14px; line-height: 1.4; }
+  .project-meta span { margin: 0 4px; color: #8c928c; }
+  .project-summary { margin-top: 10px !important; font-size: 15px; line-height: 1.55; }
+  .project-tools { display: flex; flex-wrap: wrap; gap: 4px 13px; padding: 0; margin: 12px 0 0; list-style: none; color: var(--muted); font-size: 14px; }
+  .project-preview { display: block; align-self: start; border: 1px solid var(--rule); background: #f5f7f5; overflow: hidden; }
+  .project-preview img { display: block; width: 100%; height: auto; aspect-ratio: 1.6; object-fit: cover; }
+  .currently { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 20px; padding: 40px 0; }
+  .currently h2 { color: var(--green); font-size: 16px; font-weight: 700; }
+  .currently p { max-width: 520px; font-size: 18px; line-height: 1.55; letter-spacing: -.2px; }
+  .currently p a { font-weight: 650; }
+  .text-link { display: inline-block; margin-top: 12px; font-size: 14px; }
+  .updates { margin-top: 18px; }
+  .update-entry { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 20px; padding: 23px 0; border-bottom: 1px solid var(--rule); }
+  .update-entry time { font-size: 14px; color: var(--muted); padding-top: 3px; }
+  .update-entry h3 { font-size: 18px; letter-spacing: -.3px; line-height: 1.45; }
+  .update-entry p { margin-top: 7px; font-size: 15px; line-height: 1.6; }
+  .update-entry a { display: inline-block; margin-top: 9px; font-size: 14px; }
+  .other-pages { display: grid; grid-template-columns: 1fr 1fr; gap: 38px; padding-top: 40px; }
+  .other-pages > a { display: grid; gap: 8px; text-decoration: none; }
+  .other-pages strong { display: flex; justify-content: space-between; font-size: 22px; letter-spacing: -.5px; }
+  .other-pages strong span { font-weight: 400; }
+  .other-pages > a > span { color: var(--muted); font-size: 15px; max-width: 270px; }
+  .index-footer { display: flex; justify-content: space-between; gap: 20px; max-width: 1250px; margin: 70px auto 0; padding-top: 20px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--muted); }
+  @media (max-width: 1050px) {
+    .directory-layout { grid-template-columns: 225px minmax(0, 1fr); gap: 40px; }
+    .project-details { grid-template-columns: minmax(0, 1fr) 140px; gap: 20px; }
+    .index-home h1 { font-size: 36px; }
+    .currently, .update-entry { grid-template-columns: 100px minmax(0, 1fr); gap: 16px; }
+  }
+  @media (max-width: 760px) {
+    .index-home { padding: 27px 24px 22px; }
+    .directory-layout { grid-template-columns: minmax(0, 1fr); gap: 43px; }
+    .identity { position: static; }
+    .introduction { position: relative; padding-top: 30px; }
+    .portrait { float: right; margin: 0 0 12px 16px; width: 77px; height: 95px; }
+    .index-home h1 { font-size: 39px; }
+    .welcome { max-width: 355px; clear: both; padding-top: 2px; }
+    .directory-nav { display: flex; flex-wrap: wrap; gap: 4px 22px; margin-top: 24px; padding-top: 12px; }
+    .directory-nav a { gap: 7px; font-size: 15px; }
+    .directory-nav a > span:last-child { font-size: 15px; }
+    .social-links { margin-top: 16px; }
+    .email { margin-top: 10px; }
+    .project-details { grid-template-columns: minmax(0, 1fr) 150px; }
+    .project-heading h3 { font-size: 29px; }
+    .currently { padding: 30px 0; }
+    .index-footer { margin-top: 48px; }
+  }
+  @media (max-width: 480px) {
+    .index-home { padding-inline: 20px; }
+    .section-header h2 { font-size: 17px; }
+    .section-header > a { font-size: 14px; }
+    .project-heading { gap: 10px; }
+    .project-heading h3 { font-size: 27px; }
+    .project-details { grid-template-columns: minmax(0, 1fr); margin-left: 31px; gap: 16px; }
+    .project-preview { width: 100%; max-width: 280px; }
+    .project-preview img { aspect-ratio: 2; }
+    .currently, .update-entry { grid-template-columns: minmax(0, 1fr); gap: 9px; }
+    .other-pages { gap: 24px; }
+    .other-pages strong { font-size: 20px; }
+  }
+</style>
