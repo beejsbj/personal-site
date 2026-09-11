@@ -93,6 +93,11 @@ test("guide imports production assemblies and keeps archived style-guide routing
   );
   const built = read("dist/client/design-system/index.html");
   assert.match(built, /noindex, follow/);
+  assert.doesNotMatch(
+    built,
+    /<script\b/i,
+    "The static guide must not require client JavaScript",
+  );
   assert.equal((built.match(/<h1\b/g) || []).length, 1);
   assert.match(built, /Burooj here!/);
   assert.doesNotMatch(read("dist/client/sitemap-0.xml"), /\/design-system\//);

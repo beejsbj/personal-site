@@ -11,6 +11,7 @@ interface Props {
   image?: string;
   pageClass?: string;
   noindex?: boolean;
+  clientRouting?: boolean;
 }
 
 const siteEntry = await getEntry("site", "config");
@@ -25,6 +26,7 @@ const {
   image = "/images/burooj4.jpg",
   pageClass = "page-default",
   noindex = false,
+  clientRouting = true,
 } = Astro.props;
 
 const pageTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
@@ -48,7 +50,7 @@ const socialImage = new URL(image, siteBaseUrl).toString();
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={socialImage} />
-    <ClientRouter />
+    {clientRouting && <ClientRouter />}
   </head>
 
   <body class={pageClass}>
