@@ -8,7 +8,8 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "test:homepage": "node --test scripts/tests/homepage-base.test.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",

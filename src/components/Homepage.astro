@@ -1,12 +1,25 @@
 ---
-import type { PrototypeData } from './types';
-const { projects, updates, site } = Astro.props as PrototypeData;
+import type { CollectionEntry } from 'astro:content';
+import '@fontsource/lato/300.css';
+import '@fontsource/lato/400.css';
+import '@fontsource/lato/700.css';
+interface Props {
+  projects: (CollectionEntry<'projects'>['data'] & { href: string })[];
+  updates: CollectionEntry<'updates'>['data'][];
+  site: {
+    name: string;
+    email: string;
+    writingUrl: string;
+    social: { label: string; href: string }[];
+  };
+}
+const { projects, updates, site } = Astro.props;
 ---
 
 <div class="open-home">
   <div class="edge-circle" aria-hidden="true"></div>
   <header>
-    <a href="/?variant=A" class="home-link" aria-current="page">Home</a>
+    <a href="/" class="home-link" aria-current="page">Home</a>
     <nav aria-label="Main navigation">
       <a href="/about">About</a><a href="/projects">Projects</a>
       <a href="/lab">Lab</a><a href={site.writingUrl}>Writing ↗</a>
@@ -14,10 +27,11 @@ const { projects, updates, site } = Astro.props as PrototypeData;
     <a href={`mailto:${site.email}`} class="say-hello">Say hello ↗</a>
   </header>
 
-  <section class="hello" aria-labelledby="a-title">
+  <main id="main-content" tabindex="-1">
+  <section class="hello" aria-labelledby="home-title">
     <div class="hello-copy">
       <p class="greeting">Hey there!</p>
-      <h1 id="a-title">Burooj here<span>!</span></h1>
+      <h1 id="home-title">Burooj here<span>!</span></h1>
       <p class="occupation">Web Dev/signer</p>
       <p class="welcome">Welcome to my home on the internet.<br />Feel free to look around!</p>
       <div class="socials">
@@ -26,17 +40,17 @@ const { projects, updates, site } = Astro.props as PrototypeData;
       </div>
     </div>
     <figure>
-      <img src="/images/burooj4.jpg" alt="Burooj Rashid wearing round sunglasses" width="1080" height="1920" />
+      <img src="/images/burooj4.jpg" alt="Burooj Rashid wearing round sunglasses" width="1080" height="1920" decoding="async" fetchpriority="high" />
       <figcaption>That's me. <a href="/about">A little more about me ↗</a></figcaption>
     </figure>
   </section>
 
   <div class="turn" aria-hidden="true"><svg viewBox="0 0 270 70" fill="none"><path d="M3 1C75 2 80 64 150 48S227 18 262 54" stroke="currentColor" stroke-width="2"/><path d="m251 49 13 7-2-14" stroke="currentColor" stroke-width="2"/></svg></div>
   <div class="below">
-    <section class="projects" aria-labelledby="a-projects">
-      <div class="section-heading"><h2 id="a-projects">Some things I've built</h2><a href="/projects">All projects ↗</a></div>
+    <section class="projects" aria-labelledby="home-projects">
+      <div class="section-heading"><h2 id="home-projects">Some things I've built</h2><a href="/projects">All projects ↗</a></div>
       {projects.map(project => <article>
-        <a href={project.href} class="project-image" tabindex="-1" aria-hidden="true"><img src={project.cover} alt="" loading="lazy" /></a>
+        <a href={project.href} class="project-image" tabindex="-1" aria-hidden="true"><img src={project.cover} alt="" width="280" height="200" loading="lazy" decoding="async" /></a>
         <div class="project-copy">
           <p class="meta">{project.dateLabel} · {project.role}</p>
           <h3><a href={project.href}>{project.title} <span aria-hidden="true">↗</span></a></h3>
@@ -46,13 +60,13 @@ const { projects, updates, site } = Astro.props as PrototypeData;
       </article>)}
     </section>
     <aside aria-label="Current work and updates">
-      <section class="currently" aria-labelledby="a-currently">
-        <h2 id="a-currently">Currently</h2>
+      <section class="currently" aria-labelledby="home-currently">
+        <h2 id="home-currently">Currently</h2>
         <p>I’m maintaining <strong>bjslab</strong>, my home-lab environment for the tools and services I use.</p>
         <a href="/about">More about me ↗</a>
       </section>
-      <section class="updates" aria-labelledby="a-updates">
-        <h2 id="a-updates">Recent updates</h2>
+      <section class="updates" aria-labelledby="home-updates">
+        <h2 id="home-updates">Recent updates</h2>
         {updates.map(update => <article>
           <time datetime={update.date}>{update.dateLabel}</time>
           <h3><a href={update.href}>{update.title} ↗</a></h3>
@@ -66,11 +80,16 @@ const { projects, updates, site } = Astro.props as PrototypeData;
     <div><h2><a href="/lab">In the lab ↗</a></h2><p>Experiments, prototypes, and smaller things.</p></div>
     <div><h2><a href={site.writingUrl}>Writing ↗</a></h2><p>My notes and writing on Substack.</p></div>
   </section>
+  </main>
   <footer><span>Burooj Rashid</span><a href={`mailto:${site.email}`}>{site.email} ↗</a><span>Thanks for stopping by.</span></footer>
 </div>
 
 <style>
-.open-home { --wine:#7c2621; --paper:#d9d7d0; --peach:#e5b483; --ink:#302320; --rule:#bcb2a9; position:relative; isolation:isolate; overflow:clip; background:var(--paper); color:var(--ink); font:16px/1.6 'Lato',sans-serif; padding:25px max(40px,calc((100vw - 1140px)/2)) 140px; }
+:global(body.page-warm-home) { background:#d9d7d0; --color-accent:#7c2621; }
+h1 a,h2 a,h3 a { font-size:inherit; font-weight:inherit; }
+p { color:inherit; }
+figcaption { padding:0; }
+.open-home { --wine:#7c2621; --paper:#d9d7d0; --peach:#e5b483; --ink:#302320; --rule:#bcb2a9; position:relative; isolation:isolate; overflow:clip; background:var(--paper); color:var(--ink); font:16px/1.6 'Lato',sans-serif; padding:25px max(40px,calc((100vw - 1140px)/2)) 45px; }
 .edge-circle { position:absolute; z-index:-1; top:-170px; left:-305px; width:430px; height:540px; border-radius:50%; background:var(--wine); }
 h1,h2,h3,p,figure { margin:0; } h1,h2,h3 { font-family:'Newsreader Variable',serif; color:var(--wine); font-weight:600; }
 a { color:var(--wine); text-decoration:none; text-underline-offset:5px; } a:hover { text-decoration:underline; } a:focus-visible { outline:2px solid var(--wine); outline-offset:6px; }
@@ -108,5 +127,6 @@ time { font-size:13px; color:#65534b; } .updates h3 { font:700 16px/1.4 'Lato',s
 .elsewhere p { margin-top:12px; color:#65534b; }
 footer { border-top:1px solid var(--rule); padding-top:25px; display:flex; flex-wrap:wrap; gap:20px; font-size:14px; } footer span:last-child { margin-left:auto; }
 @media(max-width:1000px) { .edge-circle { left:-365px; } .hello { grid-template-columns:minmax(0,1fr) 175px; } figure img { height:205px; } .below { gap:30px; grid-template-columns:minmax(0,1fr) 240px; } .projects article { grid-template-columns:1fr; } .project-image { max-width:300px; } }
-@media(max-width:650px) { .open-home { padding:25px 20px 130px; } .edge-circle { top:-160px; left:-380px; height:330px; } header { flex-wrap:wrap; gap:20px; padding:0 0 15px; } .home-link { margin-left:55px; } .say-hello { display:none; } nav { margin-left:auto; gap:10px; } nav a { width:62px;height:62px;font-size:13px;white-space:nowrap; } nav a:nth-child(2) { width:72px;height:72px; } .hello { grid-template-columns:1fr; padding-top:35px; gap:20px; } .greeting { font-size:27px; } h1 { font-size:clamp(54px,14vw,88px); margin-top:19px; } .occupation { font-size:27px; } figure { display:flex; align-items:center; gap:25px; padding-top:10px; } figure img { width:132px; height:145px; border-width:6px; flex-shrink:0; } figcaption { text-align:left; margin:0; } .turn { height:65px; margin-top:0; } .below { grid-template-columns:1fr; } .section-heading { flex-wrap:wrap; gap:10px; } .project-image { max-width:none; } .project-image img { height:190px; } .projects article { gap:15px; } .elsewhere { grid-template-columns:1fr; gap:28px; } footer span:last-child { margin-left:0; } }
+@media(max-width:650px) { .open-home { padding:25px 20px 40px; } .edge-circle { top:-160px; left:-380px; height:330px; } header { flex-wrap:wrap; gap:20px; padding:0 0 15px; } .home-link { margin-left:55px; } .say-hello { display:none; } nav { margin-left:auto; gap:10px; } nav a { width:62px;height:62px;font-size:13px;white-space:nowrap; } nav a:nth-child(2) { width:72px;height:72px; } .hello { grid-template-columns:1fr; padding-top:35px; gap:20px; } .greeting { font-size:27px; } h1 { font-size:clamp(54px,14vw,88px); margin-top:19px; } .occupation { font-size:27px; } figure { display:flex; align-items:center; gap:25px; padding-top:10px; } figure img { width:132px; height:145px; border-width:6px; flex-shrink:0; } figcaption { text-align:left; margin:0; } .turn { height:65px; margin-top:0; } .below { grid-template-columns:1fr; } .section-heading { flex-wrap:wrap; gap:10px; } .project-image { max-width:none; } .project-image img { height:190px; } .projects article { gap:15px; } .elsewhere { grid-template-columns:1fr; gap:28px; } footer span:last-child { margin-left:0; } }
+@media(max-width:380px) { nav { gap:6px; } }
 </style>

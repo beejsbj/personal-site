@@ -10,6 +10,8 @@ interface Props {
   description?: string;
   image?: string;
   pageClass?: string;
+  /** A page may supply its own header, main landmark, and footer. */
+  customChrome?: boolean;
 }
 
 const siteEntry = await getEntry("site", "config");
@@ -23,6 +25,7 @@ const {
   description = site.siteDescription,
   image = "/images/burooj4.jpg",
   pageClass = "page-default",
+  customChrome = false,
 } = Astro.props;
 
 const pageTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
@@ -50,10 +53,12 @@ const socialImage = new URL(image, siteBaseUrl).toString();
 
   <body class={pageClass}>
     <a class="skip-link" href="#main-content">Skip to content</a>
+    {customChrome ? <slot /> : <>
     <SiteHeader nav={site.nav} currentPath={Astro.url.pathname} />
     <main id="main-content" tabindex="-1">
       <slot />
     </main>
     <SiteFooter social={site.social} writingUrl={site.writingUrl} email={site.email} />
+    </>}
   </body>
 </html>
