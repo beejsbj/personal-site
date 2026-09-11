@@ -1,0 +1,14 @@
+---
+/** Passive container primitive. Named note silhouette; slot owns content, not chrome. */
+---
+
+<div class="ds-note">
+  <slot />
+</div>
+<style>
+  .ds-note {
+    padding: var(--space-l);
+    background: var(--color-surface);
+    border-radius: var(--radius-note);
+  }
+</style>

@@ -1,0 +1,67 @@
+---
+// Unique specimen: Burooj's photo, off-axis oval, peach border, personal caption.
+import Link from "../primitives/Link.astro";
+---
+
+<figure>
+  <img
+    src="/images/burooj4.jpg"
+    alt="Burooj Rashid wearing round sunglasses"
+    width="1080"
+    height="1920"
+    decoding="async"
+    fetchpriority="high"
+  />
+  <figcaption>
+    That's me.
+    <br />
+    <Link href="/about" arrow>
+      A little more about me
+    </Link>
+  </figcaption>
+</figure>
+<style>
+  figure {
+    padding-top: var(--space-2xl);
+    margin: 0;
+  }
+  img {
+    width: 100%;
+    height: var(--portrait-height);
+    object-fit: cover;
+    object-position: var(--portrait-position);
+    border: var(--portrait-border) solid var(--color-surface-strong);
+    border-radius: var(--radius-portrait);
+    transform: var(--portrait-rotation);
+  }
+  figcaption {
+    padding: 0;
+    font-size: var(--text-xs);
+    margin-top: var(--space-m);
+    text-align: center;
+    color: var(--color-text-soft);
+  }
+  @media (max-width: 62.5rem) {
+    img {
+      height: var(--portrait-height-mid);
+    }
+  }
+  @media (max-width: 40.625rem) {
+    figure {
+      display: flex;
+      align-items: center;
+      gap: var(--space-l);
+      padding-top: var(--space-xs);
+    }
+    img {
+      width: var(--portrait-width-compact);
+      height: var(--portrait-height-compact);
+      border-width: var(--space-2xs);
+      flex-shrink: 0;
+    }
+    figcaption {
+      text-align: left;
+      margin: 0;
+    }
+  }
+</style>

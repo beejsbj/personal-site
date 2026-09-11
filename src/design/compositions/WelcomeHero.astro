@@ -1,0 +1,96 @@
+---
+import Heading from "../primitives/Heading.astro";
+import Link from "../primitives/Link.astro";
+import Portrait from "../unique/Portrait.astro";
+/** Composition: approved A introduction. The guide imports this same region. */
+interface Props {
+  social: { label: string; href: string }[];
+  level?: 1 | 2;
+  id?: string;
+}
+const { social, level = 1, id = "home-title" } = Astro.props;
+---
+
+<section class="hello" aria-labelledby={id}>
+  <div class="copy">
+    <p class="greeting">Hey there!</p>
+    <div class="title">
+      <Heading level={level} scale="display" id={id}>
+        Burooj here!
+      </Heading>
+    </div>
+    <p class="occupation">Web Dev/signer</p>
+    <p class="welcome">
+      Welcome to my home on the internet.
+      <br />
+      Feel free to look around!
+    </p>
+    <div class="socials">
+      {social
+        .filter((link) => ["GitHub", "LinkedIn", "Email"].includes(link.label))
+        .map((link) => (
+          <Link href={link.href} arrow>
+            {link.label}
+          </Link>
+        ))}
+      <Link href="/resume" arrow>
+        Resume
+      </Link>
+    </div>
+  </div>
+  <Portrait />
+</section>
+<style>
+  .hello {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--portrait-width);
+    gap: var(--space-xl);
+    align-items: center;
+    padding: var(--space-4xl) 0 var(--space-xs);
+  }
+  .greeting {
+    font-size: var(--text-greeting);
+    line-height: var(--leading-heading);
+  }
+  .title {
+    margin: var(--space-l) 0 var(--space-xs);
+  }
+  .occupation {
+    font-size: var(--text-section);
+    font-weight: var(--weight-light);
+    color: var(--color-accent);
+  }
+  .welcome {
+    font-size: var(--text-lead);
+    margin-top: var(--space-l);
+  }
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    margin-top: var(--space-m);
+    font-size: var(--text-sm);
+  }
+  .socials :global(.ds-link) {
+    border-bottom: var(--rule-width) solid var(--color-link-rule);
+  }
+  @media (max-width: 62.5rem) {
+    .hello {
+      grid-template-columns: minmax(0, 1fr) var(--portrait-width-mid);
+    }
+  }
+  @media (max-width: 40.625rem) {
+    .hello {
+      grid-template-columns: 1fr;
+      padding-top: var(--space-xl);
+      gap: var(--space-m);
+    }
+    .greeting,
+    .occupation {
+      font-size: var(--text-card);
+    }
+    .title {
+      margin-top: var(--space-m);
+    }
+  }
+</style>

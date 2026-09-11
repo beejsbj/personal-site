@@ -1,4 +1,12 @@
 ---
+import Heading from "../design/primitives/Heading.astro";
+import Link from "../design/primitives/Link.astro";
+import MediaFrame from "../design/primitives/MediaFrame.astro";
+import TagList from "../design/primitives/TagList.astro";
+/** Compound: cover + metadata + linked heading + summary + tools.
+ * layout=row|stack is the only axis. Children own interaction/typography.
+ * Do not paste this assembly into another screen; import it.
+ */
 interface Props {
   href: string;
   title: string;
@@ -7,31 +15,64 @@ interface Props {
   role: string;
   tools: string[];
   cover: string;
+  layout?: "row" | "stack";
 }
-
-const { href, title, summary, dateLabel, role, tools, cover } = Astro.props;
-const visibleTools = tools.slice(0, 4);
+const {
+  href,
+  title,
+  summary,
+  dateLabel,
+  role,
+  tools,
+  cover,
+  layout = "row",
+} = Astro.props;
 ---
 
-<article class="project-row">
-  <div class="project-row__media">
-    <img src={cover} alt={`${title} project cover`} loading="lazy" decoding="async" />
-  </div>
-
-  <div class="project-row__body">
-    <div class="project-row__meta">
-      <span>{dateLabel}</span>
-      <span>{role}</span>
-    </div>
-
-    <h3 class="project-row__title">
-      <a href={href}>{title}</a>
-    </h3>
-
-    <p class="project-row__summary">{summary}</p>
-
-    <ul class="pill-list" aria-label={`${title} tools`}>
-      {visibleTools.map((tool) => <li>{tool}</li>)}
-    </ul>
+<article
+  class:list={["project-row", layout === "stack" && "project-row--stack"]}
+>
+  <MediaFrame src={cover} alt="" href={href} />
+  <div class="project-copy">
+    <p class="meta">
+      {dateLabel} · {role}
+    </p>
+    <Heading level={3} scale="card">
+      <Link href={href} arrow>
+        {title}
+      </Link>
+    </Heading>
+    <p class="summary">{summary}</p>
+    <TagList items={tools.slice(0, 3)} label={`${title} tools`} />
   </div>
 </article>
+<style>
+  .project-row {
+    display: grid;
+    grid-template-columns: var(--media-width) minmax(0, 1fr);
+    gap: var(--space-l);
+    border-top: var(--rule-width) solid var(--color-border);
+    padding-block: var(--space-l);
+  }
+  .project-copy {
+    display: grid;
+    align-content: start;
+    gap: var(--space-xs);
+    min-width: 0;
+  }
+  .meta {
+    font-size: var(--text-xs);
+    color: var(--color-text-soft);
+  }
+  .summary {
+    font-size: var(--text-copy);
+  }
+  .project-row--stack {
+    grid-template-columns: 1fr;
+  }
+  @media (max-width: 62.5rem) {
+    .project-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

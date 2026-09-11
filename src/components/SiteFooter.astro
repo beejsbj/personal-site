@@ -1,51 +1,37 @@
 ---
-interface SocialLink {
-  label: string;
-  href: string;
-}
-
+import Link from "../design/primitives/Link.astro";
 interface Props {
-  social: SocialLink[];
-  writingUrl: string;
   email: string;
 }
-
-const { social, writingUrl, email } = Astro.props;
-const footerSocial = social.filter((item) => item.href !== `mailto:${email}`);
-const year = new Date().getFullYear();
+const { email } = Astro.props;
 ---
 
-<footer class="site-footer">
-  <div class="site-footer__inner shell">
-    <div class="site-footer__intro">
-      <p class="site-footer__eyebrow">Keep in touch</p>
-      <h2 class="site-footer__title">Have something interesting in mind?</h2>
-      <p class="site-footer__copy">
-        I like projects with a clear point of view, strong collaboration, and room for craft.
-      </p>
-    </div>
-
-    <div class="site-footer__meta">
-      <a class="site-footer__email" href={`mailto:${email}`}>{email}</a>
-
-      <ul class="site-footer__social">
-        {
-          footerSocial.map((item) => (
-            <li>
-              <a href={item.href} target="_blank" rel="noreferrer">
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-        <li>
-          <a href={writingUrl} target="_blank" rel="noreferrer">
-            Writing
-          </a>
-        </li>
-      </ul>
-
-      <p class="site-footer__legal">© {year} Burooj Rashid</p>
-    </div>
-  </div>
+<footer class="site-footer shell">
+  <span>Burooj Rashid</span>
+  <Link href={`mailto:${email}`} arrow>
+    {email}
+  </Link>
+  <Link href="/resume" arrow>
+    Resume
+  </Link>
+  <span class="thanks">Thanks for stopping by.</span>
 </footer>
+<style>
+  .site-footer {
+    border-top: var(--rule-width) solid var(--color-border);
+    padding-top: var(--space-l);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    font-size: var(--text-sm);
+    margin-top: var(--space-xl);
+  }
+  .thanks {
+    margin-left: auto;
+  }
+  @media (max-width: 40.625rem) {
+    .thanks {
+      margin-left: 0;
+    }
+  }
+</style>

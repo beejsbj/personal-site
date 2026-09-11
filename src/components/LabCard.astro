@@ -1,4 +1,7 @@
 ---
+import Heading from "../design/primitives/Heading.astro";
+import Link from "../design/primitives/Link.astro";
+import MediaFrame from "../design/primitives/MediaFrame.astro";
 interface Props {
   href: string;
   title: string;
@@ -7,20 +10,31 @@ interface Props {
   sourceEra: string;
   cover: string;
 }
-
 const { href, title, summary, type, sourceEra, cover } = Astro.props;
 ---
 
 <article class="lab-card">
-  <div class="lab-card__media">
-    <img src={cover} alt={`${title} cover`} loading="lazy" decoding="async" />
-  </div>
-
-  <div class="lab-card__body">
-    <p class="lab-card__meta">{type} · {sourceEra}</p>
-    <h2 class="lab-card__title">
-      <a href={href}>{title}</a>
-    </h2>
-    <p class="lab-card__summary">{summary}</p>
-  </div>
+  <MediaFrame src={cover} alt="" fit="cover" />
+  <p class="meta">
+    {type} · {sourceEra}
+  </p>
+  <Heading level={2} scale="card">
+    <Link href={href} arrow>
+      {title}
+    </Link>
+  </Heading>
+  <p>{summary}</p>
 </article>
+<style>
+  .lab-card {
+    display: grid;
+    align-content: start;
+    gap: var(--space-s);
+    border-top: var(--rule-width) solid var(--color-border);
+    padding-top: var(--space-l);
+  }
+  .meta {
+    font-size: var(--text-xs);
+    color: var(--color-text-soft);
+  }
+</style>

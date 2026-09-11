@@ -15,25 +15,34 @@ if (!siteEntry) {
 }
 const site = siteEntry.data;
 
-const featuredProjects: CollectionEntry<"projects">[] = (await getCollection("projects"))
-  .filter((entry: CollectionEntry<"projects">) => !entry.data.hidden && entry.data.featured)
+const featuredProjects: CollectionEntry<"projects">[] = (
+  await getCollection("projects")
+)
+  .filter(
+    (entry: CollectionEntry<"projects">) =>
+      !entry.data.hidden && entry.data.featured,
+  )
   .sort(
     (left: CollectionEntry<"projects">, right: CollectionEntry<"projects">) =>
       left.data.order - right.data.order,
   )
   .slice(0, 3);
 
-const recentUpdates: CollectionEntry<"updates">[] = (await getCollection("updates"))
-  .sort(
-    (left: CollectionEntry<"updates">, right: CollectionEntry<"updates">) =>
-      right.data.date.localeCompare(left.data.date),
+const recentUpdates: CollectionEntry<"updates">[] = (
+  await getCollection("updates")
+)
+  .sort((left: CollectionEntry<"updates">, right: CollectionEntry<"updates">) =>
+    right.data.date.localeCompare(left.data.date),
   )
   .slice(0, 3);
 
 const homepageData = {
   site,
-  projects: featuredProjects.map(project => ({ ...project.data, href: `/projects/${project.slug}` })),
-  updates: recentUpdates.map(update => update.data),
+  projects: featuredProjects.map((project) => ({
+    ...project.data,
+    href: `/projects/${project.slug}`,
+  })),
+  updates: recentUpdates.map((update) => update.data),
 };
 ---
 
@@ -42,7 +51,6 @@ const homepageData = {
   description={homeEntry.data.description}
   image="/images/burooj4.jpg"
   pageClass="page-warm-home"
-  customChrome
 >
   <Homepage {...homepageData} />
 </BaseLayout>

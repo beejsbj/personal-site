@@ -1,14 +1,27 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Heading from "../design/primitives/Heading.astro";
+import Link from "../design/primitives/Link.astro";
 ---
 
-<BaseLayout title="Not Found" description="This page does not exist." pageClass="page-copy">
+<BaseLayout
+  title="Not Found"
+  description="This page does not exist."
+  pageClass="page-copy"
+>
   <section class="shell page-section page-section--copy">
     <p class="section-intro__eyebrow">404</p>
-    <h1 class="section-intro__title">That page wandered off.</h1>
+    <Heading level={1} scale="page">
+      That page wandered off.
+    </Heading>
     <p class="section-intro__intro">
-      The good news is the rebuilt site is much smaller, so getting back on track is easier too.
+      The good news is the rebuilt site is much smaller, so getting back on
+      track is easier too.
     </p>
-    <a class="button button--solid" href="/">Return home</a>
+    <div>
+      <Link treatment="action" tone="wine" href="/">
+        Return home
+      </Link>
+    </div>
   </section>
 </BaseLayout>

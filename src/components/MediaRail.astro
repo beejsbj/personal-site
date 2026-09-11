@@ -15,28 +15,26 @@ interface Props {
 const { media = [] } = Astro.props;
 ---
 
-{
-  media.length > 0 && (
-    <div class="media-rail">
-      {media.map((item) => (
-        <figure class="media-rail__item">
-          {item.type === "video" ? (
-            <video controls muted playsinline preload="metadata">
-              <source src={item.src} />
-            </video>
-          ) : (
-            <img
-              src={item.src}
-              alt={item.alt || ""}
-              width={item.width}
-              height={item.height}
-              loading="lazy"
-              decoding="async"
-            />
-          )}
-          {item.caption && <figcaption>{item.caption}</figcaption>}
-        </figure>
-      ))}
-    </div>
-  )
-}
+{media.length > 0 && (
+  <div class="media-rail">
+    {media.map((item) => (
+      <figure class="media-rail__item">
+        {item.type === "video" ? (
+          <video controls muted playsinline preload="metadata">
+            <source src={item.src} />
+          </video>
+        ) : (
+          <img
+            src={item.src}
+            alt={item.alt || ""}
+            width={item.width}
+            height={item.height}
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+        {item.caption && <figcaption>{item.caption}</figcaption>}
+      </figure>
+    ))}
+  </div>
+)}

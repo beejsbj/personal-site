@@ -1,48 +1,94 @@
 ---
+import Link from "../design/primitives/Link.astro";
 interface NavItem {
   label: string;
   href: string;
   external?: boolean;
 }
-
 interface Props {
   nav: NavItem[];
   currentPath: string;
+  email: string;
 }
-
-const { nav, currentPath } = Astro.props;
+const { nav, currentPath, email } = Astro.props;
+const visibleNav = ["About", "Projects", "Lab", "Writing"].flatMap((label) =>
+  nav.filter((item) => item.label === label),
+);
 ---
 
-<header class="site-header">
-  <div class="site-header__inner shell">
-    <a class="site-header__brand" href="/">
-      <span class="site-header__mark">BR</span>
-      <span class="site-header__name">Burooj Rashid</span>
-    </a>
-
-    <nav aria-label="Primary" class="site-nav">
-      <ul class="site-nav__list">
-        {
-          nav.map((item) => {
-            const active =
-              !item.external &&
-              (item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href));
-            return (
-              <li>
-                <a
-                  class:list={["site-nav__link", active && "is-active"]}
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  target={item.external ? "_blank" : undefined}
-                  rel={item.external ? "noreferrer" : undefined}
-                >
-                  {item.label}
-                </a>
-              </li>
-            );
-          })
+<header class="site-header shell">
+  <a
+    class="home-link"
+    href="/"
+    aria-current={currentPath === "/" ? "page" : undefined}
+  >
+    Home
+  </a>
+  <nav aria-label="Main navigation">
+    {visibleNav.map((item) => (
+      <Link
+        href={item.href}
+        treatment="circle"
+        tone={item.label === "Projects" ? "wine" : "paper"}
+        size={
+          item.label === "Projects" ? "lg" : item.label === "Lab" ? "sm" : "md"
         }
-      </ul>
-    </nav>
+        current={
+          !item.external &&
+          (currentPath === item.href || currentPath.startsWith(item.href + "/"))
+        }
+        arrow={item.external}
+      >
+        {item.label}
+      </Link>
+    ))}
+  </nav>
+  <div class="say-hello">
+    <Link href={`mailto:${email}`} arrow>
+      Say hello
+    </Link>
   </div>
 </header>
+<style>
+  .site-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-l);
+    padding-block: var(--space-l);
+  }
+  .home-link {
+    font-size: var(--text-brand);
+    font-weight: var(--weight-bold);
+    margin-right: auto;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+  }
+  .say-hello {
+    font-size: var(--text-sm);
+  }
+  @media (max-width: 40.625rem) {
+    .site-header {
+      flex-wrap: wrap;
+      gap: var(--space-m);
+      padding-bottom: var(--space-s);
+    }
+    .home-link {
+      margin-left: var(--space-3xl);
+    }
+    .say-hello {
+      display: none;
+    }
+    nav {
+      margin-left: auto;
+      gap: var(--space-xs);
+    }
+  }
+  @media (max-width: 23.75rem) {
+    nav {
+      gap: var(--space-2xs);
+    }
+  }
+</style>

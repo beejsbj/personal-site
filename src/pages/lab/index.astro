@@ -28,18 +28,16 @@ const entries: CollectionEntry<"lab">[] = (await getCollection("lab"))
 
   <section class="shell page-section">
     <div class="lab-grid lab-grid--dense">
-      {
-        entries.map((entry) => (
-          <LabCard
-            href={`/lab/${entry.slug}`}
-            title={entry.data.title}
-            summary={entry.data.summary}
-            type={entry.data.type}
-            sourceEra={entry.data.sourceEra}
-            cover={entry.data.cover}
-          />
-        ))
-      }
+      {entries.map((entry) => (
+        <LabCard
+          href={`/lab/${entry.slug}`}
+          title={entry.data.title}
+          summary={entry.data.summary}
+          type={entry.data.type}
+          sourceEra={entry.data.sourceEra}
+          cover={entry.data.cover}
+        />
+      ))}
     </div>
   </section>
 </BaseLayout>

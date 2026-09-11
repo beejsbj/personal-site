@@ -1,0 +1,51 @@
+---
+/** Texture surround → image. fit=contain for project art; cover for photography.
+ * Passive by default. href adds a pointer shortcut ONLY beside an equivalent
+ * accessible title link; it is hidden from AT and the tab order to avoid repeats.
+ * The fixed ratio reserves media space; it is not the original image's ratio. */
+interface Props {
+  src: string;
+  alt: string;
+  fit?: "contain" | "cover";
+  href?: string;
+}
+const { src, alt, fit = "contain", href } = Astro.props;
+const Tag = href ? "a" : "div";
+---
+
+<Tag
+  class:list={["ds-media", `ds-media--${fit}`]}
+  href={href}
+  tabindex={href ? -1 : undefined}
+  aria-hidden={href ? true : undefined}
+>
+  <img
+    src={src}
+    alt={alt}
+    width="280"
+    height="200"
+    loading="lazy"
+    decoding="async"
+  />
+</Tag>
+<style>
+  .ds-media {
+    display: block;
+    padding: var(--space-s);
+    background: var(--texture);
+    align-self: start;
+  }
+  a.ds-media:hover {
+    outline: var(--rule-width) solid var(--color-accent);
+  }
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--media-ratio);
+    object-fit: contain;
+  }
+  .ds-media--cover img {
+    object-fit: cover;
+  }
+</style>

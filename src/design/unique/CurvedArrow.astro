@@ -1,0 +1,33 @@
+---
+// Unique specimen: v2-inspired hand-drawn turn. Path coordinates are artwork,
+// not a reusable icon family. Do not add theme or size variants.
+---
+
+<div class="turn" aria-hidden="true">
+  <svg viewBox="0 0 270 70" fill="none">
+    <path
+      d="M3 1C75 2 80 64 150 48S227 18 262 54"
+      stroke="currentColor"
+      stroke-width="2"
+    />
+    <path d="m251 49 13 7-2-14" stroke="currentColor" stroke-width="2" />
+  </svg>
+</div>
+<style>
+  .turn {
+    height: var(--arrow-height);
+    width: var(--arrow-width);
+    color: var(--color-accent);
+    margin: var(--space-s) 0 var(--space-xs);
+  }
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+  @media (max-width: 40.625rem) {
+    .turn {
+      height: var(--arrow-height-compact);
+      margin-top: 0;
+    }
+  }
+</style>

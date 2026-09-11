@@ -1,0 +1,49 @@
+---
+/** Semantic level is independent from visual scale. Slot accepts text/Link only. */
+interface Props {
+  level?: 1 | 2 | 3 | 4;
+  scale?: "display" | "page" | "section" | "card" | "label";
+  id?: string;
+}
+const { level = 2, scale = "section", id } = Astro.props;
+const Tag = `h${level}` as "h1" | "h2" | "h3" | "h4";
+---
+
+<Tag id={id} class:list={["ds-heading", `ds-heading--${scale}`]}>
+  <slot />
+</Tag>
+<style>
+  .ds-heading {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: var(--font-serif);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+  }
+  .ds-heading--display {
+    font-size: var(--text-display);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+  }
+  .ds-heading--page {
+    font-size: var(--text-page);
+  }
+  .ds-heading--section {
+    font-size: var(--text-section);
+  }
+  .ds-heading--card {
+    font-size: var(--text-card);
+  }
+  .ds-heading--label {
+    font: var(--weight-bold) var(--text-base)/var(--leading-tight)
+      var(--font-sans);
+    letter-spacing: normal;
+  }
+  @media (max-width: 40.625rem) {
+    .ds-heading--display {
+      font-size: var(--text-display-compact);
+    }
+  }
+</style>

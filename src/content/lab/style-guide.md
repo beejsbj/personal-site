@@ -23,5 +23,8 @@ The current portfolio keeps that energy, but in a much smaller shape:
 
 - fewer page types
 - clearer tokens
-- theme folders without the pressure to ship theme switching immediately
+- one shared visual foundation instead of competing theme folders
 - stronger defaults instead of endless options
+
+The [current design system](/design-system) shows the real tokens and components
+used by the site, including the warm welcome homepage.
