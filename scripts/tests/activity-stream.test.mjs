@@ -117,3 +117,31 @@ test("snapshot filters future/expired signals, handles empty input, and preserve
     ["older"],
   );
 });
+
+test("display limit follows eligibility so newer hidden signals cannot crowd out valid updates", () => {
+  const stream = read("src/design/compounds/ActivityStream.astro");
+  assert.match(
+    stream,
+    /selectActivitySnapshot\(Astro\.props\.updates\)\.slice\(0, 8\)/,
+  );
+  const page = read("src/pages/index.astro");
+  assert.match(
+    page,
+    /const recentUpdates: CollectionEntry<"updates">\[\] = await getCollection\("updates"\);/,
+  );
+  const updates = [
+    ...Array.from({ length: 4 }, () => ({ date: "2026-10-01", id: "future" })),
+    ...Array.from({ length: 4 }, () => ({
+      date: "2026-09-11",
+      expiresAt: "2026-09-12T00:00:00Z",
+      id: "expired",
+    })),
+    ...Array.from({ length: 10 }, (_, id) => ({ date: "2026-09-01", id })),
+  ];
+  assert.deepEqual(
+    selectActivitySnapshot(updates, new Date("2026-09-12T08:00:00Z"))
+      .slice(0, 8)
+      .map((update) => update.id),
+    [0, 1, 2, 3, 4, 5, 6, 7],
+  );
+});

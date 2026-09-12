@@ -28,13 +28,8 @@ const featuredProjects: CollectionEntry<"projects">[] = (
   )
   .slice(0, 3);
 
-const recentUpdates: CollectionEntry<"updates">[] = (
-  await getCollection("updates")
-)
-  .sort((left: CollectionEntry<"updates">, right: CollectionEntry<"updates">) =>
-    right.data.date.localeCompare(left.data.date),
-  )
-  .slice(0, 8);
+// The shared stream filters eligibility before applying its display limit.
+const recentUpdates: CollectionEntry<"updates">[] = await getCollection("updates");
 
 const homepageData = {
   site,

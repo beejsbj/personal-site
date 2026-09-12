@@ -9,7 +9,7 @@ interface Props {
 // Curated build-time snapshot, not a connected presence service. Expiry is
 // evaluated only when rendering/building; deployed HTML does not self-expire.
 // Publish no live signals until a runtime or scheduled-refresh layer exists.
-const updates = selectActivitySnapshot(Astro.props.updates);
+const updates = selectActivitySnapshot(Astro.props.updates).slice(0, 8);
 ---
 
 <div class="activity-stream">
