@@ -1,0 +1,32 @@
+---
+/** The former menu's unequal circles, now artwork only. Geometry is SVG art;
+ * no links, pointer effects, focus targets or navigation semantics. */
+---
+
+<svg
+  class="decorative-blobs"
+  data-blob-art
+  viewBox="0 0 280 290"
+  aria-hidden="true"
+  focusable="false"
+>
+  <circle class="wine" cx="88" cy="78" r="62" />
+  <circle class="peach" cx="207" cy="88" r="47" />
+  <circle class="peach" cx="63" cy="176" r="55" />
+  <circle class="peach" cx="196" cy="217" r="68" />
+</svg>
+<style>
+  .decorative-blobs {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+  }
+  .wine {
+    fill: var(--color-accent);
+  }
+  .peach {
+    fill: var(--color-surface-strong);
+  }
+</style>

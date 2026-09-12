@@ -1,34 +1,28 @@
 ---
+import Heading from "../design/primitives/Heading.astro";
 interface Props {
   eyebrow?: string;
   title: string;
   intro?: string;
   level?: 1 | 2;
 }
-
 const { eyebrow, title, intro, level = 1 } = Astro.props;
-const hasActions = Astro.slots.has("actions");
-const hasAside = Astro.slots.has("aside");
 ---
 
-<header class:list={["page-header", hasAside && "has-aside"]}>
+<header class="page-header">
   <div class="page-header__main">
     {eyebrow && <p class="page-header__eyebrow">{eyebrow}</p>}
-    {level === 2 ? (
-      <h2 class="page-header__title">{title}</h2>
-    ) : (
-      <h1 class="page-header__title">{title}</h1>
-    )}
+    <Heading level={level} scale="page">
+      {title}
+    </Heading>
     {intro && <p class="page-header__intro">{intro}</p>}
-
-    {hasActions && (
+    {Astro.slots.has("actions") && (
       <div class="page-header__actions">
         <slot name="actions" />
       </div>
     )}
   </div>
-
-  {hasAside && (
+  {Astro.slots.has("aside") && (
     <aside class="page-header__aside">
       <slot name="aside" />
     </aside>

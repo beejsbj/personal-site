@@ -15,20 +15,16 @@ featured: true
 status: "selected"
 cover: "/images/projects/conduit-market.jpg"
 links:
-  -
-    label: "Showcase"
+  - label: "Showcase"
     url: "https://conduit-market-showcase.vercel.app/"
-  -
-    label: "Source"
+  - label: "Source"
     url: "https://github.com/beejsbj/conduit-market-client/tree/portfolio/showcase-2025"
-  -
-    label: "Current Conduit"
+  - label: "Current Conduit"
     url: "https://conduit.market/"
 media:
-  -
-    type: "image"
+  - type: "image"
     src: "/images/projects/conduit-market.jpg"
-    alt: "Conduit Market storefront interface"
+    alt: "Purple city skyline artwork used as the Conduit Market project cover"
     width: 670
     height: 458
 order: 1

@@ -3,6 +3,7 @@ import { getEntry } from "astro:content";
 import { ClientRouter } from "astro:transitions";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import EdgeBlob from "../design/unique/EdgeBlob.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -10,6 +11,8 @@ interface Props {
   description?: string;
   image?: string;
   pageClass?: string;
+  noindex?: boolean;
+  clientRouting?: boolean;
 }
 
 const siteEntry = await getEntry("site", "config");
@@ -23,6 +26,8 @@ const {
   description = site.siteDescription,
   image = "/images/burooj4.jpg",
   pageClass = "page-default",
+  noindex = false,
+  clientRouting = true,
 } = Astro.props;
 
 const pageTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
@@ -37,6 +42,7 @@ const socialImage = new URL(image, siteBaseUrl).toString();
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" href="/images/circle.svg" />
     <meta property="og:title" content={pageTitle} />
@@ -45,15 +51,24 @@ const socialImage = new URL(image, siteBaseUrl).toString();
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={socialImage} />
-    <ClientRouter />
+    {clientRouting && <ClientRouter />}
   </head>
 
   <body class={pageClass}>
-    <a class="skip-link" href="#main-content">Skip to content</a>
-    <SiteHeader nav={site.nav} currentPath={Astro.url.pathname} />
-    <main id="main-content" tabindex="-1">
-      <slot />
-    </main>
-    <SiteFooter social={site.social} writingUrl={site.writingUrl} email={site.email} />
+    <a class="skip-link" href="#main-content">
+      Skip to content
+    </a>
+    <div class="site-frame">
+      <EdgeBlob />
+      <SiteHeader
+        nav={site.nav}
+        currentPath={Astro.url.pathname}
+        email={site.email}
+      />
+      <main id="main-content" tabindex="-1">
+        <slot />
+      </main>
+      <SiteFooter email={site.email} />
+    </div>
   </body>
 </html>

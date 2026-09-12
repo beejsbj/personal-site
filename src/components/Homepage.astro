@@ -1,0 +1,138 @@
+---
+import type { CollectionEntry } from "astro:content";
+import WelcomeHero from "../design/compositions/WelcomeHero.astro";
+import DecorativeBlobs from "../design/unique/DecorativeBlobs.astro";
+import SectionHeading from "../design/compounds/SectionHeading.astro";
+import CurrentNote from "../design/compounds/CurrentNote.astro";
+import ActivityStream from "../design/compounds/ActivityStream.astro";
+import Heading from "../design/primitives/Heading.astro";
+import Link from "../design/primitives/Link.astro";
+import ProjectRow from "./ProjectRow.astro";
+interface Props {
+  projects: (CollectionEntry<"projects">["data"] & { href: string })[];
+  updates: CollectionEntry<"updates">["data"][];
+  site: { writingUrl: string; social: { label: string; href: string }[] };
+}
+const { projects, updates, site } = Astro.props;
+---
+
+<div class="home-composition shell">
+  <div class="welcome-region">
+    <WelcomeHero social={site.social} />
+    <div class="welcome-art" aria-hidden="true">
+      <DecorativeBlobs />
+    </div>
+  </div>
+  <div class="below">
+    <section class="selected-work" aria-labelledby="home-projects">
+      <SectionHeading
+        id="home-projects"
+        title="Some things I've built"
+        href="/projects"
+        linkLabel="All projects"
+      />
+      {projects.map((project, index) => (
+        <ProjectRow {...project} layout={index === 0 ? "feature" : "row"} />
+      ))}
+    </section>
+    <aside aria-label="Current work and updates">
+      <div class="current-note">
+        <CurrentNote variant="plain" />
+      </div>
+      <section class="updates" aria-labelledby="home-updates">
+        <SectionHeading id="home-updates" title="Recent updates" />
+        <ActivityStream updates={updates} />
+      </section>
+    </aside>
+  </div>
+  <section class="elsewhere" aria-label="Elsewhere on the site">
+    <div>
+      <Heading>
+        <Link href="/lab" arrow>
+          In the lab
+        </Link>
+      </Heading>
+      <p>Experiments, prototypes, and smaller things.</p>
+    </div>
+    <div>
+      <Heading>
+        <Link href={site.writingUrl} arrow>
+          Writing
+        </Link>
+      </Heading>
+      <p>My notes and writing on Substack.</p>
+    </div>
+  </section>
+</div>
+<style>
+  .welcome-region {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--blob-art-width);
+    align-items: center;
+    gap: var(--space-2xl);
+  }
+  .welcome-art {
+    pointer-events: none;
+  }
+  .below {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--rail-width);
+    gap: var(--space-2xl);
+    border-top: var(--rule-width) solid var(--color-border);
+    padding-top: var(--space-xl);
+  }
+  .below > aside {
+    border-left: var(--rule-width) solid var(--color-border);
+    padding-left: var(--space-l);
+  }
+  .current-note {
+    padding: 0 0 var(--space-l);
+    border-bottom: var(--rule-width) solid var(--color-border);
+  }
+  .selected-work :global(.project-row:first-of-type) {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .updates {
+    padding-top: var(--space-l);
+  }
+  .elsewhere {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2xl);
+    border-top: var(--rule-width) solid var(--color-border);
+    padding-block: var(--space-2xl);
+    margin-top: var(--space-xl);
+  }
+  .elsewhere p {
+    margin-top: var(--space-s);
+    color: var(--color-text-soft);
+  }
+  @media (max-width: 62.5rem) {
+    .welcome-region {
+      display: block;
+    }
+    .welcome-art {
+      display: none;
+    }
+    .below {
+      gap: var(--space-xl);
+      grid-template-columns: minmax(0, 1fr) var(--rail-width-mid);
+    }
+  }
+  @media (max-width: 40.625rem) {
+    .below,
+    .elsewhere {
+      grid-template-columns: 1fr;
+    }
+    .below > aside {
+      border-left: 0;
+      padding-left: 0;
+      border-top: var(--rule-width) solid var(--color-border);
+      padding-top: var(--space-xl);
+    }
+    .elsewhere {
+      gap: var(--space-l);
+    }
+  }
+</style>

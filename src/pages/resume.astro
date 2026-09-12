@@ -2,6 +2,7 @@
 import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHeader from "../components/PageHeader.astro";
+import Link from "../design/primitives/Link.astro";
 
 const entry = await getEntry("pages", "resume");
 if (!entry) {
@@ -10,13 +11,27 @@ if (!entry) {
 const { Content } = await entry.render();
 ---
 
-<BaseLayout title={entry.data.title} description={entry.data.description} pageClass="page-copy">
+<BaseLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  pageClass="page-copy"
+>
   <section class="shell page-section page-section--copy">
     <PageHeader
       eyebrow="Resume"
-      title="A concise view of the work behind the portfolio."
-      intro="Frontend roles, freelance work, and the threads that led into this rebuild."
-    />
+      title="Burooj Rashid"
+      intro="Frontend developer · web design & development"
+    >
+      <Fragment slot="actions">
+        <Link href="mailto:burooj.bj@gmail.com">burooj.bj@gmail.com</Link>
+        <Link href="https://www.linkedin.com/in/boroujrashid/" arrow>
+          LinkedIn
+        </Link>
+        <Link href="https://github.com/beejsbj/" arrow>
+          GitHub
+        </Link>
+      </Fragment>
+    </PageHeader>
 
     <article class="prose prose--copy">
       <Content />

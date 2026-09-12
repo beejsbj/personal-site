@@ -1,0 +1,136 @@
+---
+import type { CollectionEntry } from "astro:content";
+import Heading from "../design/primitives/Heading.astro";
+import Link from "../design/primitives/Link.astro";
+import MediaFrame from "../design/primitives/MediaFrame.astro";
+import TagList from "../design/primitives/TagList.astro";
+interface Props {
+  projects: CollectionEntry<"projects">[];
+}
+const { projects } = Astro.props;
+const years = [...new Set(projects.map((project) => project.data.year))].sort(
+  (a, b) => b - a,
+);
+---
+
+<div class="timeline">
+  {years.map((year) => (
+    <section class="timeline-year" aria-labelledby={`year-${year}`}>
+      <div class="timeline-year__label">
+        <Heading level={2} scale="section" id={`year-${year}`}>
+          {year}
+        </Heading>
+      </div>
+      <ol class="timeline-year__projects">
+        {projects
+          .filter((project) => project.data.year === year)
+          .sort((a, b) => a.data.order - b.data.order)
+          .map((project) => (
+            <li class="timeline-entry">
+              <article class="timeline-entry__body">
+                <div class="timeline-entry__copy">
+                  <p class="timeline-entry__meta">
+                    {project.data.dateLabel} <span aria-hidden="true">/</span>{" "}
+                    {project.data.kind}
+                  </p>
+                  <Heading level={3} scale="card">
+                    <Link href={`/projects/${project.slug}`} arrow>
+                      {project.data.title}
+                    </Link>
+                  </Heading>
+                  <p>{project.data.summary}</p>
+                  <TagList
+                    items={project.data.tools.slice(0, 3)}
+                    label={`${project.data.title} tools`}
+                  />
+                </div>
+                <MediaFrame
+                  src={project.data.cover}
+                  alt=""
+                  href={`/projects/${project.slug}`}
+                />
+              </article>
+            </li>
+          ))}
+      </ol>
+    </section>
+  ))}
+</div>
+<style>
+  .timeline-year {
+    display: grid;
+    grid-template-columns: var(--space-4xl) minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+  .timeline-year__label {
+    padding-top: var(--space-m);
+    color: var(--color-accent);
+  }
+  .timeline-year__projects {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 var(--space-2xl) var(--space-xl);
+    border-left: var(--rule-width) solid var(--color-border);
+  }
+  .timeline-entry {
+    position: relative;
+    padding-block: var(--space-l);
+  }
+  .timeline-entry::before {
+    content: "";
+    position: absolute;
+    width: var(--space-xs);
+    height: var(--space-xs);
+    top: var(--space-xl);
+    left: calc(
+      -1 * var(--space-xl) - var(--space-xs) / 2 - var(--rule-width) / 2
+    );
+    border-radius: var(--radius-round);
+    background: var(--color-accent);
+    box-shadow: 0 0 0 var(--space-2xs) var(--color-page);
+  }
+  .timeline-entry + .timeline-entry {
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .timeline-entry__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--media-width);
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+  .timeline-entry__copy {
+    display: grid;
+    gap: var(--space-xs);
+    min-width: 0;
+  }
+  .timeline-entry__meta {
+    color: var(--color-text-soft);
+    font-size: var(--text-xs);
+  }
+  .timeline-entry__copy > p:not(.timeline-entry__meta) {
+    font-size: var(--text-copy);
+    max-width: var(--reading-width);
+  }
+  @media (max-width: 40.625rem) {
+    .timeline-year {
+      grid-template-columns: 1fr;
+      gap: var(--space-xs);
+    }
+    .timeline-year__projects {
+      margin-left: var(--space-2xs);
+      padding-left: var(--space-l);
+    }
+    .timeline-entry::before {
+      left: calc(
+        -1 * var(--space-l) - var(--space-xs) / 2 - var(--rule-width) / 2
+      );
+    }
+    .timeline-entry__body {
+      grid-template-columns: 1fr;
+      gap: var(--space-m);
+    }
+    .timeline-entry__body :global(.ds-media) {
+      max-width: var(--intro-width);
+    }
+  }
+</style>

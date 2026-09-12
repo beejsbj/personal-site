@@ -1,0 +1,55 @@
+---
+// Unique specimen: Burooj's photo, circular peach frame, personal caption.
+import Link from "../primitives/Link.astro";
+---
+
+<figure>
+  <img
+    src="/images/burooj4.jpg"
+    alt="Burooj Rashid wearing round sunglasses"
+    width="1080"
+    height="1920"
+    decoding="async"
+    fetchpriority="high"
+  />
+  <figcaption>
+    <Link href="/about" arrow>
+      That's me
+    </Link>
+  </figcaption>
+</figure>
+<style>
+  figure {
+    margin: 0;
+  }
+  img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: var(--portrait-position);
+    border: var(--portrait-border) solid var(--color-surface-strong);
+    border-radius: var(--radius-round);
+  }
+  figcaption {
+    padding: 0;
+    font-size: var(--text-sm);
+    margin-top: var(--space-s);
+    text-align: center;
+    color: var(--color-text-soft);
+  }
+  @media (max-width: 40.625rem) {
+    figure {
+      width: var(--portrait-width-compact);
+    }
+    img {
+      width: var(--portrait-width-compact);
+      border-width: var(--space-2xs);
+      flex-shrink: 0;
+    }
+    figcaption {
+      margin-top: var(--space-xs);
+      white-space: nowrap;
+    }
+  }
+</style>

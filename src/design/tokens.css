@@ -1,0 +1,110 @@
+/* Warm welcome: v1/v2 lineage, approved study A. Sole visual-value authority.
+   Responsive contracts: compact <= 40.625rem, narrow <= 23.75rem,
+   intermediate <= 62.5rem. Media queries use literals because CSS variables
+   cannot be used in native media conditions. SVG path coordinates are artwork. */
+:root {
+  --color-page: #d9d7d0;
+  --color-surface: #dfc8ae;
+  --color-surface-strong: #e5b483;
+  --color-text: #302320;
+  --color-text-soft: #65534b;
+  --color-border: #bcb2a9;
+  --color-accent: #7c2621;
+  --color-accent-pressed: #5f1d19;
+  --color-accent-contrast: var(--color-page);
+  --color-hover: #edc39d;
+  --color-link-rule: #7c26214a;
+  --color-texture: #7c262115;
+  --font-sans: "Lato", sans-serif;
+  --font-serif: "Newsreader Variable", serif;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-copy: 0.9375rem;
+  --text-base: 1rem;
+  --text-lead: 1.125rem;
+  --text-card: 1.6875rem;
+  --text-section: 2rem;
+  --text-page: clamp(2.7rem, 6vw, 4.3rem);
+  --text-display: clamp(3.25rem, 5.3vw, 4.75rem);
+  --text-display-compact: clamp(3rem, 13vw, 4.75rem);
+  --weight-medium: 600;
+  --weight-bold: 700;
+  --leading-display: 1;
+  --leading-heading: 1.15;
+  --leading-tight: 1.4;
+  --leading-body: 1.6;
+  --tracking-display: -0.048em;
+  --tracking-heading: -0.03em;
+  --space-2xs: 0.375rem;
+  --space-xs: 0.625rem;
+  --space-s: 0.75rem;
+  --space-m: 1.25rem;
+  --space-l: 1.5625rem;
+  --space-xl: 2.1875rem;
+  --space-2xl: 2.5rem;
+  --space-3xl: 3.4375rem;
+  --space-4xl: 3.625rem;
+  --rule-width: 1px;
+  --focus-width: 2px;
+  --focus-offset: 0.375rem;
+  --underline-offset: 0.3125rem;
+  --radius-round: 50%;
+  --radius-note: 0 2.8125rem 0 0;
+  --radius-portrait: 50% 50% 46% 54%;
+  --shell-max: 71.25rem;
+  --shell-gutter: 2.5rem;
+  --shell-width: min(var(--shell-max), calc(100% - var(--shell-gutter) * 2));
+  --reading-width: 62ch;
+  --intro-width: 40rem;
+  --rail-width: 16.875rem;
+  --rail-width-mid: 15rem;
+  --media-width: 11.875rem;
+  --media-ratio: 1.4;
+  --texture: repeating-linear-gradient(
+    130deg,
+    transparent 0 3px,
+    var(--color-texture) 3px 4px
+  );
+  --swatch-size: 5.5rem;
+  --portrait-width: 9.5rem;
+  --portrait-width-mid: 10.5rem;
+  --portrait-width-compact: 5rem;
+  --portrait-border: 0.375rem;
+  --portrait-position: 50% 33%;
+  --arrow-width: 13.75rem;
+  --arrow-height: 5.3125rem;
+  --arrow-height-compact: 4.0625rem;
+  --edge-width: 26.875rem;
+  --edge-height: 33.75rem;
+  --edge-top: -10.625rem;
+  --edge-left: -19.0625rem;
+  --edge-safe-left: min(
+    var(--edge-left),
+    calc(
+      max(var(--shell-gutter), (100vw - var(--shell-max)) / 2) -
+        var(--edge-width) - var(--space-xs)
+    )
+  );
+  --edge-left-compact: -23.75rem;
+  --edge-top-compact: -10rem;
+  --edge-height-compact: 20.625rem;
+  --duration-fast: 140ms;
+  --control-min-height: 2.75rem;
+  --welcome-width: 52rem;
+  --blob-art-width: 13rem;
+  --welcome-copy-width: 32ch;
+  --feature-media-width: 45%;
+  --icon-inline: 0.72em;
+  --link-arrow-lift: 0.1875rem;
+  --ease-feedback: ease;
+  --press-scale: 0.97;
+  --disabled-opacity: 0.5;
+  --layer-decoration: -1;
+  --layer-skip: 10;
+  --skip-hidden: translateY(calc(-100% - var(--space-l)));
+}
+@media (max-width: 40.625rem) {
+  :root {
+    --shell-gutter: 1.25rem;
+  }
+}

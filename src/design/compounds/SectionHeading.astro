@@ -1,0 +1,41 @@
+---
+import Heading from "../primitives/Heading.astro";
+import Link from "../primitives/Link.astro";
+interface Props {
+  title: string;
+  id: string;
+  href?: string;
+  linkLabel?: string;
+}
+const { title, id, href, linkLabel } = Astro.props;
+---
+
+<div class="section-heading">
+  <Heading id={id}>{title}</Heading>
+  {href && (
+    <div class="section-link">
+      <Link href={href} arrow>
+        {linkLabel}
+      </Link>
+    </div>
+  )}
+</div>
+<style>
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-m);
+    margin-bottom: var(--space-l);
+  }
+  .section-link {
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+  @media (max-width: 40.625rem) {
+    .section-heading {
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+  }
+</style>

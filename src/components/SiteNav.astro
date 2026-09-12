@@ -1,0 +1,63 @@
+---
+import Link from "../design/primitives/Link.astro";
+interface Props {
+  nav: { label: string; href: string; external?: boolean }[];
+  currentPath: string;
+  email: string;
+  label?: string;
+}
+const { nav, currentPath, email, label = "Main navigation" } = Astro.props;
+const items = [
+  { label: "Home", href: "/", external: false },
+  ...["Projects", "Lab", "About", "Writing"].flatMap((name) =>
+    nav.filter((item) => item.label === name),
+  ),
+  { label: "Say hello", href: `mailto:${email}`, external: true },
+];
+const current = (href: string) =>
+  href === "/"
+    ? currentPath === "/"
+    : currentPath === href || currentPath.startsWith(href + "/");
+---
+
+<nav class="site-nav" aria-label={label}>
+  <ul>
+    {items.map((item) => (
+      <li>
+        <Link
+          href={item.href}
+          treatment="nav"
+          current={current(item.href)}
+          arrow={item.external}
+        >
+          {item.label}
+        </Link>
+      </li>
+    ))}
+  </ul>
+</nav>
+<style>
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--space-l);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .site-nav {
+    font-size: var(--text-base);
+  }
+  @media (max-width: 40.625rem) {
+    .site-nav {
+      width: 100%;
+    }
+    ul {
+      display: grid;
+      grid-template-columns: repeat(3, max-content);
+      justify-content: space-between;
+      column-gap: var(--space-s);
+    }
+  }
+</style>

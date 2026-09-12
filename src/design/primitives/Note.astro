@@ -1,0 +1,18 @@
+---
+/** Passive container primitive. Named note silhouette; slot owns content, not chrome. */
+interface Props {
+  variant?: "paper" | "plain";
+}
+const { variant = "paper" } = Astro.props;
+---
+
+<div class:list={["ds-note", `ds-note--${variant}`]}>
+  <slot />
+</div>
+<style>
+  .ds-note--paper {
+    padding: var(--space-l);
+    background: var(--color-surface);
+    border-radius: var(--radius-note);
+  }
+</style>

@@ -1,0 +1,164 @@
+---
+/** Primitive: label + optional decorative arrow. No nested controls.
+ * Axes: treatment=text|nav|action, tone=paper|wine.
+ * States: rest, hover, focus, active, current, disabled; no loading behavior.
+ * Native anchor navigation; disabled renders a non-interactive span.
+ */
+interface Props {
+  href: string;
+  treatment?: "text" | "nav" | "action";
+  tone?: "paper" | "wine";
+  current?: boolean;
+  arrow?: boolean;
+  disabled?: boolean;
+  newTab?: boolean;
+}
+const {
+  href,
+  treatment = "text",
+  tone = "paper",
+  current = false,
+  arrow = false,
+  disabled = false,
+  newTab = false,
+} = Astro.props;
+const Tag = disabled ? "span" : "a";
+---
+
+<Tag
+  href={disabled ? undefined : href}
+  class:list={["ds-link", `ds-link--${treatment}`, `ds-link--${tone}`]}
+  aria-current={current ? "page" : undefined}
+  aria-disabled={disabled || undefined}
+  target={!disabled && newTab ? "_blank" : undefined}
+  rel={!disabled && newTab ? "noreferrer" : undefined}
+>
+  <span>
+    <slot />
+    {arrow && (
+      <svg
+        class="link-arrow"
+        aria-hidden="true"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d={
+            /^(https?:|mailto:)/.test(href)
+              ? "M4 12 12 4M4 4h8v8"
+              : "M2 8h11M8 3l5 5-5 5"
+          }
+        />
+      </svg>
+    )}
+  </span>
+</Tag>
+<style>
+  .ds-link {
+    color: var(--color-accent);
+    font: inherit;
+    text-decoration: none;
+    text-underline-offset: var(--underline-offset);
+  }
+  .ds-link:hover {
+    text-decoration: underline;
+  }
+  .ds-link--text {
+    text-decoration: underline;
+    text-decoration-color: var(--color-link-rule);
+    text-decoration-thickness: var(--rule-width);
+    text-decoration-skip-ink: auto;
+  }
+  .ds-link--text:is(:hover, :focus-visible) {
+    text-decoration-color: currentColor;
+  }
+  .link-arrow {
+    display: inline-block;
+    width: var(--icon-inline);
+    height: var(--icon-inline);
+    margin-left: var(--space-2xs);
+    vertical-align: baseline;
+  }
+  .ds-link--nav {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--control-min-height);
+    color: var(--color-text-soft);
+    white-space: nowrap;
+    text-decoration-thickness: var(--focus-width);
+  }
+  .ds-link--nav:is(:hover, :focus-visible, [aria-current]) {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  .ds-link--nav[aria-current] {
+    font-weight: var(--weight-bold);
+  }
+  .ds-link--nav:active {
+    color: var(--color-accent-pressed);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .link-arrow {
+      transition: transform var(--duration-fast) var(--ease-feedback);
+    }
+    .ds-link:hover .link-arrow {
+      transform: translate(
+        var(--link-arrow-lift),
+        calc(-1 * var(--link-arrow-lift))
+      );
+    }
+  }
+  .ds-link:focus-visible {
+    outline: var(--focus-width) solid var(--color-accent);
+    outline-offset: var(--focus-offset);
+  }
+  .ds-link--action {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    background: var(--color-surface-strong);
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+    white-space: nowrap;
+    transition: transform var(--duration-fast) var(--ease-feedback);
+  }
+  .ds-link--action {
+    padding: var(--space-s) var(--space-m);
+    border: var(--rule-width) solid var(--color-accent);
+  }
+  .ds-link--wine {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+  .ds-link--action:hover {
+    background: var(--color-hover);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  .ds-link[aria-current] {
+    text-decoration: underline;
+  }
+  .ds-link--action:active {
+    transform: scale(var(--press-scale));
+  }
+  .ds-link[aria-disabled] {
+    opacity: var(--disabled-opacity);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ds-link,
+    .link-arrow {
+      transition: none;
+    }
+    .ds-link:hover .link-arrow {
+      transform: none;
+    }
+    .ds-link:active {
+      transform: none;
+    }
+  }
+</style>

@@ -1,17 +1,22 @@
 ---
 title: About
-description: About Burooj Rashid, a frontend developer focused on expressive interfaces, motion, and durable design systems.
+description: Burooj Rashid on making places on the web, learning through projects, and the connection between interfaces, storytelling, and games.
 ---
 
-I am a frontend developer who likes building sites that have a point of view. I care about visual rhythm, strong interfaces, and code that does not become a burden six weeks later.
+I make places on the web. My journey into web development began with Perpetual Education, learning the whole process from an idea to a working site.
 
-My path into web development started through Perpetual Education and kept growing through freelance work and professional frontend roles. Along the way I found that I am most energized by projects that ask for both technical care and design judgment.
+Since then, I've built interfaces at API3, a website for a family-owned pizzeria, and an event site that brought together DeSci World and local Indian visual influences. The projects change; I still enjoy figuring out how a place should feel and then making it work.
 
-I am especially interested in:
+## People, stories, interfaces
 
-- expressive landing pages and product storytelling
-- motion that guides attention instead of decorating everything
-- design systems that stay lightweight and adaptable
-- frontend architecture that is easy to update and easy to trust
+I'm fascinated by the intersection of cognitive science and storytelling in web development. How do people think, process information, and make decisions? Those questions matter when you're making something someone else has to find their way around.
 
-Outside of work, I still think about games, interface language, and the small details that make digital spaces feel memorable. That probably shows up in the way I build.
+In my free time, I enjoy gaming, and I see coding as another form of gaming—one that pays! Both have room for thoughtfully designed interfaces and the small details that make an experience feel alive.
+
+## Still exploring
+
+When I started, I wrote: “The World is Wide and as I explore this Web I hope to find where my talents and interests intersect!” That curiosity is still a good description of what brings me back.
+
+You can follow the work through my [projects](/projects), find smaller interface experiments in the [lab](/lab), or read what I've been thinking about in my [writing](https://buroojs.substack.com).
+
+Have a project in mind? [Tell me about it](mailto:burooj.bj@gmail.com).

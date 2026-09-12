@@ -2,19 +2,12 @@
 import { getCollection, getEntry } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import ProjectRow from "../components/ProjectRow.astro";
-import UpdateItem from "../components/UpdateItem.astro";
-
-interface ProfileLink {
-  label: string;
-  href: string;
-}
+import Homepage from "../components/Homepage.astro";
 
 const homeEntry = await getEntry("pages", "home");
 if (!homeEntry) {
   throw new Error("Missing home content entry.");
 }
-const { Content } = await homeEntry.render();
 
 const siteEntry = await getEntry("site", "config");
 if (!siteEntry) {
@@ -22,188 +15,37 @@ if (!siteEntry) {
 }
 const site = siteEntry.data;
 
-const featuredProjects: CollectionEntry<"projects">[] = (await getCollection("projects"))
-  .filter((entry: CollectionEntry<"projects">) => !entry.data.hidden && entry.data.featured)
+const featuredProjects: CollectionEntry<"projects">[] = (
+  await getCollection("projects")
+)
+  .filter(
+    (entry: CollectionEntry<"projects">) =>
+      !entry.data.hidden && entry.data.featured,
+  )
   .sort(
     (left: CollectionEntry<"projects">, right: CollectionEntry<"projects">) =>
       left.data.order - right.data.order,
   )
   .slice(0, 3);
 
-const recentUpdates: CollectionEntry<"updates">[] = (await getCollection("updates"))
-  .sort(
-    (left: CollectionEntry<"updates">, right: CollectionEntry<"updates">) =>
-      right.data.date.localeCompare(left.data.date),
-  )
-  .slice(0, 3);
+// The shared stream filters eligibility before applying its display limit.
+const recentUpdates: CollectionEntry<"updates">[] = await getCollection("updates");
 
-const profileLinks: ProfileLink[] = (site.social as ProfileLink[]).filter((link: ProfileLink) =>
-  ["GitHub", "LinkedIn", "Email"].includes(link.label),
-);
+const homepageData = {
+  site,
+  projects: featuredProjects.map((project) => ({
+    ...project.data,
+    href: `/projects/${project.slug}`,
+  })),
+  updates: recentUpdates.map((update) => update.data),
+};
 ---
 
 <BaseLayout
   title={homeEntry.data.title}
   description={homeEntry.data.description}
   image="/images/burooj4.jpg"
-  pageClass="page-home"
+  pageClass="page-warm-home"
 >
-  <section class="home-hero home-shell" aria-labelledby="home-title">
-    <div class="home-hero__copy">
-      <p class="home-kicker">
-        <span>Selected work / ongoing</span>
-        <span>Frontend development</span>
-      </p>
-
-      <h1 id="home-title" class="home-hero__title">
-        <span>Burooj</span>
-        <span>Rashid.</span>
-      </h1>
-
-      <p class="home-hero__intro">{homeEntry.data.intro}</p>
-
-      <ul class="home-contact-list" aria-label="Contact and profile links">
-        {
-          profileLinks.map((link: ProfileLink) => {
-            const external = link.href.startsWith("http");
-            return (
-              <li>
-                <a
-                  href={link.href}
-                  target={external ? "_blank" : undefined}
-                  rel={external ? "noreferrer" : undefined}
-                >
-                  {link.label}<span aria-hidden="true">{external ? " ↗" : " →"}</span>
-                </a>
-              </li>
-            );
-          })
-        }
-      </ul>
-    </div>
-
-    <figure class="home-portrait">
-      <div class="home-portrait__image-wrap">
-        <img
-          src="/images/burooj4.jpg"
-          alt="Burooj Rashid wearing round sunglasses"
-          width="1080"
-          height="1920"
-          decoding="async"
-        />
-      </div>
-      <figcaption>
-        <span>Design-minded frontend work</span>
-        <span aria-hidden="true">BR / 01</span>
-      </figcaption>
-    </figure>
-  </section>
-
-  <div class="home-ledger home-shell">
-    <div class="home-ledger__main">
-      <section class="home-introduction" aria-labelledby="introduction-title">
-        <p class="home-section-label">Introduction</p>
-        <div class="home-introduction__body prose prose--home">
-          <h2 id="introduction-title">Useful systems with a point of view.</h2>
-          <Content />
-        </div>
-      </section>
-
-      <section class="home-projects" aria-labelledby="selected-work-title">
-        <header class="home-section-heading">
-          <div>
-            <p class="home-section-label">Selected projects</p>
-            <h2 id="selected-work-title">Work I would start with.</h2>
-          </div>
-          <a class="home-section-link" href="/projects">
-            All projects <span aria-hidden="true">→</span>
-          </a>
-        </header>
-
-        <div class="project-row-list">
-          {
-            featuredProjects.map((project) => (
-              <ProjectRow
-                href={`/projects/${project.slug}`}
-                title={project.data.title}
-                summary={project.data.summary}
-                dateLabel={project.data.dateLabel}
-                role={project.data.role}
-                tools={project.data.tools}
-                cover={project.data.cover}
-              />
-            ))
-          }
-        </div>
-      </section>
-
-      <section class="home-paths" aria-labelledby="more-paths-title">
-        <header class="home-section-heading">
-          <div>
-            <p class="home-section-label">More paths</p>
-            <h2 id="more-paths-title">The work around the work.</h2>
-          </div>
-        </header>
-
-        <div class="home-paths__grid">
-          <a class="home-path" href="/lab">
-            <span class="home-path__index">01</span>
-            <span class="home-path__body">
-              <strong>Lab</strong>
-              <span>Experiments, prototypes, and smaller pieces that still shaped how I build.</span>
-            </span>
-            <span class="home-path__arrow" aria-hidden="true">→</span>
-          </a>
-
-          <a class="home-path" href={site.writingUrl} target="_blank" rel="noreferrer">
-            <span class="home-path__index">02</span>
-            <span class="home-path__body">
-              <strong>Writing</strong>
-              <span>Notes on frontend work, interaction, and the decisions inside a build.</span>
-            </span>
-            <span class="home-path__arrow" aria-hidden="true">↗</span>
-          </a>
-        </div>
-      </section>
-    </div>
-
-    <aside class="home-ledger__rail" aria-label="Current work and recent updates">
-      <section class="current-card" aria-labelledby="currently-title">
-        <div class="current-card__signal" aria-hidden="true"><span></span>Now</div>
-        <p class="home-section-label">Currently</p>
-        <h2 id="currently-title">Keeping a living system, not a finished shelf.</h2>
-        <p>
-          I’m maintaining <strong>bjslab</strong>, a home-lab environment for the tools and services I use,
-          while continuing to turn interface
-          experiments and smaller software ideas into durable work.
-        </p>
-        <a class="current-card__link" href="/about">
-          More about my practice <span aria-hidden="true">→</span>
-        </a>
-      </section>
-
-      <section class="updates-card" aria-labelledby="updates-title">
-        <header class="updates-card__header">
-          <p class="home-section-label">Recent updates</p>
-          <h2 id="updates-title">What changed lately.</h2>
-        </header>
-
-        <div class="updates-list">
-          {
-            recentUpdates.map((update) => (
-              <UpdateItem
-                title={update.data.title}
-                date={update.data.date}
-                dateLabel={update.data.dateLabel}
-                summary={update.data.summary}
-                href={update.data.href}
-                linkLabel={update.data.linkLabel}
-                relatedProject={update.data.relatedProject}
-              />
-            ))
-          }
-        </div>
-      </section>
-    </aside>
-  </div>
+  <Homepage {...homepageData} />
 </BaseLayout>

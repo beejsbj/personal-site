@@ -5,21 +5,16 @@ type: "interaction archive"
 sourceEra: "API3 experiments"
 cover: "/images/projects/roulette-app.jpg"
 links:
-  -
-    label: "Demo"
+  - label: "Demo"
     url: "https://demo-roulette-api3.netlify.app"
-  -
-    label: "Live"
+  - label: "Live"
     url: "https://qrng-roulette.netlify.app/"
-  -
-    label: "Read..."
+  - label: "Read..."
     url: "https://github.com/beejsbj/qrng-roulette"
-  -
-    label: "Old"
+  - label: "Old"
     url: "https://api3-roulette-old.netlify.app/"
 media:
-  -
-    type: "image"
+  - type: "image"
     src: "/images/projects/roulette-app.jpg"
     alt: "Roulette App cover image"
     width: 2000

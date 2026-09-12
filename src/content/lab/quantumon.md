@@ -5,15 +5,12 @@ type: "client archive"
 sourceEra: "Early freelance"
 cover: "/images/projects/quantumon.png"
 links:
-  -
-    label: "See Live"
+  - label: "See Live"
     url: "https://quantumon.xyz/"
-  -
-    label: "Github"
+  - label: "Github"
     url: "https://github.com/beejsbj/pe-projects/tree/main/projects/quantumon"
 media:
-  -
-    type: "image"
+  - type: "image"
     src: "/images/projects/quantumon.png"
     alt: "Quantumon cover image"
     width: 2000

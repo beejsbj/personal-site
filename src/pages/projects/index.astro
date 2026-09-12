@@ -3,86 +3,29 @@ import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHeader from "../../components/PageHeader.astro";
-import SectionIntro from "../../components/SectionIntro.astro";
-import ProjectCard from "../../components/ProjectCard.astro";
-import ProjectRow from "../../components/ProjectRow.astro";
+import ProjectTimeline from "../../components/ProjectTimeline.astro";
 
-const projects: CollectionEntry<"projects">[] = (await getCollection("projects"))
-  .filter((entry: CollectionEntry<"projects">) => !entry.data.hidden)
-  .sort(
-    (left: CollectionEntry<"projects">, right: CollectionEntry<"projects">) =>
-      left.data.order - right.data.order,
-  );
-const featuredProjects = projects.filter(
-  (project: CollectionEntry<"projects">) => project.data.featured,
-);
-const archiveProjects = projects.filter(
-  (project: CollectionEntry<"projects">) => !project.data.featured,
-);
+const projects: CollectionEntry<"projects">[] = (
+  await getCollection("projects")
+).filter((entry: CollectionEntry<"projects">) => !entry.data.hidden);
 ---
 
 <BaseLayout
   title="Projects"
-  description="Selected frontend and web design work by Burooj Rashid."
+  description="Websites, applications, and an arcade of learning projects by Burooj Rashid."
   pageClass="page-projects"
 >
   <section class="shell page-section page-section--header">
     <PageHeader
       eyebrow="Projects"
-      title="Selected work with clearer framing."
-      intro="The strongest projects live up front. Everything else stays accessible, but quieter."
+      title="Things I've made, along the way."
+      intro="Client work, personal projects, and the little arcade where I learned by building. A trail from the latest work back to the early experiments."
     />
   </section>
-
-  <section class="shell page-section">
-    {featuredProjects.length > 0 && (
-      <div class="collection-block">
-        <SectionIntro
-          eyebrow="Featured"
-          title="Projects I would lead with in a conversation."
-          intro="A tighter set of work I can stand behind without overexplaining it."
-          compact
-        />
-
-        <div class="project-row-list">
-          {featuredProjects.map((project) => (
-            <ProjectRow
-              href={`/projects/${project.slug}`}
-              title={project.data.title}
-              summary={project.data.summary}
-              dateLabel={project.data.dateLabel}
-              role={project.data.role}
-              tools={project.data.tools}
-              cover={project.data.cover}
-            />
-          ))}
-        </div>
-      </div>
-    )}
-
-    {archiveProjects.length > 0 && (
-      <div class="collection-block">
-        <SectionIntro
-          eyebrow="Archive"
-          title="Still worth seeing, just not needing the spotlight."
-          intro="Older or smaller pieces that still help tell the story."
-          compact
-        />
-
-        <div class="card-grid card-grid--dense">
-          {archiveProjects.map((project) => (
-            <ProjectCard
-              href={`/projects/${project.slug}`}
-              title={project.data.title}
-              summary={project.data.summary}
-              dateLabel={project.data.dateLabel}
-              role={project.data.role}
-              tools={project.data.tools}
-              cover={project.data.cover}
-            />
-          ))}
-        </div>
-      </div>
-    )}
+  <section
+    class="shell page-section"
+    aria-label="Project history, newest first"
+  >
+    <ProjectTimeline projects={projects} />
   </section>
 </BaseLayout>

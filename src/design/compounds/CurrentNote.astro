@@ -1,0 +1,39 @@
+---
+import Note from "../primitives/Note.astro";
+import Heading from "../primitives/Heading.astro";
+import Link from "../primitives/Link.astro";
+interface Props {
+  id?: string;
+  variant?: "paper" | "plain";
+}
+const { id = "home-currently", variant = "paper" } = Astro.props;
+---
+
+<section aria-labelledby={id}>
+  <Note variant={variant}>
+    <div class="current-copy">
+      <Heading id={id}>Currently</Heading>
+      <p>
+        I’m maintaining <strong>bjslab</strong>, my home-lab environment for the
+        tools and services I use.
+      </p>
+      <div class="more">
+        <Link href="/about" arrow>
+          More about me
+        </Link>
+      </div>
+    </div>
+  </Note>
+</section>
+<style>
+  .current-copy {
+    display: grid;
+    gap: var(--space-s);
+  }
+  p {
+    font-size: var(--text-copy);
+  }
+  .more {
+    font-size: var(--text-sm);
+  }
+</style>

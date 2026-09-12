@@ -1,0 +1,110 @@
+---
+import Heading from "../primitives/Heading.astro";
+import Link from "../primitives/Link.astro";
+import Portrait from "../unique/Portrait.astro";
+/** Composition: approved A introduction. The guide imports this same region. */
+interface Props {
+  social: { label: string; href: string }[];
+  level?: 1 | 2;
+  id?: string;
+}
+const { social, level = 1, id = "home-title" } = Astro.props;
+---
+
+<section class="hello" aria-labelledby={id}>
+  <Portrait />
+  <div class="copy">
+    <p class="greeting">Hey there!</p>
+    <div class="title">
+      <Heading level={level} scale="display" id={id}>
+        Burooj here!
+      </Heading>
+    </div>
+    <p class="occupation">Frontend developer &amp; designer</p>
+    <p class="welcome">I make places on the web. Feel free to look around!</p>
+    <div class="socials">
+      {social
+        .filter((link) => ["GitHub", "LinkedIn", "Email"].includes(link.label))
+        .map((link) => (
+          <Link href={link.href} arrow>
+            {link.label}
+          </Link>
+        ))}
+      <Link href="/resume" arrow>
+        Resume
+      </Link>
+    </div>
+  </div>
+</section>
+<style>
+  .hello {
+    display: grid;
+    grid-template-columns: var(--portrait-width) minmax(0, 1fr);
+    gap: var(--space-2xl);
+    align-items: center;
+    padding: var(--space-2xl) 0 var(--space-3xl);
+    max-width: var(--welcome-width);
+  }
+  .greeting {
+    font-size: var(--text-lead);
+    line-height: var(--leading-heading);
+    color: var(--color-text-soft);
+  }
+  .title {
+    margin: var(--space-xs) 0 var(--space-s);
+  }
+  .occupation {
+    font-size: var(--text-lead);
+    color: var(--color-accent);
+  }
+  .welcome {
+    font-size: var(--text-lead);
+    max-width: var(--welcome-copy-width);
+    margin-top: var(--space-m);
+    text-wrap: pretty;
+  }
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    margin-top: var(--space-m);
+    font-size: var(--text-base);
+  }
+  @media (max-width: 62.5rem) {
+    .hello {
+      grid-template-columns: var(--portrait-width-mid) minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 40.625rem) {
+    .hello {
+      grid-template-columns: var(--portrait-width-compact) minmax(0, 1fr);
+      padding-top: var(--space-m);
+      padding-bottom: var(--space-2xl);
+      gap: var(--space-s) var(--space-l);
+    }
+    .copy {
+      display: contents;
+    }
+    .greeting,
+    .title,
+    .welcome,
+    .socials {
+      grid-column: 1 / -1;
+    }
+    .hello :global(figure) {
+      grid-row: 3;
+      grid-column: 1;
+    }
+    .occupation {
+      grid-row: 3;
+      grid-column: 2;
+    }
+    .title {
+      margin-top: var(--space-xs);
+    }
+    .socials {
+      column-gap: var(--space-l);
+      row-gap: var(--space-s);
+    }
+  }
+</style>
