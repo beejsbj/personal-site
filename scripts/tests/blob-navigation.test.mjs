@@ -41,34 +41,54 @@ class Surface {
 
 function harness(matches = true) {
   const document = new Surface();
+  document.activeElement = {};
   const media = new Surface();
   media.matches = matches;
   const link = new Surface();
   const label = new Surface();
   const magnet = new Surface();
   const slot = new Surface();
-  const toggle = new Surface();
   const root = new Surface();
+  const edgeRoot = new Surface();
+  const edgeSlot = new Surface();
+  const edgeSurface = new Surface();
   slot.querySelector = (selector) =>
-    ({ a: link, ".blob-nav__label": label, ".blob-nav__magnet": magnet })[
-      selector
-    ];
+    ({
+      a: link,
+      ".blob-nav__label": label,
+      ".blob-nav__magnet, .edge-blob__surface": magnet,
+    })[selector] ?? null;
   slot.getBoundingClientRect = () => ({
     left: 0,
     top: 0,
     width: 100,
     height: 100,
   });
-  root.querySelector = () => toggle;
-  root.querySelectorAll = () => [slot];
-  document.querySelectorAll = () => [root];
+  edgeSlot.querySelector = (selector) =>
+    selector === ".blob-nav__magnet, .edge-blob__surface" ? edgeSurface : null;
+  edgeSlot.getBoundingClientRect = slot.getBoundingClientRect;
+  root.querySelectorAll = (selector) =>
+    selector === ".blob-nav__slot, .edge-blob__hit" ? [slot] : [];
+  edgeRoot.querySelectorAll = (selector) =>
+    selector === ".blob-nav__slot, .edge-blob__hit" ? [edgeSlot] : [];
+  document.querySelectorAll = (selector) =>
+    selector === "[data-blob-nav], [data-magnetic-edge]"
+      ? [root, edgeRoot]
+      : [];
   const frames = new Map();
   let nextFrame = 0;
   let now = 0;
   const context = {
     exports: {},
     document,
-    window: { matchMedia: () => media },
+    window: {
+      matchMedia: (query) => {
+        assert.match(query, /hover: hover/);
+        assert.match(query, /pointer: fine/);
+        assert.match(query, /prefers-reduced-motion: no-preference/);
+        return media;
+      },
+    },
     AbortController: class {
       signal = new Surface();
       abort() {
@@ -104,7 +124,9 @@ function harness(matches = true) {
     label,
     magnet,
     slot,
-    toggle,
+    edgeRoot,
+    edgeSlot,
+    edgeSurface,
     root,
     frames,
     tick,
@@ -115,13 +137,23 @@ function harness(matches = true) {
 test("blob enhancement leaves reduced-motion and touch navigation stationary", () => {
   const h = harness(false);
   assert.equal(h.root.dataset.motion, "paused");
-  assert.equal(h.toggle.hidden, true);
+  assert.equal(h.edgeRoot.dataset.motion, "paused");
   h.move();
+  h.document.emit("pointermove", {
+    pointerType: "mouse",
+    clientX: 85,
+    clientY: 25,
+  });
   h.slot.emit("pointerleave");
   assert.equal(h.frames.size, 0);
   h.media.matches = true;
   h.media.emit("change");
   h.slot.emit("pointermove", {
+    pointerType: "touch",
+    clientX: 85,
+    clientY: 25,
+  });
+  h.document.emit("pointermove", {
     pointerType: "touch",
     clientX: 85,
     clientY: 25,
@@ -143,30 +175,78 @@ test("spring moves the visual body and label but never the link; it settles with
   assert.equal(h.label.style.transform, undefined);
 });
 
-test("pause, preference changes and Astro navigation reset motion and listeners safely", () => {
+test("corner decoration follows nearby pointers, leaves click geometry still, and settles at rest", () => {
+  const h = harness();
+  h.document.emit("pointermove", {
+    pointerType: "mouse",
+    clientX: 85,
+    clientY: 25,
+  });
+  h.tick(20);
+  assert.match(h.edgeSurface.style.transform, /translate3d/);
+  assert.equal(h.edgeSlot.style.transform, undefined);
+  assert.equal(h.edgeRoot.style.transform, undefined);
+  h.tick(150);
+  assert.equal(h.frames.size, 0, "held pointer has no idle RAF loop");
+  h.document.emit("pointermove", {
+    pointerType: "mouse",
+    clientX: 300,
+    clientY: 300,
+  });
+  h.tick(150);
+  assert.equal(h.edgeSurface.style.transform, undefined);
+  assert.equal(h.frames.size, 0);
+});
+
+test("keyboard focus immediately resets navigation attraction and suppresses further pull", () => {
   const h = harness();
   h.move();
   h.tick(4);
-  h.toggle.emit("click");
+  h.document.activeElement = h.link;
+  h.link.emit("focus");
+  assert.equal(h.magnet.style.transform, undefined);
+  assert.equal(h.label.style.transform, undefined);
   assert.equal(h.frames.size, 0);
-  assert.equal(h.root.dataset.motion, "paused");
-  assert.equal(h.toggle.attributes["aria-pressed"], "true");
-  h.document.emit("astro:before-swap");
-  assert.equal(h.slot.listeners.get("pointermove").size, 0);
-  h.document.emit("astro:page-load");
-  h.document.emit("astro:page-load");
-  assert.equal(h.slot.listeners.get("pointermove").size, 1);
-  assert.equal(
-    h.root.dataset.motion,
-    "paused",
-    "user preference persists across navigation",
-  );
-  h.toggle.emit("click");
   h.move();
+  assert.equal(h.frames.size, 0);
+});
+
+test("preference changes, visibility and Astro navigation reset both surfaces and listeners safely", () => {
+  const h = harness();
+  h.move();
+  h.document.emit("pointermove", {
+    pointerType: "mouse",
+    clientX: 85,
+    clientY: 25,
+  });
   h.tick(4);
   h.media.matches = false;
   h.media.emit("change");
   assert.equal(h.frames.size, 0);
+  assert.equal(h.root.dataset.motion, "paused");
+  assert.equal(h.edgeRoot.dataset.motion, "paused");
+  assert.equal(h.edgeSurface.style.transform, undefined);
+  h.document.emit("astro:before-swap");
+  assert.equal(h.slot.listeners.get("pointermove").size, 0);
+  assert.equal(h.document.listeners.get("pointermove").size, 0);
+  h.document.emit("astro:page-load");
+  h.document.emit("astro:page-load");
+  assert.equal(h.slot.listeners.get("pointermove").size, 1);
+  assert.equal(h.document.listeners.get("pointermove").size, 1);
+  assert.equal(h.media.listeners.get("change").size, 1);
+  assert.equal(h.root.dataset.motion, "paused");
+  h.media.matches = true;
+  h.media.emit("change");
+  h.move();
+  h.document.emit("pointermove", {
+    pointerType: "mouse",
+    clientX: 85,
+    clientY: 25,
+  });
+  h.tick(4);
+  h.document.hidden = true;
+  h.document.emit("visibilitychange");
+  assert.equal(h.frames.size, 0);
   assert.equal(h.magnet.style.transform, undefined);
-  assert.equal(h.toggle.hidden, true);
+  assert.equal(h.edgeSurface.style.transform, undefined);
 });

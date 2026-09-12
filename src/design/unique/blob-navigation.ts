@@ -6,7 +6,6 @@ export function installBlobNavigation() {
     "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)",
   );
   let cleanup: (() => void) | undefined;
-  let pausedByUser = false;
 
   function mount() {
     cleanup?.();
@@ -14,40 +13,31 @@ export function installBlobNavigation() {
     const { signal } = controller;
     const disposers: (() => void)[] = [];
     const roots = [
-      ...document.querySelectorAll<HTMLElement>("[data-blob-nav]"),
+      ...document.querySelectorAll<HTMLElement>(
+        "[data-blob-nav], [data-magnetic-edge]",
+      ),
     ];
     const refreshers: (() => void)[] = [];
 
     for (const root of roots) {
-      const toggle = root.querySelector<HTMLButtonElement>(".blob-nav__motion");
       const resetters: (() => void)[] = [];
       const refresh = () => {
-        const running = motion.matches && !pausedByUser;
+        const running = motion.matches;
         root.dataset.motion = running ? "running" : "paused";
-        if (toggle) {
-          toggle.hidden = !motion.matches;
-          toggle.setAttribute("aria-pressed", String(pausedByUser));
-          toggle.textContent = pausedByUser ? "Resume motion" : "Pause motion";
-        }
         if (!running) resetters.forEach((reset) => reset());
       };
       refreshers.push(refresh);
-      toggle?.addEventListener(
-        "click",
-        () => {
-          pausedByUser = !pausedByUser;
-          refreshers.forEach((update) => update());
-        },
-        { signal },
-      );
 
       for (const slot of root.querySelectorAll<HTMLElement>(
-        ".blob-nav__slot",
+        ".blob-nav__slot, .edge-blob__hit",
       )) {
         const link = slot.querySelector<HTMLAnchorElement>("a");
-        const magnet = slot.querySelector<HTMLElement>(".blob-nav__magnet");
+        const magnet = slot.querySelector<HTMLElement>(
+          ".blob-nav__magnet, .edge-blob__surface",
+        );
         const label = slot.querySelector<HTMLElement>(".blob-nav__label");
-        if (!link || !magnet || !label) continue;
+        if (!magnet) continue;
+        const corner = !link;
         let frame = 0;
         let lastTime = 0;
         let x = 0,
@@ -63,7 +53,7 @@ export function installBlobNavigation() {
           lastTime = 0;
           x = y = vx = vy = targetX = targetY = 0;
           magnet.style.removeProperty("transform");
-          label.style.removeProperty("transform");
+          label?.style.removeProperty("transform");
         };
         resetters.push(reset);
         disposers.push(reset);
@@ -79,7 +69,8 @@ export function installBlobNavigation() {
           x += vx * dt;
           y += vy * dt;
           magnet.style.transform = `translate3d(${x.toFixed(3)}px, ${y.toFixed(3)}px, 0)`;
-          label.style.transform = `translate3d(${(x * 0.42).toFixed(3)}px, ${(y * 0.42).toFixed(3)}px, 0)`;
+          if (label)
+            label.style.transform = `translate3d(${(x * 0.42).toFixed(3)}px, ${(y * 0.42).toFixed(3)}px, 0)`;
           if (
             Math.abs(targetX - x) +
               Math.abs(targetY - y) +
@@ -97,17 +88,31 @@ export function installBlobNavigation() {
         const start = () => {
           if (!frame) frame = requestAnimationFrame(tick);
         };
-        slot.addEventListener(
+        const listener = corner ? document : slot;
+        const leave = () => {
+          targetX = targetY = 0;
+          if (frame || x || y) start();
+        };
+        listener.addEventListener(
           "pointermove",
-          (event) => {
+          (rawEvent) => {
+            const event = rawEvent as PointerEvent;
             if (
               !motion.matches ||
-              pausedByUser ||
               event.pointerType === "touch" ||
               document.activeElement === link
             )
               return;
             const rect = slot.getBoundingClientRect();
+            const nx =
+              (event.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+            const ny =
+              (event.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+            // Decoration follows nearby pointer movement without stealing clicks.
+            if (corner && nx * nx + ny * ny > 1.2) {
+              leave();
+              return;
+            }
             // Hit target stays still; only the visual body and label move.
             targetX =
               Math.max(
@@ -117,7 +122,7 @@ export function installBlobNavigation() {
                   (event.clientX - rect.left - rect.width / 2) /
                     (rect.width / 2),
                 ),
-              ) * 10;
+              ) * (corner ? 16 : 10);
             targetY =
               Math.max(
                 -1,
@@ -126,20 +131,13 @@ export function installBlobNavigation() {
                   (event.clientY - rect.top - rect.height / 2) /
                     (rect.height / 2),
                 ),
-              ) * 10;
+              ) * (corner ? 16 : 10);
             start();
           },
           { signal, passive: true },
         );
-        slot.addEventListener(
-          "pointerleave",
-          () => {
-            targetX = targetY = 0;
-            if (frame || x || y) start();
-          },
-          { signal },
-        );
-        link.addEventListener("focus", reset, { signal });
+        listener.addEventListener("pointerleave", leave, { signal });
+        link?.addEventListener("focus", reset, { signal });
       }
       refresh();
     }

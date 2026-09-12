@@ -62,6 +62,11 @@ const writing = nav.find((item) => item.label === "Writing");
       margin-bottom: calc(-1 * var(--home-nav-overlap));
     }
   }
+  @media (min-width: 62.501rem) {
+    .site-header:not(.is-home) {
+      margin-bottom: calc(-1 * var(--inner-nav-overlap));
+    }
+  }
   @media (max-width: 40.625rem) {
     .site-header {
       flex-wrap: wrap;

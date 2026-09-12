@@ -1,5 +1,5 @@
 ---
-// Unique specimen: Burooj's photo, off-axis oval, peach border, personal caption.
+// Unique specimen: Burooj's photo, circular peach frame, personal caption.
 import Link from "../primitives/Link.astro";
 ---
 
@@ -27,12 +27,12 @@ import Link from "../primitives/Link.astro";
   }
   img {
     width: 100%;
-    height: var(--portrait-height);
+    height: auto;
+    aspect-ratio: 1;
     object-fit: cover;
     object-position: var(--portrait-position);
     border: var(--portrait-border) solid var(--color-surface-strong);
-    border-radius: var(--radius-portrait);
-    transform: var(--portrait-rotation);
+    border-radius: var(--radius-round);
   }
   figcaption {
     padding: 0;
@@ -40,11 +40,6 @@ import Link from "../primitives/Link.astro";
     margin-top: var(--space-m);
     text-align: center;
     color: var(--color-text-soft);
-  }
-  @media (max-width: 62.5rem) {
-    img {
-      height: var(--portrait-height-mid);
-    }
   }
   @media (max-width: 40.625rem) {
     figure {
@@ -55,7 +50,6 @@ import Link from "../primitives/Link.astro";
     }
     img {
       width: var(--portrait-width-compact);
-      height: var(--portrait-height-compact);
       border-width: var(--space-2xs);
       flex-shrink: 0;
     }

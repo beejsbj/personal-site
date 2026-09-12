@@ -8,12 +8,9 @@ const { email } = Astro.props;
 
 <footer class="site-footer shell">
   <span>Burooj Rashid</span>
-  <Link href={`mailto:${email}`} arrow>
-    {email}
-  </Link>
-  <Link href="/resume" arrow>
-    Resume
-  </Link>
+  <Link href={`mailto:${email}`}>{email}</Link>
+  <Link href="/resume">Resume</Link>
+  <Link href="/style-guide">Style guide</Link>
   <span class="thanks">Thanks for stopping by.</span>
 </footer>
 <style>

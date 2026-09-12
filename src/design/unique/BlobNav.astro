@@ -41,9 +41,6 @@ const current = (href: string) =>
       </li>
     ))}
   </ul>
-  <button class="blob-nav__motion" type="button" aria-pressed="false" hidden>
-    Pause motion
-  </button>
 </nav>
 
 <script>
@@ -84,21 +81,21 @@ const current = (href: string) =>
     left: 57%;
     top: 11%;
     --float-delay: -1.7s;
-    --float-duration: calc(var(--duration-blob-rest) * 1.2);
+    --float-duration: calc(var(--duration-blob-rest) * 0.9);
   }
   .blob-nav__slot--3 {
     width: 40%;
     left: 1%;
     top: 47%;
     --float-delay: -3.1s;
-    --float-duration: calc(var(--duration-blob-rest) * 1.4);
+    --float-duration: calc(var(--duration-blob-rest) * 0.8);
   }
   .blob-nav__slot--4 {
     width: 44%;
     left: 48%;
     top: 54%;
     --float-delay: -2.3s;
-    --float-duration: calc(var(--duration-blob-rest) * 1.6);
+    --float-duration: var(--duration-blob-rest);
   }
   .blob-nav__slot:focus-within {
     z-index: 2;
@@ -153,22 +150,6 @@ const current = (href: string) =>
     color: var(--color-surface-strong);
     transform: scale(var(--press-scale));
   }
-  .blob-nav__motion {
-    display: block;
-    margin: var(--space-s) 0 0 auto;
-    padding: var(--space-xs) var(--space-s);
-    font: inherit;
-    font-size: var(--text-xs);
-    line-height: var(--leading-body);
-    color: var(--color-text-soft);
-    background: transparent;
-    border: var(--rule-width) solid var(--color-border);
-    border-radius: var(--radius-note);
-    cursor: pointer;
-  }
-  .blob-nav__motion[hidden] {
-    display: none;
-  }
   @media (hover: hover) and (pointer: fine) {
     .blob-nav__link:hover .blob-nav__body {
       background: var(--color-accent-hover);
@@ -183,7 +164,7 @@ const current = (href: string) =>
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
     .blob-nav[data-motion="running"] .blob-nav__float {
       animation: blob-rest var(--float-duration) ease-in-out var(--float-delay)
-        infinite;
+        1;
     }
     .blob-nav:has(.blob-nav__link:focus-visible) .blob-nav__float {
       animation-play-state: paused;
@@ -202,7 +183,7 @@ const current = (href: string) =>
   @keyframes blob-rest {
     0%,
     100% {
-      transform: translateY(-2%);
+      transform: translateY(0);
     }
     50% {
       transform: translateY(2%);
@@ -257,11 +238,6 @@ const current = (href: string) =>
       background: LinkText;
       color: Canvas;
       border-color: LinkText;
-    }
-    .blob-nav__motion {
-      border-color: ButtonText;
-      color: ButtonText;
-      background: ButtonFace;
     }
   }
 </style>

@@ -3,6 +3,7 @@ import { getEntry } from "astro:content";
 import { ClientRouter } from "astro:transitions";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import EdgeBlob from "../design/unique/EdgeBlob.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -58,6 +59,7 @@ const socialImage = new URL(image, siteBaseUrl).toString();
       Skip to content
     </a>
     <div class="site-frame">
+      <EdgeBlob />
       <SiteHeader
         nav={site.nav}
         currentPath={Astro.url.pathname}
