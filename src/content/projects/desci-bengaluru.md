@@ -13,12 +13,10 @@ featured: false
 status: "selected"
 cover: "/images/projects/desci-bengaluru.png"
 links:
-  -
-    label: "Live Link"
+  - label: "Live Link"
     url: "https://desci-bangalore.netlify.app/"
 media:
-  -
-    type: "image"
+  - type: "image"
     src: "/images/projects/desci-bengaluru.png"
     alt: "Bengaluru DeSci World cover image"
 order: 2

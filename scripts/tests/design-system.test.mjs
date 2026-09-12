@@ -79,8 +79,8 @@ test("every token and design component has a consumer", () => {
   }
 });
 
-test("guide imports production assemblies and keeps archived style-guide routing", () => {
-  const guide = read("src/pages/design-system.astro");
+test("dedicated style guide imports production assemblies and keeps design-system as an alias", () => {
+  const guide = read("src/pages/style-guide.astro");
   for (const component of [
     "WelcomeHero",
     "ProjectRow",
@@ -95,10 +95,10 @@ test("guide imports production assemblies and keeps archived style-guide routing
     assert.match(guide, new RegExp(`import ${component} from`));
   }
   assert.match(
-    read("src/pages/style-guide.astro"),
-    /Astro.redirect\("\/lab\/style-guide", 301\)/,
+    read("src/pages/design-system.astro"),
+    /Astro.redirect\("\/style-guide", 301\)/,
   );
-  const built = read("dist/client/design-system/index.html");
+  const built = read("dist/client/style-guide/index.html");
   assert.match(built, /noindex, follow/);
   assert.match(
     built,
@@ -113,6 +113,11 @@ test("guide imports production assemblies and keeps archived style-guide routing
   assert.equal((built.match(/<h1\b/g) || []).length, 1);
   assert.match(built, /Burooj here!/);
   assert.doesNotMatch(read("dist/client/sitemap-0.xml"), /\/design-system\//);
+  assert.doesNotMatch(built, /Pause motion/);
+  assert.match(
+    read("dist/client/design-system/index.html"),
+    /http-equiv="refresh"/,
+  );
 });
 
 test("all generated pages have shared chrome and resolving local links and media", () => {

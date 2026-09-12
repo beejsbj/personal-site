@@ -11,13 +11,9 @@ tools:
 featured: false
 status: "selected"
 cover: "/images/projects/pizza-nano.png"
-links:
-  -
-    label: "Live Link"
-    url: "https://pizzanano.ca"
+links: []
 media:
-  -
-    type: "image"
+  - type: "image"
     src: "/images/projects/pizza-nano.png"
     alt: "Pizza Nano cover image"
 order: 3

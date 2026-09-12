@@ -8,13 +8,13 @@ interface Props {
   summary: string;
   type: string;
   sourceEra: string;
-  cover: string;
+  cover?: string;
 }
 const { href, title, summary, type, sourceEra, cover } = Astro.props;
 ---
 
 <article class="lab-card">
-  <MediaFrame src={cover} alt="" fit="cover" />
+  {cover && <MediaFrame src={cover} alt="" fit="cover" />}
   <p class="meta">
     {type} · {sourceEra}
   </p>

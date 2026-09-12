@@ -14,27 +14,21 @@ featured: true
 status: "selected"
 cover: "/images/projects/lottery-app.jpg"
 links:
-  -
-    label: "Lottery Demo"
+  - label: "Lottery Demo"
     url: "https://qrng-lottery.vercel.app/"
-  -
-    label: "Lottery Source"
+  - label: "Lottery Source"
     url: "https://github.com/beejsbj/qrng-lottery"
-  -
-    label: "Roulette Demo"
+  - label: "Roulette Demo"
     url: "https://qrng-roulette.vercel.app/"
-  -
-    label: "Roulette Source"
+  - label: "Roulette Source"
     url: "https://github.com/beejsbj/qrng-roulette"
 media:
-  -
-    type: "image"
+  - type: "image"
     src: "/images/projects/lottery-app.jpg"
     alt: "QRNG lottery demo interface"
     width: 2000
     height: 1288
-  -
-    type: "image"
+  - type: "image"
     src: "/images/projects/roulette-app.jpg"
     alt: "QRNG roulette demo interface"
     width: 2000

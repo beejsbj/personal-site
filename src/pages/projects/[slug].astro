@@ -30,7 +30,7 @@ const { Content } = await projectEntry.render();
 >
   <section class="shell entry-page">
     <PageHeader
-      eyebrow="Project"
+      eyebrow={projectEntry.data.kind}
       title={projectEntry.data.title}
       intro={projectEntry.data.summary}
     />
@@ -70,5 +70,10 @@ const { Content } = await projectEntry.render();
     <article class="prose">
       <Content />
     </article>
+    <div class="entry-page__links">
+      <Link href="/projects" arrow>
+        Back to all projects
+      </Link>
+    </div>
   </section>
 </BaseLayout>

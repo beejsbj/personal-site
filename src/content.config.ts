@@ -26,6 +26,7 @@ const pageSchema = z.object({
 const projectSchema = z.object({
   title: z.string(),
   summary: z.string(),
+  kind: z.enum(["Project", "Arcade"]).default("Project"),
   year: z.number(),
   dateLabel: z.string(),
   role: z.string(),
@@ -46,7 +47,8 @@ const labSchema = z.object({
   summary: z.string(),
   type: z.string(),
   sourceEra: z.string(),
-  cover: z.string(),
+  cover: z.string().optional(),
+  href: z.string().url().optional(),
   links: z.array(linkSchema).default([]),
   media: z.array(mediaSchema).default([]),
   order: z.number().default(100),

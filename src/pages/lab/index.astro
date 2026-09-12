@@ -4,33 +4,32 @@ import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import LabCard from "../../components/LabCard.astro";
-
+import Link from "../../design/primitives/Link.astro";
 const entries: CollectionEntry<"lab">[] = (await getCollection("lab"))
   .filter((entry: CollectionEntry<"lab">) => !entry.data.hidden)
   .sort(
-    (left: CollectionEntry<"lab">, right: CollectionEntry<"lab">) =>
-      left.data.order - right.data.order,
+    (a: CollectionEntry<"lab">, b: CollectionEntry<"lab">) =>
+      a.data.order - b.data.order,
   );
 ---
 
 <BaseLayout
   title="Lab"
-  description="Experiments, student work, and design-system explorations by Burooj Rashid."
+  description="Little experiments in SVG, motion, sound, and interaction by Burooj Rashid."
   pageClass="page-lab"
 >
   <section class="shell page-section page-section--header">
     <PageHeader
       eyebrow="Lab"
-      title="The experiments stay visible, just in the right room."
-      intro="This is where the earlier work, design-system thinking, and more exploratory pieces live."
+      title="Small things. Room to play."
+      intro="A line that draws itself. Shapes that keep a beat. Little experiments in how the web can look, move, and feel."
     />
   </section>
-
-  <section class="shell page-section">
+  <section class="shell page-section" aria-label="Selected experiments">
     <div class="lab-grid lab-grid--dense">
       {entries.map((entry) => (
         <LabCard
-          href={`/lab/${entry.slug}`}
+          href={entry.data.href || `/lab/${entry.slug}`}
           title={entry.data.title}
           summary={entry.data.summary}
           type={entry.data.type}
@@ -39,5 +38,26 @@ const entries: CollectionEntry<"lab">[] = (await getCollection("lab"))
         />
       ))}
     </div>
+    <p class="lab-more">
+      <Link href="https://codepen.io/beejsbj" arrow>
+        More sketches on CodePen
+      </Link>
+    </p>
+    <p class="lab-aside">
+      Looking for the bigger pieces? The learning arcade and applications live
+      in <Link href="/projects">Projects</Link>. This site's visual foundations
+      have their own <Link href="/style-guide">Style Guide</Link>.
+    </p>
   </section>
 </BaseLayout>
+<style>
+  .lab-more {
+    margin-top: var(--space-2xl);
+  }
+  .lab-aside {
+    margin-top: var(--space-m);
+    max-width: var(--reading-width);
+    font-size: var(--text-copy);
+    color: var(--color-text-soft);
+  }
+</style>

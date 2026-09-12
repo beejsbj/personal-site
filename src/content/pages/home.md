@@ -1,11 +1,11 @@
 ---
 title: Burooj Rashid | Frontend Developer
-description: Selected frontend work, interface experiments, and living systems by Burooj Rashid.
+description: Burooj Rashid makes places on the web. Explore frontend projects, interface experiments, writing, and updates from around the web.
 eyebrow: Frontend Developer
-headline: I build useful interfaces with a strong point of view.
-intro: I build expressive web interfaces where interaction, storytelling, and maintainable systems meet.
+headline: Burooj here!
+intro: I'm a frontend developer, and I make places on the web.
 ---
 
-I care about the part of frontend work where visual taste and implementation discipline meet. The goal is not only to make something look good, but to make it clear, alive, and easy to keep improving.
+Welcome to my home on the internet. Feel free to look around!
 
-This site brings lasting **Projects** together with the smaller experiments in **Lab** and dated notes about what is changing now.
+There's a history of my **projects**, smaller experiments in the **lab**, and **updates** from the things I'm making and doing around the web.

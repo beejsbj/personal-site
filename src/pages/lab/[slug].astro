@@ -8,7 +8,7 @@ import Link from "../../design/primitives/Link.astro";
 
 export async function getStaticPaths() {
   const entries = (await getCollection("lab")).filter(
-    (entry: CollectionEntry<"lab">) => !entry.data.hidden,
+    (entry: CollectionEntry<"lab">) => !entry.data.hidden && !entry.data.href,
   );
   return entries.map((entry: CollectionEntry<"lab">) => ({
     params: { slug: entry.slug },

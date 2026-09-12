@@ -1,6 +1,88 @@
 # Base homepage: warm welcome
 
-## Current pass — 12 September: recover the interaction character
+## Current pass — 12 September: tighten the standalone portfolio
+
+The base must work as a portfolio on its own. This pass responds to Burooj's
+latest review: retain v1's small interaction details, fix links and portrait,
+strengthen inner pages, and separate projects, experiments, and activity.
+The refinements still need his visual review; approval of A does not automatically
+approve every new detail.
+
+### Design and interaction
+
+- Keep v1/v2's warm paper, burgundy, peach, Newsreader/Lato, greeting, curved line,
+  uneven navigation cluster, and offset shadows.
+- Preserve menu current, hover, pressed, keyboard-focus, and magnetic states.
+  Resting movement is a finite opening drift, not endless animation. There is no
+  Pause motion control. Touch and Reduced Motion stay static.
+- The cropped top-left decorative blob also responds to nearby pointer movement;
+  it does not become a hidden navigation control.
+- Links use clear underlines and small inline arrows, without the rejected dots
+  or oversized arrow blocks. Peach project-media brackets remain a separate detail.
+- The portrait has a circular crop and peach border, not the elongated oval.
+- Shared tokens, production components, and shared header/footer remain the
+  authority. The dedicated, noindexed guide is `/style-guide`, not a Lab entry;
+  `/design-system` is the compatibility alias.
+
+### Page and content roles
+
+- **Home:** authored introduction, selected project highlights, current note,
+  mixed activity. Highlights are not the complete project inventory.
+- **Projects:** six-entry timeline: Conduit Market (2025), API3 Ecosystem (2024),
+  Flash Cards and QRNG Demo Apps (2022), Exercises for Programmers and Layout
+  Garden (2021). The last two are Arcade projects; Flash Cards is a project.
+  Detail pages explain contribution and preserve archive/demo boundaries.
+- **Lab:** selected CodePen experiments, Motion Path Graph and Beating Shapes.
+  Source attribution stays visible; browsing the base needs no live embeds.
+- **About and Resume:** recovered public portfolio wording, specific work,
+  Conduit 2025, and direct contact. No stale current-employment/enrolment claims.
+  See [copy provenance](portfolio-copy-sources.md) for sources and historical
+  facts still needing Burooj's confirmation.
+- **Footer:** consistent contact, Resume, and Style guide access. Writing remains
+  an external destination.
+
+Pizza Nano and DeSci remain historical work, not newly published case studies
+with missing media. The former Pizza Nano domain has been repurposed and is not
+a safe portfolio destination.
+
+### Activity is a snapshot, not a service
+
+The six current records are curated content files. Some carry public GitHub
+evidence and observation times; older records are preserved site updates.
+There are no live agent counts, location, or service telemetry. Expiry filtering
+occurs at build/render time only. The future hook- and agent-facing system needs
+its own issue, captured in [the activity-system brief](activity-system-brief.md);
+it is not implemented by this cleanup.
+
+### Verification and scope
+
+Integrated verification on 12 September: Astro check passed for 45 files with
+zero diagnostics; build and all 22 tests passed; `git diff --check` was clean.
+An incremental content sync emitted one duplicate-ID cache warning for
+`component-guide`; the source inventory contains one such record and the following
+production build emitted no duplicate warning.
+
+The parent inspected desktop/mobile Home, Projects, Lab and Style Guide in the
+browser, and checked main routes at 320/768/1000px for overflow and missing images.
+The portrait measured 220×220px on desktop and 132×132px on mobile; link arrows
+measured about 10px. Actual pointer movement pulled the corner surface about 13px.
+Live Reduced Motion and touch emulation stopped drift and attraction. The independent
+auditor checked 12 routes at 320/390/768px with no document overflow or broken
+images, and exercised the skip link, focus rings and keyboard navigation.
+
+Audit verdict: coherent as a standalone portfolio. Remaining editorial gaps are
+Conduit's brief case study, branding/artwork covers rather than interface evidence,
+and confirmation of historical resume dates. CodePen sources and showcase previews
+were inspected, but their externally hosted demos were not fully runtime-verified.
+
+No prism, automated publication service, deployment, or broad archive removal is
+part of this pass.
+
+## Historical interaction pass — earlier on 12 September
+
+The following records the first restoration. Its continuous drift, Pause/Resume,
+link dots, and guide routing are superseded by the current pass above. Its test
+counts and browser results are historical receipts, not current verification.
 
 **Direction:** chosen under delegated authority following Burooj's request to
 retain more v1 micro-details and make updates a broad notification stream.
@@ -58,6 +140,8 @@ Live integrations are a separate follow-up. The remaining v1 photo constellation
 page transitions and click-to-scroll decorative circle are documented references,
 not silently restored features. No temporary prototype artifacts remain.
 
+## Historical selection and system baseline — 11 September
+
 Burooj selected iteration A on 2026-09-11: “A is good implement it as base.”
 
 The homepage adopts the v1/v2 warm paper, burgundy, peach circular navigation,
@@ -76,9 +160,9 @@ Run `corepack pnpm@10.6.5 dev --host 0.0.0.0 --port 4321` and open `/`.
 Verify with `corepack pnpm@10.6.5 check`, `corepack pnpm@10.6.5 build`, then
 `corepack pnpm@10.6.5 test`. The tests check generated production HTML, metadata,
 landmarks, links/assets on all pages, comparison removal, component consumers,
-and token cohesion. The live style guide is `/design-system`; it imports the
-production components and is noindexed. `/style-guide` retains its historical
-redirect to `/lab/style-guide`.
+and token cohesion. At this baseline, the style guide lived at `/design-system`
+and `/style-guide` redirected to `/lab/style-guide`. The current pass supersedes
+that routing: `/style-guide` is the dedicated canonical guide.
 
 ## 11 September baseline review (before the interaction restoration above)
 

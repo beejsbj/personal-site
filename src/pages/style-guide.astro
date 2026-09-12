@@ -1,3 +1,403 @@
 ---
-return Astro.redirect("/lab/style-guide", 301);
+import { getCollection, getEntry } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Heading from "../design/primitives/Heading.astro";
+import Link from "../design/primitives/Link.astro";
+import MediaFrame from "../design/primitives/MediaFrame.astro";
+import Note from "../design/primitives/Note.astro";
+import TagList from "../design/primitives/TagList.astro";
+import WelcomeHero from "../design/compositions/WelcomeHero.astro";
+import CurvedArrow from "../design/unique/CurvedArrow.astro";
+import CurrentNote from "../design/compounds/CurrentNote.astro";
+import UpdateEntry from "../design/compounds/UpdateEntry.astro";
+import ActivityStream from "../design/compounds/ActivityStream.astro";
+import BlobNav from "../design/unique/BlobNav.astro";
+import SectionHeading from "../design/compounds/SectionHeading.astro";
+import ProjectRow from "../components/ProjectRow.astro";
+import ProjectTimeline from "../components/ProjectTimeline.astro";
+import LabCard from "../components/LabCard.astro";
+import PageHeader from "../components/PageHeader.astro";
+import SectionIntro from "../components/SectionIntro.astro";
+import MediaRail from "../components/MediaRail.astro";
+const site = (await getEntry("site", "config"))!.data;
+const project = (await getCollection("projects")).find(
+  (entry: CollectionEntry<"projects">) =>
+    entry.data.featured && !entry.data.hidden,
+)!;
+const lab = (await getCollection("lab")).find(
+  (entry: CollectionEntry<"lab">) => !entry.data.hidden,
+)!;
+const update = (await getCollection("updates"))[0];
+const updates = (await getCollection("updates")).map(
+  (entry: CollectionEntry<"updates">) => entry.data,
+);
+const colors = [
+  ["Paper", "--color-page"],
+  ["Burgundy", "--color-accent"],
+  ["Peach", "--color-surface-strong"],
+  ["Note", "--color-surface"],
+  ["Ink", "--color-text"],
+  ["Quiet ink", "--color-text-soft"],
+  ["Rule", "--color-border"],
+];
+const anatomy = [
+  [
+    "BlobNav",
+    "Stable hit target → floating shell → magnetic surface → label",
+    "Singular unequal cluster; current / hover / focus / press",
+    "Native links first. Finite opening drift and fine-pointer magnetism; reduced motion and touch stay still. The cropped corner also follows nearby pointers without intercepting clicks.",
+  ],
+  [
+    "Link",
+    "Label → optional decorative arrow",
+    "Text / circle / action; paper / wine; sm / md / lg",
+    "Native navigation; hover, focus, press, current, disabled. Disabled is a span.",
+  ],
+  [
+    "Heading",
+    "Semantic heading → text or Link slot",
+    "Display / page / section / card / label; level 1–4",
+    "Level does not change visual scale. No interactive behavior.",
+  ],
+  [
+    "MediaFrame",
+    "Textured surround → image",
+    "Contain / cover",
+    "Reserved media space. Optional pointer shortcut beside an accessible title link; no duplicate tab stop.",
+  ],
+  [
+    "Note",
+    "Peach silhouette → arbitrary content slot",
+    "One canonical note shape",
+    "Passive. No button behavior or card shadow.",
+  ],
+  [
+    "TagList",
+    "Labeled list → items + editorial separators",
+    "One metadata recipe",
+    "Not controls; never styled like clickable filters.",
+  ],
+  [
+    "ProjectRow",
+    "MediaFrame + Heading/Link + summary + TagList",
+    "Row / stack",
+    "Featured work on Home and this guide; ProjectTimeline uses the same primitives for the full chronology.",
+  ],
+  [
+    "CurrentNote / UpdateEntry",
+    "Note + Heading + Link / event glyph + sentence + date + provenance",
+    "Canonical current note / mixed notification stream",
+    "Projects persist; updates mark anything that changed. Curated events are not live presence.",
+  ],
+  [
+    "SectionHeading / PageHeader / SectionIntro",
+    "Heading + optional context and Link",
+    "Section navigation / page title / compact intro",
+    "Never duplicate heading typography in the wrapper.",
+  ],
+  [
+    "LabCard / MediaRail",
+    "MediaFrame + Heading/Link / image-video sequence",
+    "Lab listing / detail media",
+    "Video has native controls, no autoplay.",
+  ],
+  [
+    "SiteHeader / SiteFooter",
+    "Identity + BlobNav + utilities / identity + contact Links",
+    "Same shared chrome on every route",
+    "Active route is semantic; Resume remains available in footer.",
+  ],
+];
 ---
+
+<BaseLayout
+  title="Style Guide"
+  description="The warm welcome design language used by Burooj's site."
+  noindex
+  clientRouting={false}
+>
+  <div class="guide shell">
+    <PageHeader
+      eyebrow="Living style guide"
+      title="A warm welcome, all the way down."
+      intro="Not a separate mockup. Every specimen below imports the components used by the site."
+    />
+
+    <section class="direction" aria-labelledby="direction-title">
+      <Heading id="direction-title">
+        Direction: the familiar, slightly off-axis home.
+      </Heading>
+      <p>
+        Approved A, grounded in versions/v1 + v2: burgundy on warm paper, peach
+        circular wayfinding, Newsreader display type and light Lato. A large
+        personal greeting leads; projects carry the substance; the notification
+        stream shares smaller changes from around Burooj's internet.
+      </p>
+      <p>
+        We considered the activity-first desk and the navigation-first circular
+        index. The welcome stays because it is the direction Burooj selected.
+        Systematizing it must not flatten its portrait, curve, or generous first
+        screen.
+      </p>
+    </section>
+
+    <section class="specimen" aria-labelledby="hero-specimen">
+      <SectionHeading
+        id="hero-specimen"
+        title="The hero, in context"
+        href="/"
+        linkLabel="Actual homepage"
+      />
+      <WelcomeHero social={site.social} level={2} id="guide-welcome" />
+      <CurvedArrow />
+      <p class="annotation">
+        Composition → WelcomeHero imports Heading, Link, and the singular
+        Portrait. The curved arrow is preserved artwork, not a configurable icon
+        family.
+      </p>
+    </section>
+
+    <section class="specimen" aria-labelledby="foundations">
+      <SectionHeading id="foundations" title="Foundations" />
+      <div class="swatches">
+        {colors.map(([name, token]) => (
+          <div>
+            <div class="swatch" style={`background:var(${token})`}></div>
+            <strong>{name}</strong>
+            <code>{token}</code>
+          </div>
+        ))}
+      </div>
+      <div class="type-specimens">
+        <Heading level={3} scale="page">
+          Newsreader gives the page its voice.
+        </Heading>
+        <p class="type-body">
+          Lato does the everyday work: introductions, metadata, navigation, and
+          notes.
+        </p>
+        <TagList
+          items={["Quiet metadata", "Readable detail", "No decorative pills"]}
+          label="Metadata specimen"
+        />
+      </div>
+      <p class="annotation">
+        Shared colors, type scales, spacing, focus rings and motion timing live
+        in src/design/tokens.css. BlobNav owns its singular constellation
+        geometry and spring mechanics. Responsive contracts are 40.625rem and
+        62.5rem. Native media conditions cannot consume custom properties.
+      </p>
+    </section>
+
+    <section class="specimen" aria-labelledby="controls">
+      <SectionHeading id="controls" title="Links and wayfinding" />
+      <BlobNav nav={site.nav} currentPath="/" label="Navigation specimen" />
+      <p class="annotation">
+        v1's unequal cluster, soft offset shadows and burgundy current location.
+        Move a mouse across the shapes: the surface and label follow separately,
+        then settle back. Opening drift settles within five seconds; touch and
+        Reduced Motion keep the menu still. Every destination works without
+        JavaScript.
+      </p>
+      <div class="specimen-row">
+        <Link href="/about" arrow>
+          A text link
+        </Link>
+        <Link href="/projects" treatment="action" tone="wine">
+          See projects
+        </Link>
+        <Link href="/about" treatment="action">
+          About
+        </Link>
+        <Link href="/" treatment="action" disabled>
+          Unavailable
+        </Link>
+      </div>
+      <div class="specimen-row" aria-label="Circular link variants">
+        <Link href="/lab" treatment="circle" size="sm">
+          Lab
+        </Link>
+        <Link href="/about" treatment="circle">
+          About
+        </Link>
+        <Link href="/projects" treatment="circle" size="lg" tone="wine">
+          Projects
+        </Link>
+        <Link href="/style-guide" treatment="circle" current>
+          Current
+        </Link>
+        <Link href="/" treatment="circle" disabled>
+          Disabled
+        </Link>
+      </div>
+      <p class="annotation">
+        Text links use a quiet underline and small directional arrows. Outbound
+        arrows lift with the pointer. Tab has a visible ring. These are the
+        primitive circle variants; BlobNav above owns the singular clustered
+        composition.
+      </p>
+    </section>
+
+    <section class="specimen" aria-labelledby="assemblies">
+      <SectionHeading id="assemblies" title="From parts to real content" />
+      <div class="assembly-grid">
+        <div>
+          <ProjectRow {...project.data} href={`/projects/${project.slug}`} />
+          <ProjectRow
+            {...project.data}
+            href={`/projects/${project.slug}`}
+            layout="stack"
+          />
+        </div>
+        <div>
+          <CurrentNote id="guide-currently" />
+          <div class="spaced">
+            <UpdateEntry {...update.data} detailed />
+          </div>
+          <ActivityStream updates={updates} />
+          <Note>
+            <p>
+              A note can hold arbitrary content without inventing a new card
+              style.
+            </p>
+          </Note>
+        </div>
+      </div>
+      <div class="assembly-grid spaced">
+        <LabCard {...lab.data} href={lab.data.href ?? `/lab/${lab.slug}`} />
+        <div>
+          <MediaFrame src={project.data.cover} alt="Project art specimen" />
+          <SectionIntro
+            title="A smaller section title"
+            compact
+            intro="The same heading grammar serves secondary sections."
+          />
+          <MediaRail media={project.data.media.slice(0, 1)} />
+        </div>
+      </div>
+    </section>
+
+    <section class="specimen" aria-labelledby="timeline-specimen">
+      <SectionHeading
+        id="timeline-specimen"
+        title="Work, over time"
+        href="/projects"
+        linkLabel="Full timeline"
+      />
+      <ProjectTimeline projects={[project]} />
+    </section>
+
+    <section class="specimen" aria-labelledby="anatomy">
+      <SectionHeading id="anatomy" title="Anatomy and contracts" />
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Parts / slots</th>
+              <th>Variants</th>
+              <th>State and boundary</th>
+            </tr>
+          </thead>
+          <tbody>
+            {anatomy.map((row) => (
+              <tr>
+                {row.map((cell) => (
+                  <td>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="annotation">
+        Shared colors and geometry belong to tokens; interaction belongs to its
+        public component; assemblies import their children. The portrait, curve
+        and blob constellation stay singular. Do not paste circle-link markup
+        into a page, put raw palette values in a composition, or fork project
+        rows for this guide.
+      </p>
+    </section>
+  </div>
+</BaseLayout>
+<style>
+  .guide {
+    padding-top: var(--space-2xl);
+  }
+  .direction {
+    display: grid;
+    gap: var(--space-m);
+    margin-top: var(--space-2xl);
+    padding: var(--space-l);
+    border-left: var(--focus-width) solid var(--color-accent);
+    max-width: var(--reading-width);
+  }
+  .specimen {
+    padding-top: var(--space-2xl);
+    margin-top: var(--space-2xl);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .annotation {
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+    margin-top: var(--space-l);
+    max-width: var(--reading-width);
+  }
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--circle-lg), 1fr));
+    gap: var(--space-m);
+  }
+  .swatch {
+    height: var(--circle-lg);
+    border: var(--rule-width) solid var(--color-border);
+  }
+  .swatches code {
+    display: block;
+    font-size: var(--text-xs);
+    overflow-wrap: anywhere;
+  }
+  .type-specimens {
+    display: grid;
+    gap: var(--space-m);
+    margin-top: var(--space-2xl);
+  }
+  .type-body {
+    font-size: var(--text-lead);
+  }
+  .specimen-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-l);
+    margin-block: var(--space-l);
+  }
+  .assembly-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--rail-width);
+    gap: var(--space-xl);
+  }
+  .spaced {
+    margin-top: var(--space-xl);
+  }
+  .table-scroll {
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+  th,
+  td {
+    padding: var(--space-s);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: var(--rule-width) solid var(--color-border);
+  }
+  @media (max-width: 40.625rem) {
+    .assembly-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
