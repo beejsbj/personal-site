@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import WelcomeHero from "../design/compositions/WelcomeHero.astro";
-import CurvedArrow from "../design/unique/CurvedArrow.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
@@ -18,21 +17,22 @@ const { projects, updates, site } = Astro.props;
 
 <div class="home-composition shell">
   <WelcomeHero social={site.social} />
-  <CurvedArrow />
   <div class="below">
-    <section aria-labelledby="home-projects">
+    <section class="selected-work" aria-labelledby="home-projects">
       <SectionHeading
         id="home-projects"
         title="Some things I've built"
         href="/projects"
         linkLabel="All projects"
       />
-      {projects.map((project) => (
-        <ProjectRow {...project} />
+      {projects.map((project, index) => (
+        <ProjectRow {...project} layout={index === 0 ? "feature" : "row"} />
       ))}
     </section>
     <aside aria-label="Current work and updates">
-      <CurrentNote />
+      <div class="current-note">
+        <CurrentNote variant="plain" />
+      </div>
       <section class="updates" aria-labelledby="home-updates">
         <SectionHeading id="home-updates" title="Recent updates" />
         <ActivityStream updates={updates} />
@@ -62,9 +62,21 @@ const { projects, updates, site } = Astro.props;
   .below {
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--rail-width);
-    gap: var(--space-3xl);
+    gap: var(--space-2xl);
     border-top: var(--rule-width) solid var(--color-border);
     padding-top: var(--space-xl);
+  }
+  .below > aside {
+    border-left: var(--rule-width) solid var(--color-border);
+    padding-left: var(--space-l);
+  }
+  .current-note {
+    padding: 0 0 var(--space-l);
+    border-bottom: var(--rule-width) solid var(--color-border);
+  }
+  .selected-work :global(.project-row:first-of-type) {
+    border-top: 0;
+    padding-top: 0;
   }
   .updates {
     padding-top: var(--space-l);
@@ -91,6 +103,12 @@ const { projects, updates, site } = Astro.props;
     .below,
     .elsewhere {
       grid-template-columns: 1fr;
+    }
+    .below > aside {
+      border-left: 0;
+      padding-left: 0;
+      border-top: var(--rule-width) solid var(--color-border);
+      padding-top: var(--space-xl);
     }
     .elsewhere {
       gap: var(--space-l);

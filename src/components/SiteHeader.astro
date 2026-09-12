@@ -57,7 +57,7 @@ const writing = nav.find((item) => item.label === "Writing");
     margin-top: var(--space-s);
     font-size: var(--text-sm);
   }
-  @media (min-width: 40.626rem) {
+  @media (min-width: 62.501rem) {
     .site-header.is-home {
       margin-bottom: calc(-1 * var(--home-nav-overlap));
     }
@@ -87,6 +87,9 @@ const writing = nav.find((item) => item.label === "Writing");
     }
     .site-header :global(.blob-nav) {
       margin-left: auto;
+    }
+    .site-header.is-home :global(.blob-nav) {
+      width: var(--home-nav-width-compact);
     }
   }
 </style>

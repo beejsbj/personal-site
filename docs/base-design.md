@@ -1,5 +1,36 @@
 # Base homepage: warm welcome
 
+## Composition revision — 12 September, after visual rejection
+
+Burooj rejected the current homepage as a weak design base. The earlier
+standalone-portfolio audit established usability and content structure, not
+visual approval. His screenshot showed a disconnected introduction and
+navigation/portrait stack, very small secondary text, an unearned empty middle,
+and work appearing below the first desktop screen.
+
+A fresh implementation agent revised the composition under delegated authority.
+The desktop portrait now sits beside the introduction, with a smaller display
+headline, 18px introduction and 16px social links. The first project uses the
+shared `ProjectRow` feature layout; the current-work column uses the public
+`CurrentNote`/`Note` plain variant. The floating arrow remains a guide specimen
+but no longer separates introduction from work. A's palette, type and unequal
+magnetic navigation remain. Mobile places the portrait beside the compact menu;
+tablet deliberately allows more vertical space instead of squeezing text.
+
+Both agent and parent inspected browser screenshots. At 1280×720 the first
+project title moved from about 844px to 584px, with artwork and summary now in
+the opening screen. Parent checked seven shared routes at 390/768/1000/1280px:
+no document overflow or broken images, one h1 per page. Additional 320px home
+inspection confirmed the portrait and navigation do not overlap. A mobile
+absolute-position/grid-row collision was found and fixed during review.
+Astro check passed for 45 files with zero diagnostics; build and all 23 tests
+passed; `git diff --check` passed. The guide demonstrates the new public variants.
+
+This is ready for Burooj's visual review, not automatically approved by passing
+tests. No new content inventory, activity integration, or alternate theme was
+added. Conduit's existing artwork is still weaker evidence than a real interface
+screenshot. The previous implementation is saved at `bf03e7d`.
+
 ## Current pass — 12 September: tighten the standalone portfolio
 
 The base must work as a portfolio on its own. This pass responds to Burooj's

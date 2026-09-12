@@ -13,16 +13,13 @@ import Link from "../primitives/Link.astro";
     fetchpriority="high"
   />
   <figcaption>
-    That's me.
-    <br />
     <Link href="/about" arrow>
-      A little more about me
+      That's me
     </Link>
   </figcaption>
 </figure>
 <style>
   figure {
-    padding-top: var(--space-2xl);
     margin: 0;
   }
   img {
@@ -36,17 +33,14 @@ import Link from "../primitives/Link.astro";
   }
   figcaption {
     padding: 0;
-    font-size: var(--text-xs);
-    margin-top: var(--space-m);
+    font-size: var(--text-sm);
+    margin-top: var(--space-s);
     text-align: center;
     color: var(--color-text-soft);
   }
   @media (max-width: 40.625rem) {
     figure {
-      display: flex;
-      align-items: center;
-      gap: var(--space-l);
-      padding-top: var(--space-xs);
+      width: var(--portrait-width-compact);
     }
     img {
       width: var(--portrait-width-compact);
@@ -54,8 +48,8 @@ import Link from "../primitives/Link.astro";
       flex-shrink: 0;
     }
     figcaption {
-      text-align: left;
-      margin: 0;
+      margin-top: var(--space-xs);
+      white-space: nowrap;
     }
   }
 </style>

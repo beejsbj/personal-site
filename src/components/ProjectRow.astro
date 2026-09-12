@@ -4,7 +4,7 @@ import Link from "../design/primitives/Link.astro";
 import MediaFrame from "../design/primitives/MediaFrame.astro";
 import TagList from "../design/primitives/TagList.astro";
 /** Compound: cover + metadata + linked heading + summary + tools.
- * layout=row|stack is the only axis. Children own interaction/typography.
+ * layout=row|stack|feature is the only axis. Children own interaction/typography.
  * Do not paste this assembly into another screen; import it.
  */
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
   role: string;
   tools: string[];
   cover: string;
-  layout?: "row" | "stack";
+  layout?: "row" | "stack" | "feature";
 }
 const {
   href,
@@ -29,15 +29,13 @@ const {
 } = Astro.props;
 ---
 
-<article
-  class:list={["project-row", layout === "stack" && "project-row--stack"]}
->
+<article class:list={["project-row", `project-row--${layout}`]}>
   <MediaFrame src={cover} alt="" href={href} />
   <div class="project-copy">
     <p class="meta">
       {dateLabel} · {role}
     </p>
-    <Heading level={3} scale="card">
+    <Heading level={3} scale={layout === "feature" ? "section" : "card"}>
       <Link href={href} arrow>
         {title}
       </Link>
@@ -69,6 +67,13 @@ const {
   }
   .project-row--stack {
     grid-template-columns: 1fr;
+  }
+  .project-row--feature {
+    grid-template-columns: var(--feature-media-width) minmax(0, 1fr);
+    align-items: start;
+  }
+  .project-row--feature .summary {
+    font-size: var(--text-base);
   }
   @media (max-width: 62.5rem) {
     .project-row {

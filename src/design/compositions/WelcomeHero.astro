@@ -12,6 +12,7 @@ const { social, level = 1, id = "home-title" } = Astro.props;
 ---
 
 <section class="hello" aria-labelledby={id}>
+  <Portrait />
   <div class="copy">
     <p class="greeting">Hey there!</p>
     <div class="title">
@@ -20,11 +21,7 @@ const { social, level = 1, id = "home-title" } = Astro.props;
       </Heading>
     </div>
     <p class="occupation">Frontend developer &amp; designer</p>
-    <p class="welcome">
-      I make places on the web.
-      <br />
-      Feel free to look around!
-    </p>
+    <p class="welcome">I make places on the web. Feel free to look around!</p>
     <div class="socials">
       {social
         .filter((link) => ["GitHub", "LinkedIn", "Email"].includes(link.label))
@@ -38,64 +35,75 @@ const { social, level = 1, id = "home-title" } = Astro.props;
       </Link>
     </div>
   </div>
-  <Portrait />
 </section>
 <style>
   .hello {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--portrait-width);
-    gap: var(--space-xl);
+    grid-template-columns: var(--portrait-width) minmax(0, 1fr);
+    gap: var(--space-2xl);
     align-items: center;
-    padding: var(--space-4xl) 0 var(--space-xs);
+    padding: var(--space-2xl) 0 var(--space-3xl);
   }
-  @media (min-width: 40.626rem) {
+  @media (min-width: 62.501rem) {
     :global(.page-warm-home) .hello {
-      align-items: start;
-    }
-    :global(.page-warm-home) .hello :global(figure) {
-      margin-top: var(--home-portrait-clearance);
+      max-width: calc(100% - var(--blob-nav-width) - var(--space-xl));
     }
   }
   .greeting {
-    font-size: var(--text-greeting);
+    font-size: var(--text-lead);
     line-height: var(--leading-heading);
+    color: var(--color-text-soft);
   }
   .title {
-    margin: var(--space-l) 0 var(--space-xs);
+    margin: var(--space-xs) 0 var(--space-s);
   }
   .occupation {
-    font-size: var(--text-section);
-    font-weight: var(--weight-light);
+    font-size: var(--text-lead);
     color: var(--color-accent);
   }
   .welcome {
     font-size: var(--text-lead);
-    margin-top: var(--space-l);
+    max-width: var(--welcome-copy-width);
+    margin-top: var(--space-m);
+    text-wrap: pretty;
   }
   .socials {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-m);
     margin-top: var(--space-m);
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
   }
   @media (max-width: 62.5rem) {
     .hello {
-      grid-template-columns: minmax(0, 1fr) var(--portrait-width-mid);
+      grid-template-columns: var(--portrait-width-mid) minmax(0, 1fr);
     }
   }
   @media (max-width: 40.625rem) {
     .hello {
       grid-template-columns: 1fr;
-      padding-top: var(--space-xl);
-      gap: var(--space-m);
+      padding-top: var(--space-m);
+      padding-bottom: var(--space-2xl);
+      gap: var(--space-l);
     }
-    .greeting,
-    .occupation {
-      font-size: var(--text-card);
+    .hello :global(figure) {
+      grid-row: 2;
     }
     .title {
-      margin-top: var(--space-m);
+      margin-top: var(--space-xs);
+    }
+    :global(.page-warm-home) .hello {
+      position: relative;
+    }
+    :global(.page-warm-home) .hello :global(figure) {
+      position: absolute;
+      grid-row: auto;
+      top: calc(-1 * var(--home-nav-width-compact) + var(--space-l));
+      left: 0;
+    }
+    .socials {
+      column-gap: var(--space-l);
+      row-gap: var(--space-s);
     }
   }
 </style>

@@ -4,12 +4,13 @@ import Heading from "../primitives/Heading.astro";
 import Link from "../primitives/Link.astro";
 interface Props {
   id?: string;
+  variant?: "paper" | "plain";
 }
-const { id = "home-currently" } = Astro.props;
+const { id = "home-currently", variant = "paper" } = Astro.props;
 ---
 
 <section aria-labelledby={id}>
-  <Note>
+  <Note variant={variant}>
     <div class="current-copy">
       <Heading id={id}>Currently</Heading>
       <p>

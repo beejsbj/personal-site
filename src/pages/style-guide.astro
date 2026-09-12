@@ -69,7 +69,7 @@ const anatomy = [
   [
     "Note",
     "Peach silhouette → arbitrary content slot",
-    "One canonical note shape",
+    "Paper silhouette / plain content",
     "Passive. No button behavior or card shadow.",
   ],
   [
@@ -81,7 +81,7 @@ const anatomy = [
   [
     "ProjectRow",
     "MediaFrame + Heading/Link + summary + TagList",
-    "Row / stack",
+    "Row / stack / feature",
     "Featured work on Home and this guide; ProjectTimeline uses the same primitives for the full chronology.",
   ],
   [
@@ -137,8 +137,9 @@ const anatomy = [
       <p>
         We considered the activity-first desk and the navigation-first circular
         index. The welcome stays because it is the direction Burooj selected.
-        Systematizing it must not flatten its portrait, curve, or generous first
-        screen.
+        The composition revision pairs portrait with introduction and brings the
+        first project into the opening screen. Its layout still awaits Burooj's
+        visual review; preserving the palette is not enough on its own.
       </p>
     </section>
 
@@ -153,8 +154,8 @@ const anatomy = [
       <CurvedArrow />
       <p class="annotation">
         Composition → WelcomeHero imports Heading, Link, and the singular
-        Portrait. The curved arrow is preserved artwork, not a configurable icon
-        family.
+        Portrait. The curved arrow below is retained as a historical specimen,
+        no longer placed between the homepage introduction and work.
       </p>
     </section>
 
@@ -241,6 +242,11 @@ const anatomy = [
 
     <section class="specimen" aria-labelledby="assemblies">
       <SectionHeading id="assemblies" title="From parts to real content" />
+      <ProjectRow
+        {...project.data}
+        href={`/projects/${project.slug}`}
+        layout="feature"
+      />
       <div class="assembly-grid">
         <div>
           <ProjectRow {...project.data} href={`/projects/${project.slug}`} />
@@ -251,7 +257,7 @@ const anatomy = [
           />
         </div>
         <div>
-          <CurrentNote id="guide-currently" />
+          <CurrentNote id="guide-currently" variant="plain" />
           <div class="spaced">
             <UpdateEntry {...update.data} detailed />
           </div>
