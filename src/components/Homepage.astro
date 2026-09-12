@@ -4,7 +4,7 @@ import WelcomeHero from "../design/compositions/WelcomeHero.astro";
 import CurvedArrow from "../design/unique/CurvedArrow.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
-import UpdateEntry from "../design/compounds/UpdateEntry.astro";
+import ActivityStream from "../design/compounds/ActivityStream.astro";
 import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
 import ProjectRow from "./ProjectRow.astro";
@@ -35,9 +35,7 @@ const { projects, updates, site } = Astro.props;
       <CurrentNote />
       <section class="updates" aria-labelledby="home-updates">
         <SectionHeading id="home-updates" title="Recent updates" />
-        {updates.map((update) => (
-          <UpdateEntry {...update} />
-        ))}
+        <ActivityStream updates={updates} />
       </section>
     </aside>
   </div>

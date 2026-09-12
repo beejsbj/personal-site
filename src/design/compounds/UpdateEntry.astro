@@ -1,32 +1,138 @@
 ---
-import type { CollectionEntry } from "astro:content";
-import Heading from "../primitives/Heading.astro";
+import type { UpdateData } from "../../content.config";
 import Link from "../primitives/Link.astro";
-type Props = CollectionEntry<"updates">["data"];
-const { title, date, dateLabel, href, summary } = Astro.props;
+
+type Props = UpdateData & { connected?: boolean; detailed?: boolean };
+const {
+  title,
+  date,
+  dateLabel,
+  href,
+  summary,
+  kind = "project",
+  source = "site",
+  connected = false,
+  detailed = false,
+} = Astro.props;
+
+const kinds = {
+  project: { label: "Project", path: "M3 7h6l2-3h10v15H3z" },
+  "pull-request": {
+    label: "Pull request",
+    path: "M6 6v12m12-2V9a4 4 0 0 0-4-4h-2m3-3-3 3 3 3M8 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm0 16a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm12-2a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z",
+  },
+  repository: {
+    label: "Repository",
+    path: "M5 4h14v16H5a2 2 0 0 1 0-4h14M5 4v12m4-9h6",
+  },
+  writing: {
+    label: "Writing",
+    path: "m4 16 11-11 4 4L8 20H4zm9-9 4 4M14 20h6",
+  },
+  lab: {
+    label: "Experiment",
+    path: "M9 3h6m-5 0v6L4 19a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2L14 9V3M7 15h10",
+  },
+  milestone: {
+    label: "Made",
+    path: "m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z",
+  },
+  status: { label: "Checking in", path: "M4 12h4l3-7 3 14 3-7h3" },
+  location: {
+    label: "Somewhere",
+    path: "M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0Zm-4 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z",
+  },
+  agents: {
+    label: "Agents",
+    path: "M5 8h14v12H5zM12 4v4M3 12v4m18-4v4M8 12h1m6 0h1m-7 4h6",
+  },
+} as const;
+const sources = {
+  site: "This site",
+  github: "GitHub",
+  substack: "Substack",
+  bjslab: "bjslab",
+  manual: "A note",
+};
+const event = kinds[kind];
 ---
 
-<article class="update-entry">
-  <time datetime={date}>{dateLabel}</time>
-  <Heading level={3} scale="label">
-    <Link href={href} arrow>
-      {title}
-    </Link>
-  </Heading>
-  <p>{summary}</p>
+<article
+  class:list={["update-entry", { "update-entry--connected": connected }]}
+  data-event-kind={kind}
+>
+  <span class="event-mark" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d={event.path} />
+    </svg>
+  </span>
+  <div class="event-body">
+    <p class="event-origin">
+      {sources[source]}
+      <span aria-hidden="true"> / </span>
+      {event.label}
+    </p>
+    <p class="event-title">
+      <Link href={href}>{title}</Link>
+    </p>
+    {detailed && <p class="event-detail">{summary}</p>}
+    <time datetime={date}>{dateLabel}</time>
+  </div>
 </article>
 <style>
   .update-entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--space-xl) minmax(0, 1fr);
+    gap: var(--space-s);
+    padding-bottom: var(--space-l);
+  }
+  .update-entry--connected::before {
+    content: "";
+    position: absolute;
+    inset-block: var(--space-xl) 0;
+    inset-inline-start: calc(var(--space-xl) / 2);
+    border-inline-start: var(--rule-width) solid var(--color-border);
+  }
+  .event-mark {
+    display: grid;
+    place-items: center;
+    width: var(--space-xl);
+    height: var(--space-xl);
+    border-radius: var(--radius-portrait);
+    background: var(--color-surface);
+    color: var(--color-accent);
+  }
+  .event-mark svg {
+    width: var(--space-m);
+    height: var(--space-m);
+  }
+  .event-body {
     display: grid;
     gap: var(--space-2xs);
-    border-top: var(--rule-width) solid var(--color-border);
-    padding-block: var(--space-m);
+    min-width: 0;
   }
+  .event-origin,
   time {
     font-size: var(--text-xs);
+    line-height: var(--leading-tight);
     color: var(--color-text-soft);
   }
-  p {
+  .event-title {
+    font-size: var(--text-copy);
+    line-height: var(--leading-tight);
+    font-weight: var(--weight-bold);
+    overflow-wrap: anywhere;
+  }
+  .event-detail {
     font-size: var(--text-sm);
+    line-height: var(--leading-body);
   }
 </style>

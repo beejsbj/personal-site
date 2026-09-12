@@ -53,15 +53,55 @@ const labSchema = z.object({
   hidden: z.boolean().default(false),
 });
 
-const updateSchema = z.object({
-  title: z.string(),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  dateLabel: z.string(),
-  summary: z.string(),
-  href: z.string().min(1),
-  linkLabel: z.string(),
-  relatedProject: z.string().optional(),
-});
+const updateSchema = z
+  .object({
+    // Events describe things that happened, not another project/writing collection.
+    kind: z
+      .enum([
+        "project",
+        "pull-request",
+        "repository",
+        "writing",
+        "lab",
+        "milestone",
+        "status",
+        "location",
+        "agents",
+      ])
+      .default("project"),
+    source: z
+      .enum(["site", "github", "substack", "bjslab", "manual"])
+      .default("site"),
+    evidence: z
+      .object({
+        url: z.string().url(),
+        observedAt: z.string().datetime({ offset: true }),
+      })
+      .optional(),
+    title: z.string(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    dateLabel: z.string(),
+    summary: z.string(),
+    href: z.string().min(1),
+    linkLabel: z.string(),
+    relatedProject: z.string().optional(),
+    expiresAt: z.string().datetime({ offset: true }).optional(),
+  })
+  .superRefine((update, context) => {
+    if (
+      ["status", "location", "agents"].includes(update.kind) &&
+      !update.expiresAt
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["expiresAt"],
+        message:
+          "Ephemeral signals need an expiry; do not publish indefinite live claims.",
+      });
+    }
+  });
+
+export type UpdateData = z.infer<typeof updateSchema>;
 
 const siteSchema = z.object({
   name: z.string(),

@@ -34,7 +34,7 @@ const recentUpdates: CollectionEntry<"updates">[] = (
   .sort((left: CollectionEntry<"updates">, right: CollectionEntry<"updates">) =>
     right.data.date.localeCompare(left.data.date),
   )
-  .slice(0, 3);
+  .slice(0, 8);
 
 const homepageData = {
   site,

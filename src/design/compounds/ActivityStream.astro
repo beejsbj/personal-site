@@ -1,0 +1,50 @@
+---
+import type { UpdateData } from "../../content.config";
+import { selectActivitySnapshot } from "../../lib/activity.mjs";
+import UpdateEntry from "./UpdateEntry.astro";
+
+interface Props {
+  updates: UpdateData[];
+}
+// Curated build-time snapshot, not a connected presence service. Expiry is
+// evaluated only when rendering/building; deployed HTML does not self-expire.
+// Publish no live signals until a runtime or scheduled-refresh layer exists.
+const updates = selectActivitySnapshot(Astro.props.updates);
+---
+
+<div class="activity-stream">
+  <p class="stream-intro">Little signals from around my internet.</p>
+  {updates.length ? (
+    <ol aria-label="Recent activity, newest first" class="stream-events">
+      {updates.map((update, index) => (
+        <li>
+          <UpdateEntry {...update} connected={index < updates.length - 1} />
+        </li>
+      ))}
+    </ol>
+  ) : (
+    <p class="stream-empty">
+      A quiet moment. More when there's something to share.
+    </p>
+  )}
+  <p class="stream-caption">A few things worth sharing, collected by hand.</p>
+</div>
+<style>
+  .stream-intro,
+  .stream-empty {
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+    margin-bottom: var(--space-m);
+  }
+  .stream-events {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .stream-caption {
+    padding-top: var(--space-s);
+    border-top: var(--rule-width) solid var(--color-border);
+    font-size: var(--text-xs);
+    color: var(--color-text-soft);
+  }
+</style>
