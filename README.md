@@ -17,7 +17,7 @@ Open `http://localhost:4321/`. The living style guide is
 
 - `src/design/tokens.css`: visual values and responsive contracts.
 - `src/design/primitives/`: links, headings, media frames, notes, metadata lists.
-- `src/design/unique/`: the portrait and hand-drawn curve.
+- `src/design/unique/`: the portrait, hand-drawn curve and magnetic blob navigation.
 - `src/design/compounds/`, `src/components/`: shared assemblies.
 - `src/design/compositions/`: the welcome region used by the homepage and guide.
 
@@ -33,6 +33,9 @@ corepack pnpm@10.6.5 test
 ```
 
 Tests inspect the generated output and enforce token/component cohesion.
+The navigation is progressively enhanced with a small local motion runtime;
+its links and current state work without JavaScript. The guide demonstrates the
+same behavior, including Pause motion and reduced-motion support.
 `corepack pnpm@10.6.5 format` formats active source with Prettier and its Astro plugin.
 
 ## Historical material
@@ -46,5 +49,4 @@ can overwrite authored content.
 `public/images/` and compatibility routes remain active. The old `/style-guide`
 URL continues to point at its historical Lab entry; the current system has its
 own `/design-system` route. Deployment is a separate action.
-
 

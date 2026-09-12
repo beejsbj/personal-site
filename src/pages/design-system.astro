@@ -11,6 +11,8 @@ import WelcomeHero from "../design/compositions/WelcomeHero.astro";
 import CurvedArrow from "../design/unique/CurvedArrow.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
+import ActivityStream from "../design/compounds/ActivityStream.astro";
+import BlobNav from "../design/unique/BlobNav.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import ProjectRow from "../components/ProjectRow.astro";
 import LabCard from "../components/LabCard.astro";
@@ -26,6 +28,9 @@ const lab = (await getCollection("lab")).find(
   (entry: CollectionEntry<"lab">) => !entry.data.hidden,
 )!;
 const update = (await getCollection("updates"))[0];
+const updates = (await getCollection("updates")).map(
+  (entry: CollectionEntry<"updates">) => entry.data,
+);
 const colors = [
   ["Paper", "--color-page"],
   ["Burgundy", "--color-accent"],
@@ -36,6 +41,12 @@ const colors = [
   ["Rule", "--color-border"],
 ];
 const anatomy = [
+  [
+    "BlobNav",
+    "Stable hit target → floating shell → magnetic surface → label",
+    "Singular unequal cluster; current / hover / focus / press / paused",
+    "Native links first. Fine-pointer magnetism and drift; reduced motion and touch stay still. Pause control stops motion.",
+  ],
   [
     "Link",
     "Label → optional decorative arrow",
@@ -74,9 +85,9 @@ const anatomy = [
   ],
   [
     "CurrentNote / UpdateEntry",
-    "Note + Heading + Link / time + Heading/Link + summary",
-    "Canonical current note / dated update",
-    "Projects persist; updates mark something that changed.",
+    "Note + Heading + Link / event glyph + sentence + date + provenance",
+    "Canonical current note / mixed notification stream",
+    "Projects persist; updates mark anything that changed. Curated events are not live presence.",
   ],
   [
     "SectionHeading / PageHeader / SectionIntro",
@@ -92,7 +103,7 @@ const anatomy = [
   ],
   [
     "SiteHeader / SiteFooter",
-    "Home + circle Links / identity + contact Links",
+    "Identity + BlobNav + utilities / identity + contact Links",
     "Same shared chrome on every route",
     "Active route is semantic; Resume remains available in footer.",
   ],
@@ -119,8 +130,8 @@ const anatomy = [
       <p>
         Approved A, grounded in versions/v1 + v2: burgundy on warm paper, peach
         circular wayfinding, Newsreader display type and light Lato. A large
-        personal greeting leads; projects carry the substance; updates remain a
-        quieter side note.
+        personal greeting leads; projects carry the substance; the notification
+        stream shares smaller changes from around Burooj's internet.
       </p>
       <p>
         We considered the activity-first desk and the navigation-first circular
@@ -171,15 +182,22 @@ const anatomy = [
         />
       </div>
       <p class="annotation">
-        All colors, type scales, spacing, geometry, focus rings, and feedback
-        timing resolve to src/design/tokens.css. Responsive contracts are
-        40.625rem and 62.5rem, plus a narrow-nav adjustment at 23.75rem. Native
-        media conditions cannot consume custom properties.
+        Shared colors, type scales, spacing, focus rings and motion timing live
+        in src/design/tokens.css. BlobNav owns its singular constellation
+        geometry and spring mechanics. Responsive contracts are 40.625rem and
+        62.5rem. Native media conditions cannot consume custom properties.
       </p>
     </section>
 
     <section class="specimen" aria-labelledby="controls">
       <SectionHeading id="controls" title="Links and wayfinding" />
+      <BlobNav nav={site.nav} currentPath="/" label="Navigation specimen" />
+      <p class="annotation">
+        v1's unequal cluster, soft offset shadows and burgundy current location.
+        Move a mouse across the shapes: the surface and label follow separately,
+        then settle back. The quiet rest drift can be paused; touch and Reduced
+        Motion keep the menu still. Every destination works without JavaScript.
+      </p>
       <div class="specimen-row">
         <Link href="/about" arrow>
           A text link
@@ -212,9 +230,9 @@ const anatomy = [
         </Link>
       </div>
       <p class="annotation">
-        Try Tab, hover, and press. Circles keep their hit area; focus is an
-        outside burgundy ring. Press feedback is a small scale change, disabled
-        under reduced motion. No entrance choreography or theme switcher.
+        Text links remember v1's dot → underline → ink spot; outbound arrows
+        lift with the pointer. Tab has a visible ring. These are the primitive
+        circle variants; BlobNav above owns the singular clustered composition.
       </p>
     </section>
 
@@ -232,8 +250,9 @@ const anatomy = [
         <div>
           <CurrentNote id="guide-currently" />
           <div class="spaced">
-            <UpdateEntry {...update.data} />
+            <UpdateEntry {...update.data} detailed />
           </div>
+          <ActivityStream updates={updates} />
           <Note>
             <p>
               A note can hold arbitrary content without inventing a new card
@@ -280,10 +299,11 @@ const anatomy = [
         </table>
       </div>
       <p class="annotation">
-        Colors and geometry belong to tokens; interaction and labels belong to
-        primitives; assemblies import their children. The portrait and curve
-        stay singular. Do not paste circle-link markup into a page, put raw
-        palette values in a composition, or fork project rows for this guide.
+        Shared colors and geometry belong to tokens; interaction belongs to its
+        public component; assemblies import their children. The portrait, curve
+        and blob constellation stay singular. Do not paste circle-link markup
+        into a page, put raw palette values in a composition, or fork project
+        rows for this guide.
       </p>
     </section>
   </div>

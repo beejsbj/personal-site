@@ -42,7 +42,12 @@ const Tag = disabled ? "span" : "a";
 >
   <span>
     <slot />
-    {arrow && <span aria-hidden="true"> ↗</span>}
+    {arrow && (
+      <span class="link-arrow" aria-hidden="true">
+        {" "}
+        ↗
+      </span>
+    )}
   </span>
 </Tag>
 <style>
@@ -54,6 +59,68 @@ const Tag = disabled ? "span" : "a";
   }
   .ds-link:hover {
     text-decoration: underline;
+  }
+  .ds-link--text {
+    position: relative;
+    display: inline-block;
+  }
+  .ds-link--text::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: calc(-1 * var(--link-dot-size));
+    width: var(--link-dot-size);
+    height: var(--link-dot-size);
+    background: currentColor;
+    border-radius: var(--radius-round);
+    transform: translateX(-50%);
+  }
+  .ds-link--text::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: calc(-1 * var(--link-dot-size));
+    width: 100%;
+    height: var(--rule-width);
+    background: currentColor;
+    transform: scaleX(0);
+    transition: transform var(--duration-blob-feedback) var(--ease-blob-settle);
+  }
+  .ds-link--text:focus-visible::after {
+    opacity: 0;
+  }
+  .ds-link--text:focus-visible::before {
+    transform: scaleX(1);
+    transition: none;
+  }
+  .ds-link--text:active::after {
+    opacity: 1;
+    width: var(--link-press-size);
+    height: var(--link-press-size);
+    background: var(--color-link-rule);
+  }
+  .link-arrow {
+    display: inline-block;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ds-link--text:hover {
+      text-decoration: none;
+    }
+    .ds-link--text:hover::after {
+      opacity: 0;
+    }
+    .ds-link--text:hover::before {
+      transform: scaleX(1);
+    }
+    .link-arrow {
+      transition: transform var(--duration-fast) var(--ease-feedback);
+    }
+    .ds-link:hover .link-arrow {
+      transform: translate(
+        var(--link-arrow-lift),
+        calc(-1 * var(--link-arrow-lift))
+      );
+    }
   }
   .ds-link:focus-visible {
     outline: var(--focus-width) solid var(--color-accent);
@@ -124,8 +191,13 @@ const Tag = disabled ? "span" : "a";
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .ds-link {
+    .ds-link,
+    .link-arrow,
+    .ds-link--text::before {
       transition: none;
+    }
+    .ds-link:hover .link-arrow {
+      transform: none;
     }
     .ds-link:active {
       transform: none;

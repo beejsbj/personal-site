@@ -48,6 +48,14 @@ const { social, level = 1, id = "home-title" } = Astro.props;
     align-items: center;
     padding: var(--space-4xl) 0 var(--space-xs);
   }
+  @media (min-width: 40.626rem) {
+    :global(.page-warm-home) .hello {
+      align-items: start;
+    }
+    :global(.page-warm-home) .hello :global(figure) {
+      margin-top: var(--home-portrait-clearance);
+    }
+  }
   .greeting {
     font-size: var(--text-greeting);
     line-height: var(--leading-heading);
@@ -70,9 +78,6 @@ const { social, level = 1, id = "home-title" } = Astro.props;
     gap: var(--space-m);
     margin-top: var(--space-m);
     font-size: var(--text-sm);
-  }
-  .socials :global(.ds-link) {
-    border-bottom: var(--rule-width) solid var(--color-link-rule);
   }
   @media (max-width: 62.5rem) {
     .hello {

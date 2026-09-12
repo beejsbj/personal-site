@@ -1,5 +1,63 @@
 # Base homepage: warm welcome
 
+## Current pass — 12 September: recover the interaction character
+
+**Direction:** chosen under delegated authority following Burooj's request to
+retain more v1 micro-details and make updates a broad notification stream.
+A's welcome, portrait, colors and project stories stay; the exact new treatment
+is not yet user-approved. No prism, telemetry service, deployment or archival
+cleanup is included.
+
+**Source evidence:** `versions/v1` (`1542b6f`) owns the irregular 2×2 menu,
+unequal circles, floating phases, burgundy current state and offset shadows.
+`e9a0aaf` enables the magnetic menu; the v1 tip leaves that call commented out.
+Its text-link dot, expanding underline and lifting external arrow are also
+references, not incidental decoration to erase during systematization.
+
+**Unit map:** BlobNav is a unique specimen (its cluster geometry and spring
+mechanics are local); SiteHeader and the guide import it. Shared shadows and
+motion timing belong to tokens. Link owns the dot/underline/arrow feedback.
+ActivityStream owns a dated mixed-event list; UpdateEntry owns event anatomy;
+the content schema owns event kinds and provenance. Homepage and guide import
+the same sources. Manual records are not live telemetry.
+
+**Workbench:** this is a treatment inside accepted A. The existing localhost
+preview is the integration review surface; the guide is updated only from the
+authoritative components. No new alternative-theme/gallery route is needed.
+
+**Delivered:** unequal clustered navigation with independent drift, magnetism
+and label parallax; correct current/hover/pressed colors; Pause/Resume; native
+keyboard navigation; static touch and Reduced Motion; forced-colors borders.
+Text links regain the dot/underline/ink-spot signature and outbound-arrow lift.
+MediaFrame regains off-axis peach corner brackets. No GSAP/framework was added.
+The guide now includes the same progressive-enhancement script; its former
+zero-JavaScript assertion was intentionally retired, not silently bypassed.
+
+**Activity:** six curated notifications include verified personal-site and
+EmotiTone pull requests, a site milestone and preserved project updates. The
+schema also supports repositories, writing, lab events and ephemeral signals.
+No agent-count/location/live-service claims are published. Expiry filtering is
+build-time only: a future connected stream needs runtime freshness or scheduled
+rebuilds before publishing ephemeral signals. Public source links and actual
+observation timestamps accompany the new records.
+
+**Verification (12 September):** browser inspection of Home, About, Projects
+and guide at 320/390/650/768/1000/1280px found no horizontal overflow or clipped
+content. Header link centers remained hittable; smallest target was 84px.
+Inspected screenshots of desktop/tablet/mobile heroes, the 320px stream and guide.
+Actual pointer hover moved the visual surface while the anchor transform stayed
+`none`; Pause/Resume, Tab focus and live Reduced Motion/touch emulation behaved
+as intended. Hover peach-on-burgundy contrast was corrected to 4.53:1 (current
+5.19:1). Runtime tests cover spring settling and Astro listener cleanup.
+`check` passed for 43 files with zero diagnostics; build and all 18 tests passed;
+`git diff --check` was clean. Native navigation was exercised with scripts
+disabled, and forced-colors rendering retained visible circles and selection.
+
+**Frontier:** Burooj's taste review of the cluster scale/motion and mixed stream.
+Live integrations are a separate follow-up. The remaining v1 photo constellation,
+page transitions and click-to-scroll decorative circle are documented references,
+not silently restored features. No temporary prototype artifacts remain.
+
 Burooj selected iteration A on 2026-09-11: “A is good implement it as base.”
 
 The homepage adopts the v1/v2 warm paper, burgundy, peach circular navigation,
@@ -22,7 +80,7 @@ and token cohesion. The live style guide is `/design-system`; it imports the
 production components and is noindexed. `/style-guide` retains its historical
 redirect to `/lab/style-guide`.
 
-## Design review
+## 11 September baseline review (before the interaction restoration above)
 
 - **Direction realized:** A's welcome-first layout. The activity-first desk and
   navigation-first circular index remain source material on the prototype branch,

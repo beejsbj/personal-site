@@ -10,6 +10,8 @@
   --color-text-soft: #65534b;
   --color-border: #bcb2a9;
   --color-accent: #7c2621;
+  --color-accent-hover: #85312a;
+  --color-accent-pressed: #5f1d19;
   --color-accent-contrast: var(--color-page);
   --color-hover: #edc39d;
   --color-link-rule: #7c26214a;
@@ -99,6 +101,18 @@
   --edge-top-compact: -10rem;
   --edge-height-compact: 20.625rem;
   --duration-fast: 140ms;
+  --blob-nav-width: 18rem;
+  --blob-nav-width-compact: 15rem;
+  --home-nav-overlap: 13rem;
+  --home-portrait-clearance: 8rem;
+  --shadow-blob: -0.5rem 0.75rem 1.25rem #30232030;
+  --shadow-blob-raised: -0.625rem 0.875rem 1.5rem #30232040;
+  --duration-blob-rest: 4400ms;
+  --duration-blob-feedback: 220ms;
+  --ease-blob-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --link-dot-size: 0.25rem;
+  --link-arrow-lift: 0.1875rem;
+  --link-press-size: 1.5em;
   --ease-feedback: ease;
   --press-scale: 0.97;
   --disabled-opacity: 0.5;

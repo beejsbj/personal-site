@@ -30,10 +30,32 @@ const Tag = href ? "a" : "div";
 </Tag>
 <style>
   .ds-media {
+    position: relative;
     display: block;
     padding: var(--space-s);
     background: var(--texture);
     align-self: start;
+  }
+  /* v1's offset corner brackets: framing, never a second interactive target. */
+  .ds-media::before,
+  .ds-media::after {
+    content: "";
+    position: absolute;
+    width: var(--space-l);
+    height: var(--space-l);
+    pointer-events: none;
+    border-color: var(--color-surface-strong);
+    border-style: solid;
+  }
+  .ds-media::before {
+    top: calc(-1 * var(--space-2xs));
+    left: calc(-1 * var(--space-2xs));
+    border-width: var(--focus-width) 0 0 var(--focus-width);
+  }
+  .ds-media::after {
+    bottom: calc(-1 * var(--space-2xs));
+    right: calc(-1 * var(--space-2xs));
+    border-width: 0 var(--focus-width) var(--focus-width) 0;
   }
   a.ds-media:hover {
     outline: var(--rule-width) solid var(--color-accent);

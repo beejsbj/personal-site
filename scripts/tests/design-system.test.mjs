@@ -37,13 +37,18 @@ test("one visual-value authority, with no raw colors or geometry in consumers", 
       /#[\da-f]{3,8}\b|\brgba?\(|\bhsla?\(/i,
       `${path}: raw palette value`,
     );
-    assert.doesNotMatch(
-      rules,
-      /(?:\d|\.)+(?:px|rem|em|vw|vh|ms)\b/,
-      `${path}: untokenized design value`,
-    );
+    // BlobNav is singular artwork: private cluster geometry and animation
+    // composition live with it, not in a fake family of system-wide tokens.
+    if (path !== "src/design/unique/BlobNav.astro") {
+      assert.doesNotMatch(
+        rules,
+        /(?:\d|\.)+(?:px|rem|em|vw|vh|ms)\b/,
+        `${path}: untokenized shared design value`,
+      );
+    }
     for (const [, token] of rules.matchAll(/var\((--[\w-]+)/g)) {
-      assert.ok(definitions.has(token), `${path}: undefined ${token}`);
+      const local = new RegExp(`${token}\\s*:`).test(rules);
+      assert.ok(definitions.has(token) || local, `${path}: undefined ${token}`);
     }
   }
 });
@@ -83,6 +88,8 @@ test("guide imports production assemblies and keeps archived style-guide routing
     "Heading",
     "CurrentNote",
     "UpdateEntry",
+    "ActivityStream",
+    "BlobNav",
     "MediaRail",
   ]) {
     assert.match(guide, new RegExp(`import ${component} from`));
@@ -93,10 +100,15 @@ test("guide imports production assemblies and keeps archived style-guide routing
   );
   const built = read("dist/client/design-system/index.html");
   assert.match(built, /noindex, follow/);
+  assert.match(
+    built,
+    /data-blob-nav/,
+    "Guide must demonstrate the real progressively enhanced navigation",
+  );
   assert.doesNotMatch(
     built,
-    /<script\b/i,
-    "The static guide must not require client JavaScript",
+    /astro-island/,
+    "The guide needs no hydrated UI framework",
   );
   assert.equal((built.match(/<h1\b/g) || []).length, 1);
   assert.match(built, /Burooj here!/);
