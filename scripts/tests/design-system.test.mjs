@@ -37,15 +37,11 @@ test("one visual-value authority, with no raw colors or geometry in consumers", 
       /#[\da-f]{3,8}\b|\brgba?\(|\bhsla?\(/i,
       `${path}: raw palette value`,
     );
-    // BlobNav is singular artwork: private cluster geometry and animation
-    // composition live with it, not in a fake family of system-wide tokens.
-    if (path !== "src/design/unique/BlobNav.astro") {
-      assert.doesNotMatch(
-        rules,
-        /(?:\d|\.)+(?:px|rem|em|vw|vh|ms)\b/,
-        `${path}: untokenized shared design value`,
-      );
-    }
+    assert.doesNotMatch(
+      rules,
+      /(?:\d|\.)+(?:px|rem|em|vw|vh|ms)\b/,
+      `${path}: untokenized shared design value`,
+    );
     for (const [, token] of rules.matchAll(/var\((--[\w-]+)/g)) {
       const local = new RegExp(`${token}\\s*:`).test(rules);
       assert.ok(definitions.has(token) || local, `${path}: undefined ${token}`);
@@ -89,7 +85,7 @@ test("dedicated style guide imports production assemblies and keeps design-syste
     "CurrentNote",
     "UpdateEntry",
     "ActivityStream",
-    "BlobNav",
+    "SiteNav",
     "MediaRail",
   ]) {
     assert.match(guide, new RegExp(`import ${component} from`));
@@ -102,8 +98,8 @@ test("dedicated style guide imports production assemblies and keeps design-syste
   assert.match(built, /noindex, follow/);
   assert.match(
     built,
-    /data-blob-nav/,
-    "Guide must demonstrate the real progressively enhanced navigation",
+    /aria-label="Navigation specimen"/,
+    "Guide must demonstrate the real text navigation",
   );
   assert.doesNotMatch(
     built,
@@ -114,10 +110,34 @@ test("dedicated style guide imports production assemblies and keeps design-syste
   assert.match(built, /Burooj here!/);
   assert.doesNotMatch(read("dist/client/sitemap-0.xml"), /\/design-system\//);
   assert.doesNotMatch(built, /Pause motion/);
+  assert.doesNotMatch(built, /data-blob-nav|blob-nav__cluster/);
   assert.match(
     read("dist/client/design-system/index.html"),
     /http-equiv="refresh"/,
   );
+});
+
+test("text navigation retains native links and correct section markers", () => {
+  for (const [path, current] of [
+    ["index.html", "/"],
+    ["about/index.html", "/about"],
+    ["projects/index.html", "/projects"],
+    ["projects/conduit-market/index.html", "/projects"],
+    ["lab/index.html", "/lab"],
+  ]) {
+    const html = read(`dist/client/${path}`);
+    const nav = html.match(
+      /<nav\b[^>]*aria-label="Main navigation"[^>]*>([\s\S]*?)<\/nav>/,
+    )?.[1];
+    assert.ok(nav, `${path}: missing semantic navigation`);
+    const anchors = [...nav.matchAll(/<a\b[^>]*>/g)].map(([tag]) => tag);
+    assert.equal(anchors.length, 6);
+    const marked = anchors.filter((tag) => tag.includes('aria-current="page"'));
+    assert.equal(marked.length, 1);
+    assert.ok(marked[0].includes(`href="${current}"`));
+    assert.doesNotMatch(html, /data-blob-nav|blob-nav__cluster/);
+    assert.match(html, /data-magnetic-edge/);
+  }
 });
 
 test("all generated pages have shared chrome and resolving local links and media", () => {

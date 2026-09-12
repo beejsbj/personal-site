@@ -49,7 +49,7 @@
 }
 @media (min-width: 62.501rem) {
   .page-header {
-    max-width: calc(100% - var(--blob-nav-width) - var(--space-xl));
+    max-width: var(--intro-width);
   }
   .lab-grid--dense {
     grid-template-columns: repeat(3, minmax(0, 1fr));

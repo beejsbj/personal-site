@@ -1,5 +1,32 @@
 # Base homepage: warm welcome
 
+## Current decision — normal navigation, 12 September
+
+Burooj approved the composition at `652cd9e` ("good layout") and then asked to
+normalize the cluster menu. The chosen interpretation is a normal text menu,
+not turning every other link into a blob. The approved portrait/introduction,
+featured first project, palette and typography remain.
+
+`SiteNav` uses the shared Link primitive's navigation treatment: consistent text,
+underline on hover/focus, a stronger current-page marker, and native destinations.
+Home, Projects, Lab, About, Writing and Say hello remain visible; the menu uses
+two balanced rows on compact screens. Project details retain the Projects marker.
+The header is back in normal flow; cluster clearances and mobile absolute portrait
+positioning are gone. The mobile portrait now sits beside the role line.
+
+Removed the unused cluster component, its animation/label logic, circular-link
+variants, and their tokens. These are recoverable in Git. The cropped corner
+keeps its own `edge-magnet.ts` enhancement, disabled for touch/reduced motion,
+with interruption, visibility/navigation cleanup and no idle animation loop.
+The guide imports the actual normal menu. Astro check passed for 45 files with
+zero diagnostics; build and all 23 tests passed; `git diff --check` passed.
+Browser screenshots were inspected for desktop Home, 390/320px Home, 320px
+Projects and 768px About. No overflow was found in those measured views;
+navigation targets measured 44px high. Keyboard Enter navigated to Projects and
+updated the current marker. A real pointer moved the independent corner surface
+about 13px; the old cluster count was zero. Tests cover section markers on detail
+pages, all generated local links, token consumers, and edge accessibility/lifecycle.
+
 ## Composition revision — 12 September, after visual rejection
 
 Burooj rejected the current homepage as a weak design base. The earlier

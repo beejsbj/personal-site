@@ -10,7 +10,6 @@
   --color-text-soft: #65534b;
   --color-border: #bcb2a9;
   --color-accent: #7c2621;
-  --color-accent-hover: #85312a;
   --color-accent-pressed: #5f1d19;
   --color-accent-contrast: var(--color-page);
   --color-hover: #edc39d;
@@ -23,7 +22,6 @@
   --text-copy: 0.9375rem;
   --text-base: 1rem;
   --text-lead: 1.125rem;
-  --text-brand: 1.1875rem;
   --text-card: 1.6875rem;
   --text-section: 2rem;
   --text-page: clamp(2.7rem, 6vw, 4.3rem);
@@ -67,11 +65,7 @@
     transparent 0 3px,
     var(--color-texture) 3px 4px
   );
-  --circle-sm: 3.6875rem;
-  --circle-md: 4.6875rem;
-  --circle-lg: 5.5rem;
-  --circle-compact: 3.875rem;
-  --circle-compact-lg: 4.5rem;
+  --swatch-size: 5.5rem;
   --portrait-width: 9.5rem;
   --portrait-width-mid: 10.5rem;
   --portrait-width-compact: 5rem;
@@ -95,18 +89,10 @@
   --edge-top-compact: -10rem;
   --edge-height-compact: 20.625rem;
   --duration-fast: 140ms;
-  --blob-nav-width: 18rem;
-  --blob-nav-width-compact: 15rem;
-  --home-nav-overlap: 13rem;
-  --inner-nav-overlap: 8rem;
-  --home-nav-width-compact: 11rem;
+  --control-min-height: 2.75rem;
+  --welcome-width: 52rem;
   --welcome-copy-width: 32ch;
   --feature-media-width: 45%;
-  --shadow-blob: -0.5rem 0.75rem 1.25rem #30232030;
-  --shadow-blob-raised: -0.625rem 0.875rem 1.5rem #30232040;
-  --duration-blob-rest: 4400ms;
-  --duration-blob-feedback: 220ms;
-  --ease-blob-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --icon-inline: 0.72em;
   --link-arrow-lift: 0.1875rem;
   --ease-feedback: ease;

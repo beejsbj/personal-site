@@ -1,5 +1,5 @@
 ---
-/** Cropped v1 artwork. The shared magnetic runtime never intercepts clicks. */
+/** Cropped v1 artwork. Its optional magnetic runtime never intercepts clicks. */
 ---
 
 <div class="edge-blob" data-magnetic-edge aria-hidden="true">
@@ -7,6 +7,10 @@
     <span class="edge-blob__surface"></span>
   </div>
 </div>
+<script>
+  import { installEdgeMagnet } from "./edge-magnet";
+  installEdgeMagnet();
+</script>
 <style>
   .edge-blob {
     position: absolute;

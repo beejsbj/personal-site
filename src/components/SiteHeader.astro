@@ -1,48 +1,28 @@
 ---
-import Link from "../design/primitives/Link.astro";
-import BlobNav from "../design/unique/BlobNav.astro";
-interface NavItem {
-  label: string;
-  href: string;
-  external?: boolean;
-}
+import SiteNav from "./SiteNav.astro";
 interface Props {
-  nav: NavItem[];
+  nav: { label: string; href: string; external?: boolean }[];
   currentPath: string;
   email: string;
 }
 const { nav, currentPath, email } = Astro.props;
-const writing = nav.find((item) => item.label === "Writing");
 ---
 
-<header class:list={["site-header shell", { "is-home": currentPath === "/" }]}>
-  <div class="identity">
-    <a class="home-link" href="/" aria-label="Burooj — home">
-      burooj.
-    </a>
-    <div class="header-elsewhere">
-      {writing && (
-        <Link href={writing.href} arrow={writing.external}>
-          Writing
-        </Link>
-      )}
-      <Link href={`mailto:${email}`} arrow>
-        Say hello
-      </Link>
-    </div>
-  </div>
-  <BlobNav nav={nav} currentPath={currentPath} />
+<header class="site-header shell">
+  <a class="home-link" href="/" aria-label="Burooj — home">
+    burooj.
+  </a>
+  <SiteNav nav={nav} currentPath={currentPath} email={email} />
 </header>
 <style>
   .site-header {
     display: flex;
-    align-items: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
-    gap: var(--space-l);
-    padding-block: var(--space-l) var(--space-s);
-  }
-  .identity {
-    padding-top: var(--space-m);
+    gap: var(--space-s) var(--space-xl);
+    padding-block: var(--space-l);
+    border-bottom: var(--rule-width) solid var(--color-border);
   }
   .home-link {
     font-family: var(--font-serif);
@@ -50,46 +30,12 @@ const writing = nav.find((item) => item.label === "Writing");
     font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-heading);
   }
-  .header-elsewhere {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-m);
-    margin-top: var(--space-s);
-    font-size: var(--text-sm);
-  }
-  @media (min-width: 62.501rem) {
-    .site-header.is-home {
-      margin-bottom: calc(-1 * var(--home-nav-overlap));
-    }
-  }
-  @media (min-width: 62.501rem) {
-    .site-header:not(.is-home) {
-      margin-bottom: calc(-1 * var(--inner-nav-overlap));
-    }
-  }
   @media (max-width: 40.625rem) {
+    .home-link {
+      margin-left: var(--space-xl);
+    }
     .site-header {
-      flex-wrap: wrap;
-      gap: var(--space-xs);
-    }
-    .identity {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: var(--space-s);
-      width: 100%;
-      padding-top: 0;
-      padding-left: var(--space-xl);
-    }
-    .header-elsewhere {
-      margin-top: 0;
-    }
-    .site-header :global(.blob-nav) {
-      margin-left: auto;
-    }
-    .site-header.is-home :global(.blob-nav) {
-      width: var(--home-nav-width-compact);
+      padding-block: var(--space-m) var(--space-s);
     }
   }
 </style>

@@ -1,14 +1,13 @@
 ---
 /** Primitive: label + optional decorative arrow. No nested controls.
- * Axes: treatment=text|circle|action, tone=paper|wine, size=sm|md|lg.
+ * Axes: treatment=text|nav|action, tone=paper|wine.
  * States: rest, hover, focus, active, current, disabled; no loading behavior.
  * Native anchor navigation; disabled renders a non-interactive span.
  */
 interface Props {
   href: string;
-  treatment?: "text" | "circle" | "action";
+  treatment?: "text" | "nav" | "action";
   tone?: "paper" | "wine";
-  size?: "sm" | "md" | "lg";
   current?: boolean;
   arrow?: boolean;
   disabled?: boolean;
@@ -18,7 +17,6 @@ const {
   href,
   treatment = "text",
   tone = "paper",
-  size = "md",
   current = false,
   arrow = false,
   disabled = false,
@@ -29,12 +27,7 @@ const Tag = disabled ? "span" : "a";
 
 <Tag
   href={disabled ? undefined : href}
-  class:list={[
-    "ds-link",
-    `ds-link--${treatment}`,
-    `ds-link--${tone}`,
-    `ds-link--${size}`,
-  ]}
+  class:list={["ds-link", `ds-link--${treatment}`, `ds-link--${tone}`]}
   aria-current={current ? "page" : undefined}
   aria-disabled={disabled || undefined}
   target={!disabled && newTab ? "_blank" : undefined}
@@ -90,6 +83,24 @@ const Tag = disabled ? "span" : "a";
     margin-left: var(--space-2xs);
     vertical-align: baseline;
   }
+  .ds-link--nav {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--control-min-height);
+    color: var(--color-text-soft);
+    white-space: nowrap;
+    text-decoration-thickness: var(--focus-width);
+  }
+  .ds-link--nav:is(:hover, :focus-visible, [aria-current]) {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  .ds-link--nav[aria-current] {
+    font-weight: var(--weight-bold);
+  }
+  .ds-link--nav:active {
+    color: var(--color-accent-pressed);
+  }
   @media (hover: hover) and (pointer: fine) {
     .link-arrow {
       transition: transform var(--duration-fast) var(--ease-feedback);
@@ -105,7 +116,6 @@ const Tag = disabled ? "span" : "a";
     outline: var(--focus-width) solid var(--color-accent);
     outline-offset: var(--focus-offset);
   }
-  .ds-link--circle,
   .ds-link--action {
     display: inline-grid;
     place-items: center;
@@ -116,19 +126,6 @@ const Tag = disabled ? "span" : "a";
     white-space: nowrap;
     transition: transform var(--duration-fast) var(--ease-feedback);
   }
-  .ds-link--circle {
-    width: var(--circle-md);
-    height: var(--circle-md);
-    border-radius: var(--radius-round);
-  }
-  .ds-link--circle.ds-link--sm {
-    width: var(--circle-sm);
-    height: var(--circle-sm);
-  }
-  .ds-link--circle.ds-link--lg {
-    width: var(--circle-lg);
-    height: var(--circle-lg);
-  }
   .ds-link--action {
     padding: var(--space-s) var(--space-m);
     border: var(--rule-width) solid var(--color-accent);
@@ -137,7 +134,6 @@ const Tag = disabled ? "span" : "a";
     background: var(--color-accent);
     color: var(--color-accent-contrast);
   }
-  .ds-link--circle:hover,
   .ds-link--action:hover {
     background: var(--color-hover);
     color: var(--color-accent);
@@ -146,28 +142,12 @@ const Tag = disabled ? "span" : "a";
   .ds-link[aria-current] {
     text-decoration: underline;
   }
-  .ds-link--circle:active,
   .ds-link--action:active {
     transform: scale(var(--press-scale));
   }
   .ds-link[aria-disabled] {
     opacity: var(--disabled-opacity);
     pointer-events: none;
-  }
-  @media (max-width: 40.625rem) {
-    .ds-link--circle {
-      width: var(--circle-compact);
-      height: var(--circle-compact);
-      font-size: var(--text-xs);
-    }
-    .ds-link--circle.ds-link--lg {
-      width: var(--circle-compact-lg);
-      height: var(--circle-compact-lg);
-    }
-    .ds-link--circle.ds-link--sm {
-      width: var(--circle-sm);
-      height: var(--circle-sm);
-    }
   }
   @media (prefers-reduced-motion: reduce) {
     .ds-link,
