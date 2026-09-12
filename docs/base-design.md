@@ -1,5 +1,21 @@
 # Base homepage: warm welcome
 
+## Decorative circles — 12 September
+
+Following approval of the normal menu, Burooj asked to include the blobs
+decoratively. `DecorativeBlobs` preserves the former unequal burgundy/peach
+circle arrangement as static SVG artwork beside the desktop introduction.
+The normal text navigation remains authoritative. The artwork is aria-hidden,
+non-focusable and pointer-passive; no navigation labels, shadows or hover states
+suggest that it is a control. The cluster is omitted at widths of 1000px and below
+to preserve the approved compact composition. The existing cropped corner remains.
+The dedicated guide imports the real artwork. Astro check passed for 46 files
+with zero diagnostics; build passed. Browser screenshots were inspected at the
+default desktop viewport, 1001px and 320px: no overlap, and no document overflow
+at the measured 1001px/320px widths. The compact view hides the new artwork.
+All 24 tests pass, including a regression check for non-interactive artwork;
+`git diff --check` passes.
+
 ## Current decision — normal navigation, 12 September
 
 Burooj approved the composition at `652cd9e` ("good layout") and then asked to

@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import WelcomeHero from "../design/compositions/WelcomeHero.astro";
+import DecorativeBlobs from "../design/unique/DecorativeBlobs.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
@@ -16,7 +17,12 @@ const { projects, updates, site } = Astro.props;
 ---
 
 <div class="home-composition shell">
-  <WelcomeHero social={site.social} />
+  <div class="welcome-region">
+    <WelcomeHero social={site.social} />
+    <div class="welcome-art" aria-hidden="true">
+      <DecorativeBlobs />
+    </div>
+  </div>
   <div class="below">
     <section class="selected-work" aria-labelledby="home-projects">
       <SectionHeading
@@ -59,6 +65,15 @@ const { projects, updates, site } = Astro.props;
   </section>
 </div>
 <style>
+  .welcome-region {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--blob-art-width);
+    align-items: center;
+    gap: var(--space-2xl);
+  }
+  .welcome-art {
+    pointer-events: none;
+  }
   .below {
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--rail-width);
@@ -94,6 +109,12 @@ const { projects, updates, site } = Astro.props;
     color: var(--color-text-soft);
   }
   @media (max-width: 62.5rem) {
+    .welcome-region {
+      display: block;
+    }
+    .welcome-art {
+      display: none;
+    }
     .below {
       gap: var(--space-xl);
       grid-template-columns: minmax(0, 1fr) var(--rail-width-mid);

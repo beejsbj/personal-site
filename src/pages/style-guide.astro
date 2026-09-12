@@ -9,6 +9,7 @@ import Note from "../design/primitives/Note.astro";
 import TagList from "../design/primitives/TagList.astro";
 import WelcomeHero from "../design/compositions/WelcomeHero.astro";
 import CurvedArrow from "../design/unique/CurvedArrow.astro";
+import DecorativeBlobs from "../design/unique/DecorativeBlobs.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
@@ -156,6 +157,23 @@ const anatomy = [
         Composition → WelcomeHero imports Heading, Link, and the singular
         Portrait. The curved arrow below is retained as a historical specimen,
         no longer placed between the homepage introduction and work.
+      </p>
+    </section>
+
+    <section class="specimen" aria-labelledby="decorative-specimen">
+      <SectionHeading
+        id="decorative-specimen"
+        title="Circles, without controls"
+      />
+      <div class="blob-specimen">
+        <DecorativeBlobs />
+      </div>
+      <p class="annotation">
+        The old menu's unequal burgundy and peach circles return as static
+        artwork beside the desktop introduction. They have no labels, hover
+        effects or click targets and are hidden from assistive technology.
+        Compact layouts omit the cluster so the text and real navigation retain
+        their space.
       </p>
     </section>
 
@@ -316,6 +334,9 @@ const anatomy = [
 <style>
   .guide {
     padding-top: var(--space-2xl);
+  }
+  .blob-specimen {
+    width: var(--blob-art-width);
   }
   .direction {
     display: grid;
