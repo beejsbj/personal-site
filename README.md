@@ -11,13 +11,14 @@ corepack pnpm@10.6.5 dev --host 0.0.0.0 --port 4321
 ```
 
 Open `http://localhost:4321/`. The living style guide is
-`http://localhost:4321/design-system`.
+`http://localhost:4321/style-guide` (`/design-system` is a compatibility alias).
 
 ## Design source
 
 - `src/design/tokens.css`: visual values and responsive contracts.
 - `src/design/primitives/`: links, headings, media frames, notes, metadata lists.
-- `src/design/unique/`: the portrait, hand-drawn curve and magnetic blob navigation.
+- `src/design/unique/`: the portrait, hand-drawn curve, decorative circles and
+  independently enhanced corner blob.
 - `src/design/compounds/`, `src/components/`: shared assemblies.
 - `src/design/compositions/`: the welcome region used by the homepage and guide.
 
@@ -33,9 +34,10 @@ corepack pnpm@10.6.5 test
 ```
 
 Tests inspect the generated output and enforce token/component cohesion.
-The navigation is progressively enhanced with a small local motion runtime;
-its links and current state work without JavaScript. The guide demonstrates the
-same behavior, including Pause motion and reduced-motion support.
+Text navigation and its current-page state work without JavaScript. Decorative
+circles are static, hidden from assistive technology and never act as controls.
+Only the cropped corner blob has a local pointer-attraction enhancement, disabled
+for touch and reduced motion. The guide imports these production specimens.
 `corepack pnpm@10.6.5 format` formats active source with Prettier and its Astro plugin.
 
 ## Historical material
@@ -46,7 +48,6 @@ The existing Docker configuration still serves that PHP archive. Do not rerun
 `scripts/migrate-to-astro-content.mjs` casually: it is a one-shot importer that
 can overwrite authored content.
 
-`public/images/` and compatibility routes remain active. The old `/style-guide`
-URL continues to point at its historical Lab entry; the current system has its
-own `/design-system` route. Deployment is a separate action.
-
+`public/images/` and compatibility routes remain active. `/style-guide` is the
+dedicated current guide; `/design-system` and `/lab/style-guide` redirect there.
+Deployment is a separate action.
