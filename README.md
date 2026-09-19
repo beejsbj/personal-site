@@ -50,4 +50,7 @@ can overwrite authored content.
 
 `public/images/` and compatibility routes remain active. `/style-guide` is the
 dedicated current guide; `/design-system` and `/lab/style-guide` redirect there.
-Deployment is a separate action.
+Production is hosted by Vercel at `https://burooj.dev`. GitHub branches receive
+preview deployments; successful builds from `main` update production. See
+[production operations](docs/production.md) for the build gate, DNS boundary,
+verification, and rollback.
