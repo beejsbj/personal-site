@@ -97,16 +97,24 @@ test("opening work uses one real feature without duplicating the selected projec
   );
 });
 
-test("decorative circles remain artwork rather than navigation", () => {
-  const artwork = html.match(
-    /<svg\b([^>]*\bdata-blob-art\b[^>]*)>([\s\S]*?)<\/svg>/i,
+test("playful circles are progressive controls separate from navigation", () => {
+  assert.match(html, /role="group"\s+aria-label="Playful balls"/);
+  const balls = [
+    ...html.matchAll(/<button\b[^>]*\bdata-playful-blob\b[^>]*>/g),
+  ].map(([tag]) => tag);
+  assert.equal(balls.length, 4);
+  assert.equal(
+    new Set(balls.map((tag) => attributes(tag)["aria-label"])).size,
+    4,
   );
-  assert.ok(artwork, "Missing decorative circle artwork");
-  const attrs = attributes(artwork[1]);
-  assert.equal(attrs["aria-hidden"], "true");
-  assert.equal(attrs.focusable, "false");
-  assert.equal([...artwork[2].matchAll(/<circle\b/g)].length, 4);
-  assert.doesNotMatch(artwork[0], /<(?:a|button)\b|\btabindex\s*=/i);
+  for (const ball of balls) {
+    assert.equal(attributes(ball).type, "button");
+    assert.ok(attributes(ball)["aria-describedby"]);
+    assert.match(ball, /\bdisabled(?:\s|>)/, "No inert no-script tab stops");
+    assert.doesNotMatch(ball, /aria-hidden="true"/);
+  }
+  assert.match(html, /data-playful-blobs-reset/);
+  assert.match(html, /Return balls/);
 });
 
 test("homepage preserves canonical and social metadata", () => {

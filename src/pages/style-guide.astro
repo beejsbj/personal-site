@@ -109,6 +109,12 @@ const anatomy = [
     "Same shared chrome on every route",
     "Active route is semantic; Resume remains available in footer.",
   ],
+  [
+    "PageTransition",
+    "A circle travels from the link, covers the page, and shrinks away",
+    "Default-theme cover / reveal / idle",
+    "Follows internal navigation, including keyboard and history. Reduced motion skips the sweep. Use any internal link in this guide to try it.",
+  ],
 ];
 ---
 
@@ -116,7 +122,6 @@ const anatomy = [
   title="Style Guide"
   description="The warm welcome design language used by Burooj's site."
   noindex
-  clientRouting={false}
 >
   <div class="guide shell">
     <PageHeader
@@ -139,8 +144,9 @@ const anatomy = [
         We considered the activity-first desk and the navigation-first circular
         index. The welcome stays because it is the direction Burooj selected.
         The composition revision pairs portrait with introduction and brings the
-        first project into the opening screen. Its layout still awaits Burooj's
-        visual review; preserving the palette is not enough on its own.
+        first project into the opening screen. Burooj accepted that layout and
+        the normal text menu. The restored transition and playful balls are new
+        additions for review.
       </p>
     </section>
 
@@ -161,19 +167,17 @@ const anatomy = [
     </section>
 
     <section class="specimen" aria-labelledby="decorative-specimen">
-      <SectionHeading
-        id="decorative-specimen"
-        title="Circles, without controls"
-      />
+      <SectionHeading id="decorative-specimen" title="Circles to play with" />
       <div class="blob-specimen">
         <DecorativeBlobs />
       </div>
       <p class="annotation">
-        The old menu's unequal burgundy and peach circles return as static
-        artwork beside the desktop introduction. They have no labels, hover
-        effects or click targets and are hidden from assistive technology.
-        Compact layouts omit the cluster so the text and real navigation retain
-        their space.
+        The old menu's unequal burgundy and peach circles are a small
+        playground. Move nearby, drag, and release to throw. Keyboard users can
+        move them with arrow keys and toss with Space; reset brings them home.
+        Compact homepage layouts omit the cluster so the introduction retains
+        its space. Reduced motion skips the physics. The normal text menu still
+        handles navigation.
       </p>
     </section>
 

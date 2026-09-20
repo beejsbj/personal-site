@@ -1,32 +1,145 @@
 ---
-/** The former menu's unequal circles, now artwork only. Geometry is SVG art;
- * no links, pointer effects, focus targets or navigation semantics. */
+/** The former menu's unequal circles, retained as a contained playful control. */
 ---
 
-<svg
+<div
   class="decorative-blobs"
-  data-blob-art
-  viewBox="0 0 280 290"
-  aria-hidden="true"
-  focusable="false"
+  data-playful-blobs
+  data-displaced="false"
+  role="group"
+  aria-label="Playful balls"
 >
-  <circle class="wine" cx="88" cy="78" r="62" />
-  <circle class="peach" cx="207" cy="88" r="47" />
-  <circle class="peach" cx="63" cy="176" r="55" />
-  <circle class="peach" cx="196" cy="217" r="68" />
-</svg>
+  <p id="playful-blobs-help" class="sr-only">
+    Drag a ball with a mouse and release to throw it. With a keyboard, use the
+    arrow keys to move a ball, Space to toss it, and Home or Escape to return
+    all balls to their starting places.
+  </p>
+  <button
+    class="decorative-blob decorative-blob--wine"
+    data-playful-blob
+    type="button"
+    aria-label="Burgundy ball"
+    aria-describedby="playful-blobs-help"
+    data-dragging="false"
+    disabled
+  ></button>
+  <button
+    class="decorative-blob decorative-blob--peach-one"
+    data-playful-blob
+    type="button"
+    aria-label="Small peach ball"
+    aria-describedby="playful-blobs-help"
+    data-dragging="false"
+    disabled
+  ></button>
+  <button
+    class="decorative-blob decorative-blob--peach-two"
+    data-playful-blob
+    type="button"
+    aria-label="Medium peach ball"
+    aria-describedby="playful-blobs-help"
+    data-dragging="false"
+    disabled
+  ></button>
+  <button
+    class="decorative-blob decorative-blob--peach-three"
+    data-playful-blob
+    type="button"
+    aria-label="Large peach ball"
+    aria-describedby="playful-blobs-help"
+    data-dragging="false"
+    disabled
+  ></button>
+  <button
+    class="decorative-blobs__reset"
+    data-playful-blobs-reset
+    type="button"
+  >
+    Return balls
+  </button>
+</div>
+<script>
+  import { installPlayfulBlobs } from "./playful-blobs";
+  installPlayfulBlobs();
+</script>
 <style>
   .decorative-blobs {
-    display: block;
+    position: relative;
     width: 100%;
-    height: auto;
-    pointer-events: none;
+    aspect-ratio: 280 / 290;
+  }
+  .decorative-blob {
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-round);
+    cursor: grab;
+    touch-action: manipulation;
     user-select: none;
+    will-change: transform;
   }
-  .wine {
-    fill: var(--color-accent);
+  .decorative-blob:focus-visible {
+    outline-offset: var(--focus-offset);
   }
-  .peach {
-    fill: var(--color-surface-strong);
+  .decorative-blob[data-dragging="true"] {
+    cursor: grabbing;
+  }
+  .decorative-blob:disabled {
+    cursor: default;
+  }
+  .decorative-blobs__reset {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: var(--space-2xs) var(--space-s);
+    border: var(--rule-width) solid var(--color-accent);
+    background: var(--color-page);
+    color: var(--color-accent);
+  }
+  .decorative-blobs[data-displaced="false"] .decorative-blobs__reset {
+    display: none;
+  }
+  .decorative-blob--wine {
+    top: 5.517%;
+    left: 9.286%;
+    width: 44.286%;
+    aspect-ratio: 1;
+    background: var(--color-accent);
+  }
+  .decorative-blob--peach-one {
+    top: 14.138%;
+    left: 57.143%;
+    width: 33.571%;
+    aspect-ratio: 1;
+    background: var(--color-surface-strong);
+  }
+  .decorative-blob--peach-two {
+    top: 41.724%;
+    left: 2.857%;
+    width: 39.286%;
+    aspect-ratio: 1;
+    background: var(--color-surface-strong);
+  }
+  .decorative-blob--peach-three {
+    top: 51.379%;
+    left: 45.714%;
+    width: 48.571%;
+    aspect-ratio: 1;
+    background: var(--color-surface-strong);
+  }
+  @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+    .decorative-blob {
+      cursor: default;
+      will-change: auto;
+    }
+  }
+  @media (forced-colors: active) {
+    .decorative-blob {
+      background: ButtonFace;
+      border: var(--rule-width) solid ButtonText;
+    }
   }
 </style>

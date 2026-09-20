@@ -1,5 +1,39 @@
 # Base homepage: warm welcome
 
+## Default motion and shared-theme boundary — 20 September
+
+Burooj asked to recover the PHP page transition and make the right-side circles
+playful. These are implemented for review, preserving the accepted layout and
+normal text navigation. The default transition is the traveling circle from
+`scripts/default/pageTransition.js` at `2d8ddf8`: link origin → center → cover →
+shrink away. Burooj confirmed that source after the initial implementation
+mistakenly selected the PE site's rainbow strips. The circle now follows Astro
+navigation with reduced-motion bypass, interruption cleanup and a bounded cover
+during stalled loading. The PE strips remain a separate historical theme reference.
+See [transition ownership](page-transition.md).
+
+The circles are a unique specimen with four named native controls. Nearby mouse
+movement nudges them; dragging and releasing preserves toss velocity, with
+viewport-edge bounce and settling. Arrow keys move, Space tosses, and Home,
+Escape or the visible Return balls control resets them. Reset restores focus to
+a ball before its control disappears. Compact Home still omits the cluster;
+coarse pointers/reduced motion skip the physics. Scripts-disabled circles are
+disabled artwork rather than inert tab stops. Ball-to-ball and page-element
+collisions are not implemented; the original cluster intentionally overlaps.
+
+The guide imports the same specimen and uses the same navigation transition.
+Browser inspection covered the desktop sweep, throw outside the original
+cluster, reset, keyboard controls, live reduced motion, 390/320px Home, 320px
+guide, and native navigation without scripts. The inspected compact views had
+no horizontal overflow. Passing these checks is not a claim of Burooj's taste
+acceptance of the new motion.
+
+The default already has typed content, semantic tokens and reusable assemblies,
+but no interchangeable theme implementation. [The theme assessment](theme-architecture.md)
+applies Design Lab principles and proposes proving shared content with one
+different second face before implementing the prism. Product source stays here;
+the cross-project Lab remains the owner of practice, not a runtime dependency.
+
 ## Decorative circles — 12 September
 
 Following approval of the normal menu, Burooj asked to include the blobs
