@@ -11,3 +11,5 @@
 /index.php
 /docker-compose.yaml
 /.HTACCESS
+# Operator source policy, review drafts, and raw queue never leave this checkout.
+/.activity-engine/

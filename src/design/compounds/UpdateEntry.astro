@@ -6,6 +6,7 @@ type Props = UpdateData & { connected?: boolean; detailed?: boolean };
 const {
   title,
   date,
+  occurredAt,
   dateLabel,
   href,
   summary,
@@ -52,6 +53,8 @@ const sources = {
   github: "GitHub",
   substack: "Substack",
   bjslab: "bjslab",
+  "agent-session": "Agent sessions",
+  generic: "Around the web",
   manual: "A note",
 };
 const event = kinds[kind];
@@ -83,7 +86,7 @@ const event = kinds[kind];
       <Link href={href}>{title}</Link>
     </p>
     {detailed && <p class="event-detail">{summary}</p>}
-    <time datetime={date}>{dateLabel}</time>
+    <time datetime={occurredAt ?? date}>{dateLabel}</time>
   </div>
 </article>
 <style>

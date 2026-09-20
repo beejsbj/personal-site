@@ -6,7 +6,7 @@ import UpdateEntry from "./UpdateEntry.astro";
 interface Props {
   updates: UpdateData[];
 }
-// Curated build-time snapshot, not a connected presence service. Expiry is
+// Curated and approved imported milestones, not a connected presence service. Expiry is
 // evaluated only when rendering/building; deployed HTML does not self-expire.
 // Publish no live signals until a runtime or scheduled-refresh layer exists.
 const updates = selectActivitySnapshot(Astro.props.updates).slice(0, 8);
@@ -27,7 +27,11 @@ const updates = selectActivitySnapshot(Astro.props.updates).slice(0, 8);
       A quiet moment. More when there's something to share.
     </p>
   )}
-  <p class="stream-caption">A few things worth sharing, collected by hand.</p>
+  <p class="stream-caption">
+    {updates.some((update) => update.id)
+      ? "Selected milestones from my projects, lab, and work."
+      : "A few things worth sharing, collected by hand."}
+  </p>
 </div>
 <style>
   .stream-intro,

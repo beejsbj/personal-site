@@ -1,9 +1,11 @@
-# Future work: a public activity system
+# Public activity system: direction and remaining work
 
-Status: shaping brief for a separate issue, not an implemented service or approved
-architecture. Burooj wants updates from across his work: repositories, pull
-requests, writing, experiments, and potentially agent/status signals. Projects
-remain lasting portfolio records; activity records events.
+Status: a local multi-source engine is now implemented; live source connections
+and presence delivery remain future work. See [the engine guide](activity-engine.md)
+for current commands and boundaries. Burooj wants updates from across his work,
+especially bjslab and agent sessions, alongside repositories, pull requests,
+writing and experiments. Projects remain lasting portfolio records; activity
+records events.
 
 ## What exists
 
@@ -13,12 +15,29 @@ remain lasting portfolio records; activity records events.
 - Shared `ActivityStream` / `UpdateEntry` rendering.
 - `src/lib/activity.mjs` sorts a snapshot and filters future/expired items at
   build/render time, not continuously in deployed HTML.
+- `src/lib/activity-engine/` provides validated adapters, a local review queue,
+  stable identity, deduplication, revisions, approval and withdrawal.
+- `scripts/activity/index.mjs` imports intentional source exports and writes
+  approved durable events to `src/data/activity.public.json`. Home combines that
+  projection with manual updates. The checked-in projection starts empty.
 
-There are no webhooks, polling jobs, ingestion API, agent publishing credentials,
-moderation queue, or live telemetry. An attractive stream does not establish those
-capabilities.
+There are no connected webhooks, polling jobs, public ingestion API, agent
+publishing credentials or live telemetry. The implemented queue runs locally;
+it is not a hosted service. The design options below remain relevant to those
+future connections, rather than describing shipped capabilities.
 
 ## Intended experience
+
+Burooj's 20 September decision: review new sources first, then permit selected
+milestone types automatically. The feed should describe meaningful work he is
+doing or has done, using agent-edited summaries. It should not expose private
+details or mirror raw session/service events. A completed agent session alone
+does not establish a significant milestone.
+
+The publication path is observation → edited public draft → source/type policy
+→ approved update. The engine's policy implements the gate; source producers or
+an editorial agent supply the factual draft. No automatic summarizer is running
+inside the site.
 
 A readable stream of meaningful changes, not a raw commit firehose: “Merged the
 new keyboard controls,” “Published an article,” “Created an experiment,” or
