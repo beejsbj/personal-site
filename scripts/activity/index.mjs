@@ -15,8 +15,7 @@ import {
   retract,
 } from "../../src/lib/activity-engine/index.mjs";
 
-const usage =
-  `Usage: node scripts/activity/index.mjs <command> [options]
+const usage = `Usage: node scripts/activity/index.mjs <command> [options]
 
 Commands:
   policy-init [--out .activity-engine/policy.json]
@@ -26,9 +25,9 @@ Commands:
   reject|retract --id activity_... [--note text] [--by operator] [--store .activity-engine]
   export [--store .activity-engine] [--out src/data/activity.public.json]
 
-All imported records enter review. ` +
-  "`candidate`" +
-  ` wording in an import is private context; approval requires a separate curated projection file.`;
+Imports enter review unless an exact opt-in rule trusts a previously reviewed
+producer and milestone type. Manual approval requires a separate curated
+projection file; automatic approval uses only the producer's public candidate.`;
 
 function parseArgs(argv) {
   const [command, ...tokens] = argv;
