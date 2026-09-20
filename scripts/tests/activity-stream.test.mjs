@@ -26,7 +26,7 @@ test("activity is a chronological native list, not a writing grid or live log", 
   assert.deepEqual(dates, [...dates].sort().reverse());
   assert.equal((list[1].match(/<li\b/g) || []).length, dates.length);
   assert.doesNotMatch(list[1], /<h[1-6]\b|role="log"|aria-live=/);
-  assert.match(html, /collected by hand/);
+  assert.match(html, /A few things I(?:&#39;|')ve been up to/);
 });
 
 test("different event kinds have distinct labels and icon paths", () => {
@@ -78,13 +78,13 @@ test("seeded milestones link to verifiable sources and do not invent live presen
   }
 });
 
-test("ephemeral event contract requires expiry and acknowledges build-time limits", () => {
+test("ephemeral signals have expiry and use the separate runtime surface", () => {
   assert.match(
     schema,
     /\["status", "location", "agents"\]\.includes\(update\.kind\) &&\s*!update\.expiresAt/,
   );
   const stream = read("src/design/compounds/ActivityStream.astro");
-  assert.match(stream, /deployed HTML does not self-expire/);
+  assert.match(stream, /<LiveActivity\s*\/>/);
   assert.match(stream, /selectActivitySnapshot\(Astro\.props\.updates\)/);
   assert.match(stream, /A quiet moment/);
 });
@@ -127,7 +127,7 @@ test("display limit follows eligibility so newer hidden signals cannot crowd out
   const page = read("src/pages/index.astro");
   assert.match(
     page,
-    /const recentUpdates: CollectionEntry<"updates">\[\] = await getCollection\("updates"\);/,
+    /const recentUpdates: CollectionEntry<"updates">\[\] =\s+await getCollection\("updates"\);/,
   );
   const updates = [
     ...Array.from({ length: 4 }, () => ({ date: "2026-10-01", id: "future" })),
@@ -143,5 +143,25 @@ test("display limit follows eligibility so newer hidden signals cannot crowd out
       .slice(0, 8)
       .map((update) => update.id),
     [0, 1, 2, 3, 4, 5, 6, 7],
+  );
+});
+
+test("precise engine timestamps order same-day milestones and exclude future events", () => {
+  const updates = [
+    { date: "2026-09-20", occurredAt: "2026-09-20T08:00:00Z", id: "first" },
+    { date: "2026-09-20", occurredAt: "2026-09-20T10:00:00Z", id: "future" },
+    {
+      date: "2026-09-20",
+      occurredAt: "2026-09-20T14:00:00+05:30",
+      id: "second",
+    },
+    { date: "2026-09-20", id: "manual" },
+    { date: "2026-09-20", occurredAt: "invalid", id: "invalid" },
+  ];
+  assert.deepEqual(
+    selectActivitySnapshot(updates, new Date("2026-09-20T09:00:00Z")).map(
+      (update) => update.id,
+    ),
+    ["second", "first", "manual"],
   );
 });

@@ -1,0 +1,32 @@
+[
+  {
+    "source": "bjslab",
+    "producer": "bjslab:milestone-producer",
+    "providerEventId": "synthetic-deploy-42",
+    "eventKind": "milestone",
+    "mode": "event",
+    "occurredAt": "2026-09-20T12:00:00Z",
+    "observedAt": "2026-09-20T12:01:00Z",
+    "candidate": {
+      "title": "Synthetic bjslab milestone",
+      "summary": "Fixture only; it does not describe a live service.",
+      "href": "https://example.test/activity/42",
+      "linkLabel": "View fixture"
+    }
+  },
+  {
+    "source": "bjslab",
+    "producer": "bjslab:second-producer",
+    "providerEventId": "synthetic-deploy-43",
+    "eventKind": "milestone",
+    "mode": "event",
+    "occurredAt": "2026-09-20T13:00:00Z",
+    "observedAt": "2026-09-20T13:01:00Z",
+    "candidate": {
+      "title": "Second synthetic bjslab milestone",
+      "summary": "A second fixture verifies sequential batch ingestion.",
+      "href": "https://example.test/activity/43",
+      "linkLabel": "View fixture"
+    }
+  }
+]

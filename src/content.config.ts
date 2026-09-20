@@ -55,7 +55,7 @@ const labSchema = z.object({
   hidden: z.boolean().default(false),
 });
 
-const updateSchema = z
+export const updateSchema = z
   .object({
     // Events describe things that happened, not another project/writing collection.
     kind: z
@@ -72,7 +72,15 @@ const updateSchema = z
       ])
       .default("project"),
     source: z
-      .enum(["site", "github", "substack", "bjslab", "manual"])
+      .enum([
+        "site",
+        "github",
+        "substack",
+        "bjslab",
+        "agent-session",
+        "manual",
+        "generic",
+      ])
       .default("site"),
     evidence: z
       .object({
@@ -81,6 +89,9 @@ const updateSchema = z
       })
       .optional(),
     title: z.string(),
+    // Engine events retain precise chronology; handwritten entries can use dates.
+    id: z.string().optional(),
+    occurredAt: z.string().datetime({ offset: true }).optional(),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     dateLabel: z.string(),
     summary: z.string(),

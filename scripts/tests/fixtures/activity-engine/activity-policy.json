@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "sources": {
+    "github": {
+      "enabled": true,
+      "producers": ["github:example/public-repo"],
+      "review": "required"
+    },
+    "bjslab": {
+      "enabled": true,
+      "producers": ["bjslab:milestone-producer", "bjslab:second-producer"],
+      "review": "required"
+    },
+    "agent-session": {
+      "enabled": true,
+      "producers": ["agent-session:operator"],
+      "review": "required"
+    },
+    "manual": {
+      "enabled": true,
+      "producers": ["manual:operator"],
+      "review": "required"
+    },
+    "generic": { "enabled": false, "producers": [], "review": "required" }
+  }
+}

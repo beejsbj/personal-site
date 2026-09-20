@@ -44,6 +44,14 @@ enhancement. The guide imports these production specimens. See the
 [theme architecture assessment](docs/theme-architecture.md) for their boundaries.
 `corepack pnpm@10.6.5 format` formats active source with Prettier and its Astro plugin.
 
+## Activity
+
+Hand-authored updates can be supplemented by the [local activity engine](docs/activity-engine.md).
+It queues intentional source facts for agent-edited public summaries and manual
+review, with opt-in automation for selected milestone types from reviewed
+producers. Only the approved static export reaches the site. Live bjslab and
+session collectors are a separate connection step; no real source is enabled here.
+
 ## Historical material
 
 The root PHP site, `templates/`, `data/`, `styles/`, `images/`, `projects/`, and

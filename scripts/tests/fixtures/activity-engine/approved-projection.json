@@ -1,0 +1,6 @@
+{
+  "title": "Reviewed synthetic milestone",
+  "summary": "A synthetic fixture used to verify the local activity engine.",
+  "href": "https://example.test/activity/42",
+  "linkLabel": "View fixture"
+}
