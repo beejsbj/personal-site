@@ -4,9 +4,12 @@
 
 Burooj asked to recover the PHP page transition and make the right-side circles
 playful. These are implemented for review, preserving the accepted layout and
-normal text navigation. The fourteen pastel rainbow strips now follow Astro
-navigation, including keyboard/history, with a shorter sweep, reduced-motion
-bypass, interruption cleanup and a bounded cover during stalled loading.
+normal text navigation. The default transition is the traveling circle from
+`scripts/default/pageTransition.js` at `2d8ddf8`: link origin → center → cover →
+shrink away. Burooj confirmed that source after the initial implementation
+mistakenly selected the PE site's rainbow strips. The circle now follows Astro
+navigation with reduced-motion bypass, interruption cleanup and a bounded cover
+during stalled loading. The PE strips remain a separate historical theme reference.
 See [transition ownership](page-transition.md).
 
 The circles are a unique specimen with four named native controls. Nearby mouse
