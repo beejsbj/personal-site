@@ -5,6 +5,7 @@ const MAX_COVER_TIME_MS = 5000;
 type TransitionEvent = Event & {
   loader?: () => Promise<void>;
   signal?: AbortSignal;
+  sourceElement?: Element;
 };
 
 type TransitionOverlay = HTMLElement & {
@@ -17,19 +18,53 @@ function milliseconds(value: string) {
   return Number(match[1]) * (match[2] === "s" ? 1000 : 1);
 }
 
-function sweepDuration(overlay: TransitionOverlay) {
-  const style = getComputedStyle(overlay);
-  const sweep = milliseconds(style.getPropertyValue("--page-transition-sweep"));
-  const stagger = milliseconds(
-    style.getPropertyValue("--page-transition-stagger"),
+function duration(overlay: TransitionOverlay, name: string) {
+  return milliseconds(getComputedStyle(overlay).getPropertyValue(name));
+}
+
+function clamp(value: number, max: number) {
+  return Math.min(Math.max(value, 0), max);
+}
+
+function originFor(sourceElement?: Element) {
+  if (!sourceElement) {
+    return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  }
+
+  const rect = sourceElement.getBoundingClientRect();
+  return {
+    x: clamp(rect.left + rect.width / 2, window.innerWidth),
+    y: clamp(rect.top + rect.height / 2, window.innerHeight),
+  };
+}
+
+function setGeometry(overlay: TransitionOverlay, sourceElement?: Element) {
+  const { x, y } = originFor(sourceElement);
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+  const orbSize = overlay
+    .querySelector<HTMLElement>(".page-transition__orb")
+    ?.getBoundingClientRect().width;
+  const safeOrbSize =
+    typeof orbSize === "number" && Number.isFinite(orbSize) && orbSize > 0
+      ? orbSize
+      : 50;
+  const coverDiameter = Math.hypot(window.innerWidth, window.innerHeight);
+
+  overlay.style.setProperty("--page-transition-origin-x", `${x}px`);
+  overlay.style.setProperty("--page-transition-origin-y", `${y}px`);
+  overlay.style.setProperty("--page-transition-travel-x", `${centerX - x}px`);
+  overlay.style.setProperty("--page-transition-travel-y", `${centerY - y}px`);
+  overlay.style.setProperty(
+    "--page-transition-cover-scale",
+    `${coverDiameter / safeOrbSize}`,
   );
-  return sweep + Math.max(overlay.children.length - 1, 0) * stagger;
 }
 
 /**
- * The default face's recovered PE strip sweep. This listens to Astro's router
- * lifecycle once, keeps its overlay persistent, and leaves navigation itself to
- * ClientRouter so keyboard and history navigation follow the same path.
+ * The PHP default's traveling circle, adapted to Astro's persistent router
+ * lifecycle. Links provide the start point; history navigation begins at the
+ * viewport center, and Astro retains ownership of focus and scroll restoration.
  */
 export function installDefaultPageTransition() {
   const host = window as typeof window &
@@ -43,7 +78,7 @@ export function installDefaultPageTransition() {
   const controller = new AbortController();
   const { signal } = controller;
   let activeRun = 0;
-  let pendingSweep:
+  let pendingCover:
     { resolve: () => void; timer: ReturnType<typeof setTimeout> } | undefined;
   let resetTimer: ReturnType<typeof setTimeout> | undefined;
   let coverWatchdog: ReturnType<typeof setTimeout> | undefined;
@@ -58,36 +93,42 @@ export function installDefaultPageTransition() {
     resetTimer = undefined;
   };
 
-  const completePendingSweep = () => {
-    if (!pendingSweep) return;
-    clearTimeout(pendingSweep.timer);
-    const { resolve } = pendingSweep;
-    pendingSweep = undefined;
+  const completePendingCover = () => {
+    if (!pendingCover) return;
+    clearTimeout(pendingCover.timer);
+    const { resolve } = pendingCover;
+    pendingCover = undefined;
     resolve();
   };
 
   const reset = () => {
-    completePendingSweep();
+    completePendingCover();
     clearResetTimer();
     clearWatchdog();
     if (overlay) overlay.dataset.state = "idle";
   };
 
-  const runCover = () => {
+  const runCover = (sourceElement?: Element) => {
     if (!overlay || reducedMotion.matches) return Promise.resolve();
-    completePendingSweep();
+    completePendingCover();
     clearResetTimer();
     clearWatchdog();
+    overlay.dataset.state = "idle";
+    setGeometry(overlay, sourceElement);
+    // Commit the small trigger-sized circle before transitioning it outward.
+    void overlay.offsetWidth;
     overlay.dataset.state = "covering";
     coverWatchdog = setTimeout(reset, MAX_COVER_TIME_MS);
-    const duration = sweepDuration(overlay);
+    const coverDuration =
+      duration(overlay, "--page-transition-travel") +
+      duration(overlay, "--page-transition-grow");
     return new Promise<void>((resolve) => {
-      pendingSweep = {
+      pendingCover = {
         resolve,
         timer: setTimeout(() => {
-          pendingSweep = undefined;
+          pendingCover = undefined;
           resolve();
-        }, duration),
+        }, coverDuration),
       };
     });
   };
@@ -102,11 +143,14 @@ export function installDefaultPageTransition() {
       reset();
       return;
     }
-    completePendingSweep();
+    completePendingCover();
     clearResetTimer();
     clearWatchdog();
     overlay.dataset.state = "revealing";
-    resetTimer = setTimeout(reset, sweepDuration(overlay));
+    resetTimer = setTimeout(
+      reset,
+      duration(overlay, "--page-transition-reveal"),
+    );
   };
 
   const beforePreparation = (event: TransitionEvent) => {
@@ -115,7 +159,7 @@ export function installDefaultPageTransition() {
       return;
     }
     const run = ++activeRun;
-    const cover = runCover();
+    const cover = runCover(event.sourceElement);
     const originalLoader = event.loader;
 
     if (originalLoader) {

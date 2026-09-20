@@ -1,22 +1,3 @@
----
-const stripes = [
-  "red",
-  "orange",
-  "yellow",
-  "green",
-  "cyan",
-  "blue",
-  "purple",
-  "red",
-  "orange",
-  "yellow",
-  "green",
-  "cyan",
-  "blue",
-  "purple",
-];
----
-
 <div
   class="page-transition"
   data-page-transition="default"
@@ -24,15 +5,9 @@ const stripes = [
   aria-hidden="true"
   transition:persist="page-transition-default"
 >
-  {stripes.map((color, index) => (
-    <span
-      class:list={[
-        "page-transition__stripe",
-        `page-transition__stripe--${color}`,
-      ]}
-      style={`--page-transition-stripe-index: ${index + 1}`}
-    ></span>
-  ))}
+  <div class="page-transition__traveler">
+    <div class="page-transition__orb"></div>
+  </div>
 </div>
 
 <script>
@@ -43,29 +18,37 @@ const stripes = [
 
 <style>
   [data-page-transition="default"] {
+    --page-transition-origin-x: 50%;
+    --page-transition-origin-y: 50%;
+    --page-transition-travel-x: 0%;
+    --page-transition-travel-y: 0%;
+    --page-transition-cover-scale: 1;
     position: fixed;
     z-index: var(--layer-skip);
     inset: 0;
-    display: grid;
-    grid-template-rows: repeat(14, minmax(0, 1fr));
     visibility: hidden;
+    overflow: clip;
     pointer-events: none;
   }
 
-  .page-transition__stripe {
-    border-block: var(--rule-width) solid var(--page-transition-stripe-rule);
-    transform: translate3d(100%, 0, 0);
-    transition: transform var(--page-transition-sweep)
-      var(--ease-page-transition);
-    transition-delay: calc(
-      (14 - var(--page-transition-stripe-index)) *
-        var(--page-transition-stagger)
-    );
+  .page-transition__traveler {
+    position: absolute;
+    top: var(--page-transition-origin-y);
+    left: var(--page-transition-origin-x);
+    width: var(--page-transition-orb-size);
+    aspect-ratio: 1;
+    transform: translate3d(-50%, -50%, 0);
     will-change: transform;
   }
 
-  [data-page-transition="default"][data-state="idle"] .page-transition__stripe {
-    transition: none;
+  .page-transition__orb {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-round);
+    background: var(--page-transition-color);
+    transform: scale(1);
+    transform-origin: center;
+    will-change: transform;
   }
 
   [data-page-transition="default"][data-state="covering"],
@@ -74,50 +57,40 @@ const stripes = [
   }
 
   [data-page-transition="default"][data-state="covering"]
-    .page-transition__stripe {
-    transform: translate3d(0, 0, 0);
+    .page-transition__traveler {
+    transform: translate3d(
+      calc(-50% + var(--page-transition-travel-x)),
+      calc(-50% + var(--page-transition-travel-y)),
+      0
+    );
+    transition: transform var(--page-transition-travel)
+      var(--ease-page-transition-travel);
+  }
+
+  [data-page-transition="default"][data-state="covering"]
+    .page-transition__orb {
+    transform: scale(var(--page-transition-cover-scale));
+    transition: transform var(--page-transition-grow)
+      var(--ease-page-transition-grow) var(--page-transition-travel);
   }
 
   [data-page-transition="default"][data-state="revealing"]
-    .page-transition__stripe {
-    transform: translate3d(-100%, 0, 0);
+    .page-transition__traveler {
+    transform: translate3d(-50%, -50%, 0);
+    transition: transform var(--page-transition-reveal)
+      var(--ease-page-transition-reveal);
   }
 
-  .page-transition__stripe--red {
-    background: var(--page-transition-red);
-  }
-
-  .page-transition__stripe--orange {
-    background: var(--page-transition-orange);
-  }
-
-  .page-transition__stripe--yellow {
-    background: var(--page-transition-yellow);
-  }
-
-  .page-transition__stripe--green {
-    background: var(--page-transition-green);
-  }
-
-  .page-transition__stripe--cyan {
-    background: var(--page-transition-cyan);
-  }
-
-  .page-transition__stripe--blue {
-    background: var(--page-transition-blue);
-  }
-
-  .page-transition__stripe--purple {
-    background: var(--page-transition-purple);
+  [data-page-transition="default"][data-state="revealing"]
+    .page-transition__orb {
+    transform: scale(0);
+    transition: transform var(--page-transition-reveal)
+      var(--ease-page-transition-reveal);
   }
 
   @media (prefers-reduced-motion: reduce) {
     [data-page-transition="default"] {
       display: none;
-    }
-
-    .page-transition__stripe {
-      transition: none;
     }
   }
 </style>

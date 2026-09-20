@@ -35,7 +35,7 @@ corepack pnpm@10.6.5 test
 
 Tests inspect the generated output and enforce token/component cohesion.
 Text navigation and its current-page state work without JavaScript. The default
-theme restores the PHP site's rainbow strip transition. Its four circles react
+theme restores the PHP default's traveling-circle transition. Its four circles react
 to the pointer and support drag/throw, keyboard movement, and a Return balls
 control. Reduced motion disables physics and the page sweep; without JavaScript
 the circles remain inert artwork. The corner blob retains its local pointer

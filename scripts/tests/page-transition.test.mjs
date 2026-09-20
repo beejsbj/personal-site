@@ -17,10 +17,20 @@ const compiled = ts.transpileModule(source, {
     target: ts.ScriptTarget.ES2022,
   },
 }).outputText;
+const specimen = readFileSync(
+  new URL("../../src/design/unique/PageTransition.astro", import.meta.url),
+  "utf8",
+);
 
 class Surface {
   listeners = new Map();
   dataset = {};
+  style = {
+    properties: new Map(),
+    setProperty: (name, value) => this.style.properties.set(name, value),
+    getPropertyValue: (name) => this.style.properties.get(name) ?? "",
+  };
+  offsetWidth = 1;
   addEventListener(type, listener, options = {}) {
     const listeners = this.listeners.get(type) ?? new Set();
     listeners.add(listener);
@@ -40,7 +50,10 @@ function harness() {
   document.documentElement = { dataset: { theme: "default" } };
   const overlay = new Surface();
   overlay.dataset.state = "idle";
-  overlay.children = Array.from({ length: 14 });
+  overlay.querySelector = (selector) =>
+    selector === ".page-transition__orb"
+      ? { getBoundingClientRect: () => ({ width: 50 }) }
+      : null;
   document.querySelector = (selector) =>
     selector === '[data-page-transition="default"]' ? overlay : null;
   const motion = new Surface();
@@ -51,6 +64,8 @@ function harness() {
     exports: {},
     document,
     window: Object.assign(new Surface(), {
+      innerWidth: 1000,
+      innerHeight: 600,
       matchMedia: (query) => {
         assert.equal(query, "(prefers-reduced-motion: reduce)");
         return motion;
@@ -70,8 +85,10 @@ function harness() {
     getComputedStyle: () => ({
       getPropertyValue: (name) =>
         ({
-          "--page-transition-sweep": "0.28s",
-          "--page-transition-stagger": "0.012s",
+          "--page-transition-travel": "0.5s",
+          "--page-transition-grow": "0.3s",
+          "--page-transition-reveal": "0.3s",
+          "--page-transition-orb-size": "3.125rem",
         })[name] ?? "",
     }),
   };
@@ -85,9 +102,9 @@ function harness() {
       callback();
     }
   };
-  const navigation = (loader = async () => {}) => {
+  const navigation = (loader = async () => {}, sourceElement) => {
     const signal = new Surface();
-    return { loader, signal };
+    return { loader, signal, sourceElement };
   };
   return {
     document,
@@ -101,26 +118,100 @@ function harness() {
   };
 }
 
-test("the strip cover fetches concurrently, then exposes the swapped page", async () => {
+test("the traveling circle starts at the clicked link, covers after travel plus growth, then reveals", async () => {
   const h = harness();
   h.install();
   let loaderCalls = 0;
-  const navigation = h.navigation(async () => {
-    loaderCalls += 1;
-  });
+  const navigation = h.navigation(
+    async () => {
+      loaderCalls += 1;
+    },
+    {
+      getBoundingClientRect: () => ({
+        left: 100,
+        top: 300,
+        width: 80,
+        height: 40,
+      }),
+    },
+  );
 
   h.document.emit("astro:before-preparation", navigation);
   assert.equal(h.overlay.dataset.state, "covering");
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-origin-x"),
+    "140px",
+  );
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-origin-y"),
+    "320px",
+  );
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-travel-x"),
+    "360px",
+  );
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-travel-y"),
+    "-20px",
+  );
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-cover-scale"),
+    `${Math.hypot(1000, 600) / 50}`,
+  );
   const settled = navigation.loader();
   assert.equal(loaderCalls, 1, "the incoming document starts loading at once");
   assert.equal(h.timerCount(), 2);
-  h.runTimers(436);
+  h.runTimers(800);
   await settled;
 
   h.document.emit("astro:after-swap");
   assert.equal(h.overlay.dataset.state, "revealing");
-  h.runTimers();
+  h.runTimers(299);
+  assert.equal(h.overlay.dataset.state, "revealing");
+  h.runTimers(300);
   assert.equal(h.overlay.dataset.state, "idle");
+});
+
+test("history navigation begins in the viewport center and trigger origins stay visible", () => {
+  const h = harness();
+  h.install();
+  h.document.emit("astro:before-preparation", h.navigation());
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-origin-x"),
+    "500px",
+  );
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-origin-y"),
+    "300px",
+  );
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-travel-x"),
+    "0px",
+  );
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-travel-y"),
+    "0px",
+  );
+
+  h.document.emit(
+    "astro:before-preparation",
+    h.navigation(async () => {}, {
+      getBoundingClientRect: () => ({
+        left: -30,
+        top: 590,
+        width: 10,
+        height: 40,
+      }),
+    }),
+  );
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-origin-x"),
+    "0px",
+  );
+  assert.equal(
+    h.overlay.style.getPropertyValue("--page-transition-origin-y"),
+    "600px",
+  );
 });
 
 test("a stalled fetch and a window pagehide cannot leave the page covered", () => {
@@ -130,7 +221,7 @@ test("a stalled fetch and a window pagehide cannot leave the page covered", () =
     "astro:before-preparation",
     h.navigation(() => new Promise(() => {})),
   );
-  h.runTimers(436);
+  h.runTimers(800);
   assert.equal(h.overlay.dataset.state, "covering");
   h.runTimers(5000);
   assert.equal(h.overlay.dataset.state, "idle");
@@ -193,4 +284,14 @@ test("live reduced motion and repeated Astro mounting remain safe", async () => 
   h.document.emit("astro:before-preparation", reducedNavigation);
   await reducedNavigation.loader();
   assert.equal(h.overlay.dataset.state, "idle");
+});
+
+test("the persistent specimen keeps the PHP circle choreography and removes PE strips", () => {
+  assert.match(specimen, /page-transition__traveler/);
+  assert.match(specimen, /page-transition__orb/);
+  assert.match(specimen, /--page-transition-travel/);
+  assert.match(specimen, /--page-transition-grow/);
+  assert.match(specimen, /--page-transition-reveal/);
+  assert.match(specimen, /prefers-reduced-motion: reduce/);
+  assert.doesNotMatch(specimen, /stripe|rainbow|page-transition-red/);
 });

@@ -22,7 +22,7 @@ motion needs an explicit presentation boundary.
 ## Apply Design Lab to each face
 
 Keep tokens → primitives → compounds → compositions as the reusable ladder.
-Portraits, the recovered strip transition, playful circles and the eventual prism
+Portraits, the recovered circle transition, playful circles and the eventual prism
 remain unique specimens outside that ladder. They may consume shared grammar
 without becoming forced variants of a generic component.
 
