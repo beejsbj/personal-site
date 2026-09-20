@@ -102,6 +102,18 @@
   --layer-decoration: -1;
   --layer-skip: 10;
   --skip-hidden: translateY(calc(-100% - var(--space-l)));
+  /* Default-theme strip transition: palette recovered from the PHP/PE site. */
+  --page-transition-red: hsl(0 85% 78%);
+  --page-transition-orange: hsl(30 72% 75%);
+  --page-transition-yellow: hsl(55 93% 80%);
+  --page-transition-green: hsl(140 39% 76%);
+  --page-transition-cyan: hsl(190 58% 79%);
+  --page-transition-blue: hsl(210 66% 77%);
+  --page-transition-purple: hsl(320 46% 74%);
+  --page-transition-stripe-rule: var(--color-text);
+  --page-transition-sweep: 0.28s;
+  --page-transition-stagger: 0.012s;
+  --ease-page-transition: cubic-bezier(0.16, 1, 0.3, 1);
 }
 @media (max-width: 40.625rem) {
   :root {

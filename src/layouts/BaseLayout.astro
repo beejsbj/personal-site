@@ -4,6 +4,7 @@ import { ClientRouter } from "astro:transitions";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import EdgeBlob from "../design/unique/EdgeBlob.astro";
+import PageTransition from "../design/unique/PageTransition.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
   pageClass?: string;
   noindex?: boolean;
   clientRouting?: boolean;
+  theme?: "default";
 }
 
 const siteEntry = await getEntry("site", "config");
@@ -28,6 +30,7 @@ const {
   pageClass = "page-default",
   noindex = false,
   clientRouting = true,
+  theme = "default",
 } = Astro.props;
 
 const pageTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
@@ -36,7 +39,7 @@ const socialImage = new URL(image, siteBaseUrl).toString();
 ---
 
 <!doctype html>
-<html lang="en" data-theme="default">
+<html lang="en" data-theme={theme}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -70,5 +73,6 @@ const socialImage = new URL(image, siteBaseUrl).toString();
       </main>
       <SiteFooter email={site.email} />
     </div>
+    {theme === "default" && <PageTransition />}
   </body>
 </html>
