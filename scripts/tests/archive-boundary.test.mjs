@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
@@ -40,8 +40,17 @@ function rootPattern(path) {
   return path.includes(".") && !path.includes("/") ? `/${path}` : `/${path}/`;
 }
 
+// Vercel removes ignored files but may leave their empty directory trees.
+// Only a fully excluded archive qualifies; a partly missing archive still fails.
+function containsArchiveFile(path) {
+  if (!existsSync(path)) return false;
+  if (!statSync(path).isDirectory()) return true;
+  return readdirSync(path).some((name) => containsArchiveFile(join(path, name)));
+}
+
 const archiveIsExcludedVercelInput =
-  process.env.VERCEL === "1" && archiveRoots.every((path) => !existsSync(path));
+  process.env.VERCEL === "1" &&
+  archiveRoots.every((path) => !containsArchiveFile(path));
 
 test("Vercel excludes the root-level PHP/JSON archive", () => {
   const ignored = new Set(readFileSync(".vercelignore", "utf8").split(/\r?\n/));
