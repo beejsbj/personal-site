@@ -30,7 +30,9 @@ export function getLegacyRedirect(url: URL): string | undefined {
 
   if (page === "project") {
     const projectId = url.searchParams.get("project");
-    return projectId ? (projectRedirects[projectId] ?? "/projects") : undefined;
+    return projectId !== null
+      ? (projectRedirects[projectId] ?? "/projects")
+      : undefined;
   }
 
   return page ? pageRedirects[page] : undefined;
