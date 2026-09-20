@@ -49,8 +49,14 @@ enhancement. The guide imports these production specimens. See the
 Hand-authored updates can be supplemented by the [local activity engine](docs/activity-engine.md).
 It queues intentional source facts for agent-edited public summaries and manual
 review, with opt-in automation for selected milestone types from reviewed
-producers. Only the approved static export reaches the site. Live bjslab and
+producers. Durable milestones use an approved static export; optional short-lived
+presence goes through `/api/now` and expires in the browser. Live bjslab and
 session collectors are a separate connection step; no real source is enabled here.
+
+The [activity house](docs/activity-house.md) is an illustrated `/house` prototype,
+reached under “What's happening”. Its busy demo is explicitly imagined; actual
+visitors require fresh reviewed presence. The page is omitted from navigation and
+the sitemap and marked noindex, but it is still a public URL.
 
 ## Historical material
 

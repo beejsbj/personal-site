@@ -102,6 +102,19 @@
   --layer-decoration: -1;
   --layer-skip: 10;
   --skip-hidden: translateY(calc(-100% - var(--space-l)));
+  /* The house: a small illustrated floor plan within the default visual world. */
+  --house-wall-width: 2px;
+  --house-room-pad: var(--space-m);
+  --house-map-max: var(--shell-max);
+  --house-detail-min: 16rem;
+  --house-door-size: 2.25rem;
+  --house-furnishing-line: 1px;
+  --house-wash: var(--color-surface);
+  --house-wash-soft: var(--color-page);
+  --house-ink-muted: var(--color-text-soft);
+  --house-motion-duration: 8s;
+  --house-motion-drift: 0.75rem;
+  --house-focus-outline: var(--focus-width);
   /* Default-theme traveling-circle transition, recovered from the PHP site. */
   --page-transition-orb-size: 3.125rem;
   --page-transition-travel: 0.5s;

@@ -29,6 +29,7 @@ function tags(name) {
 function plainText(value) {
   return value
     .replace(/<[^>]*>/g, " ")
+    .replace(/&#39;/g, "'")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -153,7 +154,7 @@ test("real featured projects, current work, and dated updates remain present", (
   for (const text of [
     "Currently",
     "bjslab",
-    "Recent updates",
+    "What's happening",
     "A stable home for the API3 showcase",
     "Conduit Market joins the portfolio",
     "The QRNG demos are playable again",

@@ -3,6 +3,7 @@ import sitemap from "@astrojs/sitemap";
 import vercel from "@astrojs/vercel";
 
 const excludedPaths = new Set([
+  "/house/",
   "/e4p/",
   "/garden/",
   "/style-guide/",
