@@ -42,11 +42,25 @@ paths, tokens, or transcripts in a fixture or store.
 
 `mode: "event"` describes durable history. `mode: "presence"` describes a
 short-lived state and needs an `expiresAt`; it may only use `status`, `location`,
-or `agents`. Presence never enters `src/data/activity.public.json`: a static
-build cannot enforce freshness after deployment. A completed agent-session uses
-the durable `milestone` kind after editorial review; a running/failed lifecycle
-indication is presence. A substantial action can also be a dated durable fact
-when it starts, without pretending it remains live indefinitely.
+or `agents`. Presence also needs a replacement key and has a maximum five-minute
+TTL from observation. Presence never enters `src/data/activity.public.json`: a
+static build cannot enforce freshness after deployment. A completed agent-session
+uses the durable `milestone` kind after editorial review; a running/failed
+lifecycle indication is presence. A substantial action can also be a dated
+durable fact when it starts, without pretending it remains live indefinitely.
+
+`export-presence` creates a separate optional snapshot at
+`.activity-engine/presence.public.json`. It contains only fresh approved `status`
+and `agents` signals; it is not a source of durable activity. The browser-safe
+`selectPresenceSignals(document, now = Date.now())` function strips unknown
+fields and omits stale/future signals. If no signal arrives, the state is
+unknown—not confirmed quiet or idle.
+
+The site can optionally proxy an approved HTTPS presence document through
+`/api/now` when `ACTIVITY_PRESENCE_URL` is configured. That endpoint uses
+no-store responses and the browser selector filters again at display time. No
+feed, credentials, receiver, or private connector is configured by this engine;
+without the optional URL, `/api/now` reports unavailable with no signals.
 
 ## Public drafting contract
 
@@ -59,6 +73,11 @@ private service details, prompts, logs, and transcripts. Candidate text is
 intentionally prepared for public review; raw session/service adapters remain
 queued by default. `session.completed` is a lifecycle fact, not a blanket reason
 to publish a milestone.
+
+Playful wording is welcome when it remains factual: “Astra is tinkering on
+Undertext” and “Undertext is digesting” are public drafts only when they refer to
+a real, bounded current activity. They must not imply private session contents,
+a complete result that has not happened, or an indefinitely live claim.
 
 ## Files and permissions
 
@@ -127,6 +146,7 @@ node scripts/activity/index.mjs approve --id activity_REPLACE_ME --revision 1 \
   --projection .activity-engine/review-id.json \
   --by buroj
 node scripts/activity/index.mjs export --out src/data/activity.public.json
+node scripts/activity/index.mjs export-presence
 ```
 
 Use the `revision` from `list`: approval is rejected if a provider correction
@@ -156,6 +176,27 @@ Keep this alongside the required `sources` policy object. The producer must
 already be exactly allowlisted there. Do not add a rule until its public drafts
 have been manually reviewed; rules do not make every agent session activity
 interesting enough to publish.
+
+Presence can opt in separately after its producer has a manual approval record:
+
+```json
+{
+  "autoPresence": [
+    {
+      "source": "bjslab",
+      "producer": "bjslab:public-now",
+      "eventType": "work.tinkering",
+      "eventKind": "agents"
+    }
+  ]
+}
+```
+
+Only exact `status` and `agents` rules are accepted. A renewed presence signal
+may retain approval only through that reviewed exact rule and only when its
+public copy is unchanged. Any wording change queues review. Records sharing
+`source + producer + replacementKey` replace one another internally: a completed,
+failed, or retracted successor suppresses the old running claim.
 
 Supported fixture translation boundaries are `--adapter github-pr`,
 `bjslab-milestone`, `agent-session`, and `manual`; `raw` accepts an already

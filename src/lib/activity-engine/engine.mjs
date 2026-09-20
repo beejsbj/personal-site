@@ -1,8 +1,10 @@
 import { createHash } from "node:crypto";
+import { validatePresenceSnapshot } from "../activity-presence.mjs";
 import { REVIEW_STATES } from "./constants.mjs";
 import { ActivityEngineError, ValidationError } from "./errors.mjs";
 import {
   assertAllowedByPolicy,
+  matchingAutoPresenceRule,
   matchingAutoPublishRule,
   validatePolicy,
 } from "./policy.mjs";
@@ -20,6 +22,12 @@ const stableIdFor = (identity) =>
   `activity_${createHash("sha256").update(identity).digest("hex").slice(0, 16)}`;
 const fingerprintFor = (event) =>
   createHash("sha256").update(JSON.stringify(event)).digest("hex");
+const materialFingerprintFor = (event) => {
+  const material = { ...event };
+  delete material.observedAt;
+  if (event.mode === "presence") delete material.expiresAt;
+  return fingerprintFor(material);
+};
 
 function entryAt(record, operation, at, extra = {}) {
   record.history.push({ operation, at, revision: record.revision, ...extra });
@@ -46,6 +54,24 @@ function hasManualApprovalForProducer(store, event) {
   );
 }
 
+function automaticRuleFor(event, policy) {
+  return event.mode === "presence"
+    ? matchingAutoPresenceRule(event, policy)
+    : matchingAutoPublishRule(event, policy);
+}
+
+function reviseRecord(record, event, fingerprint, deliveryFingerprint, at) {
+  record.revision += 1;
+  record.fingerprint = fingerprint;
+  record.deliveryFingerprint = deliveryFingerprint;
+  record.event = event;
+  record.status = "pending";
+  delete record.public;
+  record.review = null;
+  entryAt(record, "revised", at);
+  return { outcome: "revised", record };
+}
+
 /** Ingests one untrusted record into the private review queue. */
 export async function ingest({
   storeDir,
@@ -59,13 +85,15 @@ export async function ingest({
   const at = nowIso(clock);
   return mutateStore(storeDir, (store) => {
     const identity = identityFor(event);
-    const revisionEvent = { ...event };
-    delete revisionEvent.observedAt;
-    const fingerprint = fingerprintFor(revisionEvent);
+    const fingerprint = materialFingerprintFor(event);
+    const deliveryFingerprint = fingerprintFor(event);
     const existing = store.records.find(
       (record) => record.identity === identity,
     );
-    if (existing && existing.fingerprint === fingerprint) {
+    const existingDeliveryFingerprint =
+      existing?.deliveryFingerprint ??
+      (existing ? fingerprintFor(existing.event) : undefined);
+    if (existing && existingDeliveryFingerprint === deliveryFingerprint) {
       // A polling retry may be observed later without becoming a material
       // revision that would discard an approved editorial projection.
       if (
@@ -76,16 +104,49 @@ export async function ingest({
       return { outcome: "duplicate", record: existing };
     }
     if (existing) {
-      existing.revision += 1;
-      existing.fingerprint = fingerprint;
-      existing.event = event;
-      existing.status = "pending";
-      delete existing.public;
-      existing.review = null;
-      entryAt(existing, "revised", at);
-      return { outcome: "revised", record: existing };
+      if (existing.fingerprint === fingerprint && event.mode !== "presence") {
+        if (
+          Date.parse(event.observedAt) > Date.parse(existing.event.observedAt)
+        ) {
+          existing.event.observedAt = event.observedAt;
+        }
+        existing.deliveryFingerprint = deliveryFingerprint;
+        return { outcome: "duplicate", record: existing };
+      }
+      const presenceRule = automaticRuleFor(event, policy);
+      const canRenewPresence = Boolean(
+        event.mode === "presence" &&
+        existing.fingerprint === fingerprint &&
+        existing.status === "approved" &&
+        event.candidate &&
+        presenceRule &&
+        hasManualApprovalForProducer(store, event),
+      );
+      if (canRenewPresence) {
+        existing.event = event;
+        existing.fingerprint = fingerprint;
+        existing.deliveryFingerprint = deliveryFingerprint;
+        existing.review = {
+          ...existing.review,
+          lastRenewedAt: at,
+          renewalMethod: "auto",
+          policyRule: presenceRule,
+        };
+        entryAt(existing, "renewed", at, {
+          method: "auto",
+          policyRule: presenceRule,
+        });
+        return { outcome: "renewed", record: existing };
+      }
+      return reviseRecord(
+        existing,
+        event,
+        fingerprint,
+        deliveryFingerprint,
+        at,
+      );
     }
-    const autoRule = matchingAutoPublishRule(event, policy);
+    const autoRule = automaticRuleFor(event, policy);
     // Rules only trust the already validated candidate projection after a
     // person has manually approved one record from this exact producer.
     const autoPublish = Boolean(
@@ -96,6 +157,7 @@ export async function ingest({
       identity,
       revision: 1,
       fingerprint,
+      deliveryFingerprint,
       status: autoPublish ? "approved" : "pending",
       event,
       ...(autoPublish
@@ -271,6 +333,78 @@ export function buildStaticExport(
 export async function exportStatic({ storeDir, outFile, generatedAt }) {
   const store = await readStore(storeDir);
   const document = buildStaticExport(store.records, { generatedAt });
+  await writePublicExport(outFile, document);
+  return document;
+}
+
+function isLaterReplacement(left, right) {
+  const difference =
+    Date.parse(left.event.observedAt) - Date.parse(right.event.observedAt);
+  if (difference !== 0) return difference > 0;
+  if (left.revision !== right.revision) return left.revision > right.revision;
+  return left.id.localeCompare(right.id) > 0;
+}
+
+/** Build a separate, short-lived public view. Never use this for static HTML. */
+export function buildPresenceSnapshot(
+  records,
+  { now = Date.now(), generatedAt = new Date(now).toISOString() } = {},
+) {
+  const latestByReplacement = new Map();
+  for (const record of records) {
+    const replacementKey = record.event.replacementKey;
+    if (!replacementKey) continue;
+    const key = JSON.stringify([
+      record.event.source,
+      record.event.producer,
+      replacementKey,
+    ]);
+    const previous = latestByReplacement.get(key);
+    if (!previous || isLaterReplacement(record, previous)) {
+      latestByReplacement.set(key, record);
+    }
+  }
+  const signals = records
+    .filter(
+      (record) =>
+        record.status === "approved" &&
+        record.event.mode === "presence" &&
+        ["status", "agents"].includes(record.event.eventKind) &&
+        record.public,
+    )
+    .filter((record) => {
+      const replacementKey = record.event.replacementKey;
+      if (!replacementKey) return false;
+      const key = JSON.stringify([
+        record.event.source,
+        record.event.producer,
+        replacementKey,
+      ]);
+      return latestByReplacement.get(key) === record;
+    })
+    .map((record) => ({
+      id: record.id,
+      title: record.public.title,
+      summary: record.public.summary,
+      href: record.public.href,
+      linkLabel: record.public.linkLabel,
+      source: record.event.source,
+      kind: record.event.eventKind,
+      observedAt: record.event.observedAt,
+      expiresAt: record.event.expiresAt,
+      ...(record.public.relatedProject
+        ? { relatedProject: record.public.relatedProject }
+        : {}),
+    }));
+  return validatePresenceSnapshot(
+    { version: 1, generatedAt, signals },
+    { now },
+  );
+}
+
+export async function exportPresence({ storeDir, outFile, now, generatedAt }) {
+  const store = await readStore(storeDir);
+  const document = buildPresenceSnapshot(store.records, { now, generatedAt });
   await writePublicExport(outFile, document);
   return document;
 }

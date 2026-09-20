@@ -34,6 +34,7 @@ export const DEFAULT_POLICY = {
   version: ENGINE_VERSION,
   // Opt-in exact rules only. Add no real producer here by default.
   autoPublish: [],
+  autoPresence: [],
   sources: {
     github: {
       enabled: true,

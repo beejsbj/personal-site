@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import {
   approve,
   defaultPolicy,
+  exportPresence,
   exportStatic,
   fromAgentSessionLifecycle,
   fromBjslabMilestone,
@@ -24,6 +25,7 @@ Commands:
   approve --id activity_... --revision N --projection approved-copy.json [--by operator] [--store .activity-engine]
   reject|retract --id activity_... [--note text] [--by operator] [--store .activity-engine]
   export [--store .activity-engine] [--out src/data/activity.public.json]
+  export-presence [--store .activity-engine] [--out .activity-engine/presence.public.json]
 
 Imports enter review unless an exact opt-in rule trusts a previously reviewed
 producer and milestone type. Manual approval requires a separate curated
@@ -57,6 +59,7 @@ function assertKnownOptions(command, options) {
     reject: ["id", "by", "note", "store"],
     retract: ["id", "by", "note", "store"],
     export: ["store", "out"],
+    "export-presence": ["store", "out"],
   };
   if (!Object.hasOwn(allowed, command)) return;
   for (const key of Object.keys(options)) {
@@ -172,6 +175,12 @@ async function main() {
   if (command === "export") {
     const outFile = resolve(options.out ?? "src/data/activity.public.json");
     return output(await exportStatic({ storeDir, outFile }));
+  }
+  if (command === "export-presence") {
+    const outFile = resolve(
+      options.out ?? ".activity-engine/presence.public.json",
+    );
+    return output(await exportPresence({ storeDir, outFile }));
   }
   throw new Error(`Unknown command ${command}.\n\n${usage}`);
 }

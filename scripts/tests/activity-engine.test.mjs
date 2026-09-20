@@ -7,6 +7,7 @@ import { promisify } from "node:util";
 import test from "node:test";
 import {
   approve,
+  buildPresenceSnapshot,
   buildStaticExport,
   defaultPolicy,
   fromAgentSessionLifecycle,
@@ -83,6 +84,39 @@ function autoPolicy() {
   return value;
 }
 
+function presencePolicy() {
+  const value = policy();
+  value.autoPresence = [
+    {
+      source: "bjslab",
+      producer: "bjslab:one",
+      eventType: "work.tinkering",
+      eventKind: "agents",
+    },
+  ];
+  return value;
+}
+
+function presenceEvent(overrides = {}) {
+  return event({
+    providerEventId: "undertext-now",
+    eventKind: "agents",
+    eventType: "work.tinkering",
+    mode: "presence",
+    occurredAt: "2026-09-20T12:00:00Z",
+    observedAt: "2026-09-20T12:01:00Z",
+    expiresAt: "2026-09-20T12:05:00Z",
+    replacementKey: "undertext-work",
+    candidate: {
+      title: "Astra is tinkering on Undertext",
+      summary: "A public, short-lived work signal.",
+      href: "https://example.test/undertext",
+      linkLabel: "View Undertext",
+    },
+    ...overrides,
+  });
+}
+
 test("imports are private, review-first, bounded, and stored with private permissions", async () => {
   const testStore = await workspace();
   try {
@@ -132,6 +166,22 @@ test("imports are private, review-first, bounded, and stored with private permis
         }),
       }),
       /disabled by policy/,
+    );
+    await assert.rejects(
+      ingest({
+        storeDir: testStore.storeDir,
+        policy: policy(),
+        event: event({
+          providerEventId: "overlong-presence",
+          eventKind: "agents",
+          eventType: "work.tinkering",
+          mode: "presence",
+          observedAt: "2026-09-20T12:01:00Z",
+          expiresAt: "2026-09-20T12:07:00Z",
+          replacementKey: "overlong",
+        }),
+      }),
+      /no more than five minutes/,
     );
   } finally {
     await testStore.cleanup();
@@ -364,6 +414,142 @@ test("an exact, manually trusted public-summary producer may auto-publish a late
   }
 });
 
+test("presence is review-first, renews only through a trusted exact rule, and successor records suppress zombies", async () => {
+  const testStore = await workspace();
+  try {
+    const first = await ingest({
+      storeDir: testStore.storeDir,
+      policy: presencePolicy(),
+      event: presenceEvent(),
+      clock: FIXED_CLOCK,
+    });
+    assert.equal(first.outcome, "queued");
+    await approve({
+      storeDir: testStore.storeDir,
+      id: first.record.id,
+      expectedRevision: 1,
+      projection: first.record.event.candidate,
+      clock: FIXED_CLOCK,
+    });
+
+    const autoNewSignal = await ingest({
+      storeDir: testStore.storeDir,
+      policy: presencePolicy(),
+      event: presenceEvent({
+        providerEventId: "another-public-now",
+        replacementKey: "another-work",
+      }),
+      clock: FIXED_CLOCK,
+    });
+    assert.equal(autoNewSignal.outcome, "auto-approved");
+    assert.equal(autoNewSignal.record.review.method, "auto");
+
+    const renewed = await ingest({
+      storeDir: testStore.storeDir,
+      policy: presencePolicy(),
+      event: presenceEvent({
+        observedAt: "2026-09-20T12:02:00Z",
+        expiresAt: "2026-09-20T12:06:00Z",
+      }),
+      clock: FIXED_CLOCK,
+    });
+    assert.equal(renewed.outcome, "renewed");
+    assert.equal(renewed.record.status, "approved");
+    assert.equal(renewed.record.event.expiresAt, "2026-09-20T12:06:00Z");
+
+    const changedCopy = await ingest({
+      storeDir: testStore.storeDir,
+      policy: presencePolicy(),
+      event: presenceEvent({
+        observedAt: "2026-09-20T12:03:00Z",
+        expiresAt: "2026-09-20T12:07:00Z",
+        candidate: {
+          ...presenceEvent().candidate,
+          summary: "Changed public copy requires review.",
+        },
+      }),
+      clock: FIXED_CLOCK,
+    });
+    assert.equal(changedCopy.outcome, "revised");
+    assert.equal(changedCopy.record.status, "pending");
+
+    const approvedChangedCopy = await approve({
+      storeDir: testStore.storeDir,
+      id: changedCopy.record.id,
+      expectedRevision: 2,
+      projection: changedCopy.record.event.candidate,
+      clock: FIXED_CLOCK,
+    });
+    const runningSnapshot = buildPresenceSnapshot([approvedChangedCopy], {
+      now: Date.parse("2026-09-20T12:04:00Z"),
+      generatedAt: "2026-09-20T12:04:00Z",
+    });
+    assert.equal(runningSnapshot.signals.length, 1);
+
+    const retractedSnapshot = buildPresenceSnapshot(
+      [{ ...approvedChangedCopy, status: "retracted", revision: 3 }],
+      {
+        now: Date.parse("2026-09-20T12:04:00Z"),
+        generatedAt: "2026-09-20T12:04:00Z",
+      },
+    );
+    assert.deepEqual(retractedSnapshot.signals, []);
+
+    const completed = {
+      id: "activity_aaaaaaaaaaaaaaaa",
+      revision: 1,
+      status: "approved",
+      event: {
+        ...event({
+          providerEventId: "undertext-completed",
+          eventType: "work.milestone",
+          observedAt: "2026-09-20T12:04:00Z",
+        }),
+        replacementKey: "undertext-work",
+      },
+      public: projection,
+    };
+    const completedSnapshot = buildPresenceSnapshot(
+      [approvedChangedCopy, completed],
+      {
+        now: Date.parse("2026-09-20T12:04:30Z"),
+        generatedAt: "2026-09-20T12:04:30Z",
+      },
+    );
+    assert.deepEqual(completedSnapshot.signals, []);
+
+    const failed = {
+      ...approvedChangedCopy,
+      id: "activity_bbbbbbbbbbbbbbbb",
+      revision: 1,
+      event: presenceEvent({
+        providerEventId: "undertext-failed",
+        eventType: "session.failed",
+        observedAt: "2026-09-20T12:04:00Z",
+        expiresAt: "2026-09-20T12:06:00Z",
+      }),
+      public: { ...approvedChangedCopy.public, title: "Undertext paused" },
+    };
+    const failedSnapshot = buildPresenceSnapshot(
+      [approvedChangedCopy, failed],
+      {
+        now: Date.parse("2026-09-20T12:04:30Z"),
+        generatedAt: "2026-09-20T12:04:30Z",
+      },
+    );
+    assert.deepEqual(
+      failedSnapshot.signals.map((signal) => signal.title),
+      ["Undertext paused"],
+    );
+
+    const invalidPolicy = presencePolicy();
+    invalidPolicy.autoPresence[0].eventKind = "milestone";
+    assert.throws(() => validatePolicy(invalidPolicy), /status or agents/);
+  } finally {
+    await testStore.cleanup();
+  }
+});
+
 test("static export is deterministic, omits runtime presence, derives date, and never serializes private candidates", () => {
   const records = [
     {
@@ -517,6 +703,7 @@ test("CLI ingests a fixture batch sequentially and carries a reviewed item throu
     const policyFile = join(testStore.directory, "policy.json");
     const reviewFile = join(testStore.directory, "review.json");
     const exportFile = join(testStore.directory, "activity.public.json");
+    const presenceFile = join(testStore.directory, "presence.public.json");
     const initialPolicyFile = join(testStore.directory, "initial-policy.json");
     const cliPolicy = policy();
     cliPolicy.sources.bjslab = {
@@ -588,6 +775,18 @@ test("CLI ingests a fixture batch sequentially and carries a reviewed item throu
       ).stdout,
     );
     assert.equal(firstExport.events.length, 1);
+    const presenceExport = JSON.parse(
+      (
+        await cli([
+          "export-presence",
+          "--store",
+          testStore.storeDir,
+          "--out",
+          presenceFile,
+        ])
+      ).stdout,
+    );
+    assert.deepEqual(presenceExport.signals, []);
     assert.equal((await stat(exportFile)).mode & 0o777, 0o644);
     await cli(["retract", "--store", testStore.storeDir, "--id", listed[0].id]);
     const secondExport = JSON.parse(

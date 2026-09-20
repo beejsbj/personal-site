@@ -42,12 +42,10 @@ export function fromAgentSessionLifecycle(
     mode: completed ? "event" : "presence",
     occurredAt: assertIso(input.occurredAt, "agent session occurredAt"),
     observedAt: assertIso(observedAt, "observedAt"),
+    replacementKey: `session:${id}`,
     ...(completed
       ? {}
-      : {
-          expiresAt: assertIso(input.expiresAt, "agent session expiresAt"),
-          replacementKey: `session:${id}`,
-        }),
+      : { expiresAt: assertIso(input.expiresAt, "agent session expiresAt") }),
     candidate: {
       title: assertShortString(input.title, "agent session title", 280),
       summary: assertShortString(input.summary, "agent session summary", 280),

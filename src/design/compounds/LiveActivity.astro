@@ -1,0 +1,56 @@
+<div
+  class="live-activity"
+  data-live-activity
+  aria-live="polite"
+  aria-atomic="true"
+>
+  <p class="live-note" data-live-note>
+    Waiting for a fresh postcard.
+  </p>
+  <ul
+    class="live-signals"
+    data-live-signals
+    aria-label="Happening now"
+    hidden
+  ></ul>
+</div>
+
+<script>
+  import { installLiveActivity } from "../../lib/live-activity";
+  installLiveActivity();
+</script>
+
+<style>
+  .live-activity {
+    margin-bottom: var(--space-m);
+    font-size: var(--text-sm);
+  }
+  .live-note {
+    color: var(--color-text-soft);
+    font-style: italic;
+  }
+  .live-signals {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .live-signals :global(li) {
+    border-left: var(--focus-width) solid var(--color-accent);
+    padding: var(--space-xs) var(--space-s);
+    margin-block: var(--space-xs);
+    background: var(--color-surface);
+  }
+  .live-signals :global(a) {
+    color: var(--color-accent);
+    text-decoration-thickness: var(--rule-width);
+    text-underline-offset: var(--underline-offset);
+  }
+  .live-signals :global(p) {
+    color: var(--color-text-soft);
+    margin-top: var(--space-2xs);
+  }
+  .live-signals :global(a:focus-visible) {
+    outline: var(--focus-width) solid var(--color-accent);
+    outline-offset: var(--focus-offset);
+  }
+</style>

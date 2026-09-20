@@ -137,12 +137,24 @@ export function validateEnvelope(value) {
       : assertIso(value.expiresAt, "expiresAt");
   if (mode === "presence" && !expiresAt)
     throw new ValidationError("presence records require expiresAt.");
+  if (mode === "presence" && !value.replacementKey) {
+    throw new ValidationError("presence records require replacementKey.");
+  }
   if (
     expiresAt &&
     Date.parse(expiresAt) <=
       Date.parse(assertIso(value.occurredAt, "occurredAt"))
   ) {
     throw new ValidationError("expiresAt must be later than occurredAt.");
+  }
+  if (mode === "presence") {
+    const observedAt = assertIso(value.observedAt, "observedAt");
+    const ttl = Date.parse(expiresAt) - Date.parse(observedAt);
+    if (ttl <= 0 || ttl > 5 * 60 * 1000) {
+      throw new ValidationError(
+        "presence expiresAt must be after observedAt and no more than five minutes later.",
+      );
+    }
   }
   const candidate =
     value.candidate === undefined

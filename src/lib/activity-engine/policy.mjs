@@ -91,7 +91,63 @@ export function validatePolicy(value) {
     ruleKeys.add(key);
     return { source, producer, eventType, eventKind };
   });
-  return { version: 1, sources, autoPublish: normalizedRules };
+  const autoPresence = value.autoPresence ?? [];
+  if (!Array.isArray(autoPresence)) {
+    throw new PolicyError("policy.autoPresence must be an array.");
+  }
+  const presenceKeys = new Set();
+  const normalizedPresenceRules = autoPresence.map((rule, index) => {
+    assertObject(rule, `policy.autoPresence[${index}]`);
+    const source = assertShortString(
+      rule.source,
+      `autoPresence[${index}].source`,
+      40,
+    );
+    if (!SOURCES.includes(source)) {
+      throw new PolicyError(`autoPresence[${index}].source is unknown.`);
+    }
+    const producer = assertShortString(
+      rule.producer,
+      `autoPresence[${index}].producer`,
+      160,
+    );
+    if (producer.includes("*")) {
+      throw new PolicyError(
+        "autoPresence producers must be exact; wildcards are not allowed.",
+      );
+    }
+    if (!sources[source].producers.includes(producer)) {
+      throw new PolicyError(
+        `autoPresence producer ${producer} is not allowlisted for ${source}.`,
+      );
+    }
+    const eventType = assertEventType(
+      rule.eventType,
+      `autoPresence[${index}].eventType`,
+    );
+    const eventKind = assertShortString(
+      rule.eventKind,
+      `autoPresence[${index}].eventKind`,
+      40,
+    );
+    if (!["status", "agents"].includes(eventKind)) {
+      throw new PolicyError(
+        "autoPresence rules may only target status or agents kinds.",
+      );
+    }
+    const key = `${source}:${producer}:${eventType}:${eventKind}`;
+    if (presenceKeys.has(key)) {
+      throw new PolicyError(`Duplicate autoPresence rule ${key}.`);
+    }
+    presenceKeys.add(key);
+    return { source, producer, eventType, eventKind };
+  });
+  return {
+    version: 1,
+    sources,
+    autoPublish: normalizedRules,
+    autoPresence: normalizedPresenceRules,
+  };
 }
 
 export function assertAllowedByPolicy(event, policy) {
@@ -113,6 +169,17 @@ export function defaultPolicy() {
 export function matchingAutoPublishRule(event, policy) {
   if (event.mode !== "event" || !event.eventType) return undefined;
   return policy.autoPublish.find(
+    (rule) =>
+      rule.source === event.source &&
+      rule.producer === event.producer &&
+      rule.eventType === event.eventType &&
+      rule.eventKind === event.eventKind,
+  );
+}
+
+export function matchingAutoPresenceRule(event, policy) {
+  if (event.mode !== "presence" || !event.eventType) return undefined;
+  return policy.autoPresence.find(
     (rule) =>
       rule.source === event.source &&
       rule.producer === event.producer &&
