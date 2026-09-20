@@ -30,6 +30,8 @@ test("one visual-value authority, with no raw colors or geometry in consumers", 
     // are layout constraints, not design values. SVG/image attributes are art/data.
     const rules = css(path)
       .replace(/\/\*[\s\S]*?\*\//g, "")
+      // Screen-reader-only clipping is structural, not a visual token recipe.
+      .replace(/\.sr-only\s*\{[^}]*\}/g, "")
       .replace(/@media[^\{]+/g, "")
       .replace(/100vh/g, "");
     assert.doesNotMatch(
@@ -43,7 +45,8 @@ test("one visual-value authority, with no raw colors or geometry in consumers", 
       `${path}: untokenized shared design value`,
     );
     for (const [, token] of rules.matchAll(/var\((--[\w-]+)/g)) {
-      const local = new RegExp(`${token}\\s*:`).test(rules);
+      // Private per-instance variables may be supplied by the owner's markup.
+      const local = new RegExp(`${token}\\s*:`).test(read(path));
       assert.ok(definitions.has(token) || local, `${path}: undefined ${token}`);
     }
   }

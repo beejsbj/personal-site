@@ -1,8 +1,12 @@
 # Prism Portfolio Pause
 
-Status: paused.
+Status: shaping resumed; prism implementation remains deferred.
 
-The prism portfolio is the second layer of the personal site, not the base-site build. It is blocked by `BJS-39`, which must define the base personal-site content model and finish line before `BJS-42` can build the first usable base slice.
+The prism portfolio is the second layer of the personal site. `BJS-39` and
+`BJS-42` are complete, and the default Astro portfolio is now deployed. On
+20 September 2026 Burooj asked whether the default supports interchangeable
+themes and whether to apply Design Lab principles. The source assessment and
+proposed next steps are in [theme architecture](../theme-architecture.md).
 
 ## Current Boundary
 
@@ -36,8 +40,11 @@ The prism portfolio is the second layer of the personal site, not the base-site 
 - Do not treat the six faces as creature/story sides.
 - Do not create a separate clay-creature side.
 - Do not make the prism taxonomy override the base site.
-- Do not start implementation before the base content model is decided.
+- Do not build the prism camera before proving the shared presentation boundary.
 
 ## Resume Point
 
-When the base site exists, resume by defining how the six visual skins share one content/component structure and what design-system inputs each skin needs.
+Prove one shared content contract with the default and one different visual face.
+Each face needs its own chosen tokens, compositions, unique specimens and motion
+policy, demonstrated from real sources in the guide. The other face designs and
+the prism reveal still need shaping; no theme switcher is implemented yet.

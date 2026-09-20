@@ -18,7 +18,7 @@ Open `http://localhost:4321/`. The living style guide is
 - `src/design/tokens.css`: visual values and responsive contracts.
 - `src/design/primitives/`: links, headings, media frames, notes, metadata lists.
 - `src/design/unique/`: the portrait, hand-drawn curve, decorative circles and
-  independently enhanced corner blob.
+  independently enhanced corner blob, plus the recovered page transition.
 - `src/design/compounds/`, `src/components/`: shared assemblies.
 - `src/design/compositions/`: the welcome region used by the homepage and guide.
 
@@ -34,10 +34,14 @@ corepack pnpm@10.6.5 test
 ```
 
 Tests inspect the generated output and enforce token/component cohesion.
-Text navigation and its current-page state work without JavaScript. Decorative
-circles are static, hidden from assistive technology and never act as controls.
-Only the cropped corner blob has a local pointer-attraction enhancement, disabled
-for touch and reduced motion. The guide imports these production specimens.
+Text navigation and its current-page state work without JavaScript. The default
+theme restores the PHP site's rainbow strip transition. Its four circles react
+to the pointer and support drag/throw, keyboard movement, and a Return balls
+control. Reduced motion disables physics and the page sweep; without JavaScript
+the circles remain inert artwork. The corner blob retains its local pointer
+enhancement. The guide imports these production specimens. See the
+[transition notes](docs/page-transition.md) and
+[theme architecture assessment](docs/theme-architecture.md) for their boundaries.
 `corepack pnpm@10.6.5 format` formats active source with Prettier and its Astro plugin.
 
 ## Historical material
