@@ -1,248 +1,90 @@
 ---
 import { buildHouseModel } from "../../lib/activity-house-model.mjs";
+import {
+  buildHouseScene,
+  renderHouseMarkup,
+  renderRoomDetail,
+} from "../../lib/house-scene.mjs";
 
 interface Props {
   catalog: unknown;
   projects: unknown[];
   events: unknown[];
   editorHref?: string;
+  rehearsal?: boolean;
 }
 
-const { catalog, projects, events, editorHref } = Astro.props;
+const { catalog, projects, events, editorHref, rehearsal = false } = Astro.props;
 const input = { catalog, projects, events };
 const model = buildHouseModel(input);
+const scene = buildHouseScene(model);
+const selected = scene.rooms[0];
 const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
-const dateFor = (item: any) => item.observedAt ?? item.occurredAt ?? item.date;
-const readableDate = (item: any) => {
-  const date = new Date(dateFor(item));
-  return Number.isFinite(date.getTime())
-    ? new Intl.DateTimeFormat("en", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }).format(date)
-    : "Reviewed update";
-};
-const residentsFor = (roomId: string) =>
-  model.residents.filter((resident: any) => resident.roomId === roomId);
-const selected = model.rooms[0];
 ---
 
-<section class="activity-house" data-activity-house>
+<section
+  class="activity-house"
+  data-activity-house
+  data-busy={String(scene.busy)}
+  data-rehearsal={rehearsal ? "available" : undefined}
+>
   <header class="activity-house__heading">
-    <p class="activity-house__eyebrow">A working floorplan</p>
-    <div class="activity-house__heading-row">
-      <div>
-        <h1>Step into the house.</h1>
-        <p>
-          Projects, places, and the public traces they leave behind. Choose a
-          room to look closer.
+    <p class="activity-house__eyebrow">What’s happening, drawn as a house</p>
+    <h1>Step into the house.</h1>
+    <p class="activity-house__lead">
+      Every room is a project or a corner of my life. When something is actually
+      going on — an agent tinkering, a server digesting, a milestone landing —
+      the lights come on and whoever is working turns up.
+    </p>
+    {
+      (editorHref || rehearsal) && (
+        <p class="activity-house__tools">
+          {editorHref && <a href={editorHref}>Arrange the house</a>}
+          {rehearsal && (
+            <a href="?visitors=pretend" data-house-rehearse>
+              Rehearse with pretend visitors
+            </a>
+          )}
         </p>
-      </div>
-      {editorHref && (
-        <a class="activity-house__arrange" href={editorHref}>
-          Arrange the house
-        </a>
-      )}
-    </div>
+      )
+    }
   </header>
 
-  <div class="activity-house__controls" data-house-controls hidden>
-    <label class="activity-house__search">
-      <span>Find a room</span>
-      <input
-        type="search"
-        data-house-search
-        placeholder="Search the house"
-        disabled
-      />
-    </label>
-    <div class="activity-house__filters" role="group" aria-label="Filter rooms">
-      <button
-        type="button"
-        data-house-filter="all"
-        aria-pressed="true"
-        disabled
-      >
-        All
-      </button>
-      <button
-        type="button"
-        data-house-filter="active"
-        aria-pressed="false"
-        disabled
-      >
-        Happening now
-      </button>
-      <button
-        type="button"
-        data-house-filter="project"
-        aria-pressed="false"
-        disabled
-      >
-        Projects
-      </button>
-      <button
-        type="button"
-        data-house-filter="place"
-        aria-pressed="false"
-        disabled
-      >
-        Places
-      </button>
-    </div>
-  </div>
+  <p class="house-status" data-house-status role="status">{scene.status}</p>
 
   <div class="activity-house__body">
-    <div class="activity-house__plan-wrap">
-      <p class="activity-house__status" data-house-status role="status">
-        {model.rooms.some((room: any) => room.active)
-          ? "Fresh postcards are in the house."
-          : "No fresh postcards just now."}
-      </p>
-      <div
-        class="activity-house__plan"
-        data-house-plan
-        aria-label="House floorplan"
-      >
-        {model.rooms.map((room: any, index: number) => (
-          <button
-            type="button"
-            class="house-room"
-            data-house-room={room.id}
-            data-kind={room.kind}
-            data-active={String(room.active)}
-            aria-pressed={index === 0 ? "true" : "false"}
-            disabled
-          >
-            <span class="house-room__door" aria-hidden="true"></span>
-            <span
-              class="house-room__art"
-              data-furnishing={room.furnishing}
-              aria-hidden="true"
-            >
-              <i></i>
-              <i></i>
-              <i></i>
-            </span>
-            <span class="house-room__kind">
-              {room.kind === "place" ? "Place" : "Project"}
-            </span>
-            <strong>{room.title}</strong>
-            <span class="house-room__latest">
-              {room.events[0]
-                ? `Reviewed: ${room.events[0].title}`
-                : room.summary}
-            </span>
-            <span class="house-room__postcard">
-              {room.active ? "Fresh postcard" : "No fresh postcard"}
-            </span>
-            {residentsFor(room.id).map((resident: any) => (
-              <span class="house-resident">
-                <span aria-hidden="true">{resident.name.slice(0, 1)}</span>
-                {resident.name} · {resident.role}
-              </span>
-            ))}
-            {room.occupants.map(
-              (occupant: any) =>
-                occupant.actor && (
-                  <span class="house-occupant">
-                    <span aria-hidden="true">
-                      {occupant.actor.name.slice(0, 1)}
-                    </span>
-                    {occupant.actor.name} · {occupant.actor.role}
-                  </span>
-                ),
-            )}
-          </button>
-        ))}
-      </div>
-      <p class="activity-house__plan-caption">
-        A doorway means a room can be opened. An ink resident belongs here; a
-        filled portrait appears only with a fresh postcard.
-      </p>
-    </div>
-
+    <div
+      class="house-building"
+      data-house-building
+      role="group"
+      aria-label="Rooms of the house"
+      set:html={renderHouseMarkup(scene, { selectedId: selected?.id })}
+    />
     <aside
-      class="activity-house__inspector"
-      data-house-inspector
+      class="house-detail"
+      data-house-detail
       aria-label="Selected room"
-    >
-      {selected ? (
-        <div data-house-inspector-content>
-          <p class="activity-house__detail-eyebrow">
-            {selected.kind === "place" ? "Place" : "Project"}
-          </p>
-          <h2>{selected.title}</h2>
-          <p>{selected.summary}</p>
-          {selected.href && <a href={selected.href}>Visit this room</a>}
-          <section class="activity-house__inspector-section">
-            <h3>Fresh postcards</h3>
-            {selected.occupants.length ? (
-              <ul>
-                {selected.occupants.map((item: any) => (
-                  <li>
-                    {item.actor && (
-                      <strong>
-                        {item.actor.name} · {item.actor.role}:{" "}
-                      </strong>
-                    )}
-                    <a href={item.href}>{item.title}</a>
-                    <span>{item.summary}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No fresh postcard for this room.</p>
-            )}
-          </section>
-          <section class="activity-house__inspector-section">
-            <h3>Reviewed milestones</h3>
-            {selected.events.length ? (
-              <ol>
-                {selected.events.map((item: any) => (
-                  <li>
-                    <time datetime={dateFor(item)}>{readableDate(item)}</time>
-                    <a href={item.href}>{item.title}</a>
-                    <span>{item.summary}</span>
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <p>No reviewed milestones are displayed for this room yet.</p>
-            )}
-          </section>
-        </div>
-      ) : (
-        <p data-house-inspector-content>There are no rooms to inspect yet.</p>
-      )}
-    </aside>
+      set:html={renderRoomDetail(selected)}
+    />
   </div>
 
-  <section class="activity-house__list" aria-labelledby="house-list-title">
-    <h2 id="house-list-title">Rooms in walking order</h2>
-    <p>
-      The room list stays available when the illustrated plan is not
-      interactive.
-    </p>
-    <div data-house-list>
-      {model.rooms.map((room: any) => (
-        <details>
-          <summary>{room.title}</summary>
-          <p>{room.summary}</p>
-          <p>
-            {room.active
-              ? "Fresh postcard in this room."
-              : "No fresh postcard for this room."}
-          </p>
-          {room.href && <a href={room.href}>Visit this room</a>}
-          {room.events.length > 0 && (
-            <p>Latest reviewed milestone: {room.events[0].title}</p>
-          )}
-        </details>
-      ))}
-    </div>
-  </section>
+  <noscript>
+    <section class="house-walk" aria-labelledby="house-walk-title">
+      <h2 id="house-walk-title">Every room, in walking order</h2>
+      {
+        scene.rooms.map((room) => (
+          <details>
+            <summary>{room.title}</summary>
+            <p>{room.summary}</p>
+            {room.note && <p>Latest: {room.note.title}</p>}
+            {room.href && room.href !== "/house" && (
+              <a href={room.href}>Go to {room.title}</a>
+            )}
+          </details>
+        ))
+      }
+    </section>
+  </noscript>
 
   <script
     is:inline
@@ -259,700 +101,515 @@ const selected = model.rooms[0];
   installLiveActivity();
 </script>
 
-<style>
+<style is:global>
+  /* Global because the same markup is redrawn in the browser from house-scene. */
   .activity-house {
     display: grid;
-    gap: var(--space-l);
+    gap: var(--space-m);
     width: var(--shell-width);
     max-width: var(--house-map-max);
     margin-inline: auto;
-    padding-block: var(--space-xl);
-  }
-  .activity-house__heading {
-    display: grid;
-    gap: var(--space-2xs);
+    padding-block: var(--space-xl) var(--space-3xl);
   }
   .activity-house__eyebrow,
-  .activity-house__detail-eyebrow,
-  .house-room__kind {
+  .house-floor__label,
+  .house-detail__eyebrow {
     color: var(--house-ink-muted);
     font-size: var(--text-xs);
     font-weight: var(--weight-bold);
     letter-spacing: var(--tracking-heading);
     text-transform: uppercase;
-  }
-  .activity-house__heading-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    justify-content: space-between;
-    gap: var(--space-m);
   }
   .activity-house__heading h1 {
     margin-top: var(--space-2xs);
   }
-  .activity-house__heading p:not(.activity-house__eyebrow) {
+  .activity-house__lead {
     max-width: var(--intro-width);
     margin-top: var(--space-s);
     font-size: var(--text-lead);
   }
-  .activity-house__arrange {
-    color: var(--color-accent);
+  .activity-house__tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    margin-top: var(--space-s);
     font-size: var(--text-sm);
+  }
+  .activity-house__tools a,
+  .house-detail a {
+    color: var(--color-accent);
     text-decoration: underline;
     text-decoration-color: var(--color-link-rule);
+    text-underline-offset: var(--underline-offset);
   }
-  .activity-house__controls {
+
+  .house-status {
     display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    justify-content: space-between;
-    gap: var(--space-s);
-    padding-block: var(--space-s);
-    border-block: var(--rule-width) solid var(--color-border);
+    align-items: baseline;
+    gap: var(--space-xs);
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+    font-style: italic;
+    color: var(--color-text-soft);
   }
-  .activity-house__controls[hidden] {
-    display: none;
+  .house-status::before {
+    content: "";
+    flex: none;
+    inline-size: var(--space-xs);
+    block-size: var(--space-xs);
+    border: var(--rule-width) solid var(--color-accent);
+    border-radius: var(--radius-round);
   }
-  .activity-house__search {
-    display: grid;
-    gap: var(--space-2xs);
-    color: var(--house-ink-muted);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-bold);
-    letter-spacing: var(--tracking-heading);
-    text-transform: uppercase;
-  }
-  .activity-house__search input {
-    min-height: var(--control-min-height);
-    min-width: var(--house-detail-min);
-    padding-inline: var(--space-s);
-    border: var(--rule-width) solid var(--color-text);
-    background: var(--house-wash-soft);
-    color: var(--color-text);
-    font-size: var(--text-sm);
-    letter-spacing: normal;
-    text-transform: none;
-  }
-  .activity-house__filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2xs);
-  }
-  .activity-house__filters button {
-    min-height: var(--control-min-height);
-    padding-inline: var(--space-s);
-    border: var(--rule-width) solid var(--color-text);
-    background: var(--house-wash-soft);
-    color: var(--color-text);
-    font-size: var(--text-sm);
-  }
-  .activity-house__filters button[aria-pressed="true"] {
+  [data-busy="true"] > .house-status::before {
     background: var(--color-accent);
-    color: var(--color-accent-contrast);
+    animation: house-pulse var(--house-smoke-rise) ease-in-out infinite;
   }
+
   .activity-house__body {
     display: grid;
-    gap: var(--space-l);
+    gap: var(--space-xl);
     align-items: start;
   }
-  .activity-house__status {
-    color: var(--house-ink-muted);
-    font-size: var(--text-sm);
-    margin-bottom: var(--space-s);
+  @media (min-width: 62.5rem) {
+    .activity-house__body {
+      grid-template-columns: minmax(0, 1fr) var(--house-inspector-width);
+    }
+    .house-detail {
+      position: sticky;
+      top: var(--space-l);
+    }
   }
-  .activity-house__plan {
-    position: relative;
+
+  /* ---------- The building ---------- */
+  .house-building {
     display: grid;
-    grid-template-columns: repeat(
-      auto-fit,
-      minmax(min(100%, var(--house-detail-min)), 1fr)
-    );
-    gap: var(--space-s);
-    padding: var(--space-xl);
-    border: var(--house-wall-width) solid var(--color-text);
+    padding-top: var(--space-3xl);
+  }
+  .house-roof {
+    position: relative;
+    block-size: var(--house-roof-height);
+    margin-inline: calc(var(--space-s) * -1);
+  }
+  .house-roof::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-accent);
+    background-image: var(--texture);
+    clip-path: polygon(0 100%, 7% 0, 93% 0, 100% 100%);
+  }
+  .house-roof__chimney {
+    position: absolute;
+    right: 18%;
+    bottom: 60%;
+    inline-size: var(--space-l);
+    block-size: var(--house-roof-height);
+    background: var(--color-accent-pressed);
+  }
+  .house-roof__chimney i {
+    position: absolute;
+    left: 10%;
+    bottom: 100%;
+    inline-size: var(--space-m);
+    block-size: var(--space-m);
+    border-radius: var(--radius-round);
+    background: var(--color-border);
+    opacity: 0;
+  }
+  [data-busy="true"] .house-roof__chimney i {
+    animation: house-smoke var(--house-smoke-rise) ease-out infinite;
+  }
+  .house-roof__chimney i:nth-child(2) {
+    animation-delay: calc(var(--house-smoke-rise) / -3);
+  }
+  .house-roof__chimney i:nth-child(3) {
+    animation-delay: calc(var(--house-smoke-rise) / -1.5);
+  }
+
+  .house-floor {
+    border-inline: var(--house-wall-width) solid var(--color-text);
     background-color: var(--house-wash-soft);
     background-image: var(--texture);
-    box-shadow: var(--house-wall-width) var(--house-wall-width)
-      var(--color-text);
-    isolation: isolate;
   }
-  .activity-house__plan::before,
-  .activity-house__plan::after {
-    content: "";
-    position: absolute;
-    z-index: var(--layer-decoration);
-    background: var(--house-wash);
+  .house-floor__label {
+    padding: var(--space-2xs) var(--space-s);
+    border-bottom: var(--rule-width) solid var(--color-border);
+    background: var(--house-wash-soft);
   }
-  .activity-house__plan::before {
-    inset-block: var(--space-xl);
-    inset-inline: calc(50% - var(--space-s));
-    inline-size: var(--space-l);
+  .house-floor__rooms {
+    display: flex;
+    flex-wrap: wrap;
+    margin-inline-end: calc(var(--house-wall-width) * -1);
   }
-  .activity-house__plan::after {
-    inset-inline: var(--space-xl);
-    inset-block-start: calc(50% - var(--space-s));
-    block-size: var(--space-l);
-  }
+
   .house-room {
     position: relative;
-    z-index: 1;
-    display: grid;
-    align-content: end;
+    display: flex;
+    flex: 1 1 var(--house-room-min);
+    flex-direction: column;
+    align-items: flex-start;
     gap: var(--space-2xs);
-    min-width: 0;
-    min-block-size: var(--house-detail-min);
-    padding: var(--house-room-pad);
-    padding-block-end: calc(var(--house-room-pad) + var(--house-door-size));
-    border: var(--house-wall-width) solid var(--color-text);
+    min-inline-size: 0;
+    min-block-size: var(--house-room-height);
+    padding: calc(var(--house-lamp-drop) + var(--space-xs)) var(--house-room-pad)
+      0;
+    border: 0;
+    border-inline-end: var(--house-wall-width) solid var(--color-text);
+    border-block-end: var(--house-slab) solid var(--color-text);
     background: var(--house-wash);
     color: var(--color-text);
     text-align: start;
-    transition:
-      transform var(--duration-fast) var(--ease-feedback),
-      background-color var(--duration-fast) var(--ease-feedback);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-feedback);
   }
-  .house-room[data-active="true"] {
-    background: var(--color-surface-strong);
+  .house-room[data-wide] {
+    flex-basis: var(--house-room-wide);
+  }
+  .house-room[data-lit="true"] {
+    background: radial-gradient(
+        circle at 50% 0,
+        var(--house-glow),
+        transparent 70%
+      ),
+      var(--house-lit-wash);
+  }
+  .house-room:hover {
+    background-color: var(--color-hover);
+  }
+  .house-room[aria-pressed="true"] {
+    outline: var(--house-focus-outline) solid var(--color-accent);
+    outline-offset: calc(var(--house-focus-outline) * -3);
   }
   .house-room:focus-visible {
-    outline: var(--house-focus-outline) solid var(--color-accent);
-    outline-offset: var(--focus-offset);
+    outline: var(--house-focus-outline) dashed var(--color-accent);
+    outline-offset: calc(var(--house-focus-outline) * -3);
   }
-  .house-room[hidden] {
-    display: none;
-  }
-  .house-room > strong {
-    position: relative;
-    z-index: 1;
-    color: var(--color-accent);
-    font-family: var(--font-serif);
-    font-size: var(--text-card);
-    font-weight: var(--weight-medium);
-    line-height: var(--leading-heading);
-  }
-  .house-room__latest {
-    position: relative;
-    z-index: 1;
-    color: var(--house-ink-muted);
-    font-size: var(--text-xs);
-  }
-  .house-room__door {
-    position: absolute;
-    inset-block-end: calc(-1 * var(--house-wall-width));
-    inset-inline-start: var(--space-l);
-    inline-size: var(--house-door-size);
-    block-size: var(--house-door-size);
-    border-inline: var(--house-wall-width) solid var(--color-text);
-    border-block-start: var(--house-wall-width) solid var(--color-text);
-    border-radius: var(--radius-note) var(--radius-note) 0 0;
-    background: var(--house-wash-soft);
-  }
-  .house-room__art {
-    position: absolute;
-    inset-block-start: var(--space-s);
-    inset-inline-end: var(--space-s);
-    display: block;
-    inline-size: 48%;
-    block-size: 34%;
-    opacity: var(--disabled-opacity);
-  }
-  .house-room__art,
-  .house-room__art i {
-    border: var(--house-furnishing-line) solid var(--color-text);
-  }
-  .house-room__art i {
-    position: absolute;
-    display: block;
-  }
-  .house-room__art i:nth-child(1) {
-    inset: var(--space-2xs);
-  }
-  .house-room__art i:nth-child(2) {
-    inset-block-start: 20%;
-    inset-inline-start: 70%;
-    inline-size: 18%;
-    block-size: 60%;
-  }
-  .house-room__art i:nth-child(3) {
-    inset-block-end: 16%;
-    inset-inline-start: 10%;
-    inline-size: 48%;
-    block-size: 16%;
-  }
-  .house-room__art[data-furnishing="shelves"] i {
-    inline-size: 78%;
-    block-size: var(--house-furnishing-line);
-    border-inline: 0;
-  }
-  .house-room__art[data-furnishing="shelves"] i:nth-child(1) {
-    inset-block-start: 22%;
-  }
-  .house-room__art[data-furnishing="shelves"] i:nth-child(2) {
-    inset-block-start: 50%;
-  }
-  .house-room__art[data-furnishing="shelves"] i:nth-child(3) {
-    inset-block-start: 78%;
-  }
-  .house-room__art[data-furnishing="table"] {
-    border-radius: var(--radius-round);
-    inline-size: 36%;
-  }
-  .house-room__art[data-furnishing="sofa"] {
-    block-size: 24%;
-    border-radius: var(--radius-note);
-  }
-  .house-room__art[data-furnishing="plants"] {
-    border-radius: var(--radius-round);
-    inline-size: 26%;
-    block-size: 26%;
-  }
-  .house-room__postcard {
-    position: relative;
-    z-index: 1;
-    color: var(--color-accent);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-bold);
-  }
-  .house-resident,
-  .house-occupant {
-    position: relative;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2xs);
-    width: max-content;
-    max-width: 100%;
-    color: var(--house-ink-muted);
-    font-size: var(--text-xs);
-  }
-  .house-resident > span,
-  .house-occupant > span {
-    position: relative;
-    display: grid;
-    flex: 0 0 auto;
-    place-items: center;
-    inline-size: var(--space-l);
-    block-size: var(--space-l);
-    border: var(--house-furnishing-line) solid var(--color-text);
-    border-radius: var(--radius-round);
-    font-family: var(--font-serif);
-    color: var(--color-text);
-  }
-  .house-occupant > span {
-    background: var(--color-accent);
-    color: var(--color-accent-contrast);
-  }
-  .house-resident > span::after,
-  .house-occupant > span::after {
-    content: "";
-    position: absolute;
-    inset-block-start: 72%;
-    inset-inline-start: 15%;
-    inline-size: 70%;
-    block-size: 70%;
-    border: var(--house-furnishing-line) solid var(--color-text);
-    border-radius: var(--radius-note) var(--radius-note) 0 0;
-    background: var(--house-wash);
-    z-index: var(--layer-decoration);
-  }
-  .house-occupant > span::after {
-    background: var(--color-accent);
-  }
-  .activity-house__inspector {
-    min-block-size: var(--house-detail-min);
-    padding: var(--house-room-pad);
-    border-block: var(--house-wall-width) solid var(--color-text);
-    background: var(--house-wash);
-  }
-  .activity-house__inspector h2 {
-    margin-top: var(--space-2xs);
-  }
-  .activity-house__inspector > * > p:not(.activity-house__detail-eyebrow) {
-    margin-top: var(--space-s);
-  }
-  .activity-house__inspector a {
-    color: var(--color-accent);
-    text-decoration: underline;
-    text-decoration-color: var(--color-link-rule);
-  }
-  .activity-house__inspector-section {
-    margin-top: var(--space-l);
-    padding-top: var(--space-s);
-    border-top: var(--rule-width) solid var(--color-border);
-  }
-  .activity-house__inspector-section h3 {
-    font-size: var(--text-lead);
-  }
-  .activity-house__inspector-section ul,
-  .activity-house__inspector-section ol {
-    display: grid;
-    gap: var(--space-s);
-    margin-top: var(--space-s);
-    list-style: none;
-  }
-  .activity-house__inspector-section li {
-    display: grid;
-    gap: var(--space-2xs);
-    font-size: var(--text-sm);
-  }
-  .activity-house__inspector-section li span {
-    color: var(--house-ink-muted);
-  }
-  .activity-house__inspector-section time {
-    color: var(--house-ink-muted);
-    font-size: var(--text-xs);
-  }
-  .activity-house__list {
-    display: grid;
-    gap: var(--space-s);
-    padding-top: var(--space-l);
-    border-top: var(--rule-width) solid var(--color-border);
-  }
-  .activity-house__list > p {
-    color: var(--house-ink-muted);
-  }
-  .activity-house__list > div {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-s);
-  }
-  .activity-house__list details {
-    padding: var(--space-s);
-    border: var(--rule-width) solid var(--color-border);
-    background: var(--house-wash-soft);
-  }
-  .activity-house__list summary {
-    cursor: pointer;
-    color: var(--color-accent);
-    font-family: var(--font-serif);
-    font-size: var(--text-lead);
-  }
-  .activity-house__list details p,
-  .activity-house__list details a {
-    display: block;
-    margin-top: var(--space-s);
-    font-size: var(--text-sm);
-  }
-  .activity-house__list details a {
-    color: var(--color-accent);
-    text-decoration: underline;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .house-room:not(:disabled):hover {
-      transform: translate(
-        calc(-1 * var(--house-furnishing-line)),
-        calc(-1 * var(--house-furnishing-line))
-      );
-      background: var(--color-hover);
-    }
-  }
-  @media (min-width: 62.501rem) {
-    .activity-house__body {
-      grid-template-columns: minmax(0, 1fr) minmax(
-          var(--house-detail-min),
-          28%
-        );
-    }
-  }
-  @media (max-width: 40.625rem) {
-    .activity-house {
-      padding-block: var(--space-l);
-    }
-    .activity-house__heading-row {
-      align-items: start;
-    }
-    .activity-house__search {
-      width: 100%;
-    }
-    .activity-house__search input {
-      min-width: 0;
-      width: 100%;
-    }
-    .activity-house__plan {
-      grid-template-columns: minmax(0, 1fr);
-      padding: var(--space-m);
-    }
-    .activity-house__plan::before {
-      inset-inline-start: calc(50% - var(--space-2xs));
-      inline-size: var(--space-s);
-    }
-    .activity-house__plan::after {
-      inset-block-start: calc(50% - var(--space-2xs));
-      block-size: var(--space-s);
-    }
-    .house-room {
-      min-block-size: 0;
-    }
-    .activity-house__list > div {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .house-room {
-      transition: none;
-    }
-  }
-</style>
 
-<!-- Runtime redraws use DOM nodes, so these stay deliberately scoped to the house root. -->
-<style is:global>
-  .activity-house .house-room {
-    position: relative;
-    z-index: 1;
+  .house-room__lamp {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    inline-size: var(--space-m);
+    block-size: var(--house-lamp-drop);
+    translate: -50% 0;
+  }
+  .house-room__lamp::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    block-size: 60%;
+    border-left: var(--rule-width) solid var(--color-text);
+  }
+  .house-room__lamp::after {
+    content: "";
+    position: absolute;
+    inset: 60% 0 0;
+    background: var(--color-text-soft);
+    clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%);
+  }
+  .house-room[data-lit="true"] .house-room__lamp::after {
+    background: var(--color-text);
+    filter: drop-shadow(0 var(--space-2xs) var(--space-xs) var(--color-page));
+  }
+
+  .house-room__label {
     display: grid;
-    align-content: end;
     gap: var(--space-2xs);
-    min-width: 0;
-    min-block-size: var(--house-detail-min);
-    padding: var(--house-room-pad);
-    padding-block-end: calc(var(--house-room-pad) + var(--house-door-size));
-    border: var(--house-wall-width) solid var(--color-text);
-    background: var(--house-wash);
-    color: var(--color-text);
-    text-align: start;
-    transition:
-      transform var(--duration-fast) var(--ease-feedback),
-      background-color var(--duration-fast) var(--ease-feedback);
   }
-  .activity-house .house-room[data-active="true"] {
-    background: var(--color-surface-strong);
-  }
-  .activity-house .house-room:focus-visible {
-    outline: var(--house-focus-outline) solid var(--color-accent);
-    outline-offset: var(--focus-offset);
-  }
-  .activity-house .house-room[hidden] {
-    display: none;
-  }
-  .activity-house .house-room > strong {
-    position: relative;
-    z-index: 1;
+  .house-room__label strong {
     color: var(--color-accent);
     font-family: var(--font-serif);
-    font-size: var(--text-card);
+    font-size: var(--text-lead);
     font-weight: var(--weight-medium);
     line-height: var(--leading-heading);
   }
-  .activity-house .house-room__latest {
-    position: relative;
-    z-index: 1;
-    color: var(--house-ink-muted);
-    font-size: var(--text-xs);
+  .house-room__whisper {
+    font-family: var(--font-serif);
+    font-size: var(--text-sm);
+    font-style: italic;
+    line-height: var(--leading-tight);
   }
-  .activity-house .house-room__door {
-    position: absolute;
-    inset-block-end: calc(-1 * var(--house-wall-width));
-    inset-inline-start: var(--space-l);
-    inline-size: var(--house-door-size);
-    block-size: var(--house-door-size);
-    border-inline: var(--house-wall-width) solid var(--color-text);
-    border-block-start: var(--house-wall-width) solid var(--color-text);
-    border-radius: var(--radius-note) var(--radius-note) 0 0;
+  .house-room__note {
+    display: -webkit-box;
+    max-inline-size: min(var(--house-note-width), 100%);
+    padding: var(--space-2xs) var(--space-xs);
+    overflow: hidden;
+    border: var(--rule-width) solid var(--color-border);
     background: var(--house-wash-soft);
-  }
-  .activity-house .house-room__art {
-    position: absolute;
-    inset-block-start: var(--space-s);
-    inset-inline-end: var(--space-s);
-    display: block;
-    inline-size: 48%;
-    block-size: 34%;
-    opacity: var(--disabled-opacity);
-  }
-  .activity-house .house-room__art,
-  .activity-house .house-room__art i {
-    border: var(--house-furnishing-line) solid var(--color-text);
-  }
-  .activity-house .house-room__art i {
-    position: absolute;
-    display: block;
-  }
-  .activity-house .house-room__art i:nth-child(1) {
-    inset: var(--space-2xs);
-  }
-  .activity-house .house-room__art i:nth-child(2) {
-    inset-block-start: 20%;
-    inset-inline-start: 70%;
-    inline-size: 18%;
-    block-size: 60%;
-  }
-  .activity-house .house-room__art i:nth-child(3) {
-    inset-block-end: 16%;
-    inset-inline-start: 10%;
-    inline-size: 48%;
-    block-size: 16%;
-  }
-  .activity-house .house-room__art[data-furnishing="shelves"] i {
-    inline-size: 78%;
-    block-size: var(--house-furnishing-line);
-    border-inline: 0;
-  }
-  .activity-house .house-room__art[data-furnishing="shelves"] i:nth-child(1) {
-    inset-block-start: 22%;
-  }
-  .activity-house .house-room__art[data-furnishing="shelves"] i:nth-child(2) {
-    inset-block-start: 50%;
-  }
-  .activity-house .house-room__art[data-furnishing="shelves"] i:nth-child(3) {
-    inset-block-start: 78%;
-  }
-  .activity-house .house-room__art[data-furnishing="table"] {
-    border-radius: var(--radius-round);
-    inline-size: 36%;
-  }
-  .activity-house .house-room__art[data-furnishing="sofa"] {
-    block-size: 24%;
-    border-radius: var(--radius-note);
-  }
-  .activity-house .house-room__art[data-furnishing="plants"] {
-    border-radius: var(--radius-round);
-    inline-size: 26%;
-    block-size: 26%;
-  }
-  .activity-house .house-room__postcard {
-    position: relative;
-    z-index: 1;
-    color: var(--color-accent);
+    box-shadow: var(--rule-width) var(--rule-width) 0 var(--color-border);
+    color: var(--color-text-soft);
     font-size: var(--text-xs);
+    line-height: var(--leading-tight);
+    rotate: var(--house-note-tilt);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+  .house-room__note time {
+    margin-inline-end: var(--space-2xs);
+    color: var(--color-accent);
     font-weight: var(--weight-bold);
   }
-  .activity-house .house-resident,
-  .activity-house .house-occupant {
-    position: relative;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2xs);
-    width: max-content;
-    max-width: 100%;
-    color: var(--house-ink-muted);
+  .house-room__floor {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    inline-size: 100%;
+    margin-top: auto;
+    padding-top: var(--space-xs);
+  }
+  .house-room__furniture {
+    flex: none;
+    inline-size: var(--house-furniture-width);
+    fill: none;
+    stroke: var(--color-text-soft);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .house-room__people,
+  .house-porch__people {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-m);
+  }
+
+  /* ---------- People ---------- */
+  .house-figure {
+    display: inline-grid;
+    justify-items: center;
+    gap: var(--rule-width);
+  }
+  .house-figure svg {
+    block-size: var(--house-figure-height);
+    inline-size: auto;
+    overflow: visible;
+  }
+  .house-figure__name {
     font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-display);
   }
-  .activity-house .house-resident > span,
-  .activity-house .house-occupant > span {
-    position: relative;
-    display: grid;
-    flex: 0 0 auto;
-    place-items: center;
-    inline-size: var(--space-l);
-    block-size: var(--space-l);
-    border: var(--house-furnishing-line) solid var(--color-text);
-    border-radius: var(--radius-round);
-    font-family: var(--font-serif);
-    color: var(--color-text);
+  .house-figure__head,
+  .house-figure__body {
+    fill: var(--house-wash-soft);
+    stroke: var(--color-text);
+    stroke-width: 1.5;
   }
-  .activity-house .house-occupant > span {
-    background: var(--color-accent);
-    color: var(--color-accent-contrast);
+  .house-figure__leg,
+  .house-figure__tool {
+    fill: none;
+    stroke: var(--color-text);
+    stroke-width: 1.8;
+    stroke-linecap: round;
   }
-  .activity-house .house-resident > span::after,
-  .activity-house .house-occupant > span::after {
-    content: "";
-    position: absolute;
-    inset-block-start: 72%;
-    inset-inline-start: 15%;
-    inline-size: 70%;
-    block-size: 70%;
-    border: var(--house-furnishing-line) solid var(--color-text);
-    border-radius: var(--radius-note) var(--radius-note) 0 0;
-    background: var(--house-wash);
-    z-index: var(--layer-decoration);
+  .house-figure__prop {
+    fill: var(--color-text);
+    stroke: var(--color-text);
+    stroke-width: 1;
   }
-  .activity-house .house-occupant > span::after {
-    background: var(--color-accent);
+  .house-figure[data-figure="visitor"] .house-figure__body {
+    fill: var(--color-accent);
+    stroke: var(--color-accent-pressed);
   }
-  .activity-house .activity-house__inspector {
-    min-block-size: var(--house-detail-min);
-    padding: var(--house-room-pad);
-    border-block: var(--house-wall-width) solid var(--color-text);
-    background: var(--house-wash);
+  .house-figure[data-figure="visitor"] .house-figure__prop {
+    fill: var(--house-glow);
   }
-  .activity-house .activity-house__inspector h2 {
-    margin-top: var(--space-2xs);
-  }
-  .activity-house
-    .activity-house__inspector
-    > *
-    > p:not(.activity-house__detail-eyebrow) {
-    margin-top: var(--space-s);
-  }
-  .activity-house .activity-house__inspector a {
+  .house-figure[data-figure="visitor"] .house-figure__name {
     color: var(--color-accent);
-    text-decoration: underline;
-    text-decoration-color: var(--color-link-rule);
   }
-  .activity-house .activity-house__inspector-section {
-    margin-top: var(--space-l);
+  @media (prefers-reduced-motion: no-preference) {
+    .house-figure[data-figure="resident"] svg {
+      animation: house-bob var(--house-motion-duration) ease-in-out infinite;
+    }
+    .house-figure[data-figure="visitor"] {
+      animation: house-wander var(--house-motion-duration) ease-in-out infinite;
+    }
+    .house-figure[data-figure="visitor"] svg {
+      animation: house-bob calc(var(--house-motion-duration) / 6) ease-in-out
+        infinite;
+    }
+    .house-figure:nth-child(2) {
+      animation-delay: calc(var(--house-motion-duration) / -2.7);
+    }
+    .house-figure:nth-child(3) {
+      animation-delay: calc(var(--house-motion-duration) / -1.6);
+    }
+    .house-figure[data-arriving] {
+      animation:
+        house-arrive var(--house-walk-in) ease-out both,
+        house-wander var(--house-motion-duration) ease-in-out
+          var(--house-walk-in) infinite;
+    }
+  }
+
+  /* ---------- Porch ---------- */
+  .house-porch {
+    display: flex;
+    flex: 1 1 var(--house-porch-width);
+    flex-direction: column;
+    gap: var(--space-2xs);
+    min-block-size: var(--house-room-height);
+    padding: calc(var(--house-lamp-drop) + var(--space-xs)) var(--space-s) 0;
+    border-inline-end: var(--house-wall-width) solid var(--color-text);
+    border-block-end: var(--house-slab) solid var(--color-text);
+  }
+  .house-porch__mat {
+    color: var(--color-text-soft);
+    font-family: var(--font-serif);
+    font-size: var(--text-sm);
+    font-style: italic;
+  }
+  .house-porch__step {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: var(--space-s);
+    margin-top: auto;
+  }
+  .house-porch__door {
+    flex: none;
+    inline-size: calc(var(--house-door-size) * 1.5);
+    block-size: calc(var(--house-door-size) * 2.4);
+    border: var(--house-wall-width) solid var(--color-text);
+    border-block-end: 0;
+    border-radius: var(--radius-note);
+    background:
+      radial-gradient(
+        circle at 78% 55%,
+        var(--color-text) 0 calc(var(--space-2xs) / 2),
+        transparent calc(var(--space-2xs) / 2 + var(--rule-width))
+      ),
+      var(--color-accent);
+  }
+
+  /* ---------- The postcard ---------- */
+  .house-detail {
+    display: grid;
+    gap: var(--space-s);
+    padding: var(--space-l);
+    border: var(--house-wall-width) solid var(--color-text);
+    border-radius: var(--radius-note);
+    background: var(--house-wash-soft);
+    box-shadow: var(--house-wall-width) var(--house-wall-width) 0
+      var(--color-text);
+  }
+  .house-detail h2 {
+    font-size: var(--text-section);
+  }
+  .house-detail h2:focus {
+    outline: none;
+  }
+  .house-detail h3 {
+    margin-bottom: var(--space-2xs);
+    font-size: var(--text-lead);
+  }
+  .house-detail section {
     padding-top: var(--space-s);
     border-top: var(--rule-width) solid var(--color-border);
   }
-  .activity-house .activity-house__inspector-section h3 {
-    font-size: var(--text-lead);
+  .house-detail__summary,
+  .house-detail__quiet {
+    font-size: var(--text-copy);
   }
-  .activity-house .activity-house__inspector-section ul,
-  .activity-house .activity-house__inspector-section ol {
+  .house-detail__quiet {
+    color: var(--color-text-soft);
+    font-style: italic;
+  }
+  .house-detail__visit {
+    justify-self: start;
+    font-size: var(--text-sm);
+  }
+  .house-detail__people,
+  .house-detail__now,
+  .house-detail__lately {
     display: grid;
     gap: var(--space-s);
-    margin-top: var(--space-s);
+    padding: 0;
     list-style: none;
   }
-  .activity-house .activity-house__inspector-section li {
-    display: grid;
-    gap: var(--space-2xs);
-    font-size: var(--text-sm);
-  }
-  .activity-house .activity-house__inspector-section li span,
-  .activity-house .activity-house__inspector-section time {
-    color: var(--house-ink-muted);
-    font-size: var(--text-xs);
-  }
-  .activity-house .activity-house__list > div {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .house-detail__people li {
+    display: flex;
+    align-items: flex-end;
     gap: var(--space-s);
   }
-  .activity-house .activity-house__list details {
-    padding: var(--space-s);
-    border: var(--rule-width) solid var(--color-border);
-    background: var(--house-wash-soft);
+  .house-detail__people .house-figure__name {
+    display: none;
   }
-  .activity-house .activity-house__list summary {
-    cursor: pointer;
-    color: var(--color-accent);
-    font-family: var(--font-serif);
-    font-size: var(--text-lead);
-  }
-  .activity-house .activity-house__list details p,
-  .activity-house .activity-house__list details a {
-    display: block;
-    margin-top: var(--space-s);
+  .house-detail__people li > span:last-child,
+  .house-detail__lately li,
+  .house-detail__now li {
+    display: grid;
+    gap: var(--rule-width);
     font-size: var(--text-sm);
+    line-height: var(--leading-tight);
   }
-  .activity-house .activity-house__list details a {
-    color: var(--color-accent);
-    text-decoration: underline;
+  .house-detail__role,
+  .house-detail__lately time {
+    color: var(--color-text-soft);
+    font-size: var(--text-xs);
   }
-  @media (hover: hover) and (pointer: fine) {
-    .activity-house .house-room:not(:disabled):hover {
-      transform: translate(
-        calc(-1 * var(--house-furnishing-line)),
-        calc(-1 * var(--house-furnishing-line))
-      );
-      background: var(--color-hover);
+  .house-detail__doing {
+    font-family: var(--font-serif);
+    font-style: italic;
+  }
+  .house-detail__lately span,
+  .house-detail__now span {
+    color: var(--color-text-soft);
+  }
+
+  .house-walk {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  @keyframes house-bob {
+    50% {
+      translate: 0 calc(var(--house-motion-drift) / -6);
     }
   }
-  @media (max-width: 40.625rem) {
-    .activity-house .house-room {
-      min-block-size: 0;
+  @keyframes house-wander {
+    0%,
+    100% {
+      translate: 0 0;
     }
-    .activity-house .activity-house__list > div {
-      grid-template-columns: minmax(0, 1fr);
+    35% {
+      translate: calc(var(--house-motion-drift) / -2) 0;
+    }
+    70% {
+      translate: calc(var(--house-motion-drift) / 3) 0;
+    }
+  }
+  @keyframes house-arrive {
+    from {
+      translate: calc(var(--house-room-min) / -2) 0;
+      opacity: 0;
+    }
+  }
+  @keyframes house-smoke {
+    from {
+      opacity: 0.8;
+      transform: translate(0, 0) scale(0.6);
+    }
+    to {
+      opacity: 0;
+      transform: translate(var(--space-m), calc(var(--house-roof-height) * -1))
+        scale(1.6);
+    }
+  }
+  @keyframes house-pulse {
+    50% {
+      opacity: 0.35;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .activity-house .house-room {
-      transition: none;
+    [data-busy="true"] .house-roof__chimney i,
+    [data-busy="true"] > .house-status::before {
+      animation: none;
+    }
+    [data-busy="true"] .house-roof__chimney i:first-child {
+      opacity: 0.6;
     }
   }
 </style>

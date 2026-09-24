@@ -88,7 +88,7 @@ export async function getHouseInput() {
       ),
     },
     projects: fullProjects(projects).filter((project) => !project.hidden),
-    events: events.filter((event) => !excludedIds.has(event.id)),
+    events: events.filter((event) => !event.id || !excludedIds.has(event.id)),
   };
 }
 

@@ -14,5 +14,6 @@ const input = await getHouseInput();
   <ActivityHouse
     {...input}
     editorHref={import.meta.env.DEV ? "/house/edit" : undefined}
+    rehearsal={import.meta.env.DEV}
   />
 </BaseLayout>
