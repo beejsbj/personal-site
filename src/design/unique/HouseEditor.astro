@@ -125,7 +125,7 @@
       <div class="house-editor__checks">
         <label>
           <input type="checkbox" name="pinned" data-house-editor-room-field />{" "}
-          Pinned
+          Pinned (walks first, drawn wider)
         </label>
         <label>
           <input type="checkbox" name="hidden" data-house-editor-room-field />{" "}
@@ -158,7 +158,8 @@
   installHouseEditor();
 </script>
 
-<style>
+<style is:global>
+  /* Global: resident rows are created in the browser, outside Astro's scope. */
   .house-editor {
     display: grid;
     gap: var(--space-xl);
@@ -293,6 +294,7 @@
 
   .house-editor__resident {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-s);
     padding: var(--space-m);
     border: var(--rule-width) solid var(--color-border);
@@ -300,6 +302,7 @@
   }
 
   .house-editor__resident-actions {
+    grid-column: 1 / -1;
     justify-self: start;
   }
 
