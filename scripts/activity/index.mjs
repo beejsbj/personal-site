@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import {
   approve,
   defaultPolicy,
+  exportFeed,
   exportPresence,
   exportStatic,
   fromAgentSessionLifecycle,
@@ -26,6 +27,7 @@ Commands:
   reject|retract --id activity_... [--note text] [--by operator] [--store .activity-engine]
   export [--store .activity-engine] [--out src/data/activity.public.json]
   export-presence [--store .activity-engine] [--out .activity-engine/presence.public.json]
+  export-feed [--store .activity-engine] [--out .activity-engine/feed.public.json]
 
 Imports enter review unless an exact opt-in rule trusts a previously reviewed
 producer and milestone type. Manual approval requires a separate curated
@@ -60,6 +62,7 @@ function assertKnownOptions(command, options) {
     retract: ["id", "by", "note", "store"],
     export: ["store", "out"],
     "export-presence": ["store", "out"],
+    "export-feed": ["store", "out"],
   };
   if (!Object.hasOwn(allowed, command)) return;
   for (const key of Object.keys(options)) {
@@ -181,6 +184,10 @@ async function main() {
       options.out ?? ".activity-engine/presence.public.json",
     );
     return output(await exportPresence({ storeDir, outFile }));
+  }
+  if (command === "export-feed") {
+    const outFile = resolve(options.out ?? ".activity-engine/feed.public.json");
+    return output(await exportFeed({ storeDir, outFile }));
   }
   throw new Error(`Unknown command ${command}.\n\n${usage}`);
 }

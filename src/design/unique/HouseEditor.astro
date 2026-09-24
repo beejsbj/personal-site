@@ -1,0 +1,315 @@
+<section
+  class="house-editor"
+  data-house-editor
+  aria-labelledby="house-editor-title"
+>
+  <header class="house-editor__heading">
+    <p class="house-editor__eyebrow">Local roster editor</p>
+    <h1 id="house-editor-title">Arrange the house.</h1>
+    <p>
+      This changes the durable public roster that the illustrated house reads.
+      Changes stay in this browser until you explicitly save them.
+    </p>
+    <p class="house-editor__status" data-house-editor-status role="status">
+      Loading the current roster…
+    </p>
+  </header>
+
+  <form class="house-editor__form" data-house-editor-form hidden>
+    <div class="house-editor__actions">
+      <button type="submit" data-house-editor-save>
+        Save roster
+      </button>
+      <a href="/house/" data-house-editor-preview>
+        View house
+      </a>
+      <button type="button" data-house-editor-reload hidden>
+        Reload latest roster
+      </button>
+    </div>
+
+    <div class="house-editor__errors" data-house-editor-errors hidden>
+      <h2>Check these fields</h2>
+      <ul></ul>
+    </div>
+
+    <fieldset class="house-editor__room-picker">
+      <legend>Rooms</legend>
+      <label for="house-editor-room-select">Editing room</label>
+      <select
+        id="house-editor-room-select"
+        data-house-editor-room-select
+      ></select>
+      <div class="house-editor__room-actions">
+        <button type="button" data-house-editor-add-room>
+          Add room
+        </button>
+        <button type="button" data-house-editor-move-up>
+          Move up
+        </button>
+        <button type="button" data-house-editor-move-down>
+          Move down
+        </button>
+        <button type="button" data-house-editor-remove-room>
+          Remove room
+        </button>
+      </div>
+      <label
+        class="house-editor__suggestion"
+        data-house-editor-suggestion
+        hidden
+      >
+        Customize a project room
+        <select data-house-editor-suggested-room></select>
+        <span>Use an existing project ID to customize its room.</span>
+      </label>
+      <button type="button" data-house-editor-customize-room hidden>
+        Add selected project room
+      </button>
+    </fieldset>
+
+    <fieldset class="house-editor__fields">
+      <legend>Room details</legend>
+      <div class="house-editor__field-grid">
+        <label>
+          Room id
+          <input name="id" data-house-editor-room-field autocomplete="off" />
+        </label>
+        <label>
+          Title
+          <input name="title" data-house-editor-room-field />
+        </label>
+        <label>
+          Kind
+          <select name="kind" data-house-editor-room-field>
+            <option value="project">Project</option>
+            <option value="place">Place</option>
+          </select>
+        </label>
+        <label>
+          Furnishing
+          <select name="furnishing" data-house-editor-room-field>
+            <option value="desk">Desk</option>
+            <option value="bench">Bench</option>
+            <option value="shelves">Shelves</option>
+            <option value="table">Table</option>
+            <option value="sofa">Sofa</option>
+            <option value="plants">Plants</option>
+          </select>
+        </label>
+        <label class="house-editor__field--wide">
+          Summary
+          <textarea
+            name="summary"
+            data-house-editor-room-field
+            rows="4"
+          ></textarea>
+        </label>
+        <label>
+          Public link
+          <input
+            name="href"
+            data-house-editor-room-field
+            placeholder="/projects/example"
+          />
+        </label>
+        <label>
+          Aliases, separated by commas
+          <input name="aliases" data-house-editor-room-field />
+        </label>
+        <label>
+          Walking order
+          <input name="order" data-house-editor-room-order readonly />
+        </label>
+      </div>
+      <div class="house-editor__checks">
+        <label>
+          <input type="checkbox" name="pinned" data-house-editor-room-field />{" "}
+          Pinned
+        </label>
+        <label>
+          <input type="checkbox" name="hidden" data-house-editor-room-field />{" "}
+          Hidden
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="house-editor__residents">
+      <legend>Residents</legend>
+      <p>Every resident belongs to one public room.</p>
+      <ul data-house-editor-resident-list></ul>
+      <button type="button" data-house-editor-add-resident>
+        Add resident
+      </button>
+    </fieldset>
+  </form>
+
+  <noscript>
+    <p class="house-editor__noscript">
+      This editor needs local JavaScript. Read or edit the roster file directly
+      at <a href="/src/data/house.catalog.json">src/data/house.catalog.json</a>.
+    </p>
+  </noscript>
+</section>
+
+<script>
+  import { installHouseEditor } from "./house-editor";
+
+  installHouseEditor();
+</script>
+
+<style>
+  .house-editor {
+    display: grid;
+    gap: var(--space-xl);
+    width: var(--shell-width);
+    max-width: var(--reading-width);
+    margin-inline: auto;
+    padding-block: var(--space-3xl);
+  }
+
+  .house-editor__heading {
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  .house-editor__eyebrow {
+    color: var(--house-ink-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-heading);
+    text-transform: uppercase;
+  }
+
+  .house-editor__status {
+    color: var(--color-text-soft);
+  }
+
+  .house-editor__form,
+  .house-editor__form fieldset,
+  .house-editor__field-grid,
+  .house-editor__residents > ul {
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  .house-editor__form fieldset {
+    padding: var(--space-m);
+    border: var(--rule-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .house-editor__form legend {
+    padding-inline: var(--space-2xs);
+    color: var(--color-accent);
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+  }
+
+  .house-editor__actions,
+  .house-editor__room-actions,
+  .house-editor__checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    align-items: center;
+  }
+
+  .house-editor button,
+  .house-editor__actions a {
+    min-height: var(--control-min-height);
+    padding: var(--space-xs) var(--space-m);
+    border: var(--rule-width) solid var(--color-accent);
+    background: var(--color-page);
+    color: var(--color-accent);
+    font: inherit;
+  }
+
+  .house-editor__actions button[type="submit"] {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+
+  .house-editor button:focus-visible,
+  .house-editor__actions a:focus-visible,
+  .house-editor input:focus-visible,
+  .house-editor select:focus-visible,
+  .house-editor textarea:focus-visible {
+    outline: var(--focus-width) solid var(--color-accent);
+    outline-offset: var(--focus-offset);
+  }
+
+  .house-editor__field-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .house-editor label {
+    display: grid;
+    gap: var(--space-2xs);
+    color: var(--color-text-soft);
+    font-size: var(--text-sm);
+  }
+
+  .house-editor input,
+  .house-editor select,
+  .house-editor textarea {
+    width: 100%;
+    padding: var(--space-xs);
+    border: var(--rule-width) solid var(--color-border);
+    background: var(--color-page);
+    color: var(--color-text);
+    font: inherit;
+  }
+
+  .house-editor input[type="checkbox"] {
+    width: auto;
+  }
+
+  .house-editor__checks label {
+    display: flex;
+    gap: var(--space-2xs);
+    align-items: center;
+  }
+
+  .house-editor__field--wide {
+    grid-column: 1 / -1;
+  }
+
+  .house-editor__errors {
+    padding: var(--space-m);
+    border-inline-start: var(--house-wall-width) solid var(--color-accent);
+    background: var(--color-surface-strong);
+  }
+
+  .house-editor__errors ul {
+    margin-block-start: var(--space-xs);
+    padding-inline-start: var(--space-l);
+  }
+
+  .house-editor__suggestion span {
+    color: var(--color-text-soft);
+    font-size: var(--text-xs);
+  }
+
+  .house-editor__resident {
+    display: grid;
+    gap: var(--space-s);
+    padding: var(--space-m);
+    border: var(--rule-width) solid var(--color-border);
+    background: var(--color-page);
+  }
+
+  .house-editor__resident-actions {
+    justify-self: start;
+  }
+
+  @media (max-width: 40.625rem) {
+    .house-editor__field-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .house-editor__field--wide {
+      grid-column: auto;
+    }
+  }
+</style>

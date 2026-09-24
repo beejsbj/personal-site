@@ -98,6 +98,13 @@ export const updateSchema = z
     href: z.string().min(1),
     linkLabel: z.string(),
     relatedProject: z.string().optional(),
+    actor: z
+      .object({
+        id: z.string().max(80),
+        name: z.string().max(120),
+        role: z.string().max(120),
+      })
+      .optional(),
     expiresAt: z.string().datetime({ offset: true }).optional(),
   })
   .superRefine((update, context) => {

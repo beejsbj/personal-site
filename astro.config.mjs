@@ -4,6 +4,7 @@ import vercel from "@astrojs/vercel";
 
 const excludedPaths = new Set([
   "/house/",
+  "/house/edit/",
   "/e4p/",
   "/garden/",
   "/style-guide/",

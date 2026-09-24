@@ -72,6 +72,15 @@ export function assertHttpUrl(value, name) {
   return url.toString();
 }
 
+export function validateActor(value, name = "actor") {
+  assertObject(value, name);
+  return {
+    id: assertShortString(value.id, `${name}.id`, 80),
+    name: assertShortString(value.name, `${name}.name`, 120),
+    role: assertShortString(value.role, `${name}.role`, 120),
+  };
+}
+
 export function assertSafePayload(payload) {
   if (payload === undefined) return undefined;
   assertObject(payload, "payload");
@@ -216,6 +225,9 @@ export function validateCandidate(value) {
           ),
         }
       : {}),
+    ...(value.actor
+      ? { actor: validateActor(value.actor, "candidate.actor") }
+      : {}),
   };
 }
 
@@ -255,6 +267,9 @@ export function validatePublicProjection(value) {
             120,
           ),
         }
+      : {}),
+    ...(value.actor
+      ? { actor: validateActor(value.actor, "public projection actor") }
       : {}),
   };
 }
@@ -313,6 +328,7 @@ export function validatePublicExport(value) {
           "public export evidence.observedAt",
         ),
       },
+      ...(projection.actor ? { actor: projection.actor } : {}),
     };
   });
   return { version: 1, generatedAt: value.generatedAt, events };

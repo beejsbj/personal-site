@@ -3,7 +3,7 @@ import { getCollection, getEntry } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Homepage from "../components/Homepage.astro";
-import { generatedActivity } from "../lib/generated-activity";
+import { getPublicActivity } from "../lib/public-activity";
 
 const homeEntry = await getEntry("pages", "home");
 if (!homeEntry) {
@@ -30,8 +30,7 @@ const featuredProjects: CollectionEntry<"projects">[] = (
   .slice(0, 3);
 
 // The shared stream filters eligibility before applying its display limit.
-const recentUpdates: CollectionEntry<"updates">[] =
-  await getCollection("updates");
+const recentUpdates = await getPublicActivity();
 
 const homepageData = {
   site,
@@ -39,10 +38,7 @@ const homepageData = {
     ...project.data,
     href: `/projects/${project.slug}`,
   })),
-  updates: [
-    ...recentUpdates.map((update) => update.data),
-    ...generatedActivity,
-  ],
+  updates: recentUpdates,
 };
 ---
 

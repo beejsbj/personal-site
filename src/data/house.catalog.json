@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "rooms": [
+    {
+      "id": "personal-site",
+      "title": "This little website",
+      "summary": "A home for projects, playful interfaces, and the things taking shape around here.",
+      "kind": "project",
+      "furnishing": "desk",
+      "href": "/",
+      "aliases": [
+        "burooj-dev",
+        "this-site"
+      ],
+      "pinned": true,
+      "hidden": false,
+      "order": 10
+    },
+    {
+      "id": "undertext",
+      "title": "Undertext",
+      "summary": "Reading slowly, following a thought, and seeing what a text might become.",
+      "kind": "project",
+      "furnishing": "shelves",
+      "aliases": [
+        "undertext-wiki"
+      ],
+      "pinned": true,
+      "hidden": false,
+      "order": 20
+    },
+    {
+      "id": "design-lab",
+      "title": "Design Lab",
+      "summary": "A table for visual specimens, interface experiments, and finding a shared language.",
+      "kind": "project",
+      "furnishing": "bench",
+      "aliases": [],
+      "pinned": true,
+      "hidden": false,
+      "order": 30
+    },
+    {
+      "id": "emotitone",
+      "title": "EmotiTone",
+      "summary": "A place for music, expressive controls, and instruments that invite a little play.",
+      "kind": "project",
+      "furnishing": "table",
+      "href": "https://github.com/beejsbj/emotitone-solfrege",
+      "aliases": [
+        "emotitone-solfrege"
+      ],
+      "pinned": true,
+      "hidden": false,
+      "order": 40
+    },
+    {
+      "id": "bjslab",
+      "title": "bjslab",
+      "summary": "The machine room that holds the services and experiments I look after.",
+      "kind": "place",
+      "furnishing": "bench",
+      "aliases": [],
+      "pinned": true,
+      "hidden": false,
+      "order": 50
+    },
+    {
+      "id": "cockpit",
+      "title": "Cockpit",
+      "summary": "Loose threads, plans, and the next useful move gather around this table.",
+      "kind": "place",
+      "furnishing": "table",
+      "aliases": [
+        "dispatch"
+      ],
+      "pinned": true,
+      "hidden": false,
+      "order": 60
+    },
+    {
+      "id": "mac",
+      "title": "Mac",
+      "summary": "The desk where much of the writing and making happens.",
+      "kind": "place",
+      "furnishing": "desk",
+      "aliases": [],
+      "pinned": false,
+      "hidden": false,
+      "order": 70
+    },
+    {
+      "id": "s23",
+      "title": "S23+",
+      "summary": "A pocket doorway for catching a thought or bringing a useful link home.",
+      "kind": "place",
+      "furnishing": "plants",
+      "aliases": [
+        "s23"
+      ],
+      "pinned": false,
+      "hidden": false,
+      "order": 80
+    },
+    {
+      "id": "reddit",
+      "title": "Reddit",
+      "summary": "A reading nook for wandering through conversations and following a thread.",
+      "kind": "place",
+      "furnishing": "sofa",
+      "aliases": [],
+      "pinned": false,
+      "hidden": false,
+      "order": 90
+    }
+  ],
+  "residents": [
+    {
+      "id": "hermes",
+      "name": "Hermes",
+      "role": "Resident",
+      "roomId": "cockpit"
+    }
+  ]
+}

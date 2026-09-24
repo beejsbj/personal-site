@@ -1,224 +1,260 @@
 ---
-import {
-  houseResidents,
-  houseRooms,
-  houseWorkers,
-  quietHouseMessage,
-} from "../../data/activity-house";
+import { buildHouseModel } from "../../lib/activity-house-model.mjs";
+
+interface Props {
+  catalog: unknown;
+  projects: unknown[];
+  events: unknown[];
+  editorHref?: string;
+}
+
+const { catalog, projects, events, editorHref } = Astro.props;
+const input = { catalog, projects, events };
+const model = buildHouseModel(input);
+const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
+const dateFor = (item: any) => item.observedAt ?? item.occurredAt ?? item.date;
+const readableDate = (item: any) => {
+  const date = new Date(dateFor(item));
+  return Number.isFinite(date.getTime())
+    ? new Intl.DateTimeFormat("en", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(date)
+    : "Reviewed update";
+};
+const residentsFor = (roomId: string) =>
+  model.residents.filter((resident: any) => resident.roomId === roomId);
+const selected = model.rooms[0];
 ---
 
-<section
-  class="activity-house"
-  data-activity-house
-  data-scene="quiet"
-  data-motion="playing"
-  data-page-visible="true"
->
-  <div class="activity-house__heading">
-    <p class="activity-house__eyebrow">A small imagined floorplan</p>
-    <h1>A house for the work.</h1>
-    <p class="activity-house__intro">
-      A quiet map of the places that hold a project, a thought, or a useful next
-      move. Open a room to look around.
-    </p>
-    <div class="activity-house__controls" aria-label="House controls" hidden>
-      <button type="button" data-house-demo aria-pressed="false">
-        Imagine a busy house
+<section class="activity-house" data-activity-house>
+  <header class="activity-house__heading">
+    <p class="activity-house__eyebrow">A working floorplan</p>
+    <div class="activity-house__heading-row">
+      <div>
+        <h1>Step into the house.</h1>
+        <p>
+          Projects, places, and the public traces they leave behind. Choose a
+          room to look closer.
+        </p>
+      </div>
+      {editorHref && (
+        <a class="activity-house__arrange" href={editorHref}>
+          Arrange the house
+        </a>
+      )}
+    </div>
+  </header>
+
+  <div class="activity-house__controls" data-house-controls hidden>
+    <label class="activity-house__search">
+      <span>Find a room</span>
+      <input
+        type="search"
+        data-house-search
+        placeholder="Search the house"
+        disabled
+      />
+    </label>
+    <div class="activity-house__filters" role="group" aria-label="Filter rooms">
+      <button
+        type="button"
+        data-house-filter="all"
+        aria-pressed="true"
+        disabled
+      >
+        All
       </button>
-      <button type="button" data-house-motion aria-pressed="false">
-        Pause motion
+      <button
+        type="button"
+        data-house-filter="active"
+        aria-pressed="false"
+        disabled
+      >
+        Happening now
+      </button>
+      <button
+        type="button"
+        data-house-filter="project"
+        aria-pressed="false"
+        disabled
+      >
+        Projects
+      </button>
+      <button
+        type="button"
+        data-house-filter="place"
+        aria-pressed="false"
+        disabled
+      >
+        Places
       </button>
     </div>
-    <p class="activity-house__status" data-house-status role="status">
-      {quietHouseMessage}
-    </p>
-    <p class="activity-house__demo-note" data-house-connection>
-      Imagined scene — live postcards are not connected yet.
-    </p>
   </div>
 
   <div class="activity-house__body">
     <div class="activity-house__plan-wrap">
+      <p class="activity-house__status" data-house-status role="status">
+        {model.rooms.some((room: any) => room.active)
+          ? "Fresh postcards are in the house."
+          : "No fresh postcards just now."}
+      </p>
       <div
         class="activity-house__plan"
-        aria-label="Interactive floorplan of the house"
+        data-house-plan
+        aria-label="House floorplan"
       >
-        <span
-          class="activity-house__corridor activity-house__corridor--east"
-          aria-hidden="true"
-        ></span>
-        <span
-          class="activity-house__corridor activity-house__corridor--south"
-          aria-hidden="true"
-        ></span>
-        {houseRooms.map((room, index) => (
+        {model.rooms.map((room: any, index: number) => (
           <button
             type="button"
-            class:list={[
-              "house-room",
-              `house-room--${room.furnishing}`,
-              `house-room--${room.id}`,
-            ]}
-            data-room-button={room.id}
-            data-has-signal="false"
+            class="house-room"
+            data-house-room={room.id}
+            data-kind={room.kind}
+            data-active={String(room.active)}
             aria-pressed={index === 0 ? "true" : "false"}
             disabled
-            style={`--house-grid-column: ${room.grid.column}; --house-grid-row: ${room.grid.row};`}
           >
             <span class="house-room__door" aria-hidden="true"></span>
-            <svg
+            <span
               class="house-room__art"
+              data-furnishing={room.furnishing}
               aria-hidden="true"
-              viewBox="0 0 120 80"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
             >
-              {room.id === "mac" && (
-                <>
-                  <path d="M18 53h68M26 53V64M78 53V64M40 45h31l-4-22H44z" />
-                  <path d="M32 64h56" />
-                </>
-              )}
-              {room.id === "dispatch" && (
-                <>
-                  <circle cx="58" cy="40" r="24" />
-                  <path d="M34 20l8 9M75 21l-8 9M30 58l12-6M86 58l-12-6M51 40h14" />
-                </>
-              )}
-              {room.id === "s23" && (
-                <>
-                  <path d="M28 62h54M38 62V47h34v15M54 47V23M54 31l-12-8M54 37l12-9" />
-                </>
-              )}
-              {room.id === "undertext" && (
-                <>
-                  <path d="M24 16v48M82 16v48M24 22h58M24 39h58M24 56h58M36 22v17M51 39v17M67 22v17" />
-                </>
-              )}
-              {room.id === "design-lab" && (
-                <>
-                  <circle cx="55" cy="43" r="21" />
-                  <path d="M55 22v42M34 43h42M23 18l10 10M80 18L70 28" />
-                </>
-              )}
-              {room.id === "bjslab" && (
-                <>
-                  <rect x="26" y="14" width="46" height="52" rx="3" />
-                  <circle cx="39" cy="29" r="5" />
-                  <circle cx="58" cy="29" r="5" />
-                  <path d="M34 48h30M34 57h30" />
-                </>
-              )}
-              {room.id === "reddit" && (
-                <>
-                  <path d="M32 64V39c0-12 12-20 25-20s25 8 25 20v25M32 50h50M40 64v-9M74 64v-9M46 34h21v12H46z" />
-                </>
-              )}
-              {room.id === "projects" && (
-                <>
-                  <path d="M23 18v46M83 18v46M23 22h60M23 41h60M23 60h60M33 26h12v11H33zM55 26h14v11H55zM40 45h13v11H40z" />
-                </>
-              )}
-            </svg>
-            <span class="house-room__eyebrow">{room.eyebrow}</span>
-            <strong class="house-room__name">{room.name}</strong>
-            <span class="house-room__signal" aria-hidden="true">
-              ✦
+              <i></i>
+              <i></i>
+              <i></i>
             </span>
-            <span class="house-room__visitor" aria-hidden="true">
-              <span></span>
+            <span class="house-room__kind">
+              {room.kind === "place" ? "Place" : "Project"}
             </span>
+            <strong>{room.title}</strong>
+            <span class="house-room__latest">
+              {room.events[0]
+                ? `Reviewed: ${room.events[0].title}`
+                : room.summary}
+            </span>
+            <span class="house-room__postcard">
+              {room.active ? "Fresh postcard" : "No fresh postcard"}
+            </span>
+            {residentsFor(room.id).map((resident: any) => (
+              <span class="house-resident">
+                <span aria-hidden="true">{resident.name.slice(0, 1)}</span>
+                {resident.name} · {resident.role}
+              </span>
+            ))}
+            {room.occupants.map(
+              (occupant: any) =>
+                occupant.actor && (
+                  <span class="house-occupant">
+                    <span aria-hidden="true">
+                      {occupant.actor.name.slice(0, 1)}
+                    </span>
+                    {occupant.actor.name} · {occupant.actor.role}
+                  </span>
+                ),
+            )}
           </button>
         ))}
-        <div
-          class="activity-house__residents"
-          aria-label="Permanent illustrated residents"
-        >
-          {houseResidents.map((resident) => (
-            <span
-              class="house-resident"
-              title={`${resident.name}, ${resident.role}`}
-            >
-              <span class="house-resident__figure" aria-hidden="true"></span>
-              <span class="house-resident__label" aria-hidden="true">
-                H
-              </span>
-              <span class="sr-only">
-                {resident.name}, {resident.role}
-              </span>
-            </span>
-          ))}
-        </div>
-        <div
-          class="activity-house__workers"
-          aria-label="Visiting worker figures in the busy-house demo"
-        >
-          {houseWorkers.map((worker) => (
-            <span
-              class="house-worker"
-              data-worker-id={worker.id}
-              data-worker-room={worker.roomId}
-              title={`${worker.name}, ${worker.verb}`}
-            >
-              <span class="house-worker__figure" aria-hidden="true"></span>
-              <span class="sr-only">
-                {worker.name}, {worker.verb}
-              </span>
-            </span>
-          ))}
-        </div>
       </div>
       <p class="activity-house__plan-caption">
-        Ink residents live here. Visitors belong to the imagined scene or a
-        fresh postcard.
+        A doorway means a room can be opened. An ink resident belongs here; a
+        filled portrait appears only with a fresh postcard.
       </p>
     </div>
 
-    <aside class="activity-house__detail" aria-label="Selected room">
-      <div data-house-detail tabindex="-1"></div>
-      <ul
-        class="activity-house__signals"
-        data-house-signals
-        aria-label="Verified house signals"
-      ></ul>
+    <aside
+      class="activity-house__inspector"
+      data-house-inspector
+      aria-label="Selected room"
+    >
+      {selected ? (
+        <div data-house-inspector-content>
+          <p class="activity-house__detail-eyebrow">
+            {selected.kind === "place" ? "Place" : "Project"}
+          </p>
+          <h2>{selected.title}</h2>
+          <p>{selected.summary}</p>
+          {selected.href && <a href={selected.href}>Visit this room</a>}
+          <section class="activity-house__inspector-section">
+            <h3>Fresh postcards</h3>
+            {selected.occupants.length ? (
+              <ul>
+                {selected.occupants.map((item: any) => (
+                  <li>
+                    {item.actor && (
+                      <strong>
+                        {item.actor.name} · {item.actor.role}:{" "}
+                      </strong>
+                    )}
+                    <a href={item.href}>{item.title}</a>
+                    <span>{item.summary}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No fresh postcard for this room.</p>
+            )}
+          </section>
+          <section class="activity-house__inspector-section">
+            <h3>Reviewed milestones</h3>
+            {selected.events.length ? (
+              <ol>
+                {selected.events.map((item: any) => (
+                  <li>
+                    <time datetime={dateFor(item)}>{readableDate(item)}</time>
+                    <a href={item.href}>{item.title}</a>
+                    <span>{item.summary}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p>No reviewed milestones are displayed for this room yet.</p>
+            )}
+          </section>
+        </div>
+      ) : (
+        <p data-house-inspector-content>There are no rooms to inspect yet.</p>
+      )}
     </aside>
   </div>
 
-  <div class="activity-house__fallback">
-    <h2>Rooms, in walking order</h2>
+  <section class="activity-house__list" aria-labelledby="house-list-title">
+    <h2 id="house-list-title">Rooms in walking order</h2>
     <p>
-      Every room remains readable without the illustrated map or its controls.
+      The room list stays available when the illustrated plan is not
+      interactive.
     </p>
-    <div class="activity-house__fallback-list">
-      {houseRooms.map((room) => (
+    <div data-house-list>
+      {model.rooms.map((room: any) => (
         <details>
-          <summary>{room.name}</summary>
-          <p>{room.description}</p>
-          {room.href && <a href={room.href}>{room.linkLabel}</a>}
+          <summary>{room.title}</summary>
+          <p>{room.summary}</p>
+          <p>
+            {room.active
+              ? "Fresh postcard in this room."
+              : "No fresh postcard for this room."}
+          </p>
+          {room.href && <a href={room.href}>Visit this room</a>}
+          {room.events.length > 0 && (
+            <p>Latest reviewed milestone: {room.events[0].title}</p>
+          )}
         </details>
       ))}
     </div>
-  </div>
+  </section>
 
-  <div class="activity-house__room-copy" aria-hidden="true">
-    {houseRooms.map((room) => (
-      <div data-room-copy={room.id}>
-        <p class="activity-house__detail-eyebrow">{room.eyebrow}</p>
-        <h2>{room.name}</h2>
-        <p>{room.description}</p>
-        {room.href && <a href={room.href}>{room.linkLabel}</a>}
-      </div>
-    ))}
-  </div>
+  <script
+    is:inline
+    type="application/json"
+    data-house-input
+    set:html={safeInput}
+  ></script>
 </section>
 
 <script>
   import { installActivityHouse } from "./activity-house";
   import { installLiveActivity } from "../../lib/live-activity";
-
   installActivityHouse();
   installLiveActivity();
 </script>
@@ -226,77 +262,114 @@ import {
 <style>
   .activity-house {
     display: grid;
-    gap: var(--space-xl);
+    gap: var(--space-l);
     width: var(--shell-width);
     max-width: var(--house-map-max);
     margin-inline: auto;
-    padding-block: var(--space-3xl);
+    padding-block: var(--space-xl);
   }
   .activity-house__heading {
-    max-width: var(--intro-width);
+    display: grid;
+    gap: var(--space-2xs);
   }
   .activity-house__eyebrow,
-  .activity-house__detail-eyebrow {
+  .activity-house__detail-eyebrow,
+  .house-room__kind {
     color: var(--house-ink-muted);
     font-size: var(--text-xs);
     font-weight: var(--weight-bold);
     letter-spacing: var(--tracking-heading);
     text-transform: uppercase;
   }
-  .activity-house h1 {
+  .activity-house__heading-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-m);
+  }
+  .activity-house__heading h1 {
     margin-top: var(--space-2xs);
   }
-  .activity-house__intro {
-    margin-top: var(--space-m);
+  .activity-house__heading p:not(.activity-house__eyebrow) {
+    max-width: var(--intro-width);
+    margin-top: var(--space-s);
     font-size: var(--text-lead);
+  }
+  .activity-house__arrange {
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    text-decoration: underline;
+    text-decoration-color: var(--color-link-rule);
   }
   .activity-house__controls {
     display: flex;
     flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
     gap: var(--space-s);
-    margin-top: var(--space-l);
+    padding-block: var(--space-s);
+    border-block: var(--rule-width) solid var(--color-border);
   }
   .activity-house__controls[hidden] {
     display: none;
   }
-  .activity-house__controls button {
-    min-height: var(--control-min-height);
-    padding-inline: var(--space-m);
-    border: var(--rule-width) solid var(--color-accent);
-    background: var(--house-wash-soft);
-    color: var(--color-accent);
-  }
-  .activity-house__controls button[aria-pressed="true"] {
-    background: var(--color-accent);
-    color: var(--color-accent-contrast);
-  }
-  .activity-house__status {
-    margin-top: var(--space-m);
-    color: var(--color-accent);
-    font-family: var(--font-serif);
-    font-size: var(--text-card);
-  }
-  .activity-house__demo-note {
-    margin-top: var(--space-2xs);
+  .activity-house__search {
+    display: grid;
+    gap: var(--space-2xs);
     color: var(--house-ink-muted);
     font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-heading);
+    text-transform: uppercase;
+  }
+  .activity-house__search input {
+    min-height: var(--control-min-height);
+    min-width: var(--house-detail-min);
+    padding-inline: var(--space-s);
+    border: var(--rule-width) solid var(--color-text);
+    background: var(--house-wash-soft);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    letter-spacing: normal;
+    text-transform: none;
+  }
+  .activity-house__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+  }
+  .activity-house__filters button {
+    min-height: var(--control-min-height);
+    padding-inline: var(--space-s);
+    border: var(--rule-width) solid var(--color-text);
+    background: var(--house-wash-soft);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+  }
+  .activity-house__filters button[aria-pressed="true"] {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
   }
   .activity-house__body {
     display: grid;
     gap: var(--space-l);
     align-items: start;
   }
-  .activity-house__plan-wrap {
-    min-width: 0;
+  .activity-house__status {
+    color: var(--house-ink-muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-s);
   }
   .activity-house__plan {
     position: relative;
     display: grid;
-    grid-template-columns: repeat(10, minmax(0, 1fr));
-    grid-template-rows: repeat(7, minmax(0, 1fr));
-    gap: var(--space-2xs);
-    aspect-ratio: var(--media-ratio);
-    padding: var(--house-room-pad);
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--house-detail-min)), 1fr)
+    );
+    gap: var(--space-s);
+    padding: var(--space-xl);
     border: var(--house-wall-width) solid var(--color-text);
     background-color: var(--house-wash-soft);
     background-image: var(--texture);
@@ -304,61 +377,65 @@ import {
       var(--color-text);
     isolation: isolate;
   }
-  .activity-house__corridor {
+  .activity-house__plan::before,
+  .activity-house__plan::after {
+    content: "";
     position: absolute;
     z-index: var(--layer-decoration);
     background: var(--house-wash);
   }
-  .activity-house__corridor--east {
-    inset-block: var(--house-room-pad);
-    inset-inline-start: var(--house-room-pad);
-    inline-size: calc(100% - var(--house-room-pad) * 2);
-    block-size: var(--space-m);
+  .activity-house__plan::before {
+    inset-block: var(--space-xl);
+    inset-inline: calc(50% - var(--space-s));
+    inline-size: var(--space-l);
   }
-  .activity-house__corridor--south {
-    inset-block-start: calc(50% - var(--space-2xs));
-    inset-inline: var(--house-room-pad);
-    block-size: var(--space-m);
+  .activity-house__plan::after {
+    inset-inline: var(--space-xl);
+    inset-block-start: calc(50% - var(--space-s));
+    block-size: var(--space-l);
   }
   .house-room {
     position: relative;
     z-index: 1;
     display: grid;
     align-content: end;
+    gap: var(--space-2xs);
     min-width: 0;
+    min-block-size: var(--house-detail-min);
     padding: var(--house-room-pad);
     padding-block-end: calc(var(--house-room-pad) + var(--house-door-size));
     border: var(--house-wall-width) solid var(--color-text);
     background: var(--house-wash);
     color: var(--color-text);
     text-align: start;
-    grid-column: var(--house-grid-column);
-    grid-row: var(--house-grid-row);
     transition:
       transform var(--duration-fast) var(--ease-feedback),
       background-color var(--duration-fast) var(--ease-feedback);
   }
-  .house-room[aria-pressed="true"] {
+  .house-room[data-active="true"] {
     background: var(--color-surface-strong);
-    color: var(--color-accent);
   }
   .house-room:focus-visible {
     outline: var(--house-focus-outline) solid var(--color-accent);
     outline-offset: var(--focus-offset);
   }
-  .house-room__eyebrow {
-    position: relative;
-    z-index: 1;
-    font-size: var(--text-xs);
-    color: var(--house-ink-muted);
+  .house-room[hidden] {
+    display: none;
   }
-  .house-room__name {
+  .house-room > strong {
     position: relative;
     z-index: 1;
+    color: var(--color-accent);
     font-family: var(--font-serif);
-    font-size: var(--text-lead);
+    font-size: var(--text-card);
     font-weight: var(--weight-medium);
     line-height: var(--leading-heading);
+  }
+  .house-room__latest {
+    position: relative;
+    z-index: 1;
+    color: var(--house-ink-muted);
+    font-size: var(--text-xs);
   }
   .house-room__door {
     position: absolute;
@@ -374,295 +451,195 @@ import {
   .house-room__art {
     position: absolute;
     inset-block-start: var(--space-s);
-    inset-inline-start: var(--space-s);
-    inline-size: 62%;
-    block-size: 42%;
+    inset-inline-end: var(--space-s);
+    display: block;
+    inline-size: 48%;
+    block-size: 34%;
     opacity: var(--disabled-opacity);
   }
-  .house-room--dispatch .house-room__art,
-  .house-room--s23 .house-room__art {
-    inset-inline-start: auto;
-    inset-inline-end: var(--space-s);
-    inline-size: 42%;
-    block-size: 32%;
-  }
-  .house-room__signal {
-    position: absolute;
-    inset-block-start: var(--space-s);
-    inset-inline-end: var(--space-s);
-    color: var(--color-accent);
-    opacity: 0;
-  }
-  .house-room[data-has-signal="true"] .house-room__signal {
-    opacity: 1;
-  }
-  .house-room__visitor {
-    position: absolute;
-    inset-block-start: var(--space-s);
-    inset-inline-end: var(--space-s);
-    display: grid;
-    place-items: end center;
-    inline-size: var(--house-door-size);
-    block-size: var(--house-door-size);
-    opacity: 0;
-  }
-  .house-room__visitor span {
-    inline-size: 58%;
-    block-size: 74%;
+  .house-room__art,
+  .house-room__art i {
     border: var(--house-furnishing-line) solid var(--color-text);
-    border-radius: var(--radius-portrait);
-    background: var(--color-surface-strong);
-    box-shadow: 0 calc(-1 * var(--house-door-size)) 0 calc(-1 * var(--space-m))
-      var(--color-text);
   }
-  .house-room[data-has-signal="true"] .house-room__visitor {
-    opacity: 1;
-  }
-  .activity-house__residents,
-  .activity-house__workers {
+  .house-room__art i {
     position: absolute;
-    z-index: 2;
-    inset: 0;
-    pointer-events: none;
+    display: block;
+  }
+  .house-room__art i:nth-child(1) {
+    inset: var(--space-2xs);
+  }
+  .house-room__art i:nth-child(2) {
+    inset-block-start: 20%;
+    inset-inline-start: 70%;
+    inline-size: 18%;
+    block-size: 60%;
+  }
+  .house-room__art i:nth-child(3) {
+    inset-block-end: 16%;
+    inset-inline-start: 10%;
+    inline-size: 48%;
+    block-size: 16%;
+  }
+  .house-room__art[data-furnishing="shelves"] i {
+    inline-size: 78%;
+    block-size: var(--house-furnishing-line);
+    border-inline: 0;
+  }
+  .house-room__art[data-furnishing="shelves"] i:nth-child(1) {
+    inset-block-start: 22%;
+  }
+  .house-room__art[data-furnishing="shelves"] i:nth-child(2) {
+    inset-block-start: 50%;
+  }
+  .house-room__art[data-furnishing="shelves"] i:nth-child(3) {
+    inset-block-start: 78%;
+  }
+  .house-room__art[data-furnishing="table"] {
+    border-radius: var(--radius-round);
+    inline-size: 36%;
+  }
+  .house-room__art[data-furnishing="sofa"] {
+    block-size: 24%;
+    border-radius: var(--radius-note);
+  }
+  .house-room__art[data-furnishing="plants"] {
+    border-radius: var(--radius-round);
+    inline-size: 26%;
+    block-size: 26%;
+  }
+  .house-room__postcard {
+    position: relative;
+    z-index: 1;
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
   }
   .house-resident,
-  .house-worker {
-    position: absolute;
-    display: grid;
-    place-items: end center;
-    inline-size: var(--house-door-size);
-    block-size: var(--house-door-size);
-  }
-  .house-resident {
-    inset-inline-start: 46%;
-    inset-block-start: 20%;
-  }
-  .house-resident + .house-resident {
-    inset-inline-start: 70%;
-    inset-block-start: 62%;
-  }
-  .house-resident__figure,
-  .house-worker__figure {
+  .house-occupant {
     position: relative;
-    display: block;
-    inline-size: 58%;
-    block-size: 74%;
-  }
-  .house-resident__figure::before,
-  .house-worker__figure::before {
-    content: "";
-    position: absolute;
-    inset-inline-start: 28%;
-    inset-block-start: 0;
-    inline-size: 44%;
-    block-size: 35%;
-    border: var(--house-furnishing-line) solid var(--color-text);
-    border-radius: var(--radius-round);
-    background: var(--color-surface-strong);
-  }
-  .house-resident__figure::after,
-  .house-worker__figure::after {
-    content: "";
-    position: absolute;
-    inset-inline-start: 15%;
-    inset-block-end: 0;
-    inline-size: 70%;
-    block-size: 55%;
-    border: var(--house-furnishing-line) solid var(--color-text);
-    border-radius: var(--radius-note) var(--radius-note) 0 0;
-    background: var(--color-surface-strong);
-  }
-  .house-resident__label {
-    position: absolute;
-    inset-inline-start: 100%;
-    inset-block-end: 0;
-    color: var(--color-accent);
-    font-family: var(--font-serif);
-    font-size: var(--text-xs);
-  }
-  .activity-house__workers {
-    display: none;
-  }
-  .activity-house[data-scene="demo"] .activity-house__workers,
-  .activity-house[data-scene="presence"] .activity-house__workers {
-    display: block;
-  }
-  .house-worker:nth-child(1) {
-    inset-inline-start: 18%;
-    inset-block-start: 64%;
-  }
-  .house-worker:nth-child(2) {
-    inset-inline-start: 74%;
-    inset-block-start: 47%;
-  }
-  .house-worker:nth-child(3) {
-    inset-inline-start: 52%;
-    inset-block-start: 51%;
-  }
-  .house-worker:nth-child(4) {
-    inset-inline-start: 48%;
-    inset-block-start: 19%;
-  }
-  .activity-house[data-scene="presence"] .house-worker {
-    display: none;
-  }
-  .activity-house[data-scene="demo"][data-motion="playing"]
-    .house-worker__figure {
-    animation: house-worker-drift var(--house-motion-duration) ease-in-out
-      infinite alternate;
-  }
-  .activity-house[data-scene="demo"]
-    [data-worker-id="t3"]
-    .house-worker__figure {
-    animation-name: house-worker-tinker;
-  }
-  .activity-house[data-scene="demo"]
-    [data-worker-id="codex"]
-    .house-worker__figure {
-    animation-name: house-worker-build;
-  }
-  .activity-house[data-scene="demo"]
-    [data-worker-id="claude"]
-    .house-worker__figure {
-    animation-name: house-worker-scout;
-  }
-  .activity-house[data-scene="demo"]
-    [data-worker-id="astra"]
-    .house-worker__figure {
-    animation-name: house-worker-map;
-  }
-  .activity-house[data-motion="paused"] .house-worker__figure {
-    animation-play-state: paused;
-  }
-  .activity-house[data-page-visible="false"] .house-worker__figure {
-    animation-play-state: paused;
-  }
-  .activity-house__plan-caption {
-    margin-top: var(--space-s);
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    width: max-content;
+    max-width: 100%;
     color: var(--house-ink-muted);
     font-size: var(--text-xs);
   }
-  .activity-house__detail {
-    min-height: var(--house-detail-min);
+  .house-resident > span,
+  .house-occupant > span {
+    position: relative;
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    inline-size: var(--space-l);
+    block-size: var(--space-l);
+    border: var(--house-furnishing-line) solid var(--color-text);
+    border-radius: var(--radius-round);
+    font-family: var(--font-serif);
+    color: var(--color-text);
+  }
+  .house-occupant > span {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+  .house-resident > span::after,
+  .house-occupant > span::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 72%;
+    inset-inline-start: 15%;
+    inline-size: 70%;
+    block-size: 70%;
+    border: var(--house-furnishing-line) solid var(--color-text);
+    border-radius: var(--radius-note) var(--radius-note) 0 0;
+    background: var(--house-wash);
+    z-index: var(--layer-decoration);
+  }
+  .house-occupant > span::after {
+    background: var(--color-accent);
+  }
+  .activity-house__inspector {
+    min-block-size: var(--house-detail-min);
     padding: var(--house-room-pad);
     border-block: var(--house-wall-width) solid var(--color-text);
     background: var(--house-wash);
   }
-  .activity-house:not([data-ready]) .activity-house__detail {
-    display: none;
-  }
-  .activity-house__detail h2 {
+  .activity-house__inspector h2 {
     margin-top: var(--space-2xs);
-    font-size: var(--text-section);
   }
-  .activity-house__detail p:not(.activity-house__detail-eyebrow) {
+  .activity-house__inspector > * > p:not(.activity-house__detail-eyebrow) {
     margin-top: var(--space-s);
   }
-  .activity-house__detail a {
-    display: inline-block;
-    margin-top: var(--space-m);
+  .activity-house__inspector a {
     color: var(--color-accent);
     text-decoration: underline;
     text-decoration-color: var(--color-link-rule);
   }
-  .activity-house__signals {
-    display: grid;
-    gap: var(--space-2xs);
-    margin-top: var(--space-m);
-    color: var(--house-ink-muted);
-    font-size: var(--text-xs);
-    list-style: none;
+  .activity-house__inspector-section {
+    margin-top: var(--space-l);
+    padding-top: var(--space-s);
+    border-top: var(--rule-width) solid var(--color-border);
   }
-  .activity-house__signals:empty {
-    display: none;
+  .activity-house__inspector-section h3 {
+    font-size: var(--text-lead);
   }
-  .activity-house__signals a {
-    margin: 0;
-  }
-  .activity-house__fallback {
+  .activity-house__inspector-section ul,
+  .activity-house__inspector-section ol {
     display: grid;
     gap: var(--space-s);
-    border-top: var(--rule-width) solid var(--color-border);
-    padding-top: var(--space-l);
+    margin-top: var(--space-s);
+    list-style: none;
   }
-  .activity-house__fallback > p {
+  .activity-house__inspector-section li {
+    display: grid;
+    gap: var(--space-2xs);
+    font-size: var(--text-sm);
+  }
+  .activity-house__inspector-section li span {
     color: var(--house-ink-muted);
   }
-  .activity-house__fallback-list {
+  .activity-house__inspector-section time {
+    color: var(--house-ink-muted);
+    font-size: var(--text-xs);
+  }
+  .activity-house__list {
+    display: grid;
+    gap: var(--space-s);
+    padding-top: var(--space-l);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .activity-house__list > p {
+    color: var(--house-ink-muted);
+  }
+  .activity-house__list > div {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-s);
   }
-  .activity-house__fallback details {
+  .activity-house__list details {
     padding: var(--space-s);
     border: var(--rule-width) solid var(--color-border);
     background: var(--house-wash-soft);
   }
-  .activity-house__fallback summary {
+  .activity-house__list summary {
     cursor: pointer;
     color: var(--color-accent);
     font-family: var(--font-serif);
     font-size: var(--text-lead);
   }
-  .activity-house__fallback details p {
+  .activity-house__list details p,
+  .activity-house__list details a {
+    display: block;
     margin-top: var(--space-s);
-    color: var(--house-ink-muted);
+    font-size: var(--text-sm);
   }
-  .activity-house__fallback details a {
-    display: inline-block;
-    margin-top: var(--space-s);
+  .activity-house__list details a {
     color: var(--color-accent);
     text-decoration: underline;
   }
-  .activity-house__room-copy {
-    display: none;
-  }
-  @keyframes house-worker-drift {
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-    to {
-      transform: translate3d(
-        var(--house-motion-drift),
-        calc(-1 * var(--house-motion-drift)),
-        0
-      );
-    }
-  }
-  @keyframes house-worker-tinker {
-    from {
-      transform: translate3d(calc(-1 * var(--house-motion-drift)), 0, 0);
-    }
-    to {
-      transform: translate3d(0, var(--house-motion-drift), 0);
-    }
-  }
-  @keyframes house-worker-build {
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-    to {
-      transform: translate3d(0, calc(-1 * var(--house-motion-drift)), 0);
-    }
-  }
-  @keyframes house-worker-scout {
-    from {
-      transform: translate3d(calc(-1 * var(--house-motion-drift)), 0, 0);
-    }
-    to {
-      transform: translate3d(var(--house-motion-drift), 0, 0);
-    }
-  }
-  @keyframes house-worker-map {
-    from {
-      transform: translate3d(0, calc(-1 * var(--house-motion-drift)), 0);
-    }
-    to {
-      transform: translate3d(var(--house-motion-drift), 0, 0);
-    }
-  }
   @media (hover: hover) and (pointer: fine) {
-    .house-room:hover {
+    .house-room:not(:disabled):hover {
       transform: translate(
         calc(-1 * var(--house-furnishing-line)),
         calc(-1 * var(--house-furnishing-line))
@@ -680,35 +657,34 @@ import {
   }
   @media (max-width: 40.625rem) {
     .activity-house {
-      padding-block: var(--space-xl);
+      padding-block: var(--space-l);
+    }
+    .activity-house__heading-row {
+      align-items: start;
+    }
+    .activity-house__search {
+      width: 100%;
+    }
+    .activity-house__search input {
+      min-width: 0;
+      width: 100%;
     }
     .activity-house__plan {
-      aspect-ratio: 1;
-      padding: var(--space-s);
-      gap: var(--space-2xs);
+      grid-template-columns: minmax(0, 1fr);
+      padding: var(--space-m);
+    }
+    .activity-house__plan::before {
+      inset-inline-start: calc(50% - var(--space-2xs));
+      inline-size: var(--space-s);
+    }
+    .activity-house__plan::after {
+      inset-block-start: calc(50% - var(--space-2xs));
+      block-size: var(--space-s);
     }
     .house-room {
-      padding: var(--space-2xs);
-      padding-block-end: calc(var(--space-2xs) + var(--space-s));
+      min-block-size: 0;
     }
-    .house-room__eyebrow {
-      display: none;
-    }
-    .house-room__name {
-      font-size: var(--text-sm);
-    }
-    .house-room__art {
-      opacity: 0;
-    }
-    .house-room__door {
-      inline-size: var(--space-s);
-      block-size: var(--space-s);
-      inset-inline-start: var(--space-s);
-    }
-    .house-room__visitor {
-      transform: scale(var(--press-scale));
-    }
-    .activity-house__fallback-list {
+    .activity-house__list > div {
       grid-template-columns: minmax(0, 1fr);
     }
   }
@@ -716,9 +692,267 @@ import {
     .house-room {
       transition: none;
     }
-    .activity-house[data-scene="demo"][data-motion="playing"]
-      .house-worker__figure {
-      animation: none !important;
+  }
+</style>
+
+<!-- Runtime redraws use DOM nodes, so these stay deliberately scoped to the house root. -->
+<style is:global>
+  .activity-house .house-room {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    align-content: end;
+    gap: var(--space-2xs);
+    min-width: 0;
+    min-block-size: var(--house-detail-min);
+    padding: var(--house-room-pad);
+    padding-block-end: calc(var(--house-room-pad) + var(--house-door-size));
+    border: var(--house-wall-width) solid var(--color-text);
+    background: var(--house-wash);
+    color: var(--color-text);
+    text-align: start;
+    transition:
+      transform var(--duration-fast) var(--ease-feedback),
+      background-color var(--duration-fast) var(--ease-feedback);
+  }
+  .activity-house .house-room[data-active="true"] {
+    background: var(--color-surface-strong);
+  }
+  .activity-house .house-room:focus-visible {
+    outline: var(--house-focus-outline) solid var(--color-accent);
+    outline-offset: var(--focus-offset);
+  }
+  .activity-house .house-room[hidden] {
+    display: none;
+  }
+  .activity-house .house-room > strong {
+    position: relative;
+    z-index: 1;
+    color: var(--color-accent);
+    font-family: var(--font-serif);
+    font-size: var(--text-card);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-heading);
+  }
+  .activity-house .house-room__latest {
+    position: relative;
+    z-index: 1;
+    color: var(--house-ink-muted);
+    font-size: var(--text-xs);
+  }
+  .activity-house .house-room__door {
+    position: absolute;
+    inset-block-end: calc(-1 * var(--house-wall-width));
+    inset-inline-start: var(--space-l);
+    inline-size: var(--house-door-size);
+    block-size: var(--house-door-size);
+    border-inline: var(--house-wall-width) solid var(--color-text);
+    border-block-start: var(--house-wall-width) solid var(--color-text);
+    border-radius: var(--radius-note) var(--radius-note) 0 0;
+    background: var(--house-wash-soft);
+  }
+  .activity-house .house-room__art {
+    position: absolute;
+    inset-block-start: var(--space-s);
+    inset-inline-end: var(--space-s);
+    display: block;
+    inline-size: 48%;
+    block-size: 34%;
+    opacity: var(--disabled-opacity);
+  }
+  .activity-house .house-room__art,
+  .activity-house .house-room__art i {
+    border: var(--house-furnishing-line) solid var(--color-text);
+  }
+  .activity-house .house-room__art i {
+    position: absolute;
+    display: block;
+  }
+  .activity-house .house-room__art i:nth-child(1) {
+    inset: var(--space-2xs);
+  }
+  .activity-house .house-room__art i:nth-child(2) {
+    inset-block-start: 20%;
+    inset-inline-start: 70%;
+    inline-size: 18%;
+    block-size: 60%;
+  }
+  .activity-house .house-room__art i:nth-child(3) {
+    inset-block-end: 16%;
+    inset-inline-start: 10%;
+    inline-size: 48%;
+    block-size: 16%;
+  }
+  .activity-house .house-room__art[data-furnishing="shelves"] i {
+    inline-size: 78%;
+    block-size: var(--house-furnishing-line);
+    border-inline: 0;
+  }
+  .activity-house .house-room__art[data-furnishing="shelves"] i:nth-child(1) {
+    inset-block-start: 22%;
+  }
+  .activity-house .house-room__art[data-furnishing="shelves"] i:nth-child(2) {
+    inset-block-start: 50%;
+  }
+  .activity-house .house-room__art[data-furnishing="shelves"] i:nth-child(3) {
+    inset-block-start: 78%;
+  }
+  .activity-house .house-room__art[data-furnishing="table"] {
+    border-radius: var(--radius-round);
+    inline-size: 36%;
+  }
+  .activity-house .house-room__art[data-furnishing="sofa"] {
+    block-size: 24%;
+    border-radius: var(--radius-note);
+  }
+  .activity-house .house-room__art[data-furnishing="plants"] {
+    border-radius: var(--radius-round);
+    inline-size: 26%;
+    block-size: 26%;
+  }
+  .activity-house .house-room__postcard {
+    position: relative;
+    z-index: 1;
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+  }
+  .activity-house .house-resident,
+  .activity-house .house-occupant {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    width: max-content;
+    max-width: 100%;
+    color: var(--house-ink-muted);
+    font-size: var(--text-xs);
+  }
+  .activity-house .house-resident > span,
+  .activity-house .house-occupant > span {
+    position: relative;
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    inline-size: var(--space-l);
+    block-size: var(--space-l);
+    border: var(--house-furnishing-line) solid var(--color-text);
+    border-radius: var(--radius-round);
+    font-family: var(--font-serif);
+    color: var(--color-text);
+  }
+  .activity-house .house-occupant > span {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+  .activity-house .house-resident > span::after,
+  .activity-house .house-occupant > span::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 72%;
+    inset-inline-start: 15%;
+    inline-size: 70%;
+    block-size: 70%;
+    border: var(--house-furnishing-line) solid var(--color-text);
+    border-radius: var(--radius-note) var(--radius-note) 0 0;
+    background: var(--house-wash);
+    z-index: var(--layer-decoration);
+  }
+  .activity-house .house-occupant > span::after {
+    background: var(--color-accent);
+  }
+  .activity-house .activity-house__inspector {
+    min-block-size: var(--house-detail-min);
+    padding: var(--house-room-pad);
+    border-block: var(--house-wall-width) solid var(--color-text);
+    background: var(--house-wash);
+  }
+  .activity-house .activity-house__inspector h2 {
+    margin-top: var(--space-2xs);
+  }
+  .activity-house
+    .activity-house__inspector
+    > *
+    > p:not(.activity-house__detail-eyebrow) {
+    margin-top: var(--space-s);
+  }
+  .activity-house .activity-house__inspector a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-color: var(--color-link-rule);
+  }
+  .activity-house .activity-house__inspector-section {
+    margin-top: var(--space-l);
+    padding-top: var(--space-s);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .activity-house .activity-house__inspector-section h3 {
+    font-size: var(--text-lead);
+  }
+  .activity-house .activity-house__inspector-section ul,
+  .activity-house .activity-house__inspector-section ol {
+    display: grid;
+    gap: var(--space-s);
+    margin-top: var(--space-s);
+    list-style: none;
+  }
+  .activity-house .activity-house__inspector-section li {
+    display: grid;
+    gap: var(--space-2xs);
+    font-size: var(--text-sm);
+  }
+  .activity-house .activity-house__inspector-section li span,
+  .activity-house .activity-house__inspector-section time {
+    color: var(--house-ink-muted);
+    font-size: var(--text-xs);
+  }
+  .activity-house .activity-house__list > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-s);
+  }
+  .activity-house .activity-house__list details {
+    padding: var(--space-s);
+    border: var(--rule-width) solid var(--color-border);
+    background: var(--house-wash-soft);
+  }
+  .activity-house .activity-house__list summary {
+    cursor: pointer;
+    color: var(--color-accent);
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+  }
+  .activity-house .activity-house__list details p,
+  .activity-house .activity-house__list details a {
+    display: block;
+    margin-top: var(--space-s);
+    font-size: var(--text-sm);
+  }
+  .activity-house .activity-house__list details a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .activity-house .house-room:not(:disabled):hover {
+      transform: translate(
+        calc(-1 * var(--house-furnishing-line)),
+        calc(-1 * var(--house-furnishing-line))
+      );
+      background: var(--color-hover);
+    }
+  }
+  @media (max-width: 40.625rem) {
+    .activity-house .house-room {
+      min-block-size: 0;
+    }
+    .activity-house .activity-house__list > div {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .activity-house .house-room {
+      transition: none;
     }
   }
 </style>

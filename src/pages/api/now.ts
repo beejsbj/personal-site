@@ -1,5 +1,9 @@
 import type { APIRoute } from "astro";
 import { selectPresenceSignals } from "../../lib/activity-presence.mjs";
+import { getPublicActivity } from "../../lib/public-activity";
+import { selectFeedEvents } from "../../lib/activity-feed.mjs";
+import { validatePublicExport } from "../../lib/activity-engine/validation.mjs";
+import { getHouseExcludedActivityIds } from "../../data/activity-house";
 
 export const prerender = false;
 const MAX_BYTES = 65_536;
@@ -7,20 +11,29 @@ const MAX_BYTES = 65_536;
 /** An optional reviewed public feed. This route never reads private engine storage. */
 export const GET: APIRoute = async () => {
   const generatedAt = new Date().toISOString();
-  const reply = (
+  const localEvents = await getPublicActivity();
+  const configured =
+    import.meta.env.ACTIVITY_FEED_URL ?? import.meta.env.ACTIVITY_PRESENCE_URL;
+  const authoredEvents = localEvents.filter((event) => event.id?.startsWith("site:"));
+  const reply = async (
     status: "connected" | "unavailable",
     signals: unknown[] = [],
+    events: unknown[] = configured ? authoredEvents : localEvents,
   ) =>
-    new Response(JSON.stringify({ version: 1, generatedAt, status, signals }), {
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "no-store, max-age=0",
-        "CDN-Cache-Control": "no-store",
-        "Vercel-CDN-Cache-Control": "no-store",
-        "X-Content-Type-Options": "nosniff",
+    new Response(
+      JSON.stringify({ version: 1, generatedAt, status, signals, events,
+        houseExcludedIds: await getHouseExcludedActivityIds(events, signals),
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Cache-Control": "no-store, max-age=0",
+          "CDN-Cache-Control": "no-store",
+          "Vercel-CDN-Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+        },
       },
-    });
-  const configured = import.meta.env.ACTIVITY_PRESENCE_URL;
+    );
   if (!configured) return reply("unavailable");
   try {
     // This is operator configuration, never a visitor-provided URL or proxy query.
@@ -58,7 +71,17 @@ export const GET: APIRoute = async () => {
       offset += chunk.length;
     }
     const data = JSON.parse(new TextDecoder().decode(bytes));
-    return reply("connected", selectPresenceSignals(data, Date.now()));
+    const signals = selectPresenceSignals(data, Date.now());
+    // A combined engine export is an authoritative durable snapshot: deletions
+    // and retractions must not be revived from a stale committed engine export.
+    const events =
+      data.events === undefined
+        ? localEvents
+        : selectFeedEvents([
+            ...validatePublicExport(data).events,
+            ...authoredEvents,
+          ]);
+    return reply("connected", signals, events);
   } catch {
     // No upstream URL, error body, credential, or private diagnostic reaches visitors.
     return reply("unavailable");

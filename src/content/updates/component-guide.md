@@ -10,4 +10,5 @@ linkLabel: "Explore the field guide"
 evidence:
   url: "https://github.com/beejsbj/personal-site/commit/d2d233f42a19c99ac9d5e65299fd5e73de16508b"
   observedAt: "2026-09-12T07:37:57Z"
+relatedProject: "personal-site"
 ---

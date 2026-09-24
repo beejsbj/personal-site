@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { validatePresenceSnapshot } from "../activity-presence.mjs";
-import { REVIEW_STATES } from "./constants.mjs";
+import { MAX_INPUT_BYTES, REVIEW_STATES } from "./constants.mjs";
 import { ActivityEngineError, ValidationError } from "./errors.mjs";
 import {
   assertAllowedByPolicy,
@@ -321,6 +321,7 @@ export function buildStaticExport(
       ...(record.public.relatedProject
         ? { relatedProject: record.public.relatedProject }
         : {}),
+      ...(record.public.actor ? { actor: record.public.actor } : {}),
     }))
     .sort(
       (left, right) =>
@@ -395,6 +396,7 @@ export function buildPresenceSnapshot(
       ...(record.public.relatedProject
         ? { relatedProject: record.public.relatedProject }
         : {}),
+      ...(record.public.actor ? { actor: record.public.actor } : {}),
     }));
   return validatePresenceSnapshot(
     { version: 1, generatedAt, signals },
@@ -405,6 +407,30 @@ export function buildPresenceSnapshot(
 export async function exportPresence({ storeDir, outFile, now, generatedAt }) {
   const store = await readStore(storeDir);
   const document = buildPresenceSnapshot(store.records, { now, generatedAt });
+  await writePublicExport(outFile, document);
+  return document;
+}
+
+/** One bounded public document for consumers that need durable and current data. */
+export function buildActivityFeed(
+  records,
+  { now = Date.now(), generatedAt = new Date(now).toISOString() } = {},
+) {
+  const events = buildStaticExport(records, { generatedAt }).events;
+  const signals = buildPresenceSnapshot(records, { now, generatedAt }).signals;
+  const document = { version: 1, generatedAt, events, signals };
+  if (Buffer.byteLength(JSON.stringify(document), "utf8") > MAX_INPUT_BYTES) {
+    throw new ActivityEngineError(
+      `Public activity feed exceeds the ${MAX_INPUT_BYTES}-byte limit.`,
+      "FEED_TOO_LARGE",
+    );
+  }
+  return document;
+}
+
+export async function exportFeed({ storeDir, outFile, now, generatedAt }) {
+  const store = await readStore(storeDir);
+  const document = buildActivityFeed(store.records, { now, generatedAt });
   await writePublicExport(outFile, document);
   return document;
 }
