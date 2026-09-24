@@ -4,6 +4,7 @@ import {
   assertIso,
   assertObject,
   assertShortString,
+  validateActor,
 } from "../validation.mjs";
 
 const LIFECYCLE_ACTIONS = new Set([
@@ -51,6 +52,10 @@ export function fromAgentSessionLifecycle(
       summary: assertShortString(input.summary, "agent session summary", 280),
       href: input.href,
       linkLabel: input.linkLabel ?? "View update",
+      ...(input.relatedProject
+        ? { relatedProject: assertShortString(input.relatedProject, "public relatedProject", 120) }
+        : {}),
+      ...(input.actor ? { actor: validateActor(input.actor, "public actor") } : {}),
     },
   };
 }

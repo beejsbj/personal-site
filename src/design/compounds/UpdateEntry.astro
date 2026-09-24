@@ -78,11 +78,11 @@ const event = kinds[kind];
   </span>
   <div class="event-body">
     <p class="event-origin">
-      {sources[source]}
+      <span data-event-source>{sources[source]}</span>
       <span aria-hidden="true"> / </span>
       {event.label}
     </p>
-    <p class="event-title">
+    <p class="event-title" data-event-title>
       <Link href={href}>{title}</Link>
     </p>
     {detailed && <p class="event-detail">{summary}</p>}

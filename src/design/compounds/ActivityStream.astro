@@ -15,19 +15,47 @@ const updates = selectActivitySnapshot(Astro.props.updates).slice(0, 8);
 <div class="activity-stream">
   <p class="stream-intro">Things taking shape around here.</p>
   <LiveActivity />
-  {updates.length ? (
-    <ol aria-label="Recent activity, newest first" class="stream-events">
-      {updates.map((update, index) => (
-        <li>
-          <UpdateEntry {...update} connected={index < updates.length - 1} />
-        </li>
-      ))}
-    </ol>
-  ) : (
-    <p class="stream-empty">
-      A quiet moment. More when there's something to share.
-    </p>
-  )}
+  <ol
+    aria-label="Recent activity, newest first"
+    class="stream-events"
+    data-runtime-events
+    data-events={JSON.stringify(updates)}
+    hidden={!updates.length}
+  >
+    {updates.map((update, index) => (
+      <li>
+        <UpdateEntry {...update} connected={index < updates.length - 1} />
+      </li>
+    ))}
+  </ol>
+  <p class="stream-empty" data-stream-empty hidden={updates.length > 0}>
+    A quiet moment. More when there's something to share.
+  </p>
+  {(
+    [
+      "project",
+      "pull-request",
+      "repository",
+      "writing",
+      "lab",
+      "milestone",
+    ] as const
+  ).map((kind) => (
+    <template data-event-template={kind}>
+      <li>
+        <UpdateEntry
+          title="Postcard"
+          summary=""
+          href="/house"
+          linkLabel="Read more"
+          date="1970-01-01"
+          dateLabel=""
+          kind={kind}
+          source="site"
+        />
+      </li>
+    </template>
+  ))}
   <p class="stream-caption">
     {updates.some((update) => update.id)
       ? "A few postcards from the things I'm making."

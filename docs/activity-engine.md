@@ -34,6 +34,11 @@ producer's prepared public text and URLs for that one type; it never trusts raw
 payloads, logs, transcripts, or unreviewed private facts. Corrections always
 return to review, and rejected/retracted retry records never auto-resurrect.
 
+An approved candidate or projection may also carry a small public
+`actor: { id, name, role }` for house/activity attribution. It is validated and
+is material for revision handling; session IDs, files, prompts, and raw provider
+actors never cross this boundary.
+
 Imported payloads are size-bounded and reject obvious credential, prompt,
 transcript, history, log, and path keys. This heuristic is not proof that a
 payload is safe. The allowlist, narrow adapters, and the human approval step are
@@ -147,6 +152,7 @@ node scripts/activity/index.mjs approve --id activity_REPLACE_ME --revision 1 \
   --by buroj
 node scripts/activity/index.mjs export --out src/data/activity.public.json
 node scripts/activity/index.mjs export-presence
+node scripts/activity/index.mjs export-feed
 ```
 
 Use the `revision` from `list`: approval is rejected if a provider correction
@@ -197,6 +203,17 @@ may retain approval only through that reviewed exact rule and only when its
 public copy is unchanged. Any wording change queues review. Records sharing
 `source + producer + replacementKey` replace one another internally: a completed,
 failed, or retracted successor suppresses the old running claim.
+
+`export-feed` is the shared optional consumer document at
+`.activity-engine/feed.public.json`: `{ version, generatedAt, events, signals }`.
+It is generated from one locked store read and fails rather than silently
+truncating if it exceeds the engine's public payload bound. `/api/now` reads an
+approved HTTPS `ACTIVITY_FEED_URL` and serves that same snapshot to the homepage
+and house. Durable events replace the previous runtime snapshot, so a retracted
+event disappears without a deployment. Authored Markdown updates remain alongside
+it. On a configured-feed outage the API retains only authored updates and clears
+presence; a browser request failure clears its runtime snapshot. This repository
+does not configure a feed or connect any private source.
 
 Supported fixture translation boundaries are `--adapter github-pr`,
 `bjslab-milestone`, `agent-session`, and `manual`; `raw` accepts an already

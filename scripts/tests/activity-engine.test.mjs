@@ -13,6 +13,7 @@ import {
   fromAgentSessionLifecycle,
   fromGithubPullRequest,
   ingest,
+  listRecords,
   retract,
   validatePolicy,
   validatePublicExport,
@@ -233,26 +234,36 @@ test("tuple identity avoids colon collisions across producers and observed retri
 test("a material correction requires fresh review and retraction removes the public projection", async () => {
   const testStore = await workspace();
   try {
+    const actor = { id: "astra", name: "Astra", role: "maker" };
     const queued = await ingest({
       storeDir: testStore.storeDir,
       policy: policy(),
-      event: event(),
+      event: event({ candidate: { ...event().candidate, actor } }),
       clock: FIXED_CLOCK,
     });
     await approve({
       storeDir: testStore.storeDir,
       id: queued.record.id,
       expectedRevision: 1,
-      projection,
+      projection: { ...projection, actor },
       clock: FIXED_CLOCK,
     });
+    assert.deepEqual(
+      buildStaticExport(
+        [await listRecords(testStore.storeDir).then(([record]) => record)],
+        {
+          generatedAt: "2026-09-20T13:00:00Z",
+        },
+      ).events[0].actor,
+      actor,
+    );
     const revised = await ingest({
       storeDir: testStore.storeDir,
       policy: policy(),
       event: event({
         candidate: {
           ...event().candidate,
-          summary: "Provider corrected this event.",
+          actor: { ...actor, role: "editor" },
         },
       }),
       clock: FIXED_CLOCK,
@@ -632,6 +643,8 @@ test("agent lifecycle boundary makes completed sessions durable milestones and o
       title: "Completed a synthetic task",
       summary: "No prompt or logs are captured.",
       href: "https://example.test/session",
+      relatedProject: "Undertext",
+      actor: { id: "astra", name: "Astra", role: "Tinkerer", privateNote: "discard" },
     },
     { observedAt: "2026-09-20T12:01:00Z" },
   );
@@ -639,6 +652,8 @@ test("agent lifecycle boundary makes completed sessions durable milestones and o
     { kind: completed.eventKind, mode: completed.mode },
     { kind: "milestone", mode: "event" },
   );
+  assert.equal(completed.candidate.relatedProject, "Undertext");
+  assert.deepEqual(completed.candidate.actor, { id: "astra", name: "Astra", role: "Tinkerer" });
   const running = fromAgentSessionLifecycle(
     {
       id: "synthetic-session",
@@ -759,6 +774,26 @@ test("CLI ingests a fixture batch sequentially and carries a reviewed item throu
       "--projection",
       reviewFile,
     ]);
+    const observedAt = new Date(Date.now() - 60_000).toISOString();
+    const expiresAt = new Date(Date.now() + 4 * 60_000).toISOString();
+    const queuedPresence = await ingest({
+      storeDir: testStore.storeDir,
+      policy: cliPolicy,
+      event: presenceEvent({
+        producer: "bjslab:milestone-producer",
+        providerEventId: "cli-fresh-presence",
+        occurredAt: observedAt,
+        observedAt,
+        expiresAt,
+        replacementKey: "cli-presence",
+      }),
+    });
+    await approve({
+      storeDir: testStore.storeDir,
+      id: queuedPresence.record.id,
+      expectedRevision: 1,
+      projection: queuedPresence.record.event.candidate,
+    });
     await assert.rejects(
       cli(["list", "--store", testStore.storeDir, "--sttaus", "pending"]),
       /not valid for list/,
@@ -786,7 +821,20 @@ test("CLI ingests a fixture batch sequentially and carries a reviewed item throu
         ])
       ).stdout,
     );
-    assert.deepEqual(presenceExport.signals, []);
+    assert.equal(presenceExport.signals.length, 1);
+    const feedExport = JSON.parse(
+      (
+        await cli([
+          "export-feed",
+          "--store",
+          testStore.storeDir,
+          "--out",
+          join(testStore.directory, "feed.public.json"),
+        ])
+      ).stdout,
+    );
+    assert.equal(feedExport.events.length, 1);
+    assert.equal(feedExport.signals.length, 1);
     assert.equal((await stat(exportFile)).mode & 0o777, 0o644);
     await cli(["retract", "--store", testStore.storeDir, "--id", listed[0].id]);
     const secondExport = JSON.parse(

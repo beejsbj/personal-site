@@ -102,6 +102,33 @@
   --layer-decoration: -1;
   --layer-skip: 10;
   --skip-hidden: translateY(calc(-100% - var(--space-l)));
+  /* The house: a dollhouse cross-section within the default visual world. */
+  --house-wall-width: 2px;
+  --house-slab: 0.4375rem;
+  --house-room-pad: var(--space-s);
+  --house-map-max: var(--shell-max);
+  --house-room-min: 13rem;
+  --house-room-wide: 20rem;
+  --house-room-height: 12.5rem;
+  --house-roof-height: 4.5rem;
+  --house-inspector-width: 19rem;
+  --house-door-size: 2.25rem;
+  --house-porch-width: 8.5rem;
+  --house-furniture-width: 6rem;
+  --house-figure-height: 3.25rem;
+  --house-lamp-drop: 1.4rem;
+  --house-note-width: 11.5rem;
+  --house-note-tilt: -2.5deg;
+  --house-wash: var(--color-surface);
+  --house-wash-soft: var(--color-page);
+  --house-lit-wash: var(--color-hover);
+  --house-glow: var(--color-surface-strong);
+  --house-ink-muted: var(--color-text-soft);
+  --house-motion-duration: 9s;
+  --house-motion-drift: 1.1rem;
+  --house-walk-in: 1.2s;
+  --house-smoke-rise: 3.2s;
+  --house-focus-outline: var(--focus-width);
   /* Default-theme traveling-circle transition, recovered from the PHP site. */
   --page-transition-orb-size: 3.125rem;
   --page-transition-travel: 0.5s;
@@ -115,5 +142,8 @@
 @media (max-width: 40.625rem) {
   :root {
     --shell-gutter: 1.25rem;
+    --house-room-min: 9.5rem;
+    --house-room-height: 10.5rem;
+    --house-furniture-width: 4.5rem;
   }
 }

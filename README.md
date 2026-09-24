@@ -49,8 +49,19 @@ enhancement. The guide imports these production specimens. See the
 Hand-authored updates can be supplemented by the [local activity engine](docs/activity-engine.md).
 It queues intentional source facts for agent-edited public summaries and manual
 review, with opt-in automation for selected milestone types from reviewed
-producers. Only the approved static export reaches the site. Live bjslab and
-session collectors are a separate connection step; no real source is enabled here.
+producers. `/api/now` supplies the homepage and house with the same durable
+milestones and short-lived presence. It can read a combined reviewed engine feed;
+without one it uses the authored updates and approved static export. Live bjslab
+and session collectors are a separate connection step; no real source is enabled here.
+
+The [activity house](docs/activity-house.md), reached under “What's happening”,
+builds rooms from the public project collection, reviewed activity, and an editable
+roster. Its [local roster editor](docs/house-editor.md) at `/house/edit` saves names,
+furnishings, aliases, order, and residents to `src/data/house.catalog.json`.
+Live visitors require fresh reviewed presence with explicit actor metadata;
+residents do not imply that an agent is running. The house is omitted from
+navigation and the sitemap and marked noindex, but is still a public URL.
+The editor and save endpoint are unavailable in production.
 
 ## Historical material
 

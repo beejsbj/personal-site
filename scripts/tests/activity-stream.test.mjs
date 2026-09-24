@@ -26,7 +26,7 @@ test("activity is a chronological native list, not a writing grid or live log", 
   assert.deepEqual(dates, [...dates].sort().reverse());
   assert.equal((list[1].match(/<li\b/g) || []).length, dates.length);
   assert.doesNotMatch(list[1], /<h[1-6]\b|role="log"|aria-live=/);
-  assert.match(html, /A few things I(?:&#39;|')ve been up to/);
+  assert.match(html, /A few postcards from the things I(?:&#39;|')m making/);
 });
 
 test("different event kinds have distinct labels and icon paths", () => {
@@ -127,7 +127,7 @@ test("display limit follows eligibility so newer hidden signals cannot crowd out
   const page = read("src/pages/index.astro");
   assert.match(
     page,
-    /const recentUpdates: CollectionEntry<"updates">\[\] =\s+await getCollection\("updates"\);/,
+    /await getPublicActivity\(\)/,
   );
   const updates = [
     ...Array.from({ length: 4 }, () => ({ date: "2026-10-01", id: "future" })),

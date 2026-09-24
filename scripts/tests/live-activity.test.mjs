@@ -4,6 +4,7 @@ import test from "node:test";
 import vm from "node:vm";
 import ts from "typescript";
 import { selectPresenceSignals } from "../../src/lib/activity-presence.mjs";
+import { selectFeedEvents } from "../../src/lib/activity-feed.mjs";
 
 const code = ts.transpileModule(
   readFileSync("src/lib/live-activity.ts", "utf8"),
@@ -20,6 +21,7 @@ const snapshot = () => ({
   version: 1,
   status: "connected",
   generatedAt: new Date(START).toISOString(),
+  events: [{ id: "activity_fedcba9876543210", kind: "milestone", source: "bjslab", title: "Undertext opens a chapter", summary: "A public milestone.", href: "https://burooj.dev/house", linkLabel: "Look around", occurredAt: new Date(START - 1000).toISOString(), relatedProject: "Undertext" }],
   signals: [
     {
       id: "activity_0123456789abcdef",
@@ -40,6 +42,7 @@ function harness() {
     timerId = 0,
     calls = 0,
     fail = false;
+  let frame = snapshot();
   const timers = new Map();
   const states = [];
   const document = Object.assign(new EventTarget(), {
@@ -55,7 +58,7 @@ function harness() {
   vm.runInNewContext(code, {
     module,
     exports: module.exports,
-    require: () => ({ selectPresenceSignals }),
+    require: () => ({ selectPresenceSignals, selectFeedEvents }),
     window,
     document,
     AbortController,
@@ -74,7 +77,7 @@ function harness() {
     fetch: async () => {
       calls++;
       if (fail) throw new Error("offline");
-      return { ok: true, text: async () => JSON.stringify(snapshot()) };
+      return { ok: true, text: async () => JSON.stringify(frame) };
     },
   });
   return {
@@ -91,6 +94,7 @@ function harness() {
     set fail(value) {
       fail = value;
     },
+    set frame(value) { frame = value; },
     async advance(ms) {
       const target = clock + ms;
       while (true) {
@@ -118,6 +122,7 @@ test("fresh presence expires in an open page without waiting for another poll", 
   );
   await h.advance(1_002);
   assert.equal(h.states.at(-1).signals.length, 0);
+  assert.equal(h.states.at(-1).events.length, 1);
   assert.equal(h.calls, 1);
   cleanup();
   assert.equal(h.timerCount, 0);
@@ -151,9 +156,24 @@ test("installation is singular, route cleanup cancels timers, and failure become
   await flush();
   assert.equal(h.states.at(-1).status, "unavailable");
   assert.equal(h.states.at(-1).signals.length, 0);
+  assert.equal(h.states.at(-1).events.length, 0);
   h.document.dispatchEvent(new Event("astro:before-swap"));
   assert.equal(h.timerCount, 0);
   await h.advance(60_000);
   assert.equal(h.calls, 2);
+  cleanup();
+});
+
+test("new consumers can request the shared state and an authoritative feed removes retracted milestones", async () => {
+  const h = harness();
+  const cleanup = h.install();
+  await flush();
+  const count = h.states.length;
+  h.window.dispatchEvent(new Event("activity:request"));
+  assert.equal(h.states.length, count + 1);
+  assert.equal(h.states.at(-1).events[0].relatedProject, "Undertext");
+  h.frame = { ...snapshot(), events: [], signals: [] };
+  await h.advance(30_001);
+  assert.equal(h.states.at(-1).events.length, 0);
   cleanup();
 });

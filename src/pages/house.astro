@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ActivityHouse from "../design/unique/ActivityHouse.astro";
+import { getHouseInput } from "../data/activity-house";
+const input = await getHouseInput();
+---
+
+<BaseLayout
+  title="The House"
+  description="Step inside a changing house of projects, places, and things taking shape."
+  pageClass="page-house"
+  noindex={true}
+>
+  <ActivityHouse
+    {...input}
+    editorHref={import.meta.env.DEV ? "/house/edit" : undefined}
+    rehearsal={import.meta.env.DEV}
+  />
+</BaseLayout>
