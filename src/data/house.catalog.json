@@ -120,6 +120,18 @@
       "name": "Hermes",
       "role": "Resident",
       "roomId": "cockpit"
+    },
+    {
+      "id": "rose",
+      "name": "Rose",
+      "role": "Rhythm keeper",
+      "roomId": "cockpit"
+    },
+    {
+      "id": "otto",
+      "name": "Otto",
+      "role": "Messenger",
+      "roomId": "bjslab"
     }
   ]
 }
