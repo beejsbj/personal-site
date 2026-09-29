@@ -6,6 +6,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 import EdgeBlob from "../design/unique/EdgeBlob.astro";
 import LensBoot from "../prism/LensBoot.astro";
 import LensDecor from "../prism/LensDecor.astro";
+import Prism from "../prism/Prism.astro";
 import "../styles/global.css";
 import "../prism/prism.css";
 
@@ -75,5 +76,6 @@ const socialImage = new URL(image, siteBaseUrl).toString();
       </main>
       <SiteFooter email={site.email} />
     </div>
+    <Prism />
   </body>
 </html>
