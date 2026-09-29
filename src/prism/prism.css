@@ -1,0 +1,13 @@
+/* The prism layer. Each lens file is the visual-value authority for its own
+   refraction, the way tokens.css is for Daylight; this file only wires them.
+   Lenses restyle the Normal Portfolio from outside, so selectors are
+   :root[data-lens="…"] prefixed and never edit base components. */
+@import "./lenses/calling-card.css";
+@import "./lenses/cut-paper.css";
+@import "./lenses/back-page.css";
+@import "./lenses/hion.css";
+@import "./stage.css";
+
+.lens-decor {
+  display: none;
+}

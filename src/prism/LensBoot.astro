@@ -1,0 +1,31 @@
+---
+/** Applies the visitor's lens before first paint and after every client-side
+ * swap. `?lens=` previews a lens and keeps it; `?prism-face=` renders a
+ * non-persistent face for the prism stage. */
+import { LENSES } from "./lenses";
+const ids = LENSES.map((lens) => lens.id);
+---
+
+<script is:inline define:vars={{ ids }}>
+  (() => {
+    const key = "prism:lens";
+    const apply = () => {
+      const root = document.documentElement;
+      const params = new URLSearchParams(location.search);
+      const face = params.get("prism-face");
+      if (ids.includes(face)) {
+        root.dataset.lens = face;
+        root.setAttribute("data-prism-face", "");
+        return;
+      }
+      let lens = params.get("lens");
+      try {
+        if (ids.includes(lens)) localStorage.setItem(key, lens);
+        else lens = localStorage.getItem(key);
+      } catch {}
+      root.dataset.lens = ids.includes(lens) ? lens : ids[0];
+    };
+    apply();
+    document.addEventListener("astro:after-swap", apply);
+  })();
+</script>

@@ -23,8 +23,9 @@ const definitions = new Set(
 );
 
 test("one visual-value authority, with no raw colors or geometry in consumers", () => {
+  // Each prism lens is the visual-value authority for its own refraction.
   for (const path of sources.filter(
-    (path) => path !== "src/design/tokens.css",
+    (path) => path !== "src/design/tokens.css" && !path.startsWith("src/prism/"),
   )) {
     // Native media conditions cannot use var(). Structural 100vh and percentages
     // are layout constraints, not design values. SVG/image attributes are art/data.

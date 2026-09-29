@@ -4,7 +4,10 @@ import { ClientRouter } from "astro:transitions";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import EdgeBlob from "../design/unique/EdgeBlob.astro";
+import LensBoot from "../prism/LensBoot.astro";
+import LensDecor from "../prism/LensDecor.astro";
 import "../styles/global.css";
+import "../prism/prism.css";
 
 interface Props {
   title?: string;
@@ -36,10 +39,11 @@ const socialImage = new URL(image, siteBaseUrl).toString();
 ---
 
 <!doctype html>
-<html lang="en" data-theme="default">
+<html lang="en" data-lens="daylight">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <LensBoot />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, follow" />}
@@ -59,6 +63,7 @@ const socialImage = new URL(image, siteBaseUrl).toString();
       Skip to content
     </a>
     <div class="site-frame">
+      <LensDecor />
       <EdgeBlob />
       <SiteHeader
         nav={site.nav}
