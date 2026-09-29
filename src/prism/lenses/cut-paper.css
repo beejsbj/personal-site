@@ -1,1 +1,1216 @@
-/* Lens: cut-paper. */
+/* Lens: cut-paper — EmotiTone. "Cut-paper jazz, lit by a synth."
+   Dark ink stage, ivory type, Lets Jazz poster display, JetBrains Mono for
+   everything that reads. Brand paper (tomato / plum / mustard / pine / bone)
+   is decoration only: stickers, spines, torn labels, the hero poster.
+   Brass is the lone lit signal — the current nav item. Chromatic note hues
+   appear only where something "plays": update markers, the solfège strip,
+   the timeline beads. Motion uses the horn-section curves (swing/stab/brush). */
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+
+@font-face {
+  font-family: "Lets Jazz";
+  src: url("../fonts/lets-jazz-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  /* the face draws caps at ~1.4em; normalise so line boxes hold the glyphs */
+  size-adjust: 70%;
+  ascent-override: 150%;
+  descent-override: 34%;
+  line-gap-override: 0%;
+}
+
+:root[data-lens="cut-paper"] {
+  /* ── EmotiTone palette ─────────────────────────────── */
+  --cp-ink: #0a0908;
+  --cp-ink-2: #141210;
+  --cp-ink-3: #1b1815;
+  --cp-ink-4: #25211d;
+  --cp-ink-5: #3a352f;
+  --cp-ivory: #f4efe6;
+  --cp-ivory-2: #c9c2b5;
+  --cp-ivory-3: #9a9285; /* nudged up from #8E867A for 4.5:1 on ink */
+  --cp-hairline: rgba(255, 255, 255, 0.1);
+  --cp-ring: inset 0 0 0 1px var(--cp-hairline);
+
+  --cp-brass: #e0a93a;
+  --cp-brass-hi: #f5d278;
+  --cp-brass-edge: #2a1c08;
+  --cp-brass-fill: linear-gradient(
+    160deg,
+    #d6a03e 0%,
+    #e0aa42 22%,
+    #efbf50 42%,
+    #f5d278 50%,
+    #ebb947 60%,
+    #d6a03e 82%,
+    #e3ac42 100%
+  );
+  --cp-brass-sheen: linear-gradient(
+    110deg,
+    transparent 40%,
+    rgba(255, 238, 194, 0.55) 50%,
+    transparent 60%
+  );
+
+  --cp-tomato: #d8362a;
+  --cp-pine: #1f4d3f;
+  --cp-plum: #6b3fa0;
+  --cp-bone: #efe6d0;
+  --cp-mustard: #f0b137;
+
+  --cp-do: hsl(18 85% 56%);
+  --cp-re: hsl(78 72% 52%);
+  --cp-mi: hsl(138 60% 46%);
+  --cp-fa: hsl(178 68% 50%);
+  --cp-sol: hsl(252 72% 64%);
+  --cp-la: hsl(312 76% 62%);
+  --cp-ti: hsl(2 86% 60%);
+  --cp-solfege: linear-gradient(
+    90deg,
+    var(--cp-do) 0 14.285%,
+    var(--cp-re) 0 28.57%,
+    var(--cp-mi) 0 42.855%,
+    var(--cp-fa) 0 57.14%,
+    var(--cp-sol) 0 71.425%,
+    var(--cp-la) 0 85.71%,
+    var(--cp-ti) 0 100%
+  );
+
+  /* ── Horn-section motion ───────────────────────────── */
+  --cp-beat: 500ms;
+  --cp-ease-swing: cubic-bezier(0.7, -0.2, 0.3, 1.2);
+  --cp-ease-stab: cubic-bezier(0.2, 0.9, 0.3, 1);
+  --cp-ease-brush: cubic-bezier(0.4, 0, 0.2, 1);
+  --cp-dur-tap: 90ms;
+  --cp-dur-ui: 220ms;
+  --cp-dur-panel: 360ms;
+
+  /* ── Cut shapes ────────────────────────────────────── */
+  --cp-torn: polygon(
+    0% 10%, 4% 0%, 13% 7%, 24% 1%, 36% 6%, 49% 0%, 61% 7%, 74% 1%, 86% 6%,
+    97% 0%, 100% 14%, 98.5% 50%, 100% 86%, 96% 100%, 84% 93%, 71% 100%,
+    58% 94%, 45% 100%, 31% 93%, 18% 100%, 6% 94%, 0% 100%, 1.5% 50%
+  );
+  --cp-cut-tab: polygon(4% 0%, 98% 6%, 100% 90%, 96% 100%, 2% 94%, 0% 8%);
+  --cp-shadow-cut: 6px 6px 0;
+
+  /* confetti of cut shapes — pattern-bw at a whisper */
+  --cp-confetti: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'><g fill='%23f4efe6' fill-opacity='0.045'><path d='M20 30 44 18 38 46z'/><circle cx='120' cy='40' r='6'/><rect x='190' y='22' width='26' height='7' transform='rotate(-24 203 25)'/><path d='M60 120l14-22 10 26z'/><circle cx='220' cy='130' r='11'/><rect x='130' y='150' width='8' height='30' transform='rotate(18 134 165)'/><path d='M30 210h30l-6 14H36z'/><circle cx='98' cy='238' r='4'/><path d='M180 210l30 6-22 20z'/><rect x='240' y='60' width='6' height='6'/></g></svg>");
+
+  /* ── Base token refraction ─────────────────────────── */
+  --color-page: var(--cp-ink);
+  --color-surface: var(--cp-ink-2);
+  --color-surface-strong: var(--cp-ink-3);
+  --color-text: var(--cp-ivory);
+  --color-text-soft: var(--cp-ivory-2);
+  --color-border: var(--cp-ink-5);
+  --color-accent: var(--cp-ivory);
+  --color-accent-pressed: var(--cp-ivory-2);
+  --color-accent-contrast: var(--cp-ink);
+  --color-hover: var(--cp-ink-4);
+  --color-link-rule: rgba(244, 239, 230, 0.32);
+  --color-texture: rgba(244, 239, 230, 0.05);
+
+  --font-sans: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo,
+    monospace;
+  --font-serif: "Lets Jazz", "Anton", "Oswald", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-copy: 0.875rem;
+  --text-base: 0.9375rem;
+  --text-lead: 1rem;
+  --text-card: 2.5rem;
+  --text-section: 3.2rem;
+  --text-page: clamp(4rem, 9vw, 7.5rem);
+  --text-display: clamp(5rem, 10vw, 9rem);
+  --text-display-compact: clamp(4.25rem, 22vw, 6.5rem);
+  --weight-medium: 400;
+  --weight-bold: 700;
+  --leading-display: 1.04;
+  --leading-heading: 1;
+  --leading-body: 1.65;
+  --tracking-display: 0.01em;
+  --tracking-heading: 0.01em;
+
+  --radius-note: 0;
+  --radius-portrait: 0;
+  --texture: repeating-linear-gradient(
+    135deg,
+    transparent 0 5px,
+    var(--color-texture) 5px 6px
+  );
+  --duration-fast: var(--cp-dur-ui);
+  --ease-feedback: var(--cp-ease-stab);
+  --press-scale: 0.96;
+  --focus-width: 2px;
+
+  color-scheme: dark;
+}
+
+/* ═══════════════ Stage ═══════════════ */
+:root[data-lens="cut-paper"] body {
+  background: var(--cp-confetti) 0 0 / 260px 260px, var(--cp-ink);
+  font-size: var(--text-base);
+  -webkit-font-smoothing: antialiased;
+}
+:root[data-lens="cut-paper"] ::selection {
+  background: var(--cp-mustard);
+  color: var(--cp-ink);
+}
+:root[data-lens="cut-paper"] :focus-visible {
+  outline: 2px solid var(--cp-brass-hi);
+  outline-offset: 4px;
+}
+:root[data-lens="cut-paper"] :is(h1, h2, h3, h4),
+:root[data-lens="cut-paper"] .ds-heading.ds-heading {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  color: var(--cp-ivory);
+}
+:root[data-lens="cut-paper"] .ds-heading.ds-heading--label {
+  font: 400 1.35rem/1 var(--font-serif);
+  letter-spacing: 0.04em;
+}
+:root[data-lens="cut-paper"] strong {
+  color: var(--cp-ivory);
+  font-weight: 700;
+}
+
+/* ═══════════════ Links ═══════════════ */
+:root[data-lens="cut-paper"] .ds-link.ds-link {
+  transition: color var(--cp-dur-ui) var(--cp-ease-brush),
+    text-decoration-color var(--cp-dur-ui) var(--cp-ease-brush);
+}
+:root[data-lens="cut-paper"] .ds-link.ds-link:focus-visible {
+  outline: 2px solid var(--cp-brass-hi);
+  outline-offset: 4px;
+}
+:root[data-lens="cut-paper"] .ds-heading .ds-link.ds-link {
+  text-decoration: none;
+}
+:root[data-lens="cut-paper"] .ds-heading .ds-link.ds-link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.12em;
+  text-decoration-color: var(--cp-spine, var(--cp-mustard));
+}
+:root[data-lens="cut-paper"] .ds-heading .link-arrow {
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: 0.15em;
+  vertical-align: 0.12em;
+  stroke-width: 2;
+}
+
+/* ═══════════════ Header ═══════════════ */
+:root[data-lens="cut-paper"] .site-header.site-header {
+  position: relative;
+  border-bottom: 0;
+  padding-block: 1.6rem 1.4rem;
+}
+/* the solfège strip — do re mi fa sol la ti, keyboard tiles */
+:root[data-lens="cut-paper"] .site-header.site-header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 5px;
+  background: var(--cp-solfege);
+  -webkit-mask: repeating-linear-gradient(
+      90deg,
+      #000 0 calc(100% / 7 - 3px),
+      transparent calc(100% / 7 - 3px) calc(100% / 7)
+    );
+  mask: repeating-linear-gradient(
+      90deg,
+      #000 0 calc(100% / 7 - 3px),
+      transparent calc(100% / 7 - 3px) calc(100% / 7)
+    );
+}
+:root[data-lens="cut-paper"] .home-link.home-link {
+  display: inline-block;
+  padding: 0.3em 0.55em 0.18em;
+  font-family: var(--font-serif);
+  font-size: 2.1rem;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cp-ivory);
+  background: var(--cp-tomato);
+  clip-path: var(--cp-torn);
+  transform: rotate(-2.5deg);
+  transition: transform var(--cp-dur-ui) var(--cp-ease-swing);
+}
+:root[data-lens="cut-paper"] .home-link.home-link:hover {
+  transform: rotate(1deg) scale(1.04);
+}
+
+/* nav — Lets Jazz labels, brass for the one lit signal */
+:root[data-lens="cut-paper"] .site-nav ul {
+  gap: 0.25rem 0.35rem;
+}
+:root[data-lens="cut-paper"] .ds-link--nav.ds-link--nav {
+  position: relative;
+  padding: 0.2em 0.7em 0;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cp-ivory-2);
+  clip-path: var(--cp-cut-tab);
+  isolation: isolate;
+  overflow: hidden;
+  transition: background-color var(--cp-dur-ui) var(--cp-ease-brush),
+    color var(--cp-dur-ui) var(--cp-ease-brush),
+    transform var(--cp-dur-ui) var(--cp-ease-swing);
+}
+:root[data-lens="cut-paper"] .ds-link--nav.ds-link--nav:is(:hover, :focus-visible):not([aria-current]) {
+  color: var(--cp-ivory);
+  background: var(--cp-ink-4);
+  text-decoration: none;
+  transform: skewX(-6deg);
+}
+:root[data-lens="cut-paper"] .ds-link--nav.ds-link--nav[aria-current] {
+  color: var(--cp-brass-edge);
+  font-weight: 400;
+  text-decoration: none;
+  background: var(--cp-brass-fill);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+:root[data-lens="cut-paper"] .ds-link--nav.ds-link--nav[aria-current]::after {
+  content: "";
+  position: absolute;
+  inset: -10% -30%;
+  z-index: -1;
+  background: var(--cp-brass-sheen) no-repeat;
+  background-size: 220% 100%;
+  background-position: -60% 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+:root[data-lens="cut-paper"] .ds-link--nav.ds-link--nav:focus-visible {
+  outline-offset: -3px;
+  outline-color: var(--cp-ivory);
+}
+:root[data-lens="cut-paper"] .ds-link--nav .link-arrow {
+  width: 0.55em;
+  height: 0.55em;
+  stroke-width: 2;
+}
+
+/* ═══════════════ Decor: the Edge poster + cut shapes ═══════════════ */
+:root[data-lens="cut-paper"] .edge-blob__surface.edge-blob__surface {
+  border-radius: 0;
+  background: var(--cp-tomato);
+  clip-path: polygon(
+    0 0, 100% 0, 88% 18%, 100% 30%, 84% 44%, 97% 58%, 78% 70%, 90% 84%,
+    62% 100%, 0 100%
+  );
+}
+
+:root[data-lens="cut-paper"] .lens-decor {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+:root[data-lens="cut-paper"] .lens-decor span {
+  position: absolute;
+  display: block;
+}
+/* 1 · mustard triangle, top-right */
+:root[data-lens="cut-paper"] .lens-decor span:nth-child(1) {
+  top: 5.5rem;
+  right: -2.5rem;
+  width: 9rem;
+  height: 8rem;
+  background: var(--cp-mustard);
+  clip-path: polygon(8% 0, 100% 30%, 20% 100%);
+  transform: rotate(8deg);
+}
+/* 2 · tomato zig-zag band, left edge */
+:root[data-lens="cut-paper"] .lens-decor span:nth-child(2) {
+  top: 44%;
+  left: -1.5rem;
+  width: 5.5rem;
+  height: 2.2rem;
+  background: var(--cp-tomato);
+  clip-path: polygon(
+    0 40%, 12% 0, 25% 40%, 37% 0, 50% 40%, 62% 0, 75% 40%, 87% 0, 100% 40%,
+    100% 100%, 87% 60%, 75% 100%, 62% 60%, 50% 100%, 37% 60%, 25% 100%,
+    12% 60%, 0 100%
+  );
+  transform: rotate(-14deg);
+}
+/* 3 · plum circle dot, right edge */
+:root[data-lens="cut-paper"] .lens-decor span:nth-child(3) {
+  top: 62%;
+  right: -3.5rem;
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 50%;
+  background: var(--cp-plum);
+}
+/* 4 · bone dot */
+:root[data-lens="cut-paper"] .lens-decor span:nth-child(4) {
+  top: 30%;
+  left: 1.6%;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  background: var(--cp-bone);
+}
+/* 5 · pine torn slab, bottom-left */
+:root[data-lens="cut-paper"] .lens-decor span:nth-child(5) {
+  bottom: 5rem;
+  left: -2.5rem;
+  width: 8rem;
+  height: 5rem;
+  background: var(--cp-pine);
+  clip-path: polygon(
+    0 12%, 30% 0, 55% 10%, 78% 2%, 100% 20%, 92% 50%, 100% 88%, 60% 100%,
+    30% 92%, 0 100%
+  );
+  transform: rotate(6deg);
+}
+/* 6 · mustard lightning, lower right */
+:root[data-lens="cut-paper"] .lens-decor span:nth-child(6) {
+  bottom: 9rem;
+  right: 2%;
+  width: 4.5rem;
+  height: 1.6rem;
+  background: var(--cp-mustard);
+  clip-path: polygon(
+    0 60%, 30% 10%, 45% 55%, 70% 0, 100% 30%, 72% 22%, 50% 90%, 35% 45%,
+    8% 100%
+  );
+}
+
+/* ═══════════════ Hero ═══════════════ */
+:root[data-lens="cut-paper"] .hello.hello {
+  position: relative;
+  padding-block: 3.5rem 3.75rem;
+  align-items: center;
+}
+:root[data-lens="cut-paper"] .hello .greeting.greeting,
+:root[data-lens="cut-paper"] .page-header__eyebrow,
+:root[data-lens="cut-paper"] .section-intro__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cp-ivory-3);
+}
+:root[data-lens="cut-paper"] .hello .greeting.greeting::before,
+:root[data-lens="cut-paper"] .page-header__eyebrow::before,
+:root[data-lens="cut-paper"] .section-intro__eyebrow::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: none;
+  background: var(--cp-tomato);
+}
+:root[data-lens="cut-paper"] .hello .title.title {
+  margin: 0.9rem 0 0.9rem;
+}
+:root[data-lens="cut-paper"] .ds-heading--display.ds-heading--display {
+  line-height: var(--leading-display);
+  text-shadow: 0.045em 0.045em 0 var(--cp-plum);
+}
+:root[data-lens="cut-paper"] .hello .occupation.occupation {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cp-mustard);
+}
+:root[data-lens="cut-paper"] .hello .welcome.welcome {
+  font-size: var(--text-base);
+  color: var(--cp-ivory-2);
+  max-width: 36ch;
+}
+:root[data-lens="cut-paper"] .hello .socials.socials {
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+}
+:root[data-lens="cut-paper"] .hello .socials .ds-link.ds-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 0.9rem;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cp-ivory);
+  background: var(--cp-ink-3);
+  box-shadow: var(--cp-ring);
+  border-radius: 4px;
+  transition: background-color var(--cp-dur-ui) var(--cp-ease-brush),
+    color var(--cp-dur-ui) var(--cp-ease-brush),
+    transform var(--cp-dur-tap) var(--cp-ease-stab);
+}
+:root[data-lens="cut-paper"] .hello .socials .ds-link.ds-link:hover {
+  background: var(--cp-ivory);
+  color: var(--cp-ink);
+}
+:root[data-lens="cut-paper"] .hello .socials .ds-link.ds-link:active {
+  transform: scale(0.96);
+}
+
+/* portrait — a cut photo pasted over paper scraps */
+:root[data-lens="cut-paper"] .hello figure {
+  position: relative;
+  isolation: isolate;
+}
+:root[data-lens="cut-paper"] .hello figure::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -9%;
+  left: -12%;
+  width: 90%;
+  aspect-ratio: 1;
+  background: var(--cp-plum);
+  clip-path: polygon(6% 0, 100% 8%, 92% 100%, 0 90%);
+  transform: rotate(-6deg);
+}
+:root[data-lens="cut-paper"] .hello figure::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 58%;
+  right: -12%;
+  width: 34%;
+  aspect-ratio: 1;
+  background: var(--cp-mustard);
+  clip-path: polygon(0 0, 100% 50%, 10% 100%);
+  pointer-events: none;
+}
+:root[data-lens="cut-paper"] .hello figure img {
+  border: 0;
+  border-radius: 0;
+  filter: grayscale(0.35) contrast(1.08);
+  clip-path: polygon(
+    3% 2%, 30% 0, 55% 3%, 80% 0, 98% 4%, 100% 30%, 97% 60%, 100% 96%,
+    70% 100%, 42% 97%, 15% 100%, 0 97%, 2% 65%, 0 35%
+  );
+  transform: rotate(2deg);
+}
+:root[data-lens="cut-paper"] .hello figure figcaption {
+  position: relative;
+  z-index: 2;
+  margin-top: 0.9rem;
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* hero poster — the blob art as a cut-paper plate */
+:root[data-lens="cut-paper"] .welcome-art {
+  position: relative;
+  padding: 1.1rem;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  transform: rotate(3deg);
+}
+:root[data-lens="cut-paper"] .welcome-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--cp-plum);
+  clip-path: polygon(
+    0 55%, 18% 48%, 30% 62%, 46% 50%, 60% 66%, 78% 54%, 100% 64%, 100% 100%,
+    0 100%
+  );
+}
+:root[data-lens="cut-paper"] .welcome-art::after {
+  content: "play. build. repeat.";
+  position: absolute;
+  left: 1.1rem;
+  bottom: -2rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cp-ivory-3);
+}
+:root[data-lens="cut-paper"] .decorative-blobs {
+  position: relative;
+}
+:root[data-lens="cut-paper"] .decorative-blobs circle:nth-of-type(1) {
+  fill: var(--cp-tomato);
+}
+:root[data-lens="cut-paper"] .decorative-blobs circle:nth-of-type(2) {
+  fill: var(--cp-bone);
+}
+:root[data-lens="cut-paper"] .decorative-blobs circle:nth-of-type(3) {
+  fill: var(--cp-mustard);
+}
+:root[data-lens="cut-paper"] .decorative-blobs circle:nth-of-type(4) {
+  fill: var(--cp-ink);
+  stroke: var(--cp-bone);
+  stroke-width: 3;
+  stroke-dasharray: 10 7;
+}
+
+/* ═══════════════ Section headings: torn paper labels ═══════════════ */
+:root[data-lens="cut-paper"] .section-heading.section-heading {
+  align-items: center;
+  margin-bottom: 1.6rem;
+}
+:root[data-lens="cut-paper"] .section-heading .ds-heading.ds-heading,
+:root[data-lens="cut-paper"] .timeline-year__label .ds-heading.ds-heading {
+  display: inline-block;
+  padding: 0.32em 0.6em 0.2em;
+  font-size: 1.65rem;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  color: var(--cp-ink);
+  background: var(--cp-bone);
+  clip-path: var(--cp-torn);
+  transform: rotate(-1.8deg);
+  transform-origin: left center;
+}
+:root[data-lens="cut-paper"] .updates .section-heading .ds-heading.ds-heading {
+  transform: rotate(1.4deg);
+  font-size: 1.45rem;
+}
+:root[data-lens="cut-paper"] .section-link .ds-link.ds-link {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════ Home layout rules ═══════════════ */
+:root[data-lens="cut-paper"] .home-composition .below.below {
+  border-top: 0;
+  padding-top: 1rem;
+}
+:root[data-lens="cut-paper"] .home-composition .below > aside {
+  border-left: 1px solid var(--cp-hairline);
+}
+:root[data-lens="cut-paper"] .home-composition .current-note.current-note {
+  position: relative;
+  border-bottom: 0;
+  padding: 1rem 0 2rem;
+}
+
+/* ═══════════════ Project rows: spine cards on the stage ═══════════════ */
+:root[data-lens="cut-paper"] .project-row,
+:root[data-lens="cut-paper"] .lab-card,
+:root[data-lens="cut-paper"] .elsewhere > div {
+  --cp-spine: var(--cp-tomato);
+}
+:root[data-lens="cut-paper"] .project-row:nth-of-type(4n + 2),
+:root[data-lens="cut-paper"] .lab-card:nth-child(4n + 2),
+:root[data-lens="cut-paper"] .elsewhere > div:nth-child(2) {
+  --cp-spine: var(--cp-plum);
+}
+:root[data-lens="cut-paper"] .project-row:nth-of-type(4n + 3),
+:root[data-lens="cut-paper"] .lab-card:nth-child(4n + 3) {
+  --cp-spine: var(--cp-mustard);
+}
+:root[data-lens="cut-paper"] .project-row:nth-of-type(4n + 4),
+:root[data-lens="cut-paper"] .lab-card:nth-child(4n + 4) {
+  --cp-spine: #2f7a63; /* pine, lifted a stop to read on ink */
+}
+
+:root[data-lens="cut-paper"] .project-row.project-row,
+:root[data-lens="cut-paper"] .lab-card.lab-card,
+:root[data-lens="cut-paper"] .elsewhere.elsewhere > div {
+  position: relative;
+  border-top: 0;
+  padding: 1.25rem 1.25rem 1.35rem 1.9rem;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  transition: transform var(--cp-dur-ui) var(--cp-ease-stab),
+    box-shadow var(--cp-dur-ui) var(--cp-ease-stab);
+}
+:root[data-lens="cut-paper"] .project-row.project-row {
+  margin-bottom: 1rem;
+}
+:root[data-lens="cut-paper"] .project-row.project-row::before,
+:root[data-lens="cut-paper"] .lab-card.lab-card::before,
+:root[data-lens="cut-paper"] .elsewhere.elsewhere > div::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0.55rem;
+  background: var(--cp-spine);
+  clip-path: polygon(
+    0 0, 60% 0, 100% 4%, 55% 9%, 100% 15%, 50% 22%, 100% 30%, 60% 37%,
+    100% 46%, 55% 55%, 100% 63%, 50% 71%, 100% 80%, 60% 88%, 100% 95%,
+    70% 100%, 0 100%
+  );
+}
+:root[data-lens="cut-paper"] .project-row.project-row:hover,
+:root[data-lens="cut-paper"] .lab-card.lab-card:hover,
+:root[data-lens="cut-paper"] .elsewhere.elsewhere > div:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--cp-ring), var(--cp-shadow-cut) var(--cp-spine);
+}
+:root[data-lens="cut-paper"] .project-row .meta.meta,
+:root[data-lens="cut-paper"] .lab-card .meta.meta,
+:root[data-lens="cut-paper"] .timeline-entry__meta.timeline-entry__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cp-ivory-3);
+}
+:root[data-lens="cut-paper"] .project-row .meta.meta::before,
+:root[data-lens="cut-paper"] .lab-card .meta.meta::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: none;
+  background: var(--cp-spine);
+}
+:root[data-lens="cut-paper"] .project-row .summary.summary,
+:root[data-lens="cut-paper"] .lab-card > p:not(.meta) {
+  color: var(--cp-ivory-2);
+  font-size: var(--text-copy);
+}
+:root[data-lens="cut-paper"] .project-row--feature.project-row--feature {
+  padding: 1.5rem 1.5rem 1.6rem 2.1rem;
+}
+:root[data-lens="cut-paper"] .project-row--feature .ds-heading--section {
+  font-size: 3rem;
+}
+
+/* media frames — a pasted plate with cut corners in the spine colour */
+:root[data-lens="cut-paper"] .ds-media.ds-media {
+  padding: 0.55rem;
+  background: var(--texture), var(--cp-ink-3);
+}
+:root[data-lens="cut-paper"] .ds-media.ds-media::before,
+:root[data-lens="cut-paper"] .ds-media.ds-media::after {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 0;
+  background: var(--cp-spine, var(--cp-mustard));
+}
+:root[data-lens="cut-paper"] .ds-media.ds-media::before {
+  top: -0.3rem;
+  left: -0.3rem;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+:root[data-lens="cut-paper"] .ds-media.ds-media::after {
+  bottom: -0.3rem;
+  right: -0.3rem;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+:root[data-lens="cut-paper"] a.ds-media.ds-media:hover {
+  outline: 1px solid var(--cp-hairline);
+}
+:root[data-lens="cut-paper"] .ds-media img {
+  background: var(--cp-ink);
+}
+
+/* tags — rubber-stamped chips */
+:root[data-lens="cut-paper"] .ds-tags.ds-tags {
+  gap: 0.35rem;
+  margin-top: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cp-ivory-2);
+}
+:root[data-lens="cut-paper"] .ds-tags.ds-tags li {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: var(--cp-ink-3);
+  box-shadow: var(--cp-ring);
+}
+:root[data-lens="cut-paper"] .ds-tags.ds-tags li + li::before {
+  content: none;
+}
+
+/* ═══════════════ Currently: a bone note taped to the stage ═══════════════ */
+:root[data-lens="cut-paper"] .current-note .ds-note,
+:root[data-lens="cut-paper"] .ds-note--paper.ds-note--paper {
+  --color-accent: var(--cp-ink);
+  --color-text: var(--cp-ink);
+  --color-link-rule: rgba(10, 9, 8, 0.4);
+  position: relative;
+  padding: 1.5rem 1.2rem 1.3rem;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  border-radius: 0;
+  clip-path: polygon(
+    0 1%, 100% 0, 99% 40%, 100% 97%, 88% 100%, 76% 97%, 63% 100%, 50% 96%,
+    37% 100%, 24% 97%, 11% 100%, 0 97%
+  );
+  transform: rotate(1.2deg);
+}
+:root[data-lens="cut-paper"] .current-note.current-note::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0.35rem;
+  left: 50%;
+  width: 4.5rem;
+  height: 1.4rem;
+  background: rgba(107, 63, 160, 0.82);
+  transform: translateX(-50%) rotate(-4deg);
+  clip-path: polygon(3% 0, 97% 6%, 100% 50%, 96% 100%, 2% 94%, 0 50%);
+  pointer-events: none;
+}
+:root[data-lens="cut-paper"] .ds-note .ds-heading.ds-heading {
+  color: var(--cp-ink);
+  font-size: 1.9rem;
+}
+:root[data-lens="cut-paper"] .ds-note :is(p, strong) {
+  color: var(--cp-ink);
+}
+:root[data-lens="cut-paper"] .ds-note .ds-link.ds-link {
+  color: var(--cp-ink);
+  font-weight: 600;
+}
+
+/* ═══════════════ Updates: chromatic note markers ═══════════════ */
+:root[data-lens="cut-paper"] .stream-events > li {
+  --cp-note: var(--cp-do);
+}
+:root[data-lens="cut-paper"] .stream-events > li:nth-child(7n + 2) {
+  --cp-note: var(--cp-re);
+}
+:root[data-lens="cut-paper"] .stream-events > li:nth-child(7n + 3) {
+  --cp-note: var(--cp-mi);
+}
+:root[data-lens="cut-paper"] .stream-events > li:nth-child(7n + 4) {
+  --cp-note: var(--cp-fa);
+}
+:root[data-lens="cut-paper"] .stream-events > li:nth-child(7n + 5) {
+  --cp-note: var(--cp-sol);
+}
+:root[data-lens="cut-paper"] .stream-events > li:nth-child(7n + 6) {
+  --cp-note: var(--cp-la);
+}
+:root[data-lens="cut-paper"] .stream-events > li:nth-child(7n + 7) {
+  --cp-note: var(--cp-ti);
+}
+:root[data-lens="cut-paper"] .event-mark.event-mark {
+  border-radius: 4px;
+  background: var(--cp-note, var(--cp-do));
+  color: var(--cp-ink);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: transform var(--cp-dur-ui) var(--cp-ease-stab);
+}
+:root[data-lens="cut-paper"] .event-mark svg {
+  stroke-width: 2;
+}
+:root[data-lens="cut-paper"] .update-entry--connected.update-entry--connected::before {
+  border-inline-start: 1px dashed var(--cp-ink-5);
+}
+:root[data-lens="cut-paper"] .update-entry.update-entry:hover .event-mark {
+  transform: translateY(-3px) scale(1.06);
+}
+:root[data-lens="cut-paper"] .event-origin.event-origin,
+:root[data-lens="cut-paper"] .update-entry time {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cp-ivory-3);
+}
+:root[data-lens="cut-paper"] .event-title.event-title {
+  font-size: var(--text-copy);
+  font-weight: 600;
+}
+:root[data-lens="cut-paper"] .stream-intro.stream-intro,
+:root[data-lens="cut-paper"] .stream-caption.stream-caption {
+  color: var(--cp-ivory-3);
+  font-size: var(--text-xs);
+}
+:root[data-lens="cut-paper"] .stream-caption.stream-caption {
+  border-top-color: var(--cp-hairline);
+}
+
+/* ═══════════════ Elsewhere ═══════════════ */
+:root[data-lens="cut-paper"] .elsewhere.elsewhere {
+  border-top: 0;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+:root[data-lens="cut-paper"] .elsewhere.elsewhere > div:nth-child(1) {
+  --cp-spine: var(--cp-mustard);
+}
+:root[data-lens="cut-paper"] .elsewhere.elsewhere p {
+  color: var(--cp-ivory-2);
+  font-size: var(--text-copy);
+}
+
+/* ═══════════════ Page headers ═══════════════ */
+:root[data-lens="cut-paper"] .page-section--header.page-section--header {
+  padding-block: 4rem 2rem;
+}
+:root[data-lens="cut-paper"] .page-header .ds-heading--page {
+  text-shadow: 0.04em 0.04em 0 var(--cp-plum);
+  line-height: 1.04;
+}
+:root[data-lens="cut-paper"] .page-header__intro,
+:root[data-lens="cut-paper"] .section-intro__intro {
+  font-size: var(--text-lead);
+  color: var(--cp-ivory-2);
+}
+
+/* action buttons — ghost [ label ], filled ivory when hit */
+:root[data-lens="cut-paper"] .ds-link--action.ds-link--action {
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--cp-ivory-3);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--cp-ivory);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+:root[data-lens="cut-paper"] .ds-link--action.ds-link--action:hover {
+  background: var(--cp-ivory);
+  border-color: var(--cp-ivory);
+  color: var(--cp-ink);
+}
+:root[data-lens="cut-paper"] .page-header__actions .ds-link.ds-link,
+:root[data-lens="cut-paper"] .entry-page__links > .ds-link--text {
+  font-size: var(--text-sm);
+}
+
+/* ═══════════════ Timeline (projects) ═══════════════ */
+:root[data-lens="cut-paper"] .timeline-year.timeline-year {
+  grid-template-columns: 6rem minmax(0, 1fr);
+}
+:root[data-lens="cut-paper"] .timeline-year__label .ds-heading.ds-heading {
+  font-size: 1.8rem;
+}
+:root[data-lens="cut-paper"] .timeline-year:nth-child(even) .timeline-year__label .ds-heading.ds-heading {
+  background: var(--cp-mustard);
+  transform: rotate(2deg);
+}
+:root[data-lens="cut-paper"] .timeline-year__projects.timeline-year__projects {
+  border-left: 1px dashed var(--cp-ink-5);
+}
+:root[data-lens="cut-paper"] .timeline-entry.timeline-entry {
+  --cp-note: var(--cp-do);
+}
+:root[data-lens="cut-paper"] .timeline-entry:nth-child(7n + 2) { --cp-note: var(--cp-re); }
+:root[data-lens="cut-paper"] .timeline-entry:nth-child(7n + 3) { --cp-note: var(--cp-mi); }
+:root[data-lens="cut-paper"] .timeline-entry:nth-child(7n + 4) { --cp-note: var(--cp-fa); }
+:root[data-lens="cut-paper"] .timeline-entry:nth-child(7n + 5) { --cp-note: var(--cp-sol); }
+:root[data-lens="cut-paper"] .timeline-entry:nth-child(7n + 6) { --cp-note: var(--cp-la); }
+:root[data-lens="cut-paper"] .timeline-entry:nth-child(7n + 7) { --cp-note: var(--cp-ti); }
+:root[data-lens="cut-paper"] .timeline-entry.timeline-entry::before {
+  border-radius: 2px;
+  background: var(--cp-note);
+  box-shadow: 0 0 0 5px var(--cp-ink);
+  transform: rotate(45deg);
+}
+:root[data-lens="cut-paper"] .timeline-entry + .timeline-entry {
+  border-top-color: var(--cp-hairline);
+}
+:root[data-lens="cut-paper"] .timeline-entry .ds-media {
+  --cp-spine: var(--cp-note);
+}
+:root[data-lens="cut-paper"] .timeline-entry__copy > p:not(.timeline-entry__meta) {
+  color: var(--cp-ivory-2);
+}
+
+/* ═══════════════ Lab ═══════════════ */
+:root[data-lens="cut-paper"] .lab-grid.lab-grid {
+  gap: 1.25rem;
+}
+:root[data-lens="cut-paper"] .lab-aside.lab-aside {
+  color: var(--cp-ivory-3);
+}
+
+/* ═══════════════ Entry pages & prose ═══════════════ */
+:root[data-lens="cut-paper"] .entry-page__meta.entry-page__meta {
+  border-block: 0;
+  padding: 1.1rem 1.25rem;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+}
+:root[data-lens="cut-paper"] .entry-page__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cp-ivory-3);
+}
+:root[data-lens="cut-paper"] .entry-page__meta p {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+:root[data-lens="cut-paper"] .entry-page > .ds-tags {
+  --cp-spine: var(--cp-mustard);
+}
+:root[data-lens="cut-paper"] .media-rail__item.media-rail__item {
+  border: 0;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+}
+:root[data-lens="cut-paper"] .media-rail__item figcaption {
+  font-size: var(--text-xs);
+  color: var(--cp-ivory-3);
+}
+:root[data-lens="cut-paper"] .prose {
+  color: var(--cp-ivory-2);
+  font-size: var(--text-copy);
+}
+:root[data-lens="cut-paper"] .prose :is(h2, h3, h4) {
+  color: var(--cp-ivory);
+  line-height: 1.05;
+}
+:root[data-lens="cut-paper"] .prose h2 {
+  font-size: 2.2rem;
+}
+:root[data-lens="cut-paper"] .prose h2::before {
+  content: "";
+  display: block;
+  width: 2.2rem;
+  height: 0.35rem;
+  margin-bottom: 0.7rem;
+  background: var(--cp-tomato);
+  clip-path: polygon(0 20%, 100% 0, 96% 100%, 3% 85%);
+}
+:root[data-lens="cut-paper"] .prose h3 {
+  font-size: 1.6rem;
+}
+:root[data-lens="cut-paper"] .prose a {
+  color: var(--cp-ivory);
+  text-decoration-color: rgba(244, 239, 230, 0.4);
+}
+:root[data-lens="cut-paper"] .prose a:hover {
+  text-decoration-color: var(--cp-mustard);
+}
+:root[data-lens="cut-paper"] .prose li::marker {
+  color: var(--cp-mustard);
+}
+:root[data-lens="cut-paper"] .prose :is(code, pre) {
+  font-family: var(--font-mono);
+  background: var(--cp-ink-3);
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+}
+:root[data-lens="cut-paper"] .prose blockquote {
+  border-left: 4px solid var(--cp-plum);
+  padding-left: 1rem;
+  color: var(--cp-ivory);
+}
+:root[data-lens="cut-paper"] .prose hr {
+  border: 0;
+  height: 4px;
+  background: var(--cp-solfege);
+  opacity: 0.8;
+}
+
+/* ═══════════════ Footer ═══════════════ */
+:root[data-lens="cut-paper"] .site-footer.site-footer {
+  position: relative;
+  margin-top: 3rem;
+  padding-top: 1.6rem;
+  border-top: 0;
+  align-items: center;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cp-ivory-3);
+}
+:root[data-lens="cut-paper"] .site-footer.site-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: var(--cp-hairline);
+}
+:root[data-lens="cut-paper"] .site-footer > span:first-child {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  color: var(--cp-ivory);
+}
+:root[data-lens="cut-paper"] .site-footer .ds-link.ds-link {
+  color: var(--cp-ivory-2);
+}
+:root[data-lens="cut-paper"] .site-footer .thanks::after {
+  content: " \266A";
+  color: var(--cp-mustard);
+}
+
+/* skip link */
+:root[data-lens="cut-paper"] .skip-link.skip-link {
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  border: 0;
+  font-weight: 600;
+}
+
+/* ═══════════════ Intermediate & compact ═══════════════ */
+@media (max-width: 62.5rem) {
+  :root[data-lens="cut-paper"] .lens-decor span:nth-child(1) {
+    width: 6rem;
+    height: 5.5rem;
+    right: -2rem;
+  }
+}
+@media (max-width: 40.625rem) {
+  :root[data-lens="cut-paper"] {
+    --text-section: 2rem;
+    --text-card: 1.75rem;
+  }
+  :root[data-lens="cut-paper"] .home-link.home-link {
+    margin-left: 0;
+    font-size: 1.75rem;
+  }
+  :root[data-lens="cut-paper"] .ds-link--nav.ds-link--nav {
+    font-size: 1.2rem;
+    padding-inline: 0.5em;
+  }
+  :root[data-lens="cut-paper"] .hello.hello {
+    padding-block: 1.5rem 2.5rem;
+    row-gap: 0.9rem;
+  }
+  :root[data-lens="cut-paper"] .hello .occupation.occupation {
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+    align-self: center;
+  }
+  :root[data-lens="cut-paper"] .hello figure::after {
+    right: -18%;
+  }
+  :root[data-lens="cut-paper"] .project-row.project-row,
+  :root[data-lens="cut-paper"] .lab-card.lab-card,
+  :root[data-lens="cut-paper"] .elsewhere.elsewhere > div {
+    padding: 1rem 1rem 1.1rem 1.4rem;
+  }
+  :root[data-lens="cut-paper"] .project-row--feature .ds-heading--section {
+    font-size: 2.3rem;
+  }
+  :root[data-lens="cut-paper"] .home-composition .below > aside {
+    border-left: 0;
+    border-top: 0;
+  }
+  :root[data-lens="cut-paper"] .timeline-year.timeline-year {
+    grid-template-columns: 1fr;
+  }
+  :root[data-lens="cut-paper"] .lens-decor span:nth-child(1) {
+    top: 4.5rem;
+    width: 4rem;
+    height: 3.6rem;
+    right: -1.4rem;
+  }
+  :root[data-lens="cut-paper"] .lens-decor span:nth-child(3) {
+    width: 4.5rem;
+    height: 4.5rem;
+    right: -2.6rem;
+  }
+  :root[data-lens="cut-paper"] .lens-decor span:nth-child(2) {
+    left: -3.6rem;
+  }
+  :root[data-lens="cut-paper"] .lens-decor span:nth-child(4),
+  :root[data-lens="cut-paper"] .lens-decor span:nth-child(6) {
+    display: none;
+  }
+}
+
+/* ═══════════════ Motion — the UI keeps time ═══════════════ */
+@keyframes cp-cut-in {
+  0% { opacity: 0; transform: translateX(-12%) skewX(-8deg) rotate(var(--cp-tilt, 0deg)); }
+  60% { opacity: 1; transform: translateX(2%) skewX(-2deg) rotate(var(--cp-tilt, 0deg)); }
+  100% { opacity: 1; transform: translateX(0) skewX(0) rotate(var(--cp-tilt, 0deg)); }
+}
+@keyframes cp-beat {
+  0%, 100% { transform: scale(1); }
+  6% { transform: scale(1.035); }
+  60% { transform: scale(0.992); }
+}
+@keyframes cp-sheen {
+  0% { background-position: -60% 0; }
+  55%, 100% { background-position: 160% 0; }
+}
+@keyframes cp-drift {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+@keyframes cp-hop {
+  0%, 100% { translate: 0 0; }
+  14% { translate: 0 -3px; }
+  34% { translate: 0 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="cut-paper"] .section-heading .ds-heading.ds-heading {
+    --cp-tilt: -1.8deg;
+    animation: cp-cut-in var(--cp-dur-panel) var(--cp-ease-stab) both;
+  }
+  :root[data-lens="cut-paper"] .updates .section-heading .ds-heading.ds-heading {
+    --cp-tilt: 1.4deg;
+    animation-delay: 120ms;
+  }
+  :root[data-lens="cut-paper"] .page-header .ds-heading--page,
+  :root[data-lens="cut-paper"] .hello .ds-heading--display {
+    animation: cp-cut-in var(--cp-dur-panel) var(--cp-ease-stab) both;
+  }
+  :root[data-lens="cut-paper"] .ds-link--nav.ds-link--nav[aria-current] {
+    animation: cp-beat calc(var(--cp-beat) * 2) var(--cp-ease-stab) infinite;
+  }
+  :root[data-lens="cut-paper"] .ds-link--nav.ds-link--nav[aria-current]::after {
+    animation: cp-sheen 6.5s cubic-bezier(0.55, 0.05, 0.45, 0.95) infinite;
+  }
+  :root[data-lens="cut-paper"] .lens-decor span:nth-child(odd) {
+    animation: cp-drift 7s var(--cp-ease-brush) infinite;
+  }
+  :root[data-lens="cut-paper"] .lens-decor span:nth-child(even) {
+    animation: cp-drift 9s var(--cp-ease-brush) infinite reverse;
+  }
+  :root[data-lens="cut-paper"] .stream-events > li .event-mark {
+    animation: cp-hop calc(var(--cp-beat) * 8) var(--cp-ease-stab) infinite;
+  }
+  :root[data-lens="cut-paper"] .stream-events > li:nth-child(2) .event-mark { animation-delay: calc(var(--cp-beat) * 1); }
+  :root[data-lens="cut-paper"] .stream-events > li:nth-child(3) .event-mark { animation-delay: calc(var(--cp-beat) * 2); }
+  :root[data-lens="cut-paper"] .stream-events > li:nth-child(4) .event-mark { animation-delay: calc(var(--cp-beat) * 3); }
+  :root[data-lens="cut-paper"] .stream-events > li:nth-child(5) .event-mark { animation-delay: calc(var(--cp-beat) * 4); }
+  :root[data-lens="cut-paper"] .stream-events > li:nth-child(6) .event-mark { animation-delay: calc(var(--cp-beat) * 5); }
+  :root[data-lens="cut-paper"] .stream-events > li:nth-child(7) .event-mark { animation-delay: calc(var(--cp-beat) * 6); }
+  :root[data-lens="cut-paper"] .stream-events > li:nth-child(8) .event-mark { animation-delay: calc(var(--cp-beat) * 7); }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-lens="cut-paper"] .project-row.project-row:hover,
+  :root[data-lens="cut-paper"] .lab-card.lab-card:hover,
+  :root[data-lens="cut-paper"] .elsewhere.elsewhere > div:hover {
+    transform: none;
+  }
+  :root[data-lens="cut-paper"] *,
+  :root[data-lens="cut-paper"] *::before,
+  :root[data-lens="cut-paper"] *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
