@@ -1,1 +1,1387 @@
-/* Lens: calling-card. */
+/* Lens: calling-card.
+   The portfolio refracted through "Roll to Win", Burooj's Persona 5 lottery
+   app: a heist menu in black, blood red and white. Ransom-note headings
+   (Anton cut against Bodoni Moda), jagged skewed panels, halftone dots,
+   concentric starbursts, a command-menu nav that snaps to inverted chips.
+   Everything leans a few degrees, like it was pasted on in a hurry. */
+@import "@fontsource/anton/400.css";
+@import "@fontsource-variable/bodoni-moda/wght.css";
+@import "@fontsource-variable/bodoni-moda/wght-italic.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+
+:root[data-lens="calling-card"] {
+  /* Palette */
+  --cc-red: #e5191c;
+  --cc-red-deep: #a80d10;
+  --cc-red-text: #ff4a4a; /* red as body-size text on black: 5.5:1 */
+  --cc-red-ink: #c0101a; /* red as text on white: 6.3:1 */
+  --cc-black: #0a0a0a;
+  --cc-panel: #111;
+  --cc-white: #fff;
+  --cc-paper: #f4f1ea;
+  --cc-grey: #bdbdbd;
+  --cc-focus: #fff;
+
+  /* Type */
+  --cc-display: "Anton", "Impact", sans-serif;
+  --cc-didone: "Bodoni Moda Variable", "Bodoni 72", serif;
+  --cc-mono: "JetBrains Mono Variable", monospace;
+  --cc-snap: 70ms cubic-bezier(0.2, 1.8, 0.4, 1);
+  --cc-stab: 110ms cubic-bezier(0.15, 2.2, 0.35, 1);
+
+  /* Stars (concentric, like the Roll to Win title screen) */
+  --cc-star-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon fill='%238c8c8c' points='50.0 1.0 61.8 33.8 96.6 34.9 69.0 56.2 78.8 89.6 50.0 70.0 21.2 89.6 31.0 56.2 3.4 34.9 38.2 33.8'/%3E%3Cpolygon fill='%23e5191c' points='50.0 9.0 60.0 36.5 89.2 37.4 66.1 55.3 74.4 83.4 50.0 67.0 25.6 83.4 33.9 55.3 10.8 37.4 40.0 36.5'/%3E%3Cpolygon fill='%230a0a0a' points='50.0 20.0 57.8 40.8 79.8 41.6 62.6 54.9 68.8 76.1 50.0 63.4 31.2 76.1 37.4 54.9 20.2 41.6 42.2 40.8'/%3E%3Cpolygon fill='%23e5191c' points='50.0 30.0 55.0 43.8 71.9 44.0 58.4 52.9 63.5 68.6 50.0 59.4 36.5 68.6 41.6 52.9 28.1 44.0 45.0 43.8'/%3E%3C/svg%3E");
+  --cc-star-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon fill='%23141414' points='50.0 1.0 61.8 33.8 96.6 34.9 69.0 56.2 78.8 89.6 50.0 70.0 21.2 89.6 31.0 56.2 3.4 34.9 38.2 33.8'/%3E%3Cpolygon fill='%231b1b1b' points='50.0 14.0 58.6 38.1 84.2 38.9 64.0 54.5 71.2 79.1 50.0 64.7 28.8 79.1 36.0 54.5 15.8 38.9 41.4 38.1'/%3E%3Cpolygon fill='%23131313' points='50.0 27.0 55.5 42.4 71.9 42.9 58.9 52.9 63.5 68.6 50.0 59.4 36.5 68.6 41.1 52.9 28.1 42.9 44.5 42.4'/%3E%3Cpolygon fill='%231c1c1c' points='50.0 38.0 52.9 46.0 61.4 46.3 54.7 51.5 57.1 59.7 50.0 54.9 42.9 59.7 45.3 51.5 38.6 46.3 47.1 46.0'/%3E%3C/svg%3E");
+  --cc-star-solid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon fill='%23e5191c' stroke='%23fff' stroke-width='5' stroke-linejoin='miter' points='50.0 4.0 61.3 35.2 94.4 36.2 68.2 56.5 77.5 88.4 50.0 69.7 22.5 88.4 31.8 56.5 5.6 36.2 38.7 35.2'/%3E%3C/svg%3E");
+  --cc-star-white: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon fill='%23fff' points='50.0 1.0 61.8 33.8 96.6 34.9 69.0 56.2 78.8 89.6 50.0 70.0 21.2 89.6 31.0 56.2 3.4 34.9 38.2 33.8'/%3E%3C/svg%3E");
+  --cc-burst: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon fill='%23fff' points='50.0 1.0 58.4 29.7 84.6 15.4 70.3 41.6 99.0 50.0 70.3 58.4 84.6 84.6 58.4 70.3 50.0 99.0 41.6 70.3 15.4 84.6 29.7 58.4 1.0 50.0 29.7 41.6 15.4 15.4 41.6 29.7'/%3E%3C/svg%3E");
+  /* Jagged panel edge: white stroke, clipped to half by the matching polygon */
+  --cc-panel-edge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon fill='none' stroke='%23fff' stroke-width='7' vector-effect='non-scaling-stroke' points='0 3 96 0 100 92 3 100'/%3E%3C/svg%3E");
+  --cc-panel-shape: polygon(0 3%, 96% 0, 100% 92%, 3% 100%);
+  --cc-panel-shape-b: polygon(2% 0, 100% 4%, 97% 100%, 0 95%);
+  --cc-halftone: radial-gradient(
+    circle,
+    rgb(229 25 28 / 0.22) 0 1.3px,
+    transparent 1.8px
+  );
+
+  /* Base token refraction */
+  --color-page: var(--cc-black);
+  --color-surface: var(--cc-panel);
+  --color-surface-strong: var(--cc-red);
+  --color-text: #f2f2f2;
+  --color-text-soft: #c9c9c9;
+  --color-border: #3a3a3a;
+  --color-accent: var(--cc-red-text);
+  --color-accent-pressed: var(--cc-white);
+  --color-accent-contrast: var(--cc-white);
+  --color-hover: var(--cc-red);
+  --color-link-rule: rgb(255 74 74 / 0.55);
+  --color-texture: rgb(229 25 28 / 0.2);
+  --font-serif: var(--cc-display);
+  --text-card: 1.9rem;
+  --text-section: 2.15rem;
+  --text-page: clamp(2.6rem, 6.4vw, 4.6rem);
+  --text-display: clamp(3.4rem, 7.4vw, 6.1rem);
+  --text-display-compact: clamp(2.7rem, 14vw, 4.2rem);
+  --tracking-display: 0.005em;
+  --tracking-heading: 0.01em;
+  --leading-heading: 1.02;
+  --leading-display: 0.94;
+  --radius-note: 0;
+  --radius-portrait: 0;
+  --radius-round: 0;
+  --texture: var(--cc-halftone) 0 0 / 7px 7px, #1a1a1a;
+  --portrait-width: 11rem;
+  --portrait-width-mid: 10.5rem;
+  --portrait-width-compact: 6.5rem;
+  --duration-fast: 70ms;
+  --ease-feedback: cubic-bezier(0.2, 1.8, 0.4, 1);
+  --press-scale: 0.92;
+  --focus-width: 3px;
+  --focus-offset: 4px;
+
+  color-scheme: dark;
+  background: var(--cc-black);
+}
+
+:root[data-lens="calling-card"] ::selection {
+  background: var(--cc-red);
+  color: var(--cc-white);
+  -webkit-text-fill-color: var(--cc-white);
+}
+
+/* ---------- Page ground ---------- */
+:root[data-lens="calling-card"] body {
+  background:
+    repeating-linear-gradient(
+      -58deg,
+      transparent 0 90px,
+      rgb(255 255 255 / 0.018) 90px 180px
+    ),
+    var(--cc-black);
+  color: var(--color-text);
+}
+:root[data-lens="calling-card"] :focus-visible {
+  outline: var(--focus-width) solid var(--cc-focus);
+  outline-offset: var(--focus-offset);
+}
+:root[data-lens="calling-card"] .skip-link {
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border: 3px solid var(--cc-red);
+  font-family: var(--cc-display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Stage props ---------- */
+:root[data-lens="calling-card"] .lens-decor {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+:root[data-lens="calling-card"] .lens-decor span {
+  position: absolute;
+  display: block;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+/* 1. Giant dim star behind the hero, the title-screen backdrop */
+:root[data-lens="calling-card"] .lens-decor span:nth-child(1) {
+  top: -9rem;
+  left: 18%;
+  width: 52rem;
+  aspect-ratio: 1;
+  background-image: var(--cc-star-dark);
+  transform: rotate(-14deg);
+}
+/* 2. The red shard: the P5 menu's split, torn down the right edge */
+:root[data-lens="calling-card"] .lens-decor span:nth-child(2) {
+  top: 6.5rem;
+  right: -3rem;
+  width: 31vw;
+  height: 25rem;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.35) 0 1.6px, transparent 2.1px) 0 0 /
+      9px 9px,
+    linear-gradient(160deg, var(--cc-red) 55%, var(--cc-red-deep));
+  clip-path: polygon(
+    22% 0,
+    100% 6%,
+    100% 88%,
+    64% 100%,
+    70% 74%,
+    0 84%,
+    30% 52%,
+    8% 40%
+  );
+}
+/* 3. Concentric red star, bottom-left corner */
+:root[data-lens="calling-card"] .lens-decor span:nth-child(3) {
+  bottom: 6rem;
+  left: -9rem;
+  width: 13rem;
+  aspect-ratio: 1;
+  background-image: var(--cc-star-red);
+  transform: rotate(18deg);
+  opacity: 0.9;
+}
+/* 4. Concentric red star, poking into the top-right */
+:root[data-lens="calling-card"] .lens-decor span:nth-child(4) {
+  top: 40rem;
+  right: -5.5rem;
+  width: 11rem;
+  aspect-ratio: 1;
+  background-image: var(--cc-star-red);
+  transform: rotate(-10deg);
+}
+/* 5. Halftone fade across the middle right */
+:root[data-lens="calling-card"] .lens-decor span:nth-child(5) {
+  top: 44rem;
+  right: 0;
+  width: 42vw;
+  height: 40rem;
+  background: var(--cc-halftone) 0 0 / 11px 11px;
+  mask-image: radial-gradient(
+    ellipse at 100% 40%,
+    #000 0,
+    transparent 70%
+  );
+}
+/* 6. White knife slashes */
+:root[data-lens="calling-card"] .lens-decor span:nth-child(6) {
+  top: 8rem;
+  left: -5.5rem;
+  width: 9rem;
+  height: 1.4rem;
+  background:
+    linear-gradient(var(--cc-white), var(--cc-white)) 0 0 / 100% 5px,
+    linear-gradient(var(--cc-red), var(--cc-red)) 2.5rem 100% / 80% 7px;
+  background-repeat: no-repeat;
+  transform: rotate(-24deg);
+}
+
+/* Former wine circle -> a red shard sliver on the left edge */
+:root[data-lens="calling-card"] .edge-blob__surface {
+  border-radius: 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.4) 0 1.5px, transparent 2px) 0 0 /
+      8px 8px,
+    var(--cc-red);
+  clip-path: polygon(0 0, 100% 8%, 82% 34%, 96% 52%, 70% 100%, 0 100%);
+}
+
+/* ---------- Header: logo + command menu ---------- */
+:root[data-lens="calling-card"] .site-header {
+  position: relative;
+  border-bottom: 0;
+  padding-block: 1.6rem 1.4rem;
+}
+:root[data-lens="calling-card"] .site-header::after {
+  content: "";
+  position: absolute;
+  left: -1rem;
+  right: -1rem;
+  bottom: 0;
+  height: 9px;
+  background: var(--cc-red);
+  clip-path: polygon(0 40%, 38% 0, 62% 70%, 100% 10%, 100% 60%, 58% 100%, 36% 40%, 0 100%);
+}
+:root[data-lens="calling-card"] .home-link {
+  position: relative;
+  display: inline-block;
+  font-family: var(--cc-didone);
+  font-style: italic;
+  font-weight: 900;
+  font-size: 2.6rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--cc-white);
+  text-decoration: none;
+  text-shadow: 4px 4px 0 var(--cc-red);
+  transform: rotate(-6deg);
+  transition: transform var(--cc-stab);
+}
+:root[data-lens="calling-card"] .home-link::after {
+  content: "";
+  position: absolute;
+  top: -0.2rem;
+  right: -1.3rem;
+  width: 1.5rem;
+  aspect-ratio: 1;
+  background: var(--cc-star-solid) center / contain no-repeat;
+}
+:root[data-lens="calling-card"] .home-link:hover {
+  text-decoration: none;
+  transform: rotate(-1deg) scale(1.08);
+}
+
+:root[data-lens="calling-card"] .site-nav ul {
+  gap: 0.2rem 0.35rem;
+}
+:root[data-lens="calling-card"] .site-nav li {
+  transform: rotate(var(--cc-tilt, -3deg)) translateY(var(--cc-drop, 0));
+}
+:root[data-lens="calling-card"] .site-nav li:nth-child(2) {
+  --cc-tilt: 2deg;
+  --cc-drop: 3px;
+}
+:root[data-lens="calling-card"] .site-nav li:nth-child(3) {
+  --cc-tilt: -5deg;
+  --cc-drop: -2px;
+}
+:root[data-lens="calling-card"] .site-nav li:nth-child(4) {
+  --cc-tilt: 3deg;
+  --cc-drop: 4px;
+}
+:root[data-lens="calling-card"] .site-nav li:nth-child(5) {
+  --cc-tilt: -2deg;
+}
+:root[data-lens="calling-card"] .site-nav li:nth-child(6) {
+  --cc-tilt: 4deg;
+  --cc-drop: 2px;
+}
+:root[data-lens="calling-card"] .ds-link.ds-link--nav {
+  font-family: var(--cc-display);
+  font-size: 1.28rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--cc-white);
+  text-decoration: none;
+}
+:root[data-lens="calling-card"] .ds-link.ds-link--nav > span {
+  display: inline-block;
+  padding: 0.12em 0.55em 0.08em;
+  line-height: 1.15;
+  clip-path: polygon(3% 8%, 100% 0, 96% 100%, 0 90%);
+  transition: transform var(--cc-snap);
+}
+:root[data-lens="calling-card"] .ds-link.ds-link--nav:hover > span {
+  background: var(--cc-white);
+  color: var(--cc-black);
+  transform: scale(1.16) rotate(-4deg);
+}
+:root[data-lens="calling-card"] .ds-link.ds-link--nav[aria-current] {
+  font-weight: 400;
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .ds-link.ds-link--nav[aria-current] > span {
+  background: var(--cc-red);
+  color: var(--cc-white);
+  box-shadow: inset 0 -4px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .ds-link.ds-link--nav[aria-current]:hover > span {
+  background: var(--cc-white);
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .ds-link.ds-link--nav:active > span {
+  background: var(--cc-red);
+  color: var(--cc-black);
+  transform: scale(0.94) rotate(3deg);
+}
+
+/* ---------- Links ---------- */
+:root[data-lens="calling-card"] .ds-link {
+  color: var(--color-accent);
+}
+:root[data-lens="calling-card"] .ds-link--text {
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+}
+:root[data-lens="calling-card"] .ds-link--text:hover,
+:root[data-lens="calling-card"] .prose a:hover {
+  background: var(--cc-red);
+  color: var(--cc-white);
+  text-decoration-color: var(--cc-white);
+  box-shadow: 3px 3px 0 var(--cc-white);
+}
+:root[data-lens="calling-card"] .link-arrow {
+  stroke-width: 2.5;
+}
+:root[data-lens="calling-card"] .ds-link:hover .link-arrow {
+  transform: translate(4px, -4px) rotate(-8deg);
+}
+
+/* ---------- Headings: ransom note ---------- */
+:root[data-lens="calling-card"] :is(h1, h2, h3, h4),
+:root[data-lens="calling-card"] .ds-heading {
+  font-family: var(--cc-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .ds-heading--label {
+  font: 400 1.05rem/1.2 var(--cc-display);
+  letter-spacing: 0.03em;
+}
+/* Display + page titles: letters on alternating white / black / red chips.
+   Everything lives in the heading's own background layers (so the text layer
+   stays on top): a red offset slab, the striped chips, knife-cut gaps, and an
+   inverse stripe clipped to the glyphs, so every slice of every letter reads
+   against the chip it sits on. */
+:root[data-lens="calling-card"] .ds-heading.ds-heading--display,
+:root[data-lens="calling-card"] .ds-heading.ds-heading--page {
+  --cc-off: 0.13em;
+  --cc-chips: 100deg, #fff 0 1.05em, #0a0a0a 1.05em 1.95em,
+    #e5191c 1.95em 3.05em, #fff 3.05em 3.9em, #0a0a0a 3.9em 5.1em;
+  --cc-ink: 100deg, #0a0a0a 0 1.05em, #fff 1.05em 1.95em, #fff 1.95em 3.05em,
+    #0a0a0a 3.05em 3.9em, #fff 3.9em 5.1em;
+  --cc-size: calc(100% - var(--cc-off)) calc(100% - var(--cc-off));
+  display: inline-block;
+  padding: 0.1em calc(0.2em + var(--cc-off)) calc(0.04em + var(--cc-off)) 0.2em;
+  line-height: 1;
+  color: var(--cc-white);
+  background-image:
+    repeating-linear-gradient(var(--cc-ink)),
+    repeating-linear-gradient(
+      100deg,
+      transparent 0 1.03em,
+      #0a0a0a 1.03em 1.065em,
+      transparent 1.065em 3.03em,
+      #0a0a0a 3.03em 3.065em,
+      transparent 3.065em 5.1em
+    ),
+    repeating-linear-gradient(var(--cc-chips)),
+    linear-gradient(var(--cc-red), var(--cc-red));
+  background-size: var(--cc-size), var(--cc-size), var(--cc-size), var(--cc-size);
+  background-position: 0 0, 0 0, 0 0, 100% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text, padding-box, padding-box, padding-box;
+  background-clip: text, padding-box, padding-box, padding-box;
+  -webkit-text-fill-color: transparent;
+  clip-path: polygon(0 6%, 18% 0, 47% 5%, 71% 0, 100% 4%, 98% 97%, 64% 100%, 30% 94%, 2% 100%);
+  transform: rotate(-3.5deg) skewX(-5deg);
+  transform-origin: 0 100%;
+}
+:root[data-lens="calling-card"] .ds-heading.ds-heading--page {
+  --cc-chips: 100deg, #0a0a0a 0 1.1em, #fff 1.1em 2.05em,
+    #e5191c 2.05em 3.1em, #0a0a0a 3.1em 4.1em, #fff 4.1em 5.1em;
+  --cc-ink: 100deg, #fff 0 1.1em, #0a0a0a 1.1em 2.05em, #fff 2.05em 3.1em,
+    #fff 3.1em 4.1em, #0a0a0a 4.1em 5.1em;
+  justify-self: start;
+  width: fit-content;
+  line-height: 1.02;
+  transform: rotate(-2deg) skewX(-4deg);
+}
+
+/* Section headings: white Anton on a torn red slab, first letter pasted on
+   in Bodoni from a different magazine. */
+:root[data-lens="calling-card"] .ds-heading.ds-heading--section {
+  position: relative;
+  z-index: 0;
+  display: inline-block;
+  padding: 0.12em 0.35em 0.06em 0.3em;
+  line-height: 1;
+  transform: rotate(-2.5deg);
+}
+:root[data-lens="calling-card"] .ds-heading.ds-heading--section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cc-red);
+  clip-path: polygon(0 10%, 97% 0, 100% 86%, 4% 100%);
+}
+:root[data-lens="calling-card"] .ds-heading.ds-heading--section::first-letter {
+  font-family: var(--cc-didone);
+  font-style: italic;
+  font-weight: 900;
+  font-size: 1.12em;
+  color: var(--cc-black);
+  background: var(--cc-white);
+  padding: 0 0.1em;
+  margin-right: 0.06em;
+}
+:root[data-lens="calling-card"] .ds-heading--section .ds-link {
+  color: var(--cc-white);
+  text-decoration: none;
+}
+/* Card titles: pure Anton, first letter swapped for a red Bodoni capital */
+:root[data-lens="calling-card"] .ds-heading.ds-heading--card {
+  line-height: 1.02;
+  letter-spacing: 0.015em;
+}
+:root[data-lens="calling-card"] .ds-heading--card .ds-link,
+:root[data-lens="calling-card"] .ds-heading--section .ds-link {
+  color: var(--cc-white);
+  text-decoration: none;
+  font-weight: 400;
+}
+:root[data-lens="calling-card"] .ds-heading.ds-heading--card::first-letter {
+  font-family: var(--cc-didone);
+  font-weight: 900;
+  font-size: 1.14em;
+  color: var(--cc-red-text);
+}
+:root[data-lens="calling-card"] .ds-heading--card .ds-link > span,
+:root[data-lens="calling-card"] .ds-heading--section .ds-link > span {
+  transition: background-color 0s;
+}
+:root[data-lens="calling-card"] .ds-heading--card .ds-link:hover,
+:root[data-lens="calling-card"] .ds-heading--section .ds-link:hover {
+  background: none;
+  box-shadow: none;
+  text-decoration: none;
+}
+:root[data-lens="calling-card"] .ds-heading--card .ds-link:hover > span {
+  background: var(--cc-white);
+  color: var(--cc-black);
+  box-shadow: 5px 5px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .ds-heading--section .ds-link:hover > span {
+  color: var(--cc-black);
+}
+
+/* ---------- Small labels become chips ---------- */
+:root[data-lens="calling-card"]
+  :is(
+    .page-header__eyebrow,
+    .section-intro__eyebrow,
+    .entry-page__label,
+    .page-header__meta-label,
+    .project-row .meta,
+    .lab-card .meta,
+    .timeline-entry__meta
+  ) {
+  justify-self: start;
+  width: fit-content;
+  padding: 0.18em 0.6em 0.12em;
+  font-family: var(--cc-display);
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.25;
+  color: var(--cc-white);
+  background: var(--cc-red);
+  transform: rotate(-2deg) skewX(-8deg);
+  clip-path: polygon(0 0, 100% 6%, 97% 100%, 2% 94%);
+}
+
+/* ---------- Hero ---------- */
+:root[data-lens="calling-card"] .hello {
+  padding-top: 3.2rem;
+  gap: 2.8rem;
+}
+:root[data-lens="calling-card"] .hello .greeting {
+  width: fit-content;
+  padding: 0.1em 0.5em;
+  font-family: var(--cc-didone);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: var(--cc-black);
+  background: var(--cc-white);
+  transform: rotate(-4deg);
+  clip-path: polygon(0 12%, 100% 0, 97% 100%, 3% 90%);
+}
+:root[data-lens="calling-card"] .hello .title {
+  margin: 1rem 0 1.2rem;
+}
+:root[data-lens="calling-card"] .hello .occupation {
+  width: fit-content;
+  padding: 0.25em 0.8em 0.18em;
+  font-family: var(--cc-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cc-white);
+  background: var(--cc-black);
+  border: 3px solid var(--cc-white);
+  box-shadow: 6px 6px 0 var(--cc-red);
+  transform: rotate(1.5deg) skewX(-10deg);
+}
+:root[data-lens="calling-card"] .hello .welcome {
+  font-size: 1.15rem;
+  max-width: 34ch;
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .hello .socials {
+  gap: 0.7rem 0.6rem;
+  margin-top: 1.5rem;
+}
+/* Socials: the P5 shop's stacked, tilted buy buttons */
+:root[data-lens="calling-card"] .hello .socials .ds-link {
+  display: inline-block;
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cc-black);
+  background: var(--cc-white);
+  padding: 0.3em 0.75em 0.22em;
+  transform: rotate(var(--cc-tilt, -2deg)) skewX(-8deg);
+  transition: transform var(--cc-stab);
+}
+:root[data-lens="calling-card"] .hello .socials .ds-link:nth-child(2) {
+  --cc-tilt: 2.5deg;
+}
+:root[data-lens="calling-card"] .hello .socials .ds-link:nth-child(3) {
+  --cc-tilt: -3.5deg;
+}
+:root[data-lens="calling-card"] .hello .socials .ds-link:nth-child(4) {
+  --cc-tilt: 1.5deg;
+  background: var(--cc-red);
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .hello .socials .ds-link:hover {
+  background: var(--cc-red);
+  color: var(--cc-white);
+  box-shadow: 5px 5px 0 var(--cc-white);
+  transform: rotate(-6deg) skewX(-8deg) scale(1.12);
+}
+:root[data-lens="calling-card"] .hello .socials .ds-link:nth-child(4):hover {
+  background: var(--cc-white);
+  color: var(--cc-black);
+  box-shadow: 5px 5px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .hello .socials .ds-link:active {
+  transform: rotate(3deg) skewX(-8deg) scale(0.94);
+}
+
+/* Portrait: red duotone in a jagged, torn frame */
+:root[data-lens="calling-card"] .hello figure {
+  position: relative;
+  z-index: 0;
+  transform: rotate(-4deg);
+}
+:root[data-lens="calling-card"] .hello figure::before {
+  content: "";
+  position: absolute;
+  top: -0.6rem;
+  left: -0.7rem;
+  right: -0.5rem;
+  aspect-ratio: 1;
+  z-index: -1;
+  background: var(--cc-white);
+  clip-path: polygon(6% 0, 100% 5%, 94% 100%, 0 92%, 3% 48%);
+}
+:root[data-lens="calling-card"] .hello figure::after {
+  content: "";
+  position: absolute;
+  top: -1.4rem;
+  right: -1.5rem;
+  width: 3.2rem;
+  aspect-ratio: 1;
+  background: var(--cc-star-red) center / contain no-repeat;
+  transform: rotate(14deg);
+  pointer-events: none;
+}
+:root[data-lens="calling-card"] .hello figure img {
+  border: 0;
+  border-radius: 0;
+  filter: grayscale(1) contrast(1.55) brightness(0.92) sepia(1)
+    hue-rotate(-52deg) saturate(7);
+  clip-path: polygon(3% 4%, 97% 0, 100% 90%, 88% 97%, 2% 100%);
+}
+:root[data-lens="calling-card"] .hello figcaption {
+  margin-top: 0.8rem;
+}
+:root[data-lens="calling-card"] .hello figcaption .ds-link {
+  font-family: var(--cc-didone);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--cc-white);
+  text-decoration-color: var(--cc-red);
+}
+
+/* Blob art column -> calling-card stamp: star + "take your time" */
+:root[data-lens="calling-card"] .welcome-art {
+  position: relative;
+  min-height: 17rem;
+  display: grid;
+  place-items: center;
+}
+:root[data-lens="calling-card"] .welcome-art .decorative-blobs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--cc-star-red) center / 100% no-repeat;
+  transform: rotate(12deg);
+}
+:root[data-lens="calling-card"] .welcome-art .decorative-blobs circle {
+  display: none;
+}
+:root[data-lens="calling-card"] .welcome-art::before,
+:root[data-lens="calling-card"] .welcome-art::after {
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+  line-height: 1;
+  white-space: pre;
+}
+:root[data-lens="calling-card"] .welcome-art::before {
+  content: "Take your";
+  align-self: start;
+  margin-top: 3.2rem;
+  padding: 0.12em 0.4em;
+  font: italic 900 1.5rem/1 var(--cc-didone);
+  color: var(--cc-black);
+  background: var(--cc-white);
+  transform: rotate(-9deg) translateX(-1.4rem);
+}
+:root[data-lens="calling-card"] .welcome-art::after {
+  content: "TIME!";
+  align-self: end;
+  margin-bottom: 4rem;
+  padding: 0.06em 0.24em 0;
+  font: 400 3.4rem/1 var(--cc-display);
+  letter-spacing: 0.02em;
+  color: var(--cc-white);
+  background: var(--cc-black);
+  border: 4px solid var(--cc-white);
+  box-shadow: 7px 7px 0 var(--cc-red);
+  transform: rotate(-6deg) translateX(1.2rem);
+}
+
+/* ---------- Home composition ---------- */
+:root[data-lens="calling-card"] .home-composition .below {
+  border-top: 0;
+  padding-top: 2.4rem;
+  position: relative;
+}
+:root[data-lens="calling-card"] .home-composition .below::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -2%;
+  width: 104%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--cc-white) 0 62%, var(--cc-red) 62%);
+  transform: rotate(-0.6deg);
+}
+:root[data-lens="calling-card"] .home-composition .below > aside {
+  border-left: 0;
+  padding-left: 0.5rem;
+}
+:root[data-lens="calling-card"] .section-heading {
+  align-items: center;
+  margin-bottom: 1.8rem;
+}
+:root[data-lens="calling-card"] .section-link .ds-link {
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cc-white);
+  border-bottom: 3px solid var(--cc-red);
+  padding: 0.1em 0.2em;
+}
+:root[data-lens="calling-card"] .section-link .ds-link:hover {
+  color: var(--cc-black);
+  background: var(--cc-white);
+  border-color: var(--cc-white);
+  box-shadow: 4px 4px 0 var(--cc-red);
+}
+
+/* ---------- Calling-card panels: projects, timeline entries, lab cards ---------- */
+:root[data-lens="calling-card"] :is(.project-row, .timeline-entry__body, .lab-card) {
+  position: relative;
+  z-index: 0;
+  border: 0;
+  padding: 1.5rem 1.6rem 1.7rem;
+  transform: rotate(var(--cc-lean, -0.7deg));
+  transition: transform var(--cc-stab);
+}
+:root[data-lens="calling-card"] :is(.project-row, .timeline-entry__body, .lab-card)::before,
+:root[data-lens="calling-card"] :is(.project-row, .timeline-entry__body, .lab-card)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: var(--cc-shape, var(--cc-panel-shape));
+  pointer-events: none;
+}
+/* red offset slab */
+:root[data-lens="calling-card"] :is(.project-row, .timeline-entry__body, .lab-card)::before {
+  z-index: -2;
+  background: var(--cc-red);
+  transform: translate(8px, 9px);
+  transition: transform var(--cc-stab);
+}
+/* black face, halftone, white torn edge */
+:root[data-lens="calling-card"] :is(.project-row, .timeline-entry__body, .lab-card)::after {
+  z-index: -1;
+  background:
+    var(--cc-panel-edge) 0 0 / 100% 100% no-repeat,
+    linear-gradient(
+      125deg,
+      transparent 0 58%,
+      rgb(10 10 10 / 0.9) 80%
+    ),
+    var(--cc-halftone) 0 0 / 8px 8px,
+    var(--cc-panel);
+}
+:root[data-lens="calling-card"] :is(.project-row, .timeline-entry__body, .lab-card):nth-of-type(even) {
+  --cc-lean: 0.8deg;
+}
+:root[data-lens="calling-card"] .timeline-entry:nth-child(even) .timeline-entry__body,
+:root[data-lens="calling-card"] .lab-grid > :nth-child(even) {
+  --cc-lean: 0.8deg;
+}
+:root[data-lens="calling-card"] :is(.project-row, .timeline-entry__body, .lab-card):hover {
+  transform: rotate(0deg) translate(-3px, -3px) scale(1.012);
+}
+:root[data-lens="calling-card"] :is(.project-row, .timeline-entry__body, .lab-card):hover::before {
+  transform: translate(14px, 15px);
+}
+:root[data-lens="calling-card"] .project-row {
+  margin-bottom: 2rem;
+}
+:root[data-lens="calling-card"] .selected-work .project-row:first-of-type {
+  padding-top: 1.5rem;
+}
+:root[data-lens="calling-card"] :is(.project-row, .lab-card, .timeline-entry__copy) .summary,
+:root[data-lens="calling-card"] .lab-card > p:not(.meta),
+:root[data-lens="calling-card"] .timeline-entry__copy > p:not(.timeline-entry__meta) {
+  color: #ececec;
+}
+:root[data-lens="calling-card"] .project-copy {
+  gap: 0.75rem;
+}
+
+/* Tags: stamped tickets */
+:root[data-lens="calling-card"] .ds-tags {
+  gap: 0.4rem;
+  font-family: var(--cc-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .ds-tags li {
+  padding: 0.15em 0.55em;
+  border: 2px solid var(--cc-white);
+  background: var(--cc-black);
+  transform: skewX(-10deg);
+}
+:root[data-lens="calling-card"] .ds-tags li:nth-child(3n + 2) {
+  background: var(--cc-white);
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .ds-tags li + li::before {
+  content: none;
+}
+
+/* Media: pasted-in snapshot with a torn white border */
+:root[data-lens="calling-card"] .ds-media {
+  padding: 7px;
+  background: var(--cc-white);
+  clip-path: var(--cc-panel-shape-b);
+  transform: rotate(1.4deg);
+  transition: transform var(--cc-stab);
+}
+:root[data-lens="calling-card"] .ds-media::before {
+  content: none;
+}
+:root[data-lens="calling-card"] .ds-media::after {
+  top: auto;
+  right: 4%;
+  bottom: 6%;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 0;
+  background: var(--cc-star-solid) center / contain no-repeat;
+}
+:root[data-lens="calling-card"] .ds-media img {
+  background: #161616;
+}
+:root[data-lens="calling-card"] a.ds-media:hover {
+  outline: 0;
+  transform: rotate(-1.5deg) scale(1.03);
+}
+
+/* ---------- Aside: currently note as a white dossier ---------- */
+:root[data-lens="calling-card"] .home-composition .current-note {
+  position: relative;
+  z-index: 0;
+  border-bottom: 0;
+  padding: 1.4rem 1.3rem 1.5rem;
+  margin-bottom: 2.4rem;
+  --color-text: #0a0a0a;
+  --color-accent: var(--cc-red-ink);
+  --cc-focus: #0a0a0a;
+  color: #0a0a0a;
+  transform: rotate(1.8deg);
+}
+:root[data-lens="calling-card"] .home-composition .current-note::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle, rgb(10 10 10 / 0.12) 0 1.2px, transparent 1.7px) 0 0 /
+      7px 7px,
+    var(--cc-paper);
+  clip-path: polygon(0 4%, 100% 0, 97% 100%, 3% 96%);
+  box-shadow: none;
+}
+:root[data-lens="calling-card"] .home-composition .current-note::after {
+  content: "";
+  position: absolute;
+  top: -1.2rem;
+  right: -0.8rem;
+  width: 2.8rem;
+  aspect-ratio: 1;
+  background: var(--cc-star-red) center / contain no-repeat;
+  transform: rotate(-12deg);
+}
+:root[data-lens="calling-card"] .current-note .ds-heading.ds-heading--section {
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .current-note strong {
+  font-weight: 900;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  padding: 0 0.25em;
+}
+:root[data-lens="calling-card"] .current-note .ds-link--text:hover {
+  color: var(--cc-white);
+  box-shadow: 3px 3px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .ds-note--paper {
+  background: var(--cc-paper);
+  color: #0a0a0a;
+  --color-text: #0a0a0a;
+  --color-text-soft: #333;
+  --color-accent: var(--cc-red-ink);
+  --cc-focus: #0a0a0a;
+  clip-path: polygon(0 3%, 100% 0, 98% 100%, 2% 97%);
+}
+
+/* ---------- Activity stream: the party roster ---------- */
+:root[data-lens="calling-card"] .stream-intro {
+  font-family: var(--cc-didone);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .update-entry--connected::before {
+  border-inline-start: 3px solid var(--cc-red);
+  inset-inline-start: calc(var(--space-xl) / 2 - 1px);
+}
+:root[data-lens="calling-card"] .event-mark {
+  background: var(--cc-red);
+  color: var(--cc-white);
+  clip-path: polygon(50% 0, 100% 45%, 58% 100%, 0 58%);
+  transform: rotate(-8deg);
+}
+:root[data-lens="calling-card"] .update-entry[data-event-kind="milestone"] .event-mark,
+:root[data-lens="calling-card"] .update-entry[data-event-kind="pull-request"] .event-mark {
+  background: var(--cc-white);
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .event-origin {
+  font-family: var(--cc-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cc-red-text);
+}
+:root[data-lens="calling-card"] .event-title .ds-link {
+  color: var(--cc-white);
+  text-decoration-color: var(--cc-red);
+}
+:root[data-lens="calling-card"] .update-entry time,
+:root[data-lens="calling-card"] .stream-caption {
+  font-family: var(--cc-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: #bdbdbd;
+}
+:root[data-lens="calling-card"] .stream-caption {
+  border-top: 3px solid var(--cc-white);
+}
+
+/* ---------- Elsewhere: two command buttons ---------- */
+:root[data-lens="calling-card"] .home-composition .elsewhere {
+  border-top: 0;
+  gap: 2.4rem;
+  margin-top: 1rem;
+}
+:root[data-lens="calling-card"] .elsewhere > div {
+  position: relative;
+  z-index: 0;
+  padding: 1.3rem 1.5rem 1.4rem;
+  transform: rotate(-1.5deg);
+  transition: transform var(--cc-stab);
+  --color-text-soft: #0a0a0a;
+  --cc-focus: #0a0a0a;
+}
+:root[data-lens="calling-card"] .elsewhere > div:nth-child(2) {
+  transform: rotate(1.8deg) translateY(0.6rem);
+  --color-text-soft: #fff;
+  --cc-focus: #fff;
+}
+:root[data-lens="calling-card"] .elsewhere > div::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cc-paper);
+  clip-path: polygon(0 8%, 98% 0, 100% 90%, 3% 100%);
+  box-shadow: none;
+}
+:root[data-lens="calling-card"] .elsewhere > div:nth-child(2)::before {
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.28) 0 1.5px, transparent 2px) 0 0 /
+      9px 9px,
+    var(--cc-red);
+  clip-path: polygon(2% 0, 100% 9%, 97% 100%, 0 92%);
+}
+:root[data-lens="calling-card"] .elsewhere > div:hover {
+  transform: rotate(0deg) scale(1.03);
+}
+:root[data-lens="calling-card"] .elsewhere .ds-heading.ds-heading--section {
+  padding: 0;
+  transform: none;
+}
+:root[data-lens="calling-card"] .elsewhere .ds-heading.ds-heading--section::before {
+  content: none;
+}
+:root[data-lens="calling-card"] .elsewhere .ds-heading.ds-heading--section::first-letter {
+  background: var(--cc-black);
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .elsewhere > div:first-child .ds-heading--section .ds-link {
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .elsewhere > div:first-child .ds-heading--section .ds-link:hover > span {
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .elsewhere > div:nth-child(2) .ds-heading--section .ds-link:hover > span {
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .elsewhere p {
+  font-weight: 700;
+}
+
+/* ---------- Footer ---------- */
+:root[data-lens="calling-card"] .site-footer {
+  position: relative;
+  border-top: 0;
+  margin-top: 3.4rem;
+  padding-top: 1.6rem;
+  align-items: center;
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .site-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background: var(--cc-red);
+  clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 70%);
+}
+:root[data-lens="calling-card"] .site-footer > span:first-child {
+  font-family: var(--cc-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  padding: 0.1em 0.5em;
+  transform: rotate(-3deg);
+}
+:root[data-lens="calling-card"] .site-footer .thanks {
+  font-family: var(--cc-didone);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 0.05em 0.5em;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  transform: rotate(2deg) skewX(-8deg);
+}
+
+/* ---------- Inner pages ---------- */
+:root[data-lens="calling-card"] .page-header__main {
+  gap: 1.3rem;
+}
+:root[data-lens="calling-card"] :is(.page-header__intro, .section-intro__intro) {
+  color: var(--cc-white);
+  font-size: 1.15rem;
+  max-width: 44ch;
+}
+:root[data-lens="calling-card"] .page-header__actions .ds-link,
+:root[data-lens="calling-card"] .ds-link.ds-link--action {
+  display: inline-block;
+  padding: 0.35em 0.9em 0.28em;
+  border: 0;
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cc-black);
+  background: var(--cc-white);
+  box-shadow: 6px 6px 0 var(--cc-red);
+  transform: rotate(-2deg) skewX(-9deg);
+  transition: transform var(--cc-stab);
+}
+:root[data-lens="calling-card"] .entry-page__links .ds-link--action:nth-child(even) {
+  transform: rotate(2deg) skewX(-9deg);
+}
+:root[data-lens="calling-card"] .page-header__actions .ds-link:hover,
+:root[data-lens="calling-card"] .ds-link.ds-link--action:hover {
+  color: var(--cc-white);
+  background: var(--cc-red);
+  box-shadow: 6px 6px 0 var(--cc-white);
+  transform: rotate(-5deg) skewX(-9deg) scale(1.1);
+}
+:root[data-lens="calling-card"] .ds-link.ds-link--action:active {
+  transform: rotate(2deg) skewX(-9deg) scale(0.93);
+}
+:root[data-lens="calling-card"] .entry-page__links {
+  gap: 1rem 1.2rem;
+}
+
+/* Entry meta: the party status roster */
+:root[data-lens="calling-card"] .entry-page__meta {
+  border-block: 0;
+  gap: 0.8rem;
+}
+:root[data-lens="calling-card"] .entry-page__meta > div {
+  position: relative;
+  z-index: 0;
+  padding: 0.8rem 1rem 0.9rem;
+  gap: 0.5rem;
+}
+:root[data-lens="calling-card"] .entry-page__meta > div::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cc-panel);
+  border-left: 6px solid var(--cc-red);
+  clip-path: polygon(0 0, 100% 8%, 97% 100%, 0 100%);
+}
+:root[data-lens="calling-card"] .entry-page__meta p {
+  font-family: var(--cc-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--cc-white);
+}
+
+/* Prose */
+:root[data-lens="calling-card"] .prose {
+  color: #ededed;
+}
+:root[data-lens="calling-card"] .prose :is(h2, h3) {
+  position: relative;
+  z-index: 0;
+  width: fit-content;
+  padding: 0.1em 0.35em 0.04em;
+  line-height: 1.05;
+  transform: rotate(-1.5deg);
+}
+:root[data-lens="calling-card"] .prose h2 {
+  font-size: 2rem;
+  background: var(--cc-red);
+  box-shadow: 5px 5px 0 var(--cc-white);
+}
+:root[data-lens="calling-card"] .prose h3 {
+  font-size: 1.5rem;
+  color: var(--cc-black);
+  background: var(--cc-white);
+  box-shadow: 4px 4px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .prose a {
+  color: var(--cc-red-text);
+  text-decoration-thickness: 2px;
+  font-weight: 700;
+}
+:root[data-lens="calling-card"] .prose strong {
+  color: var(--cc-white);
+  font-weight: 900;
+}
+:root[data-lens="calling-card"] .prose ul li::marker {
+  content: "\2605  ";
+  color: var(--cc-red);
+}
+:root[data-lens="calling-card"] .prose blockquote {
+  padding: 0.8rem 1.1rem;
+  border-left: 6px solid var(--cc-red);
+  background: #161616;
+  font-family: var(--cc-didone);
+  font-style: italic;
+}
+:root[data-lens="calling-card"] .prose code {
+  font-family: var(--cc-mono);
+  font-size: 0.9em;
+  background: #1c1c1c;
+  color: var(--cc-white);
+  padding: 0.05em 0.3em;
+}
+:root[data-lens="calling-card"] .prose hr {
+  border: 0;
+  height: 5px;
+  background: var(--cc-red);
+  transform: rotate(-0.8deg);
+}
+
+/* Media rail */
+:root[data-lens="calling-card"] .media-rail {
+  gap: 1.6rem;
+}
+:root[data-lens="calling-card"] .media-rail__item {
+  border: 0;
+  padding: 7px;
+  background: var(--cc-white);
+  box-shadow: 9px 9px 0 var(--cc-red);
+  transform: rotate(-0.8deg);
+  overflow: visible;
+}
+:root[data-lens="calling-card"] .media-rail__item:nth-child(even) {
+  transform: rotate(0.8deg);
+}
+:root[data-lens="calling-card"] .media-rail__item figcaption {
+  color: #1a1a1a;
+  font-family: var(--cc-mono);
+  font-size: 0.75rem;
+}
+
+/* Projects timeline */
+:root[data-lens="calling-card"] .timeline-year__label .ds-heading.ds-heading--section {
+  font-size: 2.6rem;
+  padding: 0.1em 0.2em 0;
+  transform: rotate(-90deg) translateX(-100%);
+  transform-origin: 0 0;
+  white-space: nowrap;
+}
+:root[data-lens="calling-card"] .timeline-year__label .ds-heading--section::first-letter {
+  font-family: var(--cc-display);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1em;
+  background: none;
+  color: var(--cc-white);
+  padding: 0;
+  margin: 0;
+}
+:root[data-lens="calling-card"] .timeline-year__projects {
+  border-left: 0;
+  background: linear-gradient(var(--cc-red), var(--cc-red)) 0 0 / 4px 100% no-repeat;
+}
+:root[data-lens="calling-card"] .timeline-entry.timeline-entry + .timeline-entry {
+  border-top: 0;
+}
+:root[data-lens="calling-card"] .timeline-entry {
+  padding-block: 1.4rem;
+}
+:root[data-lens="calling-card"] .timeline-entry::before {
+  width: 1.6rem;
+  height: 1.6rem;
+  top: 2.4rem;
+  left: calc(-1 * var(--space-xl) - 0.8rem + 2px);
+  border-radius: 0;
+  background: var(--cc-star-solid) center / contain no-repeat;
+  box-shadow: none;
+}
+:root[data-lens="calling-card"] .timeline-entry__body {
+  gap: 1.6rem;
+}
+
+/* Lab */
+:root[data-lens="calling-card"] .lab-grid {
+  gap: 2.6rem 2.2rem;
+}
+:root[data-lens="calling-card"] .lab-more .ds-link {
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .lab-aside {
+  color: #d4d4d4;
+}
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="calling-card"] .lens-decor span:nth-child(4) {
+    animation: cc-spin 38s linear infinite;
+  }
+  :root[data-lens="calling-card"] .welcome-art .decorative-blobs {
+    animation: cc-throb 2.6s steps(2, jump-none) infinite;
+  }
+  :root[data-lens="calling-card"] .hello .title {
+    animation: cc-slam 360ms cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  }
+  @keyframes cc-spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+  @keyframes cc-throb {
+    0% {
+      scale: 1;
+    }
+    100% {
+      scale: 1.04;
+    }
+  }
+  @keyframes cc-slam {
+    from {
+      opacity: 0;
+      transform: translateX(-2.5rem) scale(1.25);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-lens="calling-card"] *,
+  :root[data-lens="calling-card"] *::before,
+  :root[data-lens="calling-card"] *::after {
+    transition-duration: 0s !important;
+  }
+}
+
+/* ---------- Intermediate ---------- */
+@media (max-width: 62.5rem) {
+  :root[data-lens="calling-card"] .lens-decor span:nth-child(2) {
+    width: 40vw;
+    height: 16rem;
+    top: 5rem;
+    right: -12vw;
+    opacity: 0.9;
+  }
+  :root[data-lens="calling-card"] .lens-decor span:nth-child(1) {
+    width: 36rem;
+    left: 30%;
+  }
+  :root[data-lens="calling-card"] .welcome-art {
+    display: none;
+  }
+}
+
+/* ---------- Compact ---------- */
+@media (max-width: 40.625rem) {
+  :root[data-lens="calling-card"] .home-link {
+    font-size: 2.2rem;
+  }
+  :root[data-lens="calling-card"] .ds-link.ds-link--nav {
+    font-size: 1.15rem;
+  }
+  :root[data-lens="calling-card"] .site-nav ul {
+    grid-template-columns: repeat(3, auto);
+    gap: 0.1rem 0.3rem;
+    justify-content: space-between;
+  }
+  :root[data-lens="calling-card"] .lens-decor span:nth-child(1) {
+    width: 30rem;
+    left: 10%;
+    top: 4rem;
+  }
+  :root[data-lens="calling-card"] .lens-decor span:nth-child(2) {
+    top: 11rem;
+    width: 38vw;
+    height: 13rem;
+    right: -16vw;
+    opacity: 0.85;
+  }
+  :root[data-lens="calling-card"] .lens-decor span:nth-child(4) {
+    width: 7rem;
+    top: -2.2rem;
+    right: -2.2rem;
+  }
+  :root[data-lens="calling-card"] .lens-decor span:nth-child(3) {
+    width: 10rem;
+    left: -8.5rem;
+  }
+  :root[data-lens="calling-card"] .lens-decor span:nth-child(5),
+  :root[data-lens="calling-card"] .lens-decor span:nth-child(6) {
+    display: none;
+  }
+  :root[data-lens="calling-card"] .hello {
+    gap: 1rem 1.4rem;
+    padding-top: 1.6rem;
+  }
+  :root[data-lens="calling-card"] .hello .occupation {
+    font-size: 1rem;
+    align-self: center;
+  }
+  :root[data-lens="calling-card"] .hello figure::after {
+    width: 2.2rem;
+    top: -1rem;
+    right: -1rem;
+  }
+  :root[data-lens="calling-card"] .hello figcaption .ds-link {
+    font-size: 0.85rem;
+  }
+  :root[data-lens="calling-card"] :is(.project-row, .timeline-entry__body, .lab-card) {
+    padding: 1.2rem 1.1rem 1.4rem;
+  }
+  :root[data-lens="calling-card"] .ds-heading.ds-heading--section {
+    font-size: 1.8rem;
+  }
+  :root[data-lens="calling-card"] .timeline-year__label .ds-heading.ds-heading--section {
+    font-size: 2.4rem;
+    transform: rotate(-3deg);
+  }
+  :root[data-lens="calling-card"] .timeline-entry::before {
+    left: calc(-1 * var(--space-l) - 0.8rem + 2px);
+  }
+  :root[data-lens="calling-card"] .elsewhere > div:nth-child(2) {
+    transform: rotate(1.4deg);
+  }
+  :root[data-lens="calling-card"] .site-footer .thanks {
+    margin-left: 0;
+  }
+}
