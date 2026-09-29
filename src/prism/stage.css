@@ -1,6 +1,7 @@
 /* The prism's own chrome: the lure, the glint, the stage and its HUD.
    This is the one place outside every lens, so it belongs to none of them:
-   glass, light and a dark room. */
+   glass, light and a dark room. The lure and the stage are anchored by id so
+   no lens rule, however specific, can restyle them. */
 :root {
   --prism-void: #07070b;
   --prism-ink: #f4f1ea;
@@ -68,7 +69,7 @@
 }
 
 /* ── Prism Lure ───────────────────────────────────────────────────── */
-.prism-lure {
+#prism-lure {
   position: fixed;
   z-index: calc(var(--prism-layer) - 1);
   top: 0;
@@ -89,12 +90,12 @@
   opacity: 0;
   -webkit-tap-highlight-color: transparent;
 }
-.prism-lure.is-arriving,
-.prism-lure.is-docked {
+#prism-lure.is-arriving,
+#prism-lure.is-docked {
   opacity: 1;
   transition: opacity 0.9s ease;
 }
-.prism-lure.is-docked {
+#prism-lure.is-docked {
   top: auto;
   left: auto;
   right: 1rem;
@@ -107,7 +108,7 @@
     0 0.5rem 1.5rem rgb(0 0 0 / 0.25);
   backdrop-filter: blur(6px);
 }
-.prism-lure:focus-visible {
+#prism-lure:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 4px;
   color: #fff;
@@ -145,32 +146,32 @@
   mix-blend-mode: screen;
   pointer-events: none;
 }
-.prism-lure.is-docked .prism-lure__tail {
+#prism-lure.is-docked .prism-lure__tail {
   width: 1.4rem;
   opacity: 0.55;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .prism-lure.is-arriving {
+  #prism-lure.is-arriving {
     transition:
       opacity 0.9s ease,
       transform 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.25);
   }
-  .prism-lure.is-arriving .prism-lure__glass {
+  #prism-lure.is-arriving .prism-lure__glass {
     animation: prism-bob 2.8s ease-in-out infinite;
   }
-  .prism-lure.is-arriving .prism-lure__tail {
+  #prism-lure.is-arriving .prism-lure__tail {
     animation: prism-shimmer 1.9s ease-in-out infinite alternate;
   }
-  .prism-lure.is-dodging .prism-lure__glass {
+  #prism-lure.is-dodging .prism-lure__glass {
     animation: prism-flinch 0.42s cubic-bezier(0.3, 1.6, 0.5, 1);
   }
-  .prism-lure.is-tired .prism-lure__glass {
+  #prism-lure.is-tired .prism-lure__glass {
     animation: prism-bob 4.5s ease-in-out infinite;
   }
-  .prism-lure.is-caught .prism-lure__glass {
+  #prism-lure.is-caught .prism-lure__glass {
     animation: prism-caught 0.7s cubic-bezier(0.5, 0, 0.2, 1) forwards;
   }
-  .prism-lure.is-docked:hover .prism-lure__glass {
+  #prism-lure.is-docked:hover .prism-lure__glass {
     transform: rotate(-12deg) scale(1.08);
     transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.4);
   }
@@ -210,13 +211,17 @@
 }
 
 /* ── The stage ────────────────────────────────────────────────────── */
-.prism-stage {
+#prism-stage {
   position: fixed;
   inset: 0;
   z-index: var(--prism-layer);
   overflow: hidden;
   color: var(--prism-ink);
-  font-family: var(--prism-font);
+  font: 400 1rem/1.4 var(--prism-font);
+  letter-spacing: normal;
+  text-transform: none;
+  text-shadow: none;
+  text-align: start;
   background:
     radial-gradient(
       60% 55% at 50% 52%,
@@ -227,7 +232,7 @@
   touch-action: none;
   user-select: none;
 }
-.prism-stage[hidden] {
+#prism-stage[hidden] {
   display: none;
 }
 .prism-camera {
@@ -285,11 +290,11 @@
   background: rgb(4 4 10 / 0.5);
   opacity: 1;
 }
-.prism-stage[data-outside="true"] .prism-face::before {
+#prism-stage[data-outside="true"] .prism-face::before {
   opacity: 1;
 }
 .prism-face.is-front::after,
-.prism-stage[data-outside="false"] .prism-face::after {
+#prism-stage[data-outside="false"] .prism-face::after {
   opacity: 0;
 }
 .prism-cap {
@@ -311,7 +316,7 @@
 .prism-cap--bottom {
   transform: rotateX(-90deg) translateZ(calc(var(--face-h) / 2)) scaleY(-1);
 }
-.prism-stage[data-outside="true"] .prism-cap {
+#prism-stage[data-outside="true"] .prism-cap {
   opacity: 1;
 }
 
@@ -325,7 +330,7 @@
   transition: opacity 1.2s ease 0.3s;
   pointer-events: none;
 }
-.prism-stage[data-outside="true"] .prism-light {
+#prism-stage[data-outside="true"] .prism-light {
   opacity: 1;
 }
 .prism-beam {
@@ -356,7 +361,7 @@
   opacity: 0;
   transition: opacity 1s ease 0.9s;
 }
-.prism-stage[data-outside="true"] .prism-whisper {
+#prism-stage[data-outside="true"] .prism-whisper {
   opacity: 1;
 }
 
@@ -377,7 +382,7 @@
     transform 0.6s ease;
   pointer-events: none;
 }
-.prism-stage[data-outside="true"]:not([data-entering]) .prism-hud {
+#prism-stage[data-outside="true"]:not([data-entering]) .prism-hud {
   opacity: 1;
   transform: none;
   pointer-events: auto;
@@ -413,12 +418,12 @@
   font-size: 0.85rem;
   color: var(--prism-dim);
 }
-.prism-stage button {
+#prism-stage button {
   font: inherit;
   color: var(--prism-ink);
   cursor: pointer;
 }
-.prism-stage button:focus-visible {
+#prism-stage button:focus-visible {
   outline: 2px solid var(--prism-ink);
   outline-offset: 3px;
 }
@@ -447,14 +452,14 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.prism-stage[data-journey="first"] .prism-arrow[data-go="-1"] {
+#prism-stage[data-journey="first"] .prism-arrow[data-go="-1"] {
   visibility: hidden;
 }
 .prism-dots {
   display: flex;
   gap: 0.25rem;
 }
-.prism-stage[data-journey="first"] .prism-dots {
+#prism-stage[data-journey="first"] .prism-dots {
   display: none;
 }
 .prism-dot {
@@ -513,7 +518,7 @@
 }
 
 /* Refraction flash while the page becomes a face, and back again. */
-.prism-stage::after {
+#prism-stage::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -523,10 +528,10 @@
   opacity: 0;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .prism-stage.is-open::after {
+  #prism-stage.is-open::after {
     animation: prism-flash 0.7s ease-out;
   }
-  .prism-stage.is-leaving {
+  #prism-stage.is-leaving {
     animation: prism-leave 0.26s ease-in forwards;
   }
 }

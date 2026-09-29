@@ -69,6 +69,7 @@ export function createPrism(): Prism {
   function build() {
     if (stage) return stage;
     stage = document.createElement("div");
+    stage.id = "prism-stage";
     stage.className = "prism-stage";
     stage.hidden = true;
     stage.setAttribute("role", "dialog");

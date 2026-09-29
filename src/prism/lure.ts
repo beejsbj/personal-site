@@ -19,6 +19,7 @@ export function mountLure({ tamed, onCatch }: LureOptions) {
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lure = document.createElement("button");
   lure.type = "button";
+  lure.id = "prism-lure";
   lure.className = "prism-lure";
   lure.dataset.state = tamed ? "tamed" : "wild";
   lure.setAttribute(
