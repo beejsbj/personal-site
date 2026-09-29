@@ -1,1 +1,980 @@
-/* Lens: back-page. */
+/* Lens: back-page.
+   Dotfight's world: a war fought with a ballpoint pen on the back page of a
+   squared exercise book, under a desk lamp, grades 5 and 6. The portfolio is
+   written on that page: blue biro for headings, red biro for the second pen,
+   typewriter for the printed bits of the book, a name label for the hero,
+   covers taped in, circle camps and ink flicks in the margins. */
+@import "@fontsource/caveat/400.css";
+@import "@fontsource/caveat/700.css";
+@import "@fontsource/patrick-hand/400.css";
+@import "@fontsource/special-elite/400.css";
+
+/* ---- tokens --------------------------------------------------------------- */
+:root[data-lens="back-page"] {
+  /* Dotfight's Lamplight theme */
+  --bp-paper: #f3efe4;
+  --bp-blue: #1b3899;
+  --bp-red: #c01e2a;
+  --bp-pencil: #3f3c39;
+  --bp-fine: #5e5953; /* darker than Dotfight's #77726c so small text passes AA */
+  --bp-tape: #e6d6ad;
+  --bp-kraft: #9a6f45;
+  --bp-label: #fbf8f0;
+  --bp-label-ink: #3a5fa8;
+  --bp-desk: #1a100b;
+  --bp-grid: rgba(84, 128, 168, 0.22);
+  --bp-grid-size: 22px;
+  --bp-margin-x: 3.25rem;
+  --bp-margin-line: rgba(200, 64, 64, 0.5);
+  --bp-hand: "Caveat", "Patrick Hand", cursive;
+  --bp-print: "Patrick Hand", "Caveat", sans-serif;
+  --bp-type: "Special Elite", "Courier New", monospace;
+
+  /* inline artwork */
+  --bp-scribble-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'%3E%3Cpath d='M1 6 C 18 3, 34 8, 52 5 S 84 3, 99 6' fill='none' stroke='%23c01e2a' stroke-width='1.8' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --bp-scribble-blue: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C 22 7, 40 3, 60 6 S 88 5, 99 4' fill='none' stroke='%231b3899' stroke-opacity='.45' stroke-width='1.4' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --bp-double-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 14' preserveAspectRatio='none'%3E%3Cpath d='M2 6 C 25 3, 50 8, 98 4 M6 11 C 35 8, 62 12, 90 9' fill='none' stroke='%23c01e2a' stroke-width='1.8' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --bp-circle-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M64 5 C 100 3, 117 13, 115 26 C 113 41, 82 47, 56 46 C 26 45, 5 38, 6 24 C 7 11, 33 4, 76 7' fill='none' stroke='%23c01e2a' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --bp-circle-blue: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M58 4 C 96 3, 116 12, 115 25 C 114 40, 84 47, 58 46 C 27 45, 4 39, 5 25 C 6 11, 30 5, 70 7' fill='none' stroke='%231b3899' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --bp-camp-blue: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='%233f3c39' stroke-opacity='.22' stroke-width='1'/%3E%3Cpath d='M50 9 C 74 8, 91 27, 90 51 C 89 75, 71 91, 49 90 C 25 89, 9 72, 10 49 C 11 26, 28 10, 56 10' fill='none' stroke='%231b3899' stroke-width='2.2' stroke-linecap='round'/%3E%3Cg fill='%231b3899'%3E%3Ccircle cx='38' cy='34' r='3.2'/%3E%3Ccircle cx='55' cy='30' r='3'/%3E%3Ccircle cx='68' cy='44' r='3.2'/%3E%3Ccircle cx='44' cy='49' r='3'/%3E%3Ccircle cx='58' cy='58' r='3.1'/%3E%3Ccircle cx='31' cy='61' r='3'/%3E%3Ccircle cx='50' cy='71' r='3.2'/%3E%3Ccircle cx='69' cy='66' r='3'/%3E%3Ccircle cx='27' cy='44' r='3'/%3E%3C/g%3E%3Cpath d='M52 52l12 12M64 52l-12 12M25 55l12 12M37 55l-12 12' stroke='%23c01e2a' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  --bp-camp-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='%233f3c39' stroke-opacity='.2' stroke-width='1'/%3E%3Cpath d='M48 10 C 72 9, 90 26, 90 50 C 90 74, 73 90, 50 90 C 26 90, 10 73, 10 50 C 10 28, 26 12, 54 11' fill='none' stroke='%23c01e2a' stroke-width='2.2' stroke-linecap='round'/%3E%3Cg fill='%23c01e2a'%3E%3Ccircle cx='40' cy='32' r='3.2'/%3E%3Ccircle cx='60' cy='36' r='3'/%3E%3Ccircle cx='33' cy='50' r='3.1'/%3E%3Ccircle cx='52' cy='52' r='3.2'/%3E%3Ccircle cx='70' cy='54' r='3'/%3E%3Ccircle cx='42' cy='68' r='3'/%3E%3Ccircle cx='61' cy='70' r='3.1'/%3E%3C/g%3E%3Cpath d='M34 26l12 12M46 26l-12 12M46 46l12 12M58 46l-12 12M64 48l12 12M76 48l-12 12' stroke='%231b3899' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  --bp-flicks-blue: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%231b3899' stroke-linecap='round' stroke-width='1' vector-effect='non-scaling-stroke'%3E%3Cpath d='M20 590 C 120 400, 260 200, 395 8' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M28 596 C 150 420, 280 250, 380 60' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M14 580 L 330 4' vector-effect='non-scaling-stroke'/%3E%3C/g%3E%3C/svg%3E");
+  --bp-flicks-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23c01e2a' stroke-linecap='round' stroke-width='1' vector-effect='non-scaling-stroke'%3E%3Cpath d='M390 10 C 300 200, 180 380, 8 596' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M396 30 L 60 598' vector-effect='non-scaling-stroke'/%3E%3C/g%3E%3C/svg%3E");
+  --bp-battle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 290'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M70 205 L 196 78 M78 212 L 214 92 M62 196 L 150 20 M84 214 L 270 140' stroke='%231b3899' stroke-width='1' stroke-opacity='.75'/%3E%3Cpath d='M200 84 L 60 250 M206 90 L 30 170 M194 76 L 120 280' stroke='%23c01e2a' stroke-width='1' stroke-opacity='.75'/%3E%3C/g%3E%3Cpath d='M70 158 C 98 157, 118 178, 117 204 C 116 231, 96 250, 70 249 C 43 248, 24 229, 25 203 C 26 178, 44 158, 78 160' fill='none' stroke='%231b3899' stroke-width='2.4' stroke-linecap='round'/%3E%3Cg fill='%231b3899'%3E%3Ccircle cx='56' cy='186' r='3.6'/%3E%3Ccircle cx='76' cy='180' r='3.4'/%3E%3Ccircle cx='92' cy='196' r='3.6'/%3E%3Ccircle cx='62' cy='206' r='3.4'/%3E%3Ccircle cx='80' cy='214' r='3.6'/%3E%3Ccircle cx='48' cy='222' r='3.4'/%3E%3Ccircle cx='70' cy='232' r='3.4'/%3E%3Ccircle cx='96' cy='226' r='3.4'/%3E%3C/g%3E%3Cpath d='M74 208l12 12M86 208l-12 12M42 216l12 12M54 216l-12 12' stroke='%23c01e2a' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M200 36 C 226 35, 246 55, 245 82 C 244 108, 224 127, 199 126 C 173 125, 154 106, 155 80 C 156 55, 176 36, 208 38' fill='none' stroke='%23c01e2a' stroke-width='2.4' stroke-linecap='round'/%3E%3Cg fill='%23c01e2a'%3E%3Ccircle cx='186' cy='62' r='3.4'/%3E%3Ccircle cx='208' cy='58' r='3.6'/%3E%3Ccircle cx='226' cy='76' r='3.4'/%3E%3Ccircle cx='178' cy='86' r='3.6'/%3E%3Ccircle cx='200' cy='84' r='3.4'/%3E%3Ccircle cx='220' cy='100' r='3.4'/%3E%3Ccircle cx='194' cy='108' r='3.4'/%3E%3C/g%3E%3Cpath d='M194 78l12 12M206 78l-12 12M180 56l12 12M192 56l-12 12M214 94l12 12M226 94l-12 12' stroke='%231b3899' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M232 196 C 252 195, 267 211, 266 231 C 265 251, 250 265, 231 264 C 211 263, 197 248, 198 229 C 199 210, 212 196, 238 198' fill='none' stroke='%23c01e2a' stroke-width='2' stroke-linecap='round' stroke-opacity='.8'/%3E%3Cg fill='%23c01e2a' fill-opacity='.85'%3E%3Ccircle cx='222' cy='220' r='3.2'/%3E%3Ccircle cx='242' cy='224' r='3.2'/%3E%3Ccircle cx='230' cy='244' r='3.2'/%3E%3C/g%3E%3C/svg%3E");
+  --bp-ring: radial-gradient(
+      circle at 50% 50%,
+      transparent 0 55%,
+      rgba(128, 82, 38, 0.1) 57%,
+      rgba(128, 82, 38, 0.32) 60%,
+      rgba(128, 82, 38, 0.12) 63%,
+      transparent 67%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(150, 100, 50, 0.07) 0 56%,
+      transparent 58%
+    );
+
+  /* base tokens */
+  --color-page: var(--bp-paper);
+  --color-surface: var(--bp-label);
+  --color-surface-strong: var(--bp-tape);
+  --color-text: var(--bp-pencil);
+  --color-text-soft: var(--bp-fine);
+  --color-border: rgba(27, 56, 153, 0.3);
+  --color-accent: var(--bp-blue);
+  --color-accent-pressed: var(--bp-red);
+  --color-accent-contrast: var(--bp-paper);
+  --color-hover: rgba(192, 30, 42, 0.08);
+  --color-link-rule: rgba(27, 56, 153, 0.35);
+  --color-texture: rgba(84, 128, 168, 0.25);
+  --font-sans: var(--bp-print);
+  --font-serif: var(--bp-hand);
+
+  --text-xs: 0.8125rem;
+  --text-sm: 1rem;
+  --text-copy: 1.125rem;
+  --text-base: 1.1875rem;
+  --text-lead: 1.3125rem;
+  --text-card: 2.25rem;
+  --text-section: 2.625rem;
+  --text-page: clamp(3.4rem, 7.5vw, 5.4rem);
+  --text-display: clamp(4.2rem, 7vw, 6.2rem);
+  --text-display-compact: clamp(3.4rem, 15vw, 4.9rem);
+  --weight-medium: 700;
+  --weight-bold: 700;
+  --leading-display: 0.9;
+  --leading-heading: 1;
+  --leading-tight: 1.3;
+  --leading-body: 1.5;
+  --tracking-display: 0;
+  --tracking-heading: 0;
+  --radius-note: 3px;
+  --radius-portrait: 50% 46% 52% 44% / 55% 50% 48% 52%;
+  --shell-gutter: 5rem;
+  --underline-offset: 0.28em;
+  --texture: var(--bp-paper);
+  --focus-width: 2px;
+  --focus-offset: 4px;
+  --duration-fast: 220ms;
+
+  background: var(--bp-desk);
+  scrollbar-color: var(--bp-kraft) var(--bp-desk);
+}
+@media (max-width: 40.625rem) {
+  :root[data-lens="back-page"] {
+    --shell-gutter: 1.35rem;
+    --bp-margin-x: 0.85rem;
+    --bp-grid-size: 18px;
+    --text-card: 2rem;
+    --text-section: 2.25rem;
+    --text-base: 1.125rem;
+    --text-copy: 1.0625rem;
+  }
+}
+
+/* ---- the desk and the page ----------------------------------------------- */
+:root[data-lens="back-page"] body {
+  background:
+    radial-gradient(ellipse 70% 55% at 28% 0%, rgba(255, 196, 120, 0.2), transparent 70%),
+    repeating-linear-gradient(
+      91deg,
+      rgba(0, 0, 0, 0.18) 0 2px,
+      transparent 2px 9px,
+      rgba(255, 220, 180, 0.025) 9px 11px,
+      transparent 11px 23px
+    ),
+    linear-gradient(180deg, #2a1a10, var(--bp-desk) 60%);
+  background-attachment: fixed;
+  color: var(--bp-pencil);
+  font-family: var(--bp-print);
+}
+:root[data-lens="back-page"] ::selection {
+  background: rgba(255, 214, 64, 0.55);
+  color: var(--bp-pencil);
+}
+
+:root[data-lens="back-page"] .site-frame {
+  width: min(76rem, calc(100% - 3rem));
+  margin: 1.75rem auto 3rem;
+  padding-top: 2.4rem;
+  min-height: calc(100vh - 4.75rem);
+  background:
+    /* the red margin, drawn twice like a real book */
+    linear-gradient(
+      90deg,
+      transparent calc(var(--bp-margin-x) - 1px),
+      var(--bp-margin-line) calc(var(--bp-margin-x) - 1px) var(--bp-margin-x),
+      transparent var(--bp-margin-x) calc(var(--bp-margin-x) + 3px),
+      rgba(200, 64, 64, 0.28) calc(var(--bp-margin-x) + 3px) calc(var(--bp-margin-x) + 4px),
+      transparent calc(var(--bp-margin-x) + 4px)
+    ),
+    /* the header band above the grid */
+    linear-gradient(180deg, var(--bp-paper) 0 1.9rem, transparent 1.9rem),
+    /* squares */
+    repeating-linear-gradient(90deg, var(--bp-grid) 0 1px, transparent 1px var(--bp-grid-size)),
+    repeating-linear-gradient(180deg, var(--bp-grid) 0 1px, transparent 1px var(--bp-grid-size)),
+    /* aged paper under the lamp */
+    radial-gradient(ellipse 90% 40% at 30% 0%, rgba(255, 246, 225, 0.8), transparent 70%),
+    linear-gradient(180deg, var(--bp-paper), #efe7d4);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 24px 60px rgba(0, 0, 0, 0.6),
+    0 6px 16px rgba(0, 0, 0, 0.35);
+}
+/* the printed "Page No. / Date" of every exercise-book page */
+:root[data-lens="back-page"] .site-frame::before {
+  content: "Page No. ___1___          Date ____________";
+  position: absolute;
+  top: 0.55rem;
+  right: 1.5rem;
+  font: 0.72rem/1 var(--bp-type);
+  letter-spacing: 0.04em;
+  white-space: pre;
+  color: rgba(58, 95, 168, 0.8);
+  pointer-events: none;
+}
+/* the lamp: a warm pool of light, the room falling dark at the edges */
+:root[data-lens="back-page"] .site-frame::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 8%, rgba(255, 190, 110, 0.07), transparent 70%),
+    radial-gradient(ellipse 90% 95% at 38% 25%, transparent 62%, rgba(25, 12, 4, 0.14) 86%, rgba(15, 7, 2, 0.3) 100%);
+}
+:root[data-lens="back-page"] .edge-blob {
+  display: none;
+}
+:root[data-lens="back-page"] .skip-link {
+  font-family: var(--bp-type);
+}
+:root[data-lens="back-page"] :focus-visible {
+  outline: 2px dashed var(--bp-red);
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+/* ---- header -------------------------------------------------------------- */
+:root[data-lens="back-page"] .site-header {
+  border-bottom: 0;
+  position: relative;
+  padding-block: 0.5rem 1rem;
+}
+:root[data-lens="back-page"] .site-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 10px;
+  background: var(--bp-scribble-blue) center / 100% 100% no-repeat;
+}
+:root[data-lens="back-page"] .site-header .home-link {
+  position: relative;
+  display: inline-block;
+  font-family: var(--bp-hand);
+  font-weight: 700;
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: 0;
+  text-decoration: none;
+  /* "burooj" in the first pen, the full stop in the second, as Dot/fight */
+  background: linear-gradient(90deg, var(--bp-blue) 0 83%, var(--bp-red) 83%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transform: rotate(-3deg);
+  padding: 0 0.1em;
+}
+:root[data-lens="back-page"] .site-header .home-link:hover {
+  text-decoration: none;
+}
+
+/* nav: words on the page; hover circles one in red, the current one is
+   already circled in blue, like the card in hand */
+:root[data-lens="back-page"] .site-nav {
+  font-size: 1.1875rem;
+}
+:root[data-lens="back-page"] .site-nav ul {
+  gap: 0 1.25rem;
+}
+:root[data-lens="back-page"] .ds-link.ds-link--nav {
+  position: relative;
+  color: var(--bp-pencil);
+  text-decoration: none;
+  padding-inline: 0.4rem;
+}
+:root[data-lens="back-page"] .ds-link.ds-link--nav::after {
+  content: "";
+  position: absolute;
+  inset: 0.35rem -0.35rem 0.25rem -0.45rem;
+  background: var(--bp-circle-red) center / 100% 100% no-repeat;
+  clip-path: inset(0 100% 0 0);
+  transform: rotate(-3deg);
+  pointer-events: none;
+}
+:root[data-lens="back-page"] .ds-link.ds-link--nav:is(:hover, :focus-visible) {
+  color: var(--bp-red);
+  text-decoration: none;
+}
+:root[data-lens="back-page"] .ds-link.ds-link--nav:is(:hover, :focus-visible)::after {
+  clip-path: inset(0 0 0 0);
+}
+:root[data-lens="back-page"] .ds-link.ds-link--nav[aria-current] {
+  color: var(--bp-blue);
+  font-weight: 400;
+  text-decoration: none;
+}
+:root[data-lens="back-page"] .ds-link.ds-link--nav[aria-current]::after {
+  background-image: var(--bp-circle-blue);
+  clip-path: inset(0 0 0 0);
+  transform: rotate(2deg);
+}
+:root[data-lens="back-page"] .ds-link.ds-link--nav:active {
+  color: var(--bp-red);
+}
+
+/* ---- links: blue biro underline, hover redraws it in red --------------------- */
+:root[data-lens="back-page"] .ds-link {
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .ds-link.ds-link--text {
+  text-decoration: none;
+  background:
+    var(--bp-scribble-red) left bottom / 0% 0.42em no-repeat,
+    var(--bp-scribble-blue) left bottom / 100% 0.42em no-repeat;
+  padding-bottom: 0.18em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+:root[data-lens="back-page"] .ds-link.ds-link--text:is(:hover, :focus-visible) {
+  color: var(--bp-red);
+  text-decoration: none;
+  background-size: 100% 0.42em, 100% 0.42em;
+}
+:root[data-lens="back-page"] .ds-link:hover {
+  text-decoration: none;
+}
+:root[data-lens="back-page"] .ds-link:active {
+  color: var(--bp-red);
+}
+:root[data-lens="back-page"] .link-arrow {
+  stroke-width: 1.8;
+}
+:root[data-lens="back-page"] .ds-link.ds-link--action {
+  font-family: var(--bp-hand);
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--bp-label);
+  border: 0;
+  color: var(--bp-blue);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 5px 12px rgba(40, 20, 5, 0.25);
+  transform: rotate(-1.2deg);
+}
+:root[data-lens="back-page"] .ds-link.ds-link--action:hover {
+  color: var(--bp-red);
+  background: var(--bp-label);
+}
+
+/* ---- headings ------------------------------------------------------------ */
+:root[data-lens="back-page"] :is(h1, h2, h3, h4),
+:root[data-lens="back-page"] .ds-heading {
+  font-family: var(--bp-hand);
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .ds-heading.ds-heading--label {
+  font: 400 1.0625rem/1.3 var(--bp-type);
+  color: var(--bp-pencil);
+}
+/* section headings get a red double underline, the way you'd rule off a title */
+:root[data-lens="back-page"] .section-heading .ds-heading,
+:root[data-lens="back-page"] .page-header .ds-heading,
+:root[data-lens="back-page"] .section-intro .ds-heading {
+  width: fit-content;
+  padding-bottom: 0.2em;
+  background: var(--bp-double-red) left bottom / 100% 0.32em no-repeat;
+  transform: rotate(-1deg);
+  transform-origin: left center;
+}
+:root[data-lens="back-page"] .section-heading {
+  align-items: end;
+}
+
+/* meta in the typewriter that printed the book */
+:root[data-lens="back-page"] :is(
+    .meta,
+    .event-origin,
+    .update-entry time,
+    .timeline-entry__meta,
+    .page-header__eyebrow,
+    .section-intro__eyebrow,
+    .entry-page__label,
+    .entry-page__meta,
+    .stream-caption
+  ) {
+  font-family: var(--bp-type);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--bp-fine);
+}
+:root[data-lens="back-page"] :is(.page-header__eyebrow, .section-intro__eyebrow) {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--bp-label-ink);
+}
+:root[data-lens="back-page"] .ds-tags {
+  font-family: var(--bp-hand);
+  font-size: 1.2rem;
+  color: var(--bp-fine);
+  gap: 0.2rem 0.5rem;
+}
+:root[data-lens="back-page"] .ds-tags li + li::before {
+  content: "·";
+  margin-right: 0.5rem;
+}
+
+/* ---- the hero: the exercise-book name label ------------------------------ */
+:root[data-lens="back-page"] .hello {
+  position: relative;
+  margin: 2.25rem 0 1rem;
+  padding: 3rem 2.75rem 2.25rem;
+  background: var(--bp-label);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 0 5px var(--bp-label),
+    inset 0 0 0 6.5px var(--bp-label-ink),
+    inset 0 0 0 9px var(--bp-label),
+    inset 0 0 0 10px var(--bp-label-ink),
+    0 2px 3px rgba(0, 0, 0, 0.18),
+    0 14px 30px rgba(60, 35, 10, 0.18);
+  transform: rotate(-0.8deg);
+  align-items: start;
+}
+:root[data-lens="back-page"] .hello::before {
+  content: "EXERCISE BOOK · SQUARED · 80 PAGES";
+  position: absolute;
+  top: 1.35rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font: 0.72rem/1 var(--bp-type);
+  letter-spacing: 0.16em;
+  color: var(--bp-label-ink);
+}
+:root[data-lens="back-page"] .hello .greeting {
+  font-family: var(--bp-hand);
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--bp-pencil);
+  transform: rotate(-2deg);
+  width: fit-content;
+}
+:root[data-lens="back-page"] .hello .title {
+  margin: 0.25rem 0 1rem;
+}
+:root[data-lens="back-page"] .hello .ds-heading--display {
+  width: fit-content;
+  padding: 0 0.12em 0.08em 0;
+  /* "Burooj" in blue biro, "here!" in red */
+  background: linear-gradient(90deg, var(--bp-blue) 0 55%, var(--bp-red) 55%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transform: rotate(-2.5deg);
+}
+/* the label's ruled fields */
+:root[data-lens="back-page"] .hello :is(.occupation, .welcome) {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0.35rem 0 0.15rem;
+  max-width: none;
+  border-bottom: 1.5px solid rgba(58, 95, 168, 0.5);
+  font-family: var(--bp-hand);
+  font-size: 1.6rem;
+  line-height: 1.15;
+  color: var(--bp-label-ink);
+}
+:root[data-lens="back-page"] .hello :is(.occupation, .welcome)::before {
+  flex: none;
+  width: 4.6rem;
+  font: 0.82rem/1 var(--bp-type);
+  color: var(--bp-label-ink);
+}
+:root[data-lens="back-page"] .hello .occupation::before {
+  content: "Subject";
+}
+:root[data-lens="back-page"] .hello .welcome::before {
+  content: "Class";
+}
+:root[data-lens="back-page"] .hello .welcome {
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .hello .socials {
+  margin-top: 1.4rem;
+  gap: 0.5rem 1.5rem;
+  font-size: 1.2rem;
+}
+/* the photo, taped to the label */
+:root[data-lens="back-page"] .hello figure {
+  position: relative;
+  transform: rotate(3.5deg);
+  margin-top: 0.4rem;
+}
+:root[data-lens="back-page"] .hello figure::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: -0.7rem;
+  left: 50%;
+  width: 4.6rem;
+  height: 1.35rem;
+  translate: -50% 0;
+  rotate: -6deg;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(120, 90, 40, 0.08)),
+    rgba(230, 214, 173, 0.88);
+  clip-path: polygon(0 8%, 4% 0, 96% 5%, 100% 0, 97% 50%, 100% 100%, 95% 94%, 4% 100%, 0 92%, 3% 50%);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+:root[data-lens="back-page"] .hello figure img {
+  border: 0.45rem solid #fffdf7;
+  border-bottom-width: 1.6rem;
+  border-radius: 2px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15), 0 8px 18px rgba(50, 30, 10, 0.25);
+}
+:root[data-lens="back-page"] .hello figcaption {
+  margin-top: -1.45rem;
+  position: relative;
+  font-family: var(--bp-hand);
+  font-size: 1.15rem;
+  line-height: 1.3;
+}
+:root[data-lens="back-page"] .hello figcaption .ds-link.ds-link--text {
+  background-size: 0% 0.42em, 0% 0.42em;
+}
+:root[data-lens="back-page"] .hello figcaption .ds-link.ds-link--text:is(:hover, :focus-visible) {
+  background-size: 100% 0.42em, 0% 0.42em;
+}
+
+/* the blob art becomes a skirmish in the corner of the page */
+:root[data-lens="back-page"] .welcome-art {
+  background: var(--bp-battle) center / contain no-repeat;
+  transform: rotate(-4deg);
+}
+:root[data-lens="back-page"] .welcome-art .decorative-blobs {
+  visibility: hidden;
+}
+
+/* ---- the lower page ------------------------------------------------------ */
+:root[data-lens="back-page"] .home-composition .below {
+  border-top: 0;
+  padding-top: 2.5rem;
+}
+:root[data-lens="back-page"] .home-composition .below > aside {
+  border-left: 0;
+  padding-left: 0;
+}
+:root[data-lens="back-page"] .home-composition .elsewhere {
+  border-top: 0;
+}
+
+/* project rows: ruled off with a pencil line */
+:root[data-lens="back-page"] .project-row {
+  border-top: 1.5px dashed rgba(63, 60, 57, 0.28);
+  padding-block: 2rem;
+  gap: 2rem;
+}
+:root[data-lens="back-page"] .project-row .summary {
+  line-height: 1.45;
+}
+:root[data-lens="back-page"] .project-row .ds-heading {
+  line-height: 1.05;
+}
+
+/* covers, taped into the book */
+:root[data-lens="back-page"] .ds-media {
+  padding: 0.5rem;
+  background: #fffdf7;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12), 0 10px 22px rgba(60, 35, 10, 0.2);
+  transform: rotate(-1.4deg);
+  margin: 0.8rem 0.4rem 0.4rem;
+}
+:root[data-lens="back-page"] .ds-media::before,
+:root[data-lens="back-page"] .ds-media::after {
+  width: 5.2rem;
+  height: 1.45rem;
+  border: 0;
+  z-index: 1;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(120, 90, 40, 0.08)),
+    rgba(230, 214, 173, 0.86);
+  clip-path: polygon(0 8%, 4% 0, 96% 5%, 100% 0, 97% 50%, 100% 100%, 95% 94%, 4% 100%, 0 92%, 3% 50%);
+}
+:root[data-lens="back-page"] .ds-media::before {
+  top: -0.6rem;
+  left: -1.4rem;
+  rotate: -38deg;
+}
+:root[data-lens="back-page"] .ds-media::after {
+  top: -0.6rem;
+  right: -1.4rem;
+  bottom: auto;
+  rotate: 36deg;
+}
+:root[data-lens="back-page"] :is(.project-row:nth-of-type(2n), .lab-card:nth-child(2n), .timeline-entry:nth-child(2n)) .ds-media {
+  transform: rotate(1.3deg);
+}
+:root[data-lens="back-page"] .project-row:nth-of-type(3n) .ds-media {
+  transform: rotate(-0.6deg);
+}
+:root[data-lens="back-page"] a.ds-media:hover {
+  outline: 0;
+}
+:root[data-lens="back-page"] .ds-media img {
+  filter: saturate(0.92) contrast(0.98);
+}
+
+/* the aside: an index card clipped to the page */
+:root[data-lens="back-page"] .current-note,
+:root[data-lens="back-page"] .ds-note--paper {
+  position: relative;
+  padding: 1.6rem 1.25rem 1.25rem;
+  border-bottom: 0;
+  background:
+    linear-gradient(transparent 2.9rem, rgba(200, 64, 64, 0.45) 2.9rem calc(2.9rem + 1.5px), transparent calc(2.9rem + 1.5px)),
+    repeating-linear-gradient(180deg, transparent 0 1.6rem, rgba(84, 128, 168, 0.28) 1.6rem calc(1.6rem + 1px)) 0 2.9rem / 100% 100% no-repeat,
+    #fcfaf3;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15), 0 10px 22px rgba(60, 35, 10, 0.18);
+  transform: rotate(1.4deg);
+}
+:root[data-lens="back-page"] .current-note .ds-note--paper {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+:root[data-lens="back-page"] .current-note .ds-heading {
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-top: -0.4rem;
+}
+:root[data-lens="back-page"] .current-note p {
+  line-height: 1.6rem;
+}
+:root[data-lens="back-page"] .current-note strong {
+  font-weight: 400;
+  color: var(--bp-red);
+}
+:root[data-lens="back-page"] .home-composition .updates {
+  padding-top: 2.5rem;
+}
+
+/* update stream: every event is a little circle camp */
+:root[data-lens="back-page"] .event-mark {
+  background: none;
+  color: var(--bp-blue);
+  border: 2px solid var(--bp-blue);
+  border-radius: 50% 46% 52% 44% / 55% 50% 48% 52%;
+  rotate: -8deg;
+}
+:root[data-lens="back-page"] .update-entry:nth-child(odd) .event-mark,
+:root[data-lens="back-page"] li:nth-child(even) .event-mark {
+  color: var(--bp-red);
+  border-color: var(--bp-red);
+  rotate: 6deg;
+}
+:root[data-lens="back-page"] .update-entry--connected::before {
+  border-inline-start: 1px solid rgba(27, 56, 153, 0.45);
+  rotate: 1.5deg;
+}
+:root[data-lens="back-page"] .event-title {
+  font-weight: 400;
+  font-size: 1.125rem;
+}
+:root[data-lens="back-page"] .stream-intro {
+  font-family: var(--bp-hand);
+  font-size: 1.3rem;
+  color: var(--bp-pencil);
+}
+:root[data-lens="back-page"] .stream-caption {
+  border-top: 1.5px dashed rgba(63, 60, 57, 0.3);
+}
+
+/* elsewhere: the two cards on the desk, move / shoot */
+:root[data-lens="back-page"] .home-composition .elsewhere > div {
+  position: relative;
+  padding: 1.2rem 1.4rem 1.1rem;
+  background:
+    linear-gradient(transparent 0.9rem, rgba(84, 128, 168, 0.35) 0.9rem calc(0.9rem + 1.5px), transparent calc(0.9rem + 1.5px)),
+    radial-gradient(ellipse at 30% 20%, rgba(255, 250, 240, 0.7), transparent 70%),
+    #f6f1e4;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 8px 18px rgba(60, 35, 10, 0.22);
+  transform: rotate(-1deg);
+  transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+:root[data-lens="back-page"] .home-composition .elsewhere > div + div {
+  transform: rotate(1.1deg);
+}
+:root[data-lens="back-page"] .home-composition .elsewhere .ds-heading {
+  font-size: 2.6rem;
+}
+:root[data-lens="back-page"] .home-composition .elsewhere p {
+  font-family: var(--bp-hand);
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--bp-fine);
+}
+:root[data-lens="back-page"] .home-composition .elsewhere > div:has(a:hover),
+:root[data-lens="back-page"] .home-composition .elsewhere > div:has(a:focus-visible) {
+  transform: translateY(-4px) rotate(-1.6deg);
+}
+:root[data-lens="back-page"] .home-composition .elsewhere > div + div:has(a:hover),
+:root[data-lens="back-page"] .home-composition .elsewhere > div + div:has(a:focus-visible) {
+  transform: translateY(-4px) rotate(1.6deg);
+}
+
+/* ---- inner pages --------------------------------------------------------- */
+:root[data-lens="back-page"] .page-header__intro,
+:root[data-lens="back-page"] .section-intro__intro {
+  font-family: var(--bp-hand);
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: var(--bp-pencil);
+}
+:root[data-lens="back-page"] .prose :is(h2, h3) {
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .prose strong {
+  color: var(--bp-red);
+  font-weight: 400;
+}
+:root[data-lens="back-page"] .prose blockquote {
+  border-left: 2px solid var(--bp-red);
+  font-family: var(--bp-hand);
+  font-size: 1.4rem;
+}
+:root[data-lens="back-page"] .prose code,
+:root[data-lens="back-page"] code {
+  font-family: var(--bp-type);
+  font-size: 0.85em;
+  background: rgba(230, 214, 173, 0.55);
+  padding: 0 0.25em;
+}
+:root[data-lens="back-page"] .prose hr,
+:root[data-lens="back-page"] hr {
+  border: 0;
+  height: 10px;
+  background: var(--bp-scribble-blue) center / 100% 100% no-repeat;
+}
+:root[data-lens="back-page"] .media-rail__item img,
+:root[data-lens="back-page"] .media-rail__item video {
+  border: 0.45rem solid #fffdf7;
+  box-shadow: 0 8px 18px rgba(60, 35, 10, 0.2);
+}
+:root[data-lens="back-page"] figcaption {
+  font-family: var(--bp-hand);
+  font-size: 1.15rem;
+}
+:root[data-lens="back-page"] .timeline-year__label .ds-heading {
+  color: var(--bp-red);
+  transform: rotate(-4deg);
+}
+:root[data-lens="back-page"] .timeline-year__projects {
+  border-left: 1.5px solid rgba(27, 56, 153, 0.45);
+}
+:root[data-lens="back-page"] .timeline-entry::before {
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--bp-blue);
+  box-shadow: 0 0 0 4px var(--bp-paper), 0 0 0 5.5px var(--bp-blue);
+}
+:root[data-lens="back-page"] .timeline-entry + .timeline-entry,
+:root[data-lens="back-page"] .lab-card {
+  border-top: 1.5px dashed rgba(63, 60, 57, 0.28);
+}
+:root[data-lens="back-page"] table {
+  font-family: var(--bp-print);
+}
+:root[data-lens="back-page"] :is(th, td) {
+  border-color: rgba(27, 56, 153, 0.3);
+}
+
+/* ---- footer: signed at the bottom of the page ---------------------------- */
+:root[data-lens="back-page"] .site-footer {
+  position: relative;
+  border-top: 0;
+  padding-top: 1.75rem;
+  align-items: baseline;
+  font-family: var(--bp-type);
+  font-size: 0.85rem;
+  color: var(--bp-fine);
+}
+:root[data-lens="back-page"] .site-footer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 10px;
+  background: var(--bp-scribble-blue) center / 100% 100% no-repeat;
+}
+:root[data-lens="back-page"] .site-footer .ds-link {
+  font-family: var(--bp-print);
+  font-size: 1.05rem;
+}
+:root[data-lens="back-page"] .site-footer .thanks {
+  font-family: var(--bp-hand);
+  font-weight: 700;
+  font-size: 1.7rem;
+  line-height: 1;
+  color: var(--bp-red);
+  transform: rotate(-3deg);
+}
+
+/* ---- the margins: camps, flicks, a coffee ring --------------------------- */
+:root[data-lens="back-page"] .lens-decor {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+:root[data-lens="back-page"] .lens-decor span {
+  position: absolute;
+  display: block;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+/* coffee ring, top right, where the mug always went */
+:root[data-lens="back-page"] .lens-decor span:nth-child(1) {
+  top: 5.5rem;
+  right: -2.5rem;
+  width: 12rem;
+  height: 12rem;
+  background: var(--bp-ring);
+}
+/* a second, fainter half ring lower down */
+:root[data-lens="back-page"] .lens-decor span:nth-child(2) {
+  top: 64%;
+  left: -4rem;
+  width: 9.5rem;
+  height: 9.5rem;
+  background: var(--bp-ring);
+  opacity: 0.6;
+  rotate: 40deg;
+}
+/* blue camp in the left margin */
+:root[data-lens="back-page"] .lens-decor span:nth-child(3) {
+  top: 34%;
+  left: -1.5rem;
+  width: 4.6rem;
+  height: 4.6rem;
+  background-image: var(--bp-camp-blue);
+  opacity: 0.85;
+}
+/* red camp on the right edge */
+:root[data-lens="back-page"] .lens-decor span:nth-child(4) {
+  top: 48%;
+  right: -1.2rem;
+  width: 4.2rem;
+  height: 4.2rem;
+  background-image: var(--bp-camp-red);
+  opacity: 0.85;
+}
+/* flicks: the ink lines that went wide and ran off the page */
+:root[data-lens="back-page"] .lens-decor span:nth-child(5) {
+  top: 28%;
+  left: 0;
+  width: 55%;
+  height: 40%;
+  background-image: var(--bp-flicks-blue);
+  opacity: 0.2;
+}
+:root[data-lens="back-page"] .lens-decor span:nth-child(6) {
+  top: 40%;
+  right: 0;
+  width: 40%;
+  height: 30%;
+  background-image: var(--bp-flicks-red);
+  opacity: 0.18;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="back-page"] .ds-link.ds-link--nav::after {
+    transition: clip-path 320ms cubic-bezier(0.3, 0.7, 0.3, 1);
+  }
+  :root[data-lens="back-page"] .ds-link.ds-link--text {
+    transition: color 160ms ease, background-size 360ms cubic-bezier(0.3, 0.7, 0.3, 1);
+  }
+  :root[data-lens="back-page"] .lens-decor span:nth-child(3) {
+    animation: bp-drift 11s ease-in-out infinite alternate;
+  }
+  :root[data-lens="back-page"] .lens-decor span:nth-child(4) {
+    animation: bp-drift 13s ease-in-out -4s infinite alternate-reverse;
+  }
+  :root[data-lens="back-page"] .ds-media {
+    transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1.3);
+  }
+  :root[data-lens="back-page"] .project-row:hover .ds-media {
+    transform: rotate(0deg) translateY(-3px);
+  }
+}
+@keyframes bp-drift {
+  from {
+    transform: translate(0, 0) rotate(-4deg);
+  }
+  to {
+    transform: translate(3px, -8px) rotate(5deg);
+  }
+}
+
+/* ---- intermediate -------------------------------------------------------- */
+@media (max-width: 62.5rem) {
+  :root[data-lens="back-page"] .site-frame::after {
+    background: radial-gradient(ellipse 100% 90% at 40% 25%, transparent 60%, rgba(20, 10, 4, 0.22) 100%);
+  }
+}
+
+/* ---- compact ------------------------------------------------------------- */
+@media (max-width: 40.625rem) {
+  :root[data-lens="back-page"] .site-frame {
+    width: calc(100% - 1rem);
+    margin: 0.5rem auto 1.5rem;
+    padding-top: 2rem;
+  }
+  :root[data-lens="back-page"] .site-frame::before {
+    content: "Page No. __1__   Date ________";
+    right: 0.8rem;
+    top: 0.5rem;
+    font-size: 0.62rem;
+  }
+  :root[data-lens="back-page"] .site-header .home-link {
+    font-size: 2.6rem;
+    margin-left: 0;
+  }
+  :root[data-lens="back-page"] .site-nav {
+    font-size: 1.125rem;
+  }
+  :root[data-lens="back-page"] .site-nav ul {
+    column-gap: 0.4rem;
+  }
+  :root[data-lens="back-page"] .hello {
+    margin: 1.5rem -0.35rem 0.5rem;
+    padding: 2.6rem 1.4rem 1.6rem;
+    transform: rotate(-0.6deg);
+    row-gap: 0.6rem;
+  }
+  :root[data-lens="back-page"] .hello::before {
+    content: "EXERCISE BOOK · SQUARED";
+    top: 1.1rem;
+    font-size: 0.64rem;
+  }
+  :root[data-lens="back-page"] .hello .title {
+    margin: 0 0 0.5rem;
+  }
+  :root[data-lens="back-page"] .hello :is(.occupation, .welcome) {
+    font-size: 1.35rem;
+    gap: 0.6rem;
+  }
+  :root[data-lens="back-page"] .hello .occupation {
+    align-self: center;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  :root[data-lens="back-page"] .hello :is(.occupation, .welcome)::before {
+    width: 3.6rem;
+    font-size: 0.72rem;
+  }
+  :root[data-lens="back-page"] .hello figure img {
+    border-width: 0.3rem 0.3rem 1.2rem;
+  }
+  :root[data-lens="back-page"] .hello figcaption {
+    margin-top: -1.2rem;
+    font-size: 1rem;
+  }
+  :root[data-lens="back-page"] .project-row {
+    gap: 1.25rem;
+  }
+  :root[data-lens="back-page"] .current-note {
+    margin-inline: 0.25rem;
+  }
+  :root[data-lens="back-page"] .home-composition .below > aside {
+    border-top: 0;
+  }
+  :root[data-lens="back-page"] .home-composition .elsewhere {
+    gap: 1.75rem;
+  }
+  :root[data-lens="back-page"] .lens-decor span:nth-child(1) {
+    width: 8rem;
+    height: 8rem;
+    top: 15rem;
+    right: -4rem;
+  }
+  :root[data-lens="back-page"] .lens-decor span:nth-child(3),
+  :root[data-lens="back-page"] .lens-decor span:nth-child(4) {
+    width: 3.2rem;
+    height: 3.2rem;
+  }
+  :root[data-lens="back-page"] .lens-decor span:nth-child(3) {
+    left: -1.9rem;
+  }
+  :root[data-lens="back-page"] .lens-decor span:nth-child(4) {
+    right: -1.9rem;
+  }
+  :root[data-lens="back-page"] .site-footer .thanks {
+    margin-top: 0.5rem;
+  }
+}
