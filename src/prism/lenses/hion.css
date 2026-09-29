@@ -1,1 +1,763 @@
-/* Lens: hion. */
+/* Lens: hion.
+   Kilahito after dark. The sky is black and has no sun; the city is lit by
+   hion, cyan and magenta lines strung between rooftops like power cables.
+   Nightmares seep in as smoke from the edges and a painter traps them in ink.
+   Fused with Spin to Win, the roulette app the book inspired: brick wall,
+   outlined Tourney neon, a white glowing wheel.
+   Display: Tourney (neon sign). Literary serif: Shippori Mincho. Body: Lato. */
+@import "@fontsource-variable/tourney/standard.css";
+@import "@fontsource/shippori-mincho/latin-500.css";
+@import "@fontsource/shippori-mincho/latin-700.css";
+
+:root[data-lens="hion"] {
+  /* Hion world */
+  --hion-night: #06050b;
+  --hion-night-2: #0b0914;
+  --hion-mortar: #13102200;
+  --hion-ink: #ebe7f6;
+  --hion-ink-soft: #aea8c8;
+  --hion-cyan: #3ff0ff;
+  --hion-cyan-soft: #a4f7ff;
+  --hion-magenta: #ff3dbb;
+  --hion-magenta-soft: #ff9ad9;
+  --hion-lacquer: #1a1624;
+  --hion-rule: #2c2645;
+  --hion-nightmare: #2a0f3d;
+  --hion-glow-cyan:
+    0 0 1px #d8fcff, 0 0 6px var(--hion-cyan), 0 0 16px #3ff0ffaa,
+    0 0 38px #3ff0ff55;
+  --hion-glow-magenta:
+    0 0 1px #ffe0f3, 0 0 6px var(--hion-magenta), 0 0 18px #ff3dbbaa,
+    0 0 42px #ff3dbb55;
+  --hion-glow-soft: 0 0 8px #3ff0ff99, 0 0 22px #3ff0ff44;
+  --hion-brick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='56'%3E%3Cg fill='none' stroke='%23141127' stroke-width='3'%3E%3Cpath d='M0 1.5H120M0 29.5H120M30 1.5V29.5M90 1.5V29.5M0 29.5V56M60 29.5V56M120 29.5V56'/%3E%3C/g%3E%3Cg fill='%23100d1d'%3E%3Crect x='34' y='6' width='52' height='20' opacity='.5'/%3E%3Crect x='64' y='34' width='52' height='19' opacity='.35'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* Base tokens */
+  --color-page: var(--hion-night);
+  --color-surface: var(--hion-lacquer);
+  --color-surface-strong: var(--hion-cyan);
+  --color-text: var(--hion-ink);
+  --color-text-soft: var(--hion-ink-soft);
+  --color-border: var(--hion-rule);
+  --color-accent: var(--hion-cyan-soft);
+  --color-accent-pressed: var(--hion-magenta-soft);
+  --color-accent-contrast: var(--hion-night);
+  --color-hover: #10202a;
+  --color-link-rule: #3ff0ff55;
+  --color-texture: #3ff0ff10;
+  --font-sans: "Lato", system-ui, sans-serif;
+  --font-serif: "Shippori Mincho", "Newsreader Variable", serif;
+  --font-hion: "Tourney Variable", "Lato", sans-serif;
+  --text-display: clamp(3rem, 6.4vw, 5.4rem);
+  --text-display-compact: clamp(2.6rem, 13vw, 3.6rem);
+  --text-page: clamp(2.6rem, 6vw, 4.4rem);
+  --tracking-display: 0.02em;
+  --tracking-heading: 0;
+  --radius-note: 2px;
+  --radius-portrait: 50%;
+  --texture: radial-gradient(
+      ellipse at 30% 40%,
+      #221c33 0%,
+      transparent 60%
+    ),
+    radial-gradient(ellipse at 75% 70%, #1a1428 0%, transparent 55%),
+    var(--hion-lacquer);
+  --duration-fast: 180ms;
+
+  color-scheme: dark;
+  accent-color: var(--hion-magenta);
+}
+
+/* ---------- The night itself: brick wall, hion light spilling down ---------- */
+:root[data-lens="hion"],
+:root[data-lens="hion"] body {
+  background-color: var(--hion-night);
+}
+:root[data-lens="hion"] body {
+  background-image:
+    radial-gradient(
+      ellipse 70% 38% at 18% -4%,
+      #3ff0ff1c 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 60% 34% at 88% 2%,
+      #ff3dbb1a 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 90% 60% at 50% 110%,
+      #1b0c2a 0%,
+      transparent 70%
+    ),
+    linear-gradient(180deg, #06050b00 0%, #06050bcc 70%),
+    var(--hion-brick);
+  background-attachment: scroll;
+  font-family: var(--font-sans);
+  color: var(--hion-ink);
+}
+:root[data-lens="hion"] ::selection {
+  background: var(--hion-magenta);
+  color: #120510;
+}
+:root[data-lens="hion"] :focus-visible,
+:root[data-lens="hion"] .ds-link:focus-visible {
+  outline: 2px solid var(--hion-magenta);
+  outline-offset: 4px;
+  box-shadow: 0 0 14px #ff3dbb88;
+  border-radius: 2px;
+}
+:root[data-lens="hion"] .skip-link {
+  background: var(--hion-night);
+  color: var(--hion-cyan-soft);
+  border-color: var(--hion-cyan);
+  box-shadow: var(--hion-glow-soft);
+}
+
+/* ---------- Decor: hion lines, nightmares, stacked stones ---------- */
+:root[data-lens="hion"] .lens-decor {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+:root[data-lens="hion"] .lens-decor span {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+/* Hion lines: half-ellipse borders sag like cables between unseen rooftops. */
+:root[data-lens="hion"] .lens-decor span:nth-child(-n + 3) {
+  border-bottom: 2px solid var(--hion-cyan);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  filter: drop-shadow(0 0 2px var(--hion-cyan)) drop-shadow(0 0 9px #3ff0ffaa);
+}
+:root[data-lens="hion"] .lens-decor span:nth-child(1) {
+  top: -3.5rem;
+  left: -12%;
+  width: 78%;
+  height: 11rem;
+  opacity: 0.85;
+}
+:root[data-lens="hion"] .lens-decor span:nth-child(2) {
+  top: -6.25rem;
+  left: 34%;
+  width: 86%;
+  height: 10rem;
+  border-bottom-color: var(--hion-magenta);
+  filter: drop-shadow(0 0 2px var(--hion-magenta))
+    drop-shadow(0 0 10px #ff3dbbaa);
+  opacity: 0.8;
+}
+:root[data-lens="hion"] .lens-decor span:nth-child(3) {
+  top: -1.5rem;
+  left: 52%;
+  width: 60%;
+  height: 7.5rem;
+  border-bottom-width: 1px;
+  opacity: 0.45;
+}
+/* Nightmares: smoke that creeps in from the page edges. */
+:root[data-lens="hion"] .lens-decor span:nth-child(4),
+:root[data-lens="hion"] .lens-decor span:nth-child(5) {
+  border-radius: 46% 54% 60% 40% / 52% 44% 56% 48%;
+  background:
+    radial-gradient(circle at 38% 42%, #05030a 0 18%, transparent 46%),
+    radial-gradient(circle at 64% 58%, #0a0412 0 16%, transparent 44%),
+    radial-gradient(circle at 50% 50%, #2a0f3d 0%, #1a0927 38%, transparent 70%);
+  filter: blur(26px);
+  opacity: 0.9;
+}
+:root[data-lens="hion"] .lens-decor span:nth-child(4) {
+  top: 34rem;
+  right: -14rem;
+  width: 30rem;
+  height: 26rem;
+}
+:root[data-lens="hion"] .lens-decor span:nth-child(5) {
+  bottom: -8rem;
+  left: -12rem;
+  width: 34rem;
+  height: 24rem;
+}
+/* Stacked stones: a tiny prayer at the foot of the page. */
+:root[data-lens="hion"] .lens-decor span:nth-child(6) {
+  right: max(1.25rem, calc((100% - 71.25rem) / 2 - 3.5rem));
+  bottom: 5.5rem;
+  width: 2.75rem;
+  height: 3.75rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 82'%3E%3Cg stroke-width='1.2'%3E%3Cellipse cx='30' cy='70' rx='27' ry='10' fill='%23262231' stroke='%233ff0ff' stroke-opacity='.35'/%3E%3Cellipse cx='31.5' cy='52' rx='19' ry='8.5' fill='%232f2a3b' stroke='%233ff0ff' stroke-opacity='.4'/%3E%3Cellipse cx='29' cy='37' rx='13.5' ry='7' fill='%23383246' stroke='%23ff3dbb' stroke-opacity='.45'/%3E%3Cellipse cx='30.5' cy='25' rx='8' ry='5' fill='%23413b52' stroke='%233ff0ff' stroke-opacity='.55'/%3E%3C/g%3E%3C/svg%3E")
+    center / contain no-repeat;
+  opacity: 0.9;
+}
+
+/* The base's wine blob becomes a nightmare leaning in from the top-left. */
+:root[data-lens="hion"] .edge-blob__surface {
+  background:
+    radial-gradient(circle at 60% 55%, #040208 0 22%, transparent 52%),
+    radial-gradient(circle at 50% 50%, #2e1043 0%, #170822 42%, transparent 70%);
+  filter: blur(22px);
+  opacity: 0.95;
+}
+
+/* Welcome art: the Spin to Win wheel, white neon, quietly turning. */
+:root[data-lens="hion"] .welcome-art {
+  position: relative;
+  aspect-ratio: 1;
+}
+:root[data-lens="hion"] .welcome-art .decorative-blobs {
+  visibility: hidden;
+}
+:root[data-lens="hion"] .welcome-art::before {
+  content: "";
+  position: absolute;
+  inset: -4%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Cdefs%3E%3Cfilter id='g' x='-25%25' y='-25%25' width='150%25' height='150%25'%3E%3CfeGaussianBlur stdDeviation='3.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23g)' fill='none' stroke='%23fff' transform='translate(120 120)'%3E%3Ccircle r='100' stroke-width='8'/%3E%3Ccircle r='88' stroke-width='1.6'/%3E%3Ccircle r='80' stroke='%233ff0ff' stroke-width='6' stroke-dasharray='12.566 12.566'/%3E%3Ccircle r='80' stroke='%23ff3dbb' stroke-width='6' stroke-dasharray='12.566 12.566' stroke-dashoffset='12.566'/%3E%3Ccircle r='72' stroke-width='1.6'/%3E%3Ccircle r='50' stroke-width='28' stroke-dasharray='6 11.45'/%3E%3Ccircle r='32' stroke-width='3'/%3E%3Cpath d='M0-22V22M-22 0H22' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle r='7' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+:root[data-lens="hion"] .welcome-art::after {
+  /* the pointer: a small magenta pin over the wheel */
+  content: "";
+  position: absolute;
+  top: -9%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  translate: -50% 0;
+  border-inline: 0.6rem solid transparent;
+  border-top: 1.1rem solid var(--hion-magenta);
+  filter: drop-shadow(0 0 6px var(--hion-magenta));
+}
+
+/* ---------- Header: the street's own hion line ---------- */
+:root[data-lens="hion"] .site-header {
+  position: relative;
+  border-bottom: 0;
+}
+:root[data-lens="hion"] .site-header::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--hion-cyan) 12%,
+    var(--hion-cyan) 58%,
+    var(--hion-magenta) 72%,
+    var(--hion-magenta) 88%,
+    transparent
+  );
+  box-shadow: 0 0 8px #3ff0ff88;
+  opacity: 0.7;
+}
+:root[data-lens="hion"] .home-link {
+  font-family: var(--font-hion);
+  font-weight: 300;
+  font-stretch: 110%;
+  font-size: 1.9rem;
+  letter-spacing: 0.02em;
+  color: var(--hion-magenta-soft);
+  text-shadow: var(--hion-glow-magenta);
+  text-decoration: none;
+}
+:root[data-lens="hion"] .home-link:hover {
+  text-decoration: none;
+  color: #fff0fa;
+}
+:root[data-lens="hion"] .site-nav {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+:root[data-lens="hion"] .ds-link--nav {
+  color: var(--hion-ink-soft);
+  text-decoration: none;
+  transition:
+    color var(--duration-fast) ease,
+    text-shadow var(--duration-fast) ease;
+}
+:root[data-lens="hion"] .ds-link--nav:is(:hover, :focus-visible) {
+  color: var(--hion-cyan-soft);
+  text-shadow: var(--hion-glow-soft);
+  text-decoration: none;
+}
+:root[data-lens="hion"] .ds-link--nav[aria-current] {
+  color: var(--hion-cyan-soft);
+  font-weight: 700;
+  text-shadow: var(--hion-glow-soft);
+  text-decoration: underline;
+  text-decoration-color: var(--hion-cyan);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.55em;
+}
+
+/* ---------- Type ---------- */
+:root[data-lens="hion"] :is(h1, h2, h3, h4),
+:root[data-lens="hion"] .ds-heading {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--hion-ink);
+  letter-spacing: 0;
+}
+/* Neon signs: Tourney for display and section headings. */
+:root[data-lens="hion"] :is(h1, h2).ds-heading,
+:root[data-lens="hion"] .ds-heading--display,
+:root[data-lens="hion"] .ds-heading--page {
+  font-family: var(--font-hion);
+  font-weight: 400;
+  font-stretch: 100%;
+  text-transform: uppercase;
+  line-height: 1.05;
+  color: var(--hion-cyan-soft);
+  text-shadow: var(--hion-glow-cyan);
+}
+:root[data-lens="hion"] .ds-heading--display,
+:root[data-lens="hion"] h1.ds-heading {
+  font-weight: 300;
+  font-stretch: 112%;
+  letter-spacing: 0.02em;
+  color: var(--hion-magenta-soft);
+  text-shadow: var(--hion-glow-magenta);
+}
+:root[data-lens="hion"] h2.ds-heading--section {
+  font-size: clamp(1.45rem, 2.4vw, 1.9rem);
+  font-stretch: 90%;
+  letter-spacing: 0.04em;
+}
+:root[data-lens="hion"] aside h2.ds-heading--section {
+  font-size: 1.3rem;
+  font-stretch: 80%;
+}
+/* Project and card titles: brush-written mincho, not neon. */
+:root[data-lens="hion"] h3.ds-heading {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-stretch: normal;
+  text-transform: none;
+  text-shadow: none;
+  letter-spacing: 0.01em;
+  color: var(--hion-ink);
+}
+:root[data-lens="hion"] h3.ds-heading--section {
+  font-size: 1.9rem;
+}
+:root[data-lens="hion"] .greeting {
+  font-family: var(--font-hion);
+  font-weight: 500;
+  font-stretch: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 1.05rem;
+  color: var(--hion-cyan-soft);
+  text-shadow: var(--hion-glow-soft);
+}
+:root[data-lens="hion"] .occupation {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.2rem;
+  color: var(--hion-ink);
+}
+:root[data-lens="hion"] .occupation::before {
+  content: "";
+  display: inline-block;
+  width: 1.6rem;
+  height: 2px;
+  margin-right: 0.7rem;
+  vertical-align: 0.3em;
+  background: var(--hion-magenta);
+  box-shadow: 0 0 8px var(--hion-magenta);
+}
+:root[data-lens="hion"] .welcome {
+  color: var(--hion-ink);
+}
+:root[data-lens="hion"] :is(.meta, .event-origin, time, .stream-intro) {
+  color: var(--hion-ink-soft);
+  letter-spacing: 0.04em;
+}
+:root[data-lens="hion"] .meta {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+}
+:root[data-lens="hion"] strong {
+  color: var(--hion-cyan-soft);
+}
+
+/* ---------- Links: a hion line lighting up ---------- */
+:root[data-lens="hion"] a {
+  color: var(--hion-cyan-soft);
+}
+:root[data-lens="hion"] .ds-link--text {
+  color: var(--hion-cyan-soft);
+  text-decoration-color: #3ff0ff55;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition:
+    color var(--duration-fast) ease,
+    text-shadow var(--duration-fast) ease,
+    text-decoration-color var(--duration-fast) ease;
+}
+:root[data-lens="hion"] .ds-link--text:is(:hover, :focus-visible) {
+  color: #effdff;
+  text-decoration-color: var(--hion-cyan);
+  text-decoration-thickness: 2px;
+  text-shadow: var(--hion-glow-cyan);
+}
+:root[data-lens="hion"] h3 .ds-link--text {
+  color: var(--hion-ink);
+  text-decoration-color: #ff3dbb66;
+}
+:root[data-lens="hion"] h3 .ds-link--text:is(:hover, :focus-visible) {
+  color: #fff3fb;
+  text-decoration-color: var(--hion-magenta);
+  text-shadow: var(--hion-glow-magenta);
+}
+:root[data-lens="hion"] .link-arrow {
+  color: var(--hion-magenta);
+}
+:root[data-lens="hion"] .ds-link--action {
+  background: transparent;
+  border: 1px solid var(--hion-cyan);
+  color: var(--hion-cyan-soft);
+  box-shadow: var(--hion-glow-soft), inset 0 0 10px #3ff0ff33;
+}
+:root[data-lens="hion"] .ds-link--action:hover {
+  background: #3ff0ff14;
+  color: #fff;
+}
+:root[data-lens="hion"] .ds-link--wine {
+  border-color: var(--hion-magenta);
+  color: var(--hion-magenta-soft);
+  box-shadow: var(--hion-glow-magenta);
+}
+
+/* ---------- Portrait: lit by a hion ring ---------- */
+:root[data-lens="hion"] .hello figure img {
+  border: 3px solid var(--hion-cyan);
+  box-shadow:
+    0 0 10px var(--hion-cyan),
+    0 0 30px #3ff0ff66,
+    inset 0 0 18px #3ff0ff66;
+  filter: saturate(0.85) contrast(1.05);
+}
+:root[data-lens="hion"] .hello figcaption {
+  color: var(--hion-ink-soft);
+}
+
+/* ---------- Painted covers: hanging scrolls with brushed edges ---------- */
+:root[data-lens="hion"] .ds-media {
+  padding: 0.9rem 0.75rem;
+  background:
+    radial-gradient(ellipse at 20% 30%, #2a2338 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 80%, #221b30 0%, transparent 55%),
+    linear-gradient(180deg, #17131f, #120f19);
+  box-shadow: 0 18px 40px -18px #000, 0 0 0 1px #2c2645;
+  overflow: visible;
+}
+/* Scroll rods top and bottom (kakejiku), each capped with a hion bead. */
+:root[data-lens="hion"] .ds-media::before,
+:root[data-lens="hion"] .ds-media::after {
+  width: auto;
+  height: 6px;
+  left: -8px;
+  right: -8px;
+  border: 0;
+  border-radius: 3px;
+  background:
+    radial-gradient(circle at 3px 50%, var(--hion-cyan) 0 3px, transparent 4px),
+    radial-gradient(
+      circle at calc(100% - 3px) 50%,
+      var(--hion-magenta) 0 3px,
+      transparent 4px
+    ),
+    linear-gradient(180deg, #3a3346, #16121c);
+  box-shadow: 0 2px 6px #000;
+}
+:root[data-lens="hion"] .ds-media::before {
+  top: -3px;
+}
+:root[data-lens="hion"] .ds-media::after {
+  bottom: -3px;
+  top: auto;
+}
+:root[data-lens="hion"] .ds-media img {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 200' preserveAspectRatio='none'%3E%3Cfilter id='r' x='-5%25' y='-5%25' width='110%25' height='110%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.018 .55' numOctaves='3' seed='11' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='13' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='8' y='7' width='264' height='186' fill='%23000' filter='url(%23r)'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 200' preserveAspectRatio='none'%3E%3Cfilter id='r' x='-5%25' y='-5%25' width='110%25' height='110%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.018 .55' numOctaves='3' seed='11' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='13' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='8' y='7' width='264' height='186' fill='%23000' filter='url(%23r)'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+  /* Ink wash until the painter's brush reaches it. */
+  filter: grayscale(1) contrast(1.15) brightness(0.78) sepia(0.25)
+    hue-rotate(210deg);
+  transition: filter 520ms ease;
+}
+:root[data-lens="hion"] a.ds-media:hover {
+  outline: 0;
+}
+:root[data-lens="hion"] :is(.project-row, .lab-card, a.ds-media):hover .ds-media img,
+:root[data-lens="hion"] a.ds-media:hover img,
+:root[data-lens="hion"] .project-row:focus-within .ds-media img {
+  filter: none;
+}
+
+/* ---------- Layout rules and rails ---------- */
+:root[data-lens="hion"] .below {
+  border-top-color: var(--hion-rule);
+}
+:root[data-lens="hion"] .below > aside {
+  border-left-color: var(--hion-rule);
+}
+:root[data-lens="hion"] .project-row,
+:root[data-lens="hion"] .lab-card {
+  border-top-color: var(--hion-rule);
+}
+:root[data-lens="hion"] .summary {
+  color: var(--hion-ink);
+}
+:root[data-lens="hion"] .ds-tags {
+  gap: 0.4rem;
+  color: var(--hion-magenta-soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+:root[data-lens="hion"] .ds-tags li {
+  padding: 0.15rem 0.55rem;
+  border: 1px solid #ff3dbb77;
+  border-radius: 999px;
+  box-shadow: 0 0 8px #ff3dbb33, inset 0 0 6px #ff3dbb22;
+}
+:root[data-lens="hion"] .ds-tags li + li::before {
+  content: none;
+}
+
+/* Currently: a noodle-stall paper lantern hung on the rail. */
+:root[data-lens="hion"] .current-note {
+  border-bottom-color: var(--hion-rule);
+}
+:root[data-lens="hion"] .ds-note {
+  background: transparent;
+}
+
+/* Updates: each event is a node on a hion line. */
+:root[data-lens="hion"] .update-entry--connected::before {
+  border-inline-start: 1px solid #3ff0ff55;
+  box-shadow: 0 0 6px #3ff0ff55;
+}
+:root[data-lens="hion"] .event-mark {
+  border-radius: 50%;
+  background: #0b0a12;
+  color: var(--hion-cyan-soft);
+  box-shadow:
+    0 0 0 1px var(--hion-cyan),
+    0 0 10px #3ff0ff77;
+}
+:root[data-lens="hion"] .update-entry[data-event-kind="pull-request"] .event-mark,
+:root[data-lens="hion"] .update-entry[data-event-kind="milestone"] .event-mark {
+  color: var(--hion-magenta-soft);
+  box-shadow:
+    0 0 0 1px var(--hion-magenta),
+    0 0 10px #ff3dbb77;
+}
+:root[data-lens="hion"] .event-title .ds-link--text {
+  color: var(--hion-ink);
+  text-decoration-color: #3ff0ff44;
+}
+:root[data-lens="hion"] .stream-caption {
+  border-top-color: var(--hion-rule);
+  color: var(--hion-ink-soft);
+}
+
+/* Elsewhere + footer */
+:root[data-lens="hion"] .elsewhere {
+  border-top-color: var(--hion-rule);
+}
+:root[data-lens="hion"] .elsewhere p {
+  color: var(--hion-ink-soft);
+}
+:root[data-lens="hion"] .elsewhere h2 .ds-link--text {
+  color: inherit;
+}
+:root[data-lens="hion"] .site-footer {
+  border-top-color: var(--hion-rule);
+  color: var(--hion-ink-soft);
+}
+:root[data-lens="hion"] .thanks {
+  font-family: var(--font-serif);
+  color: var(--hion-ink);
+}
+
+/* Entry pages: eyebrows as small neon, screenshots framed in a lit box. */
+:root[data-lens="hion"] :is(.page-header__eyebrow, .entry-page__label) {
+  font-family: var(--font-hion);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.78rem;
+  color: var(--hion-cyan-soft);
+  text-shadow: var(--hion-glow-soft);
+}
+:root[data-lens="hion"] .media-rail__item :is(img, video) {
+  box-shadow:
+    0 0 0 1px #3ff0ff66,
+    0 0 22px #3ff0ff2e,
+    0 30px 60px -30px #000;
+}
+:root[data-lens="hion"] .media-rail__item figcaption {
+  color: var(--hion-ink-soft);
+}
+
+/* Prose pages (project entries, about, resume). */
+:root[data-lens="hion"] .prose :is(h2, h3) {
+  font-family: var(--font-serif);
+  text-transform: none;
+  text-shadow: none;
+  color: var(--hion-ink);
+}
+:root[data-lens="hion"] .prose h2 {
+  border-bottom: 1px solid var(--hion-rule);
+  padding-bottom: 0.3em;
+}
+:root[data-lens="hion"] .prose :is(blockquote) {
+  border-left: 2px solid var(--hion-magenta);
+  box-shadow: -6px 0 12px -8px var(--hion-magenta);
+  color: var(--hion-ink);
+}
+:root[data-lens="hion"] :is(code, kbd) {
+  background: #16121f;
+  color: var(--hion-cyan-soft);
+  border-radius: 3px;
+}
+:root[data-lens="hion"] hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--hion-cyan), transparent);
+  box-shadow: 0 0 8px #3ff0ff66;
+}
+
+/* ---------- Motion: flickering hion, drifting nightmares, a turning wheel --- */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="hion"] .lens-decor span:nth-child(2) {
+    animation: hion-flicker 9s steps(1, end) infinite;
+  }
+  :root[data-lens="hion"] .lens-decor span:nth-child(1) {
+    animation: hion-hum 5.5s ease-in-out infinite;
+  }
+  :root[data-lens="hion"] .lens-decor span:nth-child(4) {
+    animation: hion-creep 24s ease-in-out infinite alternate;
+  }
+  :root[data-lens="hion"] .lens-decor span:nth-child(5) {
+    animation: hion-creep 30s ease-in-out -12s infinite alternate-reverse;
+  }
+  :root[data-lens="hion"] .welcome-art::before {
+    animation: hion-spin 80s linear infinite;
+  }
+  :root[data-lens="hion"] .ds-heading--display {
+    animation: hion-sign 11s steps(1, end) 2s infinite;
+  }
+}
+@keyframes hion-flicker {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  61% {
+    opacity: 0.25;
+  }
+  62% {
+    opacity: 0.8;
+  }
+  63.5% {
+    opacity: 0.35;
+  }
+  64.5% {
+    opacity: 0.8;
+  }
+}
+@keyframes hion-hum {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+@keyframes hion-creep {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(-3rem, 2rem) scale(1.08);
+  }
+}
+@keyframes hion-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes hion-sign {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.72;
+  }
+  80.6% {
+    opacity: 1;
+  }
+  81.4% {
+    opacity: 0.8;
+  }
+  82% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Compact ---------- */
+@media (max-width: 40.625rem) {
+  :root[data-lens="hion"] .lens-decor span:nth-child(1) {
+    top: -4.5rem;
+    left: -40%;
+    width: 150%;
+    height: 9rem;
+  }
+  :root[data-lens="hion"] .lens-decor span:nth-child(2) {
+    top: -4.5rem;
+    left: 10%;
+    width: 140%;
+    height: 8rem;
+  }
+  :root[data-lens="hion"] .lens-decor span:nth-child(3) {
+    display: none;
+  }
+  :root[data-lens="hion"] .lens-decor span:nth-child(4) {
+    top: 24rem;
+    right: -16rem;
+  }
+  :root[data-lens="hion"] .home-link {
+    font-size: 1.6rem;
+  }
+  :root[data-lens="hion"] .lens-decor span:nth-child(6) {
+    bottom: 7.5rem;
+    width: 2.25rem;
+  }
+  :root[data-lens="hion"] .site-nav {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+  :root[data-lens="hion"] .ds-heading--display,
+  :root[data-lens="hion"] h1.ds-heading {
+    font-stretch: 95%;
+  }
+  :root[data-lens="hion"] .hello figure img {
+    border-width: 2px;
+  }
+  :root[data-lens="hion"] .occupation::before {
+    display: none;
+  }
+}
