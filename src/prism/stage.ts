@@ -147,6 +147,9 @@ export function createPrism(): Prism {
           }),
       ),
     );
+    // Faces must lay out at full viewport size while dormant; shells size
+    // themselves on mount, and a 0x0 face never recovers.
+    applyGeometry(stage, measure());
     document.body.append(stage);
     return stage;
   }
@@ -180,13 +183,7 @@ export function createPrism(): Prism {
 
     const layout = () => {
       geometry = measure();
-      const { w, h, apothem, radius, perspective, pull } = geometry;
-      root.style.setProperty("--face-w", `${w}px`);
-      root.style.setProperty("--face-h", `${h}px`);
-      root.style.setProperty("--apothem", `${apothem}px`);
-      root.style.setProperty("--cap", `${radius * 2}px`);
-      root.style.setProperty("--perspective", `${perspective}px`);
-      root.style.setProperty("--pull", `${pull}px`);
+      applyGeometry(root, geometry);
     };
     const pose = (outside: boolean) =>
       `translateZ(${-geometry.apothem - (outside ? geometry.pull : 0)}px) ` +
@@ -410,6 +407,16 @@ function afterimage(from: Lens, to: Lens, exits: number) {
   ghost.style.setProperty("--burn", String(Math.min(0.18 + exits * 0.08, 0.5)));
   document.body.append(ghost);
   ghost.addEventListener("animationend", () => ghost.remove(), { once: true });
+}
+
+function applyGeometry(root: HTMLElement, geometry: Geometry) {
+  const { w, h, apothem, radius, perspective, pull } = geometry;
+  root.style.setProperty("--face-w", `${w}px`);
+  root.style.setProperty("--face-h", `${h}px`);
+  root.style.setProperty("--apothem", `${apothem}px`);
+  root.style.setProperty("--cap", `${radius * 2}px`);
+  root.style.setProperty("--perspective", `${perspective}px`);
+  root.style.setProperty("--pull", `${pull}px`);
 }
 
 /** Lens faces mount their shells after the frame loads. On a cold first open,
