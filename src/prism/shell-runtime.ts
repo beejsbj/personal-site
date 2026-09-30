@@ -41,6 +41,12 @@ export function currentRoute(): Route {
   return { kind, path, slug, title: document.title, main };
 }
 
+// A prism face is a preview inside someone else's page: it must never take
+// focus from the host, whatever a shell does on route change.
+if (document.documentElement.hasAttribute("data-prism-face")) {
+  HTMLElement.prototype.focus = () => {};
+}
+
 const idleListeners = new Set<(idle: boolean) => void>();
 new MutationObserver(() => {
   const idle = document.documentElement.hasAttribute("data-prism-idle");
