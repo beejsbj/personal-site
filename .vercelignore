@@ -1,0 +1,13 @@
+# The Astro runtime is src/, public/, and the root build configuration. These
+# paths are retained as a runnable PHP/source archive and are not Vercel inputs.
+/about/
+/assets/
+/data/
+/images/
+/projects/
+/styles/
+/templates/
+/functions.php
+/index.php
+/docker-compose.yaml
+/.HTACCESS
