@@ -29,7 +29,7 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
   data-rehearsal={rehearsal ? "available" : undefined}
 >
   <header class="activity-house__heading">
-    <p class="activity-house__eyebrow">What’s happening, drawn as a house</p>
+    <p class="activity-house__eyebrow">What’s happening, drawn as a floorplan</p>
     <h1>Step into the house.</h1>
     <p class="activity-house__lead">
       Every room is a project or a corner of my life. When something is actually
@@ -112,7 +112,6 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
     padding-block: var(--space-xl) var(--space-3xl);
   }
   .activity-house__eyebrow,
-  .house-floor__label,
   .house-detail__eyebrow {
     color: var(--house-ink-muted);
     font-size: var(--text-xs);
@@ -162,7 +161,7 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
   }
   [data-busy="true"] > .house-status::before {
     background: var(--color-accent);
-    animation: house-pulse var(--house-smoke-rise) ease-in-out infinite;
+    animation: house-pulse var(--house-pulse-duration) ease-in-out infinite;
   }
 
   .activity-house__body {
@@ -180,85 +179,70 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
     }
   }
 
-  /* ---------- The building ---------- */
+  /* ---------- The plan, from above ---------- */
   .house-building {
     display: grid;
-    padding-top: var(--space-3xl);
+    gap: var(--space-xs);
+    padding-bottom: var(--house-mat-height);
   }
-  .house-roof {
-    position: relative;
-    block-size: var(--house-roof-height);
-    margin-inline: calc(var(--space-s) * -1);
+  .house-plan {
+    display: grid;
+    gap: var(--house-plan-wall);
+    padding: var(--house-plan-outer);
+    background: var(--color-text);
   }
-  .house-roof::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: var(--color-accent);
-    background-image: var(--texture);
-    clip-path: polygon(0 100%, 7% 0, 93% 0, 100% 100%);
+  .house-plan__wing {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--house-plan-wall);
   }
-  .house-roof__chimney {
-    position: absolute;
-    right: 18%;
-    bottom: 60%;
-    inline-size: var(--space-l);
-    block-size: var(--house-roof-height);
-    background: var(--color-accent-pressed);
-  }
-  .house-roof__chimney i {
-    position: absolute;
-    left: 10%;
-    bottom: 100%;
-    inline-size: var(--space-m);
-    block-size: var(--space-m);
-    border-radius: var(--radius-round);
-    background: var(--color-border);
-    opacity: 0;
-  }
-  [data-busy="true"] .house-roof__chimney i {
-    animation: house-smoke var(--house-smoke-rise) ease-out infinite;
-  }
-  .house-roof__chimney i:nth-child(2) {
-    animation-delay: calc(var(--house-smoke-rise) / -3);
-  }
-  .house-roof__chimney i:nth-child(3) {
-    animation-delay: calc(var(--house-smoke-rise) / -1.5);
-  }
-
-  .house-floor {
-    border-inline: var(--house-wall-width) solid var(--color-text);
+  .house-plan__hall {
+    display: grid;
+    place-items: center;
+    block-size: var(--house-hall-height);
     background-color: var(--house-wash-soft);
     background-image: var(--texture);
   }
-  .house-floor__label {
-    padding: var(--space-2xs) var(--space-s);
-    border-bottom: var(--rule-width) solid var(--color-border);
-    background: var(--house-wash-soft);
+  .house-plan__hall span,
+  .house-entry__label,
+  .house-plan__title {
+    color: var(--house-ink-muted);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-heading);
+    text-transform: uppercase;
   }
-  .house-floor__rooms {
-    display: flex;
-    flex-wrap: wrap;
-    margin-inline-end: calc(var(--house-wall-width) * -1);
+  .house-plan__hall span {
+    padding-inline: var(--space-l);
+    border-block: var(--rule-width) dashed var(--color-border);
+  }
+  .house-plan__title {
+    justify-self: start;
+    font-weight: var(--weight-medium);
+  }
+  .house-plan__rug {
+    stroke-dasharray: 2 2;
   }
 
-  .house-room {
+  .house-room,
+  .house-entry {
+    --house-floor: var(--house-wash);
     position: relative;
     display: flex;
-    flex: 1 1 var(--house-room-min);
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-2xs);
+    gap: var(--space-xs);
     min-inline-size: 0;
     min-block-size: var(--house-room-height);
-    padding: calc(var(--house-lamp-drop) + var(--space-xs)) var(--house-room-pad)
-      0;
-    border: 0;
-    border-inline-end: var(--house-wall-width) solid var(--color-text);
-    border-block-end: var(--house-slab) solid var(--color-text);
-    background: var(--house-wash);
+    padding: var(--house-room-pad);
+    background-color: var(--house-floor);
+    background-image: var(--texture);
     color: var(--color-text);
     text-align: start;
+  }
+  .house-room {
+    flex: 1 1 var(--house-room-min);
+    border: 0;
     cursor: pointer;
     transition: background-color var(--duration-fast) var(--ease-feedback);
   }
@@ -266,55 +250,87 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
     flex-basis: var(--house-room-wide);
   }
   .house-room[data-lit="true"] {
-    background: radial-gradient(
-        circle at 50% 0,
-        var(--house-glow),
-        transparent 70%
-      ),
-      var(--house-lit-wash);
+    --house-floor: var(--house-lit-wash);
+    background-image: radial-gradient(
+      circle at var(--space-l) var(--space-l),
+      var(--house-glow),
+      transparent 75%
+    );
   }
   .house-room:hover {
-    background-color: var(--color-hover);
+    --house-floor: var(--color-hover);
   }
   .house-room[aria-pressed="true"] {
     outline: var(--house-focus-outline) solid var(--color-accent);
-    outline-offset: calc(var(--house-focus-outline) * -3);
+    outline-offset: calc(var(--house-focus-outline) * -2);
   }
   .house-room:focus-visible {
     outline: var(--house-focus-outline) dashed var(--color-accent);
-    outline-offset: calc(var(--house-focus-outline) * -3);
+    outline-offset: calc(var(--house-focus-outline) * -2);
   }
 
-  .house-room__lamp {
+  /* A gap in the wall toward the hallway, with the door's swing drawn in. */
+  .house-room__door,
+  .house-entry__door {
     position: absolute;
-    top: 0;
-    left: 50%;
-    inline-size: var(--space-m);
-    block-size: var(--house-lamp-drop);
-    translate: -50% 0;
+    z-index: 1;
+    inset-inline-end: var(--space-m);
+    inline-size: var(--house-door-size);
+    block-size: var(--house-plan-wall);
+    background: var(--house-floor);
   }
-  .house-room__lamp::before {
+  .house-room__door::after,
+  .house-entry__door::after {
     content: "";
     position: absolute;
-    left: 50%;
-    block-size: 60%;
-    border-left: var(--rule-width) solid var(--color-text);
+    inset-inline-start: 0;
+    inline-size: 100%;
+    aspect-ratio: 1;
+    border-inline-start: var(--rule-width) solid var(--color-text-soft);
   }
-  .house-room__lamp::after {
-    content: "";
-    position: absolute;
-    inset: 60% 0 0;
-    background: var(--color-text-soft);
-    clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%);
+  [data-wing="studios"] .house-room__door,
+  .house-entry__door {
+    bottom: calc(var(--house-plan-wall) * -1);
   }
-  .house-room[data-lit="true"] .house-room__lamp::after {
-    background: var(--color-text);
-    filter: drop-shadow(0 var(--space-2xs) var(--space-xs) var(--color-page));
+  [data-wing="studios"] .house-room__door::after,
+  .house-entry__door::after {
+    bottom: 100%;
+    border-block-start: var(--rule-width) dashed var(--color-border);
+    border-inline-end: var(--rule-width) dashed var(--color-border);
+    border-start-end-radius: 100%;
+  }
+  [data-wing="around"] .house-room__door {
+    top: calc(var(--house-plan-wall) * -1);
+  }
+  [data-wing="around"] .house-room__door::after {
+    top: 100%;
+    border-block-end: var(--rule-width) dashed var(--color-border);
+    border-inline-end: var(--rule-width) dashed var(--color-border);
+    border-end-end-radius: 100%;
   }
 
   .house-room__label {
     display: grid;
-    gap: var(--space-2xs);
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: var(--space-xs);
+    row-gap: var(--space-2xs);
+    padding-inline-end: var(--house-door-size);
+  }
+  /* The plan symbol for a ceiling light: a circle with a cross through it. */
+  .house-room__lamp {
+    inline-size: var(--house-lamp-size);
+    aspect-ratio: 1;
+    border: var(--rule-width) solid var(--color-text-soft);
+    border-radius: var(--radius-round);
+    background:
+      linear-gradient(45deg, transparent 46%, var(--color-text-soft) 46% 54%, transparent 54%),
+      linear-gradient(-45deg, transparent 46%, var(--color-text-soft) 46% 54%, transparent 54%);
+  }
+  .house-room[data-lit="true"] .house-room__lamp {
+    border-color: var(--color-text);
+    background-color: var(--house-glow);
+    box-shadow: 0 0 0 var(--space-2xs) var(--house-glow);
   }
   .house-room__label strong {
     color: var(--color-accent);
@@ -324,16 +340,33 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
     line-height: var(--leading-heading);
   }
   .house-room__whisper {
+    grid-column: 2;
     font-family: var(--font-serif);
     font-size: var(--text-sm);
     font-style: italic;
     line-height: var(--leading-tight);
   }
+  .house-room__floor {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+    gap: var(--space-s);
+    inline-size: 100%;
+    margin-block: auto;
+  }
+  .house-room__furniture {
+    flex: none;
+    inline-size: var(--house-furniture-width);
+    fill: var(--house-wash-soft);
+    stroke: var(--color-text-soft);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
   .house-room__note {
-    display: -webkit-box;
-    max-inline-size: min(var(--house-note-width), 100%);
+    max-inline-size: min(var(--house-note-width), calc(100% - var(--house-door-size)));
     padding: var(--space-2xs) var(--space-xs);
-    overflow: hidden;
     border: var(--rule-width) solid var(--color-border);
     background: var(--house-wash-soft);
     box-shadow: var(--rule-width) var(--rule-width) 0 var(--color-border);
@@ -341,41 +374,58 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
     font-size: var(--text-xs);
     line-height: var(--leading-tight);
     rotate: var(--house-note-tilt);
+  }
+  .house-room__note > span {
+    display: -webkit-box;
+    overflow: hidden;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
   .house-room__note time {
     margin-inline-end: var(--space-2xs);
     color: var(--color-accent);
     font-weight: var(--weight-bold);
   }
-  .house-room__floor {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--space-xs);
-    inline-size: 100%;
-    margin-top: auto;
-    padding-top: var(--space-xs);
+
+  /* ---------- The front door and the mat outside it ---------- */
+  .house-entry {
+    flex: 1 1 var(--house-porch-width);
+    align-items: center;
+    justify-content: center;
   }
-  .house-room__furniture {
-    flex: none;
-    inline-size: var(--house-furniture-width);
-    fill: none;
-    stroke: var(--color-text-soft);
-    stroke-width: 1.4;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .house-entry .house-room__door {
+    top: calc(var(--house-plan-wall) * -1);
   }
-  .house-room__people,
-  .house-porch__people {
+  .house-entry__door {
+    inset-inline: 0;
+    margin-inline: auto;
+    bottom: calc(var(--house-plan-outer) * -1);
+    block-size: var(--house-plan-outer);
+  }
+  .house-entry__mat {
+    position: absolute;
+    top: calc(100% + var(--house-plan-outer) + var(--space-2xs));
+    left: 50%;
     display: flex;
-    align-items: flex-end;
-    gap: var(--space-m);
+    align-items: center;
+    gap: var(--space-s);
+    min-inline-size: calc(var(--house-door-size) * 2);
+    min-block-size: calc(var(--house-mat-height) - var(--space-xs));
+    padding: var(--space-2xs) var(--space-xs);
+    border: var(--rule-width) dashed var(--color-border);
+    border-radius: var(--radius-note);
+    translate: -50% 0;
+    justify-content: center;
+  }
+  .house-entry__welcome {
+    color: var(--color-text-soft);
+    font-family: var(--font-serif);
+    font-size: var(--text-sm);
+    font-style: italic;
   }
 
-  /* ---------- People ---------- */
+  /* ---------- People, seen from above ---------- */
   .house-figure {
     display: inline-grid;
     justify-items: center;
@@ -395,13 +445,12 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
   .house-figure__body {
     fill: var(--house-wash-soft);
     stroke: var(--color-text);
-    stroke-width: 1.5;
+    stroke-width: 1.4;
   }
-  .house-figure__leg,
   .house-figure__tool {
     fill: none;
     stroke: var(--color-text);
-    stroke-width: 1.8;
+    stroke-width: 1.6;
     stroke-linecap: round;
   }
   .house-figure__prop {
@@ -421,19 +470,16 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
   }
   @media (prefers-reduced-motion: no-preference) {
     .house-figure[data-figure="resident"] svg {
-      animation: house-bob var(--house-motion-duration) ease-in-out infinite;
+      animation: house-breathe calc(var(--house-motion-duration) / 2)
+        ease-in-out infinite;
     }
     .house-figure[data-figure="visitor"] {
       animation: house-wander var(--house-motion-duration) ease-in-out infinite;
     }
-    .house-figure[data-figure="visitor"] svg {
-      animation: house-bob calc(var(--house-motion-duration) / 6) ease-in-out
-        infinite;
-    }
-    .house-figure:nth-child(2) {
+    .house-figure:nth-child(odd) {
       animation-delay: calc(var(--house-motion-duration) / -2.7);
     }
-    .house-figure:nth-child(3) {
+    .house-figure:nth-child(3n) {
       animation-delay: calc(var(--house-motion-duration) / -1.6);
     }
     .house-figure[data-arriving] {
@@ -442,46 +488,9 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
         house-wander var(--house-motion-duration) ease-in-out
           var(--house-walk-in) infinite;
     }
-  }
-
-  /* ---------- Porch ---------- */
-  .house-porch {
-    display: flex;
-    flex: 1 1 var(--house-porch-width);
-    flex-direction: column;
-    gap: var(--space-2xs);
-    min-block-size: var(--house-room-height);
-    padding: calc(var(--house-lamp-drop) + var(--space-xs)) var(--space-s) 0;
-    border-inline-end: var(--house-wall-width) solid var(--color-text);
-    border-block-end: var(--house-slab) solid var(--color-text);
-  }
-  .house-porch__mat {
-    color: var(--color-text-soft);
-    font-family: var(--font-serif);
-    font-size: var(--text-sm);
-    font-style: italic;
-  }
-  .house-porch__step {
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    gap: var(--space-s);
-    margin-top: auto;
-  }
-  .house-porch__door {
-    flex: none;
-    inline-size: calc(var(--house-door-size) * 1.5);
-    block-size: calc(var(--house-door-size) * 2.4);
-    border: var(--house-wall-width) solid var(--color-text);
-    border-block-end: 0;
-    border-radius: var(--radius-note);
-    background:
-      radial-gradient(
-        circle at 78% 55%,
-        var(--color-text) 0 calc(var(--space-2xs) / 2),
-        transparent calc(var(--space-2xs) / 2 + var(--rule-width))
-      ),
-      var(--color-accent);
+    [data-wing="around"] .house-figure[data-arriving] {
+      animation-name: house-arrive-down, house-wander;
+    }
   }
 
   /* ---------- The postcard ---------- */
@@ -564,9 +573,9 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
     gap: var(--space-xs);
   }
 
-  @keyframes house-bob {
+  @keyframes house-breathe {
     50% {
-      translate: 0 calc(var(--house-motion-drift) / -6);
+      scale: 1.06;
     }
   }
   @keyframes house-wander {
@@ -574,28 +583,26 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
     100% {
       translate: 0 0;
     }
-    35% {
-      translate: calc(var(--house-motion-drift) / -2) 0;
+    30% {
+      translate: calc(var(--house-motion-drift) / -2)
+        calc(var(--house-motion-drift) / 3);
     }
-    70% {
-      translate: calc(var(--house-motion-drift) / 3) 0;
+    65% {
+      translate: calc(var(--house-motion-drift) / 3)
+        calc(var(--house-motion-drift) / -3);
     }
   }
+  /* People walk in through the door from the hallway. */
   @keyframes house-arrive {
     from {
-      translate: calc(var(--house-room-min) / -2) 0;
+      translate: 0 var(--house-room-height);
       opacity: 0;
     }
   }
-  @keyframes house-smoke {
+  @keyframes house-arrive-down {
     from {
-      opacity: 0.8;
-      transform: translate(0, 0) scale(0.6);
-    }
-    to {
+      translate: 0 calc(var(--house-room-height) * -1);
       opacity: 0;
-      transform: translate(var(--space-m), calc(var(--house-roof-height) * -1))
-        scale(1.6);
     }
   }
   @keyframes house-pulse {
@@ -604,12 +611,8 @@ const safeInput = JSON.stringify(input).replace(/</g, "\\u003c");
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    [data-busy="true"] .house-roof__chimney i,
     [data-busy="true"] > .house-status::before {
       animation: none;
-    }
-    [data-busy="true"] .house-roof__chimney i:first-child {
-      opacity: 0.6;
     }
   }
 </style>

@@ -56,12 +56,13 @@ test("a quiet house names its residents without inventing visitors", () => {
   const quiet = scene();
   assert.equal(quiet.busy, false);
   assert.equal(quiet.status, "Hermes is minding Cockpit. Nobody else has checked in just now.");
-  assert.deepEqual(quiet.upstairs.map((room) => room.id), ["undertext"]);
-  assert.deepEqual(quiet.downstairs.map((room) => room.id), ["cockpit"]);
+  assert.deepEqual(quiet.studios.map((room) => room.id), ["undertext"]);
+  assert.deepEqual(quiet.around.map((room) => room.id), ["cockpit"]);
   const markup = renderHouseMarkup(quiet, { selectedId: "undertext" });
   assert.doesNotMatch(markup, /data-figure="visitor"/);
   assert.match(markup, /data-figure="resident"/);
-  assert.match(markup, /The front door/);
+  assert.match(markup, /Front door/);
+  assert.match(markup, /Welcome/);
 });
 
 test("a fresh actor lights their room and walks in; one without a room waits at the door", () => {
@@ -78,7 +79,7 @@ test("a fresh actor lights their room and walks in; one without a room waits at 
     arriving: new Set(["visitor:astra:undertext"]),
   });
   assert.match(markup, /data-figure="visitor" data-prop="tinkerer" data-arriving/);
-  assert.match(markup, /Someone’s at the door/);
+  assert.match(markup, /house-entry__mat"><span class="house-figure" data-figure="visitor"/);
 });
 
 test("expired signals leave the lights off", () => {

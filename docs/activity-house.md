@@ -27,18 +27,20 @@ records, approved durable activity, and fresh presence signals.
 
 ## The drawing
 
-`src/lib/house-scene.mjs` turns the model into a dollhouse cross-section: a
-roof, an upstairs of project studios, a downstairs of places, and a front
-door. The same module renders the markup on the server and in the browser, so
+`src/lib/house-scene.mjs` turns the model into a floorplan seen from above:
+project studios along the top, a hallway through the middle, the other places
+below it, and a front door opening onto a mat outside. Walls are the ink
+showing between rooms; each room has a door gap toward the hallway. The same module renders the markup on the server and in the browser, so
 a feed refresh draws exactly what first paint drew. Every interpolated string
 is escaped there, and the component's styles are global for the same reason.
 
-- Residents are ink figures who bob in place. Visitors are filled figures who
-  wander a little and walk in when they first appear.
+- Residents are ink figures who breathe in place. Visitors are filled figures
+  who wander a little and walk in through the door when they first appear.
 - An actor's free-text role picks a costume (builder's hat, scout's spyglass,
   tinkerer's wrench, consultant's clipboard, messenger's envelope). An unknown
   role gets a plain figure; the costume never adds a claim.
-- The chimney smokes and the status dot pulses only while a light is on.
+- A lit room's ceiling-light symbol glows and the status dot pulses only while
+  a light is on.
 - The status line is written from the scene: who is where, or who is minding
   which room when nobody has checked in.
 
