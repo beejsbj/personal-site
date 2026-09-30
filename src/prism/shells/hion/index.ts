@@ -14,7 +14,9 @@ import { buildScreen } from "./screens";
 import { createSky } from "./sky";
 import { createWeave } from "./weave";
 import { writeHeading } from "./write";
+import { mountMicro, screenMicro } from "./micro";
 import "./shell.css";
+import "./micro.css";
 
 interface Live {
   path: string;
@@ -75,6 +77,7 @@ function show(route: Route, first: boolean) {
     origin: () => rail.origin(),
   });
   live = { path: route.path, screen, weave, controller };
+  screenMicro(screen, controller.signal);
   rail.setCurrent(route.path);
   sky.setPose(route.kind);
   const title = screen.querySelector<HTMLElement>("h1");
@@ -132,6 +135,7 @@ const shell: LensShell = {
       isIdle: context.isIdle,
       onIdleChange: context.onIdleChange,
     });
+    mountMicro(context, rail.el);
     show(context.route, true);
     signal.addEventListener("abort", () => live?.controller.abort());
   },

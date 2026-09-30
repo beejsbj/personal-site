@@ -98,6 +98,14 @@ function portrait(caption: Node | null) {
             rx: 188,
             ry: 58,
           }),
+          s("ellipse", {
+            class: "hion-portrait__bead hion-portrait__bead--magenta",
+            cx: 0,
+            cy: 0,
+            rx: 188,
+            ry: 58,
+            pathLength: "1",
+          }),
         ),
       ),
       s(
@@ -112,6 +120,14 @@ function portrait(caption: Node | null) {
             cy: 0,
             rx: 176,
             ry: 40,
+          }),
+          s("ellipse", {
+            class: "hion-portrait__bead hion-portrait__bead--cyan",
+            cx: 0,
+            cy: 0,
+            rx: 176,
+            ry: 40,
+            pathLength: "1",
           }),
         ),
       ),
@@ -180,6 +196,8 @@ function town() {
           y: py.toFixed(1),
           width: pw.toFixed(1),
           height: ph.toFixed(1),
+          // Each lamp on its own bad line: flickers at its own pace.
+          style: `--hion-lamp:${(6 + rand() * 9).toFixed(1)}s;--hion-lamp-delay:${(-rand() * 12).toFixed(1)}s`,
         }),
       );
     }

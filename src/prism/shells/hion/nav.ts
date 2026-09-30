@@ -54,6 +54,11 @@ export function createRail(
     },
     s("path", { class: "hion-rail__cable-glow", d: "M-2 2Q50 22 102 2" }),
     s("path", { class: "hion-rail__cable-core", d: "M-2 2Q50 22 102 2" }),
+    s("path", {
+      class: "hion-rail__cable-pulse",
+      d: "M-2 2Q50 22 102 2",
+      pathLength: "1",
+    }),
   );
 
   const list = h("ul", { class: "hion-rail__lines" });
