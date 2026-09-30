@@ -53,7 +53,8 @@ export interface SiteContent {
   }[];
   lab: {
     slug: string;
-    /** Local detail page. `href`, when present, is the live experiment. */
+    /** Where the entry lives: its local page, or the live experiment when it
+     * has no local page (then `detail === href`). */
     detail: string;
     href?: string;
     title: string;
