@@ -23,6 +23,15 @@ const isExternal = (href: string) => /^(https?:)?\/\//.test(href) && !href.start
 export function phonePanel(content: SiteContent): Panel {
   const close = closeButton("Back");
   const thread = h("ol", { class: "cc-phone__thread" });
+  // Someone is typing the next update: three dots above the newest message.
+  thread.append(
+    h(
+      "li",
+      { class: "cc-msg cc-msg--typing", style: `--i:${content.updates.length}`, "aria-hidden": "true" },
+      h("span", { class: "cc-msg__avatar" }, "B"),
+      h("span", { class: "cc-msg__bubble cc-msg__dots" }, h("i", {}), h("i", {}), h("i", {})),
+    ),
+  );
   let lastDay = "";
   content.updates.forEach((update, i) => {
     if (update.date !== lastDay) {

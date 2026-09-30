@@ -11,6 +11,7 @@ import {
 } from "./chrome";
 import { WEEKDAYS, concentricStar, h, parseDay, ransom, starPoints, svg } from "./dom";
 import { portrait } from "./portrait";
+import { flashPortrait, slideHelp, tickUp, tickWords } from "./micro";
 
 interface Command {
   id: string;
@@ -62,18 +63,23 @@ function dateWidget(env: Env) {
   const latest = env.content.updates[0];
   if (!latest) return null;
   const day = parseDay(latest.date);
+  const month = h("span", { class: "cc-date__m" }, String(day.getUTCMonth() + 1));
+  const date = h("span", { class: "cc-date__d" }, String(day.getUTCDate()));
+  const weekday = h("span", { class: "cc-date__wd" }, WEEKDAYS[day.getUTCDay()]);
+  // The calendar flips forward to today once the screen lands.
+  if (!env.face) {
+    tickUp(month, day.getUTCMonth() + 1, { delay: 420, duration: 360 });
+    tickUp(date, day.getUTCDate(), { delay: 480, duration: 520 });
+    tickWords(weekday, [...WEEKDAYS, ...WEEKDAYS].slice(day.getUTCDay() + 1, day.getUTCDay() + 8), WEEKDAYS[day.getUTCDay()], { delay: 480, duration: 520 });
+  }
   return h(
     "aside",
     { class: "cc-date", "aria-label": `Last updated ${latest.dateLabel}` },
     h(
       "p",
       { class: "cc-date__day", "aria-hidden": "true" },
-      h("span", { class: "cc-date__md" },
-        h("span", { class: "cc-date__m" }, String(day.getUTCMonth() + 1)),
-        h("span", { class: "cc-date__slash" }, "/"),
-        h("span", { class: "cc-date__d" }, String(day.getUTCDate())),
-      ),
-      h("span", { class: "cc-date__wd" }, WEEKDAYS[day.getUTCDay()]),
+      h("span", { class: "cc-date__md" }, month, h("span", { class: "cc-date__slash" }, "/"), date),
+      weekday,
       sun(),
     ),
     h("p", { class: "cc-date__time", "aria-hidden": "true" }, "Daytime"),
@@ -230,12 +236,19 @@ export function home(route: Route, env: Env): Screen {
     prompts([["↑↓", "Select"], ["⏎", "Confirm"], ["Esc", "Back"]]),
   );
 
+  let first = true;
   const menu = roving(items, env.signal, (i) => {
     remembered = i;
     helpText.textContent = commands[i].help;
-    indexNum.textContent = String(i + 1).padStart(2, "0");
+    // A fresh child restarts the slam every time the number changes.
+    indexNum.replaceChildren(h("span", { class: "cc-home__num-digit" }, String(i + 1).padStart(2, "0")));
     el.style.setProperty("--sel", String(i));
     el.dataset.selected = commands[i].id;
+    if (!first && !env.face) {
+      flashPortrait(figure);
+      slideHelp(helper.lastElementChild);
+    }
+    first = false;
   }, remembered);
 
   return {

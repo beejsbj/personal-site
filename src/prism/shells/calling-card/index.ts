@@ -18,6 +18,7 @@ import { about } from "./about";
 import { resume } from "./resume";
 import { other } from "./other";
 import { createWipe, type Wipe } from "./wipe";
+import { pressPrompt, setMotion, shake, wireClicks } from "./micro";
 
 const FACTORIES: Record<Route["kind"], ScreenFactory> = {
   home,
@@ -77,6 +78,7 @@ function openPanel(kind: "phone" | "card", opener?: HTMLElement) {
   panelHost.replaceChildren(built.el);
   stage.inert = true;
   built.el.dataset.state = "open";
+  shake(stage, 0.8);
   built.el.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
     if (target.closest("[data-cc-close]")) closePanel();
@@ -112,12 +114,16 @@ function onClick(event: MouseEvent) {
   if (!link || !isInternal(link, event)) return;
   const title = link.dataset.ccTitle ?? link.textContent?.trim() ?? "";
   pendingTitle = title.slice(0, 28);
-  if (!ctx?.face) void wipe.cover(pendingTitle);
+  if (!ctx?.face) {
+    shake(stage);
+    void wipe.cover(pendingTitle);
+  }
 }
 
 function onKey(event: KeyboardEvent) {
   if (!screen || event.metaKey || event.ctrlKey || event.altKey) return;
   if (isTyping(event.target)) return;
+  if (!event.repeat) pressPrompt(screen.el, event.key);
   if (panel) {
     if (event.key === "Escape" || event.key === "Backspace") {
       event.preventDefault();
@@ -180,10 +186,13 @@ const shell: LensShell = {
       face: context.face,
       reducedMotion: context.reducedMotion,
       signal,
+      isIdle: () => context.isIdle(),
       open: openPanel,
     };
     root.classList.add("cc-root");
     if (context.face) root.dataset.face = "";
+    setMotion({ reduced: context.reducedMotion, isIdle: () => context.isIdle(), signal });
+    if (!context.face) wireClicks(root, signal);
     stage = h("div", { class: "cc-stage" });
     panelHost = h("div", { class: "cc-panels" });
     const skip = h("a", { class: "cc-skip", href: "#cc-main" }, "Skip to content");

@@ -60,18 +60,19 @@ export function about(route: Route, env: Env): Screen {
   let rank = 1;
   const source = route.main.querySelector(".prose");
   for (const node of Array.from(source?.children ?? [])) {
+    const style = `--i:${talk.childElementCount}`;
     if (/^H[2-6]$/.test(node.tagName)) {
       rank++;
       talk.append(
         h(
           "h2",
-          { class: "cc-rankup" },
+          { class: "cc-rankup", style },
           h("span", { class: "cc-rankup__tag", "aria-hidden": "true" }, `Rank ${rank}`),
           h("span", {}, node.textContent ?? ""),
         ),
       );
     } else {
-      const box = h("div", { class: "cc-say" }, h("span", { class: "cc-say__name", "aria-hidden": "true" }, "Burooj"));
+      const box = h("div", { class: "cc-say", style }, h("span", { class: "cc-say__name", "aria-hidden": "true" }, "Burooj"));
       box.append(node.cloneNode(true));
       talk.append(box);
     }
@@ -91,7 +92,7 @@ export function about(route: Route, env: Env): Screen {
         h(
           "span",
           { class: "cc-confidant__pips", "aria-hidden": "true" },
-          Array.from({ length: 10 }, () => h("span", {})),
+          Array.from({ length: 10 }, (_, i) => h("span", { style: `--i:${i}` })),
         ),
       ),
     ),

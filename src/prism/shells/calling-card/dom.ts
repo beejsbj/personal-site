@@ -95,6 +95,7 @@ export function ransom(text: string, options: RansomOptions = {}) {
           "data-box":
             !first && /[a-z0-9]/i.test(char) && random() < boxes ? "1" : null,
           style: [
+            `--n:${index}`,
             `--r:${((random() * 2 - 1) * tilt).toFixed(1)}deg`,
             `--s:${first ? 1.28 : (0.84 + random() * 0.3).toFixed(2)}`,
             `--y:${((random() * 2 - 1) * 0.06).toFixed(3)}em`,

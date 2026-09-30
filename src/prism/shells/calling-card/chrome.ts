@@ -8,6 +8,8 @@ export interface Env {
   face: boolean;
   reducedMotion: boolean;
   signal: AbortSignal;
+  /** True while this page is an off-axis prism face; JS loops should rest. */
+  isIdle(): boolean;
   /** Open an in-shell panel (the phone, the calling card). */
   open(panel: "phone" | "card", opener?: HTMLElement): void;
 }
