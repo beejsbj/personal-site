@@ -1,0 +1,427 @@
+/** The instrument itself: status bar, log drawer, stage, the score of
+ * updates and the seven-key keyboard that is the site's navigation. It
+ * persists across routes; only the screen on the stage changes. */
+import type { Route, ShellContext } from "../types";
+import { h, link, markup } from "./dom";
+import { keysFor, noteForKind, noteForUpdate, NOTES, noteVar, type Key } from "./notes";
+import { play, setSound, soundOn } from "./sound";
+
+export interface Frame {
+  app: HTMLElement;
+  stage: HTMLElement;
+  tear: HTMLElement;
+  beat: HTMLElement;
+  keys: Key[];
+  /** Light the key for this route immediately (before the screen swaps). */
+  light(route: Route): void;
+  /** Settle chrome layout for this route (called while the tear covers). */
+  settle(route: Route): void;
+}
+
+const shortDate = (iso: string) => {
+  const [, month, day] = iso.split("-");
+  return day && month ? `${day}.${month}` : iso;
+};
+
+export function buildFrame(ctx: ShellContext): Frame {
+  const { content, signal, face } = ctx;
+  const keys = keysFor(content);
+  const on = (target: EventTarget, type: string, fn: (event: Event) => void) =>
+    target.addEventListener(type, fn, { signal });
+
+  /* ── status bar ─────────────────────────────────────────── */
+  const beat = h(
+    "div",
+    { class: "cp-beat", "aria-hidden": "true" },
+    h("i", { "data-cell": "1" }),
+    h("i", { "data-cell": "2" }),
+    h("i", { "data-cell": "3" }),
+    h("i", { "data-cell": "4" }),
+  );
+  const readoutNote = h("span", { class: "cp-readout__note" }, "Do");
+  const readoutWhere = h("span", { class: "cp-readout__where" }, "home");
+  const soundButton = h(
+    "button",
+    {
+      type: "button",
+      class: "cp-sound",
+      "aria-pressed": "false",
+      "data-state": "off",
+    },
+    markup(
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="cp-sound__wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="cp-sound__mute" d="M16 9l6 6M22 9l-6 6"/></svg>',
+    ),
+    h("span", { class: "cp-sound__label" }, "Sound"),
+    h("span", { class: "cp-sound__state" }, "off"),
+  );
+  const logButton = h(
+    "button",
+    {
+      type: "button",
+      class: "cp-logbtn",
+      "aria-expanded": "false",
+      "aria-controls": "cp-log",
+    },
+    h("span", { class: "cp-logbtn__label" }, "Log"),
+    h("span", { class: "cp-logbtn__count" }, String(content.updates.length)),
+    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h8"/></svg>'),
+  );
+
+  const top = h(
+    "header",
+    { class: "cp-top" },
+    h(
+      "a",
+      { class: "cp-logo", href: "/", "aria-label": `${content.site.name}, home` },
+      h("span", { class: "cp-logo__paper", "aria-hidden": "true" }, "Burooj."),
+    ),
+    h(
+      "p",
+      { class: "cp-chip" },
+      h("span", { class: "cp-chip__swatch", "aria-hidden": "true" }),
+      h("span", { class: "cp-chip__name" }, "burooj"),
+      h("span", { class: "cp-chip__sep", "aria-hidden": "true" }, " · "),
+      h("span", { class: "cp-chip__role" }, "frontend developer"),
+    ),
+    h(
+      "p",
+      { class: "cp-readout" },
+      readoutNote,
+      h("span", { class: "cp-readout__sep", "aria-hidden": "true" }, "·"),
+      readoutWhere,
+      h("span", { class: "cp-readout__sep", "aria-hidden": "true" }, "·"),
+      h("span", null, "c major"),
+      h("span", { class: "cp-readout__sep", "aria-hidden": "true" }, "·"),
+      h("span", { class: "cp-readout__bpm" }, "120 bpm"),
+    ),
+    beat,
+    logButton,
+    face ? null : soundButton,
+  );
+
+  /* ── log drawer (all updates) ───────────────────────────── */
+  const logClose = h(
+    "button",
+    { type: "button", class: "cp-log__close", "aria-label": "Close the log" },
+    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13"/></svg>'),
+  );
+  const log = h(
+    "section",
+    {
+      class: "cp-log",
+      id: "cp-log",
+      "aria-labelledby": "cp-log-title",
+      "data-state": "closed",
+      inert: true,
+    },
+    h(
+      "div",
+      { class: "cp-log__head" },
+      h("h2", { class: "cp-log__title", id: "cp-log-title" }, "Log"),
+      h("p", { class: "cp-log__meta" }, `recent updates · ${content.updates.length} events`),
+      logClose,
+    ),
+    h(
+      "ol",
+      { class: "cp-log__list" },
+      content.updates.map((update) => {
+        const note = noteForUpdate(update.kind);
+        return h(
+          "li",
+          { class: "cp-log__event", style: `--note:${noteVar(note.id)}` },
+          h("time", { class: "cp-log__date", datetime: update.date }, update.dateLabel),
+          h(
+            "p",
+            { class: "cp-log__kind" },
+            h("span", { class: "cp-log__sol", "aria-hidden": "true" }, note.sol),
+            `${update.source} · ${update.kind.replace(/-/g, " ")}`,
+          ),
+          h(
+            "h3",
+            { class: "cp-log__name" },
+            link(update.href, { class: "cp-log__link" }, update.title),
+          ),
+          update.summary ? h("p", { class: "cp-log__sum" }, update.summary) : null,
+        );
+      }),
+    ),
+  );
+
+  /* ── stage ──────────────────────────────────────────────── */
+  const strings = h(
+    "div",
+    { class: "cp-strings", "aria-hidden": "true" },
+    NOTES.map((note) => h("i", { class: "cp-string", "data-note": note.id })),
+  );
+  const tearLabel = h("span", { class: "cp-tear__label" });
+  const tear = h(
+    "div",
+    { class: "cp-tear", "aria-hidden": "true" },
+    h("span", { class: "cp-tear__confetti" }),
+    tearLabel,
+  );
+  const stage = h(
+    "main",
+    { class: "cp-stage", id: "cp-stage", tabindex: "-1" },
+    strings,
+    tear,
+  );
+
+  /* ── score: the updates as a strip of pattern tokens ─────── */
+  const tokens = (hidden: boolean) =>
+    h(
+      "ul",
+      { class: "cp-score__run", ...(hidden ? { "aria-hidden": "true" } : {}) },
+      h("li", { class: "cp-score__tick" }, "`<"),
+      content.updates.map((update) => {
+        const note = noteForUpdate(update.kind);
+        const anchor = link(update.href, { class: "cp-tok__link" }, update.title);
+        if (hidden) anchor.setAttribute("tabindex", "-1");
+        return h(
+          "li",
+          { class: "cp-tok", style: `--note:${noteVar(note.id)}` },
+          h("span", { class: "cp-tok__brace", "aria-hidden": "true" }, "{"),
+          anchor,
+          h("span", { class: "cp-tok__at" }, `@${shortDate(update.date)}`),
+          h("span", { class: "cp-tok__brace", "aria-hidden": "true" }, "}"),
+          h("span", { class: "cp-tok__rest", "aria-hidden": "true" }, "~"),
+        );
+      }),
+      h("li", { class: "cp-score__tick" }, '>`.log("burooj")'),
+    );
+  const tape = h("div", { class: "cp-score__tape" }, tokens(false), tokens(true));
+  const pauseButton = h(
+    "button",
+    {
+      type: "button",
+      class: "cp-score__play",
+      "aria-pressed": "false",
+      "aria-label": "Pause the updates tape",
+    },
+    markup(
+      '<svg viewBox="0 0 16 16" aria-hidden="true"><path class="cp-score__icon-pause" d="M5 3v10M11 3v10"/><path class="cp-score__icon-play" d="M4 2.5v11L13.5 8z"/></svg>',
+    ),
+  );
+  const scoreCount = h(
+    "button",
+    {
+      type: "button",
+      class: "cp-score__count",
+      "aria-controls": "cp-log",
+      "aria-expanded": "false",
+      "aria-label": `Open the log of ${content.updates.length} updates`,
+    },
+    h("span", null, String(content.updates.length)),
+    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h8"/></svg>'),
+  );
+  const score = h(
+    "section",
+    { class: "cp-score", "aria-label": "Recent updates", "data-state": "playing" },
+    pauseButton,
+    h(
+      "div",
+      { class: "cp-score__window" },
+      h("p", { class: "cp-score__label" }, "Updates"),
+      h("div", { class: "cp-score__viewport" }, tape),
+    ),
+    scoreCount,
+  );
+
+  /* ── keyboard: the navigation ───────────────────────────── */
+  const keyLinks = keys.map((key, index) => {
+    const anchor = link(
+      key.href,
+      {
+        class: "cp-key",
+        "data-note": key.note.id,
+        "data-state": "rest",
+        style: `--note:${noteVar(key.note.id)}; --i:${index}`,
+      },
+      h(
+        "span",
+        { class: "cp-key__sol", "aria-hidden": "true" },
+        key.note.sol,
+        h("small", null, key.note.pitch),
+      ),
+      h("span", { class: "cp-key__name" }, key.label),
+      h("span", { class: "cp-key__hint", "aria-hidden": "true" }, key.hint),
+      h("span", { class: "cp-key__led", "aria-hidden": "true" }),
+    );
+    return anchor;
+  });
+  const fold = h(
+    "button",
+    {
+      type: "button",
+      class: "cp-keys__fold",
+      "aria-expanded": "true",
+      "aria-label": "Fold the keyboard",
+    },
+    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg>'),
+  );
+  const nav = h(
+    "nav",
+    { class: "cp-keys", "aria-label": "Sections" },
+    fold,
+    h(
+      "ul",
+      { class: "cp-keys__row" },
+      keyLinks.map((anchor) => h("li", { class: "cp-keys__slot" }, anchor)),
+    ),
+  );
+
+  const skip = h("a", { class: "cp-skip", href: "#cp-stage" }, "Skip to content");
+  const app = h(
+    "div",
+    {
+      class: "cp-app",
+      "data-route": ctx.route.kind,
+      "data-keys": "open",
+      ...(face ? { "data-face": "" } : {}),
+    },
+    skip,
+    top,
+    log,
+    stage,
+    score,
+    nav,
+  );
+
+  /* ── behaviour ──────────────────────────────────────────── */
+  on(skip, "click", (event) => {
+    event.preventDefault();
+    const heading = stage.querySelector<HTMLElement>(".cp-screen:not([inert]) h1");
+    (heading ?? stage).focus();
+  });
+
+  // keys: hover blooms the string, press stabs, sound when opted in
+  const hover = (note: string | null) => {
+    if (note) app.dataset.hover = note;
+    else delete app.dataset.hover;
+  };
+  keyLinks.forEach((anchor, index) => {
+    const key = keys[index];
+    on(anchor, "pointerenter", (event) => {
+      hover(key.note.id);
+      if ((event as PointerEvent).pointerType === "mouse") play(key.note.frequency, 0.55);
+    });
+    on(anchor, "pointerleave", () => {
+      hover(null);
+      anchor.dataset.state = anchor.getAttribute("aria-current") ? "held" : "rest";
+    });
+    on(anchor, "pointerdown", () => {
+      anchor.dataset.state = "pressed";
+      play(key.note.frequency, 1);
+    });
+    on(anchor, "focus", () => {
+      hover(key.note.id);
+      if (anchor.matches(":focus-visible")) play(key.note.frequency, 0.55);
+    });
+    on(anchor, "blur", () => hover(null));
+    on(anchor, "keydown", (event) => {
+      const { key: pressed } = event as KeyboardEvent;
+      const moves: Record<string, number> = {
+        ArrowRight: index + 1,
+        ArrowDown: index + 1,
+        ArrowLeft: index - 1,
+        ArrowUp: index - 1,
+        Home: 0,
+        End: keyLinks.length - 1,
+      };
+      if (!(pressed in moves)) return;
+      event.preventDefault();
+      const next = (moves[pressed] + keyLinks.length) % keyLinks.length;
+      keyLinks[next].focus();
+    });
+  });
+
+  // fold / unfold the keyboard (inner routes start folded)
+  const setKeys = (open: boolean) => {
+    app.dataset.keys = open ? "open" : "closed";
+    fold.setAttribute("aria-expanded", String(open));
+    fold.setAttribute("aria-label", open ? "Fold the keyboard" : "Unfold the keyboard");
+  };
+  on(fold, "click", () => setKeys(app.dataset.keys !== "open"));
+
+  // sound: off until asked
+  on(soundButton, "click", () => {
+    const next = !soundOn();
+    setSound(next);
+    soundButton.setAttribute("aria-pressed", String(next));
+    soundButton.dataset.state = next ? "on" : "off";
+    soundButton.querySelector(".cp-sound__state")!.textContent = next ? "on" : "off";
+    if (next) play(NOTES[0].frequency, 0.8);
+  });
+
+  // score: pause / play the moving tape
+  const setTape = (playing: boolean) => {
+    score.dataset.state = playing ? "playing" : "paused";
+    pauseButton.setAttribute("aria-pressed", String(!playing));
+    pauseButton.setAttribute(
+      "aria-label",
+      playing ? "Pause the updates tape" : "Play the updates tape",
+    );
+  };
+  on(pauseButton, "click", () => setTape(score.dataset.state !== "playing"));
+  if (ctx.reducedMotion) setTape(false);
+
+  // log drawer: slides down from the status bar, never fades
+  let returnFocus: HTMLElement | null = null;
+  const setLog = (open: boolean, from?: HTMLElement) => {
+    log.dataset.state = open ? "open" : "closed";
+    log.inert = !open;
+    for (const button of [logButton, scoreCount])
+      button.setAttribute("aria-expanded", String(open));
+    if (open) {
+      returnFocus = from ?? null;
+      logClose.focus({ preventScroll: true });
+    } else if (returnFocus) {
+      returnFocus.focus({ preventScroll: true });
+      returnFocus = null;
+    }
+  };
+  on(logButton, "click", () => setLog(log.dataset.state !== "open", logButton));
+  on(scoreCount, "click", () => setLog(log.dataset.state !== "open", scoreCount));
+  on(logClose, "click", () => setLog(false));
+  on(document, "keydown", (event) => {
+    if ((event as KeyboardEvent).key === "Escape" && log.dataset.state === "open")
+      setLog(false);
+  });
+  on(document, "pointerdown", (event) => {
+    if (log.dataset.state !== "open") return;
+    const target = event.target as Node;
+    if (!log.contains(target) && !logButton.contains(target) && !scoreCount.contains(target))
+      setLog(false);
+  });
+  on(log, "click", (event) => {
+    if ((event.target as Element).closest("a")) setLog(false);
+  });
+
+  /* ── route reactions ────────────────────────────────────── */
+  const light = (route: Route) => {
+    const note = noteForKind(keys, route.kind);
+    keyLinks.forEach((anchor, index) => {
+      const held = keys[index].note === note;
+      if (held) anchor.setAttribute("aria-current", "page");
+      else anchor.removeAttribute("aria-current");
+      anchor.dataset.state = held ? "held" : "rest";
+    });
+    app.dataset.note = note?.id ?? "none";
+    readoutNote.textContent = note?.sol ?? "—";
+    readoutWhere.textContent =
+      keys.find((key) => key.note === note)?.label.toLowerCase() ?? "sheet";
+    tearLabel.textContent = `${keys.find((key) => key.note === note)?.label ?? "Sheet"}.`;
+    tear.style.setProperty("--note", note ? noteVar(note.id) : "var(--cp-ivory)");
+  };
+
+  const settle = (route: Route) => {
+    app.dataset.route = route.kind;
+    setKeys(route.kind === "home");
+    if (log.dataset.state === "open") setLog(false);
+  };
+
+  light(ctx.route);
+  settle(ctx.route);
+
+  return { app, stage, tear, beat, keys, light, settle };
+}
