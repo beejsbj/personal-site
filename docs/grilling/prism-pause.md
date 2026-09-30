@@ -24,11 +24,20 @@ first, and the prism must not add, remove, or rename base content types.
   2. Calling Card: the Roll to Win lottery, Persona 5.
   3. Cut Paper: EmotiTone.
   4. Back Page: Dotfight.
-  5. Hion: Yumi and the Nightmare Painter, via the Spin to Win roulette.
+  5. Hion: Yumi and the Nightmare Painter (the roulette material was purged on 2026-09-30).
 - **How a lens works:**
   - A lens is `data-lens` on `<html>`, applied before paint and after every client swap.
-  - Each lens CSS file in `src/prism/lenses/` is the visual-value authority for its skin and must scope every selector to itself.
+  - **Lenses are whole interfaces, not reskins.** On 2026-09-30 Burooj asked for lenses that are "radically different ... in layout, in navigation, in feel. they dont all need to feel like web pages".
+  - **Shells:** each non-Daylight lens mounts a shell (`src/prism/shells/<id>/`, with the contract in `types.ts`) into a persistent `#lens-shell` root. A shell renders `/prism/content.json` and the current page's server-rendered `<main>`, and follows real URLs.
+  - **Daylight** stays the server-rendered page underneath and is the source of truth.
+  - **What each shell is:**
+    - Calling Card: the Persona 5 game UI.
+    - Cut Paper: the EmotiTone instrument.
+    - Back Page: an exercise book on a desk.
+    - Hion: Kilahito, strung with hion.
+  - **Styling rule:** every lens stylesheet (the lens file and its shell CSS) is scoped to its own `:root[data-lens]` and uses prefixed keyframes, because it stays loaded after the shell unmounts.
 - **Faces are live same-origin iframes** of the current page. What you see from outside is exactly what you step into.
+- **Idle faces:** the faces share the host's main thread, so every face holds still (`data-prism-idle`) except the one in front once the camera settles.
 - **Curiosity triggers:** 20s of lingering, reading past 85% of the page, or a second page view.
 - **The lure:**
   - It flinches from fast grabs but never from slow approaches.
