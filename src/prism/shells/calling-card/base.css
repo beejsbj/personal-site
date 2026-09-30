@@ -1,0 +1,618 @@
+/* Calling Card shell: the base layer. Tokens, the full-viewport game frame,
+   ransom lettering, tabs, prompts, shared parts and the slash wipe. */
+:root[data-lens="calling-card"] .cc-root {
+  --cc-red: #e5191c;
+  --cc-red-deep: #a80d10;
+  --cc-red-dark: #5c0306;
+  --cc-red-text: #ff4a4a; /* red text on black: 5.5:1 */
+  --cc-red-ink: #c0101a; /* red text on white: 6.3:1 */
+  --cc-black: #0a0a0a;
+  --cc-ink: #141414;
+  --cc-white: #fff;
+  --cc-paper: #f4f1ea;
+  --cc-grey: #bdbdbd;
+  --cc-display: "Anton", "Impact", sans-serif;
+  --cc-didone: "Bodoni Moda Variable", "Bodoni 72", "Didot", serif;
+  --cc-body: "Lato", system-ui, sans-serif;
+  --cc-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --cc-snap: cubic-bezier(0.2, 1.8, 0.4, 1);
+  --cc-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --cc-outline:
+    -0.045em -0.045em 0 var(--cc-black), 0.045em -0.045em 0 var(--cc-black),
+    -0.045em 0.045em 0 var(--cc-black), 0.045em 0.045em 0 var(--cc-black),
+    0.1em 0.1em 0 var(--cc-black);
+  --cc-halftone: radial-gradient(circle, rgb(0 0 0 / 0.28) 0 1.6px, transparent 2.2px);
+
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+:root[data-lens="calling-card"] .cc-root ::selection {
+  background: var(--cc-red);
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-root :focus-visible {
+  outline: 3px solid var(--cc-white);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 7px var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-root :focus:not(:focus-visible) {
+  outline: none;
+}
+/* Element resets sit at (0,2,0): above Daylight's element styles, below
+   every .cc- class rule. Daylight's own documents keep their styles. */
+:root[data-lens="calling-card"] :where(.cc-root :is(h1, h2, h3, h4, h5, h6)):not(:where(.cc-doc__page *)) {
+  color: inherit;
+  font-family: inherit;
+  font-weight: 400;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+}
+:root[data-lens="calling-card"] :where(.cc-root a):not(:where(.cc-doc__page *)) {
+  color: inherit;
+}
+:root[data-lens="calling-card"] :where(.cc-root a):not(:where(.cc-doc__page *)):hover {
+  text-decoration: none;
+}
+:root[data-lens="calling-card"] :where(.cc-root kbd) {
+  font-family: var(--cc-display);
+  font-size: 0.85em;
+  letter-spacing: 0.02em;
+}
+:root[data-lens="calling-card"] .cc-root [tabindex="-1"]:focus-visible,
+:root[data-lens="calling-card"] .cc-root [tabindex="-1"]:focus {
+  outline: none;
+  box-shadow: none;
+}
+:root[data-lens="calling-card"] .cc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+:root[data-lens="calling-card"] .cc-skip {
+  position: absolute;
+  z-index: 50;
+  top: 0.75rem;
+  left: 50%;
+  translate: -50% -200%;
+  padding: 0.5rem 1rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  border: 3px solid var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-skip:focus {
+  translate: -50% 0;
+}
+
+/* ---------- Stage & screens ---------- */
+:root[data-lens="calling-card"] .cc-stage {
+  position: absolute;
+  inset: 0;
+}
+:root[data-lens="calling-card"] .cc-screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+:root[data-lens="calling-card"] .cc-screen__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+:root[data-lens="calling-card"] .cc-screen__bg > * {
+  position: absolute;
+  display: block;
+}
+:root[data-lens="calling-card"] .cc-main {
+  position: absolute;
+  inset: 0;
+}
+:root[data-lens="calling-card"] .cc-main:focus {
+  outline: none;
+}
+:root[data-lens="calling-card"] .cc-star {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Ransom lettering ---------- */
+:root[data-lens="calling-card"] .cc-ransom__ink {
+  display: inline;
+}
+:root[data-lens="calling-card"] .cc-w {
+  display: inline-block;
+  white-space: nowrap;
+}
+:root[data-lens="calling-card"] .cc-l {
+  display: inline-block;
+  font-size: calc(var(--s, 1) * 1em);
+  line-height: 1;
+  transform: translateY(var(--y, 0)) rotate(var(--r, 0deg));
+  padding: 0 0.015em;
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-style: normal;
+}
+:root[data-lens="calling-card"] .cc-l[data-f="1"] {
+  font-family: var(--cc-didone);
+  font-weight: 900;
+}
+:root[data-lens="calling-card"] .cc-l[data-f="2"] {
+  font-family: var(--cc-didone);
+  font-weight: 800;
+  font-style: italic;
+}
+:root[data-lens="calling-card"] .cc-l[data-box] {
+  background: var(--cc-box-bg, var(--cc-white));
+  color: var(--cc-box-fg, var(--cc-black));
+  padding: 0.05em 0.07em 0.02em;
+  margin: 0 0.03em;
+  text-shadow: none;
+}
+
+/* ---------- Title block (inner screens) ---------- */
+:root[data-lens="calling-card"] .cc-titleblock {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 0.35rem;
+}
+:root[data-lens="calling-card"] .cc-titleblock__eyebrow {
+  margin: 0;
+  padding: 0.1rem 0.7rem 0.05rem;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: rotate(-4deg) skewX(-12deg);
+  box-shadow: 4px 4px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-title {
+  margin: 0;
+  font-size: clamp(3.2rem, 8vw, 6.6rem);
+  line-height: 0.9;
+  color: var(--cc-white);
+  text-shadow: var(--cc-outline);
+  transform: rotate(-6deg);
+  transform-origin: left center;
+}
+:root[data-lens="calling-card"] .cc-title:focus {
+  outline: none;
+}
+:root[data-lens="calling-card"] .cc-titleblock__sub {
+  margin: 0.4rem 0 0 1.4rem;
+  padding: 0.3rem 0.9rem;
+  max-width: 26rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-didone);
+  font-weight: 800;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.2;
+  transform: rotate(-3deg);
+  clip-path: polygon(0 6%, 100% 0, 98% 100%, 1.5% 94%);
+}
+
+/* ---------- Back prompt, tabs, controller prompts ---------- */
+:root[data-lens="calling-card"] .cc-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.9rem 0.25rem 0.35rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  border: 2px solid var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: skewX(-10deg) rotate(-2deg);
+  box-shadow: 4px 4px 0 var(--cc-red);
+  transition: transform 110ms var(--cc-snap), background 80ms;
+}
+:root[data-lens="calling-card"] .cc-back__key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.2rem;
+  height: 1.9rem;
+  padding: 0 0.3rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+:root[data-lens="calling-card"] .cc-back:hover {
+  background: var(--cc-red);
+  transform: skewX(-10deg) rotate(-2deg) translateX(-4px);
+}
+
+:root[data-lens="calling-card"] .cc-tabs {
+  position: absolute;
+  z-index: 5;
+  top: 1rem;
+  right: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transform: rotate(-2deg);
+}
+:root[data-lens="calling-card"] .cc-tabs ul {
+  display: flex;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-tabs__tab,
+:root[data-lens="calling-card"] .cc-tabs__shoulder {
+  display: inline-grid;
+  place-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.85rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 2px solid var(--cc-white);
+  transform: skewX(-14deg);
+  transition: transform 110ms var(--cc-snap), background 80ms, color 80ms;
+}
+:root[data-lens="calling-card"] .cc-tabs__shoulder {
+  min-width: 2.75rem;
+  padding: 0 0.5rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border-color: var(--cc-black);
+  border-radius: 0.3rem;
+}
+:root[data-lens="calling-card"] .cc-tabs__tab[data-state="current"] {
+  background: var(--cc-red);
+  border-color: var(--cc-white);
+  transform: skewX(-14deg) scale(1.12) translateY(-2px);
+  box-shadow: 4px 4px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-tabs__tab:hover,
+:root[data-lens="calling-card"] .cc-tabs__shoulder:hover {
+  background: var(--cc-white);
+  color: var(--cc-black);
+  transform: skewX(-14deg) translateY(-3px);
+}
+
+:root[data-lens="calling-card"] .cc-prompts {
+  position: absolute;
+  z-index: 4;
+  right: 1.25rem;
+  bottom: 0.9rem;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  font-family: var(--cc-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+:root[data-lens="calling-card"] .cc-prompts__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.55rem 0.15rem 0.2rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  border-radius: 999px;
+}
+:root[data-lens="calling-card"] .cc-prompts kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.7rem;
+  height: 1.7rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-size: 0.8rem;
+}
+
+/* ---------- Chips & shop cards (shared) ---------- */
+:root[data-lens="calling-card"] .cc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-chips li {
+  padding: 0.15rem 0.6rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transform: skewX(-12deg);
+}
+:root[data-lens="calling-card"] .cc-chips li:nth-child(3n + 2) {
+  background: var(--cc-black);
+  color: var(--cc-white);
+  outline: 2px solid var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-shop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 1.1rem;
+  margin: 0;
+  padding: 0.4rem 0 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-shop li {
+  transform: rotate(calc(-3deg + var(--i) * 2.4deg)) translateY(calc(var(--i) * 3px));
+}
+:root[data-lens="calling-card"] .cc-shop__card {
+  display: grid;
+  min-width: 10rem;
+  min-height: 2.75rem;
+  padding: 0.45rem 1.1rem 0.55rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  text-decoration: none;
+  border: 3px solid var(--cc-black);
+  border-radius: 0.45rem;
+  box-shadow: 5px 5px 0 var(--cc-black), 5px 5px 0 2px var(--cc-white);
+  line-height: 1.05;
+  transition: transform 120ms var(--cc-snap), background 80ms, color 80ms;
+}
+:root[data-lens="calling-card"] .cc-shop__card[data-primary] {
+  background: var(--cc-red);
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-shop__verb {
+  font-family: var(--cc-display);
+  font-size: 1.7rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-shop__label {
+  font-family: var(--cc-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-shop__card:hover {
+  transform: translate(-2px, -4px) rotate(-2deg);
+  background: var(--cc-black);
+  color: var(--cc-white);
+}
+
+/* ---------- Prose, dialogue boxes ---------- */
+:root[data-lens="calling-card"] .cc-prose {
+  display: grid;
+  gap: 1rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+:root[data-lens="calling-card"] .cc-prose > * {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-prose h2,
+:root[data-lens="calling-card"] .cc-prose h3 {
+  justify-self: start;
+  margin-top: 0.6rem;
+  padding: 0.15rem 0.8rem 0.1rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1.55rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transform: rotate(-2deg) skewX(-8deg);
+  box-shadow: 5px 5px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-prose ul,
+:root[data-lens="calling-card"] .cc-prose ol {
+  display: grid;
+  gap: 0.4rem;
+  padding-left: 1.4rem;
+}
+:root[data-lens="calling-card"] .cc-prose li::marker {
+  content: "★ ";
+  color: var(--cc-red-text);
+}
+:root[data-lens="calling-card"] .cc-prose a,
+:root[data-lens="calling-card"] .cc-say a,
+:root[data-lens="calling-card"] .cc-member__body a,
+:root[data-lens="calling-card"] .cc-status__lead a {
+  color: var(--cc-white);
+  text-decoration: underline;
+  text-decoration-color: var(--cc-red);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 3px;
+}
+:root[data-lens="calling-card"] .cc-prose a:hover,
+:root[data-lens="calling-card"] .cc-say a:hover,
+:root[data-lens="calling-card"] .cc-member__body a:hover,
+:root[data-lens="calling-card"] .cc-status__lead a:hover {
+  background: var(--cc-red);
+  text-decoration-color: var(--cc-white);
+}
+
+:root[data-lens="calling-card"] .cc-say {
+  position: relative;
+  margin: 0.5rem 0 0;
+  padding: 1.35rem 1.4rem 1.1rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  border: 3px solid var(--cc-white);
+  border-radius: 0.3rem 1.2rem 0.3rem 1.2rem;
+  box-shadow: 6px 6px 0 var(--cc-red);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+:root[data-lens="calling-card"] .cc-say > p {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-say__name {
+  position: absolute;
+  top: -0.75rem;
+  left: 1.1rem;
+  padding: 0 0.6rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: skewX(-12deg);
+}
+
+/* ---------- The slash wipe ---------- */
+:root[data-lens="calling-card"] .cc-wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  pointer-events: none;
+}
+:root[data-lens="calling-card"] .cc-wipe[data-state="idle"] {
+  visibility: hidden;
+}
+:root[data-lens="calling-card"] .cc-wipe__bands {
+  position: absolute;
+  inset: -40%;
+  transform: rotate(-14deg);
+}
+:root[data-lens="calling-card"] .cc-wipe__band {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 34%;
+  transform: translateX(-130%) skewX(-24deg);
+}
+:root[data-lens="calling-card"] .cc-wipe__band:nth-child(1) { top: -8%; height: 30%; }
+:root[data-lens="calling-card"] .cc-wipe__band:nth-child(2) { top: 18%; height: 24%; }
+:root[data-lens="calling-card"] .cc-wipe__band:nth-child(3) { top: 40%; height: 9%; }
+:root[data-lens="calling-card"] .cc-wipe__band:nth-child(4) { top: 47%; height: 30%; }
+:root[data-lens="calling-card"] .cc-wipe__band:nth-child(5) { top: 74%; height: 34%; }
+:root[data-lens="calling-card"] .cc-wipe__band--black {
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-wipe__band--red {
+  background:
+    var(--cc-halftone) 0 0 / 9px 9px,
+    var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-wipe__band--white {
+  background: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-wipe__star {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(90vmin, 44rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(0);
+}
+:root[data-lens="calling-card"] .cc-wipe__title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 0.08em 0.4em 0.14em;
+  font-size: clamp(2.6rem, 10vw, 7.4rem);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--cc-white);
+  background: var(--cc-black);
+  clip-path: polygon(0 10%, 100% 0, 97% 100%, 2% 90%);
+  transform: translate(-50%, -50%) rotate(-8deg);
+  opacity: 0;
+}
+:root[data-lens="calling-card"] .cc-wipe__shard {
+  position: absolute;
+  left: 0;
+  width: var(--size);
+  aspect-ratio: 1;
+  transform: translateX(-30vw);
+  background: var(--cc-white);
+  clip-path: polygon(0 20%, 100% 0, 40% 100%);
+}
+:root[data-lens="calling-card"] .cc-wipe__shard--tri-red {
+  background: var(--cc-red);
+  outline: none;
+  clip-path: polygon(10% 0, 100% 60%, 0 100%);
+}
+:root[data-lens="calling-card"] .cc-wipe__shard--star {
+  background: var(--cc-white);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+/* ---------- Entrance: children fly in after the wipe ---------- */
+@keyframes calling-card-fly-left {
+  from { transform: translateX(-60px) rotate(-4deg); opacity: 0; }
+}
+@keyframes calling-card-fly-right {
+  from { transform: translateX(70px) rotate(3deg); opacity: 0; }
+}
+@keyframes calling-card-fly-up {
+  from { transform: translateY(40px); opacity: 0; }
+}
+@keyframes calling-card-slam {
+  0% { transform: scale(1.8) rotate(-10deg); opacity: 0; }
+  60% { transform: scale(0.94) rotate(1deg); opacity: 1; }
+}
+@keyframes calling-card-snap-in {
+  0% { transform: scaleX(0); }
+  70% { transform: scaleX(1.08); }
+  100% { transform: scaleX(1); }
+}
+@keyframes calling-card-shake {
+  0%, 100% { translate: 0 0; }
+  25% { translate: -3px 1px; }
+  50% { translate: 2px -2px; }
+  75% { translate: -1px 2px; }
+}
+@keyframes calling-card-fade {
+  from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-lens="calling-card"] .cc-root *,
+  :root[data-lens="calling-card"] .cc-root *::before,
+  :root[data-lens="calling-card"] .cc-root *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+}
