@@ -3,6 +3,7 @@ import {
   assertIso,
   assertObject,
   assertShortString,
+  validateActor,
 } from "../validation.mjs";
 
 /** Generic/manual producer for intentional local operator entries. */
@@ -39,6 +40,7 @@ export function fromManualEvent(
       summary: assertShortString(input.summary, "manual summary", 280),
       href: input.href,
       linkLabel: input.linkLabel ?? "View update",
+      ...(input.actor ? { actor: validateActor(input.actor, "public actor") } : {}),
       ...(input.relatedProject
         ? {
             relatedProject: assertShortString(

@@ -10,4 +10,5 @@ linkLabel: "See pull request #3"
 evidence:
   url: "https://github.com/beejsbj/personal-site/pull/3"
   observedAt: "2026-09-12T07:37:57Z"
+relatedProject: "personal-site"
 ---

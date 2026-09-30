@@ -10,4 +10,5 @@ linkLabel: "See EmotiTone pull request #62"
 evidence:
   url: "https://github.com/beejsbj/emotitone-solfrege/pull/62"
   observedAt: "2026-09-12T07:40:33Z"
+relatedProject: "emotitone"
 ---

@@ -40,7 +40,12 @@ const { projects, updates, site } = Astro.props;
         <CurrentNote variant="plain" />
       </div>
       <section class="updates" aria-labelledby="home-updates">
-        <SectionHeading id="home-updates" title="Recent updates" />
+        <SectionHeading id="home-updates" title="What's happening" />
+        <p class="house-doorway">
+          <Link href="/house" arrow>
+            Step inside the house
+          </Link>
+        </p>
         <ActivityStream updates={updates} />
       </section>
     </aside>
@@ -96,6 +101,10 @@ const { projects, updates, site } = Astro.props;
   }
   .updates {
     padding-top: var(--space-l);
+  }
+  .house-doorway {
+    margin-block: calc(-1 * var(--space-xs)) var(--space-m);
+    font-size: var(--text-sm);
   }
   .elsewhere {
     display: grid;

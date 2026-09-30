@@ -1,121 +1,70 @@
-# Public activity system: direction and remaining work
+# What's happening: postcards and a little house
 
-Status: a local multi-source engine is now implemented; live source connections
-and presence delivery remain future work. See [the engine guide](activity-engine.md)
-for current commands and boundaries. Burooj wants updates from across his work,
-especially bjslab and agent sessions, alongside repositories, pull requests,
-writing and experiments. Projects remain lasting portfolio records; activity
-records events.
+The public activity area describes things Burooj is doing, making, trying, and
+living around. Its voice can be playful: “Astra is tinkering on Undertext,”
+“Undertext is digesting,” or “The overnight experiment has woken up.” These are
+examples of editorial voice, not assertions about current activity.
 
-## What exists
+## Two kinds of postcard
 
-- Six manually authored Markdown records in `src/content/updates/`.
-- A typed schema in `src/content.config.ts`: event kinds, source, optional evidence
-  URL/observation time, and expiry required for ephemeral kinds.
-- Shared `ActivityStream` / `UpdateEntry` rendering.
-- `src/lib/activity.mjs` sorts a snapshot and filters future/expired items at
-  build/render time, not continuously in deployed HTML.
-- `src/lib/activity-engine/` provides validated adapters, a local review queue,
-  stable identity, deduplication, revisions, approval and withdrawal.
-- `scripts/activity/index.mjs` imports intentional source exports and writes
-  approved durable events to `src/data/activity.public.json`. Home combines that
-  projection with manual updates. The checked-in projection starts empty.
+**Lasting stories** describe meaningful starts, changes, or outcomes. They come
+from authored Markdown or the engine's approved durable export. An agent ending
+its session is not automatically a worthwhile story.
 
-There are no connected webhooks, polling jobs, public ingestion API, agent
-publishing credentials or live telemetry. The implemented queue runs locally;
-it is not a hosted service. The design options below remain relevant to those
-future connections, rather than describing shipped capabilities.
+**Happening now** describes a short-lived observation: an experiment running, a
+schedule doing its rounds, a worker tinkering, or a lab processing something.
+These require fresh, deliberately public signals. A missing signal means we do
+not know; it does not prove everything is idle, healthy, or finished.
 
-## Intended experience
+The homepage heading is “What's happening.” A small “Step inside the house”
+link below it leads to `/house`; it does not become another main-navigation item.
+The floor plan turns devices into wings and projects into rooms. Hermes residents
+belong to the illustration; visiting workers need a current signal. An explicit
+imagined-house mode can show the idea before real sources are connected, with a
+persistent demo label. It never silently impersonates live work.
 
-Burooj's 20 September decision: review new sources first, then permit selected
-milestone types automatically. The feed should describe meaningful work he is
-doing or has done, using agent-edited summaries. It should not expose private
-details or mirror raw session/service events. A completed agent session alone
-does not establish a significant milestone.
+## Publication policy
 
-The publication path is observation → edited public draft → source/type policy
-→ approved update. The engine's policy implements the gate; source producers or
-an editorial agent supply the factual draft. No automatic summarizer is running
-inside the site.
+Review a new source first. After that, explicitly allow selected milestone or
+presence types from the exact reviewed producer. Both forms of automation default
+to off. Public drafts should be charming and concise without inventing facts,
+exposing private work, or pretending a session's raw log is interesting prose.
 
-A readable stream of meaningful changes, not a raw commit firehose: “Merged the
-new keyboard controls,” “Published an article,” “Created an experiment,” or
-“A project shipped.” Wording can have Burooj's voice while facts stay precise:
-opened, closed, and merged pull requests are not interchangeable.
+The path remains: observation → agent-edited public wording → source/type review
+policy → public projection. The source producer or an editorial agent prepares
+the draft; the site does not run a summarizing model. Corrections require review.
+Prompts, transcripts, private hostnames, filesystem paths, credentials, and raw
+service/session payloads do not belong in public projections.
 
-Presence is different from history. “Three agents running” may become false in
-seconds; “Published an article” remains true. Never treat changing presence as a
-permanent milestone.
+## Implemented delivery boundary
 
-## Candidate event contract
+- `src/lib/activity-engine/` owns local ingestion, review, revisions, withdrawal,
+  and independent durable/presence projections. See [its guide](activity-engine.md).
+- `src/data/activity.public.json` contains only durable approved stories and
+  supplements authored Markdown. It is initially empty.
+- `/api/now` is a read-only server route for a separately published, reviewed
+  presence feed configured with server-only `ACTIVITY_PRESENCE_URL`. It accepts
+  HTTPS, refuses redirects/embedded credentials, bounds response size/time,
+  validates the public schema, and returns `Cache-Control: no-store`.
+- No feed configured, invalid data, or an unavailable source produces an empty
+  `unavailable` response. Upstream errors and private details never reach visitors.
+- The shared browser controller polls every 30 seconds only while a relevant
+  surface is visible. It removes expired claims independently of polling, clears
+  signals on connection failure, and cleans up on navigation. The house and
+  homepage consume the same validated signals.
+- Presence must expire within five minutes of observation. It never enters the
+  durable static JSON. No-JavaScript visitors still have the authored stories and
+  the house illustration; they are not shown an indefinite live claim.
 
-Adapters should produce a common envelope, not arbitrary HTML:
+## What remains to connect
 
-- Stable internal ID, provider/source event ID, event kind, subject, exact action.
-- `occurredAt` separate from `observedAt`/`receivedAt`, public evidence URL where
-  available, and correction/retraction history.
-- Public title/summary, destination, optional related project, visibility, review
-  state, and producer identity/provenance.
-- Ephemeral records also need expiry, last heartbeat/freshness, and a replacement
-  key so a new presence snapshot replaces the previous one.
+No real bjslab, device, agent, schedule, or self-hosted-app producer is connected.
+No credentials or private account access have been granted. Next, choose one
+narrow producer, prepare public wording and a heartbeat/termination rule, review
+its first projection, and publish that feed at a configured endpoint. Deployment
+settings and the source publisher are a separate integration step.
 
-Validate before publication. Deduplicate retries by provider + source event ID;
-define how edited articles or PR transitions update a record. Keep renderers
-independent of provider payload details.
-
-## Publication and privacy boundary
-
-- Default deny for private repos, homelab internals, precise location, agent
-  prompts, paths, logs, secrets, and unreviewed free-form text.
-- Begin with explicit public-source allowlists. Being public upstream does not
-  mean every event is useful or intended for amplification here.
-- Give producers scoped, revocable credentials. Verify webhook signatures;
-  prevent replay, limit payload size/rate, and retain actor receipts.
-- Agents propose structured events through an API or CLI. They cannot bypass
-  schema, privacy checks, or review by supplying prose.
-- Decide which low-risk public events can auto-publish and which need approval.
-  Provide a reliable correction/withdrawal path.
-- Location and agent counts are opt-in. Publish only intentional coarse/aggregate
-  signals with short freshness windows; never infer location.
-
-## Delivery choices
-
-1. **Generated content + rebuild:** simplest static-site fit and reviewable Git
-   diff. Costs latency and rebuild dependence; cannot alone guarantee fresh
-   presence in already-deployed HTML.
-2. **Small event store + public read endpoint:** supports deduplication, review,
-   correction, and freshness. Adds hosting, credentials, storage, and operations.
-3. **Hybrid:** stable portfolio snapshot with read-only enhancement of the activity
-   area. Supports fresher signals but requires honest stale/offline behavior and
-   a usable no-JavaScript fallback.
-
-Recommendation for shaping, not a settled choice: start with durable events from
-one public source, retain manual entries, and separate ingestion from rendering.
-Add presence only after freshness and privacy behavior are designed and tested.
-
-## First implementation slice and acceptance gates
-
-After agreeing the source and publishing policy, connect one allowlisted source
-end to end. Include fixtures for authentic delivery, duplicate retry, edited
-event, private payload, invalid signature, outage, and correction. Show an accepted
-event with provenance; rejected payloads must not leak into public output. Keep
-manual authoring and the base portfolio usable when the source is unavailable.
-
-Before any presence slice, prove expiry at the public delivery boundary even
-without another build. An offline producer yields absent/stale status, never a
-confident old “currently” claim.
-
-## Decisions for the separate issue
-
-- Which first source: GitHub, writing feed, explicit agent milestones, or another?
-- Which repositories/event types deserve display? How much grouping/noise control?
-- Who can propose versus publish, and what requires Burooj's review?
-- What latency and maintenance cost are acceptable? Where does the service live?
-- Does activity need an archive or only a small homepage window?
-- Is presence worth its privacy/freshness complexity now or later?
-- Where does authored voice end and automated summarization begin? How are
-  summaries checked against the source event?
-
-Non-goals: deploy a service, grant credentials, connect private accounts, implement
-prism, or claim the curated stream is live.
+The house is an exploratory portfolio page. Turning it into `start.burooj.dev`,
+a private launcher, or an authenticated operations surface is a later product
+choice. Its noindex directive and omitted navigation/sitemap entries make it less
+discoverable; the doorway is not access control.

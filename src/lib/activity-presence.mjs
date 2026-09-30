@@ -34,6 +34,7 @@ export class PresenceValidationError extends Error {
  * @property {string} observedAt
  * @property {string} expiresAt
  * @property {string=} relatedProject
+ * @property {{id:string,name:string,role:string}=} actor
  */
 
 const fail = (message) => {
@@ -81,6 +82,15 @@ function publicUrl(value, name) {
   return url.toString();
 }
 
+function actor(value, name) {
+  object(value, name);
+  return {
+    id: string(value.id, `${name}.id`, 80),
+    name: string(value.name, `${name}.name`, 120),
+    role: string(value.role, `${name}.role`, 120),
+  };
+}
+
 function normalizeNow(now) {
   if (typeof now !== "number" || !Number.isFinite(now))
     fail("now must be a finite epoch timestamp.");
@@ -124,6 +134,9 @@ function normalizeSignal(value) {
             120,
           ),
         }
+      : {}),
+    ...(value.actor
+      ? { actor: actor(value.actor, "presence signal actor") }
       : {}),
   };
 }

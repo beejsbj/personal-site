@@ -3,6 +3,7 @@ import {
   assertIso,
   assertObject,
   assertShortString,
+  validateActor,
 } from "../validation.mjs";
 
 /** Accepts an intentional bjslab milestone export; it does not reach SSH/T3. */
@@ -29,6 +30,10 @@ export function fromBjslabMilestone(
       summary: assertShortString(input.summary, "bjslab summary", 280),
       href: input.href,
       linkLabel: input.linkLabel ?? "View update",
+      ...(input.relatedProject
+        ? { relatedProject: assertShortString(input.relatedProject, "public relatedProject", 120) }
+        : {}),
+      ...(input.actor ? { actor: validateActor(input.actor, "public actor") } : {}),
     },
   };
 }

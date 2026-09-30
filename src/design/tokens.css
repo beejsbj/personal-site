@@ -102,6 +102,35 @@
   --layer-decoration: -1;
   --layer-skip: 10;
   --skip-hidden: translateY(calc(-100% - var(--space-l)));
+  /* The house: a floorplan seen from above, within the default visual world. */
+  --house-wall-width: 2px;
+  --house-plan-wall: 0.3125rem;
+  --house-plan-outer: 0.625rem;
+  --house-room-pad: var(--space-s);
+  --house-map-max: var(--shell-max);
+  --house-room-min: 13rem;
+  --house-room-wide: 20rem;
+  --house-room-height: 12rem;
+  --house-hall-height: 2.25rem;
+  --house-mat-height: 4.25rem;
+  --house-inspector-width: 19rem;
+  --house-door-size: 1.75rem;
+  --house-porch-width: 7rem;
+  --house-furniture-width: 5.5rem;
+  --house-figure-height: 2.25rem;
+  --house-lamp-size: 0.875rem;
+  --house-note-width: 11.5rem;
+  --house-note-tilt: -2.5deg;
+  --house-wash: var(--color-page);
+  --house-wash-soft: var(--color-page);
+  --house-lit-wash: var(--color-hover);
+  --house-glow: var(--color-surface-strong);
+  --house-ink-muted: var(--color-text-soft);
+  --house-motion-duration: 9s;
+  --house-motion-drift: 1.1rem;
+  --house-walk-in: 1.2s;
+  --house-pulse-duration: 3.2s;
+  --house-focus-outline: var(--focus-width);
   /* Default-theme traveling-circle transition, recovered from the PHP site. */
   --page-transition-orb-size: 3.125rem;
   --page-transition-travel: 0.5s;
@@ -115,5 +144,9 @@
 @media (max-width: 40.625rem) {
   :root {
     --shell-gutter: 1.25rem;
+    --house-room-min: 9.5rem;
+    --house-room-wide: 9.5rem;
+    --house-room-height: 10rem;
+    --house-furniture-width: 4.25rem;
   }
 }

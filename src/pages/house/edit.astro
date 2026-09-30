@@ -1,0 +1,23 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import HouseEditor from "../../design/unique/HouseEditor.astro";
+
+export const prerender = false;
+
+const hostname = Astro.url.hostname;
+const localHostnames = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
+
+if (!import.meta.env.DEV || !localHostnames.has(hostname)) {
+  return new Response(null, { status: 404 });
+}
+---
+
+<BaseLayout
+  title="Edit the house roster"
+  description="A local-only editor for the public house roster."
+  pageClass="page-house-editor"
+  noindex={true}
+  clientRouting={false}
+>
+  <HouseEditor />
+</BaseLayout>
