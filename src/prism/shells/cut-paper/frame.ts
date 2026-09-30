@@ -5,11 +5,13 @@ import type { Route, ShellContext } from "../types";
 import { h, link, markup } from "./dom";
 import { keysFor, noteForKind, noteForUpdate, NOTES, noteVar, type Key } from "./notes";
 import { play, setSound, soundOn } from "./sound";
+import { onNext, setClock } from "./beat";
 
 export interface Frame {
   app: HTMLElement;
   stage: HTMLElement;
   tear: HTMLElement;
+  tearLabel: HTMLElement;
   beat: HTMLElement;
   keys: Key[];
   /** Light the key for this route immediately (before the screen swaps). */
@@ -49,7 +51,7 @@ export function buildFrame(ctx: ShellContext): Frame {
       "data-state": "off",
     },
     markup(
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="cp-sound__wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="cp-sound__mute" d="M16 9l6 6M22 9l-6 6"/></svg>',
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="cp-sound__wave" pathLength="1" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="cp-sound__mute" d="M16 9l6 6M22 9l-6 6"/></svg>',
     ),
     h("span", { class: "cp-sound__label" }, "Sound"),
     h("span", { class: "cp-sound__state" }, "off"),
@@ -124,11 +126,11 @@ export function buildFrame(ctx: ShellContext): Frame {
     h(
       "ol",
       { class: "cp-log__list" },
-      content.updates.map((update) => {
+      content.updates.map((update, index) => {
         const note = noteForUpdate(update.kind);
         return h(
           "li",
-          { class: "cp-log__event", style: `--note:${noteVar(note.id)}` },
+          { class: "cp-log__event", style: `--note:${noteVar(note.id)}; --i:${index}` },
           h("time", { class: "cp-log__date", datetime: update.date }, update.dateLabel),
           h(
             "p",
@@ -288,6 +290,7 @@ export function buildFrame(ctx: ShellContext): Frame {
   );
 
   /* ── behaviour ──────────────────────────────────────────── */
+  setClock(beat);
   on(skip, "click", (event) => {
     event.preventDefault();
     const heading = stage.querySelector<HTMLElement>(".cp-screen:not([inert]) h1");
@@ -301,18 +304,32 @@ export function buildFrame(ctx: ShellContext): Frame {
   };
   keyLinks.forEach((anchor, index) => {
     const key = keys[index];
+    let cancelHover = () => {};
+    const release = () => {
+      anchor.dataset.state = anchor.getAttribute("aria-current") ? "held" : "rest";
+    };
+    // the string blooms on the next sixteenth, not the instant the pointer lands
     on(anchor, "pointerenter", (event) => {
-      hover(key.note.id);
-      if ((event as PointerEvent).pointerType === "mouse") play(key.note.frequency, 0.55);
+      const mouse = (event as PointerEvent).pointerType === "mouse";
+      cancelHover();
+      const bloom = () => {
+        hover(key.note.id);
+        if (mouse) play(key.note.frequency, 0.55);
+      };
+      if (ctx.reducedMotion) bloom();
+      else cancelHover = onNext(4, bloom);
     });
     on(anchor, "pointerleave", () => {
+      cancelHover();
       hover(null);
-      anchor.dataset.state = anchor.getAttribute("aria-current") ? "held" : "rest";
+      release();
     });
     on(anchor, "pointerdown", () => {
       anchor.dataset.state = "pressed";
       play(key.note.frequency, 1);
     });
+    on(anchor, "pointerup", release);
+    on(anchor, "pointercancel", release);
     on(anchor, "focus", () => {
       hover(key.note.id);
       if (anchor.matches(":focus-visible")) play(key.note.frequency, 0.55);
@@ -407,9 +424,26 @@ export function buildFrame(ctx: ShellContext): Frame {
       anchor.dataset.state = held ? "held" : "rest";
     });
     app.dataset.note = note?.id ?? "none";
-    readoutNote.textContent = note?.sol ?? "—";
-    readoutWhere.textContent =
-      keys.find((key) => key.note === note)?.label.toLowerCase() ?? "sheet";
+    const sol = note?.sol ?? "—";
+    const where = keys.find((key) => key.note === note)?.label.toLowerCase() ?? "sheet";
+    if (face || ctx.reducedMotion || readoutNote.textContent === sol) {
+      readoutNote.textContent = sol;
+      readoutWhere.textContent = where;
+    } else {
+      // the old note tears off, the new one slides up under it
+      const rip: Keyframe[] = [
+        { transform: "translateY(0) skewX(0)", opacity: 1 },
+        { transform: "translateY(-10px) skewX(-10deg)", opacity: 0, offset: 0.42 },
+        { transform: "translateY(10px) skewX(8deg)", opacity: 0, offset: 0.5 },
+        { transform: "translateY(0) skewX(0)", opacity: 1 },
+      ];
+      for (const el of [readoutNote, readoutWhere])
+        el.animate(rip, { duration: 360, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" });
+      setTimeout(() => {
+        readoutNote.textContent = sol;
+        readoutWhere.textContent = where;
+      }, 160);
+    }
     tearLabel.textContent = `${keys.find((key) => key.note === note)?.label ?? "Sheet"}.`;
     tear.style.setProperty("--note", note ? noteVar(note.id) : "var(--cp-ivory)");
   };
@@ -423,5 +457,5 @@ export function buildFrame(ctx: ShellContext): Frame {
   light(ctx.route);
   settle(ctx.route);
 
-  return { app, stage, tear, beat, keys, light, settle };
+  return { app, stage, tear, tearLabel, beat, keys, light, settle };
 }

@@ -5,7 +5,10 @@
 // Carried inside the persistent root rather than <head>: the client router
 // swaps <head> on navigation and would drop a lazily injected stylesheet.
 import css from "./shell.css?inline";
+import micro from "./micro.css?inline";
 import type { LensShell, Route, ShellContext } from "../types";
+import { onNext } from "./beat";
+import { h } from "./dom";
 import { buildFrame, type Frame } from "./frame";
 import { buildScreen, type Memory } from "./screens";
 import { closeSound } from "./sound";
@@ -23,17 +26,45 @@ let memory: Memory = {};
 let generation = 0;
 
 /** Resolve on the next eighth note of the status-bar metronome. */
-function nextEighth(): Promise<void> {
-  const cell = frame?.beat.firstElementChild as HTMLElement | null;
-  const animation = cell?.getAnimations?.()[0];
-  const start = typeof animation?.startTime === "number" ? animation.startTime : 0;
-  const now = Number(document.timeline.currentTime ?? performance.now());
-  const wait = EIGHTH - ((((now - start) % EIGHTH) + EIGHTH) % EIGHTH);
-  return new Promise((resolve) => setTimeout(resolve, wait > EIGHTH - 30 ? 0 : wait));
+const nextEighth = () => new Promise<void>((resolve) => onNext(2, resolve));
+
+/** A handful of cut shapes falls across the stage as the sheet pulls away:
+ * the pressed key's colour plus brand paper, fluttering with the paper
+ * ease, each starting as the tear's edge passes it. Fourteen elements,
+ * transform and opacity only, gone after a bar. */
+function confetti(stage: HTMLElement, before: HTMLElement, note: string) {
+  const shapes = ["tri", "dot", "bar", "tab"];
+  const papers = [note, "var(--cp-tomato)", "var(--cp-plum)", "var(--cp-mustard)", "var(--cp-bone)"];
+  const box = h("span", { class: "cp-confetti", "aria-hidden": "true" });
+  for (let i = 0; i < 14; i += 1) {
+    const x = Math.random() * 100;
+    const bit = h("i", {
+      class: `cp-confetti__bit cp-confetti__bit--${shapes[i % shapes.length]}`,
+      style: `--paper:${papers[i % papers.length]}; left:${x.toFixed(1)}%`,
+    });
+    box.append(bit);
+    const drift = (Math.random() - 0.5) * 140;
+    const spin = (Math.random() - 0.5) * 720;
+    const flip = 0.5 + Math.random();
+    bit.animate(
+      [
+        { transform: "translate(0, -24px) rotate(0deg) scaleX(1)", opacity: 1 },
+        { transform: `translate(${drift * 0.4}px, 22vh) rotate(${spin * 0.4}deg) scaleX(${flip * 0.3})`, opacity: 1, offset: 0.35 },
+        { transform: `translate(${drift * 0.8}px, 48vh) rotate(${spin * 0.75}deg) scaleX(1)`, opacity: 0.85, offset: 0.7 },
+        { transform: `translate(${drift}px, 70vh) rotate(${spin}deg) scaleX(${flip * 0.25})`, opacity: 0 },
+      ],
+      { duration: 1100 + Math.random() * 700, delay: x * 3.4, easing: EASE_PAPER, fill: "forwards" },
+    );
+  }
+  stage.insertBefore(box, before);
+  setTimeout(() => box.remove(), EIGHTH * 10);
 }
 
 function show(route: Route) {
-  const built = buildScreen(route, ctx!.content, memory);
+  const built = buildScreen(route, ctx!.content, memory, {
+    reducedMotion: ctx!.reducedMotion,
+    face: ctx!.face,
+  });
   built.el.dataset.state = "entering";
   return built;
 }
@@ -76,6 +107,11 @@ async function transition(route: Route) {
     await nextEighth();
     if (id !== generation) return;
     tear.dataset.state = "cutting";
+    // the label lags the sheet a touch, like print on a page being pulled
+    frame.tearLabel.animate(
+      [{ transform: "translateX(-9%) rotate(-5deg)" }, { transform: "translateX(0) rotate(-5deg)" }],
+      { duration: EIGHTH + 120, easing: EASE_STAB },
+    );
     await tear
       .animate(
         [
@@ -94,6 +130,7 @@ async function transition(route: Route) {
       { duration: 360, easing: EASE_SWING },
     );
     land(next.el);
+    confetti(stage, tear, tear.style.getPropertyValue("--note") || "var(--cp-ivory)");
     await tear
       .animate(
         [
@@ -120,7 +157,7 @@ const shell: LensShell = {
     currentPath = context.route.path;
     const style = document.createElement("style");
     style.dataset.shellStyle = "cut-paper";
-    style.textContent = css;
+    style.textContent = `${css}\n${micro}`;
     context.root.replaceChildren(style, frame.app);
     // settle the entrance after first paint
     requestAnimationFrame(() => land(first.el));

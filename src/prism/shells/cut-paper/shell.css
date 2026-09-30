@@ -1170,6 +1170,7 @@
   display: block;
   background: var(--paper);
   pointer-events: none;
+  transform: rotate(var(--tilt, 0deg));
 }
 
 :root[data-lens="cut-paper"] .cp-scrap--torn {
@@ -1220,7 +1221,7 @@
   left: 96px;
   width: 58px;
   height: 36px;
-  transform: rotate(-8deg);
+  --tilt: -8deg;
 }
 
 :root[data-lens="cut-paper"] .cp-home__hero > .cp-kicker {
@@ -1246,7 +1247,7 @@
   right: -26px;
   width: 64px;
   height: 70px;
-  transform: rotate(14deg);
+  --tilt: 14deg;
 }
 
 :root[data-lens="cut-paper"] .cp-portrait {
@@ -1894,13 +1895,21 @@
   fill: rgba(10, 9, 8, 0.62);
 }
 
+:root[data-lens="cut-paper"] .cp-seq__run {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--head);
+  width: calc((100% - var(--head)) * var(--now));
+  pointer-events: none;
+}
+
 :root[data-lens="cut-paper"] .cp-seq__playhead {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: calc(var(--head) + (100% - var(--head)) * var(--now));
+  right: -1px;
   width: 2px;
-  margin-left: -1px;
   background: var(--cp-brass-fill);
   box-shadow: var(--cp-glow-brass);
   pointer-events: none;
@@ -2025,7 +2034,7 @@
   left: -22px;
   width: 64px;
   height: 58px;
-  transform: rotate(-12deg);
+  --tilt: -12deg;
 }
 
 :root[data-lens="cut-paper"] .cp-sleeve-art__scrap-b {
@@ -2034,7 +2043,7 @@
   bottom: -26px;
   width: 58%;
   height: 40px;
-  transform: rotate(3deg);
+  --tilt: 3deg;
 }
 
 :root[data-lens="cut-paper"] .cp-transport {
@@ -2452,7 +2461,7 @@
   left: -30px;
   width: 64%;
   height: 40%;
-  transform: rotate(-5deg);
+  --tilt: -5deg;
 }
 
 :root[data-lens="cut-paper"] .cp-poster__b {
@@ -2467,7 +2476,7 @@
   left: 8%;
   width: 90px;
   height: 100px;
-  transform: rotate(-14deg);
+  --tilt: -14deg;
 }
 
 :root[data-lens="cut-paper"] .cp-poster__d {
@@ -2476,7 +2485,7 @@
   right: 16%;
   width: 120px;
   height: 26px;
-  transform: rotate(-24deg);
+  --tilt: -24deg;
 }
 
 :root[data-lens="cut-paper"] .cp-poster__e {
