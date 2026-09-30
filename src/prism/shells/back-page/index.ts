@@ -16,7 +16,9 @@ import {
   type Stop,
 } from "./chapters";
 import { h } from "./dom";
+import { mountMicro } from "./micro";
 import "./shell.css";
+import "./micro.css";
 
 const TABS: [string, string][] = [
   ["/", "Hello"],
@@ -76,6 +78,7 @@ class App {
     this.root.replaceChildren(this.desk);
     this.book = new Book(this.desk, ctx.reducedMotion);
     this.desk.append(this.live);
+    mountMicro(ctx, this.book, this.desk);
   }
 
   build(route: Route): Chapter {

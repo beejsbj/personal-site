@@ -56,14 +56,18 @@ export function handCircle(cx: number, cy: number, r: number, rng: Rng) {
 function dot(x: number, y: number, r: number, rng: Rng, ink: string) {
   const rx = r * between(rng, 0.85, 1.15);
   const ry = r * between(rng, 0.8, 1.1);
-  return `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(ry)}" transform="rotate(${f(rng() * 180)} ${f(x)} ${f(y)})" fill="${ink}"/>`;
+  const a = rng() * 180;
+  const ax = Math.cos((a * Math.PI) / 180) * rx;
+  const ay = Math.sin((a * Math.PI) / 180) * rx;
+  // a tilted ellipse as two arcs, so it carries no transform of its own
+  return `<path class="bp-dot" d="M${f(x + ax)} ${f(y + ay)}A${f(rx)} ${f(ry)} ${f(a)} 1 0 ${f(x - ax)} ${f(y - ay)}A${f(rx)} ${f(ry)} ${f(a)} 1 0 ${f(x + ax)} ${f(y + ay)}Z" fill="${ink}"/>`;
 }
 
-function cross(x: number, y: number, s: number, rng: Rng, ink: string) {
+export function cross(x: number, y: number, s: number, rng: Rng, ink: string) {
   const a = rng() * 0.6 - 0.3;
   const c = Math.cos(a) * s;
   const sn = Math.sin(a) * s;
-  return `<path d="M${f(x - c)} ${f(y - sn - s * 0.1)}L${f(x + c)} ${f(y + sn + s * 0.1)}M${f(x + sn - s * 0.1)} ${f(y - c)}L${f(x - sn + s * 0.1)} ${f(y + c)}" stroke="${ink}" stroke-width="1.6" stroke-linecap="round"/>`;
+  return `<path class="bp-cross" d="M${f(x - c)} ${f(y - sn - s * 0.1)}L${f(x + c)} ${f(y + sn + s * 0.1)}M${f(x + sn - s * 0.1)} ${f(y - c)}L${f(x - sn + s * 0.1)} ${f(y + c)}" stroke="${ink}" stroke-width="1.6" stroke-linecap="round"/>`;
 }
 
 export interface CampOpts {
@@ -76,12 +80,14 @@ export interface CampOpts {
   /** How many of his soldiers have been crossed out. */
   hits: number;
   rng: Rng;
+  /** Names the camp's group, so a hand can reach it later. */
+  id?: string;
 }
 
 /** A camp: the pencilled guide circle, the ink ring, the soldiers in it. */
-export function camp({ cx, cy, r, ink, enemy, dots, hits, rng }: CampOpts) {
-  let out = `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r * 1.08)}" fill="none" stroke="${PENCIL}" stroke-opacity=".25" stroke-width="1"/>`;
-  out += `<path class="bp-ink-ring" d="${handCircle(cx, cy, r, rng)}" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round"/>`;
+export function camp({ cx, cy, r, ink, enemy, dots, hits, rng, id }: CampOpts) {
+  let out = `<circle class="bp-guide" cx="${f(cx)}" cy="${f(cy)}" r="${f(r * 1.08)}" fill="none" stroke="${PENCIL}" stroke-opacity=".25" stroke-width="1"/>`;
+  out += `<path class="bp-ink-ring" d="${handCircle(cx, cy, r, rng)}" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round" pathLength="1"/>`;
   const placed: [number, number][] = [];
   let guard = 0;
   while (placed.length < dots && guard++ < 400) {
@@ -97,7 +103,7 @@ export function camp({ cx, cy, r, ink, enemy, dots, hits, rng }: CampOpts) {
     out += dot(x, y, dr, rng, ink);
     if (i < hits) out += cross(x, y, dr * 2.1, rng, enemy);
   });
-  return out;
+  return id ? `<g class="bp-camp-ink" data-camp="${id}">${out}</g>` : out;
 }
 
 /** A flick: the pen pulled back and let go, the line a little off true,
@@ -127,7 +133,7 @@ export function underline(ink: string, rng: Rng, twice = false) {
   let d = `M2 ${f(y + 1)} C ${f(between(rng, 20, 30))} ${f(y - 2)}, ${f(between(rng, 45, 60))} ${f(y + 3)}, 98 ${f(y - 1)}`;
   if (twice)
     d += ` M8 ${f(y + 6)} C 35 ${f(y + 3)}, 62 ${f(y + 8)}, 90 ${f(y + 5)}`;
-  return `<svg class="bp-underline" viewBox="0 0 100 ${twice ? 14 : 10}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
+  return `<svg class="bp-underline" viewBox="0 0 100 ${twice ? 14 : 10}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke" pathLength="1"/></svg>`;
 }
 
 /** A quick war scratched on a spare page: a few camps and their flicks. */
@@ -174,10 +180,10 @@ export function tally(n: number, ink: string, rng: Rng) {
   for (let i = 0; i < n; i++) {
     const inGroup = i % 5;
     if (inGroup === 4) {
-      out += `<path d="M${f(x - 30)} ${f(24 + rng() * 2)}L${f(x + 2)} ${f(6 + rng() * 2)}" stroke="${ink}" stroke-width="1.8" stroke-linecap="round"/>`;
+      out += `<path d="M${f(x - 30)} ${f(24 + rng() * 2)}L${f(x + 2)} ${f(6 + rng() * 2)}" stroke="${ink}" stroke-width="1.8" stroke-linecap="round" pathLength="1"/>`;
       x += 12;
     } else {
-      out += `<path d="M${f(x + rng() * 2)} ${f(4 + rng() * 2)}L${f(x + rng() * 2 - 1)} ${f(26 + rng() * 2)}" stroke="${ink}" stroke-width="1.8" stroke-linecap="round"/>`;
+      out += `<path d="M${f(x + rng() * 2)} ${f(4 + rng() * 2)}L${f(x + rng() * 2 - 1)} ${f(26 + rng() * 2)}" stroke="${ink}" stroke-width="1.8" stroke-linecap="round" pathLength="1"/>`;
       x += 7;
     }
   }
@@ -209,7 +215,7 @@ export function doodle(kind: number, rng: Rng) {
     `<path ${s} d="M60 60 m0 -4 a4 4 0 1 1 -4 4 a8 8 0 1 1 8 8 a14 14 0 1 1 -14 -14 a22 22 0 1 1 22 22 a32 32 0 1 1 -32 -32"/>
      <path ${r} d="M96 20 l6 10 l-12 0 z"/>`,
   ][kind % 3];
-  return `<svg class="bp-doodle" viewBox="0 0 120 110" aria-hidden="true">${body}</svg>`;
+  return `<svg class="bp-doodle" data-doodle="${kind % 3}" viewBox="0 0 120 110" aria-hidden="true">${body}</svg>`;
 }
 
 /** A strip of masking tape, torn at both ends. */

@@ -71,6 +71,10 @@ export class Book {
   geo!: Geometry;
   /** The pages lying open right now, left to right. */
   showing: HTMLElement[] = [];
+  /** Told when a page lands open for the first time (after a turn, or as the
+   * book arrives), so the hand can write its heading in. */
+  land?: (page: HTMLElement, delay: number) => void;
+  private landDelay = 0;
 
   constructor(
     private host: HTMLElement,
@@ -142,6 +146,18 @@ export class Book {
     });
     this.showing = pages;
     this.markSides();
+    for (const page of pages) {
+      if (!("fresh" in page.dataset)) continue;
+      delete page.dataset.fresh;
+      this.land?.(page, this.landDelay);
+    }
+  }
+
+  /** Pages about to be turned to: their ink stays off the paper until they
+   * land, when it is written in. */
+  private fresh(pages: (HTMLElement | null)[]) {
+    if (this.still || !this.land) return;
+    for (const page of pages) if (page) page.dataset.fresh = "";
   }
 
   private markSides() {
@@ -218,6 +234,7 @@ export class Book {
       return { done, seek() {}, release: () => done };
     }
 
+    this.fresh(next);
     let front: HTMLElement | null;
     let back: HTMLElement | null;
     const [L0, R0] = before;
@@ -341,7 +358,10 @@ export class Book {
       return;
     }
     if (!cover || !this.geo.spread) {
+      this.fresh(pages);
+      this.landDelay = 420;
       this.place(pages);
+      this.landDelay = 0;
       await this.el.animate(
         [
           { transform: "translateY(30px) rotate(-2.5deg)", opacity: 0 },
@@ -352,6 +372,7 @@ export class Book {
       return;
     }
     const [left, right] = pages;
+    this.fresh(pages);
     this.corners.dataset.state = "turning";
     this.slots[0].replaceChildren();
     this.slots[1].replaceChildren(right ?? "");

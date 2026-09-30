@@ -762,7 +762,7 @@ function warMap(projects: Project[], w: number, hgt: number, wide: boolean) {
   let rings = "";
   for (const p of projects) {
     const { x, y } = spots.get(p.slug)!;
-    rings += camp({ cx: x, cy: y, r, ink: ink(p), enemy: foe(p), dots: campDots(p), hits: campHits(p), rng: seed(p.slug) });
+    rings += camp({ cx: x, cy: y, r, ink: ink(p), enemy: foe(p), dots: campDots(p), hits: campHits(p), rng: seed(p.slug), id: p.slug });
   }
   const box = h("div", {
     class: "bp-map",
