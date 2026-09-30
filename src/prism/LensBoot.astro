@@ -4,18 +4,23 @@
  * non-persistent face for the prism stage. */
 import { LENSES } from "./lenses";
 const ids = LENSES.map((lens) => lens.id);
+const shells = ids.slice(1);
 ---
 
-<script is:inline define:vars={{ ids }}>
+<script is:inline define:vars={{ ids, shells }}>
   (() => {
     const key = "prism:lens";
     const apply = () => {
       const root = document.documentElement;
+      // Lenses with their own shell hide Daylight before paint, not after.
+      const settle = () =>
+        root.toggleAttribute("data-lens-shell", shells.includes(root.dataset.lens));
       const params = new URLSearchParams(location.search);
       const face = params.get("prism-face");
       if (ids.includes(face)) {
         root.dataset.lens = face;
         root.setAttribute("data-prism-face", "");
+        settle();
         return;
       }
       let lens = params.get("lens");
@@ -24,6 +29,7 @@ const ids = LENSES.map((lens) => lens.id);
         else lens = localStorage.getItem(key);
       } catch {}
       root.dataset.lens = ids.includes(lens) ? lens : ids[0];
+      settle();
     };
     apply();
     document.addEventListener("astro:after-swap", apply);

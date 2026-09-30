@@ -5,5 +5,8 @@
 
 <script>
   import { installPrism } from "./prism";
+  import { syncShell } from "./shell-runtime";
+  syncShell();
+  document.addEventListener("astro:page-load", () => syncShell());
   installPrism();
 </script>

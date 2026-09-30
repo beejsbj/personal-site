@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import test from "node:test";
 
 const read = (path) => readFileSync(path, "utf8");
@@ -65,14 +66,45 @@ test("five lenses, Daylight first, each refraction with its own stylesheet", () 
   }
 });
 
+const walk = (dir) =>
+  existsSync(dir)
+    ? readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory()
+          ? walk(join(dir, entry.name))
+          : [join(dir, entry.name)],
+      )
+    : [];
+
+// Shell CSS stays in the document after its shell unmounts, so it must be as
+// strictly scoped as the lens stylesheet itself.
+const lensStyles = (id) => [
+  `src/prism/lenses/${id}.css`,
+  ...walk(`src/prism/shells/${id}`).filter((path) => path.endsWith(".css")),
+];
+
 test("a lens only ever styles itself, never Daylight, other lenses or the prism", () => {
   for (const id of refractions) {
     const scoped = new RegExp(`^:root\\[data-lens="${id}"\\]`);
-    for (const selector of selectors(read(`src/prism/lenses/${id}.css`))) {
-      assert.match(selector, scoped, `${id}: unscoped selector "${selector}"`);
-      assert.doesNotMatch(selector, /prism-/, `${id}: styles prism chrome`);
+    for (const path of lensStyles(id)) {
+      const css = read(path);
+      for (const selector of selectors(css)) {
+        assert.match(selector, scoped, `${path}: unscoped selector "${selector}"`);
+        assert.doesNotMatch(selector, /prism-/, `${path}: styles prism chrome`);
+      }
+      for (const [, name] of css.matchAll(/@keyframes\s+([\w-]+)/g)) {
+        assert.ok(name.startsWith(`${id}-`), `${path}: keyframes "${name}" needs the "${id}-" prefix`);
+      }
     }
   }
+});
+
+test("every refraction has a shell module and Daylight has none", () => {
+  const runtime = read("src/prism/shell-runtime.ts");
+  for (const id of refractions) {
+    assert.ok(existsSync(`src/prism/shells/${id}/index.ts`), id);
+    assert.match(runtime, new RegExp(`import\\("./shells/${id}/index"\\)`));
+  }
+  assert.doesNotMatch(runtime, /shells\/daylight/);
 });
 
 test("every page boots its lens before paint and carries the prism runtime", () => {

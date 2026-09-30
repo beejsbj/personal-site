@@ -11,3 +11,25 @@
 .lens-decor {
   display: none;
 }
+
+/* A lens with its own shell replaces Daylight's page; the page stays in the
+   document as the source the shell reads from. */
+#lens-shell:empty {
+  display: none;
+}
+:root[data-lens-shell] .site-frame,
+:root[data-lens-shell] .skip-link {
+  display: none;
+}
+/* Shells animate their own route changes; the router's crossfade would
+   fight them. */
+html[data-lens-shell]::view-transition-old(root),
+html[data-lens-shell]::view-transition-new(root) {
+  animation: none;
+}
+/* Off-axis prism faces, and every face while the camera moves, hold still. */
+:root[data-prism-idle] *,
+:root[data-prism-idle] *::before,
+:root[data-prism-idle] *::after {
+  animation-play-state: paused !important;
+}

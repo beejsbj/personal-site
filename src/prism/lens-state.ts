@@ -1,4 +1,5 @@
 import { DEFAULT_LENS, isLens } from "./lenses";
+import { hasShell, syncShell } from "./shell-runtime";
 
 /** Lens persistence. The pre-paint copy of this logic lives inline in
  * LensBoot.astro; keep the two in step. */
@@ -14,11 +15,16 @@ export function currentLens() {
   return isLens(lens) ? lens : DEFAULT_LENS;
 }
 
-export function setLens(id: string) {
-  if (!isLens(id)) return;
-  document.documentElement.dataset.lens = id;
-  if (isFace()) return;
-  try {
-    localStorage.setItem(LENS_KEY, id);
-  } catch {}
+/** Adopt a lens. Resolves once its shell (if any) has painted. */
+export function setLens(id: string): Promise<void> {
+  if (!isLens(id)) return Promise.resolve();
+  const root = document.documentElement;
+  root.dataset.lens = id;
+  root.toggleAttribute("data-lens-shell", hasShell(id));
+  if (!isFace()) {
+    try {
+      localStorage.setItem(LENS_KEY, id);
+    } catch {}
+  }
+  return syncShell();
 }
