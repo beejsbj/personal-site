@@ -232,8 +232,9 @@
   touch-action: none;
   user-select: none;
 }
-#prism-stage[hidden] {
-  display: none;
+#prism-stage[data-dormant] {
+  visibility: hidden;
+  pointer-events: none;
 }
 #prism-stage .prism-camera {
   position: absolute;
@@ -249,6 +250,8 @@
   height: var(--face-h);
   margin: calc(var(--face-h) / -2) 0 0 calc(var(--face-w) / -2);
   transform-style: preserve-3d;
+  /* Rasterise the faces once; the camera only ever changes this transform. */
+  will-change: transform;
 }
 #prism-stage .prism-face {
   position: absolute;
@@ -281,9 +284,7 @@
     transparent 22% 70%,
     rgb(255 255 255 / 0.1)
   );
-  box-shadow:
-    inset 0 0 0 2px var(--prism-edge),
-    inset 0 0 6rem rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 0 0 2px var(--prism-edge);
   opacity: 0;
 }
 #prism-stage .prism-face::after {
@@ -320,6 +321,14 @@
   opacity: 1;
 }
 
+/* Layers that fade in over the moving camera get their own compositor
+   layer up front, so the fade never repaints the scene. */
+#prism-stage .prism-light,
+#prism-stage .prism-hud,
+#prism-stage .prism-whisper {
+  will-change: opacity, transform;
+}
+
 /* White light in, five lenses out. */
 #prism-stage .prism-light {
   position: absolute;
@@ -336,7 +345,7 @@
 #prism-stage .prism-beam {
   stroke: #fff;
   stroke-width: 3;
-  filter: drop-shadow(0 0 6px #fff);
+  stroke-opacity: 0.9;
 }
 #prism-stage .prism-band {
   fill: var(--band);
@@ -517,38 +526,6 @@
   }
 }
 
-/* Refraction flash while the page becomes a face, and back again. */
-#prism-stage::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: var(--prism-spectrum);
-  mix-blend-mode: screen;
-  opacity: 0;
-}
-@media (prefers-reduced-motion: no-preference) {
-  #prism-stage.is-open::after {
-    animation: prism-flash 0.7s ease-out;
-  }
-  #prism-stage.is-leaving {
-    animation: prism-leave 0.26s ease-in forwards;
-  }
-}
-@keyframes prism-flash {
-  from {
-    opacity: 0.45;
-  }
-  to {
-    opacity: 0;
-  }
-}
-@keyframes prism-leave {
-  to {
-    opacity: 0;
-  }
-}
-
 /* ── Afterimage ───────────────────────────────────────────────────── */
 .prism-afterimage {
   position: fixed;
@@ -569,10 +546,8 @@
 @keyframes prism-burn {
   from {
     opacity: var(--burn);
-    filter: blur(0);
   }
   to {
     opacity: 0;
-    filter: blur(40px);
   }
 }

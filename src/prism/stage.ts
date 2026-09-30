@@ -6,6 +6,7 @@
  * page, so what you see from outside is exactly what you walk into. */
 import { LENSES, type Lens } from "./lenses";
 import { FACE_PARAM, currentLens, setLens } from "./lens-state";
+import { prewarmShell } from "./shell-runtime";
 
 const SIDES = LENSES.length;
 const TURN = 360 / SIDES;
@@ -29,6 +30,13 @@ function measure() {
 }
 
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+
+/** Same-origin faces share this page's main thread, so a face that isn't
+ * being looked at, or any face while the camera moves, must hold still. */
+function setIdle(face: HTMLIFrameElement, idle: boolean) {
+  face.contentDocument?.documentElement.toggleAttribute("data-prism-idle", idle);
+}
 const read = <T>(storage: Storage, key: string, fallback: T): T => {
   try {
     return JSON.parse(storage.getItem(key) ?? "") as T;
@@ -71,7 +79,11 @@ export function createPrism(): Prism {
     stage = document.createElement("div");
     stage.id = "prism-stage";
     stage.className = "prism-stage";
-    stage.hidden = true;
+    // Dormant, not display:none: the faces lay out at full viewport size
+    // while the visitor is still deciding, so showing them costs no relayout.
+    stage.dataset.dormant = "";
+    stage.inert = true;
+    stage.setAttribute("aria-hidden", "true");
     stage.setAttribute("role", "dialog");
     stage.setAttribute("aria-modal", "true");
     stage.setAttribute("aria-label", "The prism: one portfolio, five lenses");
@@ -123,7 +135,14 @@ export function createPrism(): Prism {
       frames.map(
         (frame) =>
           new Promise((resolve) => {
-            frame.addEventListener("load", resolve, { once: true });
+            frame.addEventListener(
+              "load",
+              (event) => {
+                setIdle(frame, true);
+                resolve(event);
+              },
+              { once: true },
+            );
             setTimeout(resolve, 4000);
           }),
       ),
@@ -171,14 +190,23 @@ export function createPrism(): Prism {
     const pose = (outside: boolean) =>
       `translateZ(${-geometry.apothem - (outside ? geometry.pull : 0)}px) ` +
       `rotateX(${outside ? -11 : 0}deg) rotateY(${turn}deg)`;
-    const move = (outside: boolean, ms: number, easing: string) =>
-      new Promise<void>((resolve) => {
-        const duration = reduced() ? 1 : ms;
-        body.style.transition = `transform ${duration}ms ${easing}`;
-        body.style.transform = pose(outside);
-        root.dataset.outside = String(outside);
-        setTimeout(resolve, duration + 30);
+    // Web Animations keep the camera on the compositor and report the real
+    // finish, even if a face is busy on the main thread.
+    const move = async (outside: boolean, ms: number, easing: string) => {
+      frames.forEach((face) => setIdle(face, true));
+      const from = getComputedStyle(body).transform;
+      const to = pose(outside);
+      root.dataset.outside = String(outside);
+      const motion = body.animate([{ transform: from }, { transform: to }], {
+        duration: reduced() ? 0 : ms,
+        easing,
+        fill: "forwards",
       });
+      await motion.finished;
+      body.style.transform = to;
+      motion.cancel();
+      if (outside) setIdle(frames[index], false);
+    };
 
     // Each face opens at the same place in the story as the page we left.
     const ratio = hostScroll / hostRange;
@@ -213,6 +241,8 @@ export function createPrism(): Prism {
       root.querySelectorAll<HTMLElement>(".prism-dot").forEach((dot, i) => {
         dot.setAttribute("aria-current", String(i === index));
       });
+      // Stepping in should find this lens already parsed and ready.
+      prewarmShell(lens.id);
     };
 
     const travel = async (step: number) => {
@@ -248,12 +278,20 @@ export function createPrism(): Prism {
       const faceScroll = frames[index].contentWindow?.scrollY ?? 0;
       root.dataset.entering = "";
       await move(false, IN_MS, "cubic-bezier(.7,0,.2,1)");
-      setLens(lens.id);
-      afterimage(previous, lens, exits);
+      // The camera now fills the screen with the face, a still frame. Switch
+      // the real page behind it, let it paint, then dissolve the prism away.
+      await setLens(lens.id);
       document.documentElement.classList.remove("prism-is-open");
-      requestAnimationFrame(() => scrollTo(0, faceScroll));
-      root.classList.add("is-leaving");
-      setTimeout(close, reduced() ? 0 : 260);
+      scrollTo(0, faceScroll);
+      await frame();
+      await frame();
+      afterimage(previous, lens, exits);
+      await root.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: reduced() ? 0 : 320,
+        easing: "ease-out",
+        fill: "forwards",
+      }).finished;
+      close();
     };
 
     const onKey = (event: KeyboardEvent) => {
@@ -317,7 +355,7 @@ export function createPrism(): Prism {
 
     function close() {
       controller.abort();
-      root.hidden = true;
+      root.dataset.dormant = "";
       root.classList.remove("is-leaving", "is-open");
       delete root.dataset.entering;
       // Faces are rebuilt next time so they follow the page the visitor is on.
@@ -332,9 +370,15 @@ export function createPrism(): Prism {
     body.style.transition = "none";
     body.style.transform = pose(false);
     root.dataset.outside = "false";
-    root.hidden = false;
+    delete root.dataset.dormant;
+    root.inert = false;
+    root.removeAttribute("aria-hidden");
     document.documentElement.classList.add("prism-is-open");
-    void root.offsetWidth;
+    // The stage looks identical to the page here; give the faces a moment
+    // to rasterise before the camera moves, so the pull starts smooth.
+    await frame();
+    await frame();
+    await new Promise((resolve) => setTimeout(resolve, 90));
     root.classList.add("is-open");
     await move(true, OUT_MS, "cubic-bezier(.6,0,.15,1)");
     root.querySelector<HTMLElement>(".prism-enter")?.focus({

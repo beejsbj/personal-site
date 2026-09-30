@@ -12,6 +12,13 @@ const SHELLS: Record<string, () => Promise<{ default: LensShell }>> = {
 
 export const hasShell = (lens: string) => lens in SHELLS;
 
+/** Fetch and evaluate a shell without mounting it. */
+export function prewarmShell(lens: string) {
+  if (!hasShell(lens)) return;
+  SHELLS[lens]().catch(() => {});
+  loadContent().catch(() => {});
+}
+
 let content: Promise<SiteContent> | undefined;
 const loadContent = () =>
   (content ??= fetch("/prism/content.json").then((response) =>
