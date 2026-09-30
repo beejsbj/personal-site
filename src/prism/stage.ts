@@ -176,6 +176,7 @@ export function createPrism(): Prism {
     );
 
     await loaded;
+    await shellsReady(frames);
 
     const layout = () => {
       geometry = measure();
@@ -409,6 +410,26 @@ function afterimage(from: Lens, to: Lens, exits: number) {
   ghost.style.setProperty("--burn", String(Math.min(0.18 + exits * 0.08, 0.5)));
   document.body.append(ghost);
   ghost.addEventListener("animationend", () => ghost.remove(), { once: true });
+}
+
+/** Lens faces mount their shells after the frame loads. On a cold first open,
+ * wait briefly for them so the camera never moves over half-built faces. */
+function shellsReady(faces: HTMLIFrameElement[], timeout = 1500) {
+  const start = performance.now();
+  return new Promise<void>((resolve) => {
+    const check = () => {
+      const pending = faces.some((face) => {
+        const root = face.contentDocument?.documentElement;
+        return (
+          root?.hasAttribute("data-lens-shell") &&
+          !root.hasAttribute("data-shell-ready")
+        );
+      });
+      if (!pending || performance.now() - start > timeout) resolve();
+      else setTimeout(check, 50);
+    };
+    check();
+  });
 }
 
 function trapFocus(event: KeyboardEvent, root: HTMLElement) {
