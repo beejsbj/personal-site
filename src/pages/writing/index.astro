@@ -1,0 +1,44 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import PostList from "../../components/PostList.astro";
+import Link from "../../design/primitives/Link.astro";
+import { getPosts } from "../../lib/writing";
+
+const site = (await getEntry("site", "config"))?.data;
+if (!site) throw new Error("Missing site config entry.");
+const posts = await getPosts();
+---
+
+<BaseLayout
+  title="Writing"
+  description="Posts by Burooj Rashid on frontend craft, animation, and learning to build for the web, first published on Substack."
+  pageClass="page-writing"
+>
+  <section class="shell page-section page-section--header">
+    <PageHeader
+      eyebrow="Writing"
+      title="Notes from building things."
+      intro="How I made the animation, wired up the form, or got stuck and found a way through. Every post is here in full, first published on Substack."
+    >
+      <Fragment slot="actions">
+        <Link
+          treatment="action"
+          tone="wine"
+          href={`${site.writingUrl}/subscribe`}
+          newTab
+          arrow
+        >
+          Subscribe
+        </Link>
+        <Link treatment="action" href={site.writingUrl} newTab arrow>
+          Read on Substack
+        </Link>
+      </Fragment>
+    </PageHeader>
+  </section>
+  <section class="shell page-section" aria-label="Posts, newest first">
+    <PostList posts={posts} />
+  </section>
+</BaseLayout>

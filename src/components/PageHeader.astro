@@ -5,14 +5,15 @@ interface Props {
   title: string;
   intro?: string;
   level?: 1 | 2;
+  scale?: "page" | "post";
 }
-const { eyebrow, title, intro, level = 1 } = Astro.props;
+const { eyebrow, title, intro, level = 1, scale = "page" } = Astro.props;
 ---
 
 <header class="page-header">
   <div class="page-header__main">
     {eyebrow && <p class="page-header__eyebrow">{eyebrow}</p>}
-    <Heading level={level} scale="page">
+    <Heading level={level} scale={scale}>
       {title}
     </Heading>
     {intro && <p class="page-header__intro">{intro}</p>}

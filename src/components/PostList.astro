@@ -1,0 +1,86 @@
+---
+import type { WritingEntry } from "../lib/writing";
+import { formatDate, isoDay } from "../lib/writing";
+import Heading from "../design/primitives/Heading.astro";
+import Link from "../design/primitives/Link.astro";
+interface Props {
+  posts: WritingEntry[]; // newest first
+}
+const { posts } = Astro.props;
+const years = [
+  ...new Set(posts.map((post) => post.data.date.getUTCFullYear())),
+];
+---
+
+<div class="post-years">
+  {years.map((year) => (
+    <section class="post-year" aria-labelledby={`writing-${year}`}>
+      <div class="post-year__label">
+        <Heading level={2} scale="section" id={`writing-${year}`}>
+          {year}
+        </Heading>
+      </div>
+      <ol class="post-year__list">
+        {posts
+          .filter((post) => post.data.date.getUTCFullYear() === year)
+          .map((post) => (
+            <li class="post-entry">
+              <article class="post-entry__body">
+                <time datetime={isoDay(post.data.date)}>
+                  {formatDate(post.data.date, "short")}
+                </time>
+                <Heading level={3} scale="card">
+                  <Link href={`/writing/${post.slug}`}>{post.data.title}</Link>
+                </Heading>
+                <p>{post.data.subtitle || post.data.description}</p>
+              </article>
+            </li>
+          ))}
+      </ol>
+    </section>
+  ))}
+</div>
+<style>
+  .post-years {
+    display: grid;
+    gap: var(--space-xl);
+  }
+  .post-year {
+    display: grid;
+    grid-template-columns: var(--space-4xl) minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+  .post-year__label {
+    padding-top: var(--space-m);
+    color: var(--color-accent);
+  }
+  .post-year__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .post-entry {
+    padding-block: var(--space-l);
+  }
+  .post-entry + .post-entry {
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .post-entry__body {
+    display: grid;
+    gap: var(--space-xs);
+    max-width: var(--reading-width);
+  }
+  time {
+    color: var(--color-text-soft);
+    font-size: var(--text-xs);
+  }
+  .post-entry__body > p {
+    font-size: var(--text-copy);
+  }
+  @media (max-width: 40.625rem) {
+    .post-year {
+      grid-template-columns: 1fr;
+      gap: var(--space-xs);
+    }
+  }
+</style>

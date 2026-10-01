@@ -1,0 +1,116 @@
+/* Long-form reading. The body is sanitised HTML synced from Substack
+   (scripts/sync-substack.mjs), so it is styled by element, not by class.
+   Values come from tokens only. */
+.post-page {
+  grid-template-columns: minmax(0, 1fr);
+}
+.post-page .page-header {
+  max-width: var(--title-width);
+}
+.post-origin {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+.post-body {
+  min-width: 0;
+  font-size: var(--text-lead);
+  line-height: var(--leading-reading);
+  overflow-wrap: break-word;
+}
+.post-body > * + * {
+  margin-top: var(--space-l);
+}
+.post-body > :is(h2, h3, h4, h5, h6) {
+  margin-top: var(--space-2xl);
+}
+.post-body > :is(h2, h3, h4, h5, h6) + * {
+  margin-top: var(--space-s);
+}
+.post-body h2 {
+  font-size: var(--text-section);
+}
+.post-body h4 {
+  font-size: var(--text-lead);
+}
+.post-body :is(h5, h6) {
+  font: var(--weight-bold) var(--text-base) / var(--leading-tight)
+    var(--font-sans);
+  letter-spacing: normal;
+}
+.post-body :is(ul, ol) {
+  padding-left: var(--space-xl);
+}
+.post-body li > :is(p, ul, ol) + :is(p, ul, ol) {
+  margin-top: var(--space-xs);
+}
+.post-body figure {
+  display: grid;
+  gap: var(--space-xs);
+}
+.post-body img {
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+  border: var(--rule-width) solid var(--color-border);
+}
+.post-body figcaption {
+  padding-top: 0;
+  text-align: center;
+}
+.post-body blockquote {
+  padding-left: var(--space-m);
+  border-left: var(--focus-width) solid var(--color-accent);
+  color: var(--color-text-soft);
+  font-family: var(--font-serif);
+}
+.post-body hr {
+  border: 0;
+  border-top: var(--rule-width) solid var(--color-border);
+  margin-block: var(--space-xl);
+}
+.post-body code {
+  padding-inline: var(--space-2xs);
+  background: var(--color-texture);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+/* Code scrolls inside its own box instead of widening the page. */
+.post-body pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: var(--space-m);
+  background: var(--color-surface);
+  border-left: var(--focus-width) solid var(--color-accent);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+.post-body pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+.post-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+.post-body :is(th, td) {
+  padding: var(--space-xs) var(--space-s);
+  border: var(--rule-width) solid var(--color-border);
+  text-align: left;
+}
+.post-body .embed-card {
+  padding: var(--space-m);
+  background: var(--color-surface);
+  border-radius: var(--radius-note);
+  font-size: var(--text-copy);
+}
+.post-body .embed-card__title {
+  font-family: var(--font-serif);
+  font-size: var(--text-lead);
+  font-weight: var(--weight-bold);
+}
+.post-end {
+  max-width: var(--reading-width);
+}
