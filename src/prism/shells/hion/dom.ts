@@ -17,30 +17,12 @@ export function h<K extends keyof HTMLElementTagNameMap>(
   return el;
 }
 
-const SVG_NS = "http://www.w3.org/2000/svg";
-
-export function s<K extends keyof SVGElementTagNameMap>(
-  tag: K,
-  attrs: Attrs = {},
-  ...children: (Child | Child[])[]
-): SVGElementTagNameMap[K] {
-  const el = document.createElementNS(SVG_NS, tag);
-  for (const [key, value] of Object.entries(attrs)) {
-    if (value === undefined || value === null || value === false) continue;
-    el.setAttribute(key, value === true ? "" : String(value));
-  }
-  append(el, children);
-  return el;
-}
-
 function append(el: Element, children: (Child | Child[])[]) {
   for (const child of children.flat()) {
     if (child === false || child === null || child === undefined) continue;
     el.append(child);
   }
 }
-
-export const isExternal = (href: string) => /^(https?:|mailto:)/.test(href);
 
 /** An ordinary link; external ones open in a new tab and say so. */
 export function link(
@@ -88,5 +70,22 @@ export const text = (el: Element | null | undefined) =>
 export const wait = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-export const nextFrame = () =>
-  new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+/** Left and right of the words inside an element, from its own left edge. */
+export function textExtent(el: HTMLElement): [number, number] | null {
+  const own = el.getBoundingClientRect();
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  let l = Infinity;
+  let r = -Infinity;
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (!node.nodeValue?.trim()) continue;
+    range.selectNodeContents(node);
+    for (const rect of range.getClientRects()) {
+      if (rect.width < 1) continue;
+      l = Math.min(l, rect.left - own.left);
+      r = Math.max(r, rect.right - own.left);
+    }
+  }
+  range.detach();
+  return l < r ? [l, r] : null;
+}

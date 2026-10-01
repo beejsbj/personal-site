@@ -1,313 +1,403 @@
-/** The weave: a braid of two hion lines, one cyan and one magenta, that runs
- * down a screen and ties itself through every knot the layout places. The
- * layout decides where the knots sit (a `.hion-knot` in a gutter, beside a
- * heading, under a card); the weave only connects them, crossing the two
- * strands at every knot so they braid.
+/** The weave: how a screen's layout becomes thread.
  *
- * The braid grows with the reader: it reaches a little past the bottom of
- * the viewport and follows you down as you scroll, lighting each knot (and
- * the item that owns it) as it arrives. Leaving a screen, it unravels. */
-import { s } from "./dom";
+ * Screens say what is what with data attributes; this reads the layout and
+ * composes the marks the loom lays down, and tells every hung thing how
+ * long its thread must be to reach what it hangs from.
+ *
+ * - `[data-spine]` are stations on the main cord, in document order:
+ *   `loop` (a section: the cord opens, its two strands part to run down
+ *   either side of it, and twist back together beneath), `knot` (the cord
+ *   ties a knot here), `via` (the cord passes through) and `end` (the cord
+ *   frays into a tassel). The cord starts at the knot of the destination
+ *   you are on, in the line at the top.
+ * - `[data-weft]` headings are strung on a weft: a thread through the waist
+ *   of their first line, woven over one strand of the loop and under the
+ *   other.
+ * - `[data-cord]` holds `[data-hang]` things. Each row of them hangs from a
+ *   cord across its top: `branch` cords are tied to the main cord and run
+ *   out to one side (the heads of screens hang from these), `heading` rows
+ *   hang from the weft of the heading just before them, and the rest get a
+ *   cord of their own (woven into the loop when inside one). Things with
+ *   `data-hang-from="prev"` hang from the thing above them instead.
+ *   Spacing is layout (`--hion-drop`); the thread length (`--hion-hang`) is
+ *   measured here, so every thread reaches its cord exactly. */
+import {
+  braid,
+  cubic,
+  hang,
+  type Hue,
+  Kind,
+  knot,
+  mark,
+  type Mark,
+  Path,
+  type Pt,
+  rng,
+  tassel,
+  thread,
+} from "./pastel";
+import type { Composition } from "./loom";
+import { textExtent } from "./dom";
 
-interface WeaveOptions {
-  screen: HTMLElement;
-  signal: AbortSignal;
-  /** Draw everything at once: reduced motion or a still face. */
-  instant: boolean;
-  /** Where the braid comes down from, in viewport coordinates: the wire of
-   * the current destination in the sky rail. */
-  origin?: () => { x: number; y: number } | null;
+interface Box {
+  l: number;
+  t: number;
+  r: number;
+  b: number;
 }
 
-interface Sample {
-  y: number;
-  length: number;
+interface Loop extends Box {
+  el: HTMLElement;
+  entry: Pt;
+  exit: Pt;
+  flare: number;
 }
 
-let uid = 0;
+const visible = (el: HTMLElement) => el.offsetParent !== null || el.getClientRects().length > 0;
 
-export function createWeave({ screen, signal, instant, origin }: WeaveOptions) {
-  let from: { x: number; y: number } | null = null;
-  const id = `hion-weave-${++uid}`;
-  const svg = s("svg", {
-    class: "hion-weave",
-    "aria-hidden": "true",
-    focusable: "false",
-  });
-  const defs = s("defs");
-  const mask = s("mask", { id: `${id}-mask`, maskUnits: "userSpaceOnUse" });
-  const maskPath = s("path", { class: "hion-weave__reach", pathLength: "1" });
-  mask.append(maskPath);
-  defs.append(mask);
-
-  const magenta = s("path", {
-    class: "hion-weave__strand hion-weave__strand--magenta",
-    pathLength: "1",
-  });
-  const cyan = s("path", {
-    class: "hion-weave__strand hion-weave__strand--cyan",
-    pathLength: "1",
-  });
-  const magentaPulse = s("path", {
-    class: "hion-weave__pulse hion-weave__pulse--magenta",
-    pathLength: "1",
-  });
-  const cyanPulse = s("path", {
-    class: "hion-weave__pulse hion-weave__pulse--cyan",
-    pathLength: "1",
-  });
-  const magentaHalo = s("path", {
-    class: "hion-weave__halo hion-weave__halo--magenta",
-    pathLength: "1",
-  });
-  const cyanHalo = s("path", {
-    class: "hion-weave__halo hion-weave__halo--cyan",
-    pathLength: "1",
-  });
-  const grown = [magentaHalo, cyanHalo, magenta, cyan, maskPath];
-  const strands = s("g", {}, magentaHalo, cyanHalo, magenta, cyan);
-  const pulses = s("g", { mask: `url(#${id}-mask)` }, magentaPulse, cyanPulse);
-  svg.append(defs, strands, pulses);
-  screen.prepend(svg);
-
-  let samples: Sample[] = [];
-  let total = 1;
-  let reach = 0;
-  let knots: { el: HTMLElement; length: number }[] = [];
-  let frame = 0;
-
-  function build() {
-    const box = screen.getBoundingClientRect();
-    const width = screen.clientWidth;
-    if (!from && origin) {
-      const o = origin();
-      // Page coordinates within the screen, as if scrolled to the top.
-      if (o) from = { x: o.x - box.left, y: o.y - (box.top + scrollY) };
+export function compose(host: HTMLElement, origin: () => Pt | null): Composition {
+  const hostBox = host.getBoundingClientRect();
+  const narrow = host.clientWidth < 720;
+  // Layout boxes, not painted ones: things still swinging into place (or
+  // waiting to) must not move the threads they hang from.
+  const box = (el: Element): Box => {
+    let x = 0;
+    let y = 0;
+    let node = el as HTMLElement | null;
+    while (node && node !== host) {
+      x += node.offsetLeft;
+      y += node.offsetTop;
+      node = node.offsetParent as HTMLElement | null;
     }
-    const braid =
-      parseFloat(getComputedStyle(screen).getPropertyValue("--hion-braid")) ||
-      26;
-    const height = screen.scrollHeight;
-    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-    svg.setAttribute("width", String(width));
-    svg.setAttribute("height", String(height));
-    const found = [
-      ...screen.querySelectorAll<HTMLElement>(".hion-knot"),
-    ].filter((el) => el.offsetParent !== null);
-    // Knots that sit almost on top of each other tie as one.
-    const twins = new Map<HTMLElement, HTMLElement[]>();
-    const points: { el: HTMLElement; x: number; y: number }[] = [];
-    for (const el of found) {
-      const r = el.getBoundingClientRect();
-      const point = {
-        el,
-        x: r.left - box.left + r.width / 2,
-        y: r.top - box.top + r.height / 2,
-      };
-      const prev = points[points.length - 1];
-      if (prev && Math.hypot(point.x - prev.x, point.y - prev.y) < 56) {
-        twins.set(prev.el, [...(twins.get(prev.el) ?? []), el]);
-        el.setAttribute("data-twin", "");
-      } else {
-        el.removeAttribute("data-twin");
-        points.push(point);
-      }
+    if (node === host && el instanceof HTMLElement) {
+      return { l: x, t: y, r: x + el.offsetWidth, b: y + el.offsetHeight };
     }
-    if (points.length === 0) {
-      svg.style.display = "none";
-      return;
-    }
-    svg.style.display = "";
-    // Enter from the sky above the first knot; leave toward the bottom.
-    const first = points[0];
-    const last = points[points.length - 1];
-    const route = [
-      ...(from
-        ? [
-            { x: from.x, y: from.y, el: null },
-            // Far from the first knot, string across the top first, like a
-            // wire slung below the rail, rather than cutting through the page.
-            ...(Math.abs(from.x - first.x) > 120 && first.y - from.y > 160
-              ? [{ x: first.x, y: from.y + 64, el: null }]
-              : []),
-          ]
-        : [
-            { x: first.x + (first.x > width / 2 ? -60 : 60), y: -40, el: null },
-          ]),
-      ...points,
-      {
-        x: last.x + (last.x > width / 2 ? -80 : 80),
-        y: Math.max(last.y + 160, height + 20),
-        el: null,
-      },
-    ];
+    const r = el.getBoundingClientRect();
+    return {
+      l: r.left - hostBox.left,
+      t: r.top - hostBox.top,
+      r: r.right - hostBox.left,
+      b: r.bottom - hostBox.top,
+    };
+  };
+  /** The box a hung thing's threads attach to: for a sign, the words
+   * themselves (a wrapped heading's box is wider than its lines). */
+  const inkBox = (el: HTMLElement): Box => {
+    const b = box(el);
+    if (el.dataset.ink !== "sign") return b;
+    const extent = textExtent(el);
+    return extent ? { ...b, l: b.l + extent[0], r: b.l + extent[1] } : b;
+  };
+  const firstLineMiddle = (el: HTMLElement) => {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const rects = [...range.getClientRects()].filter((r) => r.height > 4);
+    range.detach();
+    const own = el.getBoundingClientRect();
+    // The line that reads first, which is the one highest on the page.
+    const first = rects.reduce<DOMRect | null>((a, r) => (!a || r.top < a.top ? r : a), null) ?? own;
+    // Through the waist of the letters, not the baseline.
+    return box(el).t + (first.top - own.top) + first.height * 0.56;
+  };
+  const marks: Mark[] = [];
+  let seed = 1;
+  const cordW = narrow ? 11 : 13;
 
-    const lines: [string, string, string] = ["", "", ""];
-    samples = [];
-    knots = [];
-    let length = 0;
-    let prev: [number, number] | null = null;
-    for (let i = 0; i < route.length - 1; i++) {
-      const a = route[i];
-      const b = route[i + 1];
-      const dy = b.y - a.y;
-      const pull = Math.max(40, Math.abs(dy) * 0.5);
-      const c1 = [a.x, a.y + pull];
-      const c2 = [b.x, b.y - pull];
-      const span = Math.hypot(b.x - a.x, dy);
-      const steps = Math.max(8, Math.round(span / 10));
-      const amplitude = Math.min(braid, braid * 0.3 + span * 0.05);
-      const side = i % 2 === 0 ? 1 : -1;
-      for (let j = i === 0 ? 0 : 1; j <= steps; j++) {
-        const t = j / steps;
-        const mt = 1 - t;
-        const x =
-          mt * mt * mt * a.x +
-          3 * mt * mt * t * c1[0] +
-          3 * mt * t * t * c2[0] +
-          t * t * t * b.x;
-        const y =
-          mt * mt * mt * a.y +
-          3 * mt * mt * t * c1[1] +
-          3 * mt * t * t * c2[1] +
-          t * t * t * b.y;
-        const dx =
-          3 * mt * mt * (c1[0] - a.x) +
-          6 * mt * t * (c2[0] - c1[0]) +
-          3 * t * t * (b.x - c2[0]);
-        const dyy =
-          3 * mt * mt * (c1[1] - a.y) +
-          6 * mt * t * (c2[1] - c1[1]) +
-          3 * t * t * (b.y - c2[1]);
-        const norm = Math.hypot(dx, dyy) || 1;
-        const nx = -dyy / norm;
-        const ny = dx / norm;
-        const off = Math.sin(Math.PI * t) * amplitude * side;
-        if (prev) length += Math.hypot(x - prev[0], y - prev[1]);
-        prev = [x, y];
-        samples.push({ y, length });
-        const cmd = lines[0] ? "L" : "M";
-        lines[0] += `${cmd}${x.toFixed(1)} ${y.toFixed(1)}`;
-        lines[1] += `${cmd}${(x + nx * off).toFixed(1)} ${(y + ny * off).toFixed(1)}`;
-        lines[2] += `${cmd}${(x - nx * off).toFixed(1)} ${(y - ny * off).toFixed(1)}`;
-      }
-      if (b.el) {
-        for (const tied of [b.el, ...(twins.get(b.el) ?? [])]) {
-          knots.push({ el: tied, length });
-          const owner = tied.closest<HTMLElement>("[data-weave-item]");
-          // Only what starts below the fold waits for the braid; the first
-          // screenful is always there to read.
-          if (
-            owner &&
-            !owner.hasAttribute("data-lit") &&
-            owner.getBoundingClientRect().top - box.top > innerHeight * 0.6
-          ) {
-            owner.setAttribute("data-awaiting", "");
-          }
+  /* ---- Stations along the main cord ---- */
+  const stations = [...host.querySelectorAll<HTMLElement>("[data-spine]")].filter(visible);
+  const loops = new Map<HTMLElement, Loop>();
+  const route: Pt[][] = [];
+  let run: Pt[] = [];
+  const start = origin();
+  if (start) {
+    run.push(start);
+    // A cord hangs straight down from where it is tied, clear of the head
+    // of the screen, before it swings across to its first station.
+    const first = stations[0];
+    if (first) {
+      const top = box(first).t;
+      if (top - start[1] > 320) run.push([start[0], top - 150]);
+    }
+  }
+  let endAt: Pt | null = null;
+
+  for (const el of stations) {
+    const kind = el.dataset.spine;
+    const b = box(el);
+    if (kind === "loop") {
+      const entryX = b.l + (b.r - b.l) * parseFloat(el.dataset.entry ?? "0.5");
+      const exitX = b.l + (b.r - b.l) * parseFloat(el.dataset.exit ?? "0.5");
+      const flare = Math.min(narrow ? 60 : 104, (b.b - b.t) * 0.3, (b.r - b.l) * 0.3);
+      const loop: Loop = { el, ...b, entry: [entryX, b.t], exit: [exitX, b.b], flare };
+      loops.set(el, loop);
+      if (!run.length) run.push([entryX, Math.max(0, b.t - 160)]);
+      run.push(loop.entry);
+      route.push(run);
+      run = [loop.exit];
+    } else if (kind === "end") {
+      const p: Pt = [(b.l + b.r) / 2, b.t + (b.b - b.t) * 0.35];
+      if (!run.length) run.push([p[0], p[1] - 120]);
+      run.push(p);
+      endAt = p;
+      route.push(run);
+      run = [];
+      break;
+    } else {
+      const p: Pt = [(b.l + b.r) / 2, (b.t + b.b) / 2];
+      if (!run.length) run.push([p[0], Math.max(0, p[1] - 160)]);
+      run.push(p);
+      if (kind === "knot") marks.push(...knot(p[0], p[1], narrow ? 7 : 9, seed++));
+    }
+  }
+  if (run.length > 1) route.push(run);
+
+  // The braided runs; and one path along the whole cord (down the left
+  // strand of each loop) for the bead to ride, and for branches to tie to.
+  const spinePoints: Pt[] = [];
+  const loopList = [...loops.values()];
+  const braids: Path[] = [];
+  route.forEach((points, i) => {
+    const pts = hang(points, 0.55);
+    const path = new Path(pts, 3);
+    if (path.length > 6) {
+      marks.push(...braid(path, { w: cordW, seed: seed++ }));
+      braids.push(path);
+    }
+    spinePoints.push(...pts);
+    const loop = loopList[i];
+    if (loop) spinePoints.push([loop.l, loop.t + loop.flare], [loop.l, loop.b - loop.flare]);
+  });
+  for (const loop of loopList) {
+    marks.push(...loopStrands(loop, seed));
+    seed += 10;
+  }
+  if (endAt) marks.push(...tassel(endAt[0], endAt[1], narrow ? 74 : 100, seed++, { spread: 26 }));
+  const spine = spinePoints.length > 1 ? new Path(spinePoints, 4) : null;
+  /** Where the braided cord is at height y, if it runs there. */
+  const cordAt = (y: number) => {
+    for (const path of braids) {
+      const top = path.ys[0];
+      const bottom = path.ys[path.ys.length - 1];
+      if (y >= top && y <= bottom) return path.xAt(y);
+    }
+    return null;
+  };
+
+  const loopOf = (el: Element) => {
+    const owner = el.closest<HTMLElement>("[data-spine='loop']");
+    return owner ? loops.get(owner) : undefined;
+  };
+  let wi = 0;
+  const weftY = new Map<HTMLElement, number>();
+
+  /* ---- Headings strung on wefts ---- */
+  for (const el of host.querySelectorAll<HTMLElement>("[data-weft]")) {
+    if (!visible(el)) continue;
+    const y = firstLineMiddle(el);
+    weftY.set(el, y);
+    const loop = loopOf(el);
+    const b = box(el);
+    const from = loop ? loop.l - 22 : b.l - 36;
+    const to = loop ? loop.r + 22 : b.r + 36;
+    marks.push(...weft(from, to, y, wi++ % 2 ? "c" : "m", seed++, loop));
+  }
+
+  /* ---- Things that hang ---- */
+  const setHang = (el: HTMLElement, length: number) =>
+    el.style.setProperty("--hion-hang", `${Math.max(0, length).toFixed(1)}px`);
+
+  for (const holder of host.querySelectorAll<HTMLElement>("[data-cord]")) {
+    if (!visible(holder)) continue;
+    const items = [...holder.querySelectorAll<HTMLElement>("[data-hang]")].filter(
+      (item) =>
+        item.closest("[data-cord]") === holder &&
+        item.dataset.hangFrom !== "prev" &&
+        visible(item),
+    );
+    if (!items.length) continue;
+    const kind = holder.dataset.cord;
+    const loop = loopOf(holder);
+    // Rows: things whose tops (less their drop) sit together.
+    const rows: { items: HTMLElement[]; y: number }[] = [];
+    for (const item of items) {
+      const b = box(item);
+      const drop = parseFloat(getComputedStyle(item).getPropertyValue("--hion-drop")) || 40;
+      const row = rows.find((r) => Math.abs(box(r.items[0]).t - b.t) < 90);
+      if (row) {
+        row.items.push(item);
+        row.y = Math.min(row.y, b.t - drop);
+      } else rows.push({ items: [item], y: b.t - drop });
+    }
+    rows.forEach((row, index) => {
+      let y = row.y;
+      let drawn = true;
+      if (kind === "heading" && index === 0) {
+        // Hang from the weft of the heading just before.
+        let prev = holder.previousElementSibling as HTMLElement | null;
+        while (prev && !prev.hasAttribute("data-weft")) prev = prev.previousElementSibling as HTMLElement | null;
+        const w = prev ? weftY.get(prev) : undefined;
+        if (w !== undefined) {
+          y = w;
+          drawn = false;
         }
       }
-    }
-    total = length || 1;
-    maskPath.setAttribute("d", lines[0]);
-    cyan.setAttribute("d", lines[1]);
-    cyanHalo.setAttribute("d", lines[1]);
-    magentaHalo.setAttribute("d", lines[2]);
-    cyanPulse.setAttribute("d", lines[1]);
-    magenta.setAttribute("d", lines[2]);
-    magentaPulse.setAttribute("d", lines[2]);
-    apply(false);
-  }
-
-  /** Spine length reached by the time the braid gets to page y. */
-  function lengthAt(y: number) {
-    if (!samples.length) return 0;
-    let best = 0;
-    for (const sample of samples) {
-      if (sample.y <= y) best = Math.max(best, sample.length);
-    }
-    return best;
-  }
-
-  function apply(animate: boolean) {
-    const fraction = Math.min(1, reach / total);
-    screen.classList.toggle("hion-weave-animate", animate);
-    const offset = String(1 - fraction);
-    for (const path of grown) {
-      path.style.strokeDashoffset = offset;
-    }
-    for (const knot of knots) {
-      const lit = knot.length <= reach + 1;
-      if (lit && !knot.el.hasAttribute("data-lit")) {
-        const delay = animate
-          ? Math.max(
-              0,
-              ((knot.length - previousReach) /
-                Math.max(1, reach - previousReach)) *
-                900,
-            )
-          : 0;
-        knot.el.style.setProperty("--hion-lit-delay", `${Math.round(delay)}ms`);
-        knot.el.setAttribute("data-lit", "");
-        knot.el
-          .closest<HTMLElement>("[data-weave-item]")
-          ?.setAttribute("data-lit", "");
+      for (const item of row.items) setHang(item, box(item).t - y);
+      if (!drawn) return;
+      const lefts = row.items.map((item) => inkBox(item).l);
+      const rights = row.items.map((item) => inkBox(item).r);
+      const spanL = Math.min(...lefts);
+      const spanR = Math.max(...rights);
+      const hue: Hue = wi++ % 2 ? "c" : "m";
+      if (kind === "branch") {
+        const x = cordAt(y);
+        if (x !== null) {
+          if (spanR < x || spanL > x) {
+            // Out to one side of the main cord.
+            const toLeft = spanR < x;
+            const end = toLeft ? spanL - 34 : spanR + 34;
+            const [a, b] = toLeft ? [end, x] : [x, end];
+            marks.push(...weft(a, b, y, hue, seed++, undefined, { knotL: true, knotR: true, from: x }));
+          } else {
+            // Across it, tied on where they cross.
+            marks.push(...weft(spanL - 34, spanR + 34, y, hue, seed++, undefined, { knotL: true, knotR: true }));
+            marks.push(...knot(x, y, 7, seed++, y - 40));
+          }
+          return;
+        }
       }
-    }
-  }
-
-  let previousReach = 0;
-  function extend(animate = !instant) {
-    const box = screen.getBoundingClientRect();
-    const target = instant ? total : lengthAt(innerHeight * 0.92 - box.top);
-    if (target <= reach) return;
-    previousReach = reach;
-    reach = target;
-    apply(animate);
-  }
-
-  function onScroll() {
-    if (frame) return;
-    frame = requestAnimationFrame(() => {
-      frame = 0;
-      extend();
+      if (loop && kind !== "free") {
+        marks.push(...weft(loop.l - 22, loop.r + 22, y, hue, seed++, loop));
+      } else {
+        marks.push(...weft(spanL - 30, spanR + 30, y, hue, seed++, undefined, { knotL: true, knotR: true }));
+      }
     });
   }
 
-  let resizeTimer = 0;
-  const observer = new ResizeObserver(() => {
-    clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(() => {
-      const fraction = reach / total;
-      build();
-      reach = Math.max(reach, fraction * total);
-      apply(false);
-      extend(false);
-    }, 120);
-  });
+  // Chains: things hung from the thing above them.
+  for (const item of host.querySelectorAll<HTMLElement>("[data-hang-from='prev']")) {
+    let prev = item.previousElementSibling as HTMLElement | null;
+    while (prev && !prev.hasAttribute("data-ink")) prev = prev.previousElementSibling as HTMLElement | null;
+    if (prev) setHang(item, box(item).t - box(prev).b);
+  }
 
-  return {
-    /** Lay the braid and grow it into view. */
-    start() {
-      build();
-      reach = 0;
-      apply(false);
-      // Let the zero state paint before growing.
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => extend(!instant)),
-      );
-      addEventListener("scroll", onScroll, { passive: true, signal });
-      observer.observe(screen);
-      signal.addEventListener("abort", () => observer.disconnect());
-    },
-    /** Pull the braid back up into the sky. */
-    unravel() {
-      observer.disconnect();
-      removeEventListener("scroll", onScroll);
-      screen.classList.add("hion-weave-unravel");
-      reach = 0;
-      for (const path of grown) {
-        path.style.strokeDashoffset = "1";
-      }
-    },
-  };
+  /* ---- Ties: items knotted to their loop's left strand ---- */
+  for (const el of host.querySelectorAll<HTMLElement>("[data-tie]")) {
+    if (!visible(el)) continue;
+    const loop = loopOf(el);
+    if (!loop) continue;
+    const y = firstLineMiddle(el);
+    const b = box(el);
+    const hue: Hue = el.dataset.hue === "m" ? "m" : "c";
+    const pts: Pt[] = [
+      [loop.l, y - 4],
+      [(loop.l + b.l) / 2, y + 3],
+      [b.l - 12, y],
+    ];
+    marks.push(
+      ...thread(new Path(pts, 3), { hue, w: 2.2, seed: seed++, key: [y - 50, y - 20], glow: 0.16 }),
+      ...knot(loop.l, y - 4, 5, seed++, y - 50),
+      ...knot(b.l - 12, y, 3.5, seed++, y - 20),
+    );
+  }
+
+  return { marks, spine, end: endAt ? endAt[1] : null };
+}
+
+/** The two strands of the cord, parted around a section. */
+function loopStrands(loop: Loop, seed: number): Mark[] {
+  const out: Mark[] = [];
+  const { l, t, r, b, entry, exit, flare } = loop;
+  const sides: [number, Hue, number][] = [
+    [l, "c", -1],
+    [r, "m", 1],
+  ];
+  for (const [x, hue, dir] of sides) {
+    const pts: Pt[] = [
+      ...cubic(entry, [entry[0], t + flare * 0.55], [x, t + flare * 0.3], [x, t + flare], 28),
+    ];
+    // Down the side, with the slow drift of a hand-drawn line.
+    const rand = rng(seed + (dir > 0 ? 3 : 7));
+    const span = b - t - flare * 2;
+    const steps = Math.max(2, Math.round(span / 70));
+    const phase = rand() * 6;
+    for (let i = 1; i < steps; i++) {
+      const y = t + flare + (span * i) / steps;
+      pts.push([x + Math.sin(i * 0.9 + phase) * 2.4, y]);
+    }
+    pts.push(...cubic([x, b - flare], [x, b - flare * 0.3], [exit[0], b - flare * 0.55], exit, 28));
+    const path = new Path(pts, 3);
+    out.push(...thread(path, { hue, w: 3.8, seed: seed * 7 + (dir > 0 ? 1 : 2), glow: 0.16 }));
+    // A second, finer fibre beside it: the strand loosened by being parted.
+    const loose = new Path(
+      pts.map(([px, py], i) => [px - dir * (3.2 + Math.sin(i * 0.3) * 1.6), py] as Pt),
+      3,
+    );
+    out.push(
+      ...thread(loose, {
+        hue,
+        w: 1.6,
+        alpha: 0.7,
+        seed: seed * 7 + (dir > 0 ? 3 : 4),
+        glow: 0,
+        core: false,
+      }),
+    );
+  }
+  out.push(...knot(entry[0], entry[1], 9, seed + 1));
+  out.push(...knot(exit[0], exit[1], 9, seed + 2));
+  return out;
+}
+
+/** A weft thread across [from, to] at y. Inside a loop it is woven: over
+ * one strand and under the other, alternating. Elsewhere its ends are
+ * knotted. `from` (when given) is where it is thrown from, so it draws
+ * outward from the main cord. */
+function weft(
+  from: number,
+  to: number,
+  y: number,
+  hue: Hue,
+  seed: number,
+  loop: Loop | undefined,
+  ends: { knotL?: boolean; knotR?: boolean; from?: number } = {},
+): Mark[] {
+  const out: Mark[] = [];
+  const rand = rng(seed);
+  const pts: Pt[] = [];
+  const steps = Math.max(2, Math.round((to - from) / 40));
+  const tilt = (rand() - 0.5) * 5;
+  for (let i = 0; i <= steps; i++) {
+    const u = i / steps;
+    pts.push([
+      from + (to - from) * u,
+      y + Math.sin(u * Math.PI) * 2.5 + tilt * (u - 0.5) + Math.sin(u * 9 + seed) * 0.8,
+    ]);
+  }
+  const reversed = ends.from !== undefined && Math.abs(ends.from - to) < Math.abs(ends.from - from);
+  const path = new Path(reversed ? pts.slice().reverse() : pts, 3);
+  const key = y - 40;
+  // Thrown across as the reach passes them.
+  const keys: [number, number] = [key, key + 60];
+  if (loop) {
+    const flip = seed % 2 === 1;
+    const over = flip ? loop.l : loop.r;
+    const under = flip ? loop.r : loop.l;
+    // Where the weft passes over a strand, part the strand first.
+    out.push(mark(Kind.Erase, hue, 8, 1, [over, y - 8, over, y + 8], 0, key - 1));
+    out.push(...thread(path, { hue, w: 3.2, seed: seed * 11, key: keys, glow: 0.18 }));
+    // Where it passes under, cut the weft and lay the strand back over it.
+    out.push(mark(Kind.Erase, hue, 9, 1, [under - 6, y, under + 6, y], 0, keys[1] + 1));
+    const strandHue: Hue = under === loop.l ? "c" : "m";
+    out.push(
+      mark(Kind.Stroke, strandHue, 3.8, 1, [under, y - 13, under + 0.6, y, under, y + 13], seed * 13, keys[1] + 2),
+    );
+  } else {
+    out.push(...thread(path, { hue, w: 2.8, seed: seed * 11, key: keys, glow: 0.16 }));
+  }
+  if (ends.knotL) out.push(...knot(pts[0][0], pts[0][1], 5, seed + 3, reversed ? keys[1] : keys[0]));
+  if (ends.knotR) {
+    const last = pts[pts.length - 1];
+    out.push(...knot(last[0], last[1], 5, seed + 4, reversed ? keys[0] : keys[1]));
+  }
+  return out;
 }

@@ -1,195 +1,277 @@
-/** The sky rail: a hion cable strung across the top of the night, with the
- * site's destinations hanging from it on wires like paper tags. Home is the
- * moon. The wire of the screen you are on drops lower and burns brighter:
- * it is the line the whole screen's braid grows out of. */
+/** The line everything hangs from.
+ *
+ * A cord strung across the top of the page, sagging a little, with the
+ * site's destinations hanging from it on threads, each tied off with a knot.
+ * The place you are hangs lowest, and the page's main cord begins at its
+ * knot. Read down the page and the cord stays behind at the top; a pull
+ * cord with a tassel hangs at the corner instead. Pull it and the line
+ * drops back down to you.
+ *
+ * On a phone the line holds only your name and the tassel; pulling it lets
+ * the destinations fall in a cascade, each on a longer thread than the
+ * last, like a wind chime. */
 import type { SiteContent } from "../types";
-import { h, s } from "./dom";
+import { h } from "./dom";
+import { ink } from "./ink";
+import { Kind, Path, paint, paintGlows, patterns, braid, type Pt } from "./pastel";
 
-export interface Rail {
+export interface Nav {
   el: HTMLElement;
-  /** Bottom of the current destination's tag (or the moon), in the viewport,
-   * with the rail at rest. */
-  origin(): { x: number; y: number } | null;
+  /** Where the page's cord begins (the current knot), in page coordinates
+   * with the line at rest. */
+  origin(): Pt | null;
+  /** The cord's height at page x, at rest. */
+  cordY(x: number): number;
   setCurrent(path: string): void;
+  close(): void;
 }
 
-export function createRail(
+const narrowQuery = "(max-width: 719px)";
+
+export function createNav(
   content: SiteContent,
   signal: AbortSignal,
   face: boolean,
-): Rail {
-  const items = content.site.nav;
-  const moonArt = s(
-    "svg",
-    { class: "hion-moon__disc", viewBox: "0 0 40 40", "aria-hidden": "true" },
-    s("circle", { cx: 20, cy: 20, r: 15, class: "hion-moon__body" }),
-    s("path", {
-      class: "hion-moon__loop",
-      d: "M3 27C9 36 34 33 37 20C39 9 26 4 20 9",
-    }),
-  );
-  const moon = h(
+): Nav {
+  const cord = h("canvas", { class: "hion-nav__cord", "aria-hidden": "true" });
+  const home = h(
     "a",
-    { class: "hion-moon", href: "/", "data-nav": "/" },
-    moonArt,
-    h(
-      "span",
-      { class: "hion-moon__name" },
-      h("span", {}, content.site.name),
-      h(
-        "span",
-        { class: "hion-moon__sub", "aria-hidden": "true" },
-        "Kilahito, after dark",
-      ),
-    ),
-  );
-
-  const cable = s(
-    "svg",
     {
-      class: "hion-rail__cable",
-      viewBox: "0 0 100 20",
-      preserveAspectRatio: "none",
-      "aria-hidden": "true",
+      class: "hion-charm hion-charm--home",
+      href: "/",
+      "data-nav": "/",
+      "data-ink": "charm",
+      "data-seed": "3",
+      "data-hue": "m",
     },
-    s("path", { class: "hion-rail__cable-glow", d: "M-2 2Q50 22 102 2" }),
-    s("path", { class: "hion-rail__cable-core", d: "M-2 2Q50 22 102 2" }),
-    s("path", {
-      class: "hion-rail__cable-pulse",
-      d: "M-2 2Q50 22 102 2",
-      pathLength: "1",
-    }),
+    h("span", { class: "hion-charm__label" }, content.site.name),
   );
-
-  const list = h("ul", { class: "hion-rail__lines" });
-  items.forEach((item, index) => {
-    const u = (index + 0.5) / items.length;
-    const sag = 4 * u * (1 - u);
-    const tag = h(
-      "span",
-      { class: "hion-line__tag" },
-      item.label,
-      item.external
-        ? h("span", { class: "hion-line__out", "aria-hidden": "true" }, "↗")
-        : null,
-    );
-    const anchor = h(
-      "a",
-      {
-        class: "hion-line__link",
-        href: item.href,
-        "data-nav": item.external ? undefined : item.href,
-        ...(item.external ? { target: "_blank", rel: "noreferrer" } : {}),
-      },
-      h("span", { class: "hion-line__wire", "aria-hidden": "true" }),
-      tag,
-      item.external
-        ? h("span", { class: "hion-sr" }, " (opens in a new tab)")
-        : null,
-    );
+  const list = h("ul", { class: "hion-nav__list", id: "hion-nav-list" });
+  content.site.nav.forEach((item, i) => {
     list.append(
       h(
         "li",
-        {
-          class: "hion-line",
-          style: `--hion-sag:${sag.toFixed(3)};--hion-sway:${(3.2 + ((index * 1.7) % 2.3)).toFixed(2)}s;--hion-sway-delay:${(-index * 0.9).toFixed(2)}s`,
-          "data-hue": index % 2 ? "magenta" : "cyan",
-        },
-        anchor,
+        { class: "hion-nav__item", style: `--hion-i:${i}` },
+        h(
+          "a",
+          {
+            class: "hion-charm",
+            href: item.href,
+            "data-nav": item.external ? undefined : item.href,
+            "data-ink": "charm",
+            "data-seed": String(11 + i * 7),
+            "data-hue": i % 2 ? "m" : "c",
+            ...(item.external ? { target: "_blank", rel: "noreferrer" } : {}),
+          },
+          h("span", { class: "hion-charm__label" }, item.label),
+          item.external
+            ? h("span", { class: "hion-sr" }, " (opens in a new tab)")
+            : null,
+        ),
       ),
     );
   });
-
+  const pull = h(
+    "button",
+    {
+      class: "hion-pull",
+      type: "button",
+      "aria-expanded": "false",
+      "aria-controls": "hion-nav-list",
+      "data-ink": "tassel",
+      "data-seed": "41",
+    },
+    h("span", { class: "hion-pull__label" }, "Menu"),
+  );
   const nav = h(
     "nav",
-    { class: "hion-rail__nav", "aria-label": "Site" },
-    cable,
+    { class: "hion-nav", "aria-label": "Site" },
+    cord,
+    home,
     list,
   );
-  const el = h(
-    "header",
-    { class: "hion-rail", "data-state": "shown" },
-    moon,
-    nav,
-  );
+  const el = h("header", { class: "hion-top", "data-state": "rest" }, nav, pull);
 
-  // Arrow keys walk along the line, as the metaphor promises.
-  el.addEventListener(
-    "keydown",
-    (event) => {
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key))
-        return;
-      const links = [...el.querySelectorAll<HTMLAnchorElement>("a")];
-      const at = links.indexOf(document.activeElement as HTMLAnchorElement);
-      if (at < 0) return;
-      event.preventDefault();
-      const next =
-        event.key === "Home"
-          ? 0
-          : event.key === "End"
-            ? links.length - 1
-            : (at + (event.key === "ArrowRight" ? 1 : -1) + links.length) %
-              links.length;
-      links[next].focus();
-    },
-    { signal },
-  );
+  let width = 0;
+  const narrow = () => matchMedia(narrowQuery).matches;
+  const sagOf = () => (narrow() ? 6 : 22);
+  const cordTop = () => (narrow() ? 20 : 24);
+  const cordY = (x: number) => {
+    const u = width ? Math.max(0, Math.min(1, x / width)) : 0.5;
+    return cordTop() + sagOf() * 4 * u * (1 - u);
+  };
 
-  // The rail rises out of the way while you read down, and returns when you
-  // head back up.
-  if (!face) {
-    let lastY = scrollY;
-    let ticking = false;
-    addEventListener(
-      "scroll",
-      () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          ticking = false;
-          const y = scrollY;
-          el.toggleAttribute("data-scrolled", y > 24);
-          if (el.contains(document.activeElement)) el.dataset.state = "shown";
-          else if (y > lastY + 6 && y > 160) el.dataset.state = "hidden";
-          else if (y < lastY - 6 || y < 160) el.dataset.state = "shown";
-          lastY = y;
-        });
-      },
-      { passive: true, signal },
-    );
-    el.addEventListener("focusin", () => (el.dataset.state = "shown"), {
-      signal,
+  /** Hang every charm at its length below the sagging cord. */
+  function hangCharms() {
+    width = nav.clientWidth;
+    const dropped = el.dataset.state === "dropped";
+    const charms = [home, ...list.querySelectorAll<HTMLElement>(".hion-charm")];
+    charms.forEach((charm, i) => {
+      const isCurrent = charm.hasAttribute("data-current");
+      let hang: number;
+      if (narrow() && dropped && charm !== home) {
+        // A cascade: each further destination hangs lower.
+        hang = 96 + (i - 1) * 64;
+      } else if (charm === home) {
+        hang = isCurrent ? 34 : 18;
+      } else {
+        hang = (isCurrent ? 58 : 20) + ((i * 7) % 3) * 6;
+      }
+      charm.style.setProperty("--hion-hang", `${hang}px`);
+      // Positioned from the top of the line, so the thread meets the cord.
+      const box = charm.getBoundingClientRect();
+      const navBox = nav.getBoundingClientRect();
+      const x = box.left - navBox.left + box.width / 2;
+      charm.style.setProperty("--hion-top", `${(cordY(x) + hang).toFixed(1)}px`);
     });
+    drawCord();
+    ink(el);
+  }
+
+  function drawCord() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const w = nav.clientWidth;
+    const hgt = cordTop() + sagOf() + 30;
+    cord.width = Math.ceil(w * dpr);
+    cord.height = Math.ceil(hgt * dpr);
+    cord.style.width = `${w}px`;
+    cord.style.height = `${hgt}px`;
+    const ctx = cord.getContext("2d")!;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, hgt);
+    const pts: Pt[] = [];
+    for (let x = -10; x <= w + 10; x += 12) pts.push([x, cordY(x)]);
+    const marks = braid(new Path(pts, 3), { w: narrow() ? 6 : 7, seed: 5 });
+    const pats = patterns(ctx, dpr);
+    paintGlows(ctx, marks, w, hgt, 0.7);
+    for (const m of marks) if (m.kind !== Kind.Glow) paint(ctx, m, pats);
+  }
+
+  function setState(state: "rest" | "stowed" | "dropped") {
+    if (el.dataset.state === state) return;
+    const wasDropped = el.dataset.state === "dropped";
+    el.dataset.state = state;
+    pull.setAttribute("aria-expanded", String(state === "dropped"));
+    if (state === "dropped" || wasDropped || state === "rest") hangCharms();
+  }
+
+  function onScroll() {
+    const state = el.dataset.state;
+    const past = scrollY > (narrow() ? 70 : 150);
+    if (state === "dropped") {
+      if (narrow()) return;
+      if (!past) setState("rest");
+      return;
+    }
+    setState(past ? "stowed" : "rest");
+  }
+
+  if (!face) {
+    addEventListener("scroll", onScroll, { passive: true, signal });
+    pull.addEventListener(
+      "click",
+      () => {
+        if (el.dataset.state === "dropped") {
+          setState(narrow() || scrollY < 150 ? "rest" : "stowed");
+        } else {
+          setState("dropped");
+          requestAnimationFrame(() =>
+            (list.querySelector<HTMLElement>("a") ?? home).focus({ preventScroll: true }),
+          );
+        }
+      },
+      { signal },
+    );
+    el.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key === "Escape" && el.dataset.state === "dropped") {
+          setState(narrow() || scrollY < 150 ? "rest" : "stowed");
+          pull.focus();
+          return;
+        }
+        if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key))
+          return;
+        const links = [...nav.querySelectorAll<HTMLAnchorElement>("a")].filter(
+          (a) => a.offsetParent !== null,
+        );
+        const at = links.indexOf(document.activeElement as HTMLAnchorElement);
+        if (at < 0) return;
+        event.preventDefault();
+        const forward = event.key === "ArrowRight" || event.key === "ArrowDown";
+        const next =
+          event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? links.length - 1
+              : (at + (forward ? 1 : -1) + links.length) % links.length;
+        links[next].focus();
+      },
+      { signal },
+    );
+    // Reaching into the line with the keyboard brings it down to you.
+    nav.addEventListener(
+      "focusin",
+      () => {
+        if (el.dataset.state === "stowed") setState("dropped");
+      },
+      { signal },
+    );
+    // Clicking away from a dropped line lets it go.
+    addEventListener(
+      "pointerdown",
+      (event) => {
+        if (el.dataset.state !== "dropped") return;
+        if (el.contains(event.target as Node)) return;
+        setState(narrow() || scrollY < 150 ? "rest" : "stowed");
+      },
+      { signal },
+    );
+    let resizeTimer = 0;
+    addEventListener(
+      "resize",
+      () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(hangCharms, 120);
+      },
+      { signal },
+    );
   }
 
   return {
     el,
     origin() {
-      const tag =
-        el.querySelector<HTMLElement>(
-          ".hion-line[data-current] .hion-line__tag",
-        ) ?? el.querySelector<HTMLElement>(".hion-moon__disc");
-      if (!tag) return null;
-      const r = tag.getBoundingClientRect();
-      const lift =
-        el.dataset.state === "hidden" ? el.getBoundingClientRect().top : 0;
-      return { x: r.left + r.width / 2, y: r.bottom - lift - 2 };
+      const navBox = nav.getBoundingClientRect();
+      if (narrow()) {
+        // On a phone the page's cord comes down from the pull tassel.
+        const top = el.getBoundingClientRect();
+        const box = pull.getBoundingClientRect();
+        return [box.left - top.left + box.width / 2, box.bottom - top.top - 4];
+      }
+      const target =
+        list.querySelector<HTMLElement>(".hion-charm[data-current]") ?? home;
+      const box = target.getBoundingClientRect();
+      const hang = parseFloat(target.style.getPropertyValue("--hion-hang")) || 0;
+      const x = box.left - navBox.left + box.width / 2;
+      // The cord leaves from under the charm's label.
+      return [x, cordY(x) + hang + box.height];
     },
+    cordY,
     setCurrent(path: string) {
       const top = "/" + (path.split("/").filter(Boolean)[0] ?? "");
-      for (const a of el.querySelectorAll<HTMLAnchorElement>("a[data-nav]")) {
+      for (const a of nav.querySelectorAll<HTMLAnchorElement>("a[data-nav]")) {
         const target = a.dataset.nav!;
         const exact = target === path;
         const within = target !== "/" && target === top;
         if (exact) a.setAttribute("aria-current", "page");
         else a.removeAttribute("aria-current");
-        a.closest(".hion-line")?.toggleAttribute(
-          "data-current",
-          exact || within,
-        );
-        if (target === "/") a.toggleAttribute("data-current", exact);
+        a.toggleAttribute("data-current", exact || within);
       }
-      el.dataset.state = "shown";
+      if (el.dataset.state === "dropped") setState(scrollY < 150 ? "rest" : "stowed");
+      hangCharms();
+    },
+    close() {
+      if (el.dataset.state === "dropped") setState("rest");
     },
   };
 }

@@ -1,120 +1,124 @@
-/** Hion: the portfolio as Kilahito, the city under a sky that never
- * lightens, lit and powered by living lines of cyan and magenta light.
+/** Hion: the portfolio drawn in two threads of light, cyan and magenta, in
+ * chalk pastel on black paper.
  *
- * The lines are the interface. Destinations hang from a hion cable across
- * the sky; the one you are on drops lowest, and a braid of cyan and magenta
- * grows out of it down through the screen, tying a knot at every piece of
- * content and lighting it as it arrives. Headings are written by the light.
- * Changing screens unravels the braid back into the sky, the ribbons overhead
- * re-weave into a new pose, and the next braid grows down again. */
-import type { LensShell, Route, ShellContext, SiteContent } from "../types";
-import { h, link, wait } from "./dom";
-import { createRail, type Rail } from "./nav";
-import { buildScreen } from "./screens";
-import { createSky } from "./sky";
-import { createWeave } from "./weave";
-import { writeHeading } from "./write";
-import { mountMicro, screenMicro } from "./micro";
+ * The threads are the interface. A cord strung across the top holds the
+ * destinations, hanging on threads; from the place you are, a braided cord
+ * drops into the page and runs all the way down it. Every screen is laid
+ * out along that cord: titles hang from the line, sections are loops where
+ * the cord parts into its two strands around the words, headings are strung
+ * on woven wefts, lists dangle like charms, pictures hang wound at their
+ * corners, links are pull-cords. As you scroll, the cord draws itself just
+ * ahead of you and a bead of light rides its tip: reading is following the
+ * thread. Changing screens lets the drawing go and draws the next one down
+ * from its new knot on the line. */
+import type { LensShell, Route, ShellContext } from "../types";
+import { h, wait } from "./dom";
+import { ink } from "./ink";
+import { createLoom } from "./loom";
+import { createNav, type Nav } from "./nav";
+import { tooth } from "./pastel";
+import { buildScreen, footer } from "./screens";
+import { compose } from "./weave";
 import "./shell.css";
-import "./micro.css";
 
 interface Live {
   path: string;
-  screen: HTMLElement;
-  weave: ReturnType<typeof createWeave>;
+  page: HTMLElement;
+  loom: ReturnType<typeof createLoom>;
   controller: AbortController;
 }
 
 let ctx: ShellContext;
+let world: HTMLElement;
 let stage: HTMLElement;
-let rail: Rail;
-let sky: ReturnType<typeof createSky>;
+let nav: Nav;
 let live: Live | undefined;
 let token = 0;
 
 const still = () => ctx.reducedMotion || ctx.face;
 
-function footer(content: SiteContent) {
-  return h(
-    "footer",
-    { class: "hion-foot" },
-    h("p", { class: "hion-hello hion-foot__call" }, "Send a line my way"),
-    h(
-      "p",
-      { class: "hion-foot__mail" },
-      link(`mailto:${content.site.email}`, {}, content.site.email),
+/** The paper's tooth, for CSS: chalky text and thread underlines. */
+let textures: Promise<Record<string, string>> | undefined;
+function cssTextures() {
+  return (textures ??= Promise.all(
+    Object.entries(tooth()).map(
+      ([key, canvas]) =>
+        new Promise<[string, string]>((resolve) =>
+          canvas.toBlob((blob) =>
+            resolve([key, blob ? URL.createObjectURL(blob) : ""]),
+          ),
+        ),
     ),
-    h(
-      "ul",
-      { class: "hion-foot__social", "aria-label": "Elsewhere" },
-      content.site.social
-        .filter((item) => !item.href.startsWith("mailto:"))
-        .map((item) => h("li", {}, link(item.href, {}, item.label))),
-      h("li", {}, link(content.site.writingUrl, {}, "Writing")),
-    ),
-    h(
-      "p",
-      { class: "hion-foot__note" },
-      "Kilahito never sleeps. Lit by hion, after Brandon Sanderson’s ",
-      h("cite", {}, "Yumi and the Nightmare Painter"),
-      ".",
-    ),
-  );
+  ).then((entries) => Object.fromEntries(entries)));
 }
 
 function show(route: Route, first: boolean) {
   const controller = new AbortController();
-  ctx.signal.addEventListener("abort", () => controller.abort(), {
-    once: true,
-  });
-  const screen = buildScreen(ctx.content, route);
-  screen.dataset.state = first ? "arriving" : "entering";
-  stage.replaceChildren(screen);
-  const weave = createWeave({
-    screen,
+  ctx.signal.addEventListener("abort", () => controller.abort(), { once: true });
+  const main = buildScreen(ctx.content, route);
+  const page = h(
+    "div",
+    { class: "hion-page", "data-kind": route.kind, "data-state": first ? "arriving" : "entering" },
+    main,
+    footer(ctx.content),
+  );
+  stage.replaceChildren(page);
+  nav.setCurrent(route.path);
+  // Which side the cord drops on, so the screen's head keeps clear of it.
+  const drop = nav.origin();
+  if (drop) {
+    const width = page.clientWidth || innerWidth;
+    page.style.setProperty("--hion-drop-x", `${drop[0].toFixed(0)}px`);
+    page.dataset.drop =
+      drop[0] < width * 0.4 ? "left" : drop[0] > width * 0.6 ? "right" : "center";
+  }
+  const loom = createLoom({
+    host: page,
     signal: controller.signal,
     instant: still(),
-    origin: () => rail.origin(),
+    lookahead: ctx.face ? 0 : 0.6,
+    isIdle: ctx.isIdle,
+    onIdleChange: ctx.onIdleChange,
+    compose: () => {
+      const composition = compose(page, () => nav.origin());
+      ink(page);
+      return composition;
+    },
   });
-  live = { path: route.path, screen, weave, controller };
-  screenMicro(screen, controller.signal);
-  rail.setCurrent(route.path);
-  sky.setPose(route.kind);
-  const title = screen.querySelector<HTMLElement>("h1");
-  if (title)
-    writeHeading(title, { instant: still(), delay: first ? 250 : 120 });
-  // Lay the braid once the screen has its layout.
+  live = { path: route.path, page, loom, controller };
   requestAnimationFrame(() => {
-    weave.start();
-    screen.dataset.state = "here";
+    loom.start();
+    page.dataset.state = "here";
   });
-  // Images settle late; the weave's resize observer re-threads for them.
-  if (!first && !ctx.face) {
-    screen.focus({ preventScroll: true });
-  }
+  // Keyboard travel ahead of the drawing brings the drawing with it.
+  page.addEventListener(
+    "focusin",
+    (event) => {
+      const target = event.target as HTMLElement;
+      const y = target.getBoundingClientRect().bottom - page.getBoundingClientRect().top;
+      loom.catchUp(y + innerHeight * 0.3);
+    },
+    { signal: controller.signal },
+  );
+  if (!first && !ctx.face) main.focus({ preventScroll: true });
 }
 
 const shell: LensShell = {
   async mount(context) {
     ctx = context;
     const { root, content, signal } = context;
-    const skyHost = h("div", { class: "hion-sky", "aria-hidden": "true" });
-    rail = createRail(content, signal, context.face);
+    nav = createNav(content, signal, context.face);
     stage = h("div", { class: "hion-stage" });
-    const skip = h(
-      "a",
-      { class: "hion-skip", href: "#hion-main" },
-      "Skip to content",
-    );
+    const skip = h("a", { class: "hion-skip", href: "#hion-main" }, "Skip to content");
     skip.addEventListener(
       "click",
       (event) => {
         event.preventDefault();
-        live?.screen.focus();
+        live?.page.querySelector<HTMLElement>("main")?.focus();
       },
       { signal },
     );
-    const world = h(
+    world = h(
       "div",
       {
         class: "hion",
@@ -122,34 +126,30 @@ const shell: LensShell = {
         "data-still": still() ? "" : undefined,
       },
       skip,
-      skyHost,
-      rail.el,
+      nav.el,
       stage,
-      footer(content),
     );
+    const urls = await cssTextures();
+    for (const [key, url] of Object.entries(urls)) {
+      world.style.setProperty(`--hion-tooth-${key}`, `url("${url}")`);
+    }
     root.replaceChildren(world);
-    sky = createSky({
-      host: skyHost,
-      signal,
-      reducedMotion: context.reducedMotion,
-      isIdle: context.isIdle,
-      onIdleChange: context.onIdleChange,
-    });
-    mountMicro(context, rail.el);
+    // Let the faces arrive before measuring words to hang them.
+    await Promise.race([document.fonts?.ready, wait(600)]);
     show(context.route, true);
     signal.addEventListener("abort", () => live?.controller.abort());
   },
 
   async update(route) {
-    // The runtime also syncs on the first page load; nothing has moved.
     if (live && route.path === live.path) return;
     const mine = ++token;
     const leaving = live;
+    nav.close();
     if (leaving && !still()) {
-      leaving.screen.dataset.state = "leaving";
-      leaving.screen.setAttribute("inert", "");
-      leaving.weave.unravel();
-      await wait(420);
+      leaving.page.dataset.state = "leaving";
+      leaving.page.setAttribute("inert", "");
+      leaving.loom.release();
+      await wait(380);
       if (mine !== token) return;
     }
     leaving?.controller.abort();
