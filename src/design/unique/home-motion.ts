@@ -1,9 +1,10 @@
 /** Homepage motion runtime: scroll reveals and a soft pointer scene.
  * Reveals: elements are hidden only after this script marks them, then shown
  * once as they enter the viewport; anything already on screen stays put.
- * Scene: a nearby fine pointer tilts the portrait and nudges the decorative
- * circles. One animation frame per batch of pointer events, no idle loop,
- * CSS transitions do the smoothing. Reduced motion and touch stay static.
+ * Scene: a nearby fine pointer tilts the portrait. One animation frame per
+ * batch of pointer events, no idle loop, CSS transitions do the smoothing.
+ * Reduced motion and touch stay static. (The ball links run their own
+ * physics in ball-nav.ts.)
  */
 const REVEAL_TARGETS = [
   ".selected-work > .section-heading",
@@ -18,8 +19,6 @@ const REVEAL_TARGETS = [
 ].join(",");
 const TILT_DEGREES = 6;
 const TILT_REACH = 2.2;
-const BLOB_REACH = 1.8;
-const BLOB_PULL = [14, 9, 11, 8];
 
 export function installHomeMotion() {
   const motion = window.matchMedia("(prefers-reduced-motion: no-preference)");
@@ -109,8 +108,6 @@ function installScene(
   const scene = root.querySelector<HTMLElement>("[data-motion-scene]");
   if (!scene) return;
   const portrait = scene.querySelector<HTMLElement>("figure img");
-  const art = scene.querySelector<HTMLElement>("[data-blob-art]");
-  const blobs = art ? [...art.querySelectorAll<HTMLElement>("g")] : [];
   let frame = 0;
   let last: { clientX: number; clientY: number } | undefined;
 
@@ -120,7 +117,6 @@ function installScene(
     last = undefined;
     portrait?.style.removeProperty("--tilt-x");
     portrait?.style.removeProperty("--tilt-y");
-    for (const blob of blobs) blob.style.removeProperty("transform");
   };
   resetters.push(reset);
   const refresh = () => {
@@ -150,20 +146,6 @@ function installScene(
           "--tilt-y",
           `${(x * TILT_DEGREES).toFixed(2)}deg`,
         );
-      }
-    }
-    if (art && blobs.length) {
-      const rect = art.getBoundingClientRect();
-      if (rect.width) {
-        const nx = (clientX - rect.left - rect.width / 2) / (rect.width / 2);
-        const ny = (clientY - rect.top - rect.height / 2) / (rect.height / 2);
-        const distance = Math.hypot(nx, ny);
-        const falloff = Math.max(0, 1 - distance / BLOB_REACH);
-        blobs.forEach((blob, i) => {
-          const pull =
-            (falloff * (BLOB_PULL[i] ?? BLOB_PULL[0])) / (distance || 1);
-          blob.style.transform = `translate(${(nx * pull).toFixed(2)}px, ${(ny * pull).toFixed(2)}px)`;
-        });
       }
     }
   };

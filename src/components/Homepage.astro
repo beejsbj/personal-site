@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import WelcomeHero from "../design/compositions/WelcomeHero.astro";
-import DecorativeBlobs from "../design/unique/DecorativeBlobs.astro";
+import BallNav from "../design/unique/BallNav.astro";
 import GiantInitials from "../design/unique/GiantInitials.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
@@ -20,8 +20,8 @@ const { projects, updates, site } = Astro.props;
 <div class="home-composition shell" data-home-motion>
   <div class="welcome-region" data-motion-scene>
     <WelcomeHero social={site.social} />
-    <div class="welcome-art" aria-hidden="true">
-      <DecorativeBlobs />
+    <div class="welcome-art">
+      <BallNav />
     </div>
   </div>
   <div class="below">
@@ -75,12 +75,9 @@ const { projects, updates, site } = Astro.props;
 <style>
   .welcome-region {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--blob-art-width);
+    grid-template-columns: minmax(0, 1fr) var(--ball-nav-width);
     align-items: center;
     gap: var(--space-2xl);
-  }
-  .welcome-art {
-    pointer-events: none;
   }
   .below {
     display: grid;

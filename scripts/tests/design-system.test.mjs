@@ -110,14 +110,18 @@ test("dedicated style guide imports production assemblies and keeps design-syste
   assert.match(built, /Burooj here!/);
   assert.doesNotMatch(read("dist/client/sitemap-0.xml"), /\/design-system\//);
   assert.doesNotMatch(built, /Pause motion/);
-  assert.doesNotMatch(built, /data-blob-nav|blob-nav__cluster/);
+  assert.match(
+    built,
+    /<nav\b[^>]*aria-label="Ball navigation specimen"[^>]*data-ball-nav/,
+    "Guide must demonstrate the real ball links",
+  );
   assert.match(
     read("dist/client/design-system/index.html"),
     /http-equiv="refresh"/,
   );
 });
 
-test("text navigation retains native links and correct section markers", () => {
+test("text navigation stays primary, with native links and correct section markers", () => {
   for (const [path, current] of [
     ["index.html", "/"],
     ["about/index.html", "/about"],
@@ -135,7 +139,9 @@ test("text navigation retains native links and correct section markers", () => {
     const marked = anchors.filter((tag) => tag.includes('aria-current="page"'));
     assert.equal(marked.length, 1);
     assert.ok(marked[0].includes(`href="${current}"`));
-    assert.doesNotMatch(html, /data-blob-nav|blob-nav__cluster/);
+    // Ball links are a homepage extra, never a replacement for this menu.
+    const ballNavs = (html.match(/data-ball-nav/g) || []).length;
+    assert.equal(ballNavs, path === "index.html" ? 1 : 0, `${path}: ball nav`);
     assert.match(html, /data-magnetic-edge/);
   }
 });

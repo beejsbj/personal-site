@@ -1,0 +1,184 @@
+---
+/** Unique: v1's ball menu, back as the homepage's secondary navigation.
+ * The text menu in the header stays primary; these balls are real links
+ * (one tab stop each, named by their label) laid out on the old unequal
+ * cluster. The current page's ball is burgundy, as in v1.
+ * Motion: the balls rise in once, like a sunrise. With a fine pointer
+ * ball-nav.ts makes them a physics toy (knock, pick up, throw); a drag
+ * never navigates, a clean click always does. Without JS, touch or with
+ * reduced motion they are still, ordinary links. */
+interface Props {
+  currentPath?: string;
+  label?: string;
+}
+const { currentPath = Astro.url.pathname, label = "Explore" } = Astro.props;
+
+// Artwork geometry (centre x/y and radius in a 280 x 290 box), from v1.
+const BOX = { width: 280, height: 290 };
+const balls = [
+  { label: "Home", href: "/", cx: 88, cy: 78, r: 62 },
+  { label: "Lab", href: "/lab", cx: 207, cy: 88, r: 47 },
+  { label: "About", href: "/about", cx: 63, cy: 176, r: 55 },
+  { label: "Projects", href: "/projects", cx: 196, cy: 217, r: 68 },
+];
+const current = (href: string) =>
+  href === "/"
+    ? currentPath === "/"
+    : currentPath === href || currentPath.startsWith(href + "/");
+const place = ({ cx, cy, r }: { cx: number; cy: number; r: number }) =>
+  [
+    `left:${(((cx - r) / BOX.width) * 100).toFixed(3)}%`,
+    `top:${(((cy - r) / BOX.height) * 100).toFixed(3)}%`,
+    `width:${(((2 * r) / BOX.width) * 100).toFixed(3)}%`,
+  ].join(";");
+---
+
+<nav class="ball-nav" aria-label={label} data-ball-nav>
+  <ul>
+    {balls.map((ball, index) => (
+      <li style={`${place(ball)};--i:${index}`}>
+        <a
+          class="ball"
+          href={ball.href}
+          data-ball
+          data-tone={current(ball.href) ? "wine" : "peach"}
+          aria-current={current(ball.href) ? "page" : undefined}
+          draggable="false"
+        >
+          <span class="ball__face">
+            <span class="ball__label">{ball.label}</span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+<script>
+  import { installBallNav } from "./ball-nav";
+  installBallNav();
+</script>
+<style>
+  .ball-nav ul {
+    position: relative;
+    aspect-ratio: 280 / 290;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    --i: 0;
+    position: absolute;
+  }
+  .ball {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: var(--radius-round);
+    color: var(--color-accent);
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    touch-action: manipulation;
+    transform-origin: center;
+  }
+  .ball:hover {
+    text-decoration: none;
+  }
+  .ball__face {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-round);
+    background: var(--color-surface-strong);
+    box-shadow: var(--shadow-ball);
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-heading);
+    line-height: var(--leading-display);
+  }
+  .ball[data-tone="wine"] {
+    color: var(--color-accent-contrast);
+  }
+  .ball[data-tone="wine"] .ball__face {
+    background: var(--color-accent);
+  }
+  .ball:is(:hover, :focus-visible) .ball__face {
+    background: var(--color-hover);
+    box-shadow: var(--shadow-ball-raised);
+  }
+  .ball[data-tone="wine"]:is(:hover, :focus-visible) .ball__face {
+    background: var(--color-accent-pressed);
+  }
+  .ball:active .ball__face {
+    transform: scale(var(--press-scale));
+  }
+  .ball:focus-visible {
+    outline: var(--focus-width) solid var(--color-accent);
+    outline-offset: var(--focus-offset);
+  }
+  /* The label underline draws in like the rest of the site's links. */
+  .ball__label {
+    padding-bottom: var(--underline-pad);
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 100% 100%;
+    background-size: 0% var(--rule-width);
+  }
+  .ball:is(:hover, :focus-visible) .ball__label {
+    background-position: 0 100%;
+    background-size: 100% var(--rule-width);
+  }
+  /* Awake (fine pointer, motion allowed): the balls can be picked up. */
+  [data-balls="awake"] .ball {
+    cursor: grab;
+  }
+  [data-balls="awake"][data-held] .ball {
+    cursor: grabbing;
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .ball__face {
+      transition:
+        transform var(--duration-hover) var(--ease-pop),
+        background-color var(--duration-hover) var(--ease-feedback),
+        box-shadow var(--duration-hover) var(--ease-settle);
+    }
+    .ball:hover .ball__face {
+      transform: scale(var(--ball-hover-scale));
+    }
+    .ball:active .ball__face {
+      transform: scale(var(--press-scale));
+    }
+    .ball__label {
+      transition: background-size var(--duration-hover) var(--ease-settle);
+    }
+  }
+  /* Arrival, once: the peach suns rise, the burgundy ball comes up last. */
+  @media (prefers-reduced-motion: no-preference) {
+    .ball {
+      animation: sunrise var(--duration-settle) var(--ease-pop)
+        calc(var(--stagger) * (2 + var(--i))) backwards;
+    }
+    .ball[data-tone="wine"] {
+      animation-delay: calc(var(--stagger) * 6);
+    }
+  }
+  @keyframes sunrise {
+    from {
+      opacity: 0;
+      transform: translateY(var(--motion-sunrise)) scale(var(--pop-scale));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .ball__face {
+      border: var(--focus-width) solid CanvasText;
+    }
+    .ball[aria-current] .ball__face {
+      border-color: Highlight;
+    }
+  }
+</style>

@@ -69,15 +69,12 @@ function harness({ matches = true, reduced = false } = {}) {
     width: 200,
     height: 200,
   });
-  const art = new Surface({ left: 600, top: 100, width: 200, height: 200 });
-  const blobs = [new Surface(), new Surface(), new Surface(), new Surface()];
   const above = new Surface({ left: 0, top: 300, width: 100, height: 100 });
   const belowA = new Surface({ left: 0, top: 1200, width: 100, height: 100 });
   const belowB = new Surface({ left: 0, top: 1400, width: 100, height: 100 });
   const targets = [above, belowA, belowB];
   scene.querySelector = (selector) =>
-    ({ "figure img": portrait, "[data-blob-art]": art })[selector] ?? null;
-  art.querySelectorAll = (selector) => (selector === "g" ? blobs : []);
+    ({ "figure img": portrait })[selector] ?? null;
   root.querySelector = (selector) =>
     selector === "[data-motion-scene]" ? scene : null;
   root.querySelectorAll = (selector) =>
@@ -158,7 +155,6 @@ function harness({ matches = true, reduced = false } = {}) {
     motionMedia,
     scene,
     portrait,
-    blobs,
     frames,
     observers,
     targets: { above, belowA, belowB },
@@ -195,7 +191,7 @@ test("reduced motion marks nothing, so no content can be hidden", () => {
   assert.equal(h.frames.size, 0);
 });
 
-test("a nearby fine pointer tilts the portrait and nudges the circles in one frame, then settles", () => {
+test("a nearby fine pointer tilts the portrait in one frame, then settles", () => {
   const h = harness();
   assert.equal(h.scene.dataset.motion, "running");
   h.move();
@@ -207,11 +203,9 @@ test("a nearby fine pointer tilts the portrait and nudges the circles in one fra
   assert.equal(h.frames.size, 0, "no idle loop after applying");
   h.move({ clientX: 650, clientY: 150 });
   h.tick();
-  assert.match(h.blobs[0].style.transform, /translate\(/);
   assert.equal(h.portrait.style["--tilt-y"], "0.00deg", "out of reach: level");
   h.scene.emit("pointerleave");
   assert.equal(h.portrait.style["--tilt-x"], undefined);
-  assert.equal(h.blobs[0].style.transform, undefined);
   assert.equal(h.frames.size, 0);
 });
 
@@ -235,7 +229,7 @@ test("touch, hidden tabs and preference changes reset the scene", () => {
   h.pointerMedia.matches = false;
   h.pointerMedia.emit("change");
   assert.equal(h.scene.dataset.motion, "paused");
-  assert.equal(h.blobs[1].style.transform, undefined);
+  assert.equal(h.portrait.style["--tilt-y"], undefined);
   h.move();
   assert.equal(h.frames.size, 0);
 });

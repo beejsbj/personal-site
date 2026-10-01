@@ -97,16 +97,65 @@ test("opening work uses one real feature without duplicating the selected projec
   );
 });
 
-test("decorative circles remain artwork rather than navigation", () => {
-  const artwork = html.match(
-    /<svg\b([^>]*\bdata-blob-art\b[^>]*)>([\s\S]*?)<\/svg>/i,
+test("ball links are a real, labelled secondary navigation beside the text menu", () => {
+  // Burooj reversed "circles are artwork, not navigation" on purpose: v1's
+  // balls are links again, while the six-link text menu stays primary.
+  const navs = [...html.matchAll(/<nav\b([^>]*)>([\s\S]*?)<\/nav>/gi)].map(
+    ([, attrs, body]) => ({ ...attributes(`<nav ${attrs}>`), attrs, body }),
   );
-  assert.ok(artwork, "Missing decorative circle artwork");
-  const attrs = attributes(artwork[1]);
-  assert.equal(attrs["aria-hidden"], "true");
-  assert.equal(attrs.focusable, "false");
-  assert.equal([...artwork[2].matchAll(/<circle\b/g)].length, 4);
-  assert.doesNotMatch(artwork[0], /<(?:a|button)\b|\btabindex\s*=/i);
+  const main = navs.find((nav) => nav["aria-label"] === "Main navigation");
+  assert.ok(main, "Primary text navigation is missing");
+  const mainLinks = [...main.body.matchAll(/<a\b[^>]*>/g)].map(([tag]) =>
+    attributes(tag),
+  );
+  assert.equal(mainLinks.length, 6, "Primary navigation keeps six links");
+  assert.equal(
+    mainLinks.filter((link) => link["aria-current"] === "page").length,
+    1,
+  );
+
+  const balls = navs.find((nav) => /\bdata-ball-nav\b/.test(nav.attrs));
+  assert.ok(balls, "Missing ball navigation");
+  assert.ok(balls["aria-label"], "Ball navigation needs its own name");
+  assert.notEqual(balls["aria-label"], "Main navigation");
+  assert.equal(balls["aria-hidden"], undefined);
+  const links = [...balls.body.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].map(
+    ([, attrs, body]) => ({
+      ...attributes(`<a ${attrs}>`),
+      attrs,
+      text: plainText(body),
+    }),
+  );
+  assert.equal(links.length, 4, "One link per ball");
+  for (const link of links) {
+    assert.ok(link.href, "Every ball is a real link");
+    assert.ok(link.text, `Ball ${link.href} needs an accessible name`);
+    assert.match(link.attrs, /\bdata-ball\b/);
+    assert.equal(link["aria-hidden"], undefined);
+    assert.equal(link.tabindex, undefined, "Balls keep native tab order");
+  }
+  assert.equal(
+    new Set(links.map((link) => link.href)).size,
+    links.length,
+    "No ball duplicates another",
+  );
+  const current = links.filter((link) => link["aria-current"] === "page");
+  assert.equal(current.length, 1, "The current page's ball is marked");
+  assert.equal(current[0].href, "/");
+  assert.equal(current[0]["data-tone"], "wine", "Current ball is burgundy");
+});
+
+test("nothing focusable hides from assistive technology or jumps the tab order", () => {
+  assert.doesNotMatch(html, /\btabindex\s*=\s*["']?[1-9]/i);
+  for (const [, body] of html.matchAll(
+    /<(\w+)\b[^>]*\baria-hidden=["']true["'][^>]*>([\s\S]*?)<\/\1>/gi,
+  )) {
+    assert.doesNotMatch(
+      body,
+      /<(?:a|button|input|select|textarea)\b|\btabindex\s*=\s*["']?0/i,
+      "Focusable content inside aria-hidden",
+    );
+  }
 });
 
 test("homepage preserves canonical and social metadata", () => {

@@ -10,48 +10,61 @@
 </script>
 <style is:global>
   /* Runtime geometry, written by page-transition.ts; these are the resting
-     defaults (centre of the screen, no travel). */
+     defaults (centre of the screen). */
   :root {
     --page-x: 50%;
     --page-y: 50%;
   }
   .page-cover {
-    --page-travel-x: 0;
-    --page-travel-y: 0;
     --page-ball-r: 0;
+    --page-ball-size: auto;
+    --cover-paint: var(--color-accent);
+    --cover-ink: var(--color-accent-contrast);
     position: fixed;
     inset: 0;
     z-index: var(--layer-cover);
     pointer-events: none;
-    color: var(--color-accent-contrast);
+    color: var(--cover-ink);
   }
-  .page-cover__sheet {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    background: var(--color-accent);
-    clip-path: circle(0 at 50% 50%);
+  .page-cover[data-tone="peach"] {
+    --cover-paint: var(--color-surface-strong);
+    --cover-ink: var(--color-accent);
   }
-  .page-cover__travel {
+  .page-cover__ball {
     position: absolute;
     top: var(--page-y);
     left: var(--page-x);
-  }
-  .page-cover__ball {
     display: grid;
     place-items: center;
     min-width: var(--page-ball-min);
     aspect-ratio: 1;
     padding: var(--space-s);
     border-radius: var(--radius-round);
-    background: var(--color-accent);
+    background: var(--cover-paint);
     font-family: var(--font-sans);
     font-size: var(--text-sm);
     font-weight: var(--weight-bold);
     line-height: var(--leading-tight);
     white-space: nowrap;
     translate: -50% -50%;
+  }
+  /* A ball link: the cover ball takes its exact size and serif label. */
+  .page-cover[data-from="ball"] .page-cover__ball {
+    width: var(--page-ball-size);
+    min-width: 0;
+    padding: 0;
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-heading);
+  }
+  .page-cover__sheet {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: var(--cover-paint);
+    clip-path: circle(0 at var(--page-x) var(--page-y));
   }
   .page-cover__title {
     max-width: var(--shell-width);
@@ -64,32 +77,26 @@
     text-wrap: balance;
     opacity: 0;
   }
-  /* Choreography: pop at the link, arc to the middle (x eases out, y
-     overshoots), swell to cover, then the name lands. */
+  /* Choreography: the ball pops where you clicked (a ball link is already
+     there, so it only presses), swells over the page from that spot, and
+     the name lands while it swells. */
   .page-cover {
     --after-pop: var(--duration-fast);
-    --after-travel: calc(var(--after-pop) + var(--duration-travel));
-    /* The name lands while the sheet is still swelling, so it is whole by
-       the time the old snapshot is taken. */
-    --title-at: calc(var(--after-travel) + var(--duration-swell) / 2);
-  }
-  .page-cover__sheet {
-    animation: page-swell var(--duration-swell) var(--ease-swell)
-      var(--after-travel) forwards;
-  }
-  .page-cover__travel {
-    animation: page-travel-x var(--duration-travel) var(--ease-page)
-      var(--after-pop) forwards;
-  }
-  .page-cover__lift {
-    display: block;
-    animation: page-travel-y var(--duration-travel) var(--ease-pop)
-      var(--after-pop) forwards;
+    --title-at: calc(var(--after-pop) + var(--duration-swell) / 2);
   }
   .page-cover__ball {
     animation:
       page-ball-pop var(--duration-fast) var(--ease-pop) backwards,
-      page-ball-hush var(--duration-fast) linear var(--after-travel) forwards;
+      page-ball-hush var(--duration-fast) linear var(--after-pop) forwards;
+  }
+  .page-cover[data-from="ball"] .page-cover__ball {
+    animation:
+      page-ball-press var(--duration-fast) var(--ease-feedback),
+      page-ball-hush var(--duration-fast) linear var(--after-pop) forwards;
+  }
+  .page-cover__sheet {
+    animation: page-swell var(--duration-swell) var(--ease-swell)
+      var(--after-pop) forwards;
   }
   .page-cover__title {
     animation: page-title-in var(--duration-hover) var(--ease-settle)
@@ -100,27 +107,22 @@
       scale: 0;
     }
   }
+  @keyframes page-ball-press {
+    50% {
+      scale: var(--press-scale);
+    }
+  }
   @keyframes page-ball-hush {
     to {
       color: transparent;
     }
   }
-  @keyframes page-travel-x {
-    to {
-      translate: var(--page-travel-x) 0;
-    }
-  }
-  @keyframes page-travel-y {
-    to {
-      translate: 0 var(--page-travel-y);
-    }
-  }
   @keyframes page-swell {
     from {
-      clip-path: circle(var(--page-ball-r) at 50% 50%);
+      clip-path: circle(var(--page-ball-r) at var(--page-x) var(--page-y));
     }
     to {
-      clip-path: circle(var(--page-reach) at 50% 50%);
+      clip-path: circle(var(--page-reach) at var(--page-x) var(--page-y));
     }
   }
   @keyframes page-title-in {
@@ -133,8 +135,8 @@
       translate: none;
     }
   }
-  /* Uncover: the old snapshot is the cover; it shrinks back into the link
-     while the new page waits, still, underneath. */
+  /* Uncover: the old snapshot is the cover; it shrinks back into the spot
+     it grew from while the new page waits, still, underneath. */
   @media (prefers-reduced-motion: no-preference) {
     html[data-page-cover]::view-transition-old(root) {
       z-index: 1;

@@ -36,6 +36,7 @@ export function installEdgeMagnet() {
         lastTime = 0;
         x = y = vx = vy = targetX = targetY = 0;
         surface.style.removeProperty("transform");
+        delete root.dataset.aim;
       };
       resetters.push(reset);
       const refresh = () => {
@@ -99,6 +100,10 @@ export function installEdgeMagnet() {
             (event.clientX - rect.left - rect.width / 2) / (rect.width / 2);
           const ny =
             (event.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+          // Over the visible circle, on bare page: it can be clicked.
+          const aim = nx * nx + ny * ny <= 1 && !interactive(event.target);
+          if (aim) root.dataset.aim = "";
+          else delete root.dataset.aim;
           if (nx * nx + ny * ny > 1.2) {
             leave();
             return;
@@ -119,9 +124,7 @@ export function installEdgeMagnet() {
         "click",
         (event) => {
           if (!motion.matches || event.defaultPrevented || event.button) return;
-          const target = event.target as Element | null;
-          if (target?.closest?.("a, button, input, select, textarea, label"))
-            return;
+          if (interactive(event.target)) return;
           if (window.getSelection?.()?.toString()) return;
           const rect = hit.getBoundingClientRect();
           if (!rect.width || !rect.height) return;
@@ -154,4 +157,12 @@ export function installEdgeMagnet() {
   mount();
   document.addEventListener("astro:before-swap", () => cleanup?.());
   document.addEventListener("astro:page-load", mount);
+}
+
+/** Content under the pointer that should keep its own click. */
+function interactive(target: EventTarget | null) {
+  const element = target as Element | null;
+  return Boolean(
+    element?.closest?.("a, button, input, select, textarea, label, summary"),
+  );
 }
