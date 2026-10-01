@@ -167,7 +167,7 @@ function beads(items: string[], label: string) {
   return h(
     "ul",
     { class: "hion-beads", "aria-label": label },
-    items.map((item) => h("li", {}, item)),
+    items.map((item, i) => h("li", { style: `--hion-j:${i}` }, item)),
   );
 }
 

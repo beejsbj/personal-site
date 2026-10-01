@@ -1569,3 +1569,299 @@
     animation: none;
   }
 }
+
+/* ---------- Life: what moves over the drawing ---------- */
+
+/* The layer the threads answer on: over the page, under the line. */
+:root[data-lens="hion"] .hion-life {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+:root[data-lens="hion"] .hion-life[data-state="leaving"] {
+  opacity: 0;
+}
+
+:root[data-lens="hion"] .hion-life > canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* A glint riding slowly round each circle the hions drew. */
+:root[data-lens="hion"] .hion-glint {
+  --hion-bead: var(--hion-c);
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--hion-bead) 25%, white) 0 16%,
+    color-mix(in srgb, var(--hion-bead) 80%, transparent) 30%,
+    color-mix(in srgb, var(--hion-bead) 20%, transparent) 55%,
+    transparent 72%
+  );
+  transition: opacity 0.8s ease;
+  will-change: transform;
+}
+
+:root[data-lens="hion"] .hion-glint[data-hue="m"] {
+  --hion-bead: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-glint[data-state="on"] {
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="hion"] .hion-glint::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--hion-bead) 40%, white);
+    animation: hion-twinkle 1.9s ease-in-out infinite;
+  }
+
+  :root[data-lens="hion"] .hion-glint[data-hue="m"]::after {
+    animation-duration: 2.7s;
+  }
+}
+
+@keyframes hion-twinkle {
+  0%,
+  100% {
+    transform: scale(0.5);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+}
+
+/* Sway: scrolling swings everything hung from a thread. Light things swing
+   most; pictures stay still (they would repaint every frame). */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="hion"] .hion-charm,
+  :root[data-lens="hion"] .hion-tag,
+  :root[data-lens="hion"] .hion-pullcord[data-hang],
+  :root[data-lens="hion"] .hion-fork,
+  :root[data-lens="hion"] .hion-work--lab,
+  :root[data-lens="hion"] .hion-end,
+  :root[data-lens="hion"] .hion-title,
+  :root[data-lens="hion"] .hion-display__word {
+    rotate: calc(var(--hion-sway, 0deg) * var(--hion-k, 1));
+  }
+
+  :root[data-lens="hion"] .hion-nav__item:nth-child(2n) .hion-charm,
+  :root[data-lens="hion"] [data-hang]:nth-child(2n) {
+    --hion-k: 0.7;
+  }
+
+  :root[data-lens="hion"] .hion-nav__item:nth-child(3n) .hion-charm,
+  :root[data-lens="hion"] [data-hang]:nth-child(3n) {
+    --hion-k: 1.25;
+  }
+
+  :root[data-lens="hion"] .hion-charm--home {
+    --hion-k: 0.5;
+  }
+
+  :root[data-lens="hion"] .hion-display__word + .hion-display__word {
+    --hion-k: 1.4;
+  }
+
+  :root[data-lens="hion"] .hion-pull {
+    rotate: calc(var(--hion-sway, 0deg) * 1.9);
+  }
+}
+
+/* Tugs: a cord gives when you pull it, the thread stretching from its
+   hook, and springs back. */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="hion"] .hion-pullcord:has(.hion-pullcord__link:active) {
+    transform: translateY(13px) scaleY(1.04);
+    transition-duration: 0.1s;
+  }
+
+  :root[data-lens="hion"] .hion-charm {
+    transition:
+      margin-top 0.6s var(--hion-ease-swing),
+      transform 0.5s var(--hion-ease-swing),
+      color 0.2s;
+  }
+
+  :root[data-lens="hion"] .hion-charm:active {
+    transform: translateY(6px) scaleY(1.05);
+    transition-duration: 0.1s;
+  }
+
+  :root[data-lens="hion"] .hion-pull:active {
+    transform: translateY(16px) scaleY(1.03);
+    transition-duration: 0.1s;
+  }
+
+  :root[data-lens="hion"] .hion-tag a,
+  :root[data-lens="hion"] .hion-end__link,
+  :root[data-lens="hion"] .hion-fork__title a {
+    display: inline-block;
+    transition: transform 0.45s var(--hion-ease-swing);
+  }
+
+  :root[data-lens="hion"] .hion-tag a:active,
+  :root[data-lens="hion"] .hion-end__link:active,
+  :root[data-lens="hion"] .hion-fork__title a:active {
+    transform: translateY(5px);
+    transition-duration: 0.1s;
+  }
+}
+
+/* Strung headings write themselves in chalk, left to right, as the weft
+   reaches them (instead of fading in). */
+:root[data-lens="hion"] .hion-strung {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="hion"] .hion-strung[data-reveal] {
+    transition: clip-path 0.95s cubic-bezier(0.4, 0, 0.3, 1);
+    clip-path: inset(-20% -6% -25% -6%);
+  }
+
+  :root[data-lens="hion"] .hion-strung[data-reveal]:not([data-lit]) {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(-20% 106% -25% -6%);
+  }
+
+  /* The stick's dust, drifting off the last letter written. */
+  :root[data-lens="hion"] .hion-strung__chalk {
+    position: relative;
+  }
+
+  :root[data-lens="hion"] .hion-strung[data-lit] .hion-strung__chalk::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.12em;
+    height: 0.14em;
+    background: var(--hion-tooth-c) 0 0 / 96px 96px;
+    opacity: 0;
+    transform-origin: 0 50%;
+    animation: hion-underline 1.4s cubic-bezier(0.4, 0, 0.3, 1) 0.2s;
+  }
+}
+
+@keyframes hion-underline {
+  0% {
+    transform: scaleX(0);
+    opacity: 0.8;
+  }
+  60% {
+    transform: scaleX(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+/* Pictures and work charms swing a little when reached for; the rest of
+   the hung things already do. */
+@keyframes hion-swing-soft {
+  0% {
+    rotate: 0deg;
+  }
+  22% {
+    rotate: 1.1deg;
+  }
+  50% {
+    rotate: -0.7deg;
+  }
+  76% {
+    rotate: 0.3deg;
+  }
+  100% {
+    rotate: 0deg;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="hion"] :is(.hion-work, .hion-picture, .hion-title)[data-lit]:hover {
+    animation: hion-swing-soft 1.6s ease-in-out;
+  }
+
+  /* The beads of a tool list catch the light one after another. */
+  :root[data-lens="hion"] .hion-work:hover .hion-beads li + li::before {
+    animation: hion-bead-catch 0.9s ease-out both;
+    animation-delay: calc(var(--hion-j, 0) * 70ms);
+  }
+
+  /* Knots beside pull-cords and knotted headings pulse when reached for. */
+  :root[data-lens="hion"] .hion-prose h3.hion-knotted:hover::before {
+    animation: hion-knot-pulse 0.9s var(--hion-ease-swing);
+  }
+}
+
+@keyframes hion-bead-catch {
+  0% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+@keyframes hion-knot-pulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(1.3) rotate(40deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Prose links: the chalk underline thickens and a knot appears at its end. */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="hion"] .hion-prose a {
+    position: relative;
+  }
+
+  :root[data-lens="hion"] .hion-prose a::after {
+    content: "";
+    position: absolute;
+    right: -0.35em;
+    bottom: -0.1em;
+    width: 0.35em;
+    height: 0.35em;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--hion-cl) 0 25%, var(--hion-c) 30% 60%, transparent 65%);
+    transform: scale(0);
+    transition: transform 0.35s var(--hion-ease-swing);
+  }
+
+  :root[data-lens="hion"] .hion-prose a:hover::after {
+    transform: scale(1);
+  }
+}

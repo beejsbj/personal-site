@@ -200,10 +200,14 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
     journey.m.push(...curl(endAt[0], endAt[1], 1, narrow ? 110 : 160, seed++, 1.7));
   }
   const tips: Composition["tips"] = [];
+  const orbits: Composition["orbits"] = [];
   for (const hue of ["c", "m"] as Hue[]) {
     const pts = journey[hue];
     if (pts.length < 2) continue;
     const keys = journeyKeys(pts, detours[hue]);
+    for (const { from, to } of detours[hue]) {
+      orbits.push({ hue, points: pts.slice(from, to), key: keys.keys[to - 1] });
+    }
     marks.push(
       ...thread(new Path(pts, 3), {
         hue,
@@ -349,7 +353,7 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
     );
   }
 
-  return { marks, tips, end: endAt ? endAt[1] + 120 : null };
+  return { marks, tips, orbits, end: endAt ? endAt[1] + 120 : null };
 }
 
 /** The way one hion goes round a loop: from where they meet at its top,

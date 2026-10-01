@@ -19,6 +19,7 @@
 import type { LensShell, Route, ShellContext } from "../types";
 import { h, wait } from "./dom";
 import { ink } from "./ink";
+import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
@@ -30,6 +31,7 @@ interface Live {
   path: string;
   page: HTMLElement;
   loom: ReturnType<typeof createLoom>;
+  life: ReturnType<typeof createLife> | undefined;
   controller: AbortController;
 }
 
@@ -90,9 +92,21 @@ function show(route: Route, first: boolean) {
       return composition;
     },
   });
-  live = { path: route.path, page, loom, controller };
+  // What moves over the drawing, for a visitor who can see it move.
+  const life = still()
+    ? undefined
+    : createLife({
+        world,
+        page,
+        loom,
+        signal: controller.signal,
+        isIdle: ctx.isIdle,
+        onIdleChange: ctx.onIdleChange,
+      });
+  live = { path: route.path, page, loom, life, controller };
   requestAnimationFrame(() => {
     loom.start();
+    life?.start();
     page.dataset.state = "here";
   });
   // Keyboard travel ahead of the drawing brings the drawing with it.
@@ -154,6 +168,7 @@ const shell: LensShell = {
       leaving.page.dataset.state = "leaving";
       leaving.page.setAttribute("inert", "");
       leaving.loom.release();
+      leaving.life?.release();
       await wait(430);
       if (mine !== token) return;
     }

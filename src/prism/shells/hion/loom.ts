@@ -34,6 +34,9 @@ export interface Composition {
   /** Each hion's whole way down the page, with the reveal key of every
    * point, for its bead to ride. */
   tips: { hue: Hue; points: Pt[]; keys: Float64Array }[];
+  /** The detours round things a hion circles, once drawn (key is the
+   * reveal key of their last point), for a glint to ride. */
+  orbits: { hue: Hue; points: Pt[]; key: number }[];
   /** Where the threads end (page y), if they do. */
   end: number | null;
 }
@@ -68,7 +71,10 @@ export function createLoom(options: LoomOptions) {
 
   let marks: Mark[] = [];
   let tips: Composition["tips"] = [];
+  let orbits: Composition["orbits"] = [];
   let end = Infinity;
+  /** Counts up each time the drawing is composed afresh. */
+  let version = 0;
   let upto = 0; // marks[0..upto) are due on every tile
   let buckets: number[][] = []; // per tile, the marks that touch it
   let reach = 0;
@@ -103,7 +109,9 @@ export function createLoom(options: LoomOptions) {
       for (let t = from; t <= to; t++) buckets[t].push(i);
     });
     tips = composed.tips;
+    orbits = composed.orbits;
     end = composed.end ?? Infinity;
+    version++;
     for (const tile of tiles.values()) tile.el.remove();
     tiles.clear();
     upto = 0;
@@ -335,5 +343,10 @@ export function createLoom(options: LoomOptions) {
       target = Math.max(target, Math.min(height + 1, y));
       wake();
     },
+    /* What is drawn, for life.ts: the threads answer the visitor on it. */
+    journeys: () => tips,
+    orbits: () => orbits,
+    reach: () => reach,
+    version: () => version,
   };
 }
