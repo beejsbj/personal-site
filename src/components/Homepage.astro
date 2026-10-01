@@ -11,7 +11,7 @@ import ProjectRow from "./ProjectRow.astro";
 interface Props {
   projects: (CollectionEntry<"projects">["data"] & { href: string })[];
   updates: CollectionEntry<"updates">["data"][];
-  site: { writingUrl: string; social: { label: string; href: string }[] };
+  site: { social: { label: string; href: string }[] };
 }
 const { projects, updates, site } = Astro.props;
 ---
@@ -56,11 +56,11 @@ const { projects, updates, site } = Astro.props;
     </div>
     <div>
       <Heading>
-        <Link href={site.writingUrl} arrow>
+        <Link href="/writing" arrow>
           Writing
         </Link>
       </Heading>
-      <p>My notes and writing on Substack.</p>
+      <p>Notes on building for the web, first published on Substack.</p>
     </div>
   </section>
 </div>
