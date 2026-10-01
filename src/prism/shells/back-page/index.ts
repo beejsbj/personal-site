@@ -1,8 +1,11 @@
-/** Back Page: the portfolio is an exercise book lying open on a desk under a
- * lamp, written in blue and red biro. The book has one order, like any book;
- * every URL is a place in it. Following a link turns the pages there (a
- * flurry of leaves when it's far), the sticky tabs on the edge jump between
- * sections, and the corners, the arrow keys or a swipe turn one page. */
+/** Back Page: the portfolio is a pile of exercise books on a desk under a
+ * lamp, one for each section, each on its own paper from Dotfight (a squared
+ * maths copy, a feint-ruled notebook, a legal pad, a graph book, blueprint)
+ * and written in that paper's pens. Every URL is a place in one of them.
+ * Within a book, following a link turns the pages there (a flurry of leaves
+ * when it's far), and the corners, the arrow keys or a swipe turn one page.
+ * Going to another section shuts the open book, puts it back on the pile,
+ * takes the other one off and opens it. */
 import { navigate } from "astro:transitions/client";
 import type { LensShell, Route, ShellContext } from "../types";
 import { Book, measure, sameShape, type Geometry } from "./book";
@@ -18,17 +21,12 @@ import {
 import { h } from "./dom";
 import { mountMicro } from "./micro";
 import { mountSoldiers } from "./soldiers";
+import { BOOKS, shelfOf, type BookKey } from "./themes";
 import "./shell.css";
+import "./themes.css";
+import "./books.css";
 import "./micro.css";
 import "./soldiers.css";
-
-const TABS: [string, string][] = [
-  ["/", "Hello"],
-  ["/about", "About"],
-  ["/resume", "Resume"],
-  ["/lab", "Lab"],
-  ["/projects", "Projects"],
-];
 
 async function fontsReady() {
   const wanted = [
@@ -59,6 +57,8 @@ class App {
   queue: Promise<unknown> = Promise.resolve();
   landAtEnd = false;
   busy = false;
+  /** The book lying open. */
+  bookKey: BookKey = "home";
 
   constructor(private ctx: ShellContext) {
     this.root = ctx.root;
@@ -126,7 +126,7 @@ class App {
       this.pagedRoute = this.route;
     }
     this.view = 0;
-    this.renderTabs();
+    this.setBook(this.paged.book);
     const pages = this.pagesAt(this.paged, 0);
     if (this.sheet) this.book.setLoose(this.sheet.loose!, false);
     this.book.setDepth(this.depth());
@@ -163,8 +163,18 @@ class App {
     return this.sheet ?? this.paged;
   }
 
+  /** How far through the open book: the stops before this one, and the view. */
   depth() {
-    return Math.max(0, Math.min(1, this.current().rank / (this.order.length - 1)));
+    const stops = this.order.filter((s) => s.book === this.bookKey);
+    const at = Math.max(0, stops.findIndex((s) => s.key === this.paged.key));
+    const views = this.views(this.paged) || 1;
+    return Math.max(0, Math.min(1, (at + this.view / views + 0.5) / Math.max(1, stops.length)));
+  }
+
+  setBook(key: BookKey) {
+    this.bookKey = key;
+    this.desk.dataset.theme = shelfOf(key).theme;
+    this.renderShelf();
   }
 
   // ---- routes -------------------------------------------------------------------
@@ -187,7 +197,6 @@ class App {
     const ch = this.build(route);
     const land = this.landAtEnd;
     this.landAtEnd = false;
-    this.renderTabs();
 
     if (ch.loose) {
       this.sheet = ch;
@@ -201,6 +210,14 @@ class App {
       this.book.setLoose(null, true);
     }
     const view = land ? this.views(ch) - 1 : 0;
+    if (ch.book !== this.bookKey) {
+      await this.swap(ch, view);
+      this.paged = ch;
+      this.pagedRoute = route;
+      this.view = view;
+      this.settle();
+      return;
+    }
     if (ch.key === this.paged.key) {
       this.paged = ch;
       this.pagedRoute = route;
@@ -224,6 +241,28 @@ class App {
     this.pagedRoute = route;
     this.view = view;
     this.settle();
+  }
+
+  /** To another book: shut this one, put it back on the pile, take the other
+   * off it, and open it at `view`. */
+  async swap(ch: Chapter, view: number) {
+    const spot = (key: BookKey) =>
+      this.book.shelf.querySelector(`[data-book="${key}"] .bp-shelf__book`)?.getBoundingClientRect() ??
+      new DOMRect(innerWidth - 60, 40, 40, 56);
+    this.busy = true;
+    this.showOnShelf(ch.book);
+    try {
+      const leaving = this.bookKey;
+      await this.book.close(coverPage(this.buildCtx(), false, leaving));
+      await this.book.stow(spot(leaving));
+      this.setBook(ch.book);
+      this.book.setDepth(0);
+      const cover = coverPage(this.buildCtx(), false, ch.book);
+      await this.book.open(this.pagesAt(ch, view), cover, spot(ch.book));
+    } finally {
+      this.busy = false;
+      this.book.el.style.opacity = "";
+    }
   }
 
   /** After a route change: corners, depth, focus, and say where we are. */
@@ -262,7 +301,7 @@ class App {
     const rank = this.current().rank;
     if (step > 0) {
       const next = this.order.find((_, i) => i > rank);
-      return next ?? { key: "/", href: "/", label: "Close the book", no: "" };
+      return next ?? { key: "/", href: "/", label: "Back to the start", no: "", book: "home" };
     }
     for (let i = this.order.length - 1; i >= 0; i--)
       if (i < rank) return this.order[i];
@@ -302,33 +341,44 @@ class App {
 
   // ---- chrome: tabs and corners ------------------------------------------------
 
-  renderTabs() {
-    const path = this.route.path;
-    const near =
-      this.route.kind === "project"
-        ? "/projects"
-        : this.route.kind === "lab-entry"
-          ? "/lab"
-          : null;
+  /** On a phone the row of books scrolls: bring a book into view. */
+  showOnShelf(key: BookKey) {
+    const shelf = this.book.shelf;
+    const li = shelf.querySelector<HTMLElement>(`[data-book="${key}"]`);
+    if (!li || shelf.scrollWidth <= shelf.clientWidth + 1) return;
+    shelf.scrollLeft = Math.max(0, li.offsetLeft - (shelf.clientWidth - li.offsetWidth) / 2);
+  }
+
+  /** The books lying on the desk: the open one's place is empty. */
+  renderShelf() {
     const list = h("ul");
-    TABS.forEach(([href, name], i) => {
+    BOOKS.forEach((b, i) => {
+      const open = b.key === this.bookKey;
       list.append(
         h(
           "li",
-          { style: `--i:${i}`, "data-tab": String(i) },
+          { style: `--i:${i}`, "data-book": b.key, "data-theme": b.theme },
           h(
             "a",
             {
-              href,
-              "aria-current": path === href ? "page" : null,
-              "data-state": path === href ? "current" : near === href ? "near" : null,
+              href: b.href,
+              class: "bp-shelf__book",
+              "aria-current": open ? "true" : null,
+              "data-state": open ? "open" : null,
             },
-            name,
+            h("span", { class: "bp-shelf__paper", "aria-hidden": "true" }),
+            h(
+              "span",
+              { class: "bp-shelf__label" },
+              h("b", null, b.name),
+              h("small", null, b.aside),
+              open ? h("span", { class: "bp-sr" }, ", open on the desk") : null,
+            ),
           ),
         ),
       );
     });
-    this.book.tabs.replaceChildren(list);
+    this.book.shelf.replaceChildren(list);
   }
 
   renderCorners() {
@@ -377,7 +427,7 @@ class App {
         if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
         const target = event.target as HTMLElement | null;
         if (target?.closest("input, textarea, select, [contenteditable], video")) return;
-        const menu = target?.closest<HTMLElement>(".bp-tabs, .bp-contents");
+        const menu = target?.closest<HTMLElement>(".bp-shelf, .bp-contents");
         const arrows = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
         if (menu && arrows.includes(event.key)) {
           const links = [...menu.querySelectorAll<HTMLElement>("a")];
@@ -488,7 +538,7 @@ class App {
     const page = Math.min(firstPage, this.paged.pages.length - 1);
     this.view = geo.spread ? Math.floor(page / 2) : page;
     this.book.place(this.pagesAt(this.paged, this.view));
-    this.renderTabs();
+    this.renderShelf();
     this.settle(false);
   }
 }

@@ -7,9 +7,6 @@
 :root[data-lens="back-page"] .bp-flow a:hover {
   text-decoration-color: currentColor;
 }
-:root[data-lens="back-page"] .bp-tabs a:hover {
-  color: var(--bp-blue);
-}
 :root[data-lens="back-page"] .bp-corner:hover .bp-corner__label {
   border-bottom-color: currentColor;
 }
@@ -117,35 +114,6 @@
       transform: translate(var(--dx), var(--dy));
       opacity: 0;
     }
-  }
-
-  /* ---- sticky index tabs: they lift and peek out when reached for --------- */
-  :root[data-lens="back-page"] .bp-tabs a {
-    transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.25);
-  }
-  :root[data-lens="back-page"] .bp-tabs a:hover,
-  :root[data-lens="back-page"] .bp-tabs a:focus-visible {
-    transform: translateX(-0.15em) rotate(-0.6deg);
-  }
-  :root[data-lens="back-page"] .bp-tabs a[data-state="near"]:hover {
-    transform: translateX(0) rotate(-0.4deg);
-  }
-  :root[data-lens="back-page"] .bp-tabs a[data-state="current"]:hover {
-    transform: translateX(0.12em);
-  }
-  :root[data-lens="back-page"] .bp-tabs a:active {
-    transform: translateX(-0.45em) rotate(0.3deg);
-    transition-duration: 0.08s;
-  }
-  :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a:hover,
-  :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a:focus-visible {
-    transform: translateY(0.1em) rotate(0);
-  }
-  :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a[data-state="current"]:hover {
-    transform: translateY(-0.08em);
-  }
-  :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a:active {
-    transform: translateY(0.4em);
   }
 
   /* ---- dog-eared corners curl as the pointer comes near ------------------- */

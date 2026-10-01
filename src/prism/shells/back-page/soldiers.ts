@@ -25,9 +25,10 @@
  * once, and no wars. */
 import type { ShellContext } from "../types";
 import type { Book } from "./book";
-import { svg } from "./dom";
+import { paint, svg } from "./dom";
 import { BLUE, RED, cross, handCircle, seed, type Rng } from "./ink";
-import { CHATS, IDLE, LINES, PAGE_LINES, pick, read, type Line, type Mood } from "./lines";
+import { CHATS, IDLE, LINES, PAGE_LINES, PAPER_LINES, fill, pick, read, type Line, type Mood } from "./lines";
+import { penNames, type ThemeId } from "./themes";
 import * as notes from "./notes";
 import { measurePage, type Box, type Space } from "./space";
 
@@ -160,6 +161,7 @@ function mountSprites(desk: HTMLElement) {
 function el<K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string, string | number> = {}) {
   const e = document.createElementNS(NS, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, String(v));
+  paint(e);
   return e;
 }
 
@@ -295,7 +297,6 @@ class Troupe {
       if (this.lives.has(page)) continue;
       const kind = page.dataset.kind ?? "";
       if (["cover", "inside-cover", "back"].includes(kind) || "oversize" in page.dataset) continue;
-      if (page.querySelector(".bp-map")) continue;
       this.settle(page, 0);
     }
   }
@@ -324,9 +325,10 @@ class Troupe {
     if (spare && war) {
       war.style.display = "none";
       const note = page.querySelector(".bp-spare__note");
-      if (note) note.textContent = "(a quick war, during maths. Your go: pull a blue man back, let go)";
+      const [mine] = penNames(page);
+      if (note) note.textContent = `(a quick war, during maths. Your go: pull a ${mine.toLowerCase()} man back, let go)`;
     }
-    const others = [...this.book.corners.querySelectorAll(".bp-corner"), ...this.book.tabs.querySelectorAll("li")];
+    const others = [...this.book.corners.querySelectorAll(".bp-corner"), ...this.book.shelf.querySelectorAll("li")];
     const space = measurePage(page, others);
     const flow = page.querySelector<HTMLElement>(".bp-flow");
     const cs = getComputedStyle(page);
@@ -345,7 +347,10 @@ class Troupe {
     const found: { x: number; y: number; R: number; score: number }[] = [];
     for (const R of [big, small]) {
       const pad = R + 4;
-      for (let y = pad + edge; y < space.h - pad - edge; y += 6) {
+      // never up in the head of the page, among its number and date
+      const headEl = page.querySelector<HTMLElement>(".bp-page__head");
+      const head = headEl && !spare ? headEl.offsetTop + headEl.offsetHeight + fs * 1.2 : 0;
+      for (let y = Math.max(pad + edge, head + pad); y < space.h - pad - edge; y += 6) {
         for (let x = pad + spineL; x < space.w - pad - spineR; x += 6) {
           if (!space.clear({ x0: x - pad, y0: y - pad, x1: x + pad, y1: y + pad })) continue;
           let score = rng() * 3 + (R === big ? 2 : 0);
@@ -682,9 +687,13 @@ class Troupe {
     const mates = m.camp.men.filter((o) => o.alive && o !== m);
     const roll = Math.random();
     const page = PAGE_LINES[m.life.kind];
+    const theme = m.life.page.closest<HTMLElement>("[data-theme]")?.dataset.theme as ThemeId | undefined;
+    const paper = theme ? PAPER_LINES[theme] : undefined;
     let line: Line;
-    if (roll < 0.45 && mates.length) line = pick(CHATS);
-    else if (roll < 0.68 && page) line = pick(page);
+    if (roll < 0.4 && mates.length) line = pick(CHATS);
+    else if (roll < 0.58 && page) line = pick(page);
+    else if (roll < 0.7 && paper) line = pick(paper);
+    else if (roll < 0.78) line = pick(LINES.banter);
     else line = pick(IDLE);
     if (typeof line !== "string" && line.reply && !mates.length) line = pick(IDLE);
     void this.say(m, line);
@@ -695,7 +704,13 @@ class Troupe {
     if (!force && this.talking) return false;
     const life = m.life;
     if (!life.page.isConnected) return false;
-    const { text, mood, reply } = read(line, "say");
+    const said = read(line, "say");
+    const names = penNames(life.page);
+    const me = m.side === "blue" ? names[0] : names[1];
+    const them = m.side === "blue" ? names[1] : names[0];
+    const text = fill(said.text, me, them);
+    const reply = said.reply ? fill(said.reply, me, them) : undefined;
+    const mood = said.mood;
     const words = notes.measure(life.top, text, mood, life.base);
     const spot = notes.findSpot(life.space, m, words);
     if (!spot) return false;

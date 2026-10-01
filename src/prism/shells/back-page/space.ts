@@ -23,7 +23,9 @@ const SOLID = [
   ".bp-taped",
   ".bp-note",
   ".bp-sheet",
-  ".bp-map",
+  // on the war map, its camps (the old flicks between them are open paper)
+  ".bp-camp",
+  ".bp-map__legend",
   ".bp-fields",
   ".bp-circled li",
   "pre",

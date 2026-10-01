@@ -6,6 +6,7 @@
  * eraser: two zigzag scrubs, the first leaving a ghost, the second taking the
  * rest, and a few crumbs that are brushed off after. Never inked; the page
  * keeps nothing of it. */
+import { paint } from "./dom";
 import type { Mood } from "./lines";
 import { seed, type Rng } from "./ink";
 import type { Box, Space } from "./space";
@@ -14,7 +15,8 @@ const NS = "http://www.w3.org/2000/svg";
 const f = (n: number) => n.toFixed(1);
 let uid = 0;
 
-export const PENCIL_INK = { blue: "#3d4f94", red: "#a8393d" } as const;
+/** Each side writes in a pencil of its pen's colour (themes.css). */
+export const PENCIL_INK = { blue: "var(--bp-pencil-a)", red: "var(--bp-pencil-b)" } as const;
 
 const SIZE: Record<Mood, number> = { tiny: 0.6, whisper: 0.7, say: 0.8, shout: 1.02 };
 
@@ -150,6 +152,7 @@ function scrub(x0: number, y0: number, x1: number, y1: number, gap: number, off:
 function el<K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string, string | number>) {
   const e = document.createElementNS(NS, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, String(v));
+  paint(e);
   return e;
 }
 

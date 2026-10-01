@@ -205,7 +205,7 @@ function sweep(
 
 /* ---------- links: the pen goes over the line again ------------------- */
 
-const SKIP = ".bp-camp, .bp-tabs a, .bp-corner, .bp-loose a, .bp-contents__list a";
+const SKIP = ".bp-camp, .bp-shelf a, .bp-corner, .bp-loose a, .bp-contents__list a";
 
 function inkOf(el: Element) {
   const c = getComputedStyle(el).color;

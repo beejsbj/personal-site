@@ -76,9 +76,9 @@ export const PAGE_LINES: Record<string, Line[]> = {
 export const LINES = {
   poke: ["oi!", "that tickles", "hey!", "me?", "I'm ready", "I was napping", "pick me!", "careful", "boop", "ready!", "right then", "at last", "yes?"],
   pokeAgain: ["stop it", "I bruise easily", "I'm telling Dawood", "rude", "oi! again?", "still here", "that's my dot"],
-  pokeRed: ["wrong side", "you're not my pen", "Dawood's my pen", "off!", "are you Dawood?", "I'm Red, thanks"],
+  pokeRed: ["wrong side", "you're not my pen", "Dawood's my pen", "off!", "are you Dawood?", "I'm {me}, thanks"],
   pokeDead: ["let him rest", "he's resting", "too late, mate", "leave him"],
-  hint: ["pull me back!", "pull me & let go", "aim me!", "flick me at Red"],
+  hint: ["pull me back!", "pull me & let go", "aim me!", "flick me at {them}"],
   aim: ["steady…", "hold still", "don't miss", "a bit left", "deep breath", tiny("I'm scared"), "don't sneeze", "aim for the big one"],
   phew: ["phew", "close one", "my hat!", "oi!", "missed me", "rude", "hey!", shout("HEY!"), "I felt that", "watch it"],
   dread: ["!", "!!", "eep", "not me not me", "mum?", "oh no", "gulp", "why me", "I'm too round to die"],
@@ -90,9 +90,26 @@ export const LINES = {
   deny: ["not in our camp!", "gotcha!", "who's next?", "nice try", "denied!", "wrong camp mate", shout("GET OUT!"), "no entry", "we saw you coming"],
   more: ["One more!"],
   last: ["it's just us", "hold the line!", "we few", "to the last!", "not like this", "they shall not pass", tiny("it's been an honour")],
-  botGo: ["my go", "Dawood's go", "your turn's over", "now us", "watch this", "nice miss, Blue"],
+  botGo: ["my go", "Dawood's go", "your turn's over", "now us", "watch this", "nice miss, {them}"],
+  // banter at the other side, by its pen's name (Dotfight's `banter`)
+  banter: ["oi {them}!", "{them} can't aim", "{them}'s scared", "your camp's wonky", "nice miss {them}", "come and get us", "who drew you", "run home {them}", "{them}'s pen leaks", "is {them} even a colour", "{me} is the best colour", chat("{them} look scared", "so do you")],
   ended: ["is it over?", "we survived", "count us", "never again", "I need a lie down"],
 } satisfies Record<string, Line[]>;
+
+/** Lines about the paper itself, by theme (Dotfight's PAPER_LINES, and a few
+ * about the section the book is for). */
+export const PAPER_LINES: Record<string, Line[]> = {
+  lamplight: ["squared paper. classy", "who did the sums here", "it's a maths copy", "the lamp's in my eyes", "2 mm squares, lovely"],
+  notebook: ["a quiet notebook", "very posh paper", "don't crease it", "it's a nice notebook this", chat("is this a diary?", "it's a letter")],
+  legal: ["yellow paper?", "is this legal", "very yellow", "it's a legal pad", "objection!", chat("is this a contract?", "it's a CV"), "sign here"],
+  graph: ["graph paper. respect", "we're on a graph", "plot me", "x marks the dead", "it's all squares", "pencil? we're pencil?"],
+  blueprint: ["we're on a blueprint", "it's very blue", "are we a plan", "chalk. fancy", "I feel architectural", chat("are we built yet?", "phase two")],
+};
+
+/** Name the sides by the paper's pens: `{me}` the speaker's, `{them}` the other's. */
+export function fill(text: string, me: string, them: string) {
+  return text.replaceAll("{me}", me).replaceAll("{them}", them);
+}
 
 export function pick<T>(list: readonly T[], r = Math.random()): T {
   return list[Math.floor(r * list.length) % list.length];

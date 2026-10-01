@@ -1,0 +1,212 @@
+/* The pile of books beside the open one. Each is a closed exercise book in
+   its own paper's colours (themes.css): the cover board, the name label,
+   and its paper showing at the edge. The open book's place in the pile is
+   an empty outline. On a phone the pile is a row along the top of the desk
+   that you swipe along. */
+
+:root[data-lens="back-page"] .bp-shelf {
+  --sw: clamp(76px, calc(100vw - var(--bx) - var(--bw) - 34px), 124px);
+  position: absolute;
+  z-index: 3;
+  left: calc(var(--bx) + var(--bw) + 20px);
+  top: calc(var(--by) + 2px);
+  width: var(--sw);
+  font-size: 15px;
+}
+:root[data-lens="back-page"] .bp-shelf ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+:root[data-lens="back-page"] .bp-shelf li {
+  position: relative;
+  height: calc((var(--bh) - 6px) / 5);
+}
+:root[data-lens="back-page"] .bp-shelf li:nth-child(odd) {
+  --tilt: -2.5deg;
+  --nudge: 4px;
+}
+:root[data-lens="back-page"] .bp-shelf li:nth-child(even) {
+  --tilt: 2deg;
+  --nudge: -2px;
+}
+:root[data-lens="back-page"] .bp-shelf__book {
+  position: absolute;
+  left: var(--nudge, 0);
+  top: 0;
+  display: block;
+  width: var(--sw);
+  aspect-ratio: 0.72;
+  border-radius: 3px 7px 7px 3px;
+  color: #3f3c39;
+  text-decoration: none;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 240, 220, 0.16), transparent 60%),
+    repeating-linear-gradient(92deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.28) 0 5%, rgba(255, 255, 255, 0.06) 6%, transparent 12%),
+    var(--bp-kraft);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    2px 3px 0 -1px var(--bp-edge-2),
+    3px 4px 0 -1px var(--bp-edge-1),
+    6px 12px 18px rgba(0, 0, 0, 0.55);
+  transform: rotate(var(--tilt, 0deg));
+}
+/* its paper, showing at the corner: a sheet tucked in, ruled the book's way */
+:root[data-lens="back-page"] .bp-shelf__paper {
+  position: absolute;
+  right: -5px;
+  bottom: 9%;
+  width: 34%;
+  height: 22%;
+  background:
+    linear-gradient(var(--bp-grid) 1px, transparent 1px) 0 0 / 6px 6px,
+    linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px) 0 0 / 6px 6px,
+    var(--bp-paper);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  transform: rotate(-7deg);
+}
+:root[data-lens="back-page"] .bp-shelf [data-theme="notebook"] .bp-shelf__paper,
+:root[data-lens="back-page"] .bp-shelf [data-theme="legal"] .bp-shelf__paper {
+  background:
+    linear-gradient(90deg, transparent 18%, var(--bp-margin) 18% 21%, transparent 21%),
+    linear-gradient(transparent 5px, var(--bp-grid) 5px) 0 0 / 100% 6px,
+    var(--bp-paper);
+}
+:root[data-lens="back-page"] .bp-shelf__label {
+  position: absolute;
+  left: 11%;
+  right: 11%;
+  top: 13%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.35em 0.2em 0.3em;
+  background: var(--bp-label);
+  border-radius: 5px;
+  box-shadow:
+    inset 0 0 0 2px var(--bp-label),
+    inset 0 0 0 3px var(--bp-label-ink),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+:root[data-lens="back-page"] .bp-shelf__label b {
+  font: 700 1.45em/1 var(--bp-hand);
+  color: var(--bp-title-a);
+  white-space: nowrap;
+}
+:root[data-lens="back-page"] .bp-shelf__label small {
+  margin-top: 0.15em;
+  font: 0.62em/1.2 var(--bp-type);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bp-label-ink);
+  white-space: nowrap;
+}
+/* the open book's place: just the dust where it lay */
+:root[data-lens="back-page"] .bp-shelf__book[data-state="open"] {
+  background: none;
+  box-shadow: none;
+  outline: 1.5px dashed rgba(255, 232, 200, 0.22);
+  outline-offset: -2px;
+}
+:root[data-lens="back-page"] .bp-shelf__book[data-state="open"] > * {
+  visibility: hidden;
+}
+:root[data-lens="back-page"] .bp-shelf__book[data-state="open"]::after {
+  content: "open";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 400 1.3em/1 var(--bp-hand);
+  color: rgba(255, 232, 200, 0.4);
+}
+:root[data-lens="back-page"] .bp-shelf__book:focus-visible {
+  outline: 2.5px solid #ffd27a;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* a closed book lying on the desk mid-swap, on a phone: the board stays put */
+:root[data-lens="back-page"] .bp-book[data-mode="single"][data-closed] .bp-board {
+  left: -12px;
+}
+
+/* ---- a phone: a row of books across the top of the desk, swiped along ------- */
+:root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf {
+  left: 0;
+  right: 0;
+  top: 0;
+  width: auto;
+  height: 50px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  font-size: 13px;
+}
+:root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf::-webkit-scrollbar {
+  display: none;
+}
+:root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf ul {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  padding: 5px 12px 0;
+}
+:root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf li {
+  flex: none;
+  width: 96px;
+  height: 44px;
+  scroll-snap-align: start;
+  scroll-margin-left: 12px;
+}
+:root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf__book {
+  left: 0;
+  width: 96px;
+  height: 52px;
+  aspect-ratio: auto;
+  border-radius: 4px 4px 2px 2px;
+  transform: rotate(calc(var(--tilt) * 0.4));
+}
+:root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf__label {
+  top: 6px;
+  left: 8px;
+  right: 8px;
+  padding: 0.2em 0.2em 0.15em;
+}
+:root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf__label small {
+  display: none;
+}
+:root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf__paper {
+  right: -3px;
+  bottom: 2px;
+  width: 22%;
+  height: 34%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* reaching for a book: it lifts, straightens, and slides out of the pile a little */
+  :root[data-lens="back-page"] .bp-shelf__book {
+    transition:
+      transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2),
+      box-shadow 0.28s ease;
+  }
+  :root[data-lens="back-page"] .bp-shelf__book:not([data-state="open"]):is(:hover, :focus-visible) {
+    transform: translate(-7px, -3px) rotate(calc(var(--tilt) * 0.3));
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.12) inset,
+      2px 3px 0 -1px var(--bp-edge-2),
+      3px 4px 0 -1px var(--bp-edge-1),
+      10px 20px 26px rgba(0, 0, 0, 0.6);
+  }
+  :root[data-lens="back-page"] .bp-shelf__book:not([data-state="open"]):active {
+    transform: translate(-4px, 0) rotate(calc(var(--tilt) * 0.5)) scale(0.98);
+    transition-duration: 0.08s;
+  }
+  :root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf__book:not([data-state="open"]):is(:hover, :focus-visible) {
+    transform: translateY(3px);
+  }
+}
