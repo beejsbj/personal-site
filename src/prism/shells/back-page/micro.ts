@@ -87,6 +87,9 @@ function writeIn(page: HTMLElement, delay: number) {
     t += dur - 60;
   }
 
+  // then the rest of the page, line by line, quickly, the way a hand fills it
+  writeLines(page, h1 ? Math.max(delay, t - 260) : delay);
+
   // underlines, after the words they sit beneath
   for (const p of page.querySelectorAll<SVGPathElement>(".bp-underline path")) {
     draw(p, t, 340, OUT);
@@ -129,6 +132,75 @@ function writeIn(page: HTMLElement, delay: number) {
     w += flicks.length * flickGap + 100;
     crosses.forEach((c, i) => press(c, w + i * 60));
   }
+}
+
+/** Everything written on a page besides its title: the page number and date
+ * in the corner, headings, margin notes, and the body itself, a line at a
+ * time. Each line is uncovered left to right as the pen crosses it, the
+ * lines overlapping so a whole page is down in about a second and a half. On
+ * typed paper the lines are typed, a few characters at a clack. */
+const WRITTEN =
+  ".bp-page__head b, .bp-flow :is(p, li, dt, dd, h2, h3, h4, figcaption, blockquote, time)";
+const NOT_WRITTEN = ".bp-h1, .bp-sr, .bp-loose, .bp-contents, .bp-label, .bp-return, .bp-belongs, .bp-map";
+
+function writeLines(page: HTMLElement, start: number) {
+  const all = [...page.querySelectorAll<HTMLElement>(WRITTEN)];
+  const els = all.filter(
+    (el) =>
+      !el.closest(NOT_WRITTEN) &&
+      !el.querySelector("img, video, figure, iframe, svg:not(.bp-underline)") &&
+      !all.some((o) => o !== el && el.contains(o)) &&
+      el.offsetHeight > 0 &&
+      (el.textContent ?? "").trim().length > 0,
+  );
+  if (!els.length) return;
+  const typed = page.dataset.paper === "typed";
+  const fs = parseFloat(getComputedStyle(page).fontSize) || 18;
+  const jobs = els.map((el) => {
+    const lh = parseFloat(getComputedStyle(el).lineHeight) || fs * 1.5;
+    const h = el.offsetHeight;
+    const w = el.offsetWidth;
+    const lines = Math.max(1, Math.round(h / lh));
+    const chars = (el.textContent ?? "").trim().length;
+    const per = clamp(((lines > 1 ? w : Math.min(w, chars * fs * 0.45)) * 0.5), 110, 260);
+    return { el, lh, h, w, lines, chars, per };
+  });
+  // overlapping lines; the whole page inside about 1.4 s of starting
+  const totalLines = jobs.reduce((n, j) => n + j.lines, 0);
+  const gap = clamp(1400 / totalLines, 18, 70);
+  let t = start;
+  for (const j of jobs) {
+    const dur = j.per + (j.lines - 1) * gap * 1.6;
+    sweep(j, t, dur, typed, fs);
+    t += j.lines * gap;
+  }
+}
+
+function sweep(
+  j: { el: HTMLElement; lh: number; h: number; w: number; lines: number; chars: number },
+  delay: number,
+  duration: number,
+  typed: boolean,
+  fs: number,
+) {
+  const L = -8;
+  const R = j.w + 10;
+  const T = -6;
+  const B = j.h + 10;
+  const poly = (x: number, y0: number, y1: number) =>
+    `polygon(${L}px ${T}px, ${R}px ${T}px, ${R}px ${y0}px, ${x}px ${y0}px, ${x}px ${y1}px, ${L}px ${y1}px)`;
+  const frames: Keyframe[] = [];
+  const clacks = (w: number) => `steps(${Math.max(3, Math.round(w / (fs * 0.55)))}, end)`;
+  for (let k = 0; k < j.lines; k++) {
+    const y0 = k === 0 ? T : Math.round(k * j.lh);
+    const y1 = k === j.lines - 1 ? B : Math.round((k + 1) * j.lh);
+    const a = k / j.lines;
+    const b = (k + 1) / j.lines;
+    frames.push({ clipPath: poly(L, y0, y1), offset: a, easing: typed ? clacks(j.w) : "cubic-bezier(.3,.1,.7,.9)" });
+    frames.push({ clipPath: poly(R, y0, y1), offset: Math.max(a, b - 0.0001) });
+  }
+  frames.push({ clipPath: poly(R, B, B), offset: 1 });
+  j.el.animate(frames, { delay, duration, fill: "backwards" });
 }
 
 /* ---------- links: the pen goes over the line again ------------------- */

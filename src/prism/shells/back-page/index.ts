@@ -17,8 +17,10 @@ import {
 } from "./chapters";
 import { h } from "./dom";
 import { mountMicro } from "./micro";
+import { mountSoldiers } from "./soldiers";
 import "./shell.css";
 import "./micro.css";
+import "./soldiers.css";
 
 const TABS: [string, string][] = [
   ["/", "Hello"],
@@ -79,6 +81,7 @@ class App {
     this.book = new Book(this.desk, ctx.reducedMotion);
     this.desk.append(this.live);
     mountMicro(ctx, this.book, this.desk);
+    mountSoldiers(ctx, this.book, this.desk);
   }
 
   build(route: Route): Chapter {

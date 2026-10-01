@@ -36,7 +36,10 @@
 
 @media (prefers-reduced-motion: no-preference) {
   /* ---- a page about to land: its ink waits for the hand ------------------- */
-  :root[data-lens="back-page"] .bp-page[data-fresh] .bp-h1 {
+  :root[data-lens="back-page"] .bp-page[data-fresh] .bp-h1,
+  :root[data-lens="back-page"] .bp-page[data-fresh] .bp-page__head b,
+  :root[data-lens="back-page"] .bp-page[data-fresh] .bp-flow :is(p, dt, dd, h2, h3, h4, figcaption, blockquote, time),
+  :root[data-lens="back-page"] .bp-page[data-fresh] .bp-flow li:not(:has(img, video, figure, p)) {
     clip-path: inset(0 100% 0 0);
   }
   :root[data-lens="back-page"] .bp-page[data-fresh] :is(.bp-underline, .bp-tally, .bp-doodle, .bp-owncamp, .bp-map__ink, .bp-miniwar, .bp-cover-doodle) {

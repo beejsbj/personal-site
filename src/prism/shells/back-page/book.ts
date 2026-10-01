@@ -74,6 +74,8 @@ export class Book {
   /** Told when a page lands open for the first time (after a turn, or as the
    * book arrives), so the hand can write its heading in. */
   land?: (page: HTMLElement, delay: number) => void;
+  /** Told whenever pages lie open (the soldiers camp on them once they're still). */
+  placed?: (pages: HTMLElement[]) => void;
   private landDelay = 0;
 
   constructor(
@@ -151,6 +153,7 @@ export class Book {
       delete page.dataset.fresh;
       this.land?.(page, this.landDelay);
     }
+    this.placed?.(pages);
   }
 
   /** Pages about to be turned to: their ink stays off the paper until they
