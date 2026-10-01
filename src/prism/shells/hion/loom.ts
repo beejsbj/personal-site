@@ -2,17 +2,19 @@
  *
  * A page-tall stack of canvas tiles behind the content. The marks for the
  * whole screen are composed from its layout (see weave.ts) and sorted by
- * reveal key (page y). As the reader scrolls, the reach (how far down the
- * page the hand has drawn) runs ahead of the viewport, and every mark it
- * passes is laid on the tiles it touches: the threads draw themselves just
- * ahead of you, and stay drawn. A glowing bead rides the main cord at the
- * reach, so there is always a thread to follow.
+ * reveal key (roughly, page y; a thread's detour round something is keyed
+ * in the order the hand goes round). As the reader scrolls, the reach (how
+ * far down the page the hand has drawn) runs ahead of the viewport, and
+ * every mark it passes is laid on the tiles it touches: the threads draw
+ * themselves just ahead of you, and stay drawn. A bead of light rides the
+ * tip of each hion, so there is always something to follow.
  *
  * Cheap on purpose: tiles exist only near the viewport (others are dropped
- * and redrawn identically when you come back), each mark is drawn once,
- * blooms live on quarter-resolution canvases, and nothing runs while the
- * page is idle or once the drawing has caught up with you. */
-import { Kind, type Mark, type Path, paint, paintGlow, patterns, type Patterns } from "./pastel";
+ * and redrawn identically when you come back), each mark is drawn once and
+ * within a per-frame budget, blooms live on quarter-resolution canvases,
+ * and nothing runs while the page is idle or once the drawing has caught
+ * up with you. */
+import { type Hue, Kind, type Mark, paint, paintGlow, patterns, type Patterns, type Pt } from "./pastel";
 
 const TILE = 1024;
 const GLOW = 0.25;
@@ -29,9 +31,10 @@ interface Tile {
 
 export interface Composition {
   marks: Mark[];
-  /** The main cord, for the bead to ride. */
-  spine: Path | null;
-  /** Where the cord ends (page y), if it does. */
+  /** Each hion's whole way down the page, with the reveal key of every
+   * point, for its bead to ride. */
+  tips: { hue: Hue; points: Pt[]; keys: Float64Array }[];
+  /** Where the threads end (page y), if they do. */
   end: number | null;
 }
 
@@ -53,13 +56,18 @@ export function createLoom(options: LoomOptions) {
   const layer = document.createElement("div");
   layer.className = "hion-loom";
   layer.setAttribute("aria-hidden", "true");
-  const bead = document.createElement("span");
-  bead.className = "hion-bead";
-  layer.append(bead);
+  // One bead of light at the tip of each hion, riding its own thread.
+  const beads = (["c", "m"] as Hue[]).map((hue) => {
+    const el = document.createElement("span");
+    el.className = "hion-bead";
+    el.dataset.hue = hue;
+    layer.append(el);
+    return el;
+  });
   host.prepend(layer);
 
   let marks: Mark[] = [];
-  let spine: Path | null = null;
+  let tips: Composition["tips"] = [];
   let end = Infinity;
   let upto = 0; // marks[0..upto) are due on every tile
   let buckets: number[][] = []; // per tile, the marks that touch it
@@ -94,7 +102,7 @@ export function createLoom(options: LoomOptions) {
       const to = Math.min(buckets.length - 1, Math.floor(m.y1 / TILE));
       for (let t = from; t <= to; t++) buckets[t].push(i);
     });
-    spine = composed.spine;
+    tips = composed.tips;
     end = composed.end ?? Infinity;
     for (const tile of tiles.values()) tile.el.remove();
     tiles.clear();
@@ -191,13 +199,24 @@ export function createLoom(options: LoomOptions) {
     while (reveals.length && reveals[0].at <= reach) {
       reveals.shift()!.el.setAttribute("data-lit", "");
     }
-    if (spine && reach - 30 < end && !instant) {
-      const y = Math.max(0, reach - 30);
-      bead.style.transform = `translate(${spine.xAt(y).toFixed(1)}px, ${y.toFixed(1)}px)`;
+    beads.forEach((bead, i) => {
+      const tip = tips.find((t) => t.hue === (i ? "m" : "c"));
+      if (!tip || instant || reach - 30 > end) {
+        bead.dataset.state = "gone";
+        return;
+      }
+      // The furthest point of this thread already drawn.
+      let lo = 0;
+      let hi = tip.keys.length - 1;
+      while (hi - lo > 1) {
+        const mid = (lo + hi) >> 1;
+        if (tip.keys[mid] <= reach) lo = mid;
+        else hi = mid;
+      }
+      const [x, y] = tip.points[lo];
+      bead.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
       bead.dataset.state = reach >= target - 1 ? "resting" : "drawing";
-    } else {
-      bead.dataset.state = "gone";
-    }
+    });
   }
 
   function aim() {
@@ -299,6 +318,15 @@ export function createLoom(options: LoomOptions) {
     /** Let the drawing go: the threads lift away. */
     release() {
       layer.dataset.state = "leaving";
+      // Reeled back in: the drawing withdraws up the screen, toward the
+      // line at the top it came from.
+      const top = scrollY - hostTop();
+      const bottom = Math.max(0, height - (top + innerHeight));
+      const gone = Math.max(0, height - Math.max(0, top));
+      layer.animate(
+        [{ clipPath: `inset(0 0 ${bottom}px 0)` }, { clipPath: `inset(0 0 ${gone}px 0)` }],
+        { duration: 420, easing: "cubic-bezier(0.55, 0, 0.8, 0.2)", fill: "forwards" },
+      );
       cancelAnimationFrame(frame);
       frame = 0;
     },

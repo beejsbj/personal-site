@@ -1,16 +1,21 @@
-/** Hion: the portfolio drawn in two threads of light, cyan and magenta, in
- * chalk pastel on black paper.
+/** Hion: the portfolio drawn by two threads of light, one cyan and one
+ * magenta, in chalk pastel on black paper.
  *
- * The threads are the interface. A cord strung across the top holds the
- * destinations, hanging on threads; from the place you are, a braided cord
- * drops into the page and runs all the way down it. Every screen is laid
- * out along that cord: titles hang from the line, sections are loops where
- * the cord parts into its two strands around the words, headings are strung
- * on woven wefts, lists dangle like charms, pictures hang wound at their
- * corners, links are pull-cords. As you scroll, the cord draws itself just
- * ahead of you and a bead of light rides its tip: reading is following the
- * thread. Changing screens lets the drawing go and draws the next one down
- * from its new knot on the line. */
+ * The threads are the interface, and they are two creatures, not one cord.
+ * They are slung across the top, with the destinations hanging between
+ * them. From the place you are, they come down into the page together and
+ * dance down it, each at its own pace: cyan quick and curly, magenta slow
+ * and wide, crossing and parting as they please. They part to run down
+ * either side of each section and meet again beneath it, one tying a loose
+ * loop round the other. They go out of their way to circle the things they
+ * love (a name, a portrait, a year), and at the bottom they let go of each
+ * other in two curls. Headings are strung on woven wefts, lists dangle like
+ * charms, pictures hang wound at their corners, links are pull-cords.
+ *
+ * As you scroll, the two draw themselves just ahead of you, a bead of light
+ * at each tip: reading is following them. Leaving a screen reels the
+ * drawing back up toward the line it came from, and the next screen's
+ * threads come down from the new place. */
 import type { LensShell, Route, ShellContext } from "../types";
 import { h, wait } from "./dom";
 import { ink } from "./ink";
@@ -64,7 +69,7 @@ function show(route: Route, first: boolean) {
   );
   stage.replaceChildren(page);
   nav.setCurrent(route.path);
-  // Which side the cord drops on, so the screen's head keeps clear of it.
+  // Which side the threads drop on, so the screen's head keeps clear of them.
   const drop = nav.origin();
   if (drop) {
     const width = page.clientWidth || innerWidth;
@@ -149,7 +154,7 @@ const shell: LensShell = {
       leaving.page.dataset.state = "leaving";
       leaving.page.setAttribute("inert", "");
       leaving.loom.release();
-      await wait(380);
+      await wait(430);
       if (mine !== token) return;
     }
     leaving?.controller.abort();

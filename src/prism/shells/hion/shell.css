@@ -266,9 +266,17 @@
     transform 0.38s var(--hion-ease-out);
 }
 
-:root[data-lens="hion"] .hion-page[data-state="leaving"] {
+:root[data-lens="hion"] .hion-page > main,
+:root[data-lens="hion"] .hion-page > footer {
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s var(--hion-ease-out);
+}
+
+:root[data-lens="hion"] .hion-page[data-state="leaving"] > main,
+:root[data-lens="hion"] .hion-page[data-state="leaving"] > footer {
   opacity: 0;
-  transform: translateY(-36px);
+  transform: translateY(-24px);
 }
 
 :root[data-lens="hion"] .hion-page > main,
@@ -289,9 +297,7 @@
   transition: opacity 0.35s ease;
 }
 
-:root[data-lens="hion"] .hion-loom[data-state="leaving"] {
-  opacity: 0;
-}
+
 
 :root[data-lens="hion"] .hion-loom__tile {
   position: absolute;
@@ -306,24 +312,41 @@
   height: 100%;
 }
 
-/* The bead of light at the tip of the drawing. */
+/* A bead of light at the tip of each hion: bright while it draws, and
+   breathing, each at its own pace, while it waits for you. */
 :root[data-lens="hion"] .hion-bead {
+  --hion-bead: var(--hion-c);
   position: absolute;
-  top: -9px;
-  left: -9px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    var(--hion-cl) 0 22%,
-    color-mix(in srgb, var(--hion-c) 70%, transparent) 36%,
-    color-mix(in srgb, var(--hion-m) 30%, transparent) 58%,
-    transparent 72%
-  );
+  top: -10px;
+  left: -10px;
+  width: 20px;
+  height: 20px;
   opacity: 0;
   transition: opacity 0.6s ease;
   will-change: transform;
+}
+
+:root[data-lens="hion"] .hion-bead[data-hue="m"] {
+  --hion-bead: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-bead::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--hion-bead) 30%, white) 0 18%,
+    color-mix(in srgb, var(--hion-bead) 75%, transparent) 32%,
+    color-mix(in srgb, var(--hion-bead) 22%, transparent) 56%,
+    transparent 72%
+  );
+  animation: hion-breathe 2.6s ease-in-out infinite;
+}
+
+:root[data-lens="hion"] .hion-bead[data-hue="m"]::before {
+  animation-duration: 4.3s;
 }
 
 :root[data-lens="hion"] .hion-bead[data-state="drawing"] {
@@ -331,8 +354,18 @@
 }
 
 :root[data-lens="hion"] .hion-bead[data-state="resting"] {
-  opacity: 0;
+  opacity: 0.75;
   transition-duration: 1.4s;
+}
+
+@keyframes hion-breathe {
+  0%,
+  100% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.25);
+  }
 }
 
 /* ---------- Shared words ---------- */
@@ -1200,7 +1233,7 @@
 :root[data-lens="hion"] .hion-foot__tassel {
   display: block;
   width: 2px;
-  height: 140px;
+  height: 250px;
 }
 
 :root[data-lens="hion"] .hion-foot__call {
@@ -1267,7 +1300,8 @@
     transform: none;
   }
 
-  :root[data-lens="hion"] .hion-page[data-state="leaving"] {
+  :root[data-lens="hion"] .hion-page[data-state="leaving"] > main,
+  :root[data-lens="hion"] .hion-page[data-state="leaving"] > footer {
     transform: none;
   }
 

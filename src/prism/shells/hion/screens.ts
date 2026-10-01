@@ -1,11 +1,12 @@
 /** Every screen, as thread.
  *
- * No boxes, cards or panels: each screen is laid out as stations along one
- * cord. Titles hang from the line at the top. Sections are loops, where
- * the cord parts into its two strands to run down either side of the words
- * and twists back together beneath them. Headings are strung on wefts woven
+ * No boxes, cards or panels: each screen is laid out as stations along the
+ * two hions' way down the page. Titles hang from branches tied to them.
+ * Sections are loops, where the two part to run down either side of the
+ * words and meet again beneath them. Headings are strung on wefts woven
  * across a loop; lists hang from wefts like charms; pictures hang on two
- * threads, wound round their corners; links are pull-cords and knots. The
+ * threads, wound round their corners; links are pull-cords and knots;
+ * `data-orbit` marks something one hion goes out of its way to circle. The
  * markup only says what is what (see weave.ts for the attributes); the
  * loom and the ink draw it. */
 import type { Route, SiteContent } from "../types";
@@ -219,7 +220,7 @@ function home(content: SiteContent, route: Route) {
       h("p", { class: "hion-hello", "data-reveal": "" }, "Hey there!"),
       h(
         "h1",
-        { class: "hion-display", id: "hion-home-title" },
+        { class: "hion-display", id: "hion-home-title", "data-orbit": "c", "data-orbit-wide": "", "data-orbit-pad": "26,-14" },
         words.flatMap((word, i) => [
           hung(
             "span",
@@ -257,7 +258,7 @@ function home(content: SiteContent, route: Route) {
     h("span", { class: "hion-lane", "data-spine": "via", "aria-hidden": "true" }),
     h(
       "div",
-      { class: "hion-hero__art", "data-cord": "branch" },
+      { class: "hion-hero__art", "data-cord": "branch", "data-orbit": "m", "data-orbit-pad": "62,24" },
       picture(
         "/images/burooj4.jpg",
         "Burooj Rashid wearing round sunglasses",
@@ -354,7 +355,11 @@ function projects(content: SiteContent, route: Route) {
           "aria-labelledby": `hion-year-${year}`,
           "data-count": String(list.length),
         },
-        h("h2", { class: "hion-year", id: `hion-year-${year}`, "data-reveal": "" }, String(year)),
+        h(
+          "h2",
+          { class: "hion-year", id: `hion-year-${year}`, "data-reveal": "", "data-orbit": y % 2 ? "m" : "c" },
+          String(year),
+        ),
         h(
           "ol",
           { class: "hion-row hion-row--works", "data-cord": "" },
@@ -607,7 +612,7 @@ function about(content: SiteContent, route: Route) {
       action ? pullLink(action.getAttribute("href") ?? "/resume", text(action), "m") : null,
       h(
         "div",
-        { class: "hion-hero__art", "data-cord": "branch" },
+        { class: "hion-hero__art", "data-cord": "branch", "data-orbit": "c" },
         picture("/images/burooj4.jpg", "Burooj Rashid wearing round sunglasses", "m", {
           class: "hion-portrait",
           "data-hang": "",
@@ -671,7 +676,7 @@ function other(route: Route) {
       missing ? "This thread doesn’t lead anywhere. Try the homepage, or follow one of the lines above." : intro || undefined,
     ),
     missing
-      ? h("div", { class: "hion-lost" }, pullLink("/", "Follow the cord home", "m"))
+      ? h("div", { class: "hion-lost" }, pullLink("/", "Follow the threads home", "m"))
       : hasContent
         ? loop({ class: "hion-loop--other", "aria-label": title }, rest)
         : null,
@@ -700,7 +705,7 @@ export function buildScreen(content: SiteContent, route: Route): HTMLElement {
   }
 }
 
-/** The end of every screen: the cord frays into a tassel, and the ways to
+/** The end of every screen: the two hions let go of each other, and the ways to
  * reach me hang beneath it. */
 export function footer(content: SiteContent) {
   return h(
