@@ -1,5 +1,6 @@
 /** The scale the portfolio is played in: C major, one octave, seven keys.
- * Each section of the site is a scale degree; colour belongs to the note. */
+ * Each section of the site is a scale degree and a view of the session;
+ * colour belongs to the note. */
 import type { RouteKind, SiteContent } from "../types";
 
 export type NoteId = "do" | "re" | "mi" | "fa" | "sol" | "la" | "ti";
@@ -32,18 +33,21 @@ export interface Key {
   href: string;
   /** Route kinds this key lights up for. */
   kinds: RouteKind[];
+  /** The DAW view this section is, in the session's own words. */
+  view: string;
   hint: string;
 }
 
 export function keysFor(content: SiteContent): Key[] {
   const [home, projects, lab, about, resume, writing, hello] = NOTES;
   return [
-    { note: home, label: "Home", href: "/", kinds: ["home"], hint: "play" },
+    { note: home, label: "Home", href: "/", kinds: ["home"], view: "session", hint: "clip launcher" },
     {
       note: projects,
       label: "Projects",
       href: "/projects",
       kinds: ["projects", "project"],
+      view: "arrangement",
       hint: `${content.projects.length} tracks`,
     },
     {
@@ -51,15 +55,17 @@ export function keysFor(content: SiteContent): Key[] {
       label: "Lab",
       href: "/lab",
       kinds: ["lab", "lab-entry"],
-      hint: `${content.lab.length} presets`,
+      view: "devices",
+      hint: `${content.lab.length} devices`,
     },
-    { note: about, label: "About", href: "/about", kinds: ["about"], hint: "poster" },
-    { note: resume, label: "Resume", href: "/resume", kinds: ["resume"], hint: "credits" },
+    { note: about, label: "About", href: "/about", kinds: ["about"], view: "liner notes", hint: "set info" },
+    { note: resume, label: "Resume", href: "/resume", kinds: ["resume"], view: "roles", hint: "as tracks" },
     {
       note: writing,
       label: "Writing",
       href: content.site.writingUrl,
       kinds: [],
+      view: "send a",
       hint: "substack",
     },
     {
@@ -67,6 +73,7 @@ export function keysFor(content: SiteContent): Key[] {
       label: "Hello",
       href: `mailto:${content.site.email}`,
       kinds: [],
+      view: "send b",
       hint: "email",
     },
   ];
@@ -84,14 +91,4 @@ export function noteForUpdate(kind: string): Note {
     writing: "la",
   };
   return NOTES.find((note) => note.id === (map[kind] ?? "sol")) ?? NOTES[0];
-}
-
-const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-
-/** "Sep 2026" -> 2026.67 */
-export function yearPosition(label: string, fallbackYear: number) {
-  const [month, year] = label.toLowerCase().split(/\s+/);
-  const index = MONTHS.indexOf(month?.slice(0, 3) ?? "");
-  const y = Number(year) || fallbackYear;
-  return y + (index >= 0 ? index / 12 : 0);
 }

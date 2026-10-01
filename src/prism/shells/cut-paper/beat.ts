@@ -1,13 +1,13 @@
 /** The metronome as a clock. The status-bar beat cells run a CSS animation
  * from the moment the frame mounts; everything else that wants to land on
- * the grid (route changes, hovers, confetti) reads its phase from them. */
+ * the grid (route changes, hovers, clip launches) reads its phase from them. */
 
 export const BEAT = 500; // ms at 120 bpm
 
 let cell: HTMLElement | undefined;
 
 export function setClock(beat: HTMLElement) {
-  cell = beat.firstElementChild as HTMLElement | null ?? undefined;
+  cell = (beat.firstElementChild as HTMLElement | null) ?? undefined;
 }
 
 /** Milliseconds until the next subdivision of the beat (2 = eighth,
