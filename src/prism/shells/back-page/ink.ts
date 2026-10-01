@@ -1,9 +1,13 @@
 /** Biro ink: every drawing on the page is made here, from a seed, so the same
  * page always looks the same (a camp never redraws itself differently). */
 
-export const BLUE = "#1b3899";
-export const RED = "#c01e2a";
-export const PENCIL = "#3f3c39";
+/** The book's two pens and its pencil, as CSS variables: every book is its
+ * own paper (themes.css), and the ink follows it. SVG built from these goes
+ * through `svg()`/`paint()` (dom.ts), which move them into `style`, since a
+ * presentation attribute can't hold a `var()`. */
+export const BLUE = "var(--bp-blue)";
+export const RED = "var(--bp-red)";
+export const PENCIL = "var(--bp-pencil)";
 
 export type Rng = () => number;
 

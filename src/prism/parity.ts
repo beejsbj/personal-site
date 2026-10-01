@@ -260,11 +260,11 @@ export const GAPS: Partial<
   "back-page": {
     home: {
       "home.elsewhere":
-        "The book has no Elsewhere page: the lab and Writing are lines in the contents slip on the inside cover.",
+        "The books have no Elsewhere page: the lab is a book of its own, and Writing is a line in the contents slip (the inside cover, or the cover on a phone).",
     },
     projects: {
       "project.summary":
-        "The back page is a roll call of names and dates and the war map; each project's summary is on its own page.",
+        "The war book's first pages are a roll call of names and dates and the war map; each project's summary is on its own page.",
     },
     lab: {
       "lab.more":

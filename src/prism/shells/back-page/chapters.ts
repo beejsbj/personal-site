@@ -1,10 +1,12 @@
-/** Every route is a chapter of the exercise book: a run of pages written in
- * biro. The book's order is fixed, like a real book's: the cover and hello,
- * a letter, the typed resume stapled in, doodles from the lab, a page for
- * each project, and the war map on the back page.
+/** Every route is a chapter in one of the exercise books on the desk: a run
+ * of pages written in that book's pens. There's a book for each section,
+ * each on its own paper (themes.ts): hello in the squared maths copy, a
+ * letter in the quiet notebook, the typed resume stapled into a legal pad,
+ * doodles in the graph book, and the war on blueprint, its map first and a
+ * page for each project after.
  *
  * Every word comes from content: the portfolio and Daylight's copy from
- * `content`, the book's own handwriting from `content.lenses["back-page"]`. */
+ * `content`, the books' own handwriting from `content.lenses["back-page"]`. */
 import { markPart, part, type Part } from "../../parts";
 import { blocks, fallbackBody, featured, fill, inline } from "../rich";
 import type { Route, SiteContent } from "../types";
@@ -22,6 +24,7 @@ import {
   underline,
 } from "./ink";
 import { paginate, type Blank } from "./paginate";
+import { BOOKS, shelfOf, type BookKey } from "./themes";
 
 type Project = SiteContent["projects"][number];
 type LabItem = SiteContent["lab"][number];
@@ -30,6 +33,8 @@ export type Copy = SiteContent["lenses"]["back-page"];
 
 export interface Chapter {
   key: string;
+  /** Which book it's in. */
+  book: BookKey;
   rank: number;
   label: string;
   pages: HTMLElement[];
@@ -41,55 +46,73 @@ export interface Stop {
   key: string;
   href: string;
   label: string;
-  /** What's written for it in the contents. */
-  no: string;
-  /** The number of its first page; null for the back page. */
-  page: number | null;
+  /** Which book it's in. */
+  book: BookKey;
+  /** The number of its first page, counted in its own book. */
+  page: number;
 }
 
-// ---- the book's order ------------------------------------------------------
+// ---- the books' order ------------------------------------------------------
 
-/** How many pages each chapter is given, filled or not, so where a chapter
- * starts never depends on how far the ones before it run today. The lab
- * gives its own pages to the entries that have one, inside it. */
+/** How many pages each stop is given, filled or not, so where a stop starts
+ * never depends on how far the ones before it run today. Every book counts
+ * its own pages from 1: the lab opens with its own pages and gives each
+ * entry that has one a pair of its own after; the war is its map and roll
+ * call first, then a few pages for each project. */
 const ALLOWANCE = {
-  home: 4,
-  about: 4,
-  resume: 4,
   /** The lab's own opening pages, before its entries'. */
   labHead: 2,
-  /** The least room kept for lab entries, however few there are. */
-  labEntries: 4,
+  labEntry: 2,
+  /** The war map's pages, before the projects'. */
+  war: 2,
   project: 3,
 };
 
+/** Every stop in every book, book by book, in the order the books lie. */
 export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
   const names = copy.chapters;
   const stops: Stop[] = [];
   let page = 1;
-  const add = (href: string, label: string, pages: number) => {
-    stops.push({ key: href, href, label, no: String(page), page });
+  const add = (book: BookKey, href: string, label: string, pages: number) => {
+    stops.push({ key: href, href, label, book, page });
     page += pages;
   };
-  add("/", names.home, ALLOWANCE.home);
-  add("/about", names.about, ALLOWANCE.about);
-  add("/resume", names.resume, ALLOWANCE.resume);
-  const lab = page;
-  const own = content.lab.filter((item) => item.hasPage);
-  add("/lab", names.lab, ALLOWANCE.labHead);
-  own.forEach((item) => add(item.detail, item.title, 1));
-  page = lab + ALLOWANCE.labHead + Math.max(ALLOWANCE.labEntries, own.length);
+  add("home", "/", names.home, 1);
+  page = 1;
+  add("about", "/about", names.about, 1);
+  page = 1;
+  add("resume", "/resume", names.resume, 1);
+  page = 1;
+  add("lab", "/lab", names.lab, ALLOWANCE.labHead);
+  content.lab
+    .filter((item) => item.hasPage)
+    .forEach((item) => add("lab", item.detail, item.title, ALLOWANCE.labEntry));
+  page = 1;
+  add("projects", "/projects", names.projects, ALLOWANCE.war);
   content.projects.forEach((project) =>
-    add(project.href, project.title, ALLOWANCE.project),
+    add("projects", project.href, project.title, ALLOWANCE.project),
   );
-  stops.push({
-    key: "/projects",
-    href: "/projects",
-    label: names.projects,
-    no: copy.page.back,
-    page: null,
-  });
   return stops;
+}
+
+/** Which book a route is in; null for the loose sheets tucked into any. */
+export function bookOf(route: Route): BookKey | null {
+  switch (route.kind) {
+    case "home":
+      return "home";
+    case "about":
+      return "about";
+    case "resume":
+      return "resume";
+    case "lab":
+    case "lab-entry":
+      return "lab";
+    case "projects":
+    case "project":
+      return "projects";
+    default:
+      return null;
+  }
 }
 
 export function rankOf(route: Route, order: Stop[]) {
@@ -98,7 +121,7 @@ export function rankOf(route: Route, order: Stop[]) {
   const lab = order.findIndex((stop) => stop.key === "/lab");
   if (route.kind === "lab-entry") return lab + 0.5;
   if (route.kind === "project")
-    return order.findIndex((stop) => stop.key === "/projects") - 0.5;
+    return order.findIndex((stop) => stop.key === "/projects") + 0.5;
   return 0.5;
 }
 
@@ -264,18 +287,22 @@ function taped(
 
 // ---- the cover, and the contents -------------------------------------------------
 
-function label(content: SiteContent, copy: Copy) {
+/** The name label on a book's cover, in its paper's words. */
+function label(content: SiteContent, copy: Copy, key: BookKey) {
   const words = copy.cover;
-  const [port, folio] = words.title;
+  const shelf = shelfOf(key);
+  const book = copy.books[key];
+  const paper = copy.papers[shelf.theme];
+  const [first, second] = book.title;
   return h(
     "div",
     { class: "bp-label" },
-    h("p", { class: "bp-label__school" }, words.school),
+    h("p", { class: "bp-label__school" }, paper.school),
     h(
       "p",
       { class: "bp-label__title", "aria-hidden": "true" },
-      h("span", { class: "bp-blue" }, port),
-      h("span", { class: "bp-red" }, folio),
+      h("span", { class: "bp-blue" }, first),
+      h("span", { class: "bp-red" }, second),
     ),
     h(
       "p",
@@ -287,45 +314,41 @@ function label(content: SiteContent, copy: Copy) {
       "p",
       { class: "bp-label__field" },
       h("span", null, words.subject),
-      h("b", null, content.pages.home.hero.occupation),
+      h("b", null, key === "home" ? content.pages.home.hero.occupation : book.aside),
     ),
     h(
       "p",
       { class: "bp-label__field" },
       h("span", null, words.class),
-      h("b", null, words.classValue),
+      h("b", null, paper.klass),
     ),
   );
 }
 
-/** The contents slip: the book's sections, and where each starts. */
-const SECTIONS = [
-  ["/", "home"],
-  ["/about", "about"],
-  ["/resume", "resume"],
-  ["/lab", "lab"],
-  ["/projects", "projects"],
-] as const;
-
+/** The contents slip: the books on the desk, and the paper each is on. */
 function contents(b: Build) {
-  const { order, content, route, copy } = b;
+  const { content, route, copy } = b;
   const words = copy.contents;
   const list = h("ol", { class: "bp-contents__list" });
-  for (const [href, key] of SECTIONS) {
-    const entry: { name: string; aside?: string } = words[key];
-    const stop = order.find((s) => s.key === href);
-    const here = route.path === href;
+  for (const shelf of BOOKS) {
+    const book = copy.books[shelf.key];
+    const here = route.path === shelf.href;
     list.append(
       h(
         "li",
-        { "data-ink": href === "/projects" ? "red" : "blue" },
+        { "data-ink": shelf.key === "projects" ? "red" : "blue" },
         h(
           "a",
-          { href, "aria-current": here ? "page" : null },
-          h("span", { class: "bp-contents__name" }, entry.name),
-          entry.aside ? h("small", null, ` (${entry.aside})`) : null,
+          { href: shelf.href, "aria-current": here ? "page" : null },
+          h("span", { class: "bp-contents__name" }, book.name),
+          shelf.key === "home" ? null : h("small", null, ` (${book.aside})`),
           h("span", { class: "bp-contents__dots", "aria-hidden": "true" }),
-          h("span", { class: "bp-contents__no" }, h("span", { class: "bp-sr" }, `${words.page} `), stop?.no ?? ""),
+          h(
+            "span",
+            { class: "bp-contents__no" },
+            h("span", { class: "bp-sr" }, words.inThe),
+            copy.papers[shelf.theme].short,
+          ),
         ),
       ),
     );
@@ -376,16 +399,17 @@ function returnTo(content: SiteContent, copy: Copy) {
 
 /** The outside of the book: the name label on brown paper. On a phone the
  * cover is also where the contents slip is tucked. */
-export function coverPage(b: Build, withContents: boolean) {
+export function coverPage(b: Build, withContents: boolean, key: BookKey = "home") {
   const { page, flow } = blankPage(b.copy, "cover", "kraft");
-  flow.append(label(b.content, b.copy));
+  page.dataset.book = key;
+  flow.append(label(b.content, b.copy, key));
   if (withContents) flow.append(contents(b), returnTo(b.content, b.copy));
-  else flow.append(svg(coverDoodle()));
+  else flow.append(svg(coverDoodle(key)));
   return page;
 }
 
-function coverDoodle() {
-  const rng = seed("cover");
+function coverDoodle(key: string) {
+  const rng = seed(`cover-${key}`);
   return `<svg class="bp-cover-doodle" viewBox="0 0 200 120" aria-hidden="true">${flick(40, 90, 150, 30, BLUE, rng, 0.2)}${flick(150, 30, 60, 100, RED, rng, 0.3)}${camp({ cx: 40, cy: 90, r: 16, ink: BLUE, enemy: RED, dots: 5, hits: 1, rng })}${camp({ cx: 150, cy: 30, r: 16, ink: RED, enemy: BLUE, dots: 6, hits: 2, rng })}</svg>`;
 }
 
@@ -871,7 +895,7 @@ function projects(b: Build) {
   const rosterHead = withUnderline(h("h2", { class: "bp-h2" }, words.roll), BLUE, "roll");
 
   // measure the page the map goes on: all of it
-  const probe = blankPage(copy, "projects", "squared", copy.page.back, null);
+  const probe = blankPage(copy, "projects", "squared", String(firstPage(b)), null);
   stage.append(probe.page);
   const w = probe.flow.clientWidth - parseFloat(getComputedStyle(probe.flow).paddingLeft);
   const room = probe.flow.clientHeight;
@@ -879,7 +903,7 @@ function projects(b: Build) {
   const map = warMap(b, w, Math.max(320, room - 4), b.spread);
   map.dataset.bpBreak = "right";
   const blocks = [head, rosterHead, roster, map];
-  const pages = written(b, "projects", "squared", blocks, copy.page.back, words.date);
+  const pages = written(b, "projects", "squared", blocks, firstPage(b), words.date);
   return pages;
 }
 
@@ -926,8 +950,9 @@ export function chapter(b: Build): Chapter {
       pages = projects(b);
       break;
   }
-  if (!pages) return { key: route.path, rank, label, pages: [], loose: loose(b) };
-  return { key: route.path, rank, label, pages: evenUp(b.copy, pages, b.spread, route.path) };
+  const book = bookOf(route) ?? "home";
+  if (!pages) return { key: route.path, book, rank, label, pages: [], loose: loose(b) };
+  return { key: route.path, book, rank, label, pages: evenUp(b.copy, pages, b.spread, route.path) };
 }
 
 export const today = (copy: Copy) => handDate(new Date(), copy.months);
