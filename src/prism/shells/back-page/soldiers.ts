@@ -23,11 +23,13 @@
  * frame loop at all: a few timers, cleared while idle. Prism faces get still
  * soldiers; reduced motion gets still soldiers and notes that come and go at
  * once, and no wars. */
+import { fill as filled } from "../rich";
 import type { ShellContext } from "../types";
 import type { Book } from "./book";
+import type { Copy } from "./chapters";
 import { paint, svg } from "./dom";
 import { BLUE, RED, cross, handCircle, seed, type Rng } from "./ink";
-import { CHATS, IDLE, LINES, PAGE_LINES, PAPER_LINES, fill, pick, read, type Line, type Mood } from "./lines";
+import { fill, pick, read, talk, type Line, type Mood, type Talk } from "./lines";
 import { penNames, type ThemeId } from "./themes";
 import * as notes from "./notes";
 import { measurePage, type Box, type Space } from "./space";
@@ -224,6 +226,9 @@ class Troupe {
   private lives = new WeakMap<HTMLElement, PageLife>();
   private timers = new Set<number>();
   private talking = 0;
+  private copy: Copy;
+  /** What they say, from the lens copy. */
+  private talk: Talk;
   private quietUntil = 0;
   private hinted = false;
   private running = false;
@@ -235,6 +240,8 @@ class Troupe {
     private book: Book,
     desk: HTMLElement,
   ) {
+    this.copy = ctx.content.lenses["back-page"];
+    this.talk = talk(this.copy);
     this.alive = !ctx.face && !ctx.reducedMotion;
     mountSprites(desk);
     if (ctx.face) return;
@@ -325,8 +332,8 @@ class Troupe {
     if (spare && war) {
       war.style.display = "none";
       const note = page.querySelector(".bp-spare__note");
-      const [mine] = penNames(page);
-      if (note) note.textContent = `(a quick war, during maths. Your go: pull a ${mine.toLowerCase()} man back, let go)`;
+      const [mine] = penNames(page, this.copy.papers);
+      if (note) note.textContent = filled(this.copy.page.spareYours, { pen: mine.toLowerCase() });
     }
     const others = [...this.book.corners.querySelectorAll(".bp-corner"), ...this.book.shelf.querySelectorAll("li")];
     const space = measurePage(page, others);
@@ -606,7 +613,7 @@ class Troupe {
       () => {},
     );
     const last = camp.men.find((m) => m.alive);
-    if (last) setTimeout(() => this.say(last, { t: "LAST STAND!", mood: "shout" }, { force: true }), 500);
+    if (last) setTimeout(() => this.say(last, { t: this.copy.soldiers.lastStand, mood: "shout" }, { force: true }), 500);
   }
 
   // ---- idle life --------------------------------------------------------------------------
@@ -670,7 +677,7 @@ class Troupe {
         if (m.alive) this.moveTo(m, hx, hy, 800, 5);
         setTimeout(() => (m.busy = false), 820);
       });
-      if (chance(0.35)) this.after(1000, () => this.say(m, pick(["it's cold out here", "I'm very alone", "can I come back in", "it's quiet. too quiet", "long way from camp", "just stretching"])));
+      if (chance(0.35)) this.after(1000, () => this.say(m, pick(this.talk.wander)));
       return;
     }
   }
@@ -683,19 +690,19 @@ class Troupe {
     const men = this.living(lives);
     const m = pick(men);
     if (!m) return;
-    if (m.life.ended && chance(0.5)) return void this.say(m, pick(LINES.ended));
+    if (m.life.ended && chance(0.5)) return void this.say(m, pick(this.talk.say.ended));
     const mates = m.camp.men.filter((o) => o.alive && o !== m);
     const roll = Math.random();
-    const page = PAGE_LINES[m.life.kind];
+    const page = this.talk.page[m.life.kind];
     const theme = m.life.page.closest<HTMLElement>("[data-theme]")?.dataset.theme as ThemeId | undefined;
-    const paper = theme ? PAPER_LINES[theme] : undefined;
+    const paper = theme ? this.talk.paper[theme] : undefined;
     let line: Line;
-    if (roll < 0.4 && mates.length) line = pick(CHATS);
+    if (roll < 0.4 && mates.length) line = pick(this.talk.chats);
     else if (roll < 0.58 && page) line = pick(page);
     else if (roll < 0.7 && paper) line = pick(paper);
-    else if (roll < 0.78) line = pick(LINES.banter);
-    else line = pick(IDLE);
-    if (typeof line !== "string" && line.reply && !mates.length) line = pick(IDLE);
+    else if (roll < 0.78) line = pick(this.talk.say.banter);
+    else line = pick(this.talk.idle);
+    if (typeof line !== "string" && line.reply && !mates.length) line = pick(this.talk.idle);
     void this.say(m, line);
   }
 
@@ -705,7 +712,7 @@ class Troupe {
     const life = m.life;
     if (!life.page.isConnected) return false;
     const said = read(line, "say");
-    const names = penNames(life.page);
+    const names = penNames(life.page, this.copy.papers);
     const me = m.side === "blue" ? names[0] : names[1];
     const them = m.side === "blue" ? names[1] : names[0];
     const text = fill(said.text, me, them);
@@ -890,7 +897,7 @@ class Troupe {
         const near = segDist(this.at(x), a, end);
         if (near.d < x.r * 9) this.react(x, "dread", angleFromLine(this.at(x), a, end), rand(80, 260));
       }
-      if (by === "auto") this.maybe(m, LINES.snipe, 0.25, "shout");
+      if (by === "auto") this.maybe(m, this.talk.say.snipe, 0.25, "shout");
     }
 
     setTimeout(() => {
@@ -951,11 +958,11 @@ class Troupe {
               this.react(x, "hop", -90, i * 70);
               if (x === m) this.react(x, "hop", -90, i * 70 + KEYS.hop.length * FRAME);
             });
-          if (killed.length > 1) void this.say(m, { t: pick(LINES.more) as string, mood: "say" }, { force: true });
-          else if (chance(0.5)) this.maybe(m, LINES.kill, 0.6);
-          else this.maybe(pick(killed[0].camp.men.filter((x) => x.alive)), LINES.mourn, 0.6);
-        } else if (nearest) this.maybe(nearest, LINES.phew, 0.5);
-        else if (by !== "user") this.maybe(m, LINES.miss, 0.3);
+          if (killed.length > 1) void this.say(m, { t: pick(this.talk.say.more) as string, mood: "say" }, { force: true });
+          else if (chance(0.5)) this.maybe(m, this.talk.say.kill, 0.6);
+          else this.maybe(pick(killed[0].camp.men.filter((x) => x.alive)), this.talk.say.mourn, 0.6);
+        } else if (nearest) this.maybe(nearest, this.talk.say.phew, 0.5);
+        else if (by !== "user") this.maybe(m, this.talk.say.miss, 0.3);
       }, dur + 260);
     }, aim);
   }
@@ -968,7 +975,7 @@ class Troupe {
     const deg = angle(m, { x: tx, y: ty });
     const len = Math.hypot(tx - m.x, ty - m.y);
     this.react(m, "windup", deg, 0, 0.6);
-    this.maybe(m, LINES.lunge, 0.55, "shout");
+    this.maybe(m, this.talk.say.lunge, 0.55, "shout");
     // the defenders see him coming
     for (const d of c.men) if (d.alive) this.react(d, "dread", angle(m, d), rand(200, 500), 0.6);
     const ride = clamp(len * 1.5, 280, 650);
@@ -1020,7 +1027,7 @@ class Troupe {
         setTimeout(() => {
           for (const d of defenders) if (d.alive) this.react(d, "hop", -90, rand(0, 120), 0.6);
           this.beat(c, "still", 0, 700);
-          this.maybe(defenders[0], LINES.deny, 0.6);
+          this.maybe(defenders[0], this.talk.say.deny, 0.6);
         }, last + 160);
       }, ride);
     }, 520);
@@ -1090,7 +1097,7 @@ class Troupe {
         if (!man || this.hinted || !man.alive || man.side !== "blue" || event.pointerType !== "mouse") return;
         if (!this.alive) return;
         this.hinted = true;
-        void this.say(man, pick(LINES.hint), { force: !this.talking });
+        void this.say(man, pick(this.talk.say.hint), { force: !this.talking });
       },
       { signal },
     );
@@ -1105,7 +1112,7 @@ class Troupe {
         event.preventDefault();
         if (!man.alive) {
           const mate = man.camp.men.find((x) => x.alive);
-          if (mate) void this.say(mate, pick(LINES.pokeDead), { force: !this.talking });
+          if (mate) void this.say(mate, pick(this.talk.say.pokeDead), { force: !this.talking });
           return;
         }
         try {
@@ -1132,7 +1139,7 @@ class Troupe {
           m.busy = true;
           // his campmates turn to him
           m.camp.men.forEach((x, i) => x !== m && x.alive && this.react(x, "look", angle(x, m), i * 60));
-          if (chance(0.25)) this.maybe(m, LINES.aim, 1, "whisper");
+          if (chance(0.25)) this.maybe(m, this.talk.say.aim, 1, "whisper");
         }
         // slid back to where it started: put down
         hold.off = pull < 6;
@@ -1208,7 +1215,7 @@ class Troupe {
       // poked enough: he runs a lap of the camp
       this.react(m, "flinch", rand(-180, 180));
     }
-    const lines = m.side === "red" ? LINES.pokeRed : again ? LINES.pokeAgain : LINES.poke;
+    const lines = m.side === "red" ? this.talk.say.pokeRed : again ? this.talk.say.pokeAgain : this.talk.say.poke;
     void this.say(m, pick(lines), { force: !this.talking || again });
   }
 
@@ -1220,7 +1227,7 @@ class Troupe {
     if (!reds.length) return;
     const shot = this.lane(reds, lives, shooter.camp);
     if (!shot) return;
-    this.maybe(shot.m, LINES.botGo, 0.45);
+    this.maybe(shot.m, this.talk.say.botGo, 0.45);
     this.snipe(shot.m, shot.to, "bot", shot.from);
   }
 }

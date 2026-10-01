@@ -49,31 +49,11 @@ export function paint(el: Element) {
   }
 }
 
-/** Inline markdown used by the site copy: paragraphs, **bold**, [links](/x). */
-export function md(source: string): HTMLParagraphElement[] {
-  return source
-    .split(/\n\s*\n/)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block) => {
-      const p = h("p");
-      const pattern = /\*\*([^*]+)\*\*|\[([^\]]+)\]\(([^)]+)\)/g;
-      let last = 0;
-      for (const match of block.matchAll(pattern)) {
-        p.append(block.slice(last, match.index));
-        if (match[1]) p.append(h("strong", null, match[1]));
-        else p.append(link(match[3], match[2]));
-        last = (match.index ?? 0) + match[0].length;
-      }
-      p.append(block.slice(last));
-      return p;
-    });
-}
-
 export const isExternal = (href: string) => /^(https?:|mailto:)/.test(href);
 
-/** An ordinary link; external ones open in a new tab and say so. */
-export function link(href: string, ...kids: Kid[]) {
+/** An ordinary link; external ones open in a new tab and say so, in
+ * `newTab`'s words. */
+export function link(href: string, newTab: string, ...kids: Kid[]) {
   const external = /^https?:/.test(href);
   const a = h(
     "a",
@@ -84,33 +64,17 @@ export function link(href: string, ...kids: Kid[]) {
     },
     ...kids,
   );
-  if (external) a.append(h("span", { class: "bp-sr" }, " (opens in a new tab)"));
+  if (external) a.append(h("span", { class: "bp-sr" }, ` (${newTab})`));
   return a;
 }
 
-export const text = (el: Element | null | undefined) =>
-  (el?.textContent ?? "").replace(/\s+/g, " ").trim();
-
-const MONTHS = [
-  "Jan",
-  "Feb",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "Aug",
-  "Sept",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-/** "25 Sept 2026", the way the date is written in the corner of the page. */
-export function handDate(date: Date | string) {
+/** "25 Sept 2026", the way the date is written in the corner of the page,
+ * with the month names in the hand's own spelling (`months`, Jan to Dec). */
+export function handDate(date: Date | string, months: string[]) {
   const d = typeof date === "string" ? new Date(`${date}T12:00:00`) : date;
-  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
-export function shortDate(date: string) {
+export function shortDate(date: string, months: string[]) {
   const d = new Date(`${date}T12:00:00`);
-  return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  return `${d.getDate()} ${months[d.getMonth()]}`;
 }

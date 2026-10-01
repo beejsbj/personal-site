@@ -24,6 +24,16 @@ function append(el: Element, children: (Child | Child[])[]) {
   }
 }
 
+/** What a screen reader hears after a link that opens a new tab; the
+ * lens's copy, set once at mount. */
+let newTabNote = "";
+export function setNewTabNote(note: string) {
+  newTabNote = note;
+}
+
+/** The hidden note on a link that opens a new tab. */
+export const newTab = () => h("span", { class: "hion-sr" }, ` ${newTabNote}`);
+
 /** An ordinary link; external ones open in a new tab and say so. */
 export function link(
   href: string,
@@ -39,22 +49,11 @@ export function link(
       ...attrs,
     },
     ...children,
-    external ? h("span", { class: "hion-sr" }, " (opens in a new tab)") : null,
+    external ? newTab() : null,
   );
 }
 
-/** Pull a node out of the server-rendered main, cleaned of Astro dev noise. */
-export function take<T extends Element = HTMLElement>(
-  main: HTMLElement,
-  selector: string,
-): T | null {
-  const found = main.querySelector<T>(selector);
-  if (!found) return null;
-  const clone = found.cloneNode(true) as T;
-  scrub(clone);
-  return clone;
-}
-
+/** Clean Astro dev noise off markup borrowed from Daylight's page. */
 export function scrub(root: Element) {
   const all = [root, ...root.querySelectorAll("*")];
   for (const el of all) {

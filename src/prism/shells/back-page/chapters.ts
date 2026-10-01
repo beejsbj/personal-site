@@ -3,9 +3,14 @@
  * each on its own paper (themes.ts): hello in the squared maths copy, a
  * letter in the quiet notebook, the typed resume stapled into a legal pad,
  * doodles in the graph book, and the war on blueprint, its map first and a
- * page for each project after. */
+ * page for each project after.
+ *
+ * Every word comes from content: the portfolio and Daylight's copy from
+ * `content`, the books' own handwriting from `content.lenses["back-page"]`. */
+import { markPart, part, type Part } from "../../parts";
+import { blocks, fallbackBody, featured, fill, inline } from "../rich";
 import type { Route, SiteContent } from "../types";
-import { h, handDate, link, md, shortDate, svg, text } from "./dom";
+import { h, handDate, link, shortDate, svg } from "./dom";
 import {
   BLUE,
   RED,
@@ -19,10 +24,12 @@ import {
   underline,
 } from "./ink";
 import { paginate, type Blank } from "./paginate";
-import { BOOKS, THEMES, shelfOf, type BookKey } from "./themes";
+import { BOOKS, shelfOf, type BookKey } from "./themes";
 
 type Project = SiteContent["projects"][number];
 type LabItem = SiteContent["lab"][number];
+/** The book's own handwriting. */
+export type Copy = SiteContent["lenses"]["back-page"];
 
 export interface Chapter {
   key: string;
@@ -39,48 +46,54 @@ export interface Stop {
   key: string;
   href: string;
   label: string;
-  /** What's written for it in the contents. */
-  no: string;
+  /** Which book it's in. */
   book: BookKey;
+  /** The number of its first page, counted in its own book. */
+  page: number;
 }
 
-// ---- the book's order ------------------------------------------------------
+// ---- the books' order ------------------------------------------------------
+
+/** How many pages each stop is given, filled or not, so where a stop starts
+ * never depends on how far the ones before it run today. Every book counts
+ * its own pages from 1: the lab opens with its own pages and gives each
+ * entry that has one a pair of its own after; the war is its map and roll
+ * call first, then a few pages for each project. */
+const ALLOWANCE = {
+  /** The lab's own opening pages, before its entries'. */
+  labHead: 2,
+  labEntry: 2,
+  /** The war map's pages, before the projects'. */
+  war: 2,
+  project: 3,
+};
 
 /** Every stop in every book, book by book, in the order the books lie. */
-export function bookOrder(content: SiteContent): Stop[] {
-  const stops: Stop[] = [
-    { key: "/", href: "/", label: "Hello", no: "1", book: "home" },
-    { key: "/about", href: "/about", label: "About me", no: "1", book: "about" },
-    { key: "/resume", href: "/resume", label: "Resume", no: "1", book: "resume" },
-    { key: "/lab", href: "/lab", label: "The lab", no: "1", book: "lab" },
-  ];
+export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
+  const names = copy.chapters;
+  const stops: Stop[] = [];
+  let page = 1;
+  const add = (book: BookKey, href: string, label: string, pages: number) => {
+    stops.push({ key: href, href, label, book, page });
+    page += pages;
+  };
+  add("home", "/", names.home, 1);
+  page = 1;
+  add("about", "/about", names.about, 1);
+  page = 1;
+  add("resume", "/resume", names.resume, 1);
+  page = 1;
+  add("lab", "/lab", names.lab, ALLOWANCE.labHead);
   content.lab
-    .filter((item) => !item.href)
-    .forEach((item, i) =>
-      stops.push({
-        key: item.detail,
-        href: item.detail,
-        label: item.title,
-        no: String(labFirst(i)),
-        book: "lab",
-      }),
-    );
-  stops.push({ key: "/projects", href: "/projects", label: "The war", no: "1", book: "projects" });
-  content.projects.forEach((project, i) =>
-    stops.push({
-      key: project.href,
-      href: project.href,
-      label: project.title,
-      no: String(projectFirst(i)),
-      book: "projects",
-    }),
+    .filter((item) => item.hasPage)
+    .forEach((item) => add("lab", item.detail, item.title, ALLOWANCE.labEntry));
+  page = 1;
+  add("projects", "/projects", names.projects, ALLOWANCE.war);
+  content.projects.forEach((project) =>
+    add("projects", project.href, project.title, ALLOWANCE.project),
   );
   return stops;
 }
-
-/** Page numbers start again in each book. */
-const labFirst = (i: number) => 3 + i * 2;
-const projectFirst = (i: number) => 3 + i * 3;
 
 /** Which book a route is in; null for the loose sheets tucked into any. */
 export function bookOf(route: Route): BookKey | null {
@@ -117,6 +130,7 @@ export function rankOf(route: Route, order: Stop[]) {
 export interface Build {
   route: Route;
   content: SiteContent;
+  copy: Copy;
   order: Stop[];
   spread: boolean;
   stage: HTMLElement;
@@ -125,8 +139,13 @@ export interface Build {
 
 type Paper = "squared" | "kraft" | "kraft-in" | "typed" | "letter";
 
+/** The number of the route's first page, from the book's order. */
+const firstPage = (b: Build) =>
+  b.order.find((stop) => stop.key === b.route.path)?.page ?? null;
+
 /** A fresh page: its number and date pencilled in at the top. */
 export function blankPage(
+  copy: Copy,
   kind: string,
   paper: Paper,
   no?: string | null,
@@ -138,8 +157,8 @@ export function blankPage(
       h(
         "div",
         { class: "bp-page__head", "aria-hidden": "true" },
-        h("span", null, "Page No. ", h("b", null, no ?? "")),
-        h("span", null, "Date ", h("b", null, date ?? "")),
+        h("span", null, `${copy.page.number} `, h("b", null, no ?? "")),
+        h("span", null, `${copy.page.date} `, h("b", null, date ?? "")),
       ),
     );
   }
@@ -156,13 +175,14 @@ export function blankPage(
   return { page, flow };
 }
 
-/** Flow blocks onto numbered pages. */
+/** Flow blocks onto numbered pages, from `first` (a number counts on; a
+ * word, like the back page's, is written on every page). */
 function written(
   b: Build,
   kind: string,
   paper: Paper,
   blocks: HTMLElement[],
-  first: number | string,
+  first: number | string | null,
   date: string | null,
   offset = 0,
 ) {
@@ -171,6 +191,7 @@ function written(
     blocks,
     () =>
       blankPage(
+        b.copy,
         kind,
         paper,
         typeof first === "number" ? String(n++) : first,
@@ -179,44 +200,55 @@ function written(
     b.stage,
     { spread: b.spread, offset },
   );
-  decorateSpares(pages, kind);
+  decorateSpares(b.copy, pages, kind);
   return pages;
 }
 
 /** Pages left empty get the war that was fought on them in a boring lesson. */
-function decorateSpares(pages: HTMLElement[], key: string) {
+function decorateSpares(copy: Copy, pages: HTMLElement[], key: string) {
   pages.forEach((page, i) => {
     if (!page.hasAttribute("data-spare")) return;
     const flow = page.querySelector(".bp-flow")!;
-    flow.replaceChildren(spare(`${key}-${i}`));
+    flow.replaceChildren(spare(copy, `${key}-${i}`));
   });
 }
 
-function spare(key: string) {
+function spare(copy: Copy, key: string) {
   const rng = seed(key);
   return h(
     "div",
     { class: "bp-spare", "aria-hidden": "true" },
     svg(miniWar(300, 380, rng)),
-    h("p", { class: "bp-spare__note" }, "(a quick war, during maths)"),
+    h("p", { class: "bp-spare__note" }, copy.page.spare),
   );
 }
 
 /** A spread always ends on a right-hand page. */
-export function evenUp(pages: HTMLElement[], spread: boolean, key: string) {
+export function evenUp(copy: Copy, pages: HTMLElement[], spread: boolean, key: string) {
   if (!spread || pages.length % 2 === 0) return pages;
   const last = pages[pages.length - 1];
   const no = Number(last.querySelector(".bp-page__head b")?.textContent);
-  const { page, flow } = blankPage("spare", "squared", Number.isFinite(no) && no > 0 ? String(no + 1) : "", null);
+  const { page, flow } = blankPage(copy, "spare", "squared", Number.isFinite(no) && no > 0 ? String(no + 1) : "", null);
   page.dataset.spare = "";
-  flow.append(spare(`${key}-end`));
+  flow.append(spare(copy, `${key}-end`));
   return [...pages, page];
 }
 
 // ---- small pieces of handwriting -----------------------------------------------
 
-const h1 = (title: string, cls = "") =>
-  h("h1", { class: `bp-h1 ${cls}`.trim(), tabindex: "-1" }, title);
+const h1 = (title: string, mark?: ReturnType<typeof part>) =>
+  h("h1", { class: "bp-h1", tabindex: "-1", ...mark }, title);
+
+/** Copy as the hand jots it: a lower-case start, no full stop. */
+const jotted = (words: string) => {
+  const s = words.trim().replace(/\.$/, "");
+  return s.charAt(0).toLowerCase() + s.slice(1);
+};
+
+/** A rendered markdown body as blocks to flow onto pages, each marked as
+ * part of the body. */
+const prose = (html: string, name: Part, ref: string) =>
+  blocks(html).map((el) => markPart(el, name, ref));
 
 function withUnderline(el: HTMLElement, ink: string, key: string, twice = false) {
   el.append(svg(underline(ink, seed(key), twice)));
@@ -253,70 +285,70 @@ function taped(
   return fig;
 }
 
-
-/** Moves the children of a rendered prose article into blocks. */
-function proseBlocks(main: HTMLElement) {
-  const prose = main.querySelector(".prose");
-  if (!prose) return [];
-  return [...prose.children].map((el) => {
-    el.removeAttribute("class");
-    return el as HTMLElement;
-  });
-}
-
 // ---- the cover, and the contents -------------------------------------------------
 
-function label(content: SiteContent, eyebrow: string, key: BookKey = "home") {
-  const book = shelfOf(key);
-  const theme = THEMES[book.theme];
+/** The name label on a book's cover, in its paper's words. */
+function label(content: SiteContent, copy: Copy, key: BookKey) {
+  const words = copy.cover;
+  const shelf = shelfOf(key);
+  const book = copy.books[key];
+  const paper = copy.papers[shelf.theme];
+  const [first, second] = book.title;
   return h(
     "div",
     { class: "bp-label" },
-    h("p", { class: "bp-label__school" }, theme.school),
+    h("p", { class: "bp-label__school" }, paper.school),
     h(
       "p",
       { class: "bp-label__title", "aria-hidden": "true" },
-      h("span", { class: "bp-blue" }, book.title[0]),
-      h("span", { class: "bp-red" }, book.title[1]),
+      h("span", { class: "bp-blue" }, first),
+      h("span", { class: "bp-red" }, second),
     ),
     h(
       "p",
       { class: "bp-label__field" },
-      h("span", null, "Name"),
+      h("span", null, words.name),
       h("b", null, content.site.name),
     ),
     h(
       "p",
       { class: "bp-label__field" },
-      h("span", null, "Subject"),
-      h("b", null, eyebrow),
+      h("span", null, words.subject),
+      h("b", null, key === "home" ? content.pages.home.hero.occupation : book.aside),
     ),
     h(
       "p",
       { class: "bp-label__field" },
-      h("span", null, "Class"),
-      h("b", null, key === "home" ? "places on the web" : theme.klass),
+      h("span", null, words.class),
+      h("b", null, paper.klass),
     ),
   );
 }
 
+/** The contents slip: the books on the desk, and the paper each is on. */
 function contents(b: Build) {
-  const { order, content, route } = b;
-  void order;
+  const { content, route, copy } = b;
+  const words = copy.contents;
   const list = h("ol", { class: "bp-contents__list" });
-  for (const book of BOOKS) {
-    const here = route.path === book.href;
+  for (const shelf of BOOKS) {
+    const book = copy.books[shelf.key];
+    const here = route.path === shelf.href;
     list.append(
       h(
         "li",
-        { "data-ink": book.key === "projects" ? "red" : "blue" },
+        { "data-ink": shelf.key === "projects" ? "red" : "blue" },
         h(
           "a",
-          { href: book.href, "aria-current": here ? "page" : null },
+          { href: shelf.href, "aria-current": here ? "page" : null },
           h("span", { class: "bp-contents__name" }, book.name),
-          book.key === "home" ? null : h("small", null, ` (${book.aside})`),
+          shelf.key === "home" ? null : h("small", null, ` (${book.aside})`),
           h("span", { class: "bp-contents__dots", "aria-hidden": "true" }),
-          h("span", { class: "bp-contents__no" }, h("span", { class: "bp-sr" }, ", in the "), THEMES[book.theme].short),
+          h(
+            "span",
+            { class: "bp-contents__no" },
+            h("span", { class: "bp-sr" }, words.inThe),
+            copy.papers[shelf.theme].short,
+          ),
         ),
       ),
     );
@@ -328,22 +360,22 @@ function contents(b: Build) {
       h(
         "a",
         { href: content.site.writingUrl, target: "_blank", rel: "noreferrer" },
-        h("span", { class: "bp-contents__name" }, "Writing"),
-        h("small", null, " (Substack)"),
+        h("span", { class: "bp-contents__name" }, words.writing.name),
+        h("small", null, ` (${words.writing.aside})`),
         h("span", { class: "bp-contents__dots", "aria-hidden": "true" }),
-        h("span", { class: "bp-contents__no" }, "↗", h("span", { class: "bp-sr" }, " opens in a new tab")),
+        h("span", { class: "bp-contents__no" }, "↗", h("span", { class: "bp-sr" }, ` ${copy.newTab}`)),
       ),
     ),
   );
   return h(
     "nav",
-    { class: "bp-contents", "aria-label": "Contents" },
-    h("p", { class: "bp-contents__title", "aria-hidden": "true" }, "Contents"),
+    { class: "bp-contents", "aria-label": words.label },
+    h("p", { class: "bp-contents__title", "aria-hidden": "true" }, words.title),
     list,
   );
 }
 
-function returnTo(content: SiteContent) {
+function returnTo(content: SiteContent, copy: Copy) {
   const socials = content.site.social.filter((s) => !s.href.startsWith("mailto:"));
   return h(
     "div",
@@ -351,7 +383,7 @@ function returnTo(content: SiteContent) {
     h(
       "p",
       null,
-      "If found, please return to ",
+      `${copy.cover.returnTo} `,
       h("a", { href: `mailto:${content.site.email}` }, content.site.email),
     ),
     h(
@@ -359,7 +391,7 @@ function returnTo(content: SiteContent) {
       { class: "bp-return__socials" },
       ...socials.flatMap((s, i) => [
         i ? " · " : "",
-        link(s.href, s.label),
+        link(s.href, copy.newTab, s.label),
       ]),
     ),
   );
@@ -368,11 +400,10 @@ function returnTo(content: SiteContent) {
 /** The outside of the book: the name label on brown paper. On a phone the
  * cover is also where the contents slip is tucked. */
 export function coverPage(b: Build, withContents: boolean, key: BookKey = "home") {
-  const { page, flow } = blankPage("cover", "kraft");
-  const eyebrow = key === "home" ? (b.content.pages.home.eyebrow ?? "Frontend development") : shelfOf(key).aside;
+  const { page, flow } = blankPage(b.copy, "cover", "kraft");
   page.dataset.book = key;
-  flow.append(label(b.content, eyebrow, key));
-  if (withContents) flow.append(contents(b), returnTo(b.content));
+  flow.append(label(b.content, b.copy, key));
+  if (withContents) flow.append(contents(b), returnTo(b.content, b.copy));
   else flow.append(svg(coverDoodle(key)));
   return page;
 }
@@ -384,16 +415,16 @@ function coverDoodle(key: string) {
 
 /** The inside of the front cover: the contents slip, and who to return it to. */
 function insideCover(b: Build) {
-  const { page, flow } = blankPage("inside-cover", "kraft-in");
+  const { page, flow } = blankPage(b.copy, "inside-cover", "kraft-in");
   flow.append(
     h(
       "p",
       { class: "bp-belongs" },
-      "This book belongs to ",
+      `${b.copy.cover.belongs} `,
       h("b", null, b.content.site.name),
     ),
     contents(b),
-    returnTo(b.content),
+    returnTo(b.content, b.copy),
   );
   return page;
 }
@@ -401,81 +432,75 @@ function insideCover(b: Build) {
 // ---- home: hello, the diary, the camps worth a look -------------------------------
 
 function home(b: Build): HTMLElement[] {
-  const { content, route } = b;
+  const { content, copy } = b;
   const page = content.pages.home;
-  const main = route.main;
-  const greeting = text(main.querySelector(".greeting")) || "Hey there!";
-  const occupation =
-    text(main.querySelector(".occupation")) || page.eyebrow || "";
-  const portrait = main.querySelector<HTMLImageElement>(".hello img");
-  const current = main.querySelector('[aria-labelledby="home-currently"]');
-  const headline = page.headline ?? "Burooj here!";
-  const [first, ...rest] = headline.split(" ");
+  const { hero, currently, updates, work } = page;
+  const [first, ...rest] = hero.headline.split(" ");
 
-  const title = h("h1", { class: "bp-h1 bp-hello__title", tabindex: "-1" }, first + " ", h("span", { class: "bp-red" }, rest.join(" ")));
-  const photo = taped(
-    portrait?.getAttribute("src") ?? "/images/burooj4.jpg",
-    portrait?.getAttribute("alt") ?? `${content.site.name}`,
-    "portrait",
-    { cls: "bp-portrait" },
+  const title = h(
+    "h1",
+    { class: "bp-h1 bp-hello__title", tabindex: "-1", ...part("page.title", "home") },
+    first + " ",
+    h("span", { class: "bp-red" }, rest.join(" ")),
   );
+  const photo = taped(hero.portrait.src, hero.portrait.alt, "portrait", { cls: "bp-portrait" });
+  markPart(photo, "home.portrait");
   photo.append(
-    h("figcaption", null, h("a", { href: "/about" }, "that's me →")),
+    h("figcaption", null, h("a", { href: hero.portrait.href }, `${jotted(hero.portrait.caption)} →`)),
   );
 
   const hello: HTMLElement[] = [
-    h("div", { class: "bp-hello__top" }, photo, h("p", { class: "bp-greeting" }, greeting), title),
-    h("p", { class: "bp-typed-line" }, occupation),
-    h("p", { class: "bp-lead" }, page.intro ?? ""),
-    ...md(page.body),
+    h(
+      "div",
+      { class: "bp-hello__top" },
+      photo,
+      h("p", { class: "bp-greeting", ...part("home.greeting") }, hero.greeting),
+      title,
+    ),
+    h("p", { class: "bp-typed-line", ...part("home.occupation") }, hero.occupation),
+    h("p", { class: "bp-lead", ...part("home.welcome") }, hero.welcome),
+    h(
+      "aside",
+      { class: "bp-note", "aria-label": currently.title, ...part("home.currently") },
+      h("b", null, `${currently.title}: `),
+      inline(currently.body),
+    ),
   ];
-  if (current) {
-    const words = current.querySelector("p");
-    hello.push(
-      h(
-        "aside",
-        { class: "bp-note", "aria-label": "Currently" },
-        h("b", null, "Currently: "),
-        ...(words ? [...words.childNodes] : []),
-      ),
-    );
-  }
 
   // the diary: dated lines, newest first
-  const diary = h("ol", { class: "bp-diary", "aria-label": "Recent updates, newest first" });
+  const diary = h("ol", { class: "bp-diary", "aria-label": updates.listLabel });
   for (const u of content.updates) {
     diary.append(
       h(
         "li",
-        { "data-kind": u.kind },
-        h("time", { class: "bp-mnote", datetime: u.date }, shortDate(u.date)),
-        h("p", { class: "bp-diary__title" }, link(u.href, u.title)),
+        { "data-kind": u.kind, ...part("update.item", u.id) },
+        h("time", { class: "bp-mnote", datetime: u.date }, shortDate(u.date, copy.months)),
+        h("p", { class: "bp-diary__title" }, link(u.href, copy.newTab, u.title)),
         h("p", { class: "bp-diary__summary" }, u.summary),
-        h("p", { class: "bp-diary__src" }, `${u.source === "site" ? "this site" : u.source} · ${u.kind.replace("-", " ")}`),
+        h("p", { class: "bp-diary__src" }, `${u.sourceLabel} · ${u.kindLabel}`),
       ),
     );
   }
   const diaryHead = h(
     "div",
     { class: "bp-sechead", "data-bp-keep": "" },
-    withUnderline(h("h2", { class: "bp-h2" }, "Recent updates"), RED, "diary"),
-    h("p", { class: "bp-sub" }, "little signals from around my internet"),
+    withUnderline(h("h2", { class: "bp-h2" }, updates.title), RED, "diary"),
+    h("p", { class: "bp-sub" }, jotted(updates.intro)),
     svg(tally(content.updates.length, RED, seed("tally"))),
   );
 
   // selected work, taped in
-  const featured = content.projects.filter((p) => p.featured);
   const snaps = h("ul", { class: "bp-snaps" });
-  featured.forEach((p) => {
-    const size = (p.media.find((m) => m.src === p.cover) ?? {}) as { width?: number; height?: number };
+  featured(content).forEach((p) => {
+    const size: { width?: number; height?: number } =
+      p.media.find((m) => m.src === p.cover) ?? {};
     const ratio = size.width && size.height ? size.width / size.height : 4 / 3;
-    const fig = taped(p.cover, "", `snap-${p.slug}`, { ratio });
     snaps.append(
       h(
         "li",
         null,
-        fig,
-        h("a", { href: p.href, class: "bp-snaps__title" }, p.title),
+        p.cover ? taped(p.cover, "", `snap-${p.slug}`, { ratio }) : null,
+        h("a", { href: p.href, class: "bp-snaps__title", ...part("project.title", p.slug) }, p.title),
         h("span", { class: "bp-snaps__meta" }, p.dateLabel),
       ),
     );
@@ -483,12 +508,12 @@ function home(b: Build): HTMLElement[] {
   const workHead = h(
     "div",
     { class: "bp-sechead", "data-bp-keep": "" },
-    withUnderline(h("h2", { class: "bp-h2" }, "Some things I've built"), BLUE, "work"),
+    withUnderline(h("h2", { class: "bp-h2" }, work.title), BLUE, "work"),
   );
   const toWar = h(
     "p",
     { class: "bp-arrowlink" },
-    h("a", { href: "/projects" }, "all of them, in the war book →"),
+    h("a", { href: work.link.href }, `${copy.home.toProjects} →`),
   );
 
   const cover = b.spread ? insideCover(b) : coverPage(b, true);
@@ -497,7 +522,7 @@ function home(b: Build): HTMLElement[] {
     "home",
     "squared",
     [...hello, diaryHead, diary, workHead, snaps, toWar],
-    1,
+    firstPage(b),
     b.today,
     1,
   );
@@ -507,224 +532,225 @@ function home(b: Build): HTMLElement[] {
 // ---- about: a letter -----------------------------------------------------------------
 
 function about(b: Build) {
-  const main = b.route.main;
-  const title = text(main.querySelector("h1")) || "About";
-  const intro = text(main.querySelector(".page-header__intro"));
-  const action = main.querySelector<HTMLAnchorElement>(".page-header__actions a");
+  const { header, html } = b.content.pages.about;
+  const words = b.copy.about;
+  const [action] = header.actions;
   const blocks: HTMLElement[] = [
     h(
       "header",
       { class: "bp-letterhead" },
-      withUnderline(h1(title), BLUE, "about-title"),
-      intro ? h("p", { class: "bp-lead" }, intro) : null,
+      withUnderline(h1(header.title, part("page.title", "about")), BLUE, "about-title"),
+      header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "about") }, header.intro) : null,
     ),
-    h("p", { class: "bp-salute" }, "Dear reader,"),
-    ...proseBlocks(main),
-    h("p", { class: "bp-signoff" }, "Yours,", h("br"), h("span", null, "Burooj")),
+    h("p", { class: "bp-salute" }, words.salute),
+    ...prose(html, "page.body", "about"),
+    h("p", { class: "bp-signoff" }, words.signoff, h("br"), h("span", null, words.signature)),
   ];
   if (action)
     blocks.push(
       h(
         "p",
-        { class: "bp-ps" },
-        "P.S. ",
-        h("a", { href: action.getAttribute("href") ?? "/resume" }, text(action).toLowerCase() || "my resume"),
-        " is stapled in, a few pages on.",
+        { class: "bp-ps", ...part("page.actions", "about") },
+        `${words.ps} `,
+        h("a", { href: action.href }, action.label.toLowerCase()),
+        ` ${words.psAfter}`,
       ),
     );
-  return written(b, "about", "letter", blocks, 1, b.today);
+  return written(b, "about", "letter", blocks, firstPage(b), b.today);
 }
 
 // ---- resume: typed, and stapled in -------------------------------------------------
 
+/** The structured resume, typed out: a heading for each section, then each
+ * role or course as its heading, its dates, its summary and its bullets. */
+function typed(content: SiteContent): HTMLElement[] {
+  const { resume } = content;
+  const groups = [
+    { title: resume.experience.title, entries: resume.experience.roles, name: "resume.role" as const },
+    { title: resume.education.title, entries: resume.education.entries, name: "resume.education" as const },
+  ];
+  const out: HTMLElement[] = [];
+  for (const group of groups) {
+    out.push(h("h2", null, group.title));
+    for (const entry of group.entries) {
+      const mark = part(group.name, entry.id);
+      out.push(h("h3", { ...mark }, entry.heading));
+      if (entry.dateLine) out.push(h("p", { ...mark }, h("em", null, entry.dateLine)));
+      if (entry.summary) out.push(h("p", { ...mark }, inline(entry.summary)));
+      if (entry.bullets.length)
+        out.push(h("ul", { ...mark }, ...entry.bullets.map((bullet) => h("li", null, inline(bullet)))));
+    }
+  }
+  out.push(
+    h("h2", null, resume.tools.title),
+    h("p", { ...part("resume.tools") }, resume.tools.sentence),
+  );
+  return out;
+}
+
 function resume(b: Build) {
-  const main = b.route.main;
-  const title = text(main.querySelector("h1")) || "Resume";
-  const intro = text(main.querySelector(".page-header__intro"));
-  const actions = [...main.querySelectorAll<HTMLAnchorElement>(".page-header__actions a")];
+  const { header, html } = b.content.pages.resume;
   const blocks: HTMLElement[] = [
     h(
       "header",
       { class: "bp-typedhead" },
-      h1(title),
-      intro ? h("p", { class: "bp-typedhead__intro" }, intro) : null,
-      actions.length
+      h1(header.title, part("page.title", "resume")),
+      header.intro ? h("p", { class: "bp-typedhead__intro", ...part("page.intro", "resume") }, header.intro) : null,
+      header.actions.length
         ? h(
             "p",
-            { class: "bp-typedhead__contact" },
-            ...actions.flatMap((a, i) => [i ? "  ·  " : "", link(a.getAttribute("href") ?? "#", text(a))]),
+            { class: "bp-typedhead__contact", ...part("page.actions", "resume") },
+            ...header.actions.flatMap((a, i) => [i ? "  ·  " : "", link(a.href, b.copy.newTab, a.label)]),
           )
         : null,
     ),
-    ...proseBlocks(main),
+    ...typed(b.content),
+    ...prose(html, "page.body", "resume"),
   ];
-  return written(b, "resume", "typed", blocks, 1, b.today);
+  return written(b, "resume", "typed", blocks, firstPage(b), b.today);
 }
 
 // ---- the lab: doodles in the margin ----------------------------------------------------
 
-function labCard(item: LabItem, i: number) {
+function labCard(b: Build, item: LabItem, i: number) {
   const rng = seed(item.slug);
-  const target = item.href ?? item.detail;
   return h(
     "article",
     { class: "bp-labitem", "data-side": i % 2 ? "right" : "left" },
     svg(doodle(i, rng)),
-    h("h2", { class: "bp-h2" }, link(target, item.title)),
-    h("p", null, item.summary),
-    h("p", { class: "bp-labitem__meta" }, `${item.type} · ${item.sourceEra}`),
+    h("h2", { class: "bp-h2", ...part("lab.title", item.slug) }, link(item.detail, b.copy.newTab, item.title)),
+    h("p", { ...part("lab.summary", item.slug) }, item.summary),
+    h("p", { class: "bp-labitem__meta", ...part("lab.meta", item.slug) }, `${item.type} · ${item.sourceEra}`),
   );
 }
 
 function lab(b: Build) {
-  const main = b.route.main;
-  const title = text(main.querySelector("h1")) || "Lab";
-  const intro = text(main.querySelector(".page-header__intro"));
+  const page = b.content.pages.lab;
+  const { header } = page;
   const blocks: HTMLElement[] = [
     h(
       "header",
       { class: "bp-entryhead" },
-      h("p", { class: "bp-eyebrow" }, "Lab · in the margins"),
-      withUnderline(h1(title), RED, "lab-title"),
-      intro ? h("p", { class: "bp-lead" }, intro) : null,
+      h(
+        "p",
+        { class: "bp-eyebrow", ...part("page.eyebrow", "lab") },
+        fill(b.copy.lab.eyebrow, { eyebrow: header.eyebrow ?? page.title }),
+      ),
+      withUnderline(h1(header.title, part("page.title", "lab")), RED, "lab-title"),
+      header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "lab") }, header.intro) : null,
     ),
-    ...b.content.lab.map(labCard),
+    ...b.content.lab.map((item, i) => labCard(b, item, i)),
   ];
-  return written(b, "lab", "squared", blocks, 1, null);
+  return written(b, "lab", "squared", blocks, firstPage(b), null);
 }
 
 function labEntry(b: Build): HTMLElement[] | null {
-  const { route, content } = b;
-  const item = content.lab.find((l) => l.slug === route.slug);
-  const main = route.main;
-  const real = main.querySelector(".entry-page");
-  if (!item && !real) return null;
-  const title = text(main.querySelector(".entry-page h1")) || item?.title || "";
-  const summary = text(main.querySelector(".entry-page .page-header__intro")) || item?.summary || "";
-  const i = Math.max(0, content.lab.findIndex((l) => l.slug === route.slug));
-  const links = item?.href
-    ? [{ label: `Try it on ${item.sourceEra}`, url: item.href }, ...item.links]
-    : (item?.links ?? []);
+  const { route, content, copy } = b;
+  const item = content.lab.find((l) => l.slug === route.slug && l.hasPage);
+  if (!item) return null;
+  const { detail } = content.pages.lab;
+  const i = content.lab.indexOf(item);
+  const links = item.href
+    ? [{ label: fill(copy.lab.tryIt, { era: item.sourceEra }), url: item.href }, ...item.links]
+    : item.links;
   const blocks: HTMLElement[] = [
     h(
       "header",
       { class: "bp-entryhead" },
-      h("p", { class: "bp-eyebrow" }, "Lab"),
-      withUnderline(h1(title), RED, `lab-${route.slug}`),
-      h("p", { class: "bp-lead" }, summary),
+      h("p", { class: "bp-eyebrow" }, detail.eyebrow),
+      withUnderline(h1(item.title, part("lab.title", item.slug)), RED, `lab-${item.slug}`),
+      h("p", { class: "bp-lead", ...part("lab.summary", item.slug) }, item.summary),
     ),
-    h("div", { class: "bp-bigdoodle" }, svg(doodle(i, seed(route.slug ?? "lab")))),
-    fields([
-      ["Type", item?.type ?? ""],
-      ["Era", item?.sourceEra ?? ""],
-    ]),
-    arrows(links),
-    ...proseBlocks(main),
+    h("div", { class: "bp-bigdoodle" }, svg(doodle(i, seed(item.slug)))),
+    fields(
+      [
+        [detail.labels.type, item.type],
+        [detail.labels.era, item.sourceEra],
+      ],
+      part("lab.meta", item.slug),
+    ),
+    arrows(b, links, part("lab.links", item.slug)),
+    ...prose(item.html, "lab.body", item.slug),
   ];
-  return written(b, "lab-entry", "squared", blocks, labFirst(i), null);
+  return written(b, "lab-entry", "squared", blocks, firstPage(b), null);
 }
 
 // ---- a project: its own page, the screenshot taped in -------------------------------
 
-function fields(rows: [string, string][]) {
+function fields(rows: [string, string][], mark: ReturnType<typeof part>) {
   return h(
     "dl",
-    { class: "bp-fields" },
+    { class: "bp-fields", ...mark },
     ...rows
       .filter(([, v]) => v)
       .map(([k, v]) => h("div", null, h("dt", null, k), h("dd", null, v))),
   );
 }
 
-function arrows(links: { label: string; url: string }[]) {
+function arrows(b: Build, links: { label: string; url: string }[], mark: ReturnType<typeof part>) {
   if (!links.length) return h("span", { hidden: true });
   return h(
     "ul",
-    { class: "bp-arrows" },
-    ...links.map((l) => h("li", null, link(l.url, l.label))),
+    { class: "bp-arrows", ...mark },
+    ...links.map((l) => h("li", null, link(l.url, b.copy.newTab, l.label))),
   );
 }
 
-function project(b: Build): HTMLElement[] {
-  const { route, content } = b;
-  const main = route.main;
+function project(b: Build): HTMLElement[] | null {
+  const { route, content, copy } = b;
   const p = content.projects.find((x) => x.slug === route.slug);
-  const i = Math.max(0, content.projects.findIndex((x) => x.slug === route.slug));
-  const title = p?.title ?? text(main.querySelector("h1"));
-  const summary = p?.summary ?? text(main.querySelector(".page-header__intro"));
-  const metaRows: [string, string][] = p
-    ? [
-        ["Role", p.role],
-        ["Where", p.location],
-        ["When", p.dateLabel],
-      ]
-    : [...main.querySelectorAll(".entry-page__meta > div")].map((d) => [
-        text(d.querySelector(".entry-page__label")),
-        text(d.querySelector("p")),
-      ]);
-  const links =
-    p?.links ??
-    [...main.querySelectorAll<HTMLAnchorElement>(".entry-page__links:first-of-type a")].map((a) => ({
-      label: text(a),
-      url: a.getAttribute("href") ?? "#",
-    }));
-  const tools = p?.tools ?? [...main.querySelectorAll(".ds-tags li")].map((li) => text(li));
-  const media: { src: string; alt: string; video: boolean; ratio?: number; caption?: string }[] = p
-    ? p.media.map((m) => {
-        const size = m as { width?: number; height?: number };
-        return {
-          src: m.src,
-          alt: m.alt ?? "",
-          caption: m.caption ?? m.alt,
-          video: m.type === "video",
-          ratio: size.width && size.height ? size.width / size.height : 16 / 10,
-        };
-      })
-    : [...main.querySelectorAll<HTMLImageElement>(".media-rail img")].map((img) => ({
-        src: img.getAttribute("src") ?? "",
-        alt: img.alt,
-        caption: img.alt,
-        video: false,
-        ratio: img.width && img.height ? img.width / img.height : undefined,
-      }));
-  const archive = p?.status === "archive";
+  if (!p) return null;
+  const { detail } = content.pages.projects;
+  const archive = p.status === "archive";
   const ink = archive ? RED : BLUE;
 
   const head = h(
     "header",
     { class: "bp-entryhead", "data-ink": archive ? "red" : "blue" },
-    h("p", { class: "bp-eyebrow" }, `${p?.kind ?? "Project"} · ${archive ? "from the archive" : "selected work"}`),
-    withUnderline(h1(title), archive ? BLUE : RED, `title-${route.slug}`, true),
-    h("p", { class: "bp-lead" }, summary),
+    h("p", { class: "bp-eyebrow" }, `${p.kind} · ${archive ? copy.project.archive : copy.project.selected}`),
+    withUnderline(h1(p.title, part("project.title", p.slug)), archive ? BLUE : RED, `title-${p.slug}`, true),
+    h("p", { class: "bp-lead", ...part("project.summary", p.slug) }, p.summary),
   );
   const blocks: HTMLElement[] = [
     head,
-    fields(metaRows),
-    tools.length
-      ? h("ul", { class: "bp-circled", "aria-label": `${title} tools` }, ...tools.map((t) => h("li", null, t)))
+    fields(
+      [
+        [detail.labels.role, p.role],
+        [detail.labels.location, p.location],
+        [detail.labels.date, p.dateLabel],
+      ],
+      part("project.meta", p.slug),
+    ),
+    p.tools.length
+      ? h(
+          "ul",
+          { class: "bp-circled", "aria-label": fill(copy.project.tools, { title: p.title }), ...part("project.tools", p.slug) },
+          ...p.tools.map((t) => h("li", null, t)),
+        )
       : h("span", { hidden: true }),
-    arrows(links),
+    arrows(b, p.links, part("project.links", p.slug)),
   ];
-  media.forEach((m, n) => {
-    const fig = taped(m.src, m.alt, `${route.slug}-${n}`, {
-      caption: m.caption,
-      ratio: m.ratio,
-      video: m.video,
+  p.media.forEach((m, n) => {
+    const fig = taped(m.src, m.alt ?? "", `${p.slug}-${n}`, {
+      caption: m.caption ?? m.alt,
+      ratio: m.width && m.height ? m.width / m.height : 16 / 10,
+      video: m.type === "video",
     });
+    markPart(fig, "project.media", p.slug);
     if (n === 0) fig.dataset.bpBreak = "right";
     blocks.push(fig);
   });
-  blocks.push(...proseBlocks(main));
+  blocks.push(...prose(p.html, "project.body", p.slug));
   blocks.push(
-    h("p", { class: "bp-arrowlink" }, h("a", { href: "/projects" }, "← back to the war map (all projects)")),
+    h("p", { class: "bp-arrowlink" }, h("a", { href: detail.back.href }, `← ${copy.project.back}`)),
   );
-  const pages = written(b, "project", "squared", blocks, projectFirst(i), p?.dateLabel ?? null);
+  const pages = written(b, "project", "squared", blocks, firstPage(b), p.dateLabel);
   // this project's camp, from the map, drawn in the corner of its first page
   const first = pages[0];
-  if (first && p) {
+  if (first) {
     const rng = seed(p.slug);
     const art = svg(
-      `<svg class="bp-owncamp" viewBox="0 0 120 120" aria-hidden="true">${camp({ cx: 60, cy: 60, r: 44, ink, enemy: archive ? BLUE : RED, dots: campDots(p), hits: campHits(p), rng })}</svg>`,
+      `<svg class="bp-owncamp" viewBox="0 0 120 120" aria-hidden="true">${camp({ cx: 60, cy: 60, r: 44, ink, enemy: archive ? BLUE : RED, dots: campDots(p), hits: campHits(content, p), rng })}</svg>`,
     );
     first.append(art);
   }
@@ -732,11 +758,15 @@ function project(b: Build): HTMLElement[] {
 }
 
 const campDots = (p: Project) => Math.min(11, 5 + p.links.length + p.media.length);
-const campHits = (p: Project) => Math.max(0, Math.min(5, 2026 - p.year));
+/** Older camps have taken more hits: a year each since, up to five. */
+const campHits = (content: SiteContent, p: Project) =>
+  Math.max(0, Math.min(5, content.derived.lastYear - p.year));
 
 // ---- projects: the war on the back page ------------------------------------------------
 
-function warMap(projects: Project[], w: number, hgt: number, wide: boolean) {
+function warMap(b: Build, w: number, hgt: number, wide: boolean) {
+  const { content, copy } = b;
+  const projects = content.projects;
   const years = [...new Set(projects.map((p) => p.year))].sort((a, b) => b - a);
   const r = Math.max(20, Math.min(40, Math.min(w, hgt) * 0.074));
   const top = r + 40;
@@ -786,7 +816,7 @@ function warMap(projects: Project[], w: number, hgt: number, wide: boolean) {
   let rings = "";
   for (const p of projects) {
     const { x, y } = spots.get(p.slug)!;
-    rings += camp({ cx: x, cy: y, r, ink: ink(p), enemy: foe(p), dots: campDots(p), hits: campHits(p), rng: seed(p.slug), id: p.slug });
+    rings += camp({ cx: x, cy: y, r, ink: ink(p), enemy: foe(p), dots: campDots(p), hits: campHits(content, p), rng: seed(p.slug), id: p.slug });
   }
   const box = h("div", {
     class: "bp-map",
@@ -797,7 +827,7 @@ function warMap(projects: Project[], w: number, hgt: number, wide: boolean) {
       `<svg class="bp-map__ink" viewBox="0 0 ${w.toFixed(0)} ${hgt.toFixed(0)}" width="${w.toFixed(0)}" height="${hgt.toFixed(0)}" aria-hidden="true">${lines}${rings}</svg>`,
     ),
   );
-  const list = h("ul", { class: "bp-map__camps", "aria-label": "Projects on the map" });
+  const list = h("ul", { class: "bp-map__camps", "aria-label": copy.projects.map });
   for (const p of projects) {
     const { x, y } = spots.get(p.slug)!;
     list.append(
@@ -827,49 +857,53 @@ function warMap(projects: Project[], w: number, hgt: number, wide: boolean) {
     h(
       "p",
       { class: "bp-map__legend" },
-      h("span", { class: "bp-blue" }, "● selected work"),
-      h("span", { class: "bp-red" }, "● the archive"),
+      h("span", { class: "bp-blue" }, `● ${copy.projects.selected}`),
+      h("span", { class: "bp-red" }, `● ${copy.projects.archive}`),
     ),
   );
   return box;
 }
 
 function projects(b: Build) {
-  const { content, route, stage } = b;
-  const main = route.main;
-  const title = text(main.querySelector("h1")) || "Projects";
-  const intro = text(main.querySelector(".page-header__intro"));
+  const { content, stage, copy } = b;
+  const page = content.pages.projects;
+  const { header } = page;
+  const words = copy.projects;
   const head = h(
     "header",
     { class: "bp-entryhead" },
-    h("p", { class: "bp-eyebrow" }, "Projects · the war"),
-    withUnderline(h1(title), RED, "projects-title"),
-    intro ? h("p", { class: "bp-lead" }, intro) : null,
+    h(
+      "p",
+      { class: "bp-eyebrow", ...part("page.eyebrow", "projects") },
+      fill(words.eyebrow, { eyebrow: header.eyebrow ?? page.title }),
+    ),
+    withUnderline(h1(header.title, part("page.title", "projects")), RED, "projects-title"),
+    header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "projects") }, header.intro) : null,
   );
-  const roster = h("ol", { class: "bp-roster", "aria-label": "Every project, newest first" });
+  const roster = h("ol", { class: "bp-roster", "aria-label": page.listLabel });
   for (const p of content.projects) {
     roster.append(
       h(
         "li",
         { "data-ink": p.status === "archive" ? "red" : "blue" },
         h("span", { class: "bp-mnote", "aria-hidden": "true" }, `'${String(p.year).slice(2)}`),
-        h("a", { href: p.href }, p.title),
-        h("span", { class: "bp-roster__meta" }, ` ${p.dateLabel}${p.kind === "Arcade" ? " · arcade" : ""}`),
+        h("a", { href: p.href, ...part("project.title", p.slug) }, p.title),
+        h("span", { class: "bp-roster__meta" }, ` ${p.dateLabel}${p.kind === "Arcade" ? ` · ${p.kind.toLowerCase()}` : ""}`),
       ),
     );
   }
-  const rosterHead = withUnderline(h("h2", { class: "bp-h2" }, "Roll call"), BLUE, "roll");
+  const rosterHead = withUnderline(h("h2", { class: "bp-h2" }, words.roll), BLUE, "roll");
 
   // measure the page the map goes on: all of it
-  const probe = blankPage("projects", "squared", "1", null);
+  const probe = blankPage(copy, "projects", "squared", String(firstPage(b)), null);
   stage.append(probe.page);
   const w = probe.flow.clientWidth - parseFloat(getComputedStyle(probe.flow).paddingLeft);
   const room = probe.flow.clientHeight;
   probe.page.remove();
-  const map = warMap(content.projects, w, Math.max(320, room - 4), b.spread);
+  const map = warMap(b, w, Math.max(320, room - 4), b.spread);
   map.dataset.bpBreak = "right";
   const blocks = [head, rosterHead, roster, map];
-  const pages = written(b, "projects", "squared", blocks, 1, "the whole war");
+  const pages = written(b, "projects", "squared", blocks, firstPage(b), words.date);
   return pages;
 }
 
@@ -878,8 +912,8 @@ function projects(b: Build) {
 function loose(b: Build) {
   const sheet = h("article", { class: "bp-loose" });
   sheet.append(
-    h("p", { class: "bp-loose__tag", "aria-hidden": "true" }, "tucked in"),
-    ...b.route.main.childNodes,
+    h("p", { class: "bp-loose__tag", "aria-hidden": "true" }, b.copy.loose.tag),
+    fallbackBody(b.route),
   );
   const heading = sheet.querySelector("h1");
   heading?.setAttribute("tabindex", "-1");
@@ -910,7 +944,7 @@ export function chapter(b: Build): Chapter {
       pages = labEntry(b);
       break;
     case "project":
-      pages = route.main.querySelector(".entry-page") || b.content.projects.some((p) => p.slug === route.slug) ? project(b) : null;
+      pages = project(b);
       break;
     case "projects":
       pages = projects(b);
@@ -918,7 +952,7 @@ export function chapter(b: Build): Chapter {
   }
   const book = bookOf(route) ?? "home";
   if (!pages) return { key: route.path, book, rank, label, pages: [], loose: loose(b) };
-  return { key: route.path, book, rank, label, pages: evenUp(pages, b.spread, route.path) };
+  return { key: route.path, book, rank, label, pages: evenUp(b.copy, pages, b.spread, route.path) };
 }
 
-export const today = () => handDate(new Date());
+export const today = (copy: Copy) => handDate(new Date(), copy.months);

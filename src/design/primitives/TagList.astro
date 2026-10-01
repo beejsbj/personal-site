@@ -3,11 +3,12 @@
 interface Props {
   items: string[];
   label?: string;
+  [data: `data-${string}`]: string | undefined;
 }
-const { items, label = "Tools" } = Astro.props;
+const { items, label = "Tools", ...data } = Astro.props;
 ---
 
-<ul class="ds-tags" aria-label={label}>
+<ul class="ds-tags" aria-label={label} {...data}>
   {items.map((item) => (
     <li>{item}</li>
   ))}

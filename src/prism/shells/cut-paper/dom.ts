@@ -36,12 +36,11 @@ export function markup(html: string): DocumentFragment {
 export const text = (node: Element | null | undefined) =>
   node?.textContent?.replace(/\s+/g, " ").trim() ?? "";
 
-/** Move (not clone) the children of `from` into a fresh fragment. */
-export function take(from: Element | null | undefined): DocumentFragment {
-  const fragment = document.createDocumentFragment();
-  if (from) while (from.firstChild) fragment.appendChild(from.firstChild);
-  return fragment;
-}
+/** What a screen reader hears after an external link (lens copy). */
+let newTabNote = "";
+export const setNewTabNote = (note: string) => {
+  newTabNote = note;
+};
 
 export const isExternal = (href: string) =>
   /^(https?:)?\/\//.test(href) && !href.startsWith(location.origin);
@@ -64,7 +63,7 @@ export function link(
     external
       ? [
           h("span", { class: "cp-out", "aria-hidden": "true" }, "↗"),
-          h("span", { class: "cp-sr" }, " (opens in a new tab)"),
+          h("span", { class: "cp-sr" }, newTabNote),
         ]
       : null,
   );

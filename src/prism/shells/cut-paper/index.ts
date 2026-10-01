@@ -8,9 +8,9 @@ import css from "./shell.css?inline";
 import micro from "./micro.css?inline";
 import type { LensShell, Route, ShellContext } from "../types";
 import { onNext } from "./beat";
-import { h } from "./dom";
+import { h, setNewTabNote } from "./dom";
 import { buildFrame, type Frame } from "./frame";
-import { buildScreen, type Memory } from "./screens";
+import { buildScreen } from "./screens";
 import { closeSound } from "./sound";
 
 const EIGHTH = 250; // ms at 120 bpm
@@ -22,7 +22,6 @@ let ctx: ShellContext | undefined;
 let frame: Frame | undefined;
 let current: HTMLElement | undefined;
 let currentPath = "";
-let memory: Memory = {};
 let generation = 0;
 
 /** Resolve on the next eighth note of the status-bar metronome. */
@@ -61,7 +60,7 @@ function confetti(stage: HTMLElement, before: HTMLElement, note: string) {
 }
 
 function show(route: Route) {
-  const built = buildScreen(route, ctx!.content, memory, {
+  const built = buildScreen(route, ctx!.content, {
     reducedMotion: ctx!.reducedMotion,
     face: ctx!.face,
   });
@@ -148,8 +147,8 @@ async function transition(route: Route) {
 const shell: LensShell = {
   mount(context) {
     ctx = context;
-    memory = {};
     generation = 0;
+    setNewTabNote(context.content.lenses["cut-paper"].opensInNewTab);
     frame = buildFrame(context);
     const first = show(context.route);
     frame.stage.insertBefore(first.el, frame.tear);

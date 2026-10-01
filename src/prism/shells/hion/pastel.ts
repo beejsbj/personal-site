@@ -459,15 +459,17 @@ interface ThreadOptions {
   glow?: number;
   /** How much the hand wobbles. */
   wobble?: number;
-  /** Reveal keys: by page y (default), or a fixed key for the whole thread,
-   * or spread along the thread from `from` to `to`. */
-  key?: number | [number, number];
+  /** Reveal keys: by page y (default), a fixed key for the whole thread,
+   * spread along the thread from `from` to `to`, or a function of the
+   * distance along the thread. */
+  key?: number | [number, number] | ((s: number, y: number) => number);
   core?: boolean;
 }
 
 function keyFor(opts: { key?: ThreadOptions["key"] }, s: number, total: number, y: number) {
   if (opts.key === undefined) return y;
   if (typeof opts.key === "number") return opts.key;
+  if (typeof opts.key === "function") return opts.key(s, y);
   const [from, to] = opts.key;
   return from + (to - from) * (s / (total || 1));
 }
@@ -539,98 +541,6 @@ function bloom(
   return out;
 }
 
-/** Two strands plaited into one cord along a path: leaf-shaped lobes from
- * alternate sides, cyan over magenta over cyan. */
-export function braid(
-  path: Path,
-  opts: { w?: number; seed: number; key?: number | [number, number]; from?: Hue },
-): Mark[] {
-  const out: Mark[] = [];
-  const w = opts.w ?? 14;
-  const total = path.length;
-  if (total < 4) return out;
-  const step = w * 0.46;
-  const count = Math.floor(total / step);
-  const rand = rng(opts.seed);
-  const first = opts.from ?? "c";
-  const second: Hue = first === "c" ? "m" : "c";
-  const keyOf = (s: number, y: number) =>
-    keyFor({ key: opts.key }, s, total, y);
-  for (let i = 0; i < count; i++) {
-    const side = i % 2 ? 1 : -1;
-    const hue = i % 2 ? second : first;
-    const s0 = i * step;
-    const s1 = Math.min(total, (i + 2.5) * step);
-    const jitter = (rand() - 0.5) * w * 0.12;
-    const centre: Pt[] = [];
-    for (let k = 0; k <= 12; k++) {
-      const t = k / 12;
-      const [x, y, nx, ny] = path.at(s0 + (s1 - s0) * t);
-      const across = side * (w * 0.5 + jitter) * Math.cos(Math.PI * t);
-      centre.push([x + nx * across, y + ny * across]);
-    }
-    const [, y0] = path.at(s0);
-    out.push(
-      mark(
-        Kind.Stroke,
-        hue,
-        step * (1.25 + rand() * 0.25),
-        0.85 + rand() * 0.15,
-        centre.flat(),
-        opts.seed * 977 + i,
-        keyOf(s0, y0),
-      ),
-    );
-  }
-  out.push(...rays(path, w * 0.5, opts.seed + 7, opts.key, ["c", "m"], 1.6));
-  out.push(...bloom(path, "c", w * 2.2, 0.14, opts));
-  out.push(...bloom(path, "m", w * 1.2, 0.14, opts));
-  return out;
-}
-
-/** Light drawn the way a pastel draws it: short, faint strokes thrown out
- * from a thread, more of them near it than far. */
-export function rays(
-  path: Path,
-  from: number,
-  seed: number,
-  key?: number | [number, number],
-  hues: Hue[] = ["c", "m"],
-  sparse = 1,
-): Mark[] {
-  const out: Mark[] = [];
-  const rand = rng(seed);
-  const total = path.length;
-  for (let s = rand() * 4; s < total; s += (2.5 + rand() * 4.5) * sparse) {
-    const [x, y, nx, ny] = path.at(s);
-    const side = rand() < 0.5 ? -1 : 1;
-    const start = from - 1 + rand() * 2;
-    const len = 2 + Math.pow(rand(), 2.6) * 18;
-    // Mostly straight out, leaning along the thread a little.
-    const lean = (rand() - 0.5) * 0.7;
-    const dx = nx * side + -ny * lean;
-    const dy = ny * side + nx * lean;
-    const norm = Math.hypot(dx, dy) || 1;
-    const ux = dx / norm;
-    const uy = dy / norm;
-    const hue = hues[Math.floor(rand() * hues.length)];
-    out.push(
-      mark(
-        Kind.Stroke,
-        hue,
-        0.5,
-        // Longer rays are fainter: the light thins as it travels.
-        (0.5 - (len / 25) * 0.3) * (0.5 + rand() * 0.5),
-        [x + ux * start, y + uy * start, x + ux * (start + len), y + uy * (start + len)],
-        seed * 7919 + Math.round(s * 10),
-        keyFor({ key }, s, total, y),
-        false,
-      ),
-    );
-  }
-  return out;
-}
-
 /** A knot: a few tight loops of both colours, scribbled round a point. */
 export function knot(
   x: number,
@@ -668,56 +578,6 @@ export function knot(
   out.push(
     mark(Kind.Glow, "c", r * 2.4, 0.3, [x - 0.5, y, x + 0.5, y], 0, key ?? y - r),
     mark(Kind.Glow, "m", r * 1.6, 0.3, [x, y - 0.5, x, y + 0.5], 0, key ?? y - r),
-  );
-  return out;
-}
-
-/** A tassel: a wrapped neck, then a fall of loose fibres. */
-export function tassel(
-  x: number,
-  y: number,
-  len: number,
-  seed: number,
-  opts: { spread?: number; key?: number; hue?: Hue } = {},
-): Mark[] {
-  const out: Mark[] = [];
-  const rand = rng(seed);
-  const spread = opts.spread ?? len * 0.28;
-  const fibres = 13;
-  const key = opts.key ?? y;
-  for (let f = 0; f < fibres; f++) {
-    const u = f / (fibres - 1) - 0.5;
-    const hue: Hue = opts.hue ?? (f % 2 ? "m" : "c");
-    const end = len * (0.82 + rand() * 0.22);
-    const pts: number[] = [];
-    for (let k = 0; k <= 16; k++) {
-      const t = k / 16;
-      const fan = u * spread * Math.pow(t, 0.7) * 2;
-      pts.push(x + u * 4 + fan + Math.sin(t * 5 + f) * 0.8, y + 6 + t * end);
-    }
-    out.push(
-      mark(Kind.Stroke, hue, 1.4 + rand(), 0.7 + rand() * 0.3, pts, seed * 53 + f, key + 4, false),
-    );
-  }
-  // The wrapped neck.
-  for (let k = 0; k < 4; k++) {
-    const yy = y + 4 + k * 3.2;
-    out.push(
-      mark(
-        Kind.Stroke,
-        k % 2 ? "m" : "c",
-        2.2,
-        1,
-        [x - 6, yy + 1.5, x, yy, x + 6, yy - 1.2],
-        seed * 71 + k,
-        key + 2,
-        false,
-      ),
-    );
-  }
-  out.push(...knot(x, y, 6, seed + 5, key));
-  out.push(
-    mark(Kind.Glow, opts.hue ?? "m", spread + 10, 0.24, [x, y + 6, x, y + len * 0.9], 0, key + 4),
   );
   return out;
 }

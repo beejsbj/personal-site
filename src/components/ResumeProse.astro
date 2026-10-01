@@ -1,0 +1,37 @@
+---
+/** The structured resume as prose: headings, date lines, bullets and the
+ * tools sentence, the way the resume once read as markdown. Rendered inside
+ * an element that styles prose (Daylight's .prose) and, at build time, into
+ * /prism/content.json for lenses that read the resume as rich text. */
+import Inline from "../design/primitives/Inline.astro";
+import type { getResume, ResumeEntry } from "../lib/portfolio";
+import { part } from "../prism/parts";
+interface Props {
+  resume: Awaited<ReturnType<typeof getResume>>;
+}
+const { resume } = Astro.props;
+const groups = [
+  { title: resume.experience.title, entries: resume.experience.roles, part: "resume.role" as const },
+  { title: resume.education.title, entries: resume.education.entries, part: "resume.education" as const },
+];
+---
+
+{groups.map((group) => (
+  <>
+    <h2>{group.title}</h2>
+    {group.entries.map((entry: ResumeEntry) => (
+      <div class="resume-entry" {...part(group.part, entry.id)}>
+        <h3>{entry.heading}</h3>
+        {entry.dateLine && <p><em>{entry.dateLine}</em></p>}
+        {entry.summary && <p><Inline text={entry.summary} links="plain" /></p>}
+        {entry.bullets.length > 0 && (
+          <ul>
+            {entry.bullets.map((bullet: string) => <li><Inline text={bullet} links="plain" /></li>)}
+          </ul>
+        )}
+      </div>
+    ))}
+  </>
+))}
+<h2>{resume.tools.title}</h2>
+<p {...part("resume.tools")}>{resume.tools.sentence}</p>

@@ -2,37 +2,45 @@
  * an angle, with a client, a type and an Accept button that opens the live
  * experiment. A lab entry is the request's full brief. */
 import type { Route, SiteContent } from "../types";
+import { markPart, part } from "../../parts";
+import { fill } from "../rich";
 import {
+  type Copy,
   type Env,
   type Screen,
   backLink,
+  copyOf,
   frame,
+  linkVerb,
   prompts,
   roving,
   screenTitle,
+  tapCue,
   tabs,
-  text,
 } from "./chrome";
-import { cleanProse, concentricStar, h, ransom } from "./dom";
+import { concentricStar, h, prose, ransom } from "./dom";
 import { other } from "./other";
 
 type Experiment = SiteContent["lab"][number];
 
 let rememberedLab = 0;
 
-const primaryHref = (entry: Experiment) => entry.href ?? entry.detail;
+/** Where a request card goes: the entry's own page when it has one, else
+ * the live experiment. */
+const primaryHref = (entry: Experiment) => entry.detail;
 const isExternal = (href: string) => /^https?:\/\//.test(href);
 
-function requestNo(i: number) {
-  return `No.${String(i + 1).padStart(2, "0")}`;
+function requestNo(copy: Copy, i: number) {
+  return fill(copy.lab.number, { n: String(i + 1).padStart(2, "0") });
 }
 
 export function lab(route: Route, env: Env): Screen {
+  const { content } = env;
+  const copy = copyOf(content);
+  const { header, detail } = content.pages.lab;
   const { el, main } = frame(route.kind, "cc-requests");
-  const entries = env.content.lab;
-  const tagline = text(route.main.querySelector("h1"));
-  const intro = text(route.main.querySelector(".page-header__intro"));
-  const { wrap, heading } = screenTitle("Lab", tagline || undefined, "Requests");
+  const entries = content.lab;
+  const { wrap, heading } = screenTitle(copy.sections.lab, header.title, copy.lab.eyebrow, "lab");
   el.querySelector(".cc-screen__bg")!.append(
     h("span", { class: "cc-requests__curtain" }),
     h("span", { class: "cc-requests__star" }, concentricStar(["#8c8c8c", "#e5191c", "#0a0a0a", "#e5191c"])),
@@ -50,44 +58,51 @@ export function lab(route: Route, env: Env): Screen {
         "data-cc-title": entry.title,
         ...(external ? { rel: "noreferrer" } : {}),
       },
-      h("span", { class: "cc-request__no", "aria-hidden": "true" }, requestNo(i)),
-      h("span", { class: "cc-request__status", "aria-hidden": "true" }, "Open"),
-      h("span", { class: "cc-request__title" }, ransom(entry.title, { boxes: 0.14, salt: i })),
+      h("span", { class: "cc-request__no", "aria-hidden": "true" }, requestNo(copy, i)),
+      h("span", { class: "cc-request__status", "aria-hidden": "true" }, copy.lab.status),
+      h("span", { class: "cc-request__title", ...part("lab.title", entry.slug) }, ransom(entry.title, { boxes: 0.14, salt: i })),
       h(
         "span",
-        { class: "cc-request__meta" },
-        h("span", {}, h("b", {}, "Client "), entry.sourceEra),
-        h("span", {}, h("b", {}, "Type "), entry.type),
+        { class: "cc-request__meta", ...part("lab.meta", entry.slug) },
+        h("span", {}, h("b", {}, copy.lab.client, " "), entry.sourceEra),
+        h("span", {}, h("b", {}, detail.labels.type, " "), entry.type),
       ),
-      h("span", { class: "cc-request__summary" }, entry.summary),
+      h("span", { class: "cc-request__summary", ...part("lab.summary", entry.slug) }, entry.summary),
       h(
         "span",
         { class: "cc-request__accept" },
         h("kbd", { "aria-hidden": "true" }, "⏎"),
-        external ? " Accept · open experiment" : " Accept · read the brief",
+        " ",
+        external ? copy.lab.accept.external : copy.lab.accept.page,
         external ? h("span", { "aria-hidden": "true" }, " ↗") : null,
       ),
+      tapCue(copy.lab.accept.tap),
     );
   });
 
   main.append(
-    h("div", { class: "cc-requests__head" }, backLink("/", "Command"), wrap),
-    intro
+    h("div", { class: "cc-requests__head" }, backLink(copy, "/", copy.sections.home), wrap),
+    header.intro
       ? h(
           "div",
           { class: "cc-say cc-requests__intro" },
-          h("span", { class: "cc-say__name", "aria-hidden": "true" }, "The Lab"),
-          h("p", {}, intro),
+          h("span", { class: "cc-say__name", "aria-hidden": "true" }, copy.lab.speaker),
+          h("p", part("page.intro", "lab"), header.intro),
         )
       : "",
     h(
       "ol",
-      { class: "cc-requests__board", "aria-label": "Experiments" },
+      { class: "cc-requests__board", "aria-label": copy.lab.board },
       cards.map((card) => h("li", {}, card)),
     ),
-    prompts([["↑↓", "Select"], ["⏎", "Accept"], ["Q/E", "Section"], ["Esc", "Back"]]),
+    prompts([
+      ["↑↓", copy.chrome.prompts.select],
+      ["⏎", copy.chrome.prompts.accept],
+      ["Q/E", copy.chrome.prompts.section],
+      ["Esc", copy.chrome.prompts.back],
+    ]),
   );
-  el.prepend(tabs(route.kind));
+  el.prepend(tabs(route.kind, copy));
 
   const menu = roving(cards, env.signal, (i) => (rememberedLab = i), Math.min(rememberedLab, cards.length - 1));
   return {
@@ -101,8 +116,12 @@ export function lab(route: Route, env: Env): Screen {
 /** A lab entry: the full request brief. Built from the lab data, so it
  * reads even for experiments that only live off-site. */
 export function labEntry(route: Route, env: Env): Screen {
-  const entries = env.content.lab;
-  const index = entries.findIndex((entry) => entry.slug === route.slug);
+  const { content } = env;
+  const copy = copyOf(content);
+  const { labels } = content.pages.lab.detail;
+  const entries = content.lab;
+  // Only an entry with its own page has a route here.
+  const index = entries.findIndex((entry) => entry.slug === route.slug && entry.hasPage);
   if (index < 0) return other(route, env);
   const entry = entries[index];
   const { el, main } = frame(route.kind, "cc-brief");
@@ -110,11 +129,16 @@ export function labEntry(route: Route, env: Env): Screen {
     h("span", { class: "cc-requests__curtain" }),
     h("span", { class: "cc-requests__star" }, concentricStar(["#8c8c8c", "#e5191c", "#0a0a0a", "#e5191c"])),
   );
-  const heading = h("h1", { class: "cc-brief__title", tabindex: "-1" }, ransom(entry.title, { boxes: 0.16, salt: 2 }));
-  const back = backLink("/lab", "Lab");
-  const prose = cleanProse(route.main.querySelector(".prose"));
+  const heading = h(
+    "h1",
+    { class: "cc-brief__title", tabindex: "-1", ...part("lab.title", entry.slug) },
+    ransom(entry.title, { boxes: 0.16, salt: 2 }),
+  );
+  const back = backLink(copy, "/lab", copy.sections.lab);
+  const notes = entry.html ? prose(entry.html) : null;
+  if (notes) markPart(notes, "lab.body", entry.slug);
   const links = [
-    ...(entry.href ? [{ label: "Open the experiment", url: entry.href }] : []),
+    ...(entry.href ? [{ label: copy.lab.experiment, url: entry.href }] : []),
     ...entry.links,
   ];
   main.append(
@@ -122,25 +146,30 @@ export function labEntry(route: Route, env: Env): Screen {
       "article",
       { class: "cc-brief__paper" },
       back,
-      h("p", { class: "cc-brief__no" }, `Request ${requestNo(index)}`, h("span", {}, "Open")),
+      h(
+        "p",
+        { class: "cc-brief__no" },
+        fill(copy.lab.brief, { number: requestNo(copy, index) }),
+        h("span", {}, copy.lab.status),
+      ),
       heading,
-      h("p", { class: "cc-brief__summary" }, entry.summary),
+      h("p", { class: "cc-brief__summary", ...part("lab.summary", entry.slug) }, entry.summary),
       h(
         "dl",
-        { class: "cc-brief__meta" },
-        h("div", {}, h("dt", {}, "Client"), h("dd", {}, entry.sourceEra)),
-        h("div", {}, h("dt", {}, "Type"), h("dd", {}, entry.type)),
+        { class: "cc-brief__meta", ...part("lab.meta", entry.slug) },
+        h("div", {}, h("dt", {}, copy.lab.client), h("dd", {}, entry.sourceEra)),
+        h("div", {}, h("dt", {}, labels.type), h("dd", {}, entry.type)),
       ),
       entry.cover ? h("img", { class: "cc-brief__cover", src: entry.cover, alt: "" }) : null,
-      prose.childElementCount ? prose : null,
+      notes?.childElementCount ? notes : null,
       links.length
         ? h(
             "ul",
-            { class: "cc-shop", "aria-label": "Links" },
+            { class: "cc-shop", "aria-label": copy.lab.links, ...part("lab.links", entry.slug) },
             links.map((link, i) =>
               h("li", { style: `--i:${i}` },
                 h("a", { class: "cc-shop__card", href: link.url, rel: "noreferrer", "data-primary": i === 0 ? "" : null },
-                  h("span", { class: "cc-shop__verb", "aria-hidden": "true" }, i === 0 ? "Accept" : "Get"),
+                  h("span", { class: "cc-shop__verb", "aria-hidden": "true" }, link.url === entry.href ? copy.lab.accept.verb : linkVerb(copy, link.url)),
                   h("span", { class: "cc-shop__label" }, link.label, h("span", { "aria-hidden": "true" }, " ↗")),
                 ),
               ),
@@ -148,8 +177,8 @@ export function labEntry(route: Route, env: Env): Screen {
           )
         : null,
     ),
-    prompts([["Q/E", "Section"], ["Esc", "Back"]]),
+    prompts([["Q/E", copy.chrome.prompts.section], ["Esc", copy.chrome.prompts.back]]),
   );
-  el.prepend(tabs(route.kind));
+  el.prepend(tabs(route.kind, copy));
   return { el, heading, back };
 }

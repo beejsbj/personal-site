@@ -7,6 +7,7 @@
  * Going to another section shuts the open book, puts it back on the pile,
  * takes the other one off and opens it. */
 import { navigate } from "astro:transitions/client";
+import { fill } from "../rich";
 import type { LensShell, Route, ShellContext } from "../types";
 import { Book, measure, sameShape, type Geometry } from "./book";
 import {
@@ -16,6 +17,7 @@ import {
   today,
   type Build,
   type Chapter,
+  type Copy,
   type Stop,
 } from "./chapters";
 import { h } from "./dom";
@@ -43,6 +45,7 @@ async function fontsReady() {
 
 class App {
   root: HTMLElement;
+  copy: Copy;
   desk: HTMLElement;
   book: Book;
   live: HTMLElement;
@@ -63,9 +66,10 @@ class App {
   constructor(private ctx: ShellContext) {
     this.root = ctx.root;
     this.route = ctx.route;
-    this.order = bookOrder(ctx.content);
+    this.copy = ctx.content.lenses["back-page"];
+    this.order = bookOrder(ctx.content, this.copy);
     this.desk = h("div", { class: "bp-desk" });
-    const skip = h("a", { class: "bp-skip", href: "#bp-main" }, "Skip to the page");
+    const skip = h("a", { class: "bp-skip", href: "#bp-main" }, this.copy.skip);
     skip.addEventListener("click", (event) => {
       event.preventDefault();
       this.focusPage();
@@ -78,22 +82,14 @@ class App {
       h("div", { class: "bp-pen bp-pen--red", "aria-hidden": "true" }),
     );
     this.root.replaceChildren(this.desk);
-    this.book = new Book(this.desk, ctx.reducedMotion);
+    this.book = new Book(this.desk, ctx.reducedMotion, this.copy.books.label);
     this.desk.append(this.live);
     mountMicro(ctx, this.book, this.desk);
     mountSoldiers(ctx, this.book, this.desk);
   }
 
   build(route: Route): Chapter {
-    const b: Build = {
-      route: { ...route, main: route.main.cloneNode(true) as HTMLElement },
-      content: this.ctx.content,
-      order: this.order,
-      spread: this.book.geo.spread,
-      stage: this.book.stage,
-      today: today(),
-    };
-    return chapter(b);
+    return chapter(this.buildFor(route));
   }
 
   views(ch: Chapter) {
@@ -138,7 +134,7 @@ class App {
     } else {
       const cover =
         this.route.kind === "home" && this.book.geo.spread
-          ? coverPage(this.buildCtx(), false)
+          ? coverPage(this.buildFor(this.route), false)
           : null;
       this.busy = true;
       this.queue = this.book.open(pages, cover).finally(() => {
@@ -148,14 +144,15 @@ class App {
     }
   }
 
-  buildCtx(): Build {
+  buildFor(route: Route): Build {
     return {
-      route: this.route,
+      route,
       content: this.ctx.content,
+      copy: this.copy,
       order: this.order,
       spread: this.book.geo.spread,
       stage: this.book.stage,
-      today: today(),
+      today: today(this.copy),
     };
   }
 
@@ -253,11 +250,11 @@ class App {
     this.showOnShelf(ch.book);
     try {
       const leaving = this.bookKey;
-      await this.book.close(coverPage(this.buildCtx(), false, leaving));
+      await this.book.close(coverPage(this.buildFor(this.route), false, leaving));
       await this.book.stow(spot(leaving));
       this.setBook(ch.book);
       this.book.setDepth(0);
-      const cover = coverPage(this.buildCtx(), false, ch.book);
+      const cover = coverPage(this.buildFor(this.route), false, ch.book);
       await this.book.open(this.pagesAt(ch, view), cover, spot(ch.book));
     } finally {
       this.busy = false;
@@ -284,15 +281,16 @@ class App {
 
   announce() {
     const ch = this.current();
+    const live = this.copy.live;
     if (this.sheet) {
-      this.live.textContent = `${ch.label}: a loose sheet, tucked into the book.`;
+      this.live.textContent = fill(live.loose, { label: ch.label });
       return;
     }
     const total = this.views(ch);
-    this.live.textContent =
-      total > 1
-        ? `${ch.label}, ${this.book.geo.spread ? "pages" : "page"} ${this.view + 1} of ${total}.`
-        : `${ch.label}.`;
+    this.live.textContent = fill(
+      total > 1 ? (this.book.geo.spread ? live.spread : live.single) : live.one,
+      { label: ch.label, n: this.view + 1, total },
+    );
   }
 
   // ---- turning one page ---------------------------------------------------------
@@ -301,7 +299,7 @@ class App {
     const rank = this.current().rank;
     if (step > 0) {
       const next = this.order.find((_, i) => i > rank);
-      return next ?? { key: "/", href: "/", label: "Back to the start", no: "", book: "home" };
+      return next ?? { key: "/", href: "/", label: this.copy.chapters.close, book: "home", page: 1 };
     }
     for (let i = this.order.length - 1; i >= 0; i--)
       if (i < rank) return this.order[i];
@@ -352,8 +350,10 @@ class App {
   /** The books lying on the desk: the open one's place is empty. */
   renderShelf() {
     const list = h("ul");
+    const words = this.copy.books;
     BOOKS.forEach((b, i) => {
       const open = b.key === this.bookKey;
+      const book = words[b.key];
       list.append(
         h(
           "li",
@@ -365,14 +365,15 @@ class App {
               class: "bp-shelf__book",
               "aria-current": open ? "true" : null,
               "data-state": open ? "open" : null,
+              "data-open": words.open,
             },
             h("span", { class: "bp-shelf__paper", "aria-hidden": "true" }),
             h(
               "span",
               { class: "bp-shelf__label" },
-              h("b", null, b.name),
-              h("small", null, b.aside),
-              open ? h("span", { class: "bp-sr" }, ", open on the desk") : null,
+              h("b", null, book.name),
+              h("small", null, book.aside),
+              open ? h("span", { class: "bp-sr" }, words.openOnDesk) : null,
             ),
           ),
         ),
@@ -384,14 +385,17 @@ class App {
   renderCorners() {
     const corners = this.book.corners;
     corners.replaceChildren();
+    const words = this.copy.turner;
     const make = (step: 1 | -1) => {
       const cls = `bp-corner bp-corner--${step > 0 ? "next" : "prev"}`;
       if (this.canTurn(step)) {
+        // the next page of this chapter: what a reader (or the parity test)
+        // clicks to read on
         const btn = h(
           "button",
-          { class: cls, type: "button" },
+          { class: cls, type: "button", "data-prism-turn": step > 0 ? "next" : null },
           h("span", { class: "bp-corner__ear", "aria-hidden": "true" }),
-          h("span", { class: "bp-corner__label" }, step > 0 ? "turn over →" : "← back"),
+          h("span", { class: "bp-corner__label" }, step > 0 ? `${words.next} →` : `← ${words.prev}`),
         );
         btn.addEventListener("click", () => this.turn(step));
         return btn;
@@ -413,7 +417,7 @@ class App {
     };
     const prev = make(-1);
     const next = make(1);
-    const nav = h("nav", { class: "bp-turner", "aria-label": "Turn the page" }, prev, next);
+    const nav = h("nav", { class: "bp-turner", "aria-label": words.label }, prev, next);
     corners.append(nav);
   }
 

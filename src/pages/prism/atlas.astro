@@ -1,0 +1,120 @@
+---
+/** The atlas: every route the content generates, in every lens, side by
+ * side, and a parts mode that lights one part up in all five at once. A
+ * tool page for Burooj; not indexed, not in the sitemap. */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { LENSES } from "../../prism/lenses";
+import { PARTS } from "../../prism/parts";
+---
+
+<BaseLayout title="Prism atlas" pageClass="page-atlas" tool>
+  <section class="atlas" data-atlas>
+    <header class="atlas__head">
+      <h1>Prism atlas</h1>
+      <p>
+        Every route, in every lens. Choose a part to see where each lens puts
+        it: outlined where it is, flagged where it's missing, greyed where the
+        lens leaves it out on purpose (src/prism/parity.ts, GAPS).
+      </p>
+      <form class="atlas__controls" data-controls>
+        <label>
+          Part
+          <select name="part">
+            <option value="">None (just look)</option>
+            {PARTS.map((name) => <option value={name}>{name}</option>)}
+          </select>
+        </label>
+        <label>
+          Ref
+          <input name="ref" placeholder="any (e.g. dayshaper)" />
+        </label>
+        <label>
+          Scale
+          <select name="scale">
+            <option value="0.2">Small</option>
+            <option value="0.3" selected>Medium</option>
+            <option value="0.45">Large</option>
+          </select>
+        </label>
+        <label>
+          Width
+          <select name="width">
+            <option value="1280" selected>Desktop (1280)</option>
+            <option value="390">Phone (390)</option>
+          </select>
+        </label>
+      </form>
+    </header>
+    <div
+      class="atlas__grid"
+      data-grid
+      data-lenses={JSON.stringify(LENSES.map((lens) => [lens.id, lens.name]))}
+    >
+    </div>
+  </section>
+</BaseLayout>
+<script>
+  import "../../prism/atlas";
+</script>
+<style>
+  .atlas {
+    padding: var(--space-l);
+  }
+  .atlas__head {
+    display: grid;
+    gap: var(--space-s);
+    max-width: var(--reading-width);
+    margin-bottom: var(--space-l);
+  }
+  .atlas__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    font-size: var(--text-sm);
+  }
+  .atlas__controls label {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+  .atlas :global(.atlas__grid) {
+    display: grid;
+    gap: var(--space-s);
+    overflow-x: auto;
+  }
+  .atlas :global(.atlas__row) {
+    display: grid;
+    grid-template-columns: var(--space-4xl) repeat(5, max-content);
+    gap: var(--space-s);
+    align-items: start;
+  }
+  .atlas :global(.atlas__label),
+  .atlas :global(.atlas__cell figcaption) {
+    font-size: var(--text-xs);
+    color: var(--color-text-soft);
+    overflow-wrap: anywhere;
+  }
+  .atlas :global(.atlas__frame) {
+    position: relative;
+    overflow: hidden;
+    border: var(--rule-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+  .atlas :global(.atlas__frame iframe) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 0;
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+  .atlas :global(.atlas__cell[data-state="found"] .atlas__frame) {
+    border-color: var(--color-accent);
+  }
+  .atlas :global(.atlas__cell[data-state="missing"] figcaption) {
+    color: var(--color-accent);
+    font-weight: var(--weight-bold);
+  }
+  .atlas :global(.atlas__cell[data-state="gap"]) {
+    opacity: var(--disabled-opacity);
+  }
+</style>

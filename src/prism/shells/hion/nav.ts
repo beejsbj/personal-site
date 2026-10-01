@@ -1,26 +1,27 @@
 /** The line everything hangs from.
  *
- * A cord strung across the top of the page, sagging a little, with the
- * site's destinations hanging from it on threads, each tied off with a knot.
- * The place you are hangs lowest, and the page's main cord begins at its
- * knot. Read down the page and the cord stays behind at the top; a pull
- * cord with a tassel hangs at the corner instead. Pull it and the line
- * drops back down to you.
+ * The two hions slung across the top of the page, each sagging its own
+ * way, with the site's destinations hanging between them on threads, each
+ * tied off with a knot. The place you are hangs lowest, and the page's
+ * threads come down from its knot. Read down the page and the line stays
+ * behind at the top; a pendant hangs at the corner instead (the two hions
+ * falling from a knot and parting in two curls). Pull it and the line drops
+ * back down to you.
  *
- * On a phone the line holds only your name and the tassel; pulling it lets
+ * On a phone the line holds only your name and the pendant; pulling it lets
  * the destinations fall in a cascade, each on a longer thread than the
  * last, like a wind chime. */
 import type { SiteContent } from "../types";
-import { h } from "./dom";
+import { h, newTab } from "./dom";
 import { ink } from "./ink";
-import { Kind, Path, paint, paintGlows, patterns, braid, type Pt } from "./pastel";
+import { Kind, Path, paint, paintGlows, patterns, thread, type Pt } from "./pastel";
 
 export interface Nav {
   el: HTMLElement;
-  /** Where the page's cord begins (the current knot), in page coordinates
+  /** Where the page's threads begin (the current knot), in page coordinates
    * with the line at rest. */
   origin(): Pt | null;
-  /** The cord's height at page x, at rest. */
+  /** The line's height at page x, at rest. */
   cordY(x: number): number;
   setCurrent(path: string): void;
   close(): void;
@@ -33,6 +34,7 @@ export function createNav(
   signal: AbortSignal,
   face: boolean,
 ): Nav {
+  const copy = content.lenses.hion.nav;
   const cord = h("canvas", { class: "hion-nav__cord", "aria-hidden": "true" });
   const home = h(
     "a",
@@ -64,9 +66,7 @@ export function createNav(
             ...(item.external ? { target: "_blank", rel: "noreferrer" } : {}),
           },
           h("span", { class: "hion-charm__label" }, item.label),
-          item.external
-            ? h("span", { class: "hion-sr" }, " (opens in a new tab)")
-            : null,
+          item.external ? newTab() : null,
         ),
       ),
     );
@@ -81,11 +81,11 @@ export function createNav(
       "data-ink": "tassel",
       "data-seed": "41",
     },
-    h("span", { class: "hion-pull__label" }, "Menu"),
+    h("span", { class: "hion-pull__label" }, copy.menu),
   );
   const nav = h(
     "nav",
-    { class: "hion-nav", "aria-label": "Site" },
+    { class: "hion-nav", "aria-label": copy.label },
     cord,
     home,
     list,
@@ -101,7 +101,7 @@ export function createNav(
     return cordTop() + sagOf() * 4 * u * (1 - u);
   };
 
-  /** Hang every charm at its length below the sagging cord. */
+  /** Hang every charm at its length below the sagging line. */
   function hangCharms() {
     width = nav.clientWidth;
     const dropped = el.dataset.state === "dropped";
@@ -118,7 +118,7 @@ export function createNav(
         hang = (isCurrent ? 58 : 20) + ((i * 7) % 3) * 6;
       }
       charm.style.setProperty("--hion-hang", `${hang}px`);
-      // Positioned from the top of the line, so the thread meets the cord.
+      // Positioned from the top of the line, so the thread meets the line.
       const box = charm.getBoundingClientRect();
       const navBox = nav.getBoundingClientRect();
       const x = box.left - navBox.left + box.width / 2;
@@ -131,7 +131,7 @@ export function createNav(
   function drawCord() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
     const w = nav.clientWidth;
-    const hgt = cordTop() + sagOf() + 30;
+    const hgt = cordTop() + sagOf() + 40;
     cord.width = Math.ceil(w * dpr);
     cord.height = Math.ceil(hgt * dpr);
     cord.style.width = `${w}px`;
@@ -139,9 +139,18 @@ export function createNav(
     const ctx = cord.getContext("2d")!;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, hgt);
-    const pts: Pt[] = [];
-    for (let x = -10; x <= w + 10; x += 12) pts.push([x, cordY(x)]);
-    const marks = braid(new Path(pts, 3), { w: narrow() ? 6 : 7, seed: 5 });
+    // Two hions slung across the top, each sagging its own way, crossing
+    // where they please; the destinations hang from between them.
+    const marks = (["c", "m"] as const).flatMap((hue, i) => {
+      const pts: Pt[] = [];
+      for (let x = -10; x <= w + 10; x += 10) {
+        const sway = i
+          ? Math.sin(x / 230 + 2.1) * 6 + Math.sin(x / 71) * 1.5
+          : Math.sin(x / 140 + 0.3) * 4.5 + Math.sin(x / 47 + 1) * 1.2;
+        pts.push([x, cordY(x) + sway]);
+      }
+      return thread(new Path(pts, 3), { hue, w: i ? 3.4 : 2.8, seed: 5 + i * 9, glow: 0.24 });
+    });
     const pats = patterns(ctx, dpr);
     paintGlows(ctx, marks, w, hgt, 0.7);
     for (const m of marks) if (m.kind !== Kind.Glow) paint(ctx, m, pats);

@@ -1,6 +1,9 @@
 /** Small DOM helpers for the Calling Card shell: element building, the
  * ransom-note lettering every Persona 5 title is cut from, and the stars. */
 
+import { rich } from "../rich";
+import { type Cut, kern } from "./kern";
+
 type Attrs = Record<string, string | number | boolean | undefined | null>;
 type Child = Node | string | null | undefined | false;
 
@@ -73,6 +76,7 @@ export function ransom(text: string, options: RansomOptions = {}) {
   wrap.append(h("span", { class: "cc-sr" }, text));
   const ink = h("span", { class: "cc-ransom__ink", "aria-hidden": "true" });
   const words = text.split(/(\s+)/);
+  const cuts: Cut[][] = [];
   let index = 0;
   for (const word of words) {
     if (!word) continue;
@@ -81,34 +85,38 @@ export function ransom(text: string, options: RansomOptions = {}) {
       continue;
     }
     const w = h("span", { class: "cc-w" });
+    const wordCuts: Cut[] = [];
+    cuts.push(wordCuts);
     for (const char of word) {
       const first = index === 0;
       const r = random();
       const font = first ? 1 : r < 0.5 ? 0 : r < 0.82 ? 1 : 2;
       const lower =
         mixCase && !first && font > 0 && /[a-z]/i.test(char) && random() < 0.35;
+      const boxed = !first && /[a-z0-9]/i.test(char) && random() < boxes;
+      const rot = +((random() * 2 - 1) * tilt).toFixed(1);
+      const s = first ? 1.28 : +(0.84 + random() * 0.3).toFixed(2);
+      const y = +((random() * 2 - 1) * 0.06).toFixed(3);
+      const shown = lower ? char.toLowerCase() : char.toUpperCase();
       const letter = h(
         "span",
         {
           class: "cc-l",
           "data-f": font,
-          "data-box":
-            !first && /[a-z0-9]/i.test(char) && random() < boxes ? "1" : null,
-          style: [
-            `--n:${index}`,
-            `--r:${((random() * 2 - 1) * tilt).toFixed(1)}deg`,
-            `--s:${first ? 1.28 : (0.84 + random() * 0.3).toFixed(2)}`,
-            `--y:${((random() * 2 - 1) * 0.06).toFixed(3)}em`,
-          ].join(";"),
+          "data-box": boxed ? "1" : null,
+          style: [`--n:${index}`, `--r:${rot}deg`, `--s:${s}`, `--y:${y}em`].join(";"),
         },
-        lower ? char.toLowerCase() : char.toUpperCase(),
+        shown,
       );
+      wordCuts.push({ el: letter, char: shown, font, scale: s, y, r: rot, boxed });
       w.append(letter);
       index++;
     }
     ink.append(w);
   }
   wrap.append(ink);
+  // Close the holes a wide capital leaves before a small italic ("W riting").
+  kern(cuts);
   return wrap;
 }
 
@@ -145,18 +153,9 @@ export function parseDay(iso: string) {
   return new Date(Date.UTC(y, (m || 1) - 1, d || 1));
 }
 
-export const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-
-/** Pull the body element with the Daylight classes out of a route's main. */
-export function pick(main: HTMLElement, selector: string) {
-  return main.querySelector<HTMLElement>(selector);
-}
-
-/** Clone a prose article, dropping Astro's scoping so it only wears ours. */
-export function cleanProse(node: Element | null) {
+/** A rendered markdown body (content.json `html`) as a prose block. */
+export function prose(html: string) {
   const article = h("div", { class: "cc-prose" });
-  if (!node) return article;
-  for (const child of Array.from(node.childNodes))
-    article.append(child.cloneNode(true));
+  article.append(rich(html));
   return article;
 }

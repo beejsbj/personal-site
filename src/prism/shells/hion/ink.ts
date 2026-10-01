@@ -11,11 +11,12 @@
  *   pair   two threads to its top corners, wound round them (pictures)
  *   sign   two threads to the ends of its words (hung headings)
  *   pull   a pull-cord: a thread down to a knot beside its label
- *   tassel a tassel hanging from the top of the element
+ *   tassel the two hions falling from a knot and parting in two curls
  *
  * The hang length is `--hion-hang` on the element (px). */
+import { pendant } from "./dance";
 import { textExtent } from "./dom";
-import { Kind, type Mark, Path, knot, paint, paintGlows, patterns, rng, tassel, thread, wraps, type Hue } from "./pastel";
+import { Kind, type Mark, Path, knot, paint, paintGlows, patterns, rng, thread, wraps, type Hue } from "./pastel";
 
 const PAD = 26;
 
@@ -77,7 +78,7 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
     const side = parseFloat(getComputedStyle(el).getPropertyValue("--hion-tassel-x"));
     const x = PAD + (Number.isNaN(side) ? w / 2 : 12 + side * (w - 24));
     if (drop > 2) out.push(...line(x, top, x, at, seed));
-    out.push(...tassel(x, at, Math.min(80, h * 0.9), seed + 2, { spread: 14 }));
+    out.push(...pendant(x, at, Math.min(70, h * 0.85), seed + 2));
   }
   return out;
 }

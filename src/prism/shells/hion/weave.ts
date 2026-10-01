@@ -4,25 +4,26 @@
  * composes the marks the loom lays down, and tells every hung thing how
  * long its thread must be to reach what it hangs from.
  *
- * - `[data-spine]` are stations on the main cord, in document order:
- *   `loop` (a section: the cord opens, its two strands part to run down
- *   either side of it, and twist back together beneath), `knot` (the cord
- *   ties a knot here), `via` (the cord passes through) and `end` (the cord
- *   frays into a tassel). The cord starts at the knot of the destination
- *   you are on, in the line at the top.
+ * - `[data-spine]` are stations on the hions' way down, in document order:
+ *   `loop` (a section: the two part to run down either side of it, and
+ *   meet again beneath, one tying a loose loop round the other), `via` (they
+ *   pass through here) and `end` (they let go of each other in two curls).
+ *   They set out from the knot of the destination you are on, in the line
+ *   at the top. Between stations they dance (dance.ts).
+ * - `[data-orbit="c|m"]` is something that hion circles on its way past.
  * - `[data-weft]` headings are strung on a weft: a thread through the waist
- *   of their first line, woven over one strand of the loop and under the
+ *   of their first line, woven over one side of the loop and under the
  *   other.
  * - `[data-cord]` holds `[data-hang]` things. Each row of them hangs from a
- *   cord across its top: `branch` cords are tied to the main cord and run
+ *   cord across its top: `branch` cords are tied to the nearest hion and run
  *   out to one side (the heads of screens hang from these), `heading` rows
  *   hang from the weft of the heading just before them, and the rest get a
  *   cord of their own (woven into the loop when inside one). Things with
  *   `data-hang-from="prev"` hang from the thing above them instead.
  *   Spacing is layout (`--hion-drop`); the thread length (`--hion-hang`) is
  *   measured here, so every thread reaches its cord exactly. */
+import { curl, dancer, journeyKeys, orbit, TEMPER } from "./dance";
 import {
-  braid,
   cubic,
   hang,
   type Hue,
@@ -33,7 +34,6 @@ import {
   Path,
   type Pt,
   rng,
-  tassel,
   thread,
 } from "./pastel";
 import type { Composition } from "./loom";
@@ -101,7 +101,6 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
   };
   const marks: Mark[] = [];
   let seed = 1;
-  const cordW = narrow ? 11 : 13;
 
   /* ---- Stations along the main cord ---- */
   const stations = [...host.querySelectorAll<HTMLElement>("[data-spine]")].filter(visible);
@@ -135,7 +134,7 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
       route.push(run);
       run = [loop.exit];
     } else if (kind === "end") {
-      const p: Pt = [(b.l + b.r) / 2, b.t + (b.b - b.t) * 0.35];
+      const p: Pt = [(b.l + b.r) / 2, b.t + (b.b - b.t) * 0.2];
       if (!run.length) run.push([p[0], p[1] - 120]);
       run.push(p);
       endAt = p;
@@ -151,36 +150,90 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
   }
   if (run.length > 1) route.push(run);
 
-  // The braided runs; and one path along the whole cord (down the left
-  // strand of each loop) for the bead to ride, and for branches to tie to.
-  const spinePoints: Pt[] = [];
+  // The two hions dance down each run between stations, part to go round
+  // each loop (cyan down its left, magenta down its right), and come back
+  // together beneath it. Each hue's whole journey is one continuous thread.
   const loopList = [...loops.values()];
-  const braids: Path[] = [];
+  const journey: Record<Hue, Pt[]> = { c: [], m: [] };
+  const detours: Record<Hue, { from: number; to: number }[]> = { c: [], m: [] };
+  const runs: { top: number; bottom: number }[] = [];
+  const orbiting = [...host.querySelectorAll<HTMLElement>("[data-orbit]")].filter(
+    (el) => visible(el) && !(narrow && el.hasAttribute("data-orbit-wide")),
+  );
   route.forEach((points, i) => {
-    const pts = hang(points, 0.55);
-    const path = new Path(pts, 3);
-    if (path.length > 6) {
-      marks.push(...braid(path, { w: cordW, seed: seed++ }));
-      braids.push(path);
+    const centre = new Path(hang(points, 0.55), 3);
+    if (centre.length < 6) return;
+    runs.push({ top: Math.min(...centre.ys), bottom: Math.max(...centre.ys) });
+    // Under the head of a screen there's less room to dance.
+    const room = (narrow ? 0.42 : 1) * (i === 0 && start ? 0.6 : 1);
+    for (const hue of ["c", "m"] as Hue[]) {
+      let pts = dancer(centre, hue, { scale: room, seed: i * 13 + seed });
+      for (const el of orbiting) {
+        if (el.dataset.orbit !== hue) continue;
+        const b = box(el);
+        const cy = (b.t + b.b) / 2;
+        if (cy < centre.ys[0] || cy > centre.ys[centre.ys.length - 1]) continue;
+        const pad = (el.dataset.orbitPad ?? "34,30").split(",").map(Number) as [number, number];
+        const found = orbit(pts, b, hue === "c" ? -1 : 1, seed++, pad);
+        if (!found) continue;
+        detours[hue].push({ from: journey[hue].length + found.from, to: journey[hue].length + found.to });
+        pts = found.points;
+      }
+      journey[hue].push(...pts);
+      const loop = loopList[i];
+      if (loop) {
+        // Where they meet, one ties a loose loop round the other before
+        // they part: cyan going in, magenta coming out.
+        if (hue === "c") journey.c.push(...looseLoop(loop.entry, -1, narrow ? 11 : 15, seed + 1));
+        journey[hue].push(...strandPoints(loop, hue, seed));
+        if (hue === "m") journey.m.push(...looseLoop(loop.exit, 1, narrow ? 12 : 17, seed + 2));
+      }
     }
-    spinePoints.push(...pts);
-    const loop = loopList[i];
-    if (loop) spinePoints.push([loop.l, loop.t + loop.flare], [loop.l, loop.b - loop.flare]);
   });
   for (const loop of loopList) {
-    marks.push(...loopStrands(loop, seed));
+    marks.push(...looseFibres(loop, seed));
     seed += 10;
   }
-  if (endAt) marks.push(...tassel(endAt[0], endAt[1], narrow ? 74 : 100, seed++, { spread: 26 }));
-  const spine = spinePoints.length > 1 ? new Path(spinePoints, 4) : null;
-  /** Where the braided cord is at height y, if it runs there. */
-  const cordAt = (y: number) => {
-    for (const path of braids) {
-      const top = path.ys[0];
-      const bottom = path.ys[path.ys.length - 1];
-      if (y >= top && y <= bottom) return path.xAt(y);
+  // At the end they let go of each other: each curls away on its own.
+  if (endAt) {
+    journey.c.push(...curl(endAt[0], endAt[1], -1, narrow ? 90 : 130, seed++));
+    journey.m.push(...curl(endAt[0], endAt[1], 1, narrow ? 110 : 160, seed++, 1.7));
+  }
+  const tips: Composition["tips"] = [];
+  const orbits: Composition["orbits"] = [];
+  for (const hue of ["c", "m"] as Hue[]) {
+    const pts = journey[hue];
+    if (pts.length < 2) continue;
+    const keys = journeyKeys(pts, detours[hue]);
+    for (const { from, to } of detours[hue]) {
+      orbits.push({ hue, points: pts.slice(from, to), key: keys.keys[to - 1] });
     }
-    return null;
+    marks.push(
+      ...thread(new Path(pts, 3), {
+        hue,
+        w: TEMPER[hue].weight * (narrow ? 0.85 : 1),
+        seed: seed++,
+        key: (s) => keys.keyAt(s),
+        glow: 0.22,
+      }),
+    );
+    tips.push({ hue, points: pts, keys: keys.keys });
+  }
+  /** Where a hion crosses height y nearest to x (for things to tie on). */
+  const threadAt = (y: number, x: number) => {
+    if (!runs.some((run) => y >= run.top && y <= run.bottom)) return null;
+    let best: number | null = null;
+    for (const hue of ["c", "m"] as Hue[]) {
+      const pts = journey[hue];
+      for (let i = 1; i < pts.length; i++) {
+        const [ax, ay] = pts[i - 1];
+        const [bx, by] = pts[i];
+        if ((ay - y) * (by - y) > 0 || ay === by) continue;
+        const cx = ax + ((y - ay) / (by - ay)) * (bx - ax);
+        if (best === null || Math.abs(cx - x) < Math.abs(best - x)) best = cx;
+      }
+    }
+    return best;
   };
 
   const loopOf = (el: Element) => {
@@ -249,7 +302,7 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
       const spanR = Math.max(...rights);
       const hue: Hue = wi++ % 2 ? "c" : "m";
       if (kind === "branch") {
-        const x = cordAt(y);
+        const x = threadAt(y, (spanL + spanR) / 2);
         if (x !== null) {
           if (spanR < x || spanL > x) {
             // Out to one side of the main cord.
@@ -300,51 +353,59 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
     );
   }
 
-  return { marks, spine, end: endAt ? endAt[1] : null };
+  return { marks, tips, orbits, end: endAt ? endAt[1] + 120 : null };
 }
 
-/** The two strands of the cord, parted around a section. */
-function loopStrands(loop: Loop, seed: number): Mark[] {
-  const out: Mark[] = [];
+/** The way one hion goes round a loop: from where they meet at its top,
+ * out to its side, down, and back in to meet beneath it. */
+function strandPoints(loop: Loop, hue: Hue, seed: number): Pt[] {
   const { l, t, r, b, entry, exit, flare } = loop;
-  const sides: [number, Hue, number][] = [
-    [l, "c", -1],
-    [r, "m", 1],
+  const x = hue === "c" ? l : r;
+  const pts: Pt[] = [
+    ...cubic(entry, [entry[0], t + flare * 0.55], [x, t + flare * 0.3], [x, t + flare], 28),
   ];
-  for (const [x, hue, dir] of sides) {
-    const pts: Pt[] = [
-      ...cubic(entry, [entry[0], t + flare * 0.55], [x, t + flare * 0.3], [x, t + flare], 28),
-    ];
-    // Down the side, with the slow drift of a hand-drawn line.
-    const rand = rng(seed + (dir > 0 ? 3 : 7));
-    const span = b - t - flare * 2;
-    const steps = Math.max(2, Math.round(span / 70));
-    const phase = rand() * 6;
-    for (let i = 1; i < steps; i++) {
-      const y = t + flare + (span * i) / steps;
-      pts.push([x + Math.sin(i * 0.9 + phase) * 2.4, y]);
-    }
-    pts.push(...cubic([x, b - flare], [x, b - flare * 0.3], [exit[0], b - flare * 0.55], exit, 28));
-    const path = new Path(pts, 3);
-    out.push(...thread(path, { hue, w: 3.8, seed: seed * 7 + (dir > 0 ? 1 : 2), glow: 0.16 }));
-    // A second, finer fibre beside it: the strand loosened by being parted.
+  // Down the side, with the slow drift of a hand-drawn line.
+  const rand = rng(seed + (hue === "m" ? 3 : 7));
+  const span = b - t - flare * 2;
+  const steps = Math.max(2, Math.round(span / 70));
+  const phase = rand() * 6;
+  for (let i = 1; i < steps; i++) {
+    pts.push([x + Math.sin(i * 0.9 + phase) * 2.4, t + flare + (span * i) / steps]);
+  }
+  pts.push(...cubic([x, b - flare], [x, b - flare * 0.3], [exit[0], b - flare * 0.55], exit, 28));
+  return pts;
+}
+
+/** A single loose loop hung from a point, coming back through it. */
+function looseLoop(p: Pt, dir: 1 | -1, r: number, seed: number): Pt[] {
+  const rand = rng(seed);
+  const c: Pt = [p[0] + dir * r * 0.75, p[1] + r * 0.7];
+  const start = Math.atan2(p[1] - c[1], p[0] - c[0]);
+  const out: Pt[] = [];
+  const steps = 36;
+  for (let k = 0; k <= steps; k++) {
+    const a = start - dir * (k / steps) * Math.PI * 2.05;
+    const rr = r * (1 + Math.sin((k / steps) * Math.PI) * 0.12 + (rand() - 0.5) * 0.04);
+    out.push([c[0] + Math.cos(a) * rr * 1.15, c[1] + Math.sin(a) * rr]);
+  }
+  return out;
+}
+
+/** A finer fibre beside each side of a loop: the hion loosened where it
+ * holds a section open. */
+function looseFibres(loop: Loop, seed: number): Mark[] {
+  const out: Mark[] = [];
+  for (const hue of ["c", "m"] as Hue[]) {
+    const dir = hue === "c" ? -1 : 1;
+    const pts = strandPoints(loop, hue, seed);
     const loose = new Path(
-      pts.map(([px, py], i) => [px - dir * (3.2 + Math.sin(i * 0.3) * 1.6), py] as Pt),
+      pts.slice(20, -20).map(([px, py], i) => [px - dir * (3.2 + Math.sin(i * 0.3) * 1.6), py] as Pt),
       3,
     );
     out.push(
-      ...thread(loose, {
-        hue,
-        w: 1.6,
-        alpha: 0.7,
-        seed: seed * 7 + (dir > 0 ? 3 : 4),
-        glow: 0,
-        core: false,
-      }),
+      ...thread(loose, { hue, w: 1.5, alpha: 0.65, seed: seed * 7 + (dir > 0 ? 3 : 4), glow: 0, core: false }),
     );
   }
-  out.push(...knot(entry[0], entry[1], 9, seed + 1));
-  out.push(...knot(exit[0], exit[1], 9, seed + 2));
   return out;
 }
 

@@ -258,8 +258,14 @@
   position: relative;
   margin: 0;
 }
-:root[data-lens="calling-card"] .cc-card__star {
+:root[data-lens="calling-card"] .cc-card__starframe {
   position: absolute !important;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+:root[data-lens="calling-card"] .cc-card__star {
+  position: absolute;
   right: -3rem;
   bottom: -3rem;
   width: 14rem;
@@ -374,6 +380,11 @@
 }
 :root[data-lens="calling-card"] .cc-card .cc-panel__close {
   justify-self: start;
+  /* On short screens the card scrolls; Back stays in reach. */
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  box-shadow: 4px 4px 0 var(--cc-black);
 }
 
 @media (max-width: 760px), (max-aspect-ratio: 5/6) {
@@ -386,6 +397,8 @@
     transform: rotate(1deg);
   }
   :root[data-lens="calling-card"] .cc-card__paper {
+    width: min(36rem, calc(100vw - 2.6rem));
+    max-height: calc(100dvh - 2.4rem);
     padding: 1.4rem 1.2rem 1.2rem;
     transform: rotate(-2deg);
   }

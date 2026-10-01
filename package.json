@@ -11,6 +11,7 @@
     "check": "astro check",
     "test:homepage": "node --test scripts/tests/homepage-base.test.mjs",
     "test": "node --test scripts/tests/*.test.mjs",
+    "test:prism": "node --test scripts/tests/prism-parity.browser.mjs",
     "format": "prettier --write src astro.config.mjs tsconfig.json scripts/tests"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.8",
+    "playwright-core": "1.63.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^1.0.0",
     "typescript": "^5.9.3"

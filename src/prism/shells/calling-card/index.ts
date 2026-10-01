@@ -8,7 +8,7 @@
 import "./shell.css";
 import type { LensShell, Route, ShellContext } from "../types";
 import type { Env, Screen, ScreenFactory } from "./chrome";
-import { isTyping } from "./chrome";
+import { copyOf, isTyping } from "./chrome";
 import { h } from "./dom";
 import { home, rememberCommand } from "./home";
 import { cardPanel, phonePanel, type Panel } from "./panels";
@@ -29,17 +29,6 @@ const FACTORIES: Record<Route["kind"], ScreenFactory> = {
   about,
   resume,
   other,
-};
-
-const TITLES: Record<Route["kind"], string> = {
-  home: "Command",
-  projects: "Projects",
-  project: "Projects",
-  lab: "Lab",
-  "lab-entry": "Request",
-  about: "About",
-  resume: "Status",
-  other: "Mementos",
 };
 
 let ctx: ShellContext | undefined;
@@ -78,6 +67,7 @@ function openPanel(kind: "phone" | "card", opener?: HTMLElement) {
   panelHost.replaceChildren(built.el);
   stage.inert = true;
   built.el.dataset.state = "open";
+  built.opened?.();
   shake(stage, 0.8);
   built.el.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
@@ -156,7 +146,8 @@ async function go(route: Route) {
   // The runtime also calls update() for the page it just mounted.
   if (route.path === currentPath && !pendingTitle) return;
   closePanel(false);
-  const title = pendingTitle ?? TITLES[route.kind];
+  // The wipe's title card: the link's own name, else the screen's.
+  const title = pendingTitle ?? copyOf(ctx.content).sections[route.kind];
   pendingTitle = undefined;
   if (ctx.face) {
     build(route);
@@ -195,7 +186,7 @@ const shell: LensShell = {
     if (!context.face) wireClicks(root, signal);
     stage = h("div", { class: "cc-stage" });
     panelHost = h("div", { class: "cc-panels" });
-    const skip = h("a", { class: "cc-skip", href: "#cc-main" }, "Skip to content");
+    const skip = h("a", { class: "cc-skip", href: "#cc-main" }, context.content.site.skipLink);
     skip.addEventListener(
       "click",
       (event) => {
@@ -208,6 +199,15 @@ const shell: LensShell = {
     wipe = createWipe(root, context.reducedMotion);
     build(context.route);
     root.addEventListener("click", onClick, { signal });
+    // Which hand is on the controller: touch screens get the tap-again cue.
+    root.dataset.input = matchMedia("(hover: none)").matches ? "touch" : "mouse";
+    root.addEventListener(
+      "pointerdown",
+      (event) => {
+        root.dataset.input = event.pointerType === "mouse" ? "mouse" : "touch";
+      },
+      { signal, capture: true },
+    );
     document.addEventListener("keydown", onKey, { signal });
     context.onIdleChange(onIdle);
   },
@@ -219,7 +219,10 @@ const shell: LensShell = {
     screenController?.abort();
     screen?.destroy?.();
     ctx?.root.classList.remove("cc-root");
-    if (ctx) delete ctx.root.dataset.face;
+    if (ctx) {
+      delete ctx.root.dataset.face;
+      delete ctx.root.dataset.input;
+    }
     ctx = undefined;
     env = undefined;
     screen = undefined;

@@ -2,8 +2,10 @@
  * projects a sequencer arrangement, a project its album sleeve and liner
  * notes, the lab a drawer of presets, about a torn jazz poster, the resume
  * the credits, and anything else a sheet of music clipped to the stand. */
-import type { Route, SiteContent } from "../types";
-import { h, link, markup, seeded, take, text, type Child } from "./dom";
+import { part } from "../../parts";
+import { blocks, fallbackBody, featured, fill, inline, rich, type LinkMaker } from "../rich";
+import type { ResumeEntry, Route, SiteContent } from "../types";
+import { h, link, markup, seeded, type Child } from "./dom";
 import { noteAt, NOTES, noteVar, yearPosition } from "./notes";
 
 export interface Screen {
@@ -18,11 +20,7 @@ export interface ScreenOptions {
 
 const EASE_SWING = "cubic-bezier(0.7, -0.2, 0.3, 1.2)";
 
-/** Things worth remembering between routes (home's "currently" note). */
-export interface Memory {
-  current?: Element;
-}
-
+type Copy = SiteContent["lenses"]["cut-paper"];
 type Project = SiteContent["projects"][number];
 type LabItem = SiteContent["lab"][number];
 
@@ -69,9 +67,23 @@ function adopt(fragment: DocumentFragment | Element) {
   return fragment;
 }
 
-function prose(from: Element | null | undefined, extra = "") {
-  if (!from) return null;
-  return h("div", { class: `cp-prose ${extra}`.trim() }, adopt(take(from)));
+/** Links inside content copy, made the shell's way. */
+const makeLink: LinkMaker = (href, children) => link(href, {}, ...children);
+
+/** A link carrying the drawn arrow the sheet's notes use (the arrow of
+ * Daylight's links: out for other sites, along for this one). */
+function arrowed(href: string, label: string) {
+  const out = /^(https?:|mailto:)/.test(href);
+  const a = h("a", { href }, h("span", null, label, " ", markup(
+    `<svg class="cp-arrow" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="${out ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5"}"/></svg>`,
+  )));
+  return a;
+}
+
+/** A rendered markdown body as liner-note prose. */
+function prose(html: string, extra = "", attrs: Record<string, string | undefined> = {}) {
+  if (!html.trim()) return null;
+  return h("div", { class: `cp-prose ${extra}`.trim(), ...attrs }, adopt(rich(html)));
 }
 
 /** A little piano roll, seeded by name, drawn in the current note colour. */
@@ -91,23 +103,29 @@ function roll(seed: string, steps = 32) {
   );
 }
 
-function credits(rows: [string, string | undefined][]) {
+type Row = [string, string | undefined, Record<string, string | undefined>?];
+
+function credits(rows: Row[]) {
   return h(
     "dl",
     { class: "cp-credits" },
     rows
       .filter(([, value]) => value)
-      .map(([term, value]) =>
-        h("div", { class: "cp-credits__row" }, h("dt", null, term), h("dd", null, value ?? "")),
+      .map(([term, value, attrs]) =>
+        h("div", { class: "cp-credits__row" }, h("dt", null, term), h("dd", attrs ?? null, value ?? "")),
       ),
   );
 }
 
-const buttons = (items: { label: string; url: string }[], extra = "") =>
+const buttons = (
+  items: { label: string; url: string }[],
+  extra = "",
+  attrs: Record<string, string | undefined> = {},
+) =>
   items.length
     ? h(
         "ul",
-        { class: `cp-buttons ${extra}`.trim() },
+        { class: `cp-buttons ${extra}`.trim(), ...attrs },
         items.map((item, index) =>
           h("li", null, link(item.url, { class: index === 0 ? "cp-btn cp-btn--lit" : "cp-btn" }, item.label)),
         ),
@@ -116,24 +134,22 @@ const buttons = (items: { label: string; url: string }[], extra = "") =>
 
 /* ── home: the play screen ───────────────────────────────── */
 
-function home(route: Route, content: SiteContent, memory: Memory, options: ScreenOptions): Screen {
-  const { main } = route;
+function home(content: SiteContent, copy: Copy, options: ScreenOptions): Screen {
   const page = content.pages.home;
-  const greeting = text(main.querySelector(".greeting")) || "Hey there!";
-  const title = text(main.querySelector("h1")) || page.headline || "Burooj here!";
-  const role = text(main.querySelector(".occupation")) || page.eyebrow || "Frontend developer";
-  const intro = text(main.querySelector(".welcome")) || page.intro || "";
-  const portrait = main.querySelector<HTMLImageElement>(".hello img");
-  const current = main.querySelector(".current-copy");
-  if (current) memory.current = current.cloneNode(true) as Element;
+  const { hero } = page;
+  const words = copy.home;
 
-  const h1 = heading(title, "cp-home__title");
+  const h1 = heading(hero.headline, "cp-home__title");
+  Object.assign(h1.dataset, { part: "page.title", ref: "home" });
+  // every social link, then the hero's own links that aren't one of them
   const socials = [
     ...content.site.social.map((item) => ({ label: item.label, url: item.href })),
-    { label: "Resume", url: "/resume" },
+    ...hero.links
+      .filter((item) => !content.site.social.some((social) => social.href === item.href))
+      .map((item) => ({ label: item.label, url: item.href })),
   ];
 
-  const hero = h(
+  const hero_ = h(
     "section",
     { class: "cp-home__hero", "aria-labelledby": "cp-home-title" },
     scrap("tomato", "torn", "cp-home__scrap-a"),
@@ -141,36 +157,35 @@ function home(route: Route, content: SiteContent, memory: Memory, options: Scree
     scrap("mustard", "tri", "cp-home__scrap-c"),
     h(
       "figure",
-      { class: "cp-portrait" },
+      { class: "cp-portrait", ...part("home.portrait") },
       h("img", {
-        src: portrait?.getAttribute("src") ?? "/images/burooj4.jpg",
-        alt: portrait?.getAttribute("alt") ?? "Burooj Rashid",
+        src: hero.portrait.src,
+        alt: hero.portrait.alt,
         width: 1080,
         height: 1920,
         decoding: "async",
       }),
     ),
-    kicker(greeting),
+    h("p", { class: "cp-kicker", ...part("home.greeting") }, hero.greeting),
     h1,
-    h("p", { class: "cp-home__role" }, role),
-    h("p", { class: "cp-home__intro" }, intro),
+    h("p", { class: "cp-home__role", ...part("home.occupation") }, hero.occupation),
+    h("p", { class: "cp-home__intro", ...part("home.welcome") }, hero.welcome),
     h(
       "ul",
-      { class: "cp-chips", "aria-label": "Elsewhere" },
+      { class: "cp-chips", "aria-label": words.links, ...part("home.links") },
       socials.map((item) => h("li", null, link(item.url, { class: "cp-chipbtn" }, item.label))),
     ),
   );
   h1.id = "cp-home-title";
 
   // the deck: the featured record on the platter, the rest in the crate
-  const featured = content.projects.filter((project) => project.featured);
-  const records = featured.length ? featured : content.projects.slice(0, 4);
+  const records = featured(content);
   const first = records[0];
   const record = h("div", { class: "cp-record" }, h("span", { class: "cp-record__label" }));
   const deckWhen = h("p", { class: "cp-deck__when" });
   const deckLink = h("a", { class: "cp-deck__link" });
   const deckSum = h("p", { class: "cp-deck__sum" });
-  const deckButton = h("a", { class: "cp-btn cp-btn--lit" }, "Liner notes");
+  const deckButton = h("a", { class: "cp-btn cp-btn--lit" }, words.linerNotes);
   const turntable = h(
     "div",
     { class: "cp-turntable", "data-state": "spinning", "aria-hidden": "true" },
@@ -184,13 +199,13 @@ function home(route: Route, content: SiteContent, memory: Memory, options: Scree
     markup(
       '<svg class="cp-arm" viewBox="0 0 100 100"><circle class="cp-arm__pivot" cx="86" cy="14" r="6"/><path class="cp-arm__rod" d="M86 14 L84 58 L66 76"/><path class="cp-arm__head" d="M62 72 l8 8 l-5 5 l-8 -8z"/></svg>',
     ),
-    h("span", { class: "cp-turntable__speed" }, "33⅓"),
+    h("span", { class: "cp-turntable__speed" }, words.speed),
   );
 
   const sleeves: HTMLAnchorElement[] = [];
   const arm = turntable.querySelector<SVGElement>(".cp-arm");
   const drop = (project: Project) => {
-    record.style.setProperty("--cover", `url("${project.cover}")`);
+    record.style.setProperty("--cover", project.cover ? `url("${project.cover}")` : "none");
     record.style.setProperty(
       "--note",
       noteVar(noteAt(content.projects.indexOf(project)).id),
@@ -200,7 +215,7 @@ function home(route: Route, content: SiteContent, memory: Memory, options: Scree
     deckLink.href = project.href;
     deckSum.textContent = project.summary;
     deckButton.href = project.href;
-    deckButton.setAttribute("aria-label", `Liner notes: ${project.title}`);
+    deckButton.setAttribute("aria-label", fill(words.linerNotesFor, { title: project.title }));
   };
   const cue = (project: Project) => {
     const changing = !!turntable.dataset.cue && turntable.dataset.cue !== project.slug;
@@ -232,7 +247,7 @@ function home(route: Route, content: SiteContent, memory: Memory, options: Scree
   const deck = h(
     "section",
     { class: "cp-deck", "aria-labelledby": "cp-deck-title" },
-    h("h2", { class: "cp-label", id: "cp-deck-title" }, "Now spinning"),
+    h("h2", { class: "cp-label", id: "cp-deck-title" }, words.nowSpinning),
     turntable,
     h(
       "div",
@@ -257,11 +272,13 @@ function home(route: Route, content: SiteContent, memory: Memory, options: Scree
           "data-state": "rest",
           style: `--spine:var(--cp-${BRAND[index % BRAND.length]})`,
         },
-        h("img", { class: "cp-sleeve__art", src: project.cover, alt: "", loading: "lazy", decoding: "async" }),
+        project.cover
+          ? h("img", { class: "cp-sleeve__art", src: project.cover, alt: "", loading: "lazy", decoding: "async" })
+          : h("span", { class: "cp-sleeve__art", "aria-hidden": "true" }),
         h(
           "span",
           { class: "cp-sleeve__copy" },
-          h("span", { class: "cp-sleeve__title" }, project.title),
+          h("span", { class: "cp-sleeve__title", ...part("project.title", project.slug) }, project.title),
           h("span", { class: "cp-sleeve__meta" }, `${project.dateLabel} · ${project.tags[0]?.replace(/-/g, " ") ?? project.kind}`),
         ),
         h("span", { class: "cp-sleeve__side", "aria-hidden": "true" }, `A${index + 1}`),
@@ -273,75 +290,89 @@ function home(route: Route, content: SiteContent, memory: Memory, options: Scree
     }),
   );
 
-  const noteCopy = memory.current?.cloneNode(true) as Element | undefined;
+  const { currently } = page;
   const crate = h(
     "section",
     { class: "cp-crate", "aria-labelledby": "cp-crate-title" },
-    h("h2", { class: "cp-label", id: "cp-crate-title" }, "In the crate"),
+    h("h2", { class: "cp-label", id: "cp-crate-title" }, words.crate),
     crateList,
     h(
       "a",
-      { class: "cp-crate__all", href: "/projects" },
-      "Full setlist",
-      h("span", { class: "cp-crate__count" }, String(content.projects.length)),
+      { class: "cp-crate__all", href: page.work.link.href },
+      words.setlist,
+      h("span", { class: "cp-crate__count" }, String(content.derived.counts.projects)),
     ),
-    noteCopy
-      ? h(
-          "aside",
-          { class: "cp-note", "aria-label": "Currently" },
-          h("span", { class: "cp-note__tape", "aria-hidden": "true" }),
-          h("div", { class: "cp-note__copy" }, adopt(noteCopy)),
-        )
-      : null,
+    h(
+      "aside",
+      { class: "cp-note", "aria-label": words.currently },
+      h("span", { class: "cp-note__tape", "aria-hidden": "true" }),
+      h(
+        "div",
+        { class: "cp-note__copy", ...part("home.currently") },
+        h("h2", null, currently.title),
+        h("p", null, inline(currently.body, makeLink)),
+        h("div", { class: "more" }, arrowed(currently.link.href, currently.link.label)),
+      ),
+    ),
   );
 
-  cue(first);
-  bar(hero, 1);
+  if (first) cue(first);
+  bar(hero_, 1);
   bar(deck, 2, 2);
   bar(crateList, 1, 4);
   crateList.removeAttribute("data-beat");
   return {
-    el: screen("home", h("div", { class: "cp-home" }, hero, deck, crate)),
+    el: screen("home", h("div", { class: "cp-home" }, hero_, deck, crate)),
     heading: h1,
   };
 }
 
 /* ── projects: the arrangement ───────────────────────────── */
 
-const FROM = 2021;
-const TO = 2027.5;
-const place = (year: number) => Math.min(Math.max((year - FROM) / (TO - FROM), 0), 1);
+/** The arrangement runs from the first year with a project to a year and a
+ * half past the newest, so a new year always fits on the ruler. */
+const span = (content: SiteContent) => ({
+  from: content.derived.firstYear,
+  to: content.derived.lastYear + 1.5,
+});
+const placer = ({ from, to }: { from: number; to: number }) => (year: number) =>
+  Math.min(Math.max((year - from) / (to - from), 0), 1);
 const NOW = (() => {
   const date = new Date();
   return date.getFullYear() + date.getMonth() / 12 + date.getDate() / 365;
 })();
 
-function pageHead(route: Route, fallback: { eyebrow: string; title: string }, className: string) {
-  const main = route.main;
-  const title = text(main.querySelector("h1")) || fallback.title;
-  const intro = text(main.querySelector(".page-header__intro"));
-  const h1 = heading(title, `${className}__title`);
+/** A page's opening, from its header in content. */
+function pageHead(
+  header: SiteContent["pages"]["projects"]["header"],
+  id: string,
+  className: string,
+) {
+  const h1 = heading(header.title, `${className}__title`);
+  Object.assign(h1.dataset, { part: "page.title", ref: id });
   return {
     h1,
     head: h(
       "header",
       { class: `${className}__head` },
-      kicker(text(main.querySelector(".page-header__eyebrow")) || fallback.eyebrow),
+      header.eyebrow ? h("p", { class: "cp-kicker", ...part("page.eyebrow", id) }, header.eyebrow) : null,
       h1,
-      intro ? h("p", { class: `${className}__intro` }, intro) : null,
+      header.intro ? h("p", { class: `${className}__intro`, ...part("page.intro", id) }, header.intro) : null,
     ),
   };
 }
 
-function projects(route: Route, content: SiteContent): Screen {
-  const { h1, head } = pageHead(route, { eyebrow: "Projects", title: "Projects" }, "cp-seq");
+function projects(content: SiteContent, copy: Copy): Screen {
+  const { h1, head } = pageHead(content.pages.projects.header, "projects", "cp-seq");
+  const range = span(content);
+  const place = placer(range);
   const years: number[] = [];
-  for (let year = FROM; year <= Math.floor(TO); year += 1) years.push(year);
+  for (let year = range.from; year <= Math.floor(range.to); year += 1) years.push(year);
 
   const ruler = h(
     "div",
     { class: "cp-seq__ruler", "aria-hidden": "true" },
-    h("span", { class: "cp-seq__ruler-head" }, "track"),
+    h("span", { class: "cp-seq__ruler-head" }, copy.projects.track),
     h(
       "span",
       { class: "cp-seq__ruler-lane" },
@@ -364,7 +395,7 @@ function projects(route: Route, content: SiteContent): Screen {
       const at = yearPosition(project.dateLabel, project.year);
       return h(
         "li",
-        { class: "cp-track", style: `--note:${noteVar(note.id)}; --at:${place(at)}; --len:${0.85 / (TO - FROM)}` },
+        { class: "cp-track", style: `--note:${noteVar(note.id)}; --at:${place(at)}; --len:${0.85 / (range.to - range.from)}` },
         h(
           "a",
           { class: "cp-track__link", href: project.href, "data-state": "rest" },
@@ -372,15 +403,17 @@ function projects(route: Route, content: SiteContent): Screen {
             "span",
             { class: "cp-track__head" },
             h("span", { class: "cp-track__no", "aria-hidden": "true" }, String(index + 1).padStart(2, "0")),
-            h("img", { class: "cp-track__art", src: project.cover, alt: "", loading: "lazy", decoding: "async" }),
+            project.cover
+              ? h("img", { class: "cp-track__art", src: project.cover, alt: "", loading: "lazy", decoding: "async" })
+              : h("span", { class: "cp-track__art", "aria-hidden": "true" }),
             h(
               "span",
               { class: "cp-track__copy" },
-              h("span", { class: "cp-track__title" }, project.title),
-              h("span", { class: "cp-track__meta" }, `${project.dateLabel} · ${project.kind}`),
-              h("span", { class: "cp-track__sum" }, project.summary),
+              h("span", { class: "cp-track__title", ...part("project.title", project.slug) }, project.title),
+              h("span", { class: "cp-track__meta", ...part("project.meta", project.slug) }, `${project.dateLabel} · ${project.kind}`),
+              h("span", { class: "cp-track__sum", ...part("project.summary", project.slug) }, project.summary),
               project.tools.length
-                ? h("span", { class: "cp-track__tools" }, project.tools.join(" · "))
+                ? h("span", { class: "cp-track__tools", ...part("project.tools", project.slug) }, project.tools.join(" · "))
                 : null,
             ),
           ),
@@ -412,11 +445,10 @@ function projects(route: Route, content: SiteContent): Screen {
       h(
         "span",
         { class: "cp-seq__playhead" },
-        h("span", { class: "cp-seq__now" }, "now"),
+        h("span", { class: "cp-seq__now" }, copy.projects.now),
       ),
     ),
   );
-  const trail = text(route.main.querySelector(".timeline")?.previousElementSibling);
   return {
     el: screen(
       "projects",
@@ -426,13 +458,12 @@ function projects(route: Route, content: SiteContent): Screen {
         bar(head, 2),
         h(
           "section",
-          { class: "cp-seq__body", "aria-label": "Setlist, newest first" },
+          { class: "cp-seq__body", "aria-label": copy.projects.list },
           h(
             "div",
             { class: "cp-seq__bar-tape", "aria-hidden": "true" },
             NOTES.map((n) => h("i", { style: `--note:${noteVar(n.id)}` })),
           ),
-          trail ? h("p", { class: "cp-seq__trail" }, trail) : null,
           arrangement,
         ),
       ),
@@ -443,10 +474,13 @@ function projects(route: Route, content: SiteContent): Screen {
 
 /* ── a project: the sleeve and its liner notes ───────────── */
 
-function project(route: Route, content: SiteContent, item: Project): Screen {
+function project(content: SiteContent, copy: Copy, item: Project): Screen {
+  const words = copy.project;
+  const labels = content.pages.projects.detail.labels;
   const index = content.projects.indexOf(item);
   const note = noteAt(index);
   const h1 = heading(item.title, "cp-liner__title");
+  Object.assign(h1.dataset, { part: "project.title", ref: item.slug });
   const prev = content.projects[index - 1];
   const next = content.projects[index + 1];
   const media = item.media.filter((entry, i) => !(i === 0 && entry.src === item.cover));
@@ -458,17 +492,19 @@ function project(route: Route, content: SiteContent, item: Project): Screen {
     h(
       "span",
       { class: "cp-sleeve-art__disc", "aria-hidden": "true" },
-      h("span", { class: "cp-sleeve-art__label", style: `background-image:url("${item.cover}")` }),
+      h("span", { class: "cp-sleeve-art__label", style: item.cover ? `background-image:url("${item.cover}")` : null }),
     ),
     h(
       "figure",
       { class: "cp-sleeve-art__cover" },
-      h("img", {
-        src: item.cover,
-        alt: item.media[0]?.alt ?? `${item.title} cover`,
-        decoding: "async",
-      }),
-      h("figcaption", { class: "cp-sleeve-art__stamp" }, h("span", null, "Burooj"), h("b", null, item.title)),
+      item.cover
+        ? h("img", {
+            src: item.cover,
+            alt: item.media[0]?.alt ?? fill(words.coverAlt, { title: item.title }),
+            decoding: "async",
+          })
+        : null,
+      h("figcaption", { class: "cp-sleeve-art__stamp" }, h("span", null, words.stamp), h("b", null, item.title)),
     ),
     scrap(BRAND[index % 4], "tri", "cp-sleeve-art__scrap-a"),
     scrap(BRAND[(index + 1) % 4], "torn", "cp-sleeve-art__scrap-b"),
@@ -476,39 +512,42 @@ function project(route: Route, content: SiteContent, item: Project): Screen {
 
   const transport = h(
     "nav",
-    { class: "cp-transport", "aria-label": "Neighbouring tracks" },
+    { class: "cp-transport", "aria-label": words.neighbours },
     prev
       ? h("a", { class: "cp-transport__btn", href: prev.href, rel: "prev" },
-          h("span", { "aria-hidden": "true" }, "⏮"), h("span", { class: "cp-transport__txt" }, h("small", null, "prev"), prev.title))
-      : h("span", { class: "cp-transport__btn", "data-state": "off" }, h("span", { "aria-hidden": "true" }, "⏮"), h("span", { class: "cp-transport__txt" }, h("small", null, "first track"))),
-    h("span", { class: "cp-transport__no" }, `track ${trackNo}`),
+          h("span", { "aria-hidden": "true" }, "⏮"), h("span", { class: "cp-transport__txt" }, h("small", null, words.prev), prev.title))
+      : h("span", { class: "cp-transport__btn", "data-state": "off" }, h("span", { "aria-hidden": "true" }, "⏮"), h("span", { class: "cp-transport__txt" }, h("small", null, words.first))),
+    h("span", { class: "cp-transport__no" }, fill(words.trackNo, { no: trackNo })),
     next
       ? h("a", { class: "cp-transport__btn cp-transport__btn--next", href: next.href, rel: "next" },
-          h("span", { class: "cp-transport__txt" }, h("small", null, "next"), next.title), h("span", { "aria-hidden": "true" }, "⏭"))
-      : h("span", { class: "cp-transport__btn cp-transport__btn--next", "data-state": "off" }, h("span", { class: "cp-transport__txt" }, h("small", null, "last track")), h("span", { "aria-hidden": "true" }, "⏭")),
+          h("span", { class: "cp-transport__txt" }, h("small", null, words.next), next.title), h("span", { "aria-hidden": "true" }, "⏭"))
+      : h("span", { class: "cp-transport__btn cp-transport__btn--next", "data-state": "off" }, h("span", { class: "cp-transport__txt" }, h("small", null, words.last)), h("span", { "aria-hidden": "true" }, "⏭")),
   );
 
   const notes = h(
     "article",
     { class: "cp-liner__notes", "aria-labelledby": "cp-liner-title" },
-    kicker(h("a", { href: "/projects" }, "Setlist"), ` · track ${trackNo} · ${item.kind}`),
+    kicker(
+      h("a", { href: content.pages.projects.detail.back.href }, words.setlist),
+      fill(words.kicker, { no: trackNo, kind: item.kind }),
+    ),
     h1,
-    h("p", { class: "cp-liner__lede" }, item.summary),
-    h("h2", { class: "cp-label" }, "Credits"),
+    h("p", { class: "cp-liner__lede", ...part("project.summary", item.slug) }, item.summary),
+    h("h2", { class: "cp-label" }, words.credits),
     credits([
-      ["Role", item.role],
-      ["Where", item.location],
-      ["When", item.dateLabel],
-      ["Tools", item.tools.join(", ") || undefined],
-      ["Filed", item.tags.map((tag) => tag.replace(/-/g, " ")).join(", ") || undefined],
+      [labels.role, item.role],
+      [labels.location, item.location],
+      [labels.date, item.dateLabel],
+      [words.tools, item.tools.join(", ") || undefined, part("project.tools", item.slug)],
+      [words.filed, item.tags.map((tag) => tag.replace(/-/g, " ")).join(", ") || undefined],
     ]),
-    buttons(item.links),
-    h("h2", { class: "cp-label" }, "Liner notes"),
-    prose(route.main.querySelector(".prose")),
+    buttons(item.links, "", part("project.links", item.slug)),
+    item.html.trim() ? h("h2", { class: "cp-label" }, words.linerNotes) : null,
+    prose(item.html, "", part("project.body", item.slug)),
     media.length
       ? h(
           "div",
-          { class: "cp-liner__inserts" },
+          { class: "cp-liner__inserts", ...part("project.media", item.slug) },
           media.map((entry) =>
             h(
               "figure",
@@ -521,7 +560,7 @@ function project(route: Route, content: SiteContent, item: Project): Screen {
           ),
         )
       : null,
-    h("a", { class: "cp-back", href: "/projects" }, h("span", { "aria-hidden": "true" }, "←"), " Back to the setlist"),
+    h("a", { class: "cp-back", href: content.pages.projects.detail.back.href }, h("span", { "aria-hidden": "true" }, "←"), ` ${words.back}`),
   );
   h1.id = "cp-liner-title";
   bar(notes, 2);
@@ -557,8 +596,9 @@ function labVisual(item: LabItem) {
   return roll(item.slug, 24);
 }
 
-function lab(route: Route, content: SiteContent): Screen {
-  const { h1, head } = pageHead(route, { eyebrow: "Lab", title: "Lab" }, "cp-lab");
+function lab(content: SiteContent, copy: Copy): Screen {
+  const page = content.pages.lab;
+  const { h1, head } = pageHead(page.header, "lab", "cp-lab");
   const presets = h(
     "ul",
     { class: "cp-presets" },
@@ -571,16 +611,14 @@ function lab(route: Route, content: SiteContent): Screen {
         h(
           "div",
           { class: "cp-preset__copy" },
-          h("p", { class: "cp-preset__meta" }, `${item.type} · ${item.sourceEra}`),
-          h("h2", { class: "cp-preset__title" }, link(target, { class: "cp-preset__link" }, item.title)),
-          h("p", { class: "cp-preset__sum" }, item.summary),
+          h("p", { class: "cp-preset__meta", ...part("lab.meta", item.slug) }, `${item.type} · ${item.sourceEra}`),
+          h("h2", { class: "cp-preset__title", ...part("lab.title", item.slug) }, link(target, { class: "cp-preset__link" }, item.title)),
+          h("p", { class: "cp-preset__sum", ...part("lab.summary", item.slug) }, item.summary),
         ),
-        h("span", { class: "cp-preset__apply", "aria-hidden": "true" }, item.href ? "open" : "apply"),
+        h("span", { class: "cp-preset__apply", "aria-hidden": "true" }, item.href ? copy.lab.open : copy.lab.apply),
       );
     }),
   );
-  const more = route.main.querySelector(".lab-more");
-  const aside = route.main.querySelector(".lab-aside");
   return {
     el: screen(
       "lab",
@@ -590,37 +628,40 @@ function lab(route: Route, content: SiteContent): Screen {
         bar(head, 2),
         h(
           "section",
-          { class: "cp-drawer", "aria-label": "Presets" },
+          { class: "cp-drawer", "aria-label": copy.lab.presets },
           h(
             "div",
             { class: "cp-drawer__tabs", "aria-hidden": "true" },
-            ["anim", "freq", "color", "popup", "scope"].map((tab, i) =>
+            copy.lab.tabs.map((tab, i) =>
               h("span", { class: "cp-drawer__tab", "data-state": i === 0 ? "on" : "off" }, tab),
             ),
-            h("span", { class: "cp-drawer__count" }, String(content.lab.length).padStart(2, "0")),
+            h("span", { class: "cp-drawer__count" }, String(content.derived.counts.lab).padStart(2, "0")),
           ),
           bar(presets, 2, 4),
         ),
-        more || aside
-          ? h(
-              "div",
-              { class: "cp-lab__more" },
-              more ? prose(more, "cp-lab__more-link") : null,
-              aside ? prose(aside) : null,
-            )
-          : null,
+        h(
+          "div",
+          { class: "cp-lab__more" },
+          h(
+            "div",
+            { class: "cp-prose cp-lab__more-link", ...part("lab.more") },
+            h("p", null, arrowed(page.more.href, page.more.label)),
+          ),
+          h("div", { class: "cp-prose", ...part("lab.aside") }, h("p", null, inline(page.aside, makeLink))),
+        ),
       ),
     ),
     heading: h1,
   };
 }
 
-function labEntry(route: Route, content: SiteContent, item: LabItem): Screen {
+function labEntry(content: SiteContent, copy: Copy, item: LabItem): Screen {
+  const labels = content.pages.lab.detail.labels;
   const index = content.lab.indexOf(item);
   const h1 = heading(item.title, "cp-liner__title");
+  Object.assign(h1.dataset, { part: "lab.title", ref: item.slug });
   h1.id = "cp-liner-title";
-  const hasPage = !!route.main.querySelector(".entry-page");
-  const links = [...(item.href ? [{ label: "Open the sketch", url: item.href }] : []), ...item.links];
+  const links = [...(item.href ? [{ label: copy.lab.openSketch, url: item.href }] : []), ...item.links];
   return {
     el: screen(
       "lab-entry",
@@ -635,16 +676,19 @@ function labEntry(route: Route, content: SiteContent, item: LabItem): Screen {
         bar(h(
           "article",
           { class: "cp-liner__notes", "aria-labelledby": "cp-liner-title" },
-          kicker(h("a", { href: "/lab" }, "Lab"), ` · preset ${String(index + 1).padStart(2, "0")}`),
+          kicker(
+            h("a", { href: "/lab" }, content.pages.lab.detail.eyebrow),
+            fill(copy.lab.entryKicker, { no: String(index + 1).padStart(2, "0") }),
+          ),
           h1,
-          h("p", { class: "cp-liner__lede" }, item.summary),
+          h("p", { class: "cp-liner__lede", ...part("lab.summary", item.slug) }, item.summary),
           credits([
-            ["Type", item.type],
-            ["Era", item.sourceEra],
+            [labels.type, item.type],
+            [labels.era, item.sourceEra],
           ]),
-          buttons(links),
-          hasPage ? prose(route.main.querySelector(".prose")) : null,
-          h("a", { class: "cp-back", href: "/lab" }, h("span", { "aria-hidden": "true" }, "←"), " Back to the presets"),
+          buttons(links, "", part("lab.links", item.slug)),
+          prose(item.html, "", part("lab.body", item.slug)),
+          h("a", { class: "cp-back", href: "/lab" }, h("span", { "aria-hidden": "true" }, "←"), ` ${copy.lab.back}`),
         ), 2),
       ),
     ),
@@ -654,19 +698,18 @@ function labEntry(route: Route, content: SiteContent, item: LabItem): Screen {
 
 /* ── about: a torn jazz poster ───────────────────────────── */
 
-function about(route: Route, content: SiteContent): Screen {
-  const { main } = route;
-  const title = text(main.querySelector("h1")) || content.pages.about.title;
-  const h1 = heading(title, "cp-poster__title");
+function about(content: SiteContent, copy: Copy): Screen {
+  const page = content.pages.about;
+  const { header } = page;
+  const portrait = content.pages.home.hero.portrait;
+  const h1 = heading(header.title, "cp-poster__title");
+  Object.assign(h1.dataset, { part: "page.title", ref: "about" });
   h1.id = "cp-poster-title";
-  const actions = [...main.querySelectorAll<HTMLAnchorElement>(".page-header__actions a")].map((anchor) => ({
-    label: text(anchor),
-    url: anchor.getAttribute("href") ?? "/",
-  }));
+  const actions = header.actions.map((action) => ({ label: action.label, url: action.href }));
   const tag = h(
     "p",
     { class: "cp-poster__tag", "aria-hidden": "true" },
-    ["Play.", "Build.", "Repeat."].map((word) => h("span", null, word)),
+    copy.about.tag.map((word) => h("span", null, word)),
   );
   bar(tag, 4, 8);
   const poster = bar(
@@ -681,11 +724,11 @@ function about(route: Route, content: SiteContent): Screen {
           h(
             "figure",
             { class: "cp-poster__portrait" },
-            h("img", { src: "/images/burooj4.jpg", alt: "Burooj Rashid wearing round sunglasses", decoding: "async" }),
+            h("img", { src: portrait.src, alt: portrait.alt, decoding: "async" }),
           ),
-          kicker(text(main.querySelector(".page-header__eyebrow")) || "About"),
+          header.eyebrow ? h("p", { class: "cp-kicker", ...part("page.eyebrow", "about") }, header.eyebrow) : null,
           h1,
-          h("p", { class: "cp-poster__intro" }, text(main.querySelector(".page-header__intro")) || content.pages.about.description),
+          header.intro ? h("p", { class: "cp-poster__intro", ...part("page.intro", "about") }, header.intro) : null,
           tag,
         ),
     2,
@@ -701,9 +744,9 @@ function about(route: Route, content: SiteContent): Screen {
         bar(
           h(
             "article",
-            { class: "cp-about__body", "aria-label": "About Burooj" },
-            prose(main.querySelector(".prose")),
-            buttons(actions),
+            { class: "cp-about__body", "aria-label": copy.about.body },
+            prose(page.html, "", part("page.body", "about")),
+            buttons(actions, "", part("page.actions", "about")),
           ),
           2,
           2,
@@ -716,93 +759,94 @@ function about(route: Route, content: SiteContent): Screen {
 
 /* ── resume: the credits ─────────────────────────────────── */
 
-function resume(route: Route, content: SiteContent): Screen {
-  const { h1, head } = pageHead(route, { eyebrow: "Resume", title: content.site.name }, "cp-cv");
-  const contacts = [...route.main.querySelectorAll<HTMLAnchorElement>(".page-header__actions a")].map((anchor) => ({
-    label: text(anchor),
-    url: anchor.getAttribute("href") ?? "/",
-  }));
+function resume(content: SiteContent, copy: Copy): Screen {
+  const page = content.pages.resume;
+  const { h1, head } = pageHead(page.header, "resume", "cp-cv");
   head.append(
     h(
       "ul",
-      { class: "cp-chips" },
-      contacts.map((item) => h("li", null, link(item.url, { class: "cp-chipbtn" }, item.label))),
+      { class: "cp-chips", ...part("page.actions", "resume") },
+      page.header.actions.map((item) => h("li", null, link(item.href, { class: "cp-chipbtn" }, item.label))),
     ),
   );
 
-  const source = route.main.querySelector(".prose");
   const sides = h("div", { class: "cp-cv__sides" });
-  let side: HTMLElement | undefined;
-  let body: HTMLElement | undefined;
-  let cut: HTMLElement | undefined;
   let sideIndex = 0;
   let cutIndex = 0;
-  const children = source ? [...source.children] : [];
-  for (const child of children) {
-    adopt(child);
-    if (child.tagName === "H2") {
-      body = h("div", { class: "cp-side__body" });
-      side = h(
-        "section",
-        { class: "cp-side", style: `--note:${noteVar(noteAt(sideIndex * 2).id)}` },
-        h(
-          "h2",
-          { class: "cp-side__title" },
-          h("span", { class: "cp-side__letter" }, `Side ${String.fromCharCode(65 + sideIndex)}`),
-          h("span", { class: "cp-side__name" }, text(child)),
-        ),
-        body,
-      );
-      sideIndex += 1;
-      cut = undefined;
-      sides.append(side);
+  const side = (name: string | null, attrs: Record<string, string | undefined> = {}) => {
+    const body = h("div", { class: "cp-side__body" });
+    const el = name === null
+      ? h("section", { class: "cp-side", ...attrs }, body)
+      : h(
+          "section",
+          { class: "cp-side", style: `--note:${noteVar(noteAt(sideIndex * 2).id)}`, ...attrs },
+          h(
+            "h2",
+            { class: "cp-side__title" },
+            h("span", { class: "cp-side__letter" }, fill(copy.resume.side, { letter: String.fromCharCode(65 + sideIndex) })),
+            h("span", { class: "cp-side__name" }, name),
+          ),
+          body,
+        );
+    if (name !== null) sideIndex += 1;
+    sides.append(el);
+    return body;
+  };
+  const proseOf = (...nodes: Child[]) => h("div", { class: "cp-prose" }, ...nodes);
+  // a role or a course is a numbered cut: what, where, when, then its lines
+  const cut = (entry: ResumeEntry, kind: "resume.role" | "resume.education") => {
+    cutIndex += 1;
+    const role = entry.title ?? entry.org ?? "";
+    const where = entry.title ? entry.org : undefined;
+    const lines: Child[] = [
+      entry.summary ? h("p", null, inline(entry.summary, makeLink)) : null,
+      entry.bullets.length
+        ? h("ul", null, entry.bullets.map((bullet) => h("li", null, inline(bullet, makeLink))))
+        : null,
+    ];
+    return h(
+      "article",
+      { class: "cp-cut", ...part(kind, entry.id) },
+      h("span", { class: "cp-cut__no", "aria-hidden": "true" }, String(cutIndex).padStart(2, "0")),
+      h("h3", { class: "cp-cut__title" }, role, where ? h("span", { class: "cp-cut__where" }, ` · ${where}`) : null),
+      entry.dateLine ? h("p", { class: "cp-cut__when" }, entry.dateLine) : null,
+      lines.some(Boolean) ? proseOf(lines) : null,
+    );
+  };
+
+  const { experience, education, tools } = content.resume;
+  side(experience.title).append(...experience.roles.map((role) => cut(role, "resume.role")));
+  side(education.title).append(...education.entries.map((entry) => cut(entry, "resume.education")));
+  side(tools.title).append(proseOf(h("p", { ...part("resume.tools") }, tools.sentence)));
+  // the free body: each h2 starts a side of its own
+  let body: HTMLElement | undefined;
+  for (const block of blocks(page.html)) {
+    adopt(block);
+    if (block.tagName === "H2") {
+      body = side(block.textContent ?? "", part("page.body", "resume"));
       continue;
     }
-    if (!body) {
-      body = h("div", { class: "cp-side__body" });
-      sides.append(h("section", { class: "cp-side" }, body));
-    }
-    if (child.tagName === "H3") {
-      cutIndex += 1;
-      const [role, place] = text(child).split(" · ");
-      cut = h(
-        "article",
-        { class: "cp-cut" },
-        h("span", { class: "cp-cut__no", "aria-hidden": "true" }, String(cutIndex).padStart(2, "0")),
-        h("h3", { class: "cp-cut__title" }, role, place ? h("span", { class: "cp-cut__where" }, ` · ${place}`) : null),
-      );
-      body.append(cut);
-      continue;
-    }
-    const em = child.tagName === "P" && child.children.length === 1 && child.firstElementChild?.tagName === "EM" && text(child) === text(child.firstElementChild);
-    if (cut && em && !cut.querySelector(".cp-cut__when")) {
-      cut.append(h("p", { class: "cp-cut__when" }, text(child)));
-      continue;
-    }
-    const target = cut ?? body;
-    let proseBox = target.querySelector<HTMLElement>(":scope > .cp-prose");
-    if (!proseBox) {
-      proseBox = h("div", { class: "cp-prose" });
-      target.append(proseBox);
-    }
-    proseBox.append(child);
+    body ??= side(null, part("page.body", "resume"));
+    let box = body.querySelector<HTMLElement>(":scope > .cp-prose");
+    if (!box) body.append((box = proseOf()));
+    box.append(block);
   }
 
   bar(head, 2);
   bar(sides, 2, 4);
   return {
-    el: screen("resume", h("div", { class: "cp-cv" }, head, h("section", { class: "cp-cv__setlist", "aria-label": "Credits" }, sides))),
+    el: screen("resume", h("div", { class: "cp-cv" }, head, h("section", { class: "cp-cv__setlist", "aria-label": copy.resume.credits }, sides))),
     heading: h1,
   };
 }
 
 /* ── anything else: a sheet on the music stand ───────────── */
 
-function sheet(route: Route): Screen {
-  const paper = h("div", { class: "cp-sheet__paper" }, take(route.main));
+function sheet(route: Route, copy: Copy): Screen {
+  const paper = h("div", { class: "cp-sheet__paper" }, fallbackBody(route));
   let h1 = paper.querySelector<HTMLElement>("h1");
   if (!h1) {
-    h1 = heading(route.title.split("|")[0].trim() || "Sheet", "cp-sheet__title");
+    h1 = heading(route.title.split("|")[0].trim(), "cp-sheet__title");
     paper.prepend(h1);
   }
   h1.setAttribute("tabindex", "-1");
@@ -816,9 +860,9 @@ function sheet(route: Route): Screen {
           h(
             "div",
             { class: "cp-sheet__stand", "aria-hidden": "true" },
-            h("span", null, "sheet"),
+            h("span", null, copy.sheet.label),
             h("b", null, route.path),
-            h("span", null, "clipped to the stand"),
+            h("span", null, copy.sheet.stand),
           ),
           paper,
         ),
@@ -832,29 +876,29 @@ function sheet(route: Route): Screen {
 export function buildScreen(
   route: Route,
   content: SiteContent,
-  memory: Memory,
   options: ScreenOptions,
 ): Screen {
+  const copy = content.lenses["cut-paper"];
   switch (route.kind) {
     case "home":
-      return home(route, content, memory, options);
+      return home(content, copy, options);
     case "projects":
-      return projects(route, content);
+      return projects(content, copy);
     case "project": {
       const item = content.projects.find((entry) => entry.slug === route.slug);
-      return item ? project(route, content, item) : sheet(route);
+      return item ? project(content, copy, item) : sheet(route, copy);
     }
     case "lab":
-      return lab(route, content);
+      return lab(content, copy);
     case "lab-entry": {
-      const item = content.lab.find((entry) => entry.slug === route.slug);
-      return item ? labEntry(route, content, item) : sheet(route);
+      const item = content.lab.find((entry) => entry.slug === route.slug && entry.hasPage);
+      return item ? labEntry(content, copy, item) : sheet(route, copy);
     }
     case "about":
-      return about(route, content);
+      return about(content, copy);
     case "resume":
-      return resume(route, content);
+      return resume(content, copy);
     default:
-      return sheet(route);
+      return sheet(route, copy);
   }
 }

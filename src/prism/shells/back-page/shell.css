@@ -441,6 +441,48 @@
   font-family: var(--bp-type);
   font-size: 0.85em;
 }
+/* whatever else markdown makes, in the same hand. A picture in the words
+ * keeps its room before it loads, so the page it's measured on stays true */
+:root[data-lens="back-page"] .bp-flow :is(h4, h5, h6) {
+  margin: var(--g) 0 0;
+  font: 700 1.15em/var(--lh) var(--bp-hand);
+  color: var(--bp-red);
+}
+:root[data-lens="back-page"] .bp-flow img:not(.bp-taped img) {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  max-height: calc(var(--ph) * 0.4);
+  object-fit: contain;
+  object-position: left center;
+}
+:root[data-lens="back-page"] .bp-flow pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+:root[data-lens="back-page"] .bp-flow table {
+  max-width: 100%;
+  border-collapse: collapse;
+}
+:root[data-lens="back-page"] .bp-flow :is(th, td) {
+  padding: 0 0.9em 0 0;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+:root[data-lens="back-page"] .bp-flow th {
+  border-bottom: 1.5px solid var(--bp-red);
+}
+:root[data-lens="back-page"] .bp-flow blockquote {
+  padding-left: 0.8em;
+  border-left: 2px solid var(--bp-red);
+}
+:root[data-lens="back-page"] .bp-sheet .bp-flow :is(h4, h5, h6) {
+  margin: 0.8em 0 0.15em;
+  font: 1em/1.35 var(--bp-type);
+  color: #111;
+}
 
 /* ---- handwriting ------------------------------------------------------------------ */
 :root[data-lens="back-page"] .bp-h1 {

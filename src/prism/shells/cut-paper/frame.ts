@@ -2,6 +2,8 @@
  * updates and the seven-key keyboard that is the site's navigation. It
  * persists across routes; only the screen on the stage changes. */
 import type { Route, ShellContext } from "../types";
+import { fill } from "../rich";
+import { part } from "../../parts";
 import { h, link, markup } from "./dom";
 import { keysFor, noteForKind, noteForUpdate, NOTES, noteVar, type Key } from "./notes";
 import { play, setSound, soundOn } from "./sound";
@@ -27,6 +29,8 @@ const shortDate = (iso: string) => {
 
 export function buildFrame(ctx: ShellContext): Frame {
   const { content, signal, face } = ctx;
+  const copy = content.lenses["cut-paper"].frame;
+  const updatesCount = content.updates.length;
   const keys = keysFor(content);
   const on = (target: EventTarget, type: string, fn: (event: Event) => void) =>
     target.addEventListener(type, fn, { signal });
@@ -40,8 +44,8 @@ export function buildFrame(ctx: ShellContext): Frame {
     h("i", { "data-cell": "3" }),
     h("i", { "data-cell": "4" }),
   );
-  const readoutNote = h("span", { class: "cp-readout__note" }, "Do");
-  const readoutWhere = h("span", { class: "cp-readout__where" }, "home");
+  const readoutNote = h("span", { class: "cp-readout__note" }, NOTES[0].sol);
+  const readoutWhere = h("span", { class: "cp-readout__where" }, copy.home);
   const soundButton = h(
     "button",
     {
@@ -53,8 +57,8 @@ export function buildFrame(ctx: ShellContext): Frame {
     markup(
       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="cp-sound__wave" pathLength="1" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="cp-sound__mute" d="M16 9l6 6M22 9l-6 6"/></svg>',
     ),
-    h("span", { class: "cp-sound__label" }, "Sound"),
-    h("span", { class: "cp-sound__state" }, "off"),
+    h("span", { class: "cp-sound__label" }, copy.sound),
+    h("span", { class: "cp-sound__state" }, copy.soundOff),
   );
   const logButton = h(
     "button",
@@ -64,8 +68,8 @@ export function buildFrame(ctx: ShellContext): Frame {
       "aria-expanded": "false",
       "aria-controls": "cp-log",
     },
-    h("span", { class: "cp-logbtn__label" }, "Log"),
-    h("span", { class: "cp-logbtn__count" }, String(content.updates.length)),
+    h("span", { class: "cp-logbtn__label" }, copy.log),
+    h("span", { class: "cp-logbtn__count" }, String(updatesCount)),
     markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h8"/></svg>'),
   );
 
@@ -75,15 +79,15 @@ export function buildFrame(ctx: ShellContext): Frame {
     h(
       "a",
       { class: "cp-logo", href: "/", "aria-label": `${content.site.name}, home` },
-      h("span", { class: "cp-logo__paper", "aria-hidden": "true" }, "Burooj."),
+      h("span", { class: "cp-logo__paper", "aria-hidden": "true" }, copy.logo),
     ),
     h(
       "p",
       { class: "cp-chip" },
       h("span", { class: "cp-chip__swatch", "aria-hidden": "true" }),
-      h("span", { class: "cp-chip__name" }, "burooj"),
+      h("span", { class: "cp-chip__name" }, copy.chipName),
       h("span", { class: "cp-chip__sep", "aria-hidden": "true" }, " · "),
-      h("span", { class: "cp-chip__role" }, "frontend developer"),
+      h("span", { class: "cp-chip__role" }, content.pages.home.hero.occupation.toLowerCase()),
     ),
     h(
       "p",
@@ -92,9 +96,9 @@ export function buildFrame(ctx: ShellContext): Frame {
       h("span", { class: "cp-readout__sep", "aria-hidden": "true" }, "·"),
       readoutWhere,
       h("span", { class: "cp-readout__sep", "aria-hidden": "true" }, "·"),
-      h("span", null, "c major"),
+      h("span", null, copy.key),
       h("span", { class: "cp-readout__sep", "aria-hidden": "true" }, "·"),
-      h("span", { class: "cp-readout__bpm" }, "120 bpm"),
+      h("span", { class: "cp-readout__bpm" }, copy.tempo),
     ),
     beat,
     logButton,
@@ -104,7 +108,7 @@ export function buildFrame(ctx: ShellContext): Frame {
   /* ── log drawer (all updates) ───────────────────────────── */
   const logClose = h(
     "button",
-    { type: "button", class: "cp-log__close", "aria-label": "Close the log" },
+    { type: "button", class: "cp-log__close", "aria-label": copy.closeLog },
     markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13"/></svg>'),
   );
   const log = h(
@@ -119,8 +123,8 @@ export function buildFrame(ctx: ShellContext): Frame {
     h(
       "div",
       { class: "cp-log__head" },
-      h("h2", { class: "cp-log__title", id: "cp-log-title" }, "Log"),
-      h("p", { class: "cp-log__meta" }, `recent updates · ${content.updates.length} events`),
+      h("h2", { class: "cp-log__title", id: "cp-log-title" }, copy.log),
+      h("p", { class: "cp-log__meta" }, fill(copy.logMeta, { n: updatesCount })),
       logClose,
     ),
     h(
@@ -130,7 +134,11 @@ export function buildFrame(ctx: ShellContext): Frame {
         const note = noteForUpdate(update.kind);
         return h(
           "li",
-          { class: "cp-log__event", style: `--note:${noteVar(note.id)}; --i:${index}` },
+          {
+            class: "cp-log__event",
+            style: `--note:${noteVar(note.id)}; --i:${index}`,
+            ...part("update.item", update.id),
+          },
           h("time", { class: "cp-log__date", datetime: update.date }, update.dateLabel),
           h(
             "p",
@@ -174,7 +182,7 @@ export function buildFrame(ctx: ShellContext): Frame {
     h(
       "ul",
       { class: "cp-score__run", ...(hidden ? { "aria-hidden": "true" } : {}) },
-      h("li", { class: "cp-score__tick" }, "`<"),
+      h("li", { class: "cp-score__tick" }, copy.scoreOpen),
       content.updates.map((update) => {
         const note = noteForUpdate(update.kind);
         const anchor = link(update.href, { class: "cp-tok__link" }, update.title);
@@ -189,7 +197,7 @@ export function buildFrame(ctx: ShellContext): Frame {
           h("span", { class: "cp-tok__rest", "aria-hidden": "true" }, "~"),
         );
       }),
-      h("li", { class: "cp-score__tick" }, '>`.log("burooj")'),
+      h("li", { class: "cp-score__tick" }, copy.scoreClose),
     );
   const tape = h("div", { class: "cp-score__tape" }, tokens(false), tokens(true));
   const pauseButton = h(
@@ -198,7 +206,7 @@ export function buildFrame(ctx: ShellContext): Frame {
       type: "button",
       class: "cp-score__play",
       "aria-pressed": "false",
-      "aria-label": "Pause the updates tape",
+      "aria-label": copy.pauseTape,
     },
     markup(
       '<svg viewBox="0 0 16 16" aria-hidden="true"><path class="cp-score__icon-pause" d="M5 3v10M11 3v10"/><path class="cp-score__icon-play" d="M4 2.5v11L13.5 8z"/></svg>',
@@ -211,19 +219,23 @@ export function buildFrame(ctx: ShellContext): Frame {
       class: "cp-score__count",
       "aria-controls": "cp-log",
       "aria-expanded": "false",
-      "aria-label": `Open the log of ${content.updates.length} updates`,
+      "aria-label": fill(copy.openLog, { n: updatesCount }),
     },
-    h("span", null, String(content.updates.length)),
+    h("span", null, String(updatesCount)),
     markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h8"/></svg>'),
   );
   const score = h(
     "section",
-    { class: "cp-score", "aria-label": "Recent updates", "data-state": "playing" },
+    {
+      class: "cp-score",
+      "aria-label": content.pages.home.updates.title,
+      "data-state": "playing",
+    },
     pauseButton,
     h(
       "div",
       { class: "cp-score__window" },
-      h("p", { class: "cp-score__label" }, "Updates"),
+      h("p", { class: "cp-score__label" }, copy.score),
       h("div", { class: "cp-score__viewport" }, tape),
     ),
     scoreCount,
@@ -257,13 +269,13 @@ export function buildFrame(ctx: ShellContext): Frame {
       type: "button",
       class: "cp-keys__fold",
       "aria-expanded": "true",
-      "aria-label": "Fold the keyboard",
+      "aria-label": copy.foldKeys,
     },
     markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg>'),
   );
   const nav = h(
     "nav",
-    { class: "cp-keys", "aria-label": "Sections" },
+    { class: "cp-keys", "aria-label": copy.keys },
     fold,
     h(
       "ul",
@@ -272,7 +284,7 @@ export function buildFrame(ctx: ShellContext): Frame {
     ),
   );
 
-  const skip = h("a", { class: "cp-skip", href: "#cp-stage" }, "Skip to content");
+  const skip = h("a", { class: "cp-skip", href: "#cp-stage" }, content.site.skipLink);
   const app = h(
     "div",
     {
@@ -356,7 +368,7 @@ export function buildFrame(ctx: ShellContext): Frame {
   const setKeys = (open: boolean) => {
     app.dataset.keys = open ? "open" : "closed";
     fold.setAttribute("aria-expanded", String(open));
-    fold.setAttribute("aria-label", open ? "Fold the keyboard" : "Unfold the keyboard");
+    fold.setAttribute("aria-label", open ? copy.foldKeys : copy.unfoldKeys);
   };
   on(fold, "click", () => setKeys(app.dataset.keys !== "open"));
 
@@ -366,7 +378,7 @@ export function buildFrame(ctx: ShellContext): Frame {
     setSound(next);
     soundButton.setAttribute("aria-pressed", String(next));
     soundButton.dataset.state = next ? "on" : "off";
-    soundButton.querySelector(".cp-sound__state")!.textContent = next ? "on" : "off";
+    soundButton.querySelector(".cp-sound__state")!.textContent = next ? copy.soundOn : copy.soundOff;
     if (next) play(NOTES[0].frequency, 0.8);
   });
 
@@ -374,10 +386,7 @@ export function buildFrame(ctx: ShellContext): Frame {
   const setTape = (playing: boolean) => {
     score.dataset.state = playing ? "playing" : "paused";
     pauseButton.setAttribute("aria-pressed", String(!playing));
-    pauseButton.setAttribute(
-      "aria-label",
-      playing ? "Pause the updates tape" : "Play the updates tape",
-    );
+    pauseButton.setAttribute("aria-label", playing ? copy.pauseTape : copy.playTape);
   };
   on(pauseButton, "click", () => setTape(score.dataset.state !== "playing"));
   if (ctx.reducedMotion) setTape(false);
@@ -425,7 +434,7 @@ export function buildFrame(ctx: ShellContext): Frame {
     });
     app.dataset.note = note?.id ?? "none";
     const sol = note?.sol ?? "—";
-    const where = keys.find((key) => key.note === note)?.label.toLowerCase() ?? "sheet";
+    const where = keys.find((key) => key.note === note)?.label.toLowerCase() ?? copy.sheet;
     if (face || ctx.reducedMotion || readoutNote.textContent === sol) {
       readoutNote.textContent = sol;
       readoutWhere.textContent = where;
@@ -444,7 +453,7 @@ export function buildFrame(ctx: ShellContext): Frame {
         readoutWhere.textContent = where;
       }, 160);
     }
-    tearLabel.textContent = `${keys.find((key) => key.note === note)?.label ?? "Sheet"}.`;
+    tearLabel.textContent = `${keys.find((key) => key.note === note)?.label ?? copy.sheetTear}.`;
     tear.style.setProperty("--note", note ? noteVar(note.id) : "var(--cp-ivory)");
   };
 

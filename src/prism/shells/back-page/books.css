@@ -114,7 +114,7 @@
   visibility: hidden;
 }
 :root[data-lens="back-page"] .bp-shelf__book[data-state="open"]::after {
-  content: "open";
+  content: attr(data-open);
   position: absolute;
   inset: 0;
   display: grid;

@@ -1,102 +1,144 @@
 /** The resume as the STATUS screen: a party roster. Each role is a member
  * row with a tag, a name plate and its record; education follows, tools are
- * the skill list, and the closing note is a dialogue box. */
-import type { Route } from "../types";
-import { type Env, type Screen, backLink, frame, prompts, scrollKeys, tabs, text } from "./chrome";
+ * the skill list, and the resume page's own note is a dialogue box. Built
+ * from the structured resume (content.resume), never from its prose. */
+import type { ResumeEntry, Route } from "../types";
+import { type PartAttrs, part } from "../../parts";
+import { blocks, inline } from "../rich";
+import { type Copy, type Env, type Screen, backLink, copyOf, frame, prompts, scrollKeys, tabs } from "./chrome";
 import { h, ransom } from "./dom";
 
-interface Entry {
-  heading: string;
-  nodes: Element[];
-}
-interface Section {
-  title: string;
-  lead: Element[];
-  entries: Entry[];
-}
+type Kind = "experience" | "education" | "tools" | "note";
 
-function sections(prose: Element | null): Section[] {
-  const out: Section[] = [];
-  let section: Section | undefined;
-  let entry: Entry | undefined;
-  for (const node of Array.from(prose?.children ?? [])) {
-    if (node.tagName === "H2") {
-      section = { title: text(node), lead: [], entries: [] };
-      entry = undefined;
-      out.push(section);
-    } else if (node.tagName === "H3") {
-      section ??= (out.push({ title: "", lead: [], entries: [] }), out[out.length - 1]);
-      entry = { heading: text(node), nodes: [] };
-      section.entries.push(entry);
-    } else {
-      section ??= (out.push({ title: "", lead: [], entries: [] }), out[out.length - 1]);
-      (entry ? entry.nodes : section.lead).push(node.cloneNode(true) as Element);
-    }
-  }
-  return out;
+/** A row's tag, read from what the entry says, never from its position.
+ * An open-ended role is current; otherwise the kind of work, when its title,
+ * kind or date line names it; otherwise nothing. */
+function tagFor(kind: Kind, entry: ResumeEntry, copy: Copy): { label: string; current?: boolean } | null {
+  const { tags } = copy.resume;
+  if (entry.current) return { label: tags.current, current: true };
+  if (kind === "education") return { label: tags.education };
+  if (kind !== "experience") return null;
+  const said = [entry.title, entry.kind, entry.dateLine].filter(Boolean).join(" ");
+  if (/\bintern(ship)?\b/i.test(said)) return { label: tags.internship };
+  if (/\b(freelance|client work)\b/i.test(said)) return { label: tags.client };
+  if (/\bcontract\b/i.test(said)) return { label: tags.contract };
+  if (/\bproject work\b/i.test(said)) return { label: tags.projectWork };
+  // A titled role at a named organisation over a span of time.
+  if (entry.title && entry.org && entry.start && entry.end && entry.start !== entry.end)
+    return { label: tags.employment };
+  return null;
 }
 
-const TAGS = ["Leader", "Party", "Party", "Party", "Party", "Party"];
-
-function row(entry: Entry, i: number, kind: string) {
-  const [role, org] = entry.heading.split(" · ");
-  // A leading italic line is the date, the "level" of the row.
-  const first = entry.nodes[0];
-  const hasDate = first?.tagName === "P" && first.children.length === 1 && first.firstElementChild?.tagName === "EM";
-  const date = hasDate ? text(first) : "";
-  const body = hasDate ? entry.nodes.slice(1) : entry.nodes;
+function row(entry: ResumeEntry, i: number, kind: Kind, copy: Copy) {
+  // The name plate: the title, with the organisation beside it; an entry
+  // with no title is named by its organisation alone.
+  const role = entry.title ?? entry.org ?? entry.heading;
+  const org = entry.title ? entry.org : undefined;
+  const tag = tagFor(kind, entry, copy);
+  const body: HTMLElement[] = [];
+  if (entry.summary) body.push(h("p", {}, inline(entry.summary)));
+  if (entry.bullets.length)
+    body.push(h("ul", {}, entry.bullets.map((bullet) => h("li", {}, inline(bullet)))));
   return h(
     "li",
-    { class: "cc-member", style: `--i:${i}`, "data-kind": kind },
-    h("span", { class: "cc-member__tag", "aria-hidden": "true" }, kind === "experience" ? TAGS[i] ?? "Party" : "Study"),
+    {
+      class: "cc-member",
+      style: `--i:${i}`,
+      "data-kind": kind,
+      "data-current": tag?.current ? "" : null,
+      ...part(kind === "education" ? "resume.education" : "resume.role", entry.id),
+    },
+    tag ? h("span", { class: "cc-member__tag", "aria-hidden": "true" }, tag.label) : null,
     h(
       "h3",
       { class: "cc-member__head" },
       h("span", { class: "cc-member__role" }, role),
       org ? h("span", { class: "cc-member__org" }, h("span", { class: "cc-sr" }, " · "), org) : null,
     ),
-    date ? h("p", { class: "cc-member__date" }, date) : null,
+    entry.dateLine ? h("p", { class: "cc-member__date" }, entry.dateLine) : null,
     body.length ? h("div", { class: "cc-member__body" }, body) : null,
   );
 }
 
+/** The resume page's free body: each h2 opens its own section, and what
+ * follows it is said in a dialogue box. */
+function notes(html: string) {
+  const out: { title: string; nodes: HTMLElement[] }[] = [];
+  for (const node of blocks(html)) {
+    if (node.tagName === "H2") out.push({ title: node.textContent ?? "", nodes: [] });
+    else {
+      if (!out.length) out.push({ title: "", nodes: [] });
+      out[out.length - 1].nodes.push(node);
+    }
+  }
+  return out;
+}
+
 export function resume(route: Route, env: Env): Screen {
-  void env;
+  const { content } = env;
+  const copy = copyOf(content);
+  const { header, html } = content.pages.resume;
+  const { experience, education, tools } = content.resume;
   const { el, main } = frame(route.kind, "cc-status");
   el.querySelector(".cc-screen__bg")!.append(
     h("span", { class: "cc-status__red" }),
     h("span", { class: "cc-status__rays" }),
   );
-  const name = text(route.main.querySelector("h1")) || "Resume";
-  const intro = text(route.main.querySelector(".page-header__intro"));
-  const contacts = Array.from(route.main.querySelectorAll<HTMLAnchorElement>(".page-header__actions a"));
-  const heading = h("h1", { class: "cc-status__name", tabindex: "-1" }, ransom(name, { boxes: 0.16, salt: 8 }));
-  const back = backLink("/", "Command");
+  const heading = h(
+    "h1",
+    { class: "cc-status__name", tabindex: "-1", ...part("page.title", "resume") },
+    ransom(header.title, { boxes: 0.16, salt: 8 }),
+  );
+  const back = backLink(copy, "/", copy.sections.home);
 
-  const panels = sections(route.main.querySelector(".prose")).map((section, s) => {
-    const key = section.title.toLowerCase();
-    const kind = key.includes("experience") ? "experience" : key.includes("education") ? "education" : key.includes("tool") ? "tools" : "note";
-    const content: (Node | null)[] = [];
-    if (kind === "tools") {
-      const list = section.lead.map((n) => text(n)).join(" ").replace(/\.$/, "");
-      const skills = list.split(/,\s*(?:and\s+)?|\s+and\s+/).filter(Boolean);
-      content.push(
-        h("ul", { class: "cc-skills" }, skills.map((skill, i) => h("li", { style: `--i:${i}` }, h("span", { "aria-hidden": "true" }, "★ "), skill))),
-      );
-    } else if (section.lead.length) {
-      content.push(h("div", { class: kind === "note" ? "cc-say" : "cc-status__lead" },
-        kind === "note" ? h("span", { class: "cc-say__name", "aria-hidden": "true" }, "Burooj") : null,
-        ...section.lead));
-    }
-    if (section.entries.length)
-      content.push(h("ol", { class: "cc-roster" }, section.entries.map((entry, i) => row(entry, i, kind))));
-    return h(
+  const sections: { kind: Kind; title: string; content: Node[]; attrs?: PartAttrs }[] = [];
+  if (experience.roles.length)
+    sections.push({
+      kind: "experience",
+      title: experience.title,
+      content: [h("ol", { class: "cc-roster" }, experience.roles.map((entry, i) => row(entry, i, "experience", copy)))],
+    });
+  if (education.entries.length)
+    sections.push({
+      kind: "education",
+      title: education.title,
+      content: [h("ol", { class: "cc-roster" }, education.entries.map((entry, i) => row(entry, i, "education", copy)))],
+    });
+  if (tools.items.length)
+    sections.push({
+      kind: "tools",
+      title: tools.title,
+      content: [
+        h(
+          "ul",
+          { class: "cc-skills", ...part("resume.tools") },
+          tools.items.map((skill, i) => h("li", { style: `--i:${i}` }, h("span", { "aria-hidden": "true" }, "★ "), skill)),
+        ),
+      ],
+    });
+  for (const note of notes(html))
+    sections.push({
+      kind: "note",
+      title: note.title,
+      content: note.nodes.length
+        ? [h("div", { class: "cc-say" }, h("span", { class: "cc-say__name", "aria-hidden": "true" }, copy.speaker), ...note.nodes)]
+        : [],
+      attrs: part("page.body", "resume"),
+    });
+
+  const panels = sections.map((section, s) =>
+    h(
       "section",
-      { class: `cc-status__panel cc-status__panel--${kind}`, style: `--i:${s}`, "aria-labelledby": `cc-status-${s}` },
-      h("h2", { class: "cc-status__section", id: `cc-status-${s}` }, section.title),
-      ...content,
-    );
-  });
+      {
+        class: `cc-status__panel cc-status__panel--${section.kind}`,
+        style: `--i:${s}`,
+        "aria-labelledby": section.title ? `cc-status-${s}` : null,
+        ...section.attrs,
+      },
+      section.title ? h("h2", { class: "cc-status__section", id: `cc-status-${s}` }, section.title) : null,
+      ...section.content,
+    ),
+  );
 
   const body = h("div", { class: "cc-status__body" }, panels);
   main.append(
@@ -104,27 +146,27 @@ export function resume(route: Route, env: Env): Screen {
       "header",
       { class: "cc-status__head" },
       back,
-      h("p", { class: "cc-status__logo", "aria-hidden": "true" }, ransom("Status", { boxes: 0.3, salt: 1 })),
+      h("p", { class: "cc-status__logo", "aria-hidden": "true" }, ransom(copy.sections.resume, { boxes: 0.3, salt: 1 })),
       h(
         "div",
         { class: "cc-status__card" },
-        h("p", { class: "cc-status__lv", "aria-hidden": "true" }, "Leader"),
+        h("p", { class: "cc-status__lv", "aria-hidden": "true" }, copy.resume.leader),
         heading,
-        intro ? h("p", { class: "cc-status__intro" }, intro) : null,
-        contacts.length
+        header.intro ? h("p", { class: "cc-status__intro", ...part("page.intro", "resume") }, header.intro) : null,
+        header.actions.length
           ? h(
               "ul",
-              { class: "cc-status__contacts", "aria-label": "Contact" },
-              contacts.map((a) =>
-                h("li", {}, h("a", { href: a.getAttribute("href") ?? "#", rel: "noreferrer" }, text(a))),
+              { class: "cc-status__contacts", "aria-label": copy.resume.contacts, ...part("page.actions", "resume") },
+              header.actions.map((action) =>
+                h("li", {}, h("a", { href: action.href, rel: "noreferrer" }, action.label)),
               ),
             )
           : null,
       ),
     ),
     body,
-    prompts([["Q/E", "Section"], ["Esc", "Back"]]),
+    prompts([["Q/E", copy.chrome.prompts.section], ["Esc", copy.chrome.prompts.back]]),
   );
-  el.prepend(tabs(route.kind));
+  el.prepend(tabs(route.kind, copy));
   return { el, heading, back, onKey: scrollKeys(body) };
 }
