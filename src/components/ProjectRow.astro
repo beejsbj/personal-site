@@ -75,6 +75,23 @@ const {
   .project-row--feature .summary {
     font-size: var(--text-base);
   }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .project-row:hover :global(.ds-media),
+    .project-row:has(:focus-visible) :global(.ds-media) {
+      transform: translateY(calc(-1 * var(--motion-lift)));
+    }
+    .project-row:hover :global(.ds-media)::before,
+    .project-row:has(:focus-visible) :global(.ds-media)::before {
+      transform: translate(
+        calc(-1 * var(--motion-nudge)),
+        calc(-1 * var(--motion-nudge))
+      );
+    }
+    .project-row:hover :global(.ds-media)::after,
+    .project-row:has(:focus-visible) :global(.ds-media)::after {
+      transform: translate(var(--motion-nudge), var(--motion-nudge));
+    }
+  }
   @media (max-width: 62.5rem) {
     .project-row {
       grid-template-columns: 1fr;

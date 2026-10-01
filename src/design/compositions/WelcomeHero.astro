@@ -70,6 +70,73 @@ const { social, level = 1, id = "home-title" } = Astro.props;
     margin-top: var(--space-m);
     font-size: var(--text-base);
   }
+  /* Arrival: the greeting waves, the headline lands as its tracking settles,
+     then the role, welcome and links rise in turn. CSS only; reduced motion
+     and no-JavaScript visitors simply see the resting state. */
+  @media (prefers-reduced-motion: no-preference) {
+    .greeting {
+      transform-origin: 0 100%;
+      animation: wave calc(var(--duration-settle) * 1.25) var(--ease-settle)
+        backwards;
+    }
+    .title {
+      transform-origin: 0 100%;
+      animation: land var(--duration-settle) var(--ease-settle)
+        calc(var(--stagger) * 2) backwards;
+    }
+    .occupation,
+    .welcome,
+    .socials {
+      animation: rise var(--duration-settle) var(--ease-settle) backwards;
+    }
+    .occupation {
+      animation-delay: calc(var(--stagger) * 3);
+    }
+    .welcome {
+      animation-delay: calc(var(--stagger) * 4);
+    }
+    .socials {
+      animation-delay: calc(var(--stagger) * 5);
+    }
+  }
+  @keyframes wave {
+    0% {
+      opacity: 0;
+      transform: translateY(var(--motion-rise))
+        rotate(calc(-1 * var(--wave-angle)));
+    }
+    45% {
+      opacity: 1;
+      transform: rotate(calc(var(--wave-angle) / 2));
+    }
+    75% {
+      transform: rotate(calc(var(--wave-angle) / -4));
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes land {
+    from {
+      opacity: 0;
+      transform: translateY(var(--motion-rise)) scaleX(var(--tracking-settle));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(var(--motion-rise));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
   @media (max-width: 62.5rem) {
     .hello {
       grid-template-columns: var(--portrait-width-mid) minmax(0, 1fr);
