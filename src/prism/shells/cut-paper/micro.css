@@ -1,643 +1,248 @@
-/* Cut Paper — microanimations. Everything lives on the beat (500ms at
-   120bpm): hovers bloom on the next sixteenth, entrances stagger on
-   eighths, the downbeat nods. Transform and opacity only; the horn section
-   names every ease (swing = the lift, stab = the hit, brush = the wash,
-   paper = the fold). Individual transform properties (translate / rotate /
-   scale) compose over the designer's static `transform`s so nothing snaps.
-   One brass-lit signal per panel: the pulses here are the same signal the
-   panel already has, breathing. Injected after shell.css into the same
-   persistent <style>. */
-
-:root[data-lens="cut-paper"] {
-  --cp-8th: calc(var(--cp-beat) / 2);
-  --cp-16th: calc(var(--cp-beat) / 4);
-  --cp-bar: calc(var(--cp-beat) * 4);
-}
-
-/* ── entrances: a screen lands in parts, on the grid ─────────
-   `data-beat` is the hook, `--i` the sixteenth it lands on. Opacity is
-   outside the motion query so the fade still reads with reduced motion. */
-
-:root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="entering"] [data-beat] {
-  opacity: 0;
-}
-
-:root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] [data-beat] {
-  transition: opacity var(--cp-dur-panel) var(--cp-ease-brush);
-  transition-delay: calc(min(var(--i, 0), 14) * var(--cp-16th));
-}
-
-/* ── confetti: cut shapes fall as the sheet pulls away ──────── */
-
-:root[data-lens="cut-paper"] .cp-confetti {
-  position: absolute;
-  inset: 0;
-  z-index: 15;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-:root[data-lens="cut-paper"] .cp-confetti__bit {
-  position: absolute;
-  top: 0;
-  width: 13px;
-  height: 13px;
-  background: var(--paper);
-  opacity: 0;
-  will-change: transform;
-}
-
-:root[data-lens="cut-paper"] .cp-confetti__bit--tri {
-  clip-path: polygon(0 100%, 46% 0, 100% 88%);
-}
-
-:root[data-lens="cut-paper"] .cp-confetti__bit--dot {
-  border-radius: 50%;
-}
-
-:root[data-lens="cut-paper"] .cp-confetti__bit--bar {
-  width: 22px;
-  height: 6px;
-}
-
-:root[data-lens="cut-paper"] .cp-confetti__bit--tab {
-  width: 16px;
-  height: 10px;
-  clip-path: var(--cp-cut-tab);
-}
-
-/* ── colour-only responses (safe under reduced motion) ──────── */
-
-:root[data-lens="cut-paper"] .cp-cut:hover .cp-cut__no,
-:root[data-lens="cut-paper"] .cp-track__link:hover .cp-track__no {
-  color: var(--note, var(--cp-ivory));
-}
-
-:root[data-lens="cut-paper"] .cp-sleeve:hover .cp-sleeve__side {
-  color: var(--cp-ivory-2);
-}
-
-:root[data-lens="cut-paper"] .cp-sound__wave {
-  stroke-dasharray: 1;
-}
+/* Cut Paper microanimation: everything that moves lands on the 120 bpm
+   grid. Cells tick in eighths, playing things pulse on the beat, entrances
+   arrive a sixteenth apart. All of it pauses with the prism's idle flag and
+   none of it runs under reduced motion. */
 
 @media (prefers-reduced-motion: no-preference) {
-  /* ── entrances (motion half) ──────────────────────────────── */
-
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="entering"] [data-beat] {
-    translate: 0 12px;
-  }
-
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] [data-beat] {
-    transition:
-      opacity var(--cp-dur-panel) var(--cp-ease-brush),
-      translate var(--cp-dur-panel) var(--cp-ease-swing);
-  }
-
-  /* the poster's tagline lands a word per beat */
-  :root[data-lens="cut-paper"] .cp-poster__tag span {
-    display: inline-block;
-    margin-right: 0.3em;
-  }
-
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="entering"] .cp-poster__tag span {
-    translate: 0 6px;
-    rotate: -3deg;
-  }
-
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] .cp-poster__tag span {
-    transition:
-      opacity var(--cp-dur-ui) var(--cp-ease-brush),
-      translate var(--cp-dur-ui) var(--cp-ease-stab),
-      rotate var(--cp-dur-ui) var(--cp-ease-stab);
-  }
-
-  /* ── status bar ───────────────────────────────────────────── */
-
-  /* the logo nods on the downbeat, like a musician counting in */
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-logo__paper {
-    animation: cut-paper-nod var(--cp-bar) var(--cp-ease-stab) infinite;
-  }
-
-  @keyframes cut-paper-nod {
-    0% { rotate: 0deg; translate: 0 0; }
-    4% { rotate: -2.2deg; translate: 0 -1px; }
-    16%, 100% { rotate: 0deg; translate: 0 0; }
-  }
-
-  /* headings nod too, a hair, from the baseline */
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) :is(.cp-home__title, .cp-seq__title, .cp-lab__title, .cp-cv__title, .cp-poster__title, .cp-liner__title) {
-    transform-origin: 0 100%;
-    animation: cut-paper-nod-head var(--cp-bar) var(--cp-ease-stab) infinite;
-  }
-
-  @keyframes cut-paper-nod-head {
-    0% { transform: rotate(0deg); }
-    4% { transform: rotate(-0.45deg) translateY(-2px); }
-    16%, 100% { transform: rotate(0deg); }
-  }
-
-  /* sound on: the wave draws out of the speaker */
-  :root[data-lens="cut-paper"] .cp-sound[data-state="on"] .cp-sound__wave {
-    animation: cut-paper-wave var(--cp-dur-panel) var(--cp-ease-brush) both;
-  }
-
-  @keyframes cut-paper-wave {
-    from { stroke-dashoffset: 1; }
-    to { stroke-dashoffset: 0; }
-  }
-
-  :root[data-lens="cut-paper"] .cp-sound svg {
-    transition: transform var(--cp-dur-tap) var(--cp-ease-stab);
-  }
-
-  :root[data-lens="cut-paper"] .cp-sound:active svg {
-    transform: scale(0.85);
-  }
-
-  /* log count nudges when the drawer is open */
-  :root[data-lens="cut-paper"] .cp-logbtn svg,
-  :root[data-lens="cut-paper"] .cp-score__count svg {
-    transition: transform var(--cp-dur-panel) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-logbtn[aria-expanded="true"] svg,
-  :root[data-lens="cut-paper"] .cp-score__count[aria-expanded="true"] svg {
-    transform: translateY(2px) scaleY(0.7);
-  }
-
-  /* ── log drawer: events land on successive sixteenths ─────── */
-
-  :root[data-lens="cut-paper"] .cp-log[data-state="open"] .cp-log__event {
-    animation: cut-paper-land var(--cp-dur-panel) var(--cp-ease-swing) both;
-    animation-delay: calc(var(--cp-dur-ui) + min(var(--i, 0), 7) * var(--cp-16th));
-  }
-
-  @keyframes cut-paper-land {
-    from { opacity: 0; translate: 0 10px; }
-    to { opacity: 1; translate: 0 0; }
-  }
-
-  :root[data-lens="cut-paper"] .cp-log__sol {
-    display: inline-block;
-    transition: translate var(--cp-dur-ui) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-log__event:hover .cp-log__sol {
-    translate: 0 -2px;
-  }
-
-  /* ── stage: the held string is plucked when its key lands ─── */
-
-  :root[data-lens="cut-paper"] .cp-app[data-note="do"] .cp-string[data-note="do"],
-  :root[data-lens="cut-paper"] .cp-app[data-note="re"] .cp-string[data-note="re"],
-  :root[data-lens="cut-paper"] .cp-app[data-note="mi"] .cp-string[data-note="mi"],
-  :root[data-lens="cut-paper"] .cp-app[data-note="fa"] .cp-string[data-note="fa"],
-  :root[data-lens="cut-paper"] .cp-app[data-note="sol"] .cp-string[data-note="sol"],
-  :root[data-lens="cut-paper"] .cp-app[data-note="la"] .cp-string[data-note="la"],
-  :root[data-lens="cut-paper"] .cp-app[data-note="ti"] .cp-string[data-note="ti"] {
-    animation: cut-paper-pluck calc(var(--cp-beat) * 2) var(--cp-ease-brush) 1;
-  }
-
-  @keyframes cut-paper-pluck {
-    0% { translate: 0 0; }
-    8% { translate: -5px 0; }
-    22% { translate: 4px 0; }
-    38% { translate: -3px 0; }
-    54% { translate: 2px 0; }
-    70% { translate: -1px 0; }
-    100% { translate: 0 0; }
-  }
-
-  /* ── score: tokens hop on the downbeat, braces spread on hover */
-
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-tok {
-    animation: cut-paper-hop var(--cp-bar) var(--cp-ease-stab) infinite;
-  }
-
-  @keyframes cut-paper-hop {
-    0% { translate: 0 -3px; }
-    7% { translate: 0 1px; }
-    14%, 100% { translate: 0 0; }
-  }
-
-  :root[data-lens="cut-paper"] .cp-tok__brace {
-    display: inline-block;
-    transition: translate var(--cp-dur-tap) var(--cp-ease-stab);
-  }
-
-  :root[data-lens="cut-paper"] .cp-tok:hover .cp-tok__brace:first-child {
-    translate: -3px 0;
-  }
-
-  :root[data-lens="cut-paper"] .cp-tok:hover .cp-tok__brace:nth-last-child(2) {
-    translate: 3px 0;
-  }
-
-  :root[data-lens="cut-paper"] .cp-score__play svg {
-    animation: cut-paper-stab-in var(--cp-dur-ui) var(--cp-ease-stab);
-  }
-
-  @keyframes cut-paper-stab-in {
-    from { transform: scale(0.55); }
-    to { transform: scale(1); }
-  }
-
-  /* ── keyboard ─────────────────────────────────────────────── */
-
-  /* keys are laid down one by one at mount */
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-key {
-    animation: cut-paper-lay var(--cp-dur-scene) var(--cp-ease-swing) both;
-    animation-delay: calc(var(--i, 0) * 55ms);
-  }
-
-  @keyframes cut-paper-lay {
-    from { opacity: 0; translate: 0 45%; }
-    to { opacity: 1; translate: 0 0; }
-  }
-
-  /* press stabs down, the release swings back */
-  :root[data-lens="cut-paper"] .cp-key {
-    transition:
-      transform var(--cp-dur-ui) var(--cp-ease-swing),
-      filter var(--cp-dur-ui) var(--cp-ease-brush),
-      background var(--cp-dur-panel) var(--cp-ease-brush),
-      color var(--cp-dur-panel) var(--cp-ease-brush),
-      border-radius var(--cp-dur-panel) var(--cp-ease-paper);
-  }
-
-  :root[data-lens="cut-paper"] .cp-key[data-state="pressed"] {
-    transform: scale(0.96) translateY(3px);
-    transition: transform var(--cp-dur-tap) var(--cp-ease-stab);
-  }
-
-  /* a corner of the paper tears off on the hit */
-  :root[data-lens="cut-paper"] .cp-key::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 16px;
-    height: 16px;
-    background: var(--cp-ink);
-    clip-path: polygon(0 0, 0 100%, 100% 100%);
-    opacity: 0;
-    transform-origin: 0 100%;
-    pointer-events: none;
-  }
-
-  :root[data-lens="cut-paper"] .cp-key[data-state="pressed"]::after {
-    animation: cut-paper-rip var(--cp-beat) var(--cp-ease-stab) both;
-  }
-
-  @keyframes cut-paper-rip {
-    0% { opacity: 0; transform: scale(0); }
-    12% { opacity: 0.85; transform: scale(1) rotate(0deg); }
-    45% { opacity: 0.85; transform: scale(1) rotate(0deg); }
-    100% { opacity: 0; transform: scale(0.6) translate(-6px, 6px) rotate(-28deg); }
-  }
-
-  /* the solfège glyph nods toward the hand */
-  :root[data-lens="cut-paper"] .cp-key__sol {
-    transform-origin: 0 100%;
-    transition: transform var(--cp-dur-ui) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-key:hover .cp-key__sol,
-  :root[data-lens="cut-paper"] .cp-key:focus-visible .cp-key__sol {
-    transform: rotate(-4deg) translateY(-2px);
-  }
-
-  :root[data-lens="cut-paper"] .cp-key__name {
-    transition: translate var(--cp-dur-ui) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-key:hover .cp-key__name {
-    translate: 0 -2px;
-  }
-
-  /* the held key's brass LED breathes on the downbeat */
-  :root[data-lens="cut-paper"] .cp-key[aria-current="page"] .cp-key__led {
-    animation: cut-paper-led var(--cp-bar) var(--cp-ease-stab) infinite;
-  }
-
-  @keyframes cut-paper-led {
-    0% { scale: 1.45; }
-    12%, 100% { scale: 1; }
-  }
-
-  :root[data-lens="cut-paper"] .cp-keys__fold svg {
-    transition: transform var(--cp-dur-panel) var(--cp-ease-swing), translate var(--cp-dur-ui) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-keys__fold:hover svg {
-    translate: 0 -1px;
-  }
-
-  /* ── shared: buttons lift a hair, arrows lean ─────────────── */
-
-  :root[data-lens="cut-paper"] .cp-btn,
-  :root[data-lens="cut-paper"] .cp-chipbtn {
-    transition:
-      background var(--cp-dur-ui) var(--cp-ease-brush),
-      transform var(--cp-dur-tap) var(--cp-ease-stab),
-      translate var(--cp-dur-ui) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-btn:hover,
-  :root[data-lens="cut-paper"] .cp-chipbtn:hover {
-    translate: 0 -2px;
-  }
-
-  :root[data-lens="cut-paper"] .cp-back > span,
-  :root[data-lens="cut-paper"] .cp-crate__all::after {
-    display: inline-block;
-    transition: translate var(--cp-dur-ui) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-back:hover > span {
-    translate: -4px 0;
-  }
-
-  :root[data-lens="cut-paper"] .cp-crate__all:hover::after {
-    translate: 4px 0;
-  }
-
-  :root[data-lens="cut-paper"] .cp-kicker::before {
-    transition: transform var(--cp-dur-ui) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-kicker:hover::before {
-    transform: rotate(53deg);
-  }
-
-  /* brand paper scraps flutter, slowly, out of phase */
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-scrap {
-    animation: cut-paper-flutter 5.5s var(--cp-ease-paper) infinite alternate;
-    transition: transform var(--cp-dur-panel) var(--cp-ease-paper);
-  }
-
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-scrap:nth-child(2) {
-    animation-duration: 6.5s;
-    animation-delay: -2.2s;
-  }
-
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-scrap:nth-child(3) {
-    animation-duration: 7.5s;
-    animation-delay: -4.1s;
-  }
-
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-scrap:nth-child(4) {
-    animation-duration: 6s;
-    animation-delay: -1.3s;
-  }
-
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-scrap:nth-child(5) {
-    animation-duration: 8s;
-    animation-delay: -5s;
-  }
-
-  @keyframes cut-paper-flutter {
-    from { rotate: 0deg; translate: 0 0; }
-    to { rotate: 2.5deg; translate: 1px 3px; }
-  }
-
-  /* ── home ─────────────────────────────────────────────────── */
-
-  /* the label sits a hair off the spindle, so it wobbles as it spins */
-  :root[data-lens="cut-paper"] .cp-record__label {
-    translate: 1.6% 0.8%;
-  }
-
-  /* the light on the vinyl creeps the other way */
-  :root[data-lens="cut-paper"] .cp-record__sheen {
-    animation: cut-paper-glint 11s linear infinite reverse;
-  }
-
-  @keyframes cut-paper-glint {
-    to { transform: rotate(360deg); }
-  }
-
-  /* the brass speed lamp breathes on the beat (the deck's one signal) */
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-turntable__speed::before {
-    animation: cut-paper-lamp var(--cp-beat) var(--cp-ease-stab) infinite;
-  }
-
-  @keyframes cut-paper-lamp {
-    0% { scale: 1.35; }
-    30%, 100% { scale: 1; }
+  /* the metronome: four dotted-quarter cells, a 12/8 bar */
+  :root[data-lens="cut-paper"] .cp-beat i {
+    animation: cut-paper-cell calc(var(--cp-beat) * 4) steps(1) infinite;
   }
 
-  /* the portrait straightens up when looked at */
-  :root[data-lens="cut-paper"] .cp-portrait,
-  :root[data-lens="cut-paper"] .cp-poster__portrait {
-    transition: transform var(--cp-dur-panel) var(--cp-ease-swing);
+  :root[data-lens="cut-paper"] .cp-beat i:first-child {
+    animation-name: cut-paper-down;
   }
 
-  :root[data-lens="cut-paper"] .cp-portrait:hover {
-    transform: rotate(1.5deg) scale(1.03);
+  :root[data-lens="cut-paper"] .cp-beat i:nth-child(2) {
+    animation-delay: calc(var(--cp-beat) * 1);
   }
-
-  :root[data-lens="cut-paper"] .cp-poster__portrait:hover {
-    transform: rotate(0.5deg) scale(1.02);
-  }
-
-  /* crate: a record peeks out of its sleeve when you reach for it */
-  :root[data-lens="cut-paper"] .cp-sleeve__art {
-    transition:
-      translate var(--cp-dur-ui) var(--cp-ease-swing),
-      rotate var(--cp-dur-ui) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-sleeve:hover .cp-sleeve__art,
-  :root[data-lens="cut-paper"] .cp-sleeve:focus-visible .cp-sleeve__art {
-    translate: 0 -4px;
-    rotate: -5deg;
-  }
-
-  :root[data-lens="cut-paper"] .cp-sleeve__side {
-    transition: translate var(--cp-dur-ui) var(--cp-ease-swing), color var(--cp-dur-ui) var(--cp-ease-brush);
-  }
-
-  :root[data-lens="cut-paper"] .cp-sleeve:hover .cp-sleeve__side {
-    translate: -4px 0;
-  }
-
-  :root[data-lens="cut-paper"] .cp-sleeve::before {
-    transition: scale var(--cp-dur-ui) var(--cp-ease-stab);
-    transform-origin: 0 50%;
-  }
-
-  :root[data-lens="cut-paper"] .cp-sleeve:hover::before,
-  :root[data-lens="cut-paper"] .cp-sleeve[data-state="playing"]::before {
-    scale: 1.8 1;
-  }
-
-  /* the taped note settles when touched */
-  :root[data-lens="cut-paper"] .cp-note {
-    transition: transform var(--cp-dur-panel) var(--cp-ease-swing);
-  }
-
-  :root[data-lens="cut-paper"] .cp-note:hover {
-    transform: rotate(-0.4deg);
-  }
-
-  /* ── projects: the playhead sweeps in, clips flash as it passes */
 
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] .cp-seq__run {
-    animation: cut-paper-sweep var(--cp-bar) linear both;
+  :root[data-lens="cut-paper"] .cp-beat i:nth-child(3) {
     animation-delay: calc(var(--cp-beat) * 2);
   }
 
-  @keyframes cut-paper-sweep {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
+  :root[data-lens="cut-paper"] .cp-beat i:nth-child(4) {
+    animation-delay: calc(var(--cp-beat) * 3);
   }
 
-  :root[data-lens="cut-paper"] .cp-clip::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--cp-ivory);
+  @keyframes cut-paper-cell {
+    0%, 11% { background: var(--cp-ivory-2); border-color: var(--cp-ivory-2); }
+    12%, 100% { background: transparent; border-color: var(--cp-hairline); }
+  }
+
+  @keyframes cut-paper-down {
+    0%, 11% { background: var(--cp-ivory); border-color: var(--cp-ivory); transform: scale(1.2); }
+    12%, 100% { background: transparent; border-color: var(--cp-hairline); transform: none; }
+  }
+
+  /* entrances: each piece arrives on its own sixteenth */
+  :root[data-lens="cut-paper"] .cp-screen [data-beat] {
+    transition:
+      opacity var(--cp-dur-panel) var(--cp-ease-brush) calc(var(--i, 0) * var(--cp-sixteenth)),
+      transform var(--cp-dur-panel) var(--cp-ease-swing) calc(var(--i, 0) * var(--cp-sixteenth));
+  }
+
+  :root[data-lens="cut-paper"] .cp-screen[data-state="entering"] [data-beat] {
     opacity: 0;
-    pointer-events: none;
+    transform: translateY(12px);
+    transition: none;
   }
 
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] .cp-clip {
-    animation: cut-paper-hit-clip var(--cp-8th) var(--cp-ease-stab) both;
-    animation-delay: calc(var(--cp-beat) * 2 + var(--at) / var(--now) * var(--cp-bar));
+  /* the transport, playing: the brass button breathes on the beat */
+  :root[data-lens="cut-paper"] .cp-app[data-playing="true"] .cp-tp--play {
+    animation: cut-paper-breathe var(--cp-beat) var(--cp-ease-stab) infinite;
   }
 
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] .cp-clip::after {
-    animation: cut-paper-hit-flash var(--cp-8th) var(--cp-ease-brush) both;
-    animation-delay: calc(var(--cp-beat) * 2 + var(--at) / var(--now) * var(--cp-bar));
+  @keyframes cut-paper-breathe {
+    0% { box-shadow: 0 0 22px rgba(224, 169, 58, 0.8); }
+    60%, 100% { box-shadow: var(--cp-glow-brass); }
   }
 
-  @keyframes cut-paper-hit-clip {
+  :root[data-lens="cut-paper"] .cp-app[data-playing="true"] .cp-pos__num i {
+    animation: cut-paper-tick var(--cp-beat) steps(1) infinite;
+  }
+
+  @keyframes cut-paper-tick {
+    0%, 49% { color: var(--cp-brass); }
+    50%, 100% { color: var(--cp-ivory-4); }
+  }
+
+  /* the "now" mark and the resting playhead breathe slowly */
+  :root[data-lens="cut-paper"] .cp-app[data-playing="false"] .cp-run__head {
+    animation: cut-paper-rest calc(var(--cp-beat) * 4) var(--cp-ease-brush) infinite;
+  }
+
+  @keyframes cut-paper-rest {
+    0% { opacity: 1; }
+    50% { opacity: 0.55; }
+    100% { opacity: 1; }
+  }
+
+  /* what is live pulses on the beat: clips, meters */
+  :root[data-lens="cut-paper"] .cp-launch[data-live] .cp-launch__btn::before,
+  :root[data-lens="cut-paper"] [data-live] > .cp-lane .cp-clip__name {
+    animation: cut-paper-pulse var(--cp-beat) var(--cp-ease-stab) infinite;
+  }
+
+  @keyframes cut-paper-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.55; }
+    100% { opacity: 1; }
+  }
+
+  :root[data-lens="cut-paper"] .cp-tr[data-live] .cp-vu i,
+  :root[data-lens="cut-paper"] .cp-col:has([data-live]) .cp-col__meter i,
+  :root[data-lens="cut-paper"] .cp-page--clip:has(.cp-pr[data-state="playing"]) .cp-fader__meter i {
+    animation: cut-paper-vu var(--cp-beat) var(--cp-ease-stab) infinite;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tr[data-live] .cp-vu i:nth-child(2),
+  :root[data-lens="cut-paper"] .cp-col:has([data-live]) .cp-col__meter i:nth-child(2) {
+    animation-delay: calc(var(--cp-sixteenth) * -1);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tr[data-live] .cp-vu i:nth-child(3),
+  :root[data-lens="cut-paper"] .cp-col:has([data-live]) .cp-col__meter i:nth-child(3) {
+    animation-delay: calc(var(--cp-sixteenth) * -3);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tr[data-live] .cp-vu i:nth-child(4),
+  :root[data-lens="cut-paper"] .cp-col:has([data-live]) .cp-col__meter i:nth-child(4) {
+    animation-delay: calc(var(--cp-sixteenth) * -2);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tr[data-live] .cp-vu i:nth-child(5) {
+    animation-delay: calc(var(--cp-sixteenth) * -0.5);
+  }
+
+  @keyframes cut-paper-vu {
     0% { transform: scaleY(1); }
-    30% { transform: scaleY(1.14) translateY(-2px); }
-    100% { transform: scaleY(1); }
+    35% { transform: scaleY(0.6); }
+    100% { transform: scaleY(0.2); }
   }
 
-  @keyframes cut-paper-hit-flash {
-    0% { opacity: 0; }
-    20% { opacity: 0.55; }
-    100% { opacity: 0; }
+  :root[data-lens="cut-paper"] .cp-page--clip:has(.cp-pr[data-state="playing"]) .cp-fader__meter i {
+    background: var(--note);
+    transform-origin: bottom;
   }
 
-  :root[data-lens="cut-paper"] .cp-track__art {
-    transition: rotate var(--cp-dur-ui) var(--cp-ease-swing), translate var(--cp-dur-ui) var(--cp-ease-swing);
+  /* a clicked clip is queued: it blinks on eighths until the page lands */
+  :root[data-lens="cut-paper"] .cp-launch[data-state="queued"] {
+    animation: cut-paper-queued var(--cp-eighth) steps(1) infinite;
   }
 
-  :root[data-lens="cut-paper"] .cp-track__link:hover .cp-track__art {
-    rotate: -3deg;
-    translate: 0 -2px;
+  @keyframes cut-paper-queued {
+    0% { filter: brightness(1.45); }
+    50% { filter: brightness(0.8); }
   }
 
-  :root[data-lens="cut-paper"] .cp-track__no {
-    transition: translate var(--cp-dur-ui) var(--cp-ease-swing), color var(--cp-dur-ui) var(--cp-ease-brush);
+  :root[data-lens="cut-paper"] .cp-launch[data-hit] {
+    animation: cut-paper-hit 400ms var(--cp-ease-stab);
   }
 
-  :root[data-lens="cut-paper"] .cp-track__link:hover .cp-track__no {
-    translate: 3px 0;
+  @keyframes cut-paper-hit {
+    0% { transform: scale(1.06); }
+    100% { transform: none; }
   }
 
-  /* ── a project: pull the record, peel the sticker ─────────── */
-
-  :root[data-lens="cut-paper"] .cp-sleeve-art:hover .cp-sleeve-art__disc {
-    transform: translateX(40%) rotate(24deg);
+  /* a marker the playhead crosses jumps */
+  :root[data-lens="cut-paper"] .cp-marker-slot[data-live] .cp-marker__flag {
+    animation: cut-paper-flag var(--cp-beat) var(--cp-ease-stab);
   }
 
-  :root[data-lens="cut-paper"] .cp-sleeve-art:hover .cp-sleeve-art__scrap-a {
-    transform: rotate(calc(var(--tilt) - 9deg)) translate(-5px, -4px);
+  @keyframes cut-paper-flag {
+    0% { transform: scale(1.8) rotate(-8deg); }
+    100% { transform: scale(1.3); }
   }
 
-  :root[data-lens="cut-paper"] .cp-sleeve-art:hover .cp-sleeve-art__scrap-b {
-    transform: rotate(calc(var(--tilt) + 2deg)) translate(3px, 2px);
+  /* knobs turn a little on hover, a pitch bend */
+  :root[data-lens="cut-paper"] .cp-device:hover .cp-knob__cap,
+  :root[data-lens="cut-paper"] .cp-strip:hover .cp-knob__cap {
+    transform: rotate(calc(var(--turn) + 24deg));
   }
 
-  :root[data-lens="cut-paper"] .cp-transport__btn > [aria-hidden] {
-    display: inline-block;
-    transition: translate var(--cp-dur-ui) var(--cp-ease-swing);
+  /* devices: the lab's own displays */
+  :root[data-lens="cut-paper"] .cp-viz--lotus path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: cut-paper-draw calc(var(--cp-beat) * 8) var(--cp-ease-paper) infinite;
+    animation-delay: calc(var(--d, 0) * var(--cp-eighth));
   }
 
-  :root[data-lens="cut-paper"] a.cp-transport__btn:not(.cp-transport__btn--next):hover > :first-child {
-    translate: -4px 0;
+  :root[data-lens="cut-paper"] .cp-viz__water {
+    --d: 5;
   }
 
-  :root[data-lens="cut-paper"] a.cp-transport__btn--next:hover > :last-child {
-    translate: 4px 0;
+  @keyframes cut-paper-draw {
+    0% { stroke-dashoffset: 1; }
+    40%, 82% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -1; }
   }
 
-  :root[data-lens="cut-paper"] .cp-insert {
-    transition: rotate var(--cp-dur-panel) var(--cp-ease-swing);
+  :root[data-lens="cut-paper"] .cp-viz--beats > * {
+    animation: cut-paper-thump calc(var(--cp-beat) * 4) var(--cp-ease-stab) infinite;
+    animation-delay: calc(var(--d) * var(--cp-beat));
   }
 
-  :root[data-lens="cut-paper"] .cp-insert:hover {
-    rotate: -0.4deg;
+  @keyframes cut-paper-thump {
+    0% { transform: scale(1.28); opacity: 1; }
+    22% { transform: scale(1); opacity: 0.85; }
+    100% { transform: scale(1); opacity: 0.45; }
   }
 
-  /* ── lab: presets lift out of the drawer ──────────────────── */
-
-  :root[data-lens="cut-paper"] .cp-preset__viz {
-    transition:
-      translate var(--cp-dur-ui) var(--cp-ease-swing),
-      rotate var(--cp-dur-ui) var(--cp-ease-swing);
+  :root[data-lens="cut-paper"] .cp-device__power {
+    animation: cut-paper-pulse calc(var(--cp-beat) * 2) var(--cp-ease-brush) infinite;
   }
 
-  :root[data-lens="cut-paper"] .cp-preset:hover .cp-preset__viz,
-  :root[data-lens="cut-paper"] .cp-preset:focus-within .cp-preset__viz {
-    translate: 0 -3px;
-    rotate: -1.5deg;
+  /* the browser: the held key's LED keeps time */
+  :root[data-lens="cut-paper"] .cp-key[aria-current="page"] .cp-key__led {
+    animation: cut-paper-pulse var(--cp-beat) var(--cp-ease-stab) infinite;
   }
 
-  :root[data-lens="cut-paper"] .cp-preset::before {
-    transition: scale var(--cp-dur-ui) var(--cp-ease-stab);
+  :root[data-lens="cut-paper"] .cp-key[data-state="hover"] .cp-key__pad {
+    animation: cut-paper-key 300ms var(--cp-ease-stab);
   }
 
-  :root[data-lens="cut-paper"] .cp-preset:hover::before,
-  :root[data-lens="cut-paper"] .cp-preset:focus-within::before {
-    scale: 1 1.12;
+  @keyframes cut-paper-key {
+    0% { transform: translateX(-3px); }
+    100% { transform: none; }
   }
 
-  :root[data-lens="cut-paper"] .cp-preset__apply {
-    transition:
-      background var(--cp-dur-ui) var(--cp-ease-brush),
-      color var(--cp-dur-ui) var(--cp-ease-brush),
-      translate var(--cp-dur-ui) var(--cp-ease-swing);
+  /* the sleeve's record turns, slowly, at 33 1/3 */
+  :root[data-lens="cut-paper"] .cp-sleeve__disc {
+    animation: cut-paper-spin 1800ms linear infinite;
   }
 
-  :root[data-lens="cut-paper"] .cp-preset:hover .cp-preset__apply,
-  :root[data-lens="cut-paper"] .cp-preset:focus-within .cp-preset__apply {
-    translate: 3px 0;
+  @keyframes cut-paper-spin {
+    to { transform: rotate(360deg); }
   }
 
-  :root[data-lens="cut-paper"] .cp-drawer__tab[data-state="on"] {
-    animation: cut-paper-tab-nod var(--cp-bar) var(--cp-ease-stab) infinite;
+  :root[data-lens="cut-paper"] .cp-sleeve__tag span[data-beat] {
+    transition-timing-function: var(--cp-ease-swing);
   }
 
-  @keyframes cut-paper-tab-nod {
-    0% { translate: 0 0; }
-    4% { translate: 0 -2px; }
-    16%, 100% { translate: 0 0; }
+  :root[data-lens="cut-paper"] .cp-sleeve:hover .cp-sleeve__portrait {
+    transform: rotate(-1deg) translateY(-4px);
   }
 
-  /* ── resume: the side letter peels ────────────────────────── */
-
-  :root[data-lens="cut-paper"] .cp-side__letter {
-    transition: rotate var(--cp-dur-ui) var(--cp-ease-swing), translate var(--cp-dur-ui) var(--cp-ease-swing);
+  :root[data-lens="cut-paper"] .cp-sleeve__portrait {
+    transition: transform var(--cp-dur-panel) var(--cp-ease-swing);
   }
 
-  :root[data-lens="cut-paper"] .cp-side:hover .cp-side__letter {
-    rotate: -4deg;
-    translate: 0 -1px;
+  /* the scene button, while it plays its row */
+  :root[data-lens="cut-paper"] .cp-scene[data-state="playing"] .cp-scene__btn {
+    animation: cut-paper-pulse var(--cp-eighth) steps(2) infinite;
   }
 }
 
-/* ── reduced motion: colour and opacity only ───────────────── */
-
 @media (prefers-reduced-motion: reduce) {
-  :root[data-lens="cut-paper"] .cp-confetti {
-    display: none;
+  :root[data-lens="cut-paper"] .cp-launch:hover,
+  :root[data-lens="cut-paper"] .cp-key[data-state="pressed"],
+  :root[data-lens="cut-paper"] .cp-key[aria-current="page"] {
+    transform: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-viz--lotus path {
+    stroke-dasharray: none;
   }
 }

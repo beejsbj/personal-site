@@ -65,3 +65,11 @@ export function closeSound() {
   context = undefined;
   master = undefined;
 }
+
+/** Play a few frequencies together, a hair apart, like a strummed chord. */
+export function strum(frequencies: number[], velocity = 0.7, spread = 18) {
+  if (!enabled) return;
+  frequencies.forEach((frequency, index) =>
+    setTimeout(() => play(frequency, velocity / Math.sqrt(frequencies.length)), index * spread),
+  );
+}
