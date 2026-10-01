@@ -27,9 +27,10 @@ html[data-lens-shell]::view-transition-old(root),
 html[data-lens-shell]::view-transition-new(root) {
   animation: none;
 }
-/* Off-axis prism faces, and every face while the camera moves, hold still. */
-:root[data-prism-idle] *,
-:root[data-prism-idle] *::before,
-:root[data-prism-idle] *::after {
+/* Off-axis prism faces, every face while the camera moves, and the page
+   behind an open prism hold still. The prism's own chrome keeps moving. */
+:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-lure, #prism-lure *),
+:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-lure, #prism-lure *)::before,
+:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-lure, #prism-lure *)::after {
   animation-play-state: paused !important;
 }

@@ -280,6 +280,7 @@ export function createPrism(): Prism {
       // the real page behind it, let it paint, then dissolve the prism away.
       await setLens(lens.id);
       document.documentElement.classList.remove("prism-is-open");
+      document.documentElement.removeAttribute("data-prism-idle");
       scrollTo(0, faceScroll);
       await frame();
       await frame();
@@ -372,6 +373,8 @@ export function createPrism(): Prism {
     root.inert = false;
     root.removeAttribute("aria-hidden");
     document.documentElement.classList.add("prism-is-open");
+    // The page behind the stage is fully covered: it holds still too.
+    document.documentElement.setAttribute("data-prism-idle", "");
     // The stage looks identical to the page here; give the faces a moment
     // to rasterise before the camera moves, so the pull starts smooth.
     await frame();
