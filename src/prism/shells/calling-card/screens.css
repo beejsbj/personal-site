@@ -141,7 +141,7 @@
 }
 :root[data-lens="calling-card"] .cc-slot__name {
   font-family: var(--cc-display);
-  font-size: 1.45rem;
+  font-size: clamp(1.15rem, 1.9vw, 1.45rem);
   line-height: 1.15;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -1262,6 +1262,14 @@
   outline: none;
 }
 
+/* Mid widths: the document label would run under the section tabs; the
+   sheet's own heading already says it. */
+@media (max-width: 1180px) {
+  :root[data-lens="calling-card"] .cc-doc__label {
+    display: none;
+  }
+}
+
 /* =====================================================================
    Small screens: every inner screen becomes one scrolling column
    ===================================================================== */
@@ -1393,6 +1401,10 @@
   :root[data-lens="calling-card"] .cc-item__red {
     clip-path: polygon(0 0, 100% 0, 100% 22%, 0 34%);
   }
+  /* The column scrolls over a fixed ground: the star would sit under text. */
+  :root[data-lens="calling-card"] .cc-item__star {
+    display: none;
+  }
   :root[data-lens="calling-card"] .cc-item__visual {
     display: grid;
     gap: 1rem;
@@ -1447,13 +1459,18 @@
     clip-path: polygon(0 8%, 100% 0, 100% 26%, 0 40%);
   }
   :root[data-lens="calling-card"] .cc-confidant__side {
-    height: 22rem;
+    height: clamp(22rem, 58vw, 30rem);
   }
+  /* Capped so a tall tablet doesn't push the face under the tabs and the
+     chest over the title. */
   :root[data-lens="calling-card"] .cc-confidant__portrait {
     left: auto;
-    right: -12vw;
+    right: max(-12vw, calc(50% - 26rem));
     bottom: 0;
-    width: 78vw;
+    width: min(78vw, 28rem);
+    /* The cut-out's torso runs past its box; end it at the box so it
+       doesn't sit under the title and intro. */
+    clip-path: polygon(-20% -20%, 120% -20%, 120% 92%, -20% 100%);
   }
   :root[data-lens="calling-card"] .cc-arcana {
     left: 0.4rem;

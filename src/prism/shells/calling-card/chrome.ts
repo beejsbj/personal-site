@@ -230,10 +230,15 @@ export function roving(
 export function scrollKeys(column: HTMLElement) {
   return (event: KeyboardEvent) => {
     if (column.contains(document.activeElement)) return false;
+    const behavior = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    if (event.key === "Home" || event.key === "End") {
+      column.scrollTo({ top: event.key === "Home" ? 0 : column.scrollHeight, behavior });
+      return true;
+    }
     const step = { ArrowDown: 80, ArrowUp: -80, PageDown: 0.85, PageUp: -0.85 }[event.key];
     if (step === undefined) return false;
     const top = Math.abs(step) < 1 ? step * column.clientHeight : step;
-    column.scrollBy({ top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    column.scrollBy({ top, behavior });
     return true;
   };
 }

@@ -141,6 +141,8 @@
 /* ---------- Ransom lettering ---------- */
 :root[data-lens="calling-card"] .cc-ransom__ink {
   display: inline;
+  /* Tilted cut-outs eat the gap; keep "Calling Card" two words. */
+  word-spacing: 0.14em;
 }
 :root[data-lens="calling-card"] .cc-w {
   display: inline-block;
@@ -342,6 +344,35 @@
   background: var(--cc-white);
   color: var(--cc-black);
   font-size: 0.8rem;
+}
+
+/* Touch screens have no Esc, Q/E or Enter: the controller prompts step
+   aside, and key caps that label a tappable control become arrows. */
+@media (hover: none) and (pointer: coarse) {
+  /* .cc-root lifts these above the screen and panel sheets loaded later. */
+  :root[data-lens="calling-card"] .cc-root .cc-prompts,
+  :root[data-lens="calling-card"] .cc-root .cc-tabs__shoulder,
+  :root[data-lens="calling-card"] .cc-root .cc-file__open kbd,
+  :root[data-lens="calling-card"] .cc-root .cc-request__accept kbd {
+    display: none;
+  }
+  :root[data-lens="calling-card"] .cc-root .cc-file__open {
+    padding-left: 0.9rem;
+  }
+  :root[data-lens="calling-card"] .cc-root .cc-back__key,
+  :root[data-lens="calling-card"] .cc-root .cc-panel__close kbd {
+    min-width: 1.9rem;
+    font-size: 0;
+  }
+  :root[data-lens="calling-card"] .cc-root .cc-back__key::before,
+  :root[data-lens="calling-card"] .cc-root .cc-panel__close kbd::before {
+    content: "";
+    width: 0.62rem;
+    height: 0.72rem;
+    margin-left: -0.12rem;
+    background: currentColor;
+    clip-path: polygon(100% 0, 0 50%, 100% 100%);
+  }
 }
 
 /* ---------- Chips & shop cards (shared) ---------- */

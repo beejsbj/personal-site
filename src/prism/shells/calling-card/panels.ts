@@ -110,7 +110,12 @@ export function cardPanel(content: SiteContent): Panel {
     h(
       "div",
       { class: "cc-card__paper" },
-      h("span", { class: "cc-card__star", "aria-hidden": "true" }, concentricStar(["#0a0a0a", "#fff", "#0a0a0a", "#e5191c"])),
+      // The star is clipped by its own frame so it never adds scroll room.
+      h(
+        "span",
+        { class: "cc-card__starframe", "aria-hidden": "true" },
+        h("span", { class: "cc-card__star" }, concentricStar(["#0a0a0a", "#fff", "#0a0a0a", "#e5191c"])),
+      ),
       h("p", { class: "cc-card__to" }, "To whoever has a project in mind,"),
       title,
       h(

@@ -233,7 +233,7 @@ export function home(route: Route, env: Env): Screen {
     bubble,
     money,
     phoneChip ?? "",
-    prompts([["↑↓", "Select"], ["⏎", "Confirm"], ["Esc", "Back"]]),
+    prompts([["↑↓", "Select"], ["⏎", "Confirm"]]),
   );
 
   let first = true;
