@@ -14,6 +14,7 @@ const REVEAL_TARGETS = [
   ".updates .stream-events > li",
   ".updates .stream-caption",
   ".elsewhere > div",
+  ".signoff",
 ].join(",");
 const TILT_DEGREES = 6;
 const TILT_REACH = 2.2;

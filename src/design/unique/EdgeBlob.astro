@@ -1,5 +1,8 @@
 ---
-/** Cropped v1 artwork. Its optional magnetic runtime never intercepts clicks. */
+/** Cropped v1 artwork. Its optional magnetic runtime never intercepts clicks;
+ * a click on bare page inside the circle scrolls to the bottom and back.
+ * Like v1/v2's header circle it floats on arrival (a finite spell, on the
+ * individual translate property so it composes with the magnet's transform). */
 ---
 
 <div class="edge-blob" data-magnetic-edge aria-hidden="true">
@@ -36,6 +39,16 @@
       top: var(--edge-top-compact);
       left: var(--edge-left-compact);
       height: var(--edge-height-compact);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .edge-blob__surface {
+      animation: edge-float var(--duration-drift) ease-in-out 2 alternate;
+    }
+  }
+  @keyframes edge-float {
+    to {
+      translate: 0 var(--motion-float);
     }
   }
   @media (prefers-reduced-motion: reduce) {

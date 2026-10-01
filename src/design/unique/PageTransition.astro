@@ -1,0 +1,166 @@
+---
+/** Unique: the page transition's cover and view-transition choreography.
+ * The runtime (page-transition.ts) builds the cover only while a link
+ * navigation is in flight; nothing renders at rest. */
+---
+
+<script>
+  import { installPageTransition } from "./page-transition";
+  installPageTransition();
+</script>
+<style is:global>
+  /* Runtime geometry, written by page-transition.ts; these are the resting
+     defaults (centre of the screen, no travel). */
+  :root {
+    --page-x: 50%;
+    --page-y: 50%;
+  }
+  .page-cover {
+    --page-travel-x: 0;
+    --page-travel-y: 0;
+    --page-ball-r: 0;
+    position: fixed;
+    inset: 0;
+    z-index: var(--layer-cover);
+    pointer-events: none;
+    color: var(--color-accent-contrast);
+  }
+  .page-cover__sheet {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: var(--color-accent);
+    clip-path: circle(0 at 50% 50%);
+  }
+  .page-cover__travel {
+    position: absolute;
+    top: var(--page-y);
+    left: var(--page-x);
+  }
+  .page-cover__ball {
+    display: grid;
+    place-items: center;
+    min-width: var(--page-ball-min);
+    aspect-ratio: 1;
+    padding: var(--space-s);
+    border-radius: var(--radius-round);
+    background: var(--color-accent);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    white-space: nowrap;
+    translate: -50% -50%;
+  }
+  .page-cover__title {
+    max-width: var(--shell-width);
+    font-family: var(--font-serif);
+    font-size: var(--text-cover);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    text-align: center;
+    text-wrap: balance;
+    opacity: 0;
+  }
+  /* Choreography: pop at the link, arc to the middle (x eases out, y
+     overshoots), swell to cover, then the name lands. */
+  .page-cover {
+    --after-pop: var(--duration-fast);
+    --after-travel: calc(var(--after-pop) + var(--duration-travel));
+    /* The name lands while the sheet is still swelling, so it is whole by
+       the time the old snapshot is taken. */
+    --title-at: calc(var(--after-travel) + var(--duration-swell) / 2);
+  }
+  .page-cover__sheet {
+    animation: page-swell var(--duration-swell) var(--ease-swell)
+      var(--after-travel) forwards;
+  }
+  .page-cover__travel {
+    animation: page-travel-x var(--duration-travel) var(--ease-page)
+      var(--after-pop) forwards;
+  }
+  .page-cover__lift {
+    display: block;
+    animation: page-travel-y var(--duration-travel) var(--ease-pop)
+      var(--after-pop) forwards;
+  }
+  .page-cover__ball {
+    animation:
+      page-ball-pop var(--duration-fast) var(--ease-pop) backwards,
+      page-ball-hush var(--duration-fast) linear var(--after-travel) forwards;
+  }
+  .page-cover__title {
+    animation: page-title-in var(--duration-hover) var(--ease-settle)
+      var(--title-at) forwards;
+  }
+  @keyframes page-ball-pop {
+    from {
+      scale: 0;
+    }
+  }
+  @keyframes page-ball-hush {
+    to {
+      color: transparent;
+    }
+  }
+  @keyframes page-travel-x {
+    to {
+      translate: var(--page-travel-x) 0;
+    }
+  }
+  @keyframes page-travel-y {
+    to {
+      translate: 0 var(--page-travel-y);
+    }
+  }
+  @keyframes page-swell {
+    from {
+      clip-path: circle(var(--page-ball-r) at 50% 50%);
+    }
+    to {
+      clip-path: circle(var(--page-reach) at 50% 50%);
+    }
+  }
+  @keyframes page-title-in {
+    from {
+      opacity: 0;
+      translate: 0 var(--motion-rise);
+    }
+    to {
+      opacity: 1;
+      translate: none;
+    }
+  }
+  /* Uncover: the old snapshot is the cover; it shrinks back into the link
+     while the new page waits, still, underneath. */
+  @media (prefers-reduced-motion: no-preference) {
+    html[data-page-cover]::view-transition-old(root) {
+      z-index: 1;
+      animation: page-uncover var(--duration-uncover) var(--ease-settle) both;
+    }
+    html[data-page-cover]::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal;
+    }
+  }
+  @keyframes page-uncover {
+    from {
+      clip-path: circle(var(--page-reach) at var(--page-x) var(--page-y));
+    }
+    to {
+      clip-path: circle(0 at var(--page-x) var(--page-y));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .page-cover {
+      display: none;
+    }
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none;
+    }
+  }
+</style>

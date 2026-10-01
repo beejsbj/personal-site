@@ -27,8 +27,11 @@
   --text-page: clamp(2.7rem, 6vw, 4.3rem);
   --text-display: clamp(3.25rem, 5.3vw, 4.75rem);
   --text-display-compact: clamp(3rem, 13vw, 4.75rem);
+  --text-cover: clamp(3.5rem, 11vw, 8.5rem);
+  --text-initials: clamp(15rem, 34vw, 30rem);
   --weight-medium: 600;
   --weight-bold: 700;
+  --weight-black: 800;
   --leading-display: 1;
   --leading-heading: 1.15;
   --leading-tight: 1.4;
@@ -94,8 +97,13 @@
   --duration-settle: 800ms;
   --duration-drift: 7s;
   --stagger: 90ms;
+  --duration-travel: 380ms;
+  --duration-swell: 300ms;
+  --duration-uncover: 460ms;
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-pop: cubic-bezier(0.34, 1.45, 0.64, 1);
+  --ease-page: cubic-bezier(0.5, 0, 0.15, 1);
+  --ease-swell: cubic-bezier(0.7, 0, 0.84, 0);
   --motion-rise: 0.75rem;
   --motion-lift: 0.25rem;
   --motion-nudge: 0.125rem;
@@ -108,8 +116,11 @@
   --ring-scale: 1.14;
   --ring-opacity: 0.7;
   --pop-scale: 0.6;
+  --motion-sunrise: 2.5rem;
+  --motion-float: 1.25rem;
   --underline-pad: 0.125rem;
   --control-min-height: 2.75rem;
+  --ball-link-size: 2.25rem;
   --welcome-width: 52rem;
   --blob-art-width: 13rem;
   --welcome-copy-width: 32ch;
@@ -121,6 +132,16 @@
   --disabled-opacity: 0.5;
   --layer-decoration: -1;
   --layer-skip: 10;
+  --layer-cover: 20;
+  --page-ball-min: 4.75rem;
+  --page-reach: 150vmax;
+  --bleed: calc(50% - 50vw);
+  --initials-horizon: 0.6em;
+  --initials-sink: -0.4em;
+  --initials-inset-b: -0.08em;
+  --initials-inset-j: 0.06em;
+  --initials-rise: 70%;
+  --initials-peek: 0.75rem;
   --skip-hidden: translateY(calc(-100% - var(--space-l)));
 }
 @media (max-width: 40.625rem) {

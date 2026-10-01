@@ -1,13 +1,15 @@
 ---
 /** Primitive: label + optional decorative arrow. No nested controls.
- * Axes: treatment=text|nav|action, tone=paper|wine.
+ * Axes: treatment=text|nav|action|ball, tone=paper|wine.
  * States: rest, hover, focus, active, current, disabled; no loading behavior.
  * Native anchor navigation; disabled renders a non-interactive span.
  * Hover draws the underline in from the left; arrows nudge the way they point.
+ * Ball (v2's .button): a peach ball rests behind the label's first letters
+ * and stretches into a pill under the whole label on hover or focus.
  */
 interface Props {
   href: string;
-  treatment?: "text" | "nav" | "action";
+  treatment?: "text" | "nav" | "action" | "ball";
   tone?: "paper" | "wine";
   current?: boolean;
   arrow?: boolean;
@@ -153,6 +155,45 @@ const outbound = /^(https?:|mailto:)/.test(href);
   .ds-link:focus-visible {
     outline: var(--focus-width) solid var(--color-accent);
     outline-offset: var(--focus-offset);
+  }
+  .ds-link--ball {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--control-min-height);
+    padding-inline: var(--space-s);
+  }
+  .ds-link--ball::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 0;
+    width: var(--ball-link-size);
+    height: var(--ball-link-size);
+    border-radius: var(--ball-link-size);
+    background: var(--color-surface-strong);
+    translate: 0 -50%;
+  }
+  .ds-link--ball:is(:hover, :focus-visible) {
+    text-decoration: none;
+  }
+  .ds-link--ball:is(:hover, :focus-visible)::before {
+    width: 100%;
+    background: var(--color-hover);
+  }
+  .ds-link--ball:active::before {
+    background: var(--color-surface-strong);
+    scale: var(--press-scale);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .ds-link--ball::before {
+      transition:
+        width var(--duration-hover) var(--ease-pop),
+        background-color var(--duration-hover) var(--ease-feedback),
+        scale var(--duration-fast) var(--ease-feedback);
+    }
   }
   .ds-link--action {
     display: inline-grid;

@@ -1,13 +1,16 @@
 ---
-/** The former menu's unequal circles, now artwork only. Geometry is SVG art;
- * no links, pointer effects, focus targets or navigation semantics.
- * Motion: each circle pops in, then drifts out of phase for a finite spell.
- * The wrapping groups accept a soft pointer offset from the homepage scene. */
+/** The former menu's unequal circles, now daybreak balls: artwork, never
+ * navigation. No links, labels, focus targets or navigation semantics.
+ * Motion: the balls rise like a sunrise, settle, then drift out of phase for
+ * a finite spell. The wrapping groups take the homepage scene's soft lean
+ * toward a nearby pointer; the circles themselves take daybreak-balls'
+ * physics (poke, knock, pick up and throw) for a fine pointer only. */
 ---
 
 <svg
   class="decorative-blobs"
   data-blob-art
+  data-balls
   viewBox="0 0 280 290"
   aria-hidden="true"
   focusable="false"
@@ -25,13 +28,19 @@
     <circle class="peach" cx="196" cy="217" r="68" />
   </g>
 </svg>
+<script>
+  import { installDaybreakBalls } from "./daybreak-balls";
+  installDaybreakBalls();
+</script>
 <style>
   .decorative-blobs {
     display: block;
     width: 100%;
     height: auto;
+    overflow: visible;
     pointer-events: none;
     user-select: none;
+    touch-action: none;
   }
   .wine {
     fill: var(--color-accent);
@@ -44,6 +53,14 @@
     transform-box: fill-box;
     transform-origin: center;
   }
+  /* Awake (fine pointer, motion allowed): the balls can be picked up. */
+  [data-balls="awake"] circle {
+    pointer-events: auto;
+    cursor: grab;
+  }
+  [data-balls="awake"][data-held] circle {
+    cursor: grabbing;
+  }
   @media (prefers-reduced-motion: no-preference) {
     g {
       transition: transform var(--duration-reveal) var(--ease-settle);
@@ -51,28 +68,32 @@
     circle {
       --i: 0;
       animation:
-        blob-in var(--duration-settle) var(--ease-pop)
+        sunrise var(--duration-settle) var(--ease-pop)
           calc(var(--stagger) * (2 + var(--i))) backwards,
         drift var(--duration-drift) ease-in-out
           calc(var(--duration-settle) + var(--stagger) * (2 + var(--i))) 2
           alternate;
     }
-    g:nth-child(2) circle {
-      --i: 1;
-      animation-name: blob-in, drift-back;
-    }
-    g:nth-child(3) circle {
-      --i: 2;
-      animation-name: blob-in, drift-back;
-    }
-    g:nth-child(4) circle {
+    /* Peach suns rise first; the wine ball is the last to come up. */
+    g:nth-child(1) circle {
       --i: 3;
     }
+    g:nth-child(2) circle {
+      --i: 0;
+      animation-name: sunrise, drift-back;
+    }
+    g:nth-child(3) circle {
+      --i: 1;
+      animation-name: sunrise, drift-back;
+    }
+    g:nth-child(4) circle {
+      --i: 2;
+    }
   }
-  @keyframes blob-in {
+  @keyframes sunrise {
     from {
       opacity: 0;
-      transform: scale(var(--pop-scale));
+      transform: translateY(var(--motion-sunrise)) scale(var(--pop-scale));
     }
     to {
       opacity: 1;

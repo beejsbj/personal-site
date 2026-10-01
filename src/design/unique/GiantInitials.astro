@@ -1,0 +1,74 @@
+---
+/** Unique: v0's giant B and J, back as the homepage's sign-off. v0 fixed two
+ * huge peach letters off the page edges, drifting and turning burgundy on
+ * hover. Here they rise over a horizon (the footer rule) like two suns at
+ * daybreak, cropped by it; a fine pointer turns one burgundy and lifts it.
+ * Decorative: hidden from assistive technology, never a control. */
+---
+
+<div class="giant-initials" aria-hidden="true">
+  <span class="initial initial--b">B</span>
+  <span class="initial initial--j">J</span>
+</div>
+<style>
+  /* Sized in the letters' own em: the horizon cuts a fifth of the way up
+     the capitals, and only the horizon and page edges crop them. */
+  .giant-initials {
+    position: relative;
+    height: var(--initials-horizon);
+    margin-inline: var(--bleed);
+    font-family: var(--font-serif);
+    font-size: var(--text-initials);
+    line-height: var(--leading-display);
+    clip-path: inset(-50% 0 0 0);
+    pointer-events: none;
+    user-select: none;
+  }
+  .initial {
+    position: absolute;
+    bottom: var(--initials-sink);
+    font-weight: var(--weight-black);
+    color: var(--color-surface-strong);
+  }
+  .initial--b {
+    left: var(--initials-inset-b);
+  }
+  .initial--j {
+    right: var(--initials-inset-j);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .initial {
+      pointer-events: auto;
+      transition:
+        color var(--duration-hover) var(--ease-feedback),
+        translate var(--duration-reveal) var(--ease-pop);
+    }
+    .initial:hover {
+      color: var(--color-accent);
+    }
+  }
+
+  /* Daybreak: once the homepage marks the band (data-reveal) the letters
+     sit below the horizon, and rise in turn when it scrolls into view. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global([data-reveal]) > .giant-initials .initial {
+      translate: 0 var(--initials-rise);
+    }
+    :global([data-reveal][data-in]) > .giant-initials .initial {
+      translate: none;
+      transition:
+        color var(--duration-hover) var(--ease-feedback),
+        translate calc(var(--duration-settle) * 1.5) var(--ease-pop);
+    }
+    :global([data-reveal][data-in]) > .giant-initials .initial--j {
+      transition-delay: 0s, calc(var(--stagger) * 2);
+    }
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .initial:hover,
+    :global([data-reveal][data-in]) > .giant-initials .initial:hover {
+      translate: 0 calc(-1 * var(--initials-peek));
+      transition-delay: 0s;
+    }
+  }
+</style>

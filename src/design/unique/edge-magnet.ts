@@ -1,5 +1,6 @@
 /** Optional pointer attraction for the cropped corner artwork only.
  * Stable hit geometry, interruptible spring, no dependencies or idle loop.
+ * While it moves, the surface squashes and stretches along its travel.
  */
 export function installEdgeMagnet() {
   const motion = window.matchMedia(
@@ -52,7 +53,14 @@ export function installEdgeMagnet() {
         vy += ((targetY - y) * 210 - vy * 22) * dt;
         x += vx * dt;
         y += vy * dt;
-        surface.style.transform = `translate3d(${x.toFixed(3)}px, ${y.toFixed(3)}px, 0)`;
+        // Jelly: the big ball stretches along its travel, as the small ones do.
+        const speed = Math.hypot(vx, vy);
+        const s = Math.min(0.06, speed * 0.0004);
+        const ux = speed ? vx / speed : 0;
+        const uy = speed ? vy / speed : 0;
+        const sx = 1 + s * (ux * ux - uy * uy * 0.5);
+        const sy = 1 + s * (uy * uy - ux * ux * 0.5);
+        surface.style.transform = `translate3d(${x.toFixed(3)}px, ${y.toFixed(3)}px, 0) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
         if (
           Math.abs(targetX - x) +
             Math.abs(targetY - y) +
@@ -103,6 +111,34 @@ export function installEdgeMagnet() {
         { signal, passive: true },
       );
       document.addEventListener("pointerleave", leave, { signal });
+      // v1/v2's Easter egg: clicking the big circle rolls you to the bottom
+      // of the page, or back to the top once you are past halfway. The
+      // artwork sits under the page, so the click is read from the document:
+      // only a click on bare page inside the visible circle counts.
+      document.addEventListener(
+        "click",
+        (event) => {
+          if (!motion.matches || event.defaultPrevented || event.button) return;
+          const target = event.target as Element | null;
+          if (target?.closest?.("a, button, input, select, textarea, label"))
+            return;
+          if (window.getSelection?.()?.toString()) return;
+          const rect = hit.getBoundingClientRect();
+          if (!rect.width || !rect.height) return;
+          const nx =
+            (event.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+          const ny =
+            (event.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+          if (nx * nx + ny * ny > 1) return;
+          const end =
+            document.documentElement.scrollHeight - window.innerHeight;
+          window.scrollTo({
+            top: window.scrollY > end / 2 ? 0 : end,
+            behavior: "smooth",
+          });
+        },
+        { signal },
+      );
       refresh();
     }
 

@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import WelcomeHero from "../design/compositions/WelcomeHero.astro";
 import DecorativeBlobs from "../design/unique/DecorativeBlobs.astro";
+import GiantInitials from "../design/unique/GiantInitials.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
@@ -63,6 +64,9 @@ const { projects, updates, site } = Astro.props;
       <p>My notes and writing on Substack.</p>
     </div>
   </section>
+  <div class="signoff">
+    <GiantInitials />
+  </div>
 </div>
 <script>
   import { installHomeMotion } from "../design/unique/home-motion";
@@ -107,6 +111,10 @@ const { projects, updates, site } = Astro.props;
     border-top: var(--rule-width) solid var(--color-border);
     padding-block: var(--space-2xl);
     margin-top: var(--space-xl);
+  }
+  /* The letters stand on the footer rule: it is their horizon. */
+  .signoff {
+    margin-bottom: calc(-1 * var(--space-xl));
   }
   .elsewhere p {
     margin-top: var(--space-s);
