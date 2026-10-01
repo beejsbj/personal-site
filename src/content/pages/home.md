@@ -17,15 +17,6 @@ hero:
     - href: "social:Email"
     - label: Resume
       href: /resume
-# The home copy from before the hero was settled. Daylight never showed it,
-# and nothing renders it now. Keep what you like, move it up, delete the rest.
-alternatives:
-  occupation: Frontend Developer
-  welcome: I'm a frontend developer, and I make places on the web.
-  welcomeLong: |
-    Welcome to my home on the internet. Feel free to look around!
-
-    There's a history of my **projects**, smaller experiments in the **lab**, and **updates** from the things I'm making and doing around the web.
 work:
   title: Some things I've built
   link:

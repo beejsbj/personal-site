@@ -94,6 +94,30 @@ test("lens shells hold no content: every word of 12+ characters comes from src/c
   );
 });
 
+// A lens's own copy file holds only that lens's voice (help lines, labels,
+// jokes). Portfolio content lives once, outside src/content/lenses, so it
+// can't drift between a lens copy and the real page.
+test("lens copy files never repeat portfolio content", () => {
+  const portfolio = contentFiles
+    .filter((path) => !path.startsWith(join("src", "content", "lenses")))
+    .map(read)
+    .join("\n");
+  const strings = (value) =>
+    typeof value === "string"
+      ? [value]
+      : value && typeof value === "object"
+        ? Object.values(value).flatMap(strings)
+        : [];
+  const repeats = [];
+  for (const path of walk("src/content/lenses").filter((p) => p.endsWith(".json")))
+    for (const value of strings(JSON.parse(read(path))))
+      for (const piece of value.split(/\{[^}]*\}/)) {
+        const text = piece.trim();
+        if (text.length >= 16 && portfolio.includes(text)) repeats.push(`${path}: "${text}"`);
+      }
+  assert.deepEqual(repeats, [], "Lens copy repeats portfolio content; read it from content.json instead");
+});
+
 test("lens shells read Daylight's page only through fallbackBody, for other routes", () => {
   const reads = [];
   for (const path of shellSources) {

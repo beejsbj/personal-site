@@ -154,9 +154,6 @@ export interface SiteContent {
         portrait: { src: string; alt: string; caption: string; href: string };
         links: Link[];
       };
-      /** Earlier home copy kept for Burooj to choose from. Render nothing
-       * from here. */
-      alternatives: Record<string, string | undefined>;
       sidebarLabel: string;
       /** `limit`: how many featured projects Daylight's home shows. */
       work: { title: string; link: Link; limit: number };

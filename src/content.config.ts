@@ -88,15 +88,6 @@ const pageSchema = z.object({
       links: z.array(linkRefSchema).default([]),
     })
     .optional(),
-  /** Earlier home copy that Daylight never showed. Kept for Burooj to
-   * choose between; nothing renders it. */
-  alternatives: z
-    .object({
-      occupation: z.string().optional(),
-      welcome: z.string().optional(),
-      welcomeLong: z.string().optional(),
-    })
-    .optional(),
   sidebarLabel: z.string().optional(),
   work: z
     .object({

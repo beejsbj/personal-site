@@ -87,7 +87,7 @@ export function buildFrame(ctx: ShellContext): Frame {
       h("span", { class: "cp-chip__swatch", "aria-hidden": "true" }),
       h("span", { class: "cp-chip__name" }, copy.chipName),
       h("span", { class: "cp-chip__sep", "aria-hidden": "true" }, " · "),
-      h("span", { class: "cp-chip__role" }, copy.chipRole),
+      h("span", { class: "cp-chip__role" }, content.pages.home.hero.occupation.toLowerCase()),
     ),
     h(
       "p",

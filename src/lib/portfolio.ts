@@ -154,7 +154,6 @@ export async function getHome() {
     title: data.title,
     description: data.description,
     hero: { ...hero, links: hero.links.map(resolve) },
-    alternatives: data.alternatives ?? {},
     sidebarLabel: need(data.sidebarLabel, "sidebarLabel in pages/home.md"),
     work: { ...work, link: resolve(work.link) },
     currently: { ...currently, link: resolve(currently.link) },
