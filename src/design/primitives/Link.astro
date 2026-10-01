@@ -3,6 +3,7 @@
  * Axes: treatment=text|nav|action, tone=paper|wine.
  * States: rest, hover, focus, active, current, disabled; no loading behavior.
  * Native anchor navigation; disabled renders a non-interactive span.
+ * Hover draws the underline in from the left; arrows nudge the way they point.
  */
 interface Props {
   href: string;
@@ -23,6 +24,7 @@ const {
   newTab = false,
 } = Astro.props;
 const Tag = disabled ? "span" : "a";
+const outbound = /^(https?:|mailto:)/.test(href);
 ---
 
 <Tag
@@ -34,10 +36,12 @@ const Tag = disabled ? "span" : "a";
   rel={!disabled && newTab ? "noreferrer" : undefined}
 >
   <span>
-    <slot />
+    <span class="link-label">
+      <slot />
+    </span>
     {arrow && (
       <svg
-        class="link-arrow"
+        class:list={["link-arrow", { "link-arrow--out": outbound }]}
         aria-hidden="true"
         viewBox="0 0 16 16"
         fill="none"
@@ -46,13 +50,7 @@ const Tag = disabled ? "span" : "a";
         stroke-linecap="round"
         stroke-linejoin="round"
       >
-        <path
-          d={
-            /^(https?:|mailto:)/.test(href)
-              ? "M4 12 12 4M4 4h8v8"
-              : "M2 8h11M8 3l5 5-5 5"
-          }
-        />
+        <path d={outbound ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5"} />
       </svg>
     )}
   </span>
@@ -67,14 +65,45 @@ const Tag = disabled ? "span" : "a";
   .ds-link:hover {
     text-decoration: underline;
   }
-  .ds-link--text {
-    text-decoration: underline;
-    text-decoration-color: var(--color-link-rule);
-    text-decoration-thickness: var(--rule-width);
-    text-decoration-skip-ink: auto;
+  /* Text and navigation underlines are painted on the label so the ink can
+     draw in from the left; the resting pencil rule stays full width. */
+  .ds-link--text .link-label,
+  .ds-link--nav .link-label {
+    padding-bottom: var(--underline-pad);
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 100% 100%;
+    background-size: 0% var(--rule-width);
   }
-  .ds-link--text:is(:hover, :focus-visible) {
-    text-decoration-color: currentColor;
+  .ds-link--text .link-label {
+    background-image:
+      linear-gradient(currentColor, currentColor),
+      linear-gradient(var(--color-link-rule), var(--color-link-rule));
+    background-position:
+      100% 100%,
+      0 100%;
+    background-size:
+      0% var(--rule-width),
+      100% var(--rule-width);
+  }
+  .ds-link--text:hover,
+  .ds-link--nav:hover {
+    text-decoration: none;
+  }
+  .ds-link--text:is(:hover, :focus-visible) .link-label {
+    background-position:
+      0 100%,
+      0 100%;
+    background-size:
+      100% var(--rule-width),
+      100% var(--rule-width);
+  }
+  .ds-link--nav .link-label {
+    background-size: 0% var(--focus-width);
+  }
+  .ds-link--nav:is(:hover, :focus-visible) .link-label {
+    background-position: 0 100%;
+    background-size: 100% var(--focus-width);
   }
   .link-arrow {
     display: inline-block;
@@ -93,19 +122,28 @@ const Tag = disabled ? "span" : "a";
   }
   .ds-link--nav:is(:hover, :focus-visible, [aria-current]) {
     color: var(--color-accent);
-    text-decoration: underline;
   }
   .ds-link--nav[aria-current] {
     font-weight: var(--weight-bold);
+  }
+  .ds-link--nav[aria-current] .link-label {
+    background-image: none;
   }
   .ds-link--nav:active {
     color: var(--color-accent-pressed);
   }
   @media (hover: hover) and (pointer: fine) {
+    .ds-link--text .link-label,
+    .ds-link--nav .link-label {
+      transition: background-size var(--duration-hover) var(--ease-settle);
+    }
     .link-arrow {
-      transition: transform var(--duration-fast) var(--ease-feedback);
+      transition: transform var(--duration-hover) var(--ease-settle);
     }
     .ds-link:hover .link-arrow {
+      transform: translateX(var(--link-arrow-lift));
+    }
+    .ds-link:hover .link-arrow--out {
       transform: translate(
         var(--link-arrow-lift),
         calc(-1 * var(--link-arrow-lift))
@@ -151,7 +189,8 @@ const Tag = disabled ? "span" : "a";
   }
   @media (prefers-reduced-motion: reduce) {
     .ds-link,
-    .link-arrow {
+    .link-arrow,
+    .link-label {
       transition: none;
     }
     .ds-link:hover .link-arrow {

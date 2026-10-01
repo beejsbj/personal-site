@@ -1,6 +1,8 @@
 ---
 /** The former menu's unequal circles, now artwork only. Geometry is SVG art;
- * no links, pointer effects, focus targets or navigation semantics. */
+ * no links, pointer effects, focus targets or navigation semantics.
+ * Motion: each circle pops in, then drifts out of phase for a finite spell.
+ * The wrapping groups accept a soft pointer offset from the homepage scene. */
 ---
 
 <svg
@@ -10,10 +12,18 @@
   aria-hidden="true"
   focusable="false"
 >
-  <circle class="wine" cx="88" cy="78" r="62" />
-  <circle class="peach" cx="207" cy="88" r="47" />
-  <circle class="peach" cx="63" cy="176" r="55" />
-  <circle class="peach" cx="196" cy="217" r="68" />
+  <g>
+    <circle class="wine" cx="88" cy="78" r="62" />
+  </g>
+  <g>
+    <circle class="peach" cx="207" cy="88" r="47" />
+  </g>
+  <g>
+    <circle class="peach" cx="63" cy="176" r="55" />
+  </g>
+  <g>
+    <circle class="peach" cx="196" cy="217" r="68" />
+  </g>
 </svg>
 <style>
   .decorative-blobs {
@@ -28,5 +38,61 @@
   }
   .peach {
     fill: var(--color-surface-strong);
+  }
+  g,
+  circle {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    g {
+      transition: transform var(--duration-reveal) var(--ease-settle);
+    }
+    circle {
+      --i: 0;
+      animation:
+        blob-in var(--duration-settle) var(--ease-pop)
+          calc(var(--stagger) * (2 + var(--i))) backwards,
+        drift var(--duration-drift) ease-in-out
+          calc(var(--duration-settle) + var(--stagger) * (2 + var(--i))) 2
+          alternate;
+    }
+    g:nth-child(2) circle {
+      --i: 1;
+      animation-name: blob-in, drift-back;
+    }
+    g:nth-child(3) circle {
+      --i: 2;
+      animation-name: blob-in, drift-back;
+    }
+    g:nth-child(4) circle {
+      --i: 3;
+    }
+  }
+  @keyframes blob-in {
+    from {
+      opacity: 0;
+      transform: scale(var(--pop-scale));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes drift {
+    from {
+      transform: none;
+    }
+    to {
+      transform: translate(var(--motion-drift), calc(-1 * var(--motion-drift)));
+    }
+  }
+  @keyframes drift-back {
+    from {
+      transform: none;
+    }
+    to {
+      transform: translate(calc(-1 * var(--motion-drift)), var(--motion-drift));
+    }
   }
 </style>

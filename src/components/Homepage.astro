@@ -16,8 +16,8 @@ interface Props {
 const { projects, updates, site } = Astro.props;
 ---
 
-<div class="home-composition shell">
-  <div class="welcome-region">
+<div class="home-composition shell" data-home-motion>
+  <div class="welcome-region" data-motion-scene>
     <WelcomeHero social={site.social} />
     <div class="welcome-art" aria-hidden="true">
       <DecorativeBlobs />
@@ -64,6 +64,10 @@ const { projects, updates, site } = Astro.props;
     </div>
   </section>
 </div>
+<script>
+  import { installHomeMotion } from "../design/unique/home-motion";
+  installHomeMotion();
+</script>
 <style>
   .welcome-region {
     display: grid;
@@ -107,6 +111,55 @@ const { projects, updates, site } = Astro.props;
   .elsewhere p {
     margin-top: var(--space-s);
     color: var(--color-text-soft);
+  }
+  /* Arrival: the work block follows the welcome. Scroll reveals hide an
+     element only once the script marks it (data-reveal) and show it when it
+     enters the viewport (data-in); --i staggers a batch. Event marks pop in
+     after their row; the current note settles like a sheet of paper. */
+  @media (prefers-reduced-motion: no-preference) {
+    .below {
+      animation: below-in var(--duration-settle) var(--ease-settle)
+        calc(var(--stagger) * 6) backwards;
+    }
+    .home-composition :global([data-reveal]) {
+      --i: 0;
+      opacity: 0;
+      transform: translateY(var(--motion-rise));
+    }
+    .home-composition :global(.current-note[data-reveal]) {
+      transform-origin: 0 0;
+      transform: translateY(var(--motion-rise)) rotate(var(--settle-angle));
+    }
+    .home-composition :global([data-reveal][data-in]) {
+      opacity: 1;
+      transform: none;
+      transition:
+        opacity var(--duration-reveal) var(--ease-settle),
+        transform var(--duration-reveal) var(--ease-settle);
+      transition-delay: calc(var(--stagger) * var(--i));
+    }
+    .home-composition :global([data-reveal] .event-mark) {
+      opacity: 0;
+      transform: scale(var(--pop-scale));
+    }
+    .home-composition :global([data-reveal][data-in] .event-mark) {
+      opacity: 1;
+      transform: none;
+      transition:
+        opacity var(--duration-reveal) var(--ease-settle),
+        transform var(--duration-reveal) var(--ease-pop);
+      transition-delay: calc(var(--stagger) * (var(--i) + 1));
+    }
+  }
+  @keyframes below-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--motion-rise));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
   @media (max-width: 62.5rem) {
     .welcome-region {
