@@ -79,9 +79,10 @@ export class Book {
   constructor(
     private host: HTMLElement,
     private still: boolean,
+    tabsLabel: string,
   ) {
     this.el = h("div", { class: "bp-book" });
-    this.tabs = h("nav", { class: "bp-tabs", "aria-label": "Book tabs" });
+    this.tabs = h("nav", { class: "bp-tabs", "aria-label": tabsLabel });
     this.main = h("main", { class: "bp-spread", id: "bp-main", tabindex: "-1" });
     this.leaves = h("div", { class: "bp-leaves", "aria-hidden": "true" });
     this.corners = h("div", { class: "bp-corners" });
@@ -128,7 +129,11 @@ export class Book {
         }),
       );
       this.main.replaceChildren(...this.slots);
-      if (this.loose) this.main.append(this.loose);
+      if (this.loose) {
+        // the book stays still under a loose sheet
+        this.slots.forEach((slot) => slot.setAttribute("inert", ""));
+        this.main.append(this.loose);
+      }
     }
   }
 

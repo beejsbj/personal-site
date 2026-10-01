@@ -17,7 +17,7 @@
  * drawing back up toward the line it came from, and the next screen's
  * threads come down from the new place. */
 import type { LensShell, Route, ShellContext } from "../types";
-import { h, wait } from "./dom";
+import { h, setNewTabNote, wait } from "./dom";
 import { ink } from "./ink";
 import { createLife } from "./life";
 import { createLoom } from "./loom";
@@ -126,9 +126,10 @@ const shell: LensShell = {
   async mount(context) {
     ctx = context;
     const { root, content, signal } = context;
+    setNewTabNote(content.lenses.hion.newTab);
     nav = createNav(content, signal, context.face);
     stage = h("div", { class: "hion-stage" });
-    const skip = h("a", { class: "hion-skip", href: "#hion-main" }, "Skip to content");
+    const skip = h("a", { class: "hion-skip", href: "#hion-main" }, content.site.skipLink);
     skip.addEventListener(
       "click",
       (event) => {

@@ -1,5 +1,6 @@
 /** The scale the portfolio is played in: C major, one octave, seven keys.
  * Each section of the site is a scale degree; colour belongs to the note. */
+import { fill } from "../rich";
 import type { RouteKind, SiteContent } from "../types";
 
 export type NoteId = "do" | "re" | "mi" | "fa" | "sol" | "la" | "ti";
@@ -37,38 +38,23 @@ export interface Key {
 
 export function keysFor(content: SiteContent): Key[] {
   const [home, projects, lab, about, resume, writing, hello] = NOTES;
+  const copy = content.lenses["cut-paper"].keys;
+  const { counts } = content.derived;
+  const key = (
+    note: Note,
+    words: { label: string; hint: string },
+    href: string,
+    kinds: RouteKind[],
+    n?: number,
+  ): Key => ({ note, label: words.label, href, kinds, hint: fill(words.hint, { n: n ?? 0 }) });
   return [
-    { note: home, label: "Home", href: "/", kinds: ["home"], hint: "play" },
-    {
-      note: projects,
-      label: "Projects",
-      href: "/projects",
-      kinds: ["projects", "project"],
-      hint: `${content.projects.length} tracks`,
-    },
-    {
-      note: lab,
-      label: "Lab",
-      href: "/lab",
-      kinds: ["lab", "lab-entry"],
-      hint: `${content.lab.length} presets`,
-    },
-    { note: about, label: "About", href: "/about", kinds: ["about"], hint: "poster" },
-    { note: resume, label: "Resume", href: "/resume", kinds: ["resume"], hint: "credits" },
-    {
-      note: writing,
-      label: "Writing",
-      href: content.site.writingUrl,
-      kinds: [],
-      hint: "substack",
-    },
-    {
-      note: hello,
-      label: "Hello",
-      href: `mailto:${content.site.email}`,
-      kinds: [],
-      hint: "email",
-    },
+    key(home, copy.home, "/", ["home"]),
+    key(projects, copy.projects, "/projects", ["projects", "project"], counts.projects),
+    key(lab, copy.lab, "/lab", ["lab", "lab-entry"], counts.lab),
+    key(about, copy.about, "/about", ["about"]),
+    key(resume, copy.resume, "/resume", ["resume"]),
+    key(writing, copy.writing, content.site.writingUrl, []),
+    key(hello, copy.hello, `mailto:${content.site.email}`, []),
   ];
 }
 

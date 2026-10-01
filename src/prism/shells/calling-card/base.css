@@ -375,6 +375,83 @@
   }
 }
 
+/* ---------- Tap-again cue (touch) ----------
+   On touch the first tap only selects; the selected item wears a sticker
+   saying a second tap opens it. `.cc-root[data-input]` follows the last
+   pointer, so a hybrid laptop shows it only after a finger touches. */
+:root[data-lens="calling-card"] .cc-tapcue {
+  display: none;
+}
+:root[data-lens="calling-card"] .cc-root[data-input="touch"] [data-state="selected"] > .cc-tapcue {
+  position: absolute;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.65rem 0.15rem 0.22rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  border: 2px solid var(--cc-white);
+  box-shadow: 3px 3px 0 var(--cc-red);
+  font-family: var(--cc-display);
+  font-size: 0.85rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: none;
+  white-space: nowrap;
+  pointer-events: none;
+  rotate: -4deg;
+}
+:root[data-lens="calling-card"] .cc-tapcue__key {
+  display: inline-grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  background: var(--cc-red);
+  border-radius: 50%;
+  font-size: 0.6rem;
+  line-height: 1;
+}
+/* Where the sticker sits on each list. */
+/* Commands: under the word's tail, so it never runs off a phone's edge. */
+:root[data-lens="calling-card"] .cc-cmd > .cc-tapcue {
+  right: -0.2rem;
+  top: calc(100% - 0.35rem);
+}
+/* Inset from the right: the slot list scrolls, and would clip it. */
+:root[data-lens="calling-card"] .cc-slot > .cc-tapcue {
+  right: 1.2rem;
+  bottom: -0.95rem;
+  rotate: 3deg;
+}
+:root[data-lens="calling-card"] .cc-request > .cc-tapcue {
+  right: 1rem;
+  top: -1.1rem;
+  rotate: 4deg;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="calling-card"] .cc-root[data-input="touch"] [data-state="selected"] > .cc-tapcue {
+    animation:
+      calling-card-tapcue-in 260ms var(--cc-snap) both 140ms,
+      calling-card-tapcue-nudge 700ms ease-in-out 700ms infinite alternate;
+  }
+  :root[data-lens="calling-card"] .cc-root[data-input="touch"] [data-state="selected"] > .cc-tapcue .cc-tapcue__key {
+    animation: calling-card-tapcue-key 700ms ease-in-out 700ms infinite alternate;
+  }
+}
+@keyframes calling-card-tapcue-in {
+  from { opacity: 0; scale: 0.4; }
+}
+@keyframes calling-card-tapcue-nudge {
+  to { scale: 1.06; }
+}
+@keyframes calling-card-tapcue-key {
+  to { background: var(--cc-white); color: var(--cc-red); }
+}
+
 /* ---------- Chips & shop cards (shared) ---------- */
 :root[data-lens="calling-card"] .cc-chips {
   display: flex;
@@ -527,6 +604,88 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   transform: skewX(-12deg);
+}
+
+/* Whatever the markdown makes, it stays inside its box: lists keep their
+   nesting, tables and code scroll sideways, pictures fit. */
+:root[data-lens="calling-card"] :is(.cc-say, .cc-prose) {
+  overflow-wrap: break-word;
+}
+:root[data-lens="calling-card"] .cc-say > :not(.cc-say__name) ~ :not(.cc-say__name) {
+  margin-top: 0.7rem;
+}
+:root[data-lens="calling-card"] .cc-say :is(ul, ol) {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  padding-left: 1.4rem;
+}
+:root[data-lens="calling-card"] .cc-say ul > li::marker {
+  content: "★ ";
+  color: var(--cc-red-text);
+}
+:root[data-lens="calling-card"] :is(.cc-say, .cc-prose) li > :is(ul, ol) {
+  margin-top: 0.3rem;
+  padding-left: 1.3rem;
+}
+:root[data-lens="calling-card"] .cc-prose :is(h4, h5, h6) {
+  justify-self: start;
+  margin-top: 0.4rem;
+  padding: 0.1rem 0.7rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1.2rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  transform: rotate(-2deg) skewX(-8deg);
+}
+:root[data-lens="calling-card"] :is(.cc-say, .cc-prose) table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+:root[data-lens="calling-card"] :is(.cc-say, .cc-prose) :is(th, td) {
+  padding: 0.3rem 1rem 0.3rem 0;
+  border-bottom: 2px solid rgb(255 255 255 / 0.2);
+  text-align: left;
+  vertical-align: top;
+}
+:root[data-lens="calling-card"] :is(.cc-say, .cc-prose) th {
+  font-family: var(--cc-display);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cc-red-text);
+  border-bottom-color: var(--cc-red);
+}
+:root[data-lens="calling-card"] :is(.cc-say, .cc-prose) :is(code, pre) {
+  font-family: var(--cc-mono);
+  font-size: 0.9em;
+}
+:root[data-lens="calling-card"] :is(.cc-say, .cc-prose) pre {
+  max-width: 100%;
+  margin: 0;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+:root[data-lens="calling-card"] :is(.cc-say, .cc-prose) img {
+  display: block;
+  max-width: 100%;
+  max-height: 50vh;
+  width: auto;
+  height: auto;
+  border: 3px solid var(--cc-white);
+  box-shadow: 6px 6px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] :is(.cc-say, .cc-prose) blockquote {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 4px solid var(--cc-red);
+  font-family: var(--cc-didone);
+  font-style: italic;
 }
 
 /* ---------- The slash wipe ---------- */

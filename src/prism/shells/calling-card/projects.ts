@@ -2,26 +2,35 @@
  * item file with the cover on the other. A project page is the item's full
  * file: cover pinned left, stats, links as shop cards, notes as dialogue. */
 import type { Route, SiteContent } from "../types";
+import { part } from "../../parts";
+import { fill } from "../rich";
 import {
   type Env,
   type Screen,
   backLink,
+  copyOf,
   frame,
+  linkVerb,
   prompts,
   roving,
   screenTitle,
+  tapCue,
   tabs,
-  text,
 } from "./chrome";
-import { cleanProse, concentricStar, h, ransom } from "./dom";
+import { concentricStar, h, prose, ransom } from "./dom";
 import { other } from "./other";
 
 type Project = SiteContent["projects"][number];
 
 let rememberedSlug: string | undefined;
 
-const kindLabel = (project: Project) =>
-  project.kind === "Arcade" ? "Arcade" : project.featured ? "Selected" : "Project";
+/** The item's category: an arcade piece, a featured project (the shared
+ * featured set) or a project. */
+const kindLabel = (project: Project, content: SiteContent) => {
+  const { kinds } = copyOf(content).projects;
+  if (project.kind === "Arcade") return kinds.Arcade;
+  return content.featured.includes(project.slug) ? kinds.featured : kinds.Project;
+};
 
 function stat(label: string, value: string) {
   return h(
@@ -32,19 +41,28 @@ function stat(label: string, value: string) {
   );
 }
 
-function detailPanel(project: Project) {
+/** The cover, or for a project without one, the star where it would be. */
+function cover(project: Project, className: string) {
+  return h(
+    "figure",
+    { class: className, "data-empty": project.cover ? null : "" },
+    project.cover
+      ? h("img", { src: project.cover, alt: "", decoding: "async" })
+      : h("span", { class: "cc-cover-star", "aria-hidden": "true" }, concentricStar(["#0a0a0a", "#e5191c", "#0a0a0a", "#fff"])),
+  );
+}
+
+function detailPanel(project: Project, content: SiteContent) {
+  const copy = copyOf(content);
+  const { labels } = content.pages.projects.detail;
   return h(
     "div",
     { class: "cc-file", "data-slug": project.slug },
-    h(
-      "figure",
-      { class: "cc-file__cover" },
-      h("img", { src: project.cover, alt: "", decoding: "async" }),
-    ),
+    cover(project, "cc-file__cover"),
     h(
       "p",
       { class: "cc-file__cat" },
-      h("span", {}, kindLabel(project)),
+      h("span", {}, kindLabel(project, content)),
       " ★ ",
       h("span", {}, project.dateLabel),
     ),
@@ -53,22 +71,23 @@ function detailPanel(project: Project) {
     h(
       "dl",
       { class: "cc-file__stats" },
-      stat("Role", project.role),
-      stat("Where", project.location),
+      stat(labels.role, project.role),
+      stat(labels.location, project.location),
     ),
     project.tools.length
       ? h("ul", { class: "cc-chips" }, project.tools.map((tool) => h("li", {}, tool)))
       : null,
-    h("p", { class: "cc-file__open" }, h("kbd", {}, "⏎"), " Open file"),
+    h("p", { class: "cc-file__open" }, h("kbd", {}, "⏎"), " ", copy.projects.open),
   );
 }
 
 export function projects(route: Route, env: Env): Screen {
+  const { content } = env;
+  const copy = copyOf(content);
+  const { header } = content.pages.projects;
   const { el, main } = frame(route.kind, "cc-equip");
-  const list = env.content.projects;
-  const intro = text(route.main.querySelector(".page-header__intro"));
-  const tagline = text(route.main.querySelector("h1"));
-  const { wrap, heading } = screenTitle("Projects", tagline || undefined, "Equip");
+  const list = content.projects;
+  const { wrap, heading } = screenTitle(copy.sections.projects, header.title, copy.projects.eyebrow, "projects");
   el.querySelector(".cc-screen__bg")!.append(
     h("span", { class: "cc-equip__rays" }),
     h("span", { class: "cc-equip__red" }),
@@ -84,6 +103,7 @@ export function projects(route: Route, env: Env): Screen {
         style: `--i:${i}`,
         "data-slug": project.slug,
         "data-cc-title": project.title,
+        "data-bare": project.cover ? null : "",
       },
       h("span", { class: "cc-slot__shard", "aria-hidden": "true" }),
       h(
@@ -92,11 +112,14 @@ export function projects(route: Route, env: Env): Screen {
         h("span", { class: "cc-slot__year" }, String(project.year)),
         h("span", { "aria-hidden": "true" }, " ★ "),
         h("span", { class: "cc-sr" }, ", "),
-        kindLabel(project),
+        kindLabel(project, content),
       ),
-      h("span", { class: "cc-slot__name" }, project.title),
-      h("img", { class: "cc-slot__thumb", src: project.cover, alt: "", loading: "lazy", decoding: "async" }),
-      h("span", { class: "cc-slot__sum" }, project.summary),
+      h("span", { class: "cc-slot__name", ...part("project.title", project.slug) }, project.title),
+      project.cover
+        ? h("img", { class: "cc-slot__thumb", src: project.cover, alt: "", loading: "lazy", decoding: "async" })
+        : null,
+      h("span", { class: "cc-slot__sum", ...part("project.summary", project.slug) }, project.summary),
+      tapCue(copy.projects.tap),
     ),
   );
 
@@ -111,23 +134,28 @@ export function projects(route: Route, env: Env): Screen {
     h(
       "div",
       { class: "cc-equip__col" },
-      h("div", { class: "cc-equip__head" }, backLink("/", "Command"), wrap),
-      intro ? h("p", { class: "cc-equip__intro" }, intro) : "",
+      h("div", { class: "cc-equip__head" }, backLink(copy, "/", copy.sections.home), wrap),
+      header.intro ? h("p", { class: "cc-equip__intro", ...part("page.intro", "projects") }, header.intro) : "",
       h(
         "nav",
-        { class: "cc-equip__list", "aria-label": "Projects, newest first" },
+        { class: "cc-equip__list", "aria-label": copy.projects.list },
         h("ol", {}, slots.map((slot) => h("li", {}, slot))),
       ),
     ),
     detail,
-    prompts([["↑↓", "Browse"], ["⏎", "Open"], ["Q/E", "Section"], ["Esc", "Back"]]),
+    prompts([
+      ["↑↓", copy.chrome.prompts.browse],
+      ["⏎", copy.chrome.prompts.open],
+      ["Q/E", copy.chrome.prompts.section],
+      ["Esc", copy.chrome.prompts.back],
+    ]),
   );
-  el.prepend(tabs(route.kind));
+  el.prepend(tabs(route.kind, copy));
 
   const start = Math.max(0, list.findIndex((p) => p.slug === rememberedSlug));
   const menu = roving(slots, env.signal, (i) => {
     rememberedSlug = list[i].slug;
-    const next = detailPanel(list[i]);
+    const next = detailPanel(list[i], content);
     detail.replaceChildren(next);
     detail.dataset.flip = detail.dataset.flip === "a" ? "b" : "a";
   }, start);
@@ -142,7 +170,10 @@ export function projects(route: Route, env: Env): Screen {
 
 /** A project page: the full item file. */
 export function projectEntry(route: Route, env: Env): Screen {
-  const list = env.content.projects;
+  const { content } = env;
+  const copy = copyOf(content);
+  const { labels } = content.pages.projects.detail;
+  const list = content.projects;
   const index = list.findIndex((p) => p.slug === route.slug);
   if (index < 0) return other(route, env);
   const project = list[index];
@@ -157,12 +188,14 @@ export function projectEntry(route: Route, env: Env): Screen {
 
   const heading = h(
     "h1",
-    { class: "cc-item__title", tabindex: "-1" },
+    { class: "cc-item__title", tabindex: "-1", ...part("project.title", project.slug) },
     ransom(project.title, { boxes: 0.18, salt: 1 }),
   );
   const media = project.media.length
     ? project.media
-    : [{ type: "image" as const, src: project.cover, alt: project.title }];
+    : project.cover
+      ? [{ type: "image" as const, src: project.cover, alt: project.title }]
+      : [];
   const [lead, ...rest] = media;
   const figure = (m: (typeof media)[number], cls: string) =>
     h(
@@ -174,14 +207,14 @@ export function projectEntry(route: Route, env: Env): Screen {
       m.caption ? h("figcaption", {}, m.caption) : null,
     );
 
-  const prose = cleanProse(route.main.querySelector(".prose"));
-  const back = backLink("/projects", "Projects");
+  const notes = project.html ? prose(project.html) : null;
+  const back = backLink(copy, "/projects", copy.sections.projects);
 
   main.append(
     h(
       "div",
-      { class: "cc-item__visual" },
-      figure(lead, "cc-item__cover"),
+      { class: "cc-item__visual", ...(media.length ? part("project.media", project.slug) : {}) },
+      lead ? figure(lead, "cc-item__cover") : cover(project, "cc-item__cover"),
       rest.length
         ? h("div", { class: "cc-item__rail" }, rest.map((m) => figure(m, "cc-item__media")))
         : null,
@@ -193,26 +226,34 @@ export function projectEntry(route: Route, env: Env): Screen {
       h(
         "p",
         { class: "cc-item__cat" },
-        h("span", {}, kindLabel(project)),
+        h("span", {}, kindLabel(project, content)),
         " ★ ",
         h("span", {}, project.dateLabel),
       ),
       heading,
-      h("p", { class: "cc-item__summary" }, project.summary),
+      h("p", { class: "cc-item__summary", ...part("project.summary", project.slug) }, project.summary),
       h(
         "dl",
-        { class: "cc-item__stats" },
-        stat("Role", project.role),
-        stat("Where", project.location),
-        stat("When", project.dateLabel),
+        { class: "cc-item__stats", ...part("project.meta", project.slug) },
+        stat(labels.role, project.role),
+        stat(labels.location, project.location),
+        stat(labels.date, project.dateLabel),
       ),
       project.tools.length
-        ? h("ul", { class: "cc-chips", "aria-label": `${project.title} tools` }, project.tools.map((tool) => h("li", {}, tool)))
+        ? h(
+            "ul",
+            {
+              class: "cc-chips",
+              "aria-label": fill(copy.projects.tools, { title: project.title }),
+              ...part("project.tools", project.slug),
+            },
+            project.tools.map((tool) => h("li", {}, tool)),
+          )
         : null,
       project.links.length
         ? h(
             "ul",
-            { class: "cc-shop", "aria-label": "Links" },
+            { class: "cc-shop", "aria-label": copy.projects.links, ...part("project.links", project.slug) },
             project.links.map((link, i) =>
               h(
                 "li",
@@ -220,26 +261,32 @@ export function projectEntry(route: Route, env: Env): Screen {
                 h(
                   "a",
                   { class: "cc-shop__card", href: link.url, rel: "noreferrer", "data-primary": i === 0 ? "" : null },
-                  h("span", { class: "cc-shop__verb", "aria-hidden": "true" }, i === 0 ? "Open" : "Get"),
+                  h("span", { class: "cc-shop__verb", "aria-hidden": "true" }, linkVerb(copy, link.url)),
                   h("span", { class: "cc-shop__label" }, link.label, h("span", { "aria-hidden": "true" }, " ↗")),
                 ),
               ),
             ),
           )
         : null,
-      prose.childElementCount ? h("div", { class: "cc-item__notes" }, prose) : null,
+      notes?.childElementCount
+        ? h("div", { class: "cc-item__notes", ...part("project.body", project.slug) }, notes)
+        : null,
       h(
         "nav",
-        { class: "cc-item__pager", "aria-label": "More projects" },
+        { class: "cc-item__pager", "aria-label": copy.projects.more },
         h("a", { href: prev.href, rel: "prev", "data-cc-title": prev.title, class: "cc-pager cc-pager--prev" },
-          h("kbd", { "aria-hidden": "true" }, "←"), h("span", { class: "cc-pager__dir" }, "Prev"), h("span", { class: "cc-pager__name" }, prev.title)),
+          h("kbd", { "aria-hidden": "true" }, "←"), h("span", { class: "cc-pager__dir" }, copy.projects.prev), h("span", { class: "cc-pager__name" }, prev.title)),
         h("a", { href: next.href, rel: "next", "data-cc-title": next.title, class: "cc-pager cc-pager--next" },
-          h("span", { class: "cc-pager__dir" }, "Next"), h("span", { class: "cc-pager__name" }, next.title), h("kbd", { "aria-hidden": "true" }, "→")),
+          h("span", { class: "cc-pager__dir" }, copy.projects.next), h("span", { class: "cc-pager__name" }, next.title), h("kbd", { "aria-hidden": "true" }, "→")),
       ),
     ),
-    prompts([["←→", "Item"], ["Q/E", "Section"], ["Esc", "Back"]]),
+    prompts([
+      ["←→", copy.chrome.prompts.item],
+      ["Q/E", copy.chrome.prompts.section],
+      ["Esc", copy.chrome.prompts.back],
+    ]),
   );
-  el.prepend(tabs(route.kind));
+  el.prepend(tabs(route.kind, copy));
 
   const pager = el.querySelectorAll<HTMLAnchorElement>(".cc-pager");
   return {

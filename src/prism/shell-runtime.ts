@@ -25,8 +25,15 @@ const loadContent = () =>
     response.json(),
   ));
 
-export function currentRoute(): Route {
-  const path = location.pathname.replace(/\/+$/, "") || "/";
+/** The test harness mounts shells on fixture content at a pretend route. */
+let pretend: (() => Route) | undefined;
+export function useSource(source: { content: SiteContent; route: () => Route }) {
+  content = Promise.resolve(source.content);
+  pretend = source.route;
+}
+
+/** What kind of route a path is. */
+export function kindOf(path: string): { kind: RouteKind; slug?: string } {
   const [first, slug] = path.split("/").filter(Boolean);
   const kinds: Record<string, RouteKind> = {
     projects: slug ? "project" : "projects",
@@ -34,11 +41,20 @@ export function currentRoute(): Route {
     about: "about",
     resume: "resume",
   };
-  const kind: RouteKind = path === "/" ? "home" : (kinds[first] ?? "other");
+  return { kind: path === "/" ? "home" : (kinds[first] ?? "other"), slug };
+}
+
+export function currentRoute(): Route {
+  if (pretend) return pretend();
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  const { kind, slug } = kindOf(path);
   const main = (document.getElementById("main-content")?.cloneNode(true) ??
     document.createElement("main")) as HTMLElement;
   main.removeAttribute("id");
-  return { kind, path, slug, title: document.title, main };
+  const notFound = !!main.querySelector(
+    '[data-part="page.title"][data-ref="not-found"]',
+  );
+  return { kind, path, slug, title: document.title, notFound, main };
 }
 
 // A prism face is a preview inside someone else's page: it must never take

@@ -639,6 +639,11 @@
     gap: 0.4rem;
     margin-top: -2.2rem;
   }
+  /* The eyebrow tucks in beside the calendar; a longer occupation wraps
+     rather than running under it. */
+  :root[data-lens="calling-card"] .cc-plate--eyebrow {
+    max-width: max(15rem, 100% - 11rem);
+  }
   :root[data-lens="calling-card"] .cc-home__name {
     font-size: clamp(2.4rem, 8vw, 4.4rem);
   }

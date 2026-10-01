@@ -12,7 +12,7 @@
  * the destinations fall in a cascade, each on a longer thread than the
  * last, like a wind chime. */
 import type { SiteContent } from "../types";
-import { h } from "./dom";
+import { h, newTab } from "./dom";
 import { ink } from "./ink";
 import { Kind, Path, paint, paintGlows, patterns, thread, type Pt } from "./pastel";
 
@@ -34,6 +34,7 @@ export function createNav(
   signal: AbortSignal,
   face: boolean,
 ): Nav {
+  const copy = content.lenses.hion.nav;
   const cord = h("canvas", { class: "hion-nav__cord", "aria-hidden": "true" });
   const home = h(
     "a",
@@ -65,9 +66,7 @@ export function createNav(
             ...(item.external ? { target: "_blank", rel: "noreferrer" } : {}),
           },
           h("span", { class: "hion-charm__label" }, item.label),
-          item.external
-            ? h("span", { class: "hion-sr" }, " (opens in a new tab)")
-            : null,
+          item.external ? newTab() : null,
         ),
       ),
     );
@@ -82,11 +81,11 @@ export function createNav(
       "data-ink": "tassel",
       "data-seed": "41",
     },
-    h("span", { class: "hion-pull__label" }, "Menu"),
+    h("span", { class: "hion-pull__label" }, copy.menu),
   );
   const nav = h(
     "nav",
-    { class: "hion-nav", "aria-label": "Site" },
+    { class: "hion-nav", "aria-label": copy.label },
     cord,
     home,
     list,

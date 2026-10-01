@@ -1,6 +1,13 @@
 ---
 title: About
 description: Burooj Rashid on making places on the web, learning through projects, and the connection between interfaces, storytelling, and games.
+header:
+  eyebrow: About
+  title: Burooj, again!
+  intro: Frontend developer. Curious about people, stories, and the places we make on the web.
+  actions:
+    - label: Experience & resume
+      href: /resume
 ---
 
 I make places on the web. My journey into web development began with Perpetual Education, learning the whole process from an idea to a working site.

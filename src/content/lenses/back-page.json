@@ -1,0 +1,90 @@
+{
+  "months": ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"],
+  "skip": "Skip to the page",
+  "newTab": "opens in a new tab",
+  "tabs": {
+    "label": "Book tabs",
+    "home": "Hello",
+    "about": "About",
+    "resume": "Resume",
+    "lab": "Lab",
+    "projects": "Projects"
+  },
+  "chapters": {
+    "home": "Hello",
+    "about": "About me",
+    "resume": "Resume",
+    "lab": "The lab",
+    "projects": "The back page",
+    "close": "Close the book"
+  },
+  "page": {
+    "number": "Page No.",
+    "date": "Date",
+    "back": "back",
+    "spare": "(a quick war, during maths)"
+  },
+  "cover": {
+    "school": "Exercise book · squared",
+    "title": ["Port", "folio"],
+    "name": "Name",
+    "subject": "Subject",
+    "class": "Class",
+    "classValue": "places on the web",
+    "belongs": "This book belongs to",
+    "returnTo": "If found, please return to"
+  },
+  "contents": {
+    "title": "Contents",
+    "label": "Contents",
+    "page": ", page",
+    "home": { "name": "Hello" },
+    "about": { "name": "About me", "aside": "a letter" },
+    "resume": { "name": "Resume", "aside": "stapled in" },
+    "lab": { "name": "The lab", "aside": "doodles" },
+    "projects": { "name": "Projects", "aside": "the war" },
+    "writing": { "name": "Writing", "aside": "Substack" }
+  },
+  "home": {
+    "toProjects": "all of them, on the back page"
+  },
+  "about": {
+    "salute": "Dear reader,",
+    "signoff": "Yours,",
+    "signature": "Burooj",
+    "ps": "P.S.",
+    "psAfter": "is stapled in, a few pages on."
+  },
+  "lab": {
+    "eyebrow": "{eyebrow} · in the margins",
+    "tryIt": "Try it on {era}"
+  },
+  "project": {
+    "selected": "selected work",
+    "archive": "from the archive",
+    "tools": "{title} tools",
+    "back": "back to the war (all projects)"
+  },
+  "projects": {
+    "eyebrow": "{eyebrow} · the back page",
+    "date": "the whole war",
+    "roll": "Roll call",
+    "map": "Projects on the map",
+    "selected": "selected work",
+    "archive": "the archive"
+  },
+  "loose": {
+    "tag": "tucked in"
+  },
+  "turner": {
+    "label": "Turn the page",
+    "next": "turn over",
+    "prev": "back"
+  },
+  "live": {
+    "loose": "{label}: a loose sheet, tucked into the book.",
+    "spread": "{label}, pages {n} of {total}.",
+    "single": "{label}, page {n} of {total}.",
+    "one": "{label}."
+  }
+}
