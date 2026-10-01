@@ -1,0 +1,36 @@
+/* The prism layer. Each lens file is the visual-value authority for its own
+   refraction, the way tokens.css is for Daylight; this file only wires them.
+   Lenses restyle the Normal Portfolio from outside, so selectors are
+   :root[data-lens="…"] prefixed and never edit base components. */
+@import "./lenses/calling-card.css";
+@import "./lenses/cut-paper.css";
+@import "./lenses/back-page.css";
+@import "./lenses/hion.css";
+@import "./stage.css";
+
+.lens-decor {
+  display: none;
+}
+
+/* A lens with its own shell replaces Daylight's page; the page stays in the
+   document as the source the shell reads from. */
+#lens-shell:empty {
+  display: none;
+}
+:root[data-lens-shell] .site-frame,
+:root[data-lens-shell] .skip-link {
+  display: none;
+}
+/* Shells animate their own route changes; the router's crossfade would
+   fight them. */
+html[data-lens-shell]::view-transition-old(root),
+html[data-lens-shell]::view-transition-new(root) {
+  animation: none;
+}
+/* Off-axis prism faces, every face while the camera moves, and the page
+   behind an open prism hold still. The prism's own chrome keeps moving. */
+:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-lure, #prism-lure *),
+:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-lure, #prism-lure *)::before,
+:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-lure, #prism-lure *)::after {
+  animation-play-state: paused !important;
+}

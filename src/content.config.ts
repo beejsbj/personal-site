@@ -1,8 +1,23 @@
 import { defineCollection, z } from "astro:content";
 
+/* Every word a visitor reads lives in src/content. Daylight renders it and
+ * /prism/content.json hands the same words to every lens. Short copy fields
+ * may use inline markdown: **bold**, _em_, `code` and [links](/somewhere).
+ *
+ * Link hrefs may name the site's own identity instead of repeating it, so a
+ * changed email or profile URL is changed once, in site/config.json:
+ *   "social:GitHub"  a `social` entry by label (label defaults to it)
+ *   "site:email"     mailto: the site email (label defaults to the address)
+ *   "site:writing"   the writing URL (needs a label) */
+
 const linkSchema = z.object({
   label: z.string(),
   url: z.string().min(1),
+});
+
+const linkRefSchema = z.object({
+  label: z.string().optional(),
+  href: z.string().min(1),
 });
 
 const mediaSchema = z.object({
@@ -14,14 +29,131 @@ const mediaSchema = z.object({
   height: z.number().int().positive().optional(),
 });
 
+/** A page's opening: eyebrow, h1, intro and its action links. */
+const headerSchema = z.object({
+  eyebrow: z.string().optional(),
+  title: z.string(),
+  intro: z.string().optional(),
+  actions: z.array(linkRefSchema).default([]),
+});
+
+/** "2022", "2022-01" or "2022-01-15". */
+const partialDate = z
+  .union([z.string(), z.number()])
+  .transform(String)
+  .pipe(z.string().regex(/^\d{4}(-\d{2}){0,2}$/));
+
+/** A role or a course on the resume. The date line is derived from
+ * `kind`, `start` and `end` ("January 2022 - November 2024"), unless
+ * `dateLabel` says it in other words. No `end` means current. */
+const resumeEntrySchema = z.object({
+  title: z.string().optional(),
+  org: z.string().optional(),
+  kind: z.string().optional(),
+  start: partialDate.optional(),
+  end: partialDate.optional(),
+  dateLabel: z.string().optional(),
+  location: z.string().optional(),
+  url: z.string().optional(),
+  summary: z.string().optional(),
+  bullets: z.array(z.string()).default([]),
+});
+
+const roleSchema = resumeEntrySchema.refine(
+  (role) => role.title || role.org,
+  "A role needs a title or an org.",
+);
+
+/** One schema for every page; each page fills the groups it uses and
+ * src/lib/portfolio.ts insists on the ones its page needs. */
 const pageSchema = z.object({
+  /** Document title and meta description. */
   title: z.string(),
   description: z.string(),
-  eyebrow: z.string().optional(),
-  headline: z.string().optional(),
-  intro: z.string().optional(),
-  availability: z.string().optional(),
+  header: headerSchema.optional(),
+
+  // Home
+  hero: z
+    .object({
+      greeting: z.string(),
+      headline: z.string(),
+      occupation: z.string(),
+      welcome: z.string(),
+      portrait: z.object({
+        src: z.string(),
+        alt: z.string(),
+        caption: z.string(),
+        href: z.string(),
+      }),
+      links: z.array(linkRefSchema).default([]),
+    })
+    .optional(),
+  sidebarLabel: z.string().optional(),
+  work: z
+    .object({
+      title: z.string(),
+      link: linkRefSchema,
+      /** How many featured projects the home page shows. */
+      limit: z.number().int().positive(),
+    })
+    .optional(),
+  currently: z
+    .object({
+      title: z.string(),
+      body: z.string(),
+      link: linkRefSchema,
+    })
+    .optional(),
+  updates: z
+    .object({
+      title: z.string(),
+      intro: z.string(),
+      listLabel: z.string(),
+      empty: z.string(),
+      caption: z.string(),
+      /** How many updates the home page shows. */
+      limit: z.number().int().positive(),
+    })
+    .optional(),
+  elsewhere: z
+    .object({
+      label: z.string(),
+      items: z.array(
+        z.object({ title: z.string(), href: z.string(), blurb: z.string() }),
+      ),
+    })
+    .optional(),
+
+  // Projects and Lab
+  listLabel: z.string().optional(),
+  more: linkRefSchema.optional(),
+  aside: z.string().optional(),
+  /** Copy for each entry's own page. */
+  entry: z
+    .object({
+      eyebrow: z.string().optional(),
+      back: linkRefSchema.optional(),
+      labels: z.record(z.string()),
+    })
+    .optional(),
+
+  // Resume
+  experience: z
+    .object({ title: z.string(), roles: z.array(roleSchema) })
+    .optional(),
+  education: z
+    .object({ title: z.string(), entries: z.array(roleSchema) })
+    .optional(),
+  tools: z
+    .object({ title: z.string(), items: z.array(z.string()) })
+    .optional(),
+  /** The end of a date line for a role with no end date. */
+  ongoing: z.string().optional(),
 });
+
+export type PageData = z.infer<typeof pageSchema>;
+export type ResumeEntryData = z.infer<typeof resumeEntrySchema>;
+export type LinkRef = z.infer<typeof linkRefSchema>;
 
 const projectSchema = z.object({
   title: z.string(),
@@ -55,25 +187,30 @@ const labSchema = z.object({
   hidden: z.boolean().default(false),
 });
 
+const UPDATE_KINDS = [
+  "project",
+  "pull-request",
+  "repository",
+  "writing",
+  "lab",
+  "milestone",
+  "status",
+  "location",
+  "agents",
+] as const;
+const UPDATE_SOURCES = [
+  "site",
+  "github",
+  "substack",
+  "bjslab",
+  "manual",
+] as const;
+
 const updateSchema = z
   .object({
     // Events describe things that happened, not another project/writing collection.
-    kind: z
-      .enum([
-        "project",
-        "pull-request",
-        "repository",
-        "writing",
-        "lab",
-        "milestone",
-        "status",
-        "location",
-        "agents",
-      ])
-      .default("project"),
-    source: z
-      .enum(["site", "github", "substack", "bjslab", "manual"])
-      .default("site"),
+    kind: z.enum(UPDATE_KINDS).default("project"),
+    source: z.enum(UPDATE_SOURCES).default("site"),
     evidence: z
       .object({
         url: z.string().url(),
@@ -111,6 +248,9 @@ const siteSchema = z.object({
   siteDescription: z.string(),
   email: z.string().email(),
   writingUrl: z.string().url(),
+  /** The wordmark in the header, and its accessible name. */
+  mark: z.object({ text: z.string(), label: z.string() }),
+  skipLink: z.string(),
   nav: z.array(
     z.object({
       label: z.string(),
@@ -118,13 +258,30 @@ const siteSchema = z.object({
       external: z.boolean().optional(),
     }),
   ),
+  /** Daylight's header: which `nav` items it shows, in order, between a
+   * home link and a "say hello" mail link. */
+  header: z.object({
+    label: z.string(),
+    home: z.string(),
+    hello: z.string(),
+    items: z.array(z.string()),
+  }),
+  footer: z.object({
+    links: z.array(linkRefSchema),
+    signoff: z.string(),
+  }),
   social: z.array(
     z.object({
       label: z.string(),
       href: z.string(),
     }),
   ),
+  /** How each kind and source of update is named. */
+  updateKinds: z.record(z.enum(UPDATE_KINDS), z.string()),
+  updateSources: z.record(z.enum(UPDATE_SOURCES), z.string()),
 });
+
+export type SiteData = z.infer<typeof siteSchema>;
 
 const pages = defineCollection({
   type: "content",
@@ -151,10 +308,20 @@ const site = defineCollection({
   schema: siteSchema,
 });
 
+/** Each lens's own flavour copy: the words a lens's designer wrote for it
+ * (command help lines, captions, labels). Shells read it as
+ * `content.lenses[id]`; its shape is the JSON file itself (see
+ * src/prism/shells/types.ts), so `astro check` catches a missing key. */
+const lenses = defineCollection({
+  type: "data",
+  schema: z.record(z.string(), z.unknown()),
+});
+
 export const collections = {
   pages,
   projects,
   lab,
   updates,
   site,
+  lenses,
 };

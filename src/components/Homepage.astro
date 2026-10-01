@@ -8,17 +8,24 @@ import ActivityStream from "../design/compounds/ActivityStream.astro";
 import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
 import ProjectRow from "./ProjectRow.astro";
+import { part } from "../prism/parts";
+import type { getHome } from "../lib/portfolio";
+import type { UpdateData } from "../content.config";
 interface Props {
-  projects: (CollectionEntry<"projects">["data"] & { href: string })[];
-  updates: CollectionEntry<"updates">["data"][];
-  site: { writingUrl: string; social: { label: string; href: string }[] };
+  home: Awaited<ReturnType<typeof getHome>>;
+  projects: (CollectionEntry<"projects">["data"] & {
+    href: string;
+    slug: string;
+  })[];
+  updates: (UpdateData & { id: string })[];
+  labels: { kinds: Record<string, string>; sources: Record<string, string> };
 }
-const { projects, updates, site } = Astro.props;
+const { home, projects, updates, labels } = Astro.props;
 ---
 
 <div class="home-composition shell">
   <div class="welcome-region">
-    <WelcomeHero social={site.social} />
+    <WelcomeHero hero={home.hero} />
     <div class="welcome-art" aria-hidden="true">
       <DecorativeBlobs />
     </div>
@@ -27,41 +34,35 @@ const { projects, updates, site } = Astro.props;
     <section class="selected-work" aria-labelledby="home-projects">
       <SectionHeading
         id="home-projects"
-        title="Some things I've built"
-        href="/projects"
-        linkLabel="All projects"
+        title={home.work.title}
+        href={home.work.link.href}
+        linkLabel={home.work.link.label}
       />
       {projects.map((project, index) => (
         <ProjectRow {...project} layout={index === 0 ? "feature" : "row"} />
       ))}
     </section>
-    <aside aria-label="Current work and updates">
+    <aside aria-label={home.sidebarLabel}>
       <div class="current-note">
-        <CurrentNote variant="plain" />
+        <CurrentNote note={home.currently} variant="plain" />
       </div>
       <section class="updates" aria-labelledby="home-updates">
-        <SectionHeading id="home-updates" title="Recent updates" />
-        <ActivityStream updates={updates} />
+        <SectionHeading id="home-updates" title={home.updates.title} />
+        <ActivityStream updates={updates} copy={home.updates} labels={labels} />
       </section>
     </aside>
   </div>
-  <section class="elsewhere" aria-label="Elsewhere on the site">
-    <div>
-      <Heading>
-        <Link href="/lab" arrow>
-          In the lab
-        </Link>
-      </Heading>
-      <p>Experiments, prototypes, and smaller things.</p>
-    </div>
-    <div>
-      <Heading>
-        <Link href={site.writingUrl} arrow>
-          Writing
-        </Link>
-      </Heading>
-      <p>My notes and writing on Substack.</p>
-    </div>
+  <section class="elsewhere" aria-label={home.elsewhere.label}>
+    {home.elsewhere.items.map((item: { title: string; href: string; blurb: string }, index: number) => (
+      <div {...part("home.elsewhere", index)}>
+        <Heading>
+          <Link href={item.href} arrow>
+            {item.title}
+          </Link>
+        </Heading>
+        <p>{item.blurb}</p>
+      </div>
+    ))}
   </section>
 </div>
 <style>

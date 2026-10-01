@@ -1,18 +1,18 @@
 ---
+import type { SiteData } from "../content.config";
 import Link from "../design/primitives/Link.astro";
 interface Props {
-  nav: { label: string; href: string; external?: boolean }[];
+  site: Pick<SiteData, "nav" | "email" | "header">;
   currentPath: string;
-  email: string;
   label?: string;
 }
-const { nav, currentPath, email, label = "Main navigation" } = Astro.props;
+const { site, currentPath, label = site.header.label } = Astro.props;
 const items = [
-  { label: "Home", href: "/", external: false },
-  ...["Projects", "Lab", "About", "Writing"].flatMap((name) =>
-    nav.filter((item) => item.label === name),
+  { label: site.header.home, href: "/", external: false },
+  ...site.header.items.flatMap((name) =>
+    site.nav.filter((item) => item.label === name),
   ),
-  { label: "Say hello", href: `mailto:${email}`, external: true },
+  { label: site.header.hello, href: `mailto:${site.email}`, external: true },
 ];
 const current = (href: string) =>
   href === "/"

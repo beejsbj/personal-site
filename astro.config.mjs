@@ -11,6 +11,8 @@ const excludedPaths = new Set([
   "/lab/garden/",
   "/lab/flashcards/",
   "/lab/style-guide/",
+  "/prism/harness/",
+  "/prism/atlas/",
 ]);
 
 export default defineConfig({
