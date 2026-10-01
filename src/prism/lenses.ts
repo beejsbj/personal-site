@@ -38,7 +38,7 @@ export const LENSES: readonly Lens[] = [
   {
     id: "hion",
     name: "Hion",
-    source: "Yumi and the Nightmare Painter",
+    source: "the hion of Yumi and the Nightmare Painter",
     signal: "#ff2bd6",
   },
 ];
