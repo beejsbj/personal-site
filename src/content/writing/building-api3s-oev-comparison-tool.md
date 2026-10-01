@@ -37,7 +37,7 @@ description: "Visualizing blockchain data in a way that’s accessible and engag
 
 <p>The chart needed bars with heights that adjust dynamically based on the highest value across selected metrics. This makes it easy for users to instantly grasp relative protocol performance.</p>
 
-<pre><code>const maxHeight = computed(() =&gt; {
+<pre tabindex="0"><code>const maxHeight = computed(() =&gt; {
   const values = [
     {
       isShown: visibleBars.value.includes("totalSentToBuilderUSD"),
@@ -59,7 +59,7 @@ description: "Visualizing blockchain data in a way that’s accessible and engag
 
 <p>To keep the tool adaptable, we included a flexible legend system that lets users toggle different metrics on and off. This gives users the freedom to visualize the data that matters most to them.</p>
 
-<pre><code>const bars = [
+<pre tabindex="0"><code>const bars = [
   {
     label: "Blockspace Auction Bribes",
     value: "totalSentToBuilderUSD",
@@ -77,7 +77,7 @@ description: "Visualizing blockchain data in a way that’s accessible and engag
 
 <p>Each bar’s height is calculated dynamically, while ensuring that no bar dips below a minimum visibility threshold.</p>
 
-<pre><code>function barHeight(value) {
+<pre tabindex="0"><code>function barHeight(value) {
   let minHeight = 5; // Minimum height for visibility
   const maxHeightPixels = 350; // Maximum height in pixels
   const scaledHeight = (value / maxHeight.value) * maxHeightPixels;
@@ -88,7 +88,7 @@ description: "Visualizing blockchain data in a way that’s accessible and engag
 
 <p>On mobile, we needed to ensure users could easily scroll through multiple metrics. GSAP handled this effortlessly with smooth horizontal scrolling.</p>
 
-<pre><code>useGsap((gsap) =&gt; {
+<pre tabindex="0"><code>useGsap((gsap) =&gt; {
   handleButton = (direction) =&gt; {
     const carousel = barsList.value;
     scrollPosition.value = carousel.clientWidth;
@@ -107,7 +107,7 @@ description: "Visualizing blockchain data in a way that’s accessible and engag
 
 <p>To keep the chart clean and readable, we designed a styling system that ensured hierarchy and visual distinction across multiple bars and protocols.</p>
 
-<pre><code>.bar {
+<pre tabindex="0"><code>.bar {
   display: grid;
   grid-template-columns: repeat(var(--grid-count), 1fr);
   gap: var(--space-xs);
@@ -132,7 +132,7 @@ description: "Visualizing blockchain data in a way that’s accessible and engag
 
 <p>The OEV tool’s Pinia store was crucial for handling protocol data and user selections, allowing users to add or hide protocols and keeping everything in sync.</p>
 
-<pre><code>export const useOEVStore = defineStore("oev", function () {
+<pre tabindex="0"><code>export const useOEVStore = defineStore("oev", function () {
   const userSelectedProtocols = ref({
     "dApp-1": "morphoAaveV2-1",
     "dApp-2": "venusBsc-56",
@@ -157,7 +157,7 @@ description: "Visualizing blockchain data in a way that’s accessible and engag
 
 <p>The chart needed to handle both logarithmic and linear scales while keeping transitions smooth between data updates. We extended Chart.js with custom plugins to handle zoom and responsive layouts.</p>
 
-<pre><code>const options = computed(() =&gt; {
+<pre tabindex="0"><code>const options = computed(() =&gt; {
   return {
     scales: {
       y: {

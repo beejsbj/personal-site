@@ -14,7 +14,7 @@ description: "Inspired by Hi-Fi Rush"
 
 <p>At the core of this experiment is a simple HTML structure of shapes and a song selector. Each shape in the UI represents a different beat frequency (quarter, half, double, etc.), creating a complex visual rhythm as the animations sync with the tempo.</p>
 
-<pre><code>&lt;div class="parent"&gt;
+<pre tabindex="0"><code>&lt;div class="parent"&gt;
     &lt;div class="dancer shape square common-beat"&gt;&lt;/div&gt;
     &lt;div class="dancer shape line quarter-beat"&gt;&lt;/div&gt;
     &lt;div class="dancer shape triangle third-beat"&gt;&lt;/div&gt;
@@ -36,7 +36,7 @@ description: "Inspired by Hi-Fi Rush"
 
 <p>Here, CSS handles the heavy lifting for animation timing, color shifts, and shape manipulation. I set up the CSS variables to represent different beat times based on the BPM (beats per minute), allowing us to scale the animations in real time.</p>
 
-<pre><code>html {
+<pre tabindex="0"><code>html {
     --bpm: 100; /* Initial BPM, updated in JS */
     --common-time-beat: calc(60s / var(--bpm));
     --quarter-time-beat: calc(var(--common-time-beat) * 4);
@@ -67,7 +67,7 @@ description: "Inspired by Hi-Fi Rush"
 
 <p>Once a track is selected and played, we calculate its BPM and set the root variable <code>--bpm</code> based on that tempo.</p>
 
-<pre><code>async function addAnimation() {
+<pre tabindex="0"><code>async function addAnimation() {
     const bpm = (await calcTempo()).tempo;
     $bpm.innerHTML = bpm;
     $html.style.setProperty("--bpm", bpm);
@@ -83,7 +83,7 @@ description: "Inspired by Hi-Fi Rush"
 
 <p>The colors shift based on the beat duration, giving the UI a dynamic, pulsing feel that syncs with the track. Using <code>setInterval</code>, I updated the hue to slowly evolve, which adds another layer of visual interest to the composition.</p>
 
-<pre><code>function shiftColors(beatDuration) {
+<pre tabindex="0"><code>function shiftColors(beatDuration) {
     setInterval(() =&gt; {
         let hue = 36 + Number($html.style.getPropertyValue("--hue"));
         $html.style.setProperty("--hue", hue);
@@ -94,7 +94,7 @@ description: "Inspired by Hi-Fi Rush"
 
 <p>Finally, using an <code>AudioContext</code>, we fetch and decode audio data to get the tempo with <code>music-tempo</code>. This was key for synchronizing animations without manually defining the tempo for each track.</p>
 
-<pre><code>async function getAudioBufferData(url) {
+<pre tabindex="0"><code>async function getAudioBufferData(url) {
     let context = new AudioContext();
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();

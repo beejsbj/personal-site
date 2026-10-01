@@ -31,7 +31,7 @@ description: "Creating a site that feels alive takes more than static content—
 
 <p>To showcase API3’s data feeds, I animated rotating gears and numeric displays. It’s a mix of precision and energy, capturing both the mechanics and motion of real-time data.</p>
 
-<pre><code>useGsap((gsap) =&gt; {
+<pre tabindex="0"><code>useGsap((gsap) =&gt; {
   const timeline = gsap.timeline({
     repeat: -1,
   });
@@ -70,7 +70,7 @@ description: "Creating a site that feels alive takes more than static content—
 
 <p>One of the more intricate animations was for API3’s developer experience flow. Using GSAP’s MotionPath plugin, I animated data points following a path, showing how data moves and interacts. This animation visually explains data flow—a complex concept made intuitive.</p>
 
-<pre><code>function pointPathAnimation(timeline, path) {
+<pre tabindex="0"><code>function pointPathAnimation(timeline, path) {
   timeline.to(
     `${path} ~ .point`,
     {
@@ -102,7 +102,7 @@ description: "Creating a site that feels alive takes more than static content—
 
 <p>For the OEV Network loader, I went for a timeline animation that combined scaling, rotation, and staggering. This loader has a “loading” feel but in a way that keeps things visually interesting.</p>
 
-<pre><code>useGsap((gsap) =&gt; {
+<pre tabindex="0"><code>useGsap((gsap) =&gt; {
   const timeline = gsap.timeline({ repeat: 0, repeatDelay: 0.1 });
 
   timeline.set(".oev-loader :is(#O, #V) path", {

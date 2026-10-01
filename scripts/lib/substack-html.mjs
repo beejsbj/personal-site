@@ -282,7 +282,10 @@ function walk(node, ctx) {
   if (tag === "pre") {
     ctx.stats.code += 1;
     return [
-      el("pre", {}, [el("code", codeClass(node), [text(rawText(node))])]),
+      // tabindex makes a scrolling code box reachable by keyboard.
+      el("pre", { tabindex: "0" }, [
+        el("code", codeClass(node), [text(rawText(node))]),
+      ]),
     ];
   }
   if (tag === "code") {
@@ -347,6 +350,19 @@ const BLOCK = new Set([
   "ul",
 ]);
 
+const STRUCTURAL = new Set([
+  ...BLOCK,
+  "figcaption",
+  "li",
+  "summary",
+  "tbody",
+  "td",
+  "tfoot",
+  "th",
+  "thead",
+  "tr",
+]);
+
 function textOf(node) {
   if (node.text !== undefined) return node.text;
   return (node.children ?? []).map(textOf).join("");
@@ -372,7 +388,13 @@ function tidy(nodes, inPre = false) {
       continue;
     }
     const pre = inPre || node.tag === "pre";
-    const children = VOID.has(node.tag) ? [] : tidy(node.children, pre);
+    let children = VOID.has(node.tag) ? [] : tidy(node.children, pre);
+    // Whitespace between block children is formatting, not content.
+    if (!pre && children.some((c) => STRUCTURAL.has(c.tag))) {
+      children = children.filter(
+        (c) => c.text === undefined || c.text.trim() !== "",
+      );
+    }
     const next = { ...node, children };
     if (!pre) trimEdges(next);
     // Empty paragraphs and headings are Substack spacing, not content. Cells and

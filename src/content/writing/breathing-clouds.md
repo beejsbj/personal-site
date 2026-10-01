@@ -32,7 +32,7 @@ description: "Css tricks or something.."
 
 <p>to do that I had to create unique keyframes for each of them</p>
 
-<pre><code>@keyframes breatha {
+<pre tabindex="0"><code>@keyframes breatha {
 	0% {
 		transform: translate(10px, -10px);
 	}
@@ -61,7 +61,7 @@ description: "Css tricks or something.."
 
 <p>finally, you need to tell each of the cloud elements which keyframe sequence to follow.</p>
 
-<pre><code>.a {
+<pre tabindex="0"><code>.a {
 	position: absolute;
         opacity: 0.5;
 	max-width: 80vw;

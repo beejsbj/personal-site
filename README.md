@@ -25,6 +25,30 @@ Open `http://localhost:4321/`. The living style guide is
 The guide imports production components, not copies. [Design review](docs/base-design.md)
 records the selected direction and the archived alternatives.
 
+## Writing
+
+`/writing` and `/writing/<slug>` publish Burooj's Substack posts in full, from
+markdown in `src/content/writing/`. Each page's `<link rel="canonical">` points
+at the Substack original, and links back to it.
+
+Those files are generated, and committed. The sync is **never run at build
+time**: builds stay deterministic and offline-safe, and a change to the writing
+shows up as a reviewable diff. To pull new or edited posts:
+
+```sh
+corepack pnpm@10.6.5 sync:writing              # add new, update changed
+corepack pnpm@10.6.5 sync:writing -- --dry-run # preview, write nothing
+corepack pnpm@10.6.5 sync:writing -- --prune   # also delete posts Substack dropped
+```
+
+then review the diff and commit. It reads Substack's public archive API for the
+full list (the RSS feed is capped), each post's body from the posts API, and
+uses the feed as a cross-check and fallback. Only free, published posts are
+synced. Bodies pass an allowlist sanitiser (`scripts/lib/substack-html.mjs`):
+subscribe and share widgets, scripts, iframes, forms, icons and tracking images
+are removed; images stay hotlinked to Substack's CDN. Re-running is idempotent.
+Fix a post on Substack and re-sync rather than editing the generated file.
+
 ## Verify
 
 ```sh

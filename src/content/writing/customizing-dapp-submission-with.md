@@ -27,7 +27,7 @@ description: "Creating a smooth, on-brand experience for dApp submissions can be
 
 <p>Here’s a snippet of how we structured the main FormKit component to flow through each of these steps:</p>
 
-<pre><code>&lt;FormKit
+<pre tabindex="0"><code>&lt;FormKit
   type="multi-step"
   tab-style="progress"
   :allow-incomplete="ui.isDev"
@@ -44,7 +44,7 @@ description: "Creating a smooth, on-brand experience for dApp submissions can be
 
 <p>One of the standout aspects of this project was how we customized FormKit using plugins. By extending its default capabilities, we created a polished, intuitive experience that feels native to API3’s ecosystem. Here are the plugins we implemented:</p>
 
-<pre><code>const plugins = [
+<pre tabindex="0"><code>const plugins = [
   createMultiStepPlugin(),
   createAutoHeightTextareaPlugin,
   createAutoAnimatePlugin(autoAnimate.config, autoAnimate.targets),
@@ -59,7 +59,7 @@ description: "Creating a smooth, on-brand experience for dApp submissions can be
 
 <p>To offer guidance on specific fields, we added help tooltips using <code>floating-vue</code>. These appear when users hover over a field, providing contextual information without cluttering the interface.</p>
 
-<pre><code>function addSuffixHelpTooltipPlugin(node) {
+<pre tabindex="0"><code>function addSuffixHelpTooltipPlugin(node) {
   if (!node.props.help) {
     node.props.suffixIcon = null;
     return;
@@ -90,7 +90,7 @@ description: "Creating a smooth, on-brand experience for dApp submissions can be
 
 <p>To improve user recognition, we configured automatic icons for common input types, such as email and password fields. These icons appear automatically, based on field type, adding visual consistency to the form.</p>
 
-<pre><code>function addPrefixIconPlugin(node) {
+<pre tabindex="0"><code>function addPrefixIconPlugin(node) {
   node.on("created", () =&gt; {
     const typesToApply = ["email", "password", "text", "url", "search"];
     
@@ -119,7 +119,7 @@ description: "Creating a smooth, on-brand experience for dApp submissions can be
 
 <p>To clearly signal which fields are required, we implemented an asterisk indicator plugin. This plugin adds a subtle but clear visual cue to help users understand what needs to be filled out.</p>
 
-<pre><code>function addAsteriskPlugin(node) {
+<pre tabindex="0"><code>function addAsteriskPlugin(node) {
   const legends = ["checkbox_multi", "radio_multi", "repeater", "transferlist"];
   
   if (["button", "submit", "hidden", "group"].includes(node.props.type)) return;
@@ -154,7 +154,7 @@ description: "Creating a smooth, on-brand experience for dApp submissions can be
 
 <p>Matching API3’s design language meant modifying FormKit’s default styles to feel cohesive with the rest of the Ecosystem site. With a mix of CSS variables and custom components, we brought API3’s visual language into the form itself.</p>
 
-<pre><code>:root {
+<pre tabindex="0"><code>:root {
   --formkit-theme: api3;
   --fk-color-primary: var(--ink);
   --fk-border-width: var(--line-width);
@@ -165,7 +165,7 @@ description: "Creating a smooth, on-brand experience for dApp submissions can be
 
 <p>We needed to ensure image uploads followed specific guidelines, so we created custom validation rules to check image dimensions and file size. This helped us keep user submissions clean and consistent.</p>
 
-<pre><code>const imageRatio = async function (node) {
+<pre tabindex="0"><code>const imageRatio = async function (node) {
   if (!node.value) return true;
 
   const imageRatios = await Promise.all(
@@ -191,7 +191,7 @@ description: "Creating a smooth, on-brand experience for dApp submissions can be
 
 <p>To keep things user-friendly, we added conditional rendering based on user selections. For example, the “Proxy Information” step only appears for data feed dApps, making the form experience customized and relevant.</p>
 
-<pre><code>&lt;FormKit
+<pre tabindex="0"><code>&lt;FormKit
   type="step"
   name="proxy"
   v-if="dappForm.productType === 'datafeed'"
@@ -209,7 +209,7 @@ description: "Creating a smooth, on-brand experience for dApp submissions can be
 
 <ul><li><p><strong>Progress Tracking</strong>: Custom progress indicators let users know exactly where they are in the process.</p></li><li><p><strong>Automatic Data Persistence</strong>: Using <code>useStorage</code>, we stored form data locally so that users don’t lose progress if they navigate away accidentally.</p></li></ul>
 
-<pre><code>const dappForm = useStorage("dapp-form", {});</code></pre>
+<pre tabindex="0"><code>const dappForm = useStorage("dapp-form", {});</code></pre>
 
 <ul><li><p><strong>Clear Validation and Help Text</strong>: We customized validation messages and added helpful hints to guide users through each step.</p></li><li><p><strong>Mobile-Responsive Design</strong>: The form adjusts itself based on device size, so the experience remains intuitive on mobile and desktop alike.</p></li></ul>
 

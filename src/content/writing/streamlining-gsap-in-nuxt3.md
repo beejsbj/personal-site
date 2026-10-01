@@ -24,7 +24,7 @@ description: "Simple and Clean!"
 
 <p>Here is a common setup:</p>
 
-<pre><code>import { gsap } from "gsap";
+<pre tabindex="0"><code>import { gsap } from "gsap";
 
 onMounted(() =&gt; { 
 //needs this hook since the script tag runs in SSR before the DOM is present.
@@ -46,7 +46,7 @@ onMounted(() =&gt; {
 
 <h4>Kill tweens after a time <em>(Not Ideal)</em>:</h4>
 
-<pre><code>import { gsap } from "gsap";
+<pre tabindex="0"><code>import { gsap } from "gsap";
 
 onMounted(() =&gt; { 
   let context = gsap.context(() =&gt; { //create context
@@ -67,7 +67,7 @@ onMounted(() =&gt; {
 
 <h4>Kill when Component is unmounted:</h4>
 
-<pre><code>import { gsap } from "gsap";
+<pre tabindex="0"><code>import { gsap } from "gsap";
 
 let context; //create this outside the hook to be able to use it in the second hook
 
@@ -97,7 +97,7 @@ onUnmounted(() =&gt; {
 
 <p>to streamline using GSAP in Nuxt3 we can create a plugin. This centralizes your GSAP logic, making it easier to maintain and reuse:</p>
 
-<pre><code>import { gsap } from "gsap";
+<pre tabindex="0"><code>import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger"; 
 
 export default defineNuxtPlugin((nuxtApp) =&gt; {
@@ -112,7 +112,7 @@ export default defineNuxtPlugin((nuxtApp) =&gt; {
 
 <h5>Make sure to add GSAP to the transpile array in your <code>nuxt.config </code>for optimal performance across all browsers:</h5>
 
-<pre><code>export default defineNuxtConfig({
+<pre tabindex="0"><code>export default defineNuxtConfig({
     build: {
         transpile: ["gsap"],
     },
@@ -125,7 +125,7 @@ export default defineNuxtPlugin((nuxtApp) =&gt; {
 
 <p>Here’s how:</p>
 
-<pre><code>export default function useGsap(animationFunction) {
+<pre tabindex="0"><code>export default function useGsap(animationFunction) {
   // auto imported by nuxt
   const { $gsap } = useNuxtApp();
 
@@ -154,7 +154,7 @@ export default defineNuxtPlugin((nuxtApp) =&gt; {
 
 <h3><strong>Using the Composable</strong></h3>
 
-<pre><code>useGsap((gsap) =&gt; { //pass the plugins you need (gsap, scrollTrigger, ...)
+<pre tabindex="0"><code>useGsap((gsap) =&gt; { //pass the plugins you need (gsap, scrollTrigger, ...)
   gsap.from(".site-header", {
     delay: "0.5",
     duration: 0.5,

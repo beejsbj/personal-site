@@ -15,7 +15,7 @@ description: "I've been learning how to make FormKit plugins and want to walk yo
 
 <p>Before diving into code, let's think about what we want to do. I was adding icons to my form inputs manually like this:</p>
 
-<pre><code>&lt;FormKit
+<pre tabindex="0"><code>&lt;FormKit
   type="email"
   prefixIcon="email"
 /&gt;</code></pre>
@@ -26,7 +26,7 @@ description: "I've been learning how to make FormKit plugins and want to walk yo
 
 <p>All FormKit plugins start as a function that receives a node. The node is your connection to the input - it has all the properties, methods and lifecycle hooks you need. Here's our starting point:</p>
 
-<pre><code>function addPrefixIconPlugin(node) {
+<pre tabindex="0"><code>function addPrefixIconPlugin(node) {
   // This is where we'll put our code
 }</code></pre>
 
@@ -34,7 +34,7 @@ description: "I've been learning how to make FormKit plugins and want to walk yo
 
 <p>We need to know when our input is created so we can add the icon. FormKit gives us lifecycle events for this:</p>
 
-<pre><code>function addPrefixIconPlugin(node) {
+<pre tabindex="0"><code>function addPrefixIconPlugin(node) {
   node.on("created", () =&gt; {
     // This runs when the input is created
   });
@@ -44,7 +44,7 @@ description: "I've been learning how to make FormKit plugins and want to walk yo
 
 <p>Now we need some logic to decide if and when to add icons. Let's add some checks:</p>
 
-<pre><code>function addPrefixIconPlugin(node) {
+<pre tabindex="0"><code>function addPrefixIconPlugin(node) {
   node.on("created", () =&gt; {
     // Which input types should get icons?
     const typesToApply = ["email", "password", "text", "url", "search"];
@@ -58,7 +58,7 @@ description: "I've been learning how to make FormKit plugins and want to walk yo
 
 <p>This is where it gets interesting. FormKit uses something called a schema to build its inputs. Think of it like a blueprint. To add our icon, we need to modify this blueprint:</p>
 
-<pre><code>// Keep the original schema function
+<pre tabindex="0"><code>// Keep the original schema function
     const originalSchema = node.props.definition.schema;
 
     // Create our new schema function
@@ -87,7 +87,7 @@ description: "I've been learning how to make FormKit plugins and want to walk yo
 
 <p>Here's our complete plugin:</p>
 
-<pre><code>function addPrefixIconPlugin(node) {
+<pre tabindex="0"><code>function addPrefixIconPlugin(node) {
   node.on("created", () =&gt; {
     const typesToApply = ["email", "password", "text", "url", "search"];
 
@@ -117,7 +117,7 @@ description: "I've been learning how to make FormKit plugins and want to walk yo
 
 <p>To use the plugin, we add it to our FormKit config:</p>
 
-<pre><code>import { defaultConfig } from '@formkit/vue'
+<pre tabindex="0"><code>import { defaultConfig } from '@formkit/vue'
 
 export default defineFormKitConfig({
   plugins: [addPrefixIconPlugin]

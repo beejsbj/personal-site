@@ -21,7 +21,7 @@ description: "Building API3’s Ecosystem hub was a balancing act between user e
 
 <p>The <code>ecosystem.js</code> store is the core of all data-driven interactions. It pulls in project lists, keeps track of user-selected filters, and handles pagination. This store is the real MVP behind the <code>DappFilter</code> and <code>DappGrid</code> components, ensuring that users can search, filter, and load content without missing a beat.</p>
 
-<pre><code>// ecosystem.js - Ecosystem Store
+<pre tabindex="0"><code>// ecosystem.js - Ecosystem Store
 import { defineStore } from "pinia";
 import { useFetch } from "nuxt/app";
 
@@ -55,7 +55,7 @@ export const useEcosystemStore = defineStore("ecosystem", () =&gt; {
 
 <p>In the ecosystem, this store synchronizes with the <code>DappFilter</code> component, which enables users to refine their search by networks, product types, categories, and more. The filter options are dynamically populated based on <code>ecosystem.stats</code>, a dataset that allows the filter criteria to expand and adapt. For instance:</p>
 
-<pre><code>const categories = computed(() =&gt; {
+<pre tabindex="0"><code>const categories = computed(() =&gt; {
   if (ecosystem.stats) {
     return [...ecosystem.stats.categories];
   }
@@ -67,7 +67,7 @@ export const useEcosystemStore = defineStore("ecosystem", () =&gt; {
 
 <p>The <code>blog.js</code> store handles the articles section of the site, managing both pagination and dynamic sorting to keep everything organized and relevant. This store powers the <code>ArticleGrid</code> component, which displays articles in multiple grid layouts based on user preferences.</p>
 
-<pre><code>// blog.js - Blog Store
+<pre tabindex="0"><code>// blog.js - Blog Store
 import { defineStore } from "pinia";
 
 export const useBlogStore = defineStore("blog", () =&gt; {
@@ -89,7 +89,7 @@ export const useBlogStore = defineStore("blog", () =&gt; {
 
 <p><code>ArticleGrid</code> takes this data and organizes it with dynamic layouts based on props like <code>isRecentSort</code> or <code>isPopularSort</code>. The <code>sorted</code> computed property ensures that the latest, most popular, or trending content is always front and center.</p>
 
-<pre><code>const sorted = computed(() =&gt; {
+<pre tabindex="0"><code>const sorted = computed(() =&gt; {
   if (blog.list &amp;&amp; props.isRecentSort) {
     return blog.list.sort((a, b) =&gt; new Date(b.created_at) - new Date(a.created_at));
   }
@@ -107,7 +107,7 @@ export const useBlogStore = defineStore("blog", () =&gt; {
 
 <p>The <code>interface.js</code> store is responsible for all global UI elements, like modal visibility, viewport tracking, and responsive layouts. This store connects with components throughout the app, from managing modals in <code>DappFilter</code> to tracking responsive layouts for mobile devices.</p>
 
-<pre><code>// interface.js - Interface Store
+<pre tabindex="0"><code>// interface.js - Interface Store
 import { defineStore } from "pinia";
 
 export const useInterfaceStore = defineStore("interface", () =&gt; {
@@ -136,7 +136,7 @@ export const useInterfaceStore = defineStore("interface", () =&gt; {
 
 <p>Finally, the <code>web3Store.js</code> store centralizes all Web3-related interactions, from wallet connections to blockchain switching. This keeps Web3 functionality straightforward and easily accessible across components.</p>
 
-<pre><code>// web3Store.js - Web3 Store
+<pre tabindex="0"><code>// web3Store.js - Web3 Store
 import { defineStore } from "pinia";
 
 export const useWeb3Store = defineStore("web3Store", () =&gt; {
