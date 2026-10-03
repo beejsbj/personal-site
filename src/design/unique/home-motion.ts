@@ -3,8 +3,7 @@
  * once as they enter the viewport; anything already on screen stays put.
  * Scene: a nearby fine pointer tilts the portrait. One animation frame per
  * batch of pointer events, no idle loop, CSS transitions do the smoothing.
- * Reduced motion and touch stay static. (The ball links run their own
- * physics in ball-nav.ts.)
+ * Reduced motion and touch stay static.
  */
 const REVEAL_TARGETS = [
   ".selected-work > .section-heading",

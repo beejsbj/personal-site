@@ -3,10 +3,10 @@
  * The text menu in the header stays primary; these balls are real links
  * (one tab stop each, named by their label) laid out on the old unequal
  * cluster. The current page's ball is burgundy, as in v1.
- * Motion: the balls rise in once, like a sunrise. With a fine pointer
- * ball-nav.ts makes them a physics toy (knock, pick up, throw); a drag
- * never navigates, a clean click always does. Without JS, touch or with
- * reduced motion they are still, ordinary links. */
+ * Motion: the balls rise in once, like a sunrise. A press is always a
+ * click: the link's hit area never moves; only the painted face lifts on
+ * hover and squishes on press. CSS only, so no-JS, touch and reduced
+ * motion get the same dependable links. */
 interface Props {
   currentPath?: string;
   label?: string;
@@ -53,10 +53,6 @@ const place = ({ cx, cy, r }: { cx: number; cy: number; r: number }) =>
     ))}
   </ul>
 </nav>
-<script>
-  import { installBallNav } from "./ball-nav";
-  installBallNav();
-</script>
 <style>
   .ball-nav ul {
     position: relative;
@@ -75,10 +71,11 @@ const place = ({ cx, cy, r }: { cx: number; cy: number; r: number }) =>
     border-radius: var(--radius-round);
     color: var(--color-accent);
     text-decoration: none;
+    /* A press that wobbles must still be a click: no native link drag, no
+       text selection starting inside the ball. */
     user-select: none;
     -webkit-user-drag: none;
     touch-action: manipulation;
-    transform-origin: center;
   }
   .ball:hover {
     text-decoration: none;
@@ -128,13 +125,6 @@ const place = ({ cx, cy, r }: { cx: number; cy: number; r: number }) =>
   .ball:is(:hover, :focus-visible) .ball__label {
     background-position: 0 100%;
     background-size: 100% var(--rule-width);
-  }
-  /* Awake (fine pointer, motion allowed): the balls can be picked up. */
-  [data-balls="awake"] .ball {
-    cursor: grab;
-  }
-  [data-balls="awake"][data-held] .ball {
-    cursor: grabbing;
   }
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
     .ball__face {
