@@ -5,9 +5,13 @@
 //   corepack pnpm@10.6.5 sync:writing -- --dry-run   show what would change
 //   corepack pnpm@10.6.5 sync:writing -- --prune     also delete posts Substack no longer lists
 //
-// Run by hand, then commit the result. It is never part of the build: builds
-// stay deterministic and work offline. Re-running is safe: output is a pure
-// function of the Substack content, unchanged posts are not rewritten.
+// Run by hand, or by .github/workflows/sync-writing.yml, which commits the
+// result. It is never part of the build: builds stay deterministic and work
+// offline. Re-running is safe: output is a pure function of the Substack
+// content, unchanged posts are not rewritten.
+//
+// Exits 1 when Substack yields zero publishable posts (an outage or a changed
+// API, not a real empty blog), before anything is written.
 import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -191,6 +195,14 @@ const live = posts.filter((post) => {
   skipped.push(`${post.slug} (${post.skip})`);
   return false;
 });
+if (live.length === 0) {
+  console.error(
+    `error: ${ORIGIN} returned zero publishable posts ` +
+      `(archive API: ${archive.length}, RSS feed: ${feed.length}); ` +
+      "refusing to continue",
+  );
+  process.exit(1);
+}
 const slugs = new Set(live.map((post) => post.slug));
 // Posts that link to each other should stay on this site.
 const rewriteHref = (href) => {

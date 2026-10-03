@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { readFileSync, readdirSync } from "node:fs";
+import { createServer } from "node:http";
 import test from "node:test";
+import { promisify } from "node:util";
 import { sanitizeSubstackHtml } from "../lib/substack-html.mjs";
 
 // Run after `pnpm build`: these assertions inspect what will actually ship.
@@ -200,4 +203,68 @@ b</code></pre>
     "top-level code keeps its blank line",
   );
   assert.doesNotMatch(html.replace(/<pre[\s\S]*?<\/pre>/, ""), /\n\s*\n\s*\n/);
+});
+
+// Run the real sync script against a fixture "Substack", dry-run so the repo's
+// own posts are never touched. The scheduled workflow depends on the exit code.
+async function runSync(routes) {
+  const server = createServer((req, res) => {
+    const route = routes[new URL(req.url, "http://x").pathname];
+    res.writeHead(route ? 200 : 404, { "content-type": "text/plain" });
+    res.end(route?.body ?? "");
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const env = {
+    ...process.env,
+    SUBSTACK_URL: `http://127.0.0.1:${server.address().port}`,
+  };
+  try {
+    const { stdout, stderr } = await promisify(execFile)(
+      process.execPath,
+      ["scripts/sync-substack.mjs", "--dry-run"],
+      { env },
+    );
+    return { code: 0, stdout, stderr };
+  } catch (error) {
+    return { code: error.code, stdout: error.stdout, stderr: error.stderr };
+  } finally {
+    server.close();
+  }
+}
+
+test("the sync exits non-zero, and writes nothing, when Substack has zero posts", async () => {
+  const before = readdirSync(dir).join();
+  const result = await runSync({
+    "/api/v1/archive": { body: "[]" },
+    "/feed": { body: "<rss><channel></channel></rss>" },
+  });
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /zero publishable posts/);
+  assert.equal(readdirSync(dir).join(), before);
+});
+
+test("the sync exits non-zero when Substack errors", async () => {
+  const result = await runSync({}); // every route 404s
+  assert.notEqual(result.code, 0);
+});
+
+test("the sync succeeds on a Substack with a post", async () => {
+  const post = {
+    slug: "hello",
+    title: "Hello",
+    post_date: "2025-01-01T00:00:00.000Z",
+    canonical_url: "https://buroojs.substack.com/p/hello",
+    audience: "everyone",
+    is_published: true,
+  };
+  const result = await runSync({
+    "/api/v1/archive": { body: JSON.stringify([post]) },
+    "/feed": { body: "<rss><channel></channel></rss>" },
+    "/api/v1/posts/hello": {
+      body: JSON.stringify({ ...post, body_html: "<p>Hi there.</p>" }),
+    },
+  });
+  assert.equal(result.code, 0, result.stderr);
+  assert.match(result.stdout, /\[dry run\] 1 posts/);
+  assert.match(result.stdout, /\+ hello/);
 });
