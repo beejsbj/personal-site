@@ -17,6 +17,6 @@ In my free time, I enjoy gaming, and I see coding as another form of gaming—on
 
 When I started, I wrote: “The World is Wide and as I explore this Web I hope to find where my talents and interests intersect!” That curiosity is still a good description of what brings me back.
 
-You can follow the work through my [projects](/projects), find smaller interface experiments in the [lab](/lab), or read what I've been thinking about in my [writing](https://buroojs.substack.com).
+You can follow the work through my [projects](/projects), find smaller interface experiments in the [lab](/lab), or read what I've been thinking about in my [writing](/writing).
 
 Have a project in mind? [Tell me about it](mailto:burooj.bj@gmail.com).

@@ -105,6 +105,17 @@ const updateSchema = z
 
 export type UpdateData = z.infer<typeof updateSchema>;
 
+// Synced from Substack by scripts/sync-substack.mjs; the body is sanitised HTML.
+// Edit the post on Substack and re-run `sync:writing`, not the file.
+const writingSchema = z.object({
+  title: z.string(),
+  subtitle: z.string().optional(),
+  date: z.coerce.date(),
+  canonical: z.string().url(),
+  cover: z.string().url().optional(),
+  description: z.string(),
+});
+
 const siteSchema = z.object({
   name: z.string(),
   siteTitle: z.string(),
@@ -146,6 +157,11 @@ const updates = defineCollection({
   schema: updateSchema,
 });
 
+const writing = defineCollection({
+  type: "content",
+  schema: writingSchema,
+});
+
 const site = defineCollection({
   type: "data",
   schema: siteSchema,
@@ -156,5 +172,6 @@ export const collections = {
   projects,
   lab,
   updates,
+  writing,
   site,
 };

@@ -2,7 +2,7 @@
 /** Semantic level is independent from visual scale. Slot accepts text/Link only. */
 interface Props {
   level?: 1 | 2 | 3 | 4;
-  scale?: "display" | "page" | "section" | "card" | "label";
+  scale?: "display" | "page" | "post" | "section" | "card" | "label";
   id?: string;
 }
 const { level = 2, scale = "section", id } = Astro.props;
@@ -29,6 +29,9 @@ const Tag = `h${level}` as "h1" | "h2" | "h3" | "h4";
   }
   .ds-heading--page {
     font-size: var(--text-page);
+  }
+  .ds-heading--post {
+    font-size: var(--text-post);
   }
   .ds-heading--section {
     font-size: var(--text-section);

@@ -12,6 +12,8 @@ interface Props {
   image?: string;
   pageClass?: string;
   noindex?: boolean;
+  /** For pages republished from elsewhere: points search engines at the original. */
+  canonical?: string;
   clientRouting?: boolean;
 }
 
@@ -27,11 +29,13 @@ const {
   image = "/images/burooj4.jpg",
   pageClass = "page-default",
   noindex = false,
+  canonical,
   clientRouting = true,
 } = Astro.props;
 
 const pageTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
-const canonicalUrl = new URL(Astro.url.pathname, siteBaseUrl).toString();
+const canonicalUrl =
+  canonical ?? new URL(Astro.url.pathname, siteBaseUrl).toString();
 const socialImage = new URL(image, siteBaseUrl).toString();
 ---
 

@@ -9,6 +9,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "sync:writing": "node scripts/sync-substack.mjs",
     "test:homepage": "node --test scripts/tests/homepage-base.test.mjs",
     "test": "node --test scripts/tests/*.test.mjs",
     "format": "prettier --write src astro.config.mjs tsconfig.json scripts/tests"
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.8",
+    "parse5": "^7.3.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^1.0.0",
     "typescript": "^5.9.3"

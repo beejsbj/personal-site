@@ -1,0 +1,87 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import Note from "../../design/primitives/Note.astro";
+import Heading from "../../design/primitives/Heading.astro";
+import Link from "../../design/primitives/Link.astro";
+import { formatDate, getPosts, isoDay } from "../../lib/writing";
+import type { WritingEntry } from "../../lib/writing";
+
+export async function getStaticPaths() {
+  return (await getPosts()).map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const site = (await getEntry("site", "config"))?.data;
+if (!site) throw new Error("Missing site config entry.");
+const { entry } = Astro.props as { entry: WritingEntry };
+const { title, subtitle, date, canonical, cover, description } = entry.data;
+const { Content } = await entry.render();
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={cover}
+  canonical={canonical}
+  pageClass="page-entry"
+>
+  <section class="shell entry-page post-page">
+    <PageHeader eyebrow="Writing" title={title} intro={subtitle} scale="post" />
+
+    <p class="post-origin">
+      <time datetime={isoDay(date)}>{formatDate(date)}</time>
+      <span aria-hidden="true"> / </span>
+      <Link href={canonical} newTab arrow>
+        Originally published on Substack
+      </Link>
+    </p>
+
+    <article class="prose post-body">
+      <Content />
+    </article>
+
+    <aside class="post-end" aria-labelledby="post-end-title">
+      <Note>
+        <div class="post-end__copy">
+          <Heading id="post-end-title" level={2} scale="card">
+            Liked this one?
+          </Heading>
+          <p>
+            New posts go out by email first. Subscribe on Substack and they'll
+            find you.
+          </p>
+          <div class="entry-page__links">
+            <Link
+              treatment="action"
+              tone="wine"
+              href={`${site.writingUrl}/subscribe`}
+              newTab
+              arrow
+            >
+              Subscribe
+            </Link>
+            <Link treatment="action" href={canonical} newTab arrow>
+              Originally published on Substack
+            </Link>
+          </div>
+        </div>
+      </Note>
+    </aside>
+
+    <div class="entry-page__links">
+      <Link href="/writing" arrow>
+        Back to all writing
+      </Link>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .post-end__copy {
+    display: grid;
+    gap: var(--space-s);
+  }
+</style>

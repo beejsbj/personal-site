@@ -27,6 +27,9 @@ importers:
       '@astrojs/check':
         specifier: ^0.9.8
         version: 0.9.8(prettier-plugin-astro@1.0.0(@emnapi/core@1.11.3)(@emnapi/runtime@1.9.1)(prettier@3.9.6))(prettier@3.9.6)(typescript@5.9.3)
+      parse5:
+        specifier: ^7.3.0
+        version: 7.3.0
       prettier:
         specifier: ^3.9.6
         version: 3.9.6
