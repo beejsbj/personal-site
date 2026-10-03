@@ -141,7 +141,7 @@ function writeIn(page: HTMLElement, delay: number) {
  * typed paper the lines are typed, a few characters at a clack. */
 const WRITTEN =
   ".bp-page__head b, .bp-flow :is(p, li, dt, dd, h2, h3, h4, figcaption, blockquote, time)";
-const NOT_WRITTEN = ".bp-h1, .bp-sr, .bp-loose, .bp-contents, .bp-label, .bp-return, .bp-belongs, .bp-map";
+const NOT_WRITTEN = ".bp-h1, .bp-sr, .bp-loose, .bp-label, .bp-return, .bp-belongs, .bp-map";
 
 function writeLines(page: HTMLElement, start: number) {
   const all = [...page.querySelectorAll<HTMLElement>(WRITTEN)];
@@ -205,7 +205,7 @@ function sweep(
 
 /* ---------- links: the pen goes over the line again ------------------- */
 
-const SKIP = ".bp-camp, .bp-shelf a, .bp-corner, .bp-loose a, .bp-contents__list a";
+const SKIP = ".bp-camp, .bp-shelf a, .bp-corner, .bp-loose a";
 
 function inkOf(el: Element) {
   const c = getComputedStyle(el).color;

@@ -260,7 +260,7 @@ export const GAPS: Partial<
   "back-page": {
     home: {
       "home.elsewhere":
-        "The books have no Elsewhere page: the lab is a book of its own, and Writing is a line in the contents slip (the inside cover, or the cover on a phone).",
+        "The books have no Elsewhere page: the lab is a book of its own on the pile, and Writing has no book yet.",
     },
     projects: {
       "project.summary":
@@ -270,7 +270,7 @@ export const GAPS: Partial<
       "lab.more":
         "The lab chapter is the doodles only; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
-        "The lab chapter is the doodles only; Projects is in the contents and the style guide is not in the book.",
+        "The lab chapter is the doodles only; Projects is a book of its own on the pile, and the style guide is not in any book.",
     },
   },
   hion: {},

@@ -10,9 +10,6 @@
 :root[data-lens="back-page"] .bp-corner:hover .bp-corner__label {
   border-bottom-color: currentColor;
 }
-:root[data-lens="back-page"] .bp-contents__list a:hover .bp-contents__dots {
-  border-bottom-color: currentColor;
-}
 :root[data-lens="back-page"] .bp-scribbled {
   position: relative;
 }
@@ -213,19 +210,6 @@
   }
   :root[data-lens="back-page"] .bp-circled li:nth-child(2n):hover {
     transform: rotate(-3.5deg) scale(1.04);
-  }
-
-  /* ---- the contents slip: the pen hovers over the name -------------------- */
-  :root[data-lens="back-page"] .bp-contents__name,
-  :root[data-lens="back-page"] .bp-contents__no {
-    display: inline-block;
-    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.3, 1.3);
-  }
-  :root[data-lens="back-page"] .bp-contents__list a:hover .bp-contents__name {
-    transform: translateX(3px) rotate(-1deg);
-  }
-  :root[data-lens="back-page"] .bp-contents__list a:hover .bp-contents__no {
-    transform: rotate(6deg) scale(1.15);
   }
 
   /* ---- the war map: soldiers stir when reached for ------------------------ */

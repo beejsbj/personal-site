@@ -431,7 +431,7 @@ class App {
         if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
         const target = event.target as HTMLElement | null;
         if (target?.closest("input, textarea, select, [contenteditable], video")) return;
-        const menu = target?.closest<HTMLElement>(".bp-shelf, .bp-contents");
+        const menu = target?.closest<HTMLElement>(".bp-shelf");
         const arrows = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
         if (menu && arrows.includes(event.key)) {
           const links = [...menu.querySelectorAll<HTMLElement>("a")];

@@ -9,63 +9,48 @@
     "home": {
       "title": ["Port", "folio"],
       "name": "Hello",
-      "aside": "start here"
+      "aside": "start here",
+      "klass": "after lights out"
     },
     "about": {
       "title": ["About ", "me"],
       "name": "About me",
-      "aside": "a letter"
+      "aside": "a letter",
+      "klass": "the quiet one"
     },
     "resume": {
       "title": ["Res", "ume"],
       "name": "Resume",
-      "aside": "stapled in"
+      "aside": "stapled in",
+      "klass": "after hours"
     },
     "lab": {
       "title": ["The ", "lab"],
       "name": "The lab",
-      "aside": "doodles"
+      "aside": "doodles",
+      "klass": "pencil fight"
     },
     "projects": {
       "title": ["The ", "war"],
       "name": "Projects",
-      "aside": "the war"
+      "aside": "the war",
+      "klass": "drawing office"
     }
   },
   "papers": {
     "lamplight": {
-      "name": "Maths copy",
-      "short": "squared",
-      "school": "Exercise book · squared",
-      "klass": "after lights out",
       "pens": ["Blue", "Red"]
     },
     "notebook": {
-      "name": "The quiet notebook",
-      "short": "feint ruled",
-      "school": "Notebook · feint ruled",
-      "klass": "the quiet one",
       "pens": ["Blue", "Red"]
     },
     "legal": {
-      "name": "Legal pad",
-      "short": "legal pad",
-      "school": "Legal pad · 50 sheets",
-      "klass": "after hours",
       "pens": ["Black", "Red"]
     },
     "graph": {
-      "name": "Graph book",
-      "short": "graph, 2 mm",
-      "school": "Graph book · 2 mm",
-      "klass": "pencil fight",
       "pens": ["Lead", "Red"]
     },
     "blueprint": {
-      "name": "Blueprint",
-      "short": "blueprint",
-      "school": "Drawing sheets · A2",
-      "klass": "drawing office",
       "pens": ["White", "Yellow"]
     }
   },
@@ -88,16 +73,8 @@
     "subject": "Subject",
     "class": "Class",
     "belongs": "This book belongs to",
-    "returnTo": "If found, please return to"
-  },
-  "contents": {
-    "title": "Contents",
-    "label": "Contents",
-    "inThe": ", in the",
-    "writing": {
-      "name": "Writing",
-      "aside": "Substack"
-    }
+    "returnTo": "If found, please return to",
+    "series": "Book {n}"
   },
   "home": {
     "toProjects": "all of them, in the war book"

@@ -707,6 +707,11 @@
   transform: rotate(-8deg);
   mix-blend-mode: multiply;
 }
+:root[data-lens="back-page"] .bp-page[data-kind="inside-cover"] .bp-cover-doodle {
+  width: 64%;
+  margin: auto;
+  transform: rotate(-4deg);
+}
 :root[data-lens="back-page"] .bp-belongs {
   margin: 0 auto;
   padding: 0.5em 1em;
@@ -723,70 +728,6 @@
   font-size: 1.2em;
 }
 
-/* the contents: a slip of squared paper tucked into the cover */
-:root[data-lens="back-page"] .bp-contents {
-  position: relative;
-  padding: 1em 1.1em 0.8em 2.2em;
-  background:
-    linear-gradient(90deg, transparent 1.45em, var(--bp-margin) 1.45em calc(1.45em + 1.5px), transparent calc(1.45em + 1.5px)),
-    linear-gradient(var(--bp-grid) 1px, transparent 1px) 0 0 / 14px 14px,
-    linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px) 0 0 / 14px 14px,
-    var(--bp-paper);
-  transform: rotate(1.4deg);
-  box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.38),
-    0 1px 0 rgba(0, 0, 0, 0.2);
-  clip-path: polygon(0 1.2%, 8% 0, 16% 1.4%, 25% 0, 33% 1%, 42% 0, 51% 1.2%, 60% 0, 69% 1.3%, 78% 0, 87% 1.1%, 100% 0, 100% 100%, 0 100%);
-}
-:root[data-lens="back-page"] .bp-contents__title {
-  margin: 0 0 0.2em;
-  font: 700 1.6em/1 var(--bp-hand);
-  color: var(--bp-pencil);
-  text-decoration: underline 2px var(--bp-red);
-  text-underline-offset: 0.2em;
-}
-:root[data-lens="back-page"] .bp-contents__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-:root[data-lens="back-page"] .bp-contents__list a {
-  display: flex;
-  align-items: baseline;
-  gap: 0.35em;
-  padding: 0.18em 0;
-  min-height: 44px;
-  box-sizing: border-box;
-  color: var(--bp-blue);
-  text-decoration: none;
-}
-:root[data-lens="back-page"] .bp-contents__list [data-ink="red"] a {
-  color: var(--bp-red);
-}
-:root[data-lens="back-page"] .bp-contents__name {
-  font: 700 1.55em/1.1 var(--bp-hand);
-  white-space: nowrap;
-}
-:root[data-lens="back-page"] .bp-contents__list small {
-  font: 400 1.1em/1 var(--bp-hand);
-  color: var(--bp-fine);
-  white-space: nowrap;
-}
-:root[data-lens="back-page"] .bp-contents__dots {
-  flex: 1;
-  min-width: 1em;
-  border-bottom: 2px dotted color-mix(in srgb, var(--bp-pencil) 45%, transparent);
-  transform: translateY(-0.3em);
-}
-:root[data-lens="back-page"] .bp-contents__no {
-  font: 700 1.3em/1 var(--bp-hand);
-  color: var(--bp-pencil);
-}
-:root[data-lens="back-page"] .bp-contents__list a[aria-current="page"] .bp-contents__name {
-  padding: 0 0.25em;
-  margin: 0 -0.25em;
-  background: var(--bp-circle-red) center / 100% 100% no-repeat;
-}
 :root[data-lens="back-page"] .bp-return {
   margin: 0 auto;
   padding: 0.55em 1em 0.6em;
@@ -1398,8 +1339,8 @@
   line-height: 1.2;
   margin-bottom: -0.1em;
 }
-/* the phone's cover holds the label and the whole contents slip: its hand
-   shrinks to fit a short screen rather than lose the return address */
+/* the phone's cover holds the label and the return address: its hand
+   shrinks to fit a short screen rather than lose either */
 :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-page[data-kind="cover"],
 :root[data-lens="back-page"] .bp-stage[data-mode="single"] .bp-page[data-kind="cover"] {
   font-size: min(var(--fs), calc(var(--ph) / 47));

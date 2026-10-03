@@ -31,7 +31,6 @@ const SOLID = [
   "pre",
   "table",
   "hr",
-  ".bp-contents",
   ".bp-return",
   ".bp-label",
   ".bp-belongs",

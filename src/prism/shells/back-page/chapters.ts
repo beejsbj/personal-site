@@ -24,7 +24,7 @@ import {
   underline,
 } from "./ink";
 import { paginate, type Blank } from "./paginate";
-import { BOOKS, shelfOf, type BookKey } from "./themes";
+import { BOOKS, type BookKey } from "./themes";
 
 type Project = SiteContent["projects"][number];
 type LabItem = SiteContent["lab"][number];
@@ -285,19 +285,18 @@ function taped(
   return fig;
 }
 
-// ---- the cover, and the contents -------------------------------------------------
+// ---- the cover --------------------------------------------------------------------
 
-/** The name label on a book's cover, in its paper's words. */
+/** The name label on a book's cover: which book in the pile it is, its title,
+ * and the name, subject and class written in. */
 function label(content: SiteContent, copy: Copy, key: BookKey) {
   const words = copy.cover;
-  const shelf = shelfOf(key);
   const book = copy.books[key];
-  const paper = copy.papers[shelf.theme];
   const [first, second] = book.title;
   return h(
     "div",
     { class: "bp-label" },
-    h("p", { class: "bp-label__school" }, paper.school),
+    h("p", { class: "bp-label__school" }, fill(words.series, { n: BOOKS.findIndex((b) => b.key === key) + 1 })),
     h(
       "p",
       { class: "bp-label__title", "aria-hidden": "true" },
@@ -320,58 +319,8 @@ function label(content: SiteContent, copy: Copy, key: BookKey) {
       "p",
       { class: "bp-label__field" },
       h("span", null, words.class),
-      h("b", null, paper.klass),
+      h("b", null, book.klass),
     ),
-  );
-}
-
-/** The contents slip: the books on the desk, and the paper each is on. */
-function contents(b: Build) {
-  const { content, route, copy } = b;
-  const words = copy.contents;
-  const list = h("ol", { class: "bp-contents__list" });
-  for (const shelf of BOOKS) {
-    const book = copy.books[shelf.key];
-    const here = route.path === shelf.href;
-    list.append(
-      h(
-        "li",
-        { "data-ink": shelf.key === "projects" ? "red" : "blue" },
-        h(
-          "a",
-          { href: shelf.href, "aria-current": here ? "page" : null },
-          h("span", { class: "bp-contents__name" }, book.name),
-          shelf.key === "home" ? null : h("small", null, ` (${book.aside})`),
-          h("span", { class: "bp-contents__dots", "aria-hidden": "true" }),
-          h(
-            "span",
-            { class: "bp-contents__no" },
-            h("span", { class: "bp-sr" }, words.inThe),
-            copy.papers[shelf.theme].short,
-          ),
-        ),
-      ),
-    );
-  }
-  list.append(
-    h(
-      "li",
-      { "data-ink": "blue" },
-      h(
-        "a",
-        { href: content.site.writingUrl, target: "_blank", rel: "noreferrer" },
-        h("span", { class: "bp-contents__name" }, words.writing.name),
-        h("small", null, ` (${words.writing.aside})`),
-        h("span", { class: "bp-contents__dots", "aria-hidden": "true" }),
-        h("span", { class: "bp-contents__no" }, "↗", h("span", { class: "bp-sr" }, ` ${copy.newTab}`)),
-      ),
-    ),
-  );
-  return h(
-    "nav",
-    { class: "bp-contents", "aria-label": words.label },
-    h("p", { class: "bp-contents__title", "aria-hidden": "true" }, words.title),
-    list,
   );
 }
 
@@ -398,13 +347,14 @@ function returnTo(content: SiteContent, copy: Copy) {
 }
 
 /** The outside of the book: the name label on brown paper. On a phone the
- * cover is also where the contents slip is tucked. */
-export function coverPage(b: Build, withContents: boolean, key: BookKey = "home") {
+ * first book's cover is also where the return address is written, since it
+ * has no inside cover to show. */
+export function coverPage(b: Build, withReturn: boolean, key: BookKey = "home") {
   const { page, flow } = blankPage(b.copy, "cover", "kraft");
   page.dataset.book = key;
   flow.append(label(b.content, b.copy, key));
-  if (withContents) flow.append(contents(b), returnTo(b.content, b.copy));
-  else flow.append(svg(coverDoodle(key)));
+  if (withReturn) flow.append(returnTo(b.content, b.copy));
+  flow.append(svg(coverDoodle(key)));
   return page;
 }
 
@@ -413,7 +363,9 @@ function coverDoodle(key: string) {
   return `<svg class="bp-cover-doodle" viewBox="0 0 200 120" aria-hidden="true">${flick(40, 90, 150, 30, BLUE, rng, 0.2)}${flick(150, 30, 60, 100, RED, rng, 0.3)}${camp({ cx: 40, cy: 90, r: 16, ink: BLUE, enemy: RED, dots: 5, hits: 1, rng })}${camp({ cx: 150, cy: 30, r: 16, ink: RED, enemy: BLUE, dots: 6, hits: 2, rng })}</svg>`;
 }
 
-/** The inside of the front cover: the contents slip, and who to return it to. */
+/** The inside of the front cover: whose book it is, a war fought there when
+ * it was new, and who to return it to. The books themselves are the way
+ * round: each lies on the pile with its own label. */
 function insideCover(b: Build) {
   const { page, flow } = blankPage(b.copy, "inside-cover", "kraft-in");
   flow.append(
@@ -423,7 +375,7 @@ function insideCover(b: Build) {
       `${b.copy.cover.belongs} `,
       h("b", null, b.content.site.name),
     ),
-    contents(b),
+    svg(coverDoodle("inside")),
     returnTo(b.content, b.copy),
   );
   return page;
