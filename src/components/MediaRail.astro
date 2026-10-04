@@ -10,13 +10,14 @@ interface MediaItem {
 
 interface Props {
   media: MediaItem[];
+  [data: `data-${string}`]: string | undefined;
 }
 
-const { media = [] } = Astro.props;
+const { media = [], ...data } = Astro.props;
 ---
 
 {media.length > 0 && (
-  <div class="media-rail">
+  <div class="media-rail" {...data}>
     {media.map((item) => (
       <figure class="media-rail__item">
         {item.type === "video" ? (

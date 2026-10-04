@@ -1,0 +1,17 @@
+/* Lens: calling-card, before paint.
+   The lens is its own shell (src/prism/shells/calling-card); this file only
+   holds the ground so there is no flash before the shell's JS arrives, and
+   preloads the ransom-note faces the COMMAND screen is cut from. */
+@import "@fontsource/anton/400.css";
+@import "@fontsource-variable/bodoni-moda/wght.css";
+@import "@fontsource-variable/bodoni-moda/wght-italic.css";
+
+:root[data-lens="calling-card"] {
+  color-scheme: dark;
+  background: #0a0a0a;
+  color: #fff;
+}
+:root[data-lens="calling-card"] body {
+  background: #0a0a0a;
+  color: #fff;
+}

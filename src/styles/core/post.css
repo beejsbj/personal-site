@@ -1,5 +1,5 @@
-/* Long-form reading. The body is sanitised HTML synced from Substack
-   (scripts/sync-substack.mjs), so it is styled by element, not by class.
+/* Long-form reading. The body is sanitised HTML fetched from Substack
+   (src/lib/content/substack-html.mjs), so it is styled by element, not by class.
    Values come from tokens only. */
 .post-page {
   grid-template-columns: minmax(0, 1fr);

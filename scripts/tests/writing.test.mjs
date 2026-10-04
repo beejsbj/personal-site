@@ -1,156 +1,318 @@
 import assert from "node:assert/strict";
-import { execFile } from "node:child_process";
-import { readFileSync, readdirSync } from "node:fs";
-import { createServer } from "node:http";
+import { readFileSync, existsSync } from "node:fs";
 import test from "node:test";
-import { promisify } from "node:util";
-import { sanitizeSubstackHtml } from "../lib/substack-html.mjs";
+import {
+  createSubstackSource,
+  ContentUnavailable,
+  parseFeed,
+} from "../../src/lib/content/substack.mjs";
+import { sanitizeSubstackHtml } from "../../src/lib/content/substack-html.mjs";
 
-// Run after `pnpm build`: these assertions inspect what will actually ship.
-const read = (path) => readFileSync(path, "utf8");
-const dir = "src/content/writing";
-const posts = readdirSync(dir)
-  .filter((name) => name.endsWith(".md"))
-  .map((name) => {
-    const source = read(`${dir}/${name}`);
-    const [, front, body] = source.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-    // The sync writes each value as JSON, which is also valid YAML.
-    const data = Object.fromEntries(
-      front.split("\n").map((line) => {
-        const at = line.indexOf(": ");
-        return [line.slice(0, at), JSON.parse(line.slice(at + 2))];
-      }),
-    );
-    return { file: name, source, body, ...data };
-  });
-const page = (slug) => read(`dist/client/writing/${slug}/index.html`);
-const articleOf = (html) =>
-  html.match(
-    /<article\b[^>]*class="[^"]*post-body[^"]*"[^>]*>([\s\S]*?)<\/article>/,
-  )?.[1];
-const plain = (html) =>
-  html
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&#38;|&amp;/g, "&")
-    .replace(/&#39;|&#x27;/g, "'")
-    .replace(/&#34;|&quot;/g, '"')
-    .replace(/\s+/g, " ");
-
-test("posts are synced, and each file is named for its slug", () => {
-  assert.ok(posts.length > 0, "No posts under src/content/writing");
-  for (const post of posts) {
-    assert.equal(post.file, `${post.slug}.md`);
-    assert.ok(post.title && post.description && post.date);
-    assert.match(post.canonical, /^https:\/\/buroojs\.substack\.com\/p\//);
-    assert.ok(post.body.trim().length > 0, `${post.file}: empty body`);
-  }
+const origin = "https://buroojs.substack.com";
+const post = (slug = "hello", extra = {}) => ({
+  slug,
+  title: `Title ${slug}`,
+  post_date: "2025-01-01T00:00:00.000Z",
+  canonical_url: `${origin}/p/${slug}`,
+  audience: "everyone",
+  is_published: true,
+  body_html: "<p>Hello world.</p>",
+  ...extra,
 });
+const rss = (slug = "hello", body = "<p>Public feed content.</p>") =>
+  `<rss><channel><item><title><![CDATA[Title ${slug}]]></title><link>${origin}/p/${slug}</link><pubDate>Wed, 01 Jan 2025 00:00:00 GMT</pubDate><content:encoded><![CDATA[${body}]]></content:encoded></item></channel></rss>`;
+function fixture({ shared = new Map(), cacheFailure = false } = {}) {
+  let time = 0;
+  const requests = [];
+  let routes = (url) =>
+    url.pathname === "/api/v1/archive"
+      ? [post()]
+      : url.pathname === "/feed"
+        ? rss()
+        : post();
+  const cache = {
+    async get(key) {
+      if (cacheFailure) throw new Error("cache offline");
+      return shared.get(key);
+    },
+    async set(key, value) {
+      if (cacheFailure) throw new Error("cache offline");
+      shared.set(key, structuredClone(value));
+    },
+    async delete(key) {
+      if (cacheFailure) throw new Error("cache offline");
+      shared.delete(key);
+    },
+  };
+  const config = {
+    origin,
+    cache,
+    now: () => time,
+    fetcher: async (url) => {
+      requests.push(url.href);
+      const result = await routes(url);
+      if (result instanceof Error) throw result;
+      if (typeof result === "number")
+        return new Response("", { status: result });
+      return new Response(
+        typeof result === "string" ? result : JSON.stringify(result),
+      );
+    },
+  };
+  return {
+    source: createSubstackSource(config),
+    fresh: () => createSubstackSource(config),
+    requests,
+    shared,
+    cache,
+    advance: (ms) => {
+      time += ms;
+    },
+    routes: (next) => {
+      routes = next;
+    },
+  };
+}
 
-test("every post file has a page, canonical to its Substack original", () => {
-  for (const post of posts) {
-    const html = page(post.slug);
-    assert.equal(
-      html.match(/<link rel="canonical" href="([^"]+)"/)?.[1],
-      post.canonical,
-      `${post.slug}: canonical`,
-    );
-    assert.equal(
-      (html.match(/<h1\b/g) || []).length,
-      1,
-      `${post.slug}: one h1`,
-    );
-    assert.ok(articleOf(html), `${post.slug}: missing post body`);
-    assert.match(html, /Originally published on Substack/);
-    assert.ok(
-      html.includes(`href="${post.canonical}"`),
-      `${post.slug}: visible link to the original`,
-    );
-    assert.match(html, /href="https:\/\/buroojs\.substack\.com\/subscribe"/);
-  }
-});
-
-test("the index lists every post, newest first, with date and subtitle", () => {
-  const html = read("dist/client/writing/index.html");
-  const entries = [
-    ...html.matchAll(
-      /<article\b[^>]*class="[^"]*post-entry__body[^"]*"[^>]*>([\s\S]*?)<\/article>/g,
-    ),
-  ].map(([, entry]) => entry);
-  assert.equal(entries.length, posts.length);
-  const dates = entries.map(
-    (entry) => entry.match(/<time[^>]*datetime="([^"]+)"/)[1],
+test("writing uses runtime routes and no article-commit machinery", () => {
+  assert.equal(existsSync(".github/workflows/sync-writing.yml"), false);
+  assert.equal(existsSync("scripts/sync-substack.mjs"), false);
+  assert.equal(existsSync("src/content/writing"), false);
+  const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
+  assert.equal(packageJson.scripts["sync:writing"], undefined);
+  assert.ok(
+    packageJson.dependencies.parse5,
+    "sanitiser must ship in the runtime",
   );
-  assert.deepEqual(dates, [...dates].sort().reverse());
-  for (const post of posts) {
-    const entry = entries.find((item) =>
-      item.includes(`href="/writing/${post.slug}"`),
-    );
-    assert.ok(entry, `${post.slug}: not listed`);
-    const text = plain(entry);
-    assert.ok(text.includes(post.title), `${post.slug}: title`);
-    assert.ok(
-      text.includes(post.subtitle || post.description),
-      `${post.slug}: subtitle`,
-    );
+  for (const file of [
+    "src/pages/writing/index.astro",
+    "src/pages/writing/[slug].astro",
+    "src/pages/writing/sitemap.xml.ts",
+  ]) {
+    const source = readFileSync(file, "utf8");
+    assert.match(source, /export const prerender = false/);
+    assert.doesNotMatch(source, /getStaticPaths/);
   }
   assert.match(
-    html,
-    /href="https:\/\/buroojs\.substack\.com"/,
-    "Substack stays reachable from the index",
+    readFileSync("dist/client/sitemap-index.xml", "utf8"),
+    /https:\/\/burooj\.dev\/writing\/sitemap\.xml/,
   );
 });
 
-test("nothing executable or embedded leaks from Substack bodies", () => {
-  for (const post of posts) {
-    assert.doesNotMatch(
-      post.body,
-      /<(script|iframe|object|embed|form|button|input|svg|style)\b|\son\w+=|javascript:/i,
-      `${post.slug}: source body`,
-    );
-    const body = articleOf(page(post.slug));
-    assert.doesNotMatch(
-      body,
-      /<(script|iframe)\b/i,
-      `${post.slug}: built body`,
-    );
-    assert.doesNotMatch(body, /subscription-widget|data-attrs|pencraft/);
-  }
+test("archive is paginated, deduplicated, newest first, and public-only", async () => {
+  const f = fixture();
+  const first = Array.from({ length: 50 }, (_, i) => post(`post-${i}`));
+  f.routes((url) =>
+    url.searchParams.get("offset") === "0"
+      ? first
+      : [
+          post("new", {
+            post_date: "2026-01-01",
+            description: "<b>Description</b>",
+          }),
+          post("post-0"),
+          post("paid", { audience: "only_paid" }),
+          post("draft", { is_published: false }),
+        ],
+  );
+  const posts = await f.source.getPosts();
+  assert.equal(posts.length, 51);
+  assert.equal(posts[0].slug, "new");
+  assert.equal(posts[0].data.description, "Description");
+  assert.equal(f.requests.length, 2);
+  assert.match(f.requests[1], /offset=50/);
 });
 
-test("Writing is the current section on the index and every post", () => {
-  for (const path of [
-    "writing/index.html",
-    ...posts.map((post) => `writing/${post.slug}/index.html`),
+test("repeated full archive pages terminate instead of exhausting function time", async () => {
+  const f = fixture();
+  f.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? Array.from({ length: 50 }, (_, i) => post(`post-${i}`))
+      : 500,
+  );
+  await assert.rejects(f.source.getPosts(), ContentUnavailable);
+  assert.equal(f.requests.length, 3);
+});
+
+test("body is fetched lazily and sanitised into the shared entry contract", async () => {
+  const f = fixture();
+  f.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? [post(), post("other")]
+      : post("hello", {
+          body_html: `<h1>Heading</h1><p>Hello <a href="${origin}/p/other?utm_source=sub#part">other</a><a href="${origin}/p/absent">absent</a></p><script>alert(1)</script><img src="https://substackcdn.com/p.png" onerror="bad()">`,
+        }),
+  );
+  const posts = await f.source.getPosts();
+  assert.equal(f.requests.length, 1);
+  assert.equal(posts[0].body, undefined);
+  const full = await f.source.getPost("hello");
+  assert.equal(f.requests.length, 2);
+  assert.equal(full.id, "hello");
+  assert.equal(full.data.canonical, `${origin}/p/hello`);
+  assert.match(full.body, /<h2>Heading<\/h2>/);
+  assert.match(full.body, /href="\/writing\/other#part"/);
+  assert.match(full.body, /href="https:\/\/buroojs\.substack\.com\/p\/absent"/);
+  assert.doesNotMatch(full.body, /script|onerror|utm_source/);
+});
+
+test("warm and cross-instance caches deduplicate requests and revalidate edits", async () => {
+  const f = fixture();
+  const [a, b] = await Promise.all([
+    f.source.getPost("hello"),
+    f.source.getPost("hello"),
+  ]);
+  assert.deepEqual(a, b);
+  assert.equal(f.requests.length, 2);
+  assert.deepEqual(await f.fresh().getPost("hello"), a);
+  assert.equal(f.requests.length, 2);
+  f.advance(300_001);
+  f.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? [post(), post("new")]
+      : post("hello", { title: "Edited", body_html: "<p>Updated.</p>" }),
+  );
+  assert.equal((await f.source.getPost("hello")).data.title, "Edited");
+  assert.match((await f.source.getPost("hello")).body, /Updated/);
+  assert.ok((await f.source.getPosts()).some((p) => p.slug === "new"));
+  assert.equal(f.requests.length, 4);
+});
+
+test("last-known-good content survives a transient outage but expires from its original timestamp", async () => {
+  const f = fixture();
+  const initial = await f.source.getPost("hello");
+  f.advance(300_001);
+  f.routes(() => 500);
+  assert.deepEqual(await f.fresh().getPost("hello"), initial);
+  f.advance(3_300_000);
+  await assert.rejects(f.source.getPosts(), ContentUnavailable);
+  await assert.rejects(f.source.getPost("hello"), ContentUnavailable);
+});
+
+test("known paid, unpublished, deleted and missing posts do not reveal old bodies", async () => {
+  for (const result of [
+    post("hello", { audience: "only_paid" }),
+    post("hello", { is_published: false }),
+    404,
+    410,
+    401,
+    403,
   ]) {
-    const html = read(`dist/client/${path}`);
-    const nav = html.match(
-      /<nav\b[^>]*aria-label="Main navigation"[^>]*>([\s\S]*?)<\/nav>/,
-    )[1];
-    const anchors = [...nav.matchAll(/<a\b[^>]*>/g)].map(([tag]) => tag);
-    assert.equal(anchors.length, 6, `${path}: six links`);
-    const marked = anchors.filter((tag) => tag.includes('aria-current="page"'));
-    assert.equal(marked.length, 1);
-    assert.ok(marked[0].includes('href="/writing"'), `${path}: ${marked[0]}`);
-  }
-});
-
-test("writing pages are in the sitemap", () => {
-  const sitemap = read("dist/client/sitemap-0.xml");
-  assert.match(sitemap, /<loc>https:\/\/burooj\.dev\/writing\/<\/loc>/);
-  for (const post of posts) {
-    assert.ok(
-      sitemap.includes(`<loc>https://burooj.dev/writing/${post.slug}/</loc>`),
-      `${post.slug}: not in sitemap`,
+    const f = fixture();
+    await f.source.getPost("hello");
+    f.advance(300_001);
+    f.routes((url) =>
+      url.pathname === "/api/v1/archive"
+        ? [post()]
+        : url.pathname === "/feed"
+          ? rss()
+          : result,
+    );
+    assert.equal(await f.source.getPost("hello"), null);
+    f.routes(() => 500);
+    assert.equal(
+      await f
+        .fresh()
+        .getPost("hello")
+        .catch(() => null),
+      null,
     );
   }
+  const f = fixture();
+  await f.source.getPost("hello");
+  f.advance(300_001);
+  f.routes(() => []);
+  assert.equal(await f.source.getPost("hello"), null);
+  assert.equal(await f.source.getPost("unknown"), null);
 });
 
-test("/blog now lands on /writing, not Substack", () => {
-  const { redirects } = JSON.parse(read("vercel.json"));
+test("failed shared-cache invalidation cannot resurrect a revoked warm body", async () => {
+  const f = fixture();
+  await f.source.getPost("hello");
+  f.advance(300_001);
+  const oldSet = f.cache.set;
+  f.cache.set = async (key, value, options) => {
+    if (value.tombstone) throw new Error("set failed");
+    return oldSet(key, value, options);
+  };
+  f.cache.delete = async () => {
+    throw new Error("delete failed");
+  };
+  f.routes((url) => (url.pathname === "/api/v1/archive" ? [post()] : 404));
+  assert.equal(await f.source.getPost("hello"), null);
+  f.routes((url) => (url.pathname === "/api/v1/archive" ? [post()] : 500));
+  await assert.rejects(f.source.getPost("hello"), ContentUnavailable);
+});
+
+test("cache infrastructure failures still permit uncached source and warm fallback", async () => {
+  const f = fixture({ cacheFailure: true });
+  const initial = await f.source.getPost("hello");
+  f.advance(300_001);
+  f.routes(() => 500);
+  assert.deepEqual(await f.source.getPost("hello"), initial);
+});
+
+test("cold outages are explicit and malformed archive does not poison known-good data", async () => {
+  const f = fixture();
+  f.routes(() => 500);
+  await assert.rejects(f.source.getPosts(), ContentUnavailable);
+  f.routes((url) => (url.pathname === "/api/v1/archive" ? [post()] : post()));
+  await f.source.getPost("hello");
+  f.advance(300_001);
+  f.routes((url) =>
+    url.pathname === "/api/v1/archive" ? { surprise: "not an array" } : 500,
+  );
+  assert.equal((await f.source.getPosts()).length, 1);
+});
+
+test("RSS is a recent-public-content fallback and never bypasses an API denial", async () => {
+  const f = fixture();
+  f.routes((url) => (url.pathname === "/feed" ? rss() : 500));
+  assert.equal((await f.source.getPosts()).length, 1);
+  assert.match((await f.source.getPost("hello")).body, /Public feed content/);
+  const denied = fixture();
+  denied.routes((url) => (url.pathname === "/feed" ? rss() : 403));
+  await assert.rejects(denied.source.getPosts(), ContentUnavailable);
+  assert.equal(denied.requests.length, 1);
+});
+
+test("unsafe slugs never trigger upstream requests and canonical source stays fixed", async () => {
+  const f = fixture();
+  for (const slug of ["../secrets", "x?admin=1", "x/#bad", "", "x".repeat(201)])
+    assert.equal(await f.source.getPost(slug), null);
+  assert.equal(f.requests.length, 0);
+  f.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? [post()]
+      : post("hello", { canonical_url: "https://evil.example/p/hello" }),
+  );
+  assert.equal(
+    (await f.source.getPost("hello")).data.canonical,
+    `${origin}/p/hello`,
+  );
+});
+
+test("RSS ignores off-origin and malformed entries and sanitises public bytes", () => {
+  assert.equal(
+    parseFeed(rss().replaceAll(origin, "https://evil.example"), origin).length,
+    0,
+  );
+  assert.throws(
+    () => parseFeed("<html>blocked</html>", origin),
+    ContentUnavailable,
+  );
+  assert.doesNotMatch(
+    parseFeed(rss("hello", "<p>Hello</p><script>bad</script>"), origin)[0].body,
+    /script|bad/,
+  );
+});
+
+test("/blog still lands on /writing", () => {
+  const { redirects } = JSON.parse(readFileSync("vercel.json", "utf8"));
   const blog = redirects.filter(
-    (redirect) =>
-      redirect.source === "/blog" ||
-      redirect.has?.some((h) => h.key === "page" && h.value === "blog"),
+    (r) =>
+      r.source === "/blog" ||
+      r.has?.some((h) => h.key === "page" && h.value === "blog"),
   );
   assert.equal(blog.length, 2);
   for (const redirect of blog) assert.equal(redirect.destination, "/writing");
@@ -205,66 +367,126 @@ b</code></pre>
   assert.doesNotMatch(html.replace(/<pre[\s\S]*?<\/pre>/, ""), /\n\s*\n\s*\n/);
 });
 
-// Run the real sync script against a fixture "Substack", dry-run so the repo's
-// own posts are never touched. The scheduled workflow depends on the exit code.
-async function runSync(routes) {
-  const server = createServer((req, res) => {
-    const route = routes[new URL(req.url, "http://x").pathname];
-    res.writeHead(route ? 200 : 404, { "content-type": "text/plain" });
-    res.end(route?.body ?? "");
-  });
-  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-  const env = {
-    ...process.env,
-    SUBSTACK_URL: `http://127.0.0.1:${server.address().port}`,
+test("RSS absence does not turn a healthy older article into a false 404", async () => {
+  const f = fixture();
+  f.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? 500
+      : url.pathname === "/feed"
+        ? rss("recent")
+        : post("older"),
+  );
+  assert.equal((await f.source.getPost("older")).slug, "older");
+  assert.ok(f.requests.some((url) => url.endsWith("/api/v1/posts/older")));
+});
+
+test("a stale archive cannot exclude a new healthy article", async () => {
+  const f = fixture();
+  await f.source.getPosts();
+  f.advance(300_001);
+  f.routes((url) => (url.pathname === "/api/v1/archive" ? 500 : post("new")));
+  assert.equal((await f.source.getPost("new")).slug, "new");
+});
+
+test("fresh RSS cannot override a known revoked-post tombstone", async () => {
+  const f = fixture();
+  await f.source.getPost("hello");
+  f.advance(300_001);
+  f.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? [post()]
+      : url.pathname === "/feed"
+        ? rss()
+        : 404,
+  );
+  assert.equal(await f.source.getPost("hello"), null);
+  f.routes((url) => (url.pathname === "/feed" ? rss() : 500));
+  await assert.rejects(f.source.getPost("hello"), ContentUnavailable);
+  f.routes((url) => (url.pathname === "/api/v1/archive" ? [post()] : post()));
+  assert.equal(
+    (await f.source.getPost("hello")).slug,
+    "hello",
+    "successful API response can restore public content",
+  );
+});
+
+test("unknown URLs do not write cache tombstones", async () => {
+  const f = fixture();
+  await f.source.getPosts();
+  for (let i = 0; i < 100; i++)
+    assert.equal(await f.source.getPost(`missing-${i}`), null);
+  assert.equal(f.shared.size, 1);
+});
+
+test("cold instances tombstone shared bodies after observing archive deletion", async () => {
+  const f = fixture();
+  await f.source.getPost("hello");
+  f.advance(300_001);
+  f.routes((url) => (url.pathname === "/api/v1/archive" ? [] : 500));
+  assert.equal(await f.fresh().getPost("hello"), null);
+  f.advance(300_001);
+  f.routes(() => 500);
+  await assert.rejects(f.fresh().getPost("hello"), ContentUnavailable);
+});
+
+test("cache snapshot provenance cannot race a concurrently replaced archive", async () => {
+  const f = fixture();
+  f.routes((url) =>
+    url.pathname === "/api/v1/archive" ? [post("old")] : post("old"),
+  );
+  await f.source.getPosts();
+  f.advance(300_001);
+  let archiveReads = 0;
+  const oldGet = f.cache.get;
+  f.cache.get = async (key) => {
+    const previous = await oldGet(key);
+    if (key.endsWith(":archive") && ++archiveReads > 1)
+      return {
+        at: 300_001,
+        value: [
+          {
+            id: "new",
+            slug: "new",
+            data: { date: "2025-01-01T00:00:00.000Z" },
+          },
+        ],
+      };
+    return previous;
   };
-  try {
-    const { stdout, stderr } = await promisify(execFile)(
-      process.execPath,
-      ["scripts/sync-substack.mjs", "--dry-run"],
-      { env },
+  f.routes((url) => (url.pathname === "/api/v1/archive" ? 500 : post("new")));
+  assert.equal((await f.source.getPost("new")).slug, "new");
+  assert.equal(
+    archiveReads,
+    1,
+    "authoritative provenance uses the exact returned snapshot",
+  );
+});
+
+test("index failure and empty RSS are not false deletion evidence", async () => {
+  const f = fixture();
+  f.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? 500
+      : url.pathname === "/feed"
+        ? "<rss><channel></channel></rss>"
+        : post("older"),
+  );
+  await assert.rejects(f.source.getPosts(), ContentUnavailable);
+  assert.equal((await f.source.getPost("older")).slug, "older");
+});
+
+test("authored writing page copy lives in the existing page collection", () => {
+  const page = readFileSync("src/content/pages/writing.md", "utf8");
+  assert.match(page, /title: Notes from building things/);
+  for (const file of [
+    "src/pages/writing/index.astro",
+    "src/pages/writing/[slug].astro",
+  ]) {
+    const source = readFileSync(file, "utf8");
+    assert.match(source, /getWritingPage/);
+    assert.doesNotMatch(
+      source,
+      /Notes from building things|Liked this one|New posts go out by email/,
     );
-    return { code: 0, stdout, stderr };
-  } catch (error) {
-    return { code: error.code, stdout: error.stdout, stderr: error.stderr };
-  } finally {
-    server.close();
   }
-}
-
-test("the sync exits non-zero, and writes nothing, when Substack has zero posts", async () => {
-  const before = readdirSync(dir).join();
-  const result = await runSync({
-    "/api/v1/archive": { body: "[]" },
-    "/feed": { body: "<rss><channel></channel></rss>" },
-  });
-  assert.equal(result.code, 1);
-  assert.match(result.stderr, /zero publishable posts/);
-  assert.equal(readdirSync(dir).join(), before);
-});
-
-test("the sync exits non-zero when Substack errors", async () => {
-  const result = await runSync({}); // every route 404s
-  assert.notEqual(result.code, 0);
-});
-
-test("the sync succeeds on a Substack with a post", async () => {
-  const post = {
-    slug: "hello",
-    title: "Hello",
-    post_date: "2025-01-01T00:00:00.000Z",
-    canonical_url: "https://buroojs.substack.com/p/hello",
-    audience: "everyone",
-    is_published: true,
-  };
-  const result = await runSync({
-    "/api/v1/archive": { body: JSON.stringify([post]) },
-    "/feed": { body: "<rss><channel></channel></rss>" },
-    "/api/v1/posts/hello": {
-      body: JSON.stringify({ ...post, body_html: "<p>Hi there.</p>" }),
-    },
-  });
-  assert.equal(result.code, 0, result.stderr);
-  assert.match(result.stdout, /\[dry run\] 1 posts/);
-  assert.match(result.stdout, /\+ hello/);
 });

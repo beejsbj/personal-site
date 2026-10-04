@@ -1,0 +1,341 @@
+/* Back Page microanimations: hand and paper. Ink is drawn, not faded; paper
+   curls, lifts and settles; the lamp is warm and almost steady. Everything
+   that moves lives under prefers-reduced-motion: no-preference; state
+   changes stay legible by colour without it. */
+
+/* ---- state without motion --------------------------------------------------- */
+:root[data-lens="back-page"] .bp-flow a:hover {
+  text-decoration-color: currentColor;
+}
+:root[data-lens="back-page"] .bp-tabs a:hover {
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-corner:hover .bp-corner__label {
+  border-bottom-color: currentColor;
+}
+:root[data-lens="back-page"] .bp-contents__list a:hover .bp-contents__dots {
+  border-bottom-color: currentColor;
+}
+:root[data-lens="back-page"] .bp-scribbled {
+  position: relative;
+}
+:root[data-lens="back-page"] .bp-scribble {
+  position: absolute;
+  left: -0.05em;
+  right: -0.05em;
+  bottom: -0.22em;
+  height: 0.5em;
+  overflow: visible;
+  pointer-events: none;
+}
+:root[data-lens="back-page"] .bp-camp:hover .bp-camp__name,
+:root[data-lens="back-page"] .bp-camp:focus-visible .bp-camp__name {
+  text-decoration: underline 2px currentColor;
+  text-underline-offset: 0.15em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ---- a page about to land: its ink waits for the hand ------------------- */
+  :root[data-lens="back-page"] .bp-page[data-fresh] .bp-h1 {
+    clip-path: inset(0 100% 0 0);
+  }
+  :root[data-lens="back-page"] .bp-page[data-fresh] :is(.bp-underline, .bp-tally, .bp-doodle, .bp-owncamp, .bp-map__ink, .bp-miniwar, .bp-cover-doodle) {
+    opacity: 0;
+  }
+  :root[data-lens="back-page"] .bp-map__ink .bp-dot,
+  :root[data-lens="back-page"] .bp-map__ink .bp-cross,
+  :root[data-lens="back-page"] .bp-miniwar .bp-dot,
+  :root[data-lens="back-page"] .bp-miniwar .bp-cross,
+  :root[data-lens="back-page"] .bp-owncamp .bp-dot,
+  :root[data-lens="back-page"] .bp-owncamp .bp-cross,
+  :root[data-lens="back-page"] .bp-cover-doodle .bp-dot,
+  :root[data-lens="back-page"] .bp-cover-doodle .bp-cross {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* ---- the lamp: warm, and once in a long while it flickers --------------- */
+  :root[data-lens="back-page"] .bp-lamp {
+    animation: back-page-lamp 37s linear infinite;
+  }
+  @keyframes back-page-lamp {
+    0%,
+    93.4%,
+    94.2%,
+    100% {
+      opacity: 1;
+    }
+    93.6% {
+      opacity: 0.78;
+    }
+    93.8% {
+      opacity: 0.96;
+    }
+    94% {
+      opacity: 0.86;
+    }
+  }
+
+  /* dust drifting through the light */
+  :root[data-lens="back-page"] .bp-motes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  :root[data-lens="back-page"] .bp-motes i {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    background: rgba(255, 226, 180, 0.55);
+    opacity: 0;
+    will-change: transform, opacity;
+    animation: back-page-mote var(--t) linear var(--d) infinite;
+  }
+  @keyframes back-page-mote {
+    0% {
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+    12% {
+      opacity: 0.7;
+    }
+    50% {
+      transform: translate(calc(var(--dx) * 0.6), calc(var(--dy) * 0.5));
+      opacity: 0.35;
+    }
+    88% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translate(var(--dx), var(--dy));
+      opacity: 0;
+    }
+  }
+
+  /* ---- sticky index tabs: they lift and peek out when reached for --------- */
+  :root[data-lens="back-page"] .bp-tabs a {
+    transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+  }
+  :root[data-lens="back-page"] .bp-tabs a:hover,
+  :root[data-lens="back-page"] .bp-tabs a:focus-visible {
+    transform: translateX(-0.15em) rotate(-0.6deg);
+  }
+  :root[data-lens="back-page"] .bp-tabs a[data-state="near"]:hover {
+    transform: translateX(0) rotate(-0.4deg);
+  }
+  :root[data-lens="back-page"] .bp-tabs a[data-state="current"]:hover {
+    transform: translateX(0.12em);
+  }
+  :root[data-lens="back-page"] .bp-tabs a:active {
+    transform: translateX(-0.45em) rotate(0.3deg);
+    transition-duration: 0.08s;
+  }
+  :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a:hover,
+  :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a:focus-visible {
+    transform: translateY(0.1em) rotate(0);
+  }
+  :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a[data-state="current"]:hover {
+    transform: translateY(-0.08em);
+  }
+  :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a:active {
+    transform: translateY(0.4em);
+  }
+
+  /* ---- dog-eared corners curl as the pointer comes near ------------------- */
+  :root[data-lens="back-page"] .bp-corner {
+    --curl: 0;
+  }
+  :root[data-lens="back-page"] .bp-corner__ear {
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.3, 1);
+    transform: scale(calc(1 + var(--curl) * 0.28));
+  }
+  :root[data-lens="back-page"] .bp-corner--next .bp-corner__ear {
+    transform-origin: 100% 100%;
+  }
+  :root[data-lens="back-page"] .bp-corner--prev .bp-corner__ear {
+    transform-origin: 0 100%;
+  }
+  :root[data-lens="back-page"] .bp-corner:hover .bp-corner__ear,
+  :root[data-lens="back-page"] .bp-corner:focus-visible .bp-corner__ear {
+    animation: back-page-earlift 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.3) both;
+  }
+  @keyframes back-page-earlift {
+    from {
+      transform: scale(calc(1 + var(--curl) * 0.28));
+    }
+    to {
+      transform: scale(1.42);
+    }
+  }
+  :root[data-lens="back-page"] .bp-corner:active .bp-corner__ear {
+    transform: scale(1.52) !important;
+    animation: none;
+  }
+  :root[data-lens="back-page"] .bp-corner__label {
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  :root[data-lens="back-page"] .bp-corner--next:hover .bp-corner__label {
+    transform: translateX(0.15em);
+  }
+  :root[data-lens="back-page"] .bp-corner--prev:hover .bp-corner__label {
+    transform: translateX(-0.15em);
+  }
+
+  /* ---- taped photos: a strip of tape lifts at one edge -------------------- */
+  :root[data-lens="back-page"] .bp-tape {
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1.1);
+  }
+  :root[data-lens="back-page"] .bp-taped__frame {
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.15);
+  }
+  :root[data-lens="back-page"] .bp-taped:hover .bp-tape--a,
+  :root[data-lens="back-page"] .bp-snaps li:hover .bp-tape--a {
+    transform: rotate(-11deg) translate(-2px, -3px);
+  }
+  :root[data-lens="back-page"] .bp-taped:hover .bp-tape--b,
+  :root[data-lens="back-page"] .bp-snaps li:hover .bp-tape--b {
+    transform: rotate(7deg) translate(1px, -1px);
+  }
+  :root[data-lens="back-page"] .bp-taped:hover .bp-taped__frame,
+  :root[data-lens="back-page"] .bp-snaps li:hover .bp-taped__frame {
+    transform: translateY(-2px) rotate(0.4deg);
+  }
+
+  /* ---- the sticky note flutters in the lamp's warmth ---------------------- */
+  :root[data-lens="back-page"] .bp-note {
+    transform-origin: 6% 0;
+    animation: back-page-flutter 7s ease-in-out infinite alternate;
+  }
+  @keyframes back-page-flutter {
+    from {
+      transform: rotate(-1.2deg);
+    }
+    to {
+      transform: rotate(-0.7deg) translateY(-1px);
+    }
+  }
+  :root[data-lens="back-page"] .bp-note:hover {
+    animation-play-state: paused;
+  }
+
+  /* ---- arrows nudge, circled words wobble --------------------------------- */
+  :root[data-lens="back-page"] .bp-arrows a::before,
+  :root[data-lens="back-page"] .bp-portrait figcaption a,
+  :root[data-lens="back-page"] .bp-arrowlink a {
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+  }
+  :root[data-lens="back-page"] .bp-arrows a:hover::before,
+  :root[data-lens="back-page"] .bp-portrait figcaption a:hover,
+  :root[data-lens="back-page"] .bp-arrowlink a:hover {
+    transform: translateX(3px);
+  }
+  :root[data-lens="back-page"] .bp-circled li {
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1.4);
+  }
+  :root[data-lens="back-page"] .bp-circled li:hover {
+    transform: rotate(1.5deg) scale(1.04);
+  }
+  :root[data-lens="back-page"] .bp-circled li:nth-child(2n):hover {
+    transform: rotate(-3.5deg) scale(1.04);
+  }
+
+  /* ---- the contents slip: the pen hovers over the name -------------------- */
+  :root[data-lens="back-page"] .bp-contents__name,
+  :root[data-lens="back-page"] .bp-contents__no {
+    display: inline-block;
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.3, 1.3);
+  }
+  :root[data-lens="back-page"] .bp-contents__list a:hover .bp-contents__name {
+    transform: translateX(3px) rotate(-1deg);
+  }
+  :root[data-lens="back-page"] .bp-contents__list a:hover .bp-contents__no {
+    transform: rotate(6deg) scale(1.15);
+  }
+
+  /* ---- the war map: soldiers stir when reached for ------------------------ */
+  :root[data-lens="back-page"] .bp-camp__name {
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1.3);
+  }
+  :root[data-lens="back-page"] .bp-camp:hover .bp-camp__name,
+  :root[data-lens="back-page"] .bp-camp:focus-visible .bp-camp__name {
+    transform: translateX(-50%) rotate(0deg) scale(1.08);
+  }
+  :root[data-lens="back-page"] .bp-camp-ink.bp-hot .bp-dot {
+    animation: back-page-jiggle 0.55s cubic-bezier(0.3, 0.1, 0.3, 1) both;
+  }
+  :root[data-lens="back-page"] .bp-camp-ink.bp-hot .bp-dot:nth-child(3n) {
+    animation-delay: 0.05s;
+    animation-direction: reverse;
+  }
+  :root[data-lens="back-page"] .bp-camp-ink.bp-hot .bp-dot:nth-child(3n + 1) {
+    animation-delay: 0.1s;
+  }
+  :root[data-lens="back-page"] .bp-camp-ink.bp-hot .bp-dot:nth-child(4n) {
+    animation-duration: 0.7s;
+  }
+  @keyframes back-page-jiggle {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    25% {
+      translate: 1.6px -1.2px;
+    }
+    50% {
+      translate: -1.4px 1px;
+    }
+    75% {
+      translate: 0.8px 1.4px;
+    }
+  }
+
+  /* ---- doodles keep time in the margin ------------------------------------ */
+  :root[data-lens="back-page"] .bp-doodle path {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  /* shapes keeping a beat: the circle, square and triangle of the second doodle */
+  :root[data-lens="back-page"] .bp-doodle[data-doodle="1"] path:nth-child(-n + 3) {
+    animation: back-page-beat 1.2s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+  }
+  :root[data-lens="back-page"] .bp-doodle[data-doodle="1"] path:nth-child(2) {
+    animation-delay: 0.4s;
+  }
+  :root[data-lens="back-page"] .bp-doodle[data-doodle="1"] path:nth-child(3) {
+    animation-delay: 0.8s;
+  }
+  /* the spiral turns, very slowly, the way the eye follows it */
+  :root[data-lens="back-page"] .bp-doodle[data-doodle="2"] path:first-child {
+    animation: back-page-spiral 60s linear infinite;
+  }
+  @keyframes back-page-spiral {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes back-page-beat {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    12% {
+      transform: scale(1.09);
+    }
+    30% {
+      transform: scale(1);
+    }
+  }
+
+  /* ---- the loose sheet's tape wobbles when the sheet is touched ----------- */
+  :root[data-lens="back-page"] .bp-loose__tag {
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1.3);
+  }
+  :root[data-lens="back-page"] .bp-loose:hover .bp-loose__tag {
+    transform: rotate(-3.5deg) translateY(-1px);
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "frame": {
+    "logo": "Burooj.",
+    "chipName": "burooj",
+    "key": "c major",
+    "tempo": "120 bpm",
+    "home": "home",
+    "sheet": "sheet",
+    "sheetTear": "Sheet",
+    "sound": "Sound",
+    "soundOff": "off",
+    "soundOn": "on",
+    "log": "Log",
+    "logMeta": "recent updates · {n} events",
+    "closeLog": "Close the log",
+    "openLog": "Open the log of {n} updates",
+    "score": "Updates",
+    "scoreOpen": "`<",
+    "scoreClose": ">`.log(\"burooj\")",
+    "pauseTape": "Pause the updates tape",
+    "playTape": "Play the updates tape",
+    "keys": "Sections",
+    "foldKeys": "Fold the keyboard",
+    "unfoldKeys": "Unfold the keyboard"
+  },
+  "keys": {
+    "home": { "label": "Home", "hint": "play" },
+    "projects": { "label": "Projects", "hint": "{n} tracks" },
+    "lab": { "label": "Lab", "hint": "{n} presets" },
+    "about": { "label": "About", "hint": "poster" },
+    "resume": { "label": "Resume", "hint": "credits" },
+    "writing": { "label": "Writing", "hint": "substack" },
+    "hello": { "label": "Hello", "hint": "email" }
+  },
+  "home": {
+    "links": "Elsewhere",
+    "nowSpinning": "Now spinning",
+    "linerNotes": "Liner notes",
+    "linerNotesFor": "Liner notes: {title}",
+    "speed": "33⅓",
+    "crate": "In the crate",
+    "setlist": "Full setlist",
+    "currently": "Currently"
+  },
+  "projects": {
+    "track": "track",
+    "now": "now",
+    "list": "Setlist, newest first"
+  },
+  "project": {
+    "setlist": "Setlist",
+    "trackNo": "track {no}",
+    "kicker": " · track {no} · {kind}",
+    "stamp": "Burooj",
+    "coverAlt": "{title} cover",
+    "neighbours": "Neighbouring tracks",
+    "prev": "prev",
+    "next": "next",
+    "first": "first track",
+    "last": "last track",
+    "credits": "Credits",
+    "tools": "Tools",
+    "filed": "Filed",
+    "linerNotes": "Liner notes",
+    "back": "Back to the setlist"
+  },
+  "lab": {
+    "presets": "Presets",
+    "tabs": ["anim", "freq", "color", "popup", "scope"],
+    "open": "open",
+    "apply": "apply",
+    "entryKicker": " · preset {no}",
+    "openSketch": "Open the sketch",
+    "back": "Back to the presets"
+  },
+  "about": {
+    "tag": ["Play.", "Build.", "Repeat."],
+    "body": "About Burooj"
+  },
+  "resume": {
+    "side": "Side {letter}",
+    "credits": "Credits"
+  },
+  "sheet": {
+    "label": "sheet",
+    "stand": "clipped to the stand"
+  },
+  "opensInNewTab": " (opens in a new tab)"
+}

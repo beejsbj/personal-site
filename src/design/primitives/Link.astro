@@ -12,6 +12,8 @@ interface Props {
   arrow?: boolean;
   disabled?: boolean;
   newTab?: boolean;
+  /** Prism part markers (see src/prism/parts.ts). */
+  [data: `data-${string}`]: string | undefined;
 }
 const {
   href,
@@ -21,6 +23,7 @@ const {
   arrow = false,
   disabled = false,
   newTab = false,
+  ...data
 } = Astro.props;
 const Tag = disabled ? "span" : "a";
 ---
@@ -32,6 +35,7 @@ const Tag = disabled ? "span" : "a";
   aria-disabled={disabled || undefined}
   target={!disabled && newTab ? "_blank" : undefined}
   rel={!disabled && newTab ? "noreferrer" : undefined}
+  {...data}
 >
   <span>
     <slot />

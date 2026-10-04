@@ -4,12 +4,14 @@ interface Props {
   level?: 1 | 2 | 3 | 4;
   scale?: "display" | "page" | "post" | "section" | "card" | "label";
   id?: string;
+  /** Prism part markers (see src/prism/parts.ts). */
+  [data: `data-${string}`]: string | undefined;
 }
-const { level = 2, scale = "section", id } = Astro.props;
+const { level = 2, scale = "section", id, ...data } = Astro.props;
 const Tag = `h${level}` as "h1" | "h2" | "h3" | "h4";
 ---
 
-<Tag id={id} class:list={["ds-heading", `ds-heading--${scale}`]}>
+<Tag id={id} class:list={["ds-heading", `ds-heading--${scale}`]} {...data}>
   <slot />
 </Tag>
 <style>
