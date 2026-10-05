@@ -24,6 +24,7 @@ import {
   underline,
 } from "./ink";
 import { paginate, type Blank } from "./paginate";
+import { studyNotes } from "./studynotes";
 import { BOOKS, type BookKey } from "./themes";
 
 type Project = SiteContent["projects"][number];
@@ -137,7 +138,7 @@ export interface Build {
   today: string;
 }
 
-type Paper = "squared" | "kraft" | "kraft-in" | "typed" | "letter";
+type Paper = "squared" | "kraft" | "kraft-in" | "typed" | "notes";
 
 /** The number of the route's first page, from the book's order. */
 const firstPage = (b: Build) =>
@@ -481,34 +482,62 @@ function home(b: Build): HTMLElement[] {
   return [cover, ...pages];
 }
 
-// ---- about: a letter -----------------------------------------------------------------
+// ---- about: a note-taker's notebook ------------------------------------------------
 
-function about(b: Build) {
+/** The about page as study notes: a subject tab, the title in brush pen over
+ * a highlighter swipe, the intro boxed as the key fact, a small taped photo,
+ * a sticky note pointing to the resume stapled in at the back, then the body
+ * as numbered headings, bullets and boxed callouts (studynotes.ts). */
+function aboutPages(b: Build) {
   const { header, html } = b.content.pages.about;
+  const { portrait } = b.content.pages.home.hero;
   const words = b.copy.about;
   const [action] = header.actions;
-  const blocks: HTMLElement[] = [
-    h(
-      "header",
-      { class: "bp-letterhead" },
-      withUnderline(h1(header.title, part("page.title", "about")), BLUE, "about-title"),
-      header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "about") }, header.intro) : null,
-    ),
-    h("p", { class: "bp-salute" }, words.salute),
-    ...prose(html, "page.body", "about"),
-    h("p", { class: "bp-signoff" }, words.signoff, h("br"), h("span", null, words.signature)),
-  ];
-  if (action)
+
+  const photo = taped(portrait.src, portrait.alt, "about-photo", { cls: "bp-notephoto", caption: jotted(portrait.caption) });
+  const title = h1("", part("page.title", "about"));
+  title.classList.add("bp-brush");
+  title.append(h("span", { class: "bp-hl" }, header.title));
+  const head = h(
+    "header",
+    { class: "bp-noteshead" },
+    photo,
+    header.eyebrow ? h("p", { class: "bp-ntab", ...part("page.eyebrow", "about") }, header.eyebrow) : null,
+    title,
+  );
+  const blocks: HTMLElement[] = [head];
+  if (header.intro)
     blocks.push(
       h(
-        "p",
-        { class: "bp-ps", ...part("page.actions", "about") },
-        `${words.ps} `,
-        h("a", { href: action.href }, action.label.toLowerCase()),
-        ` ${words.psAfter}`,
+        "div",
+        { class: "bp-keybox" },
+        h("span", { class: "bp-keybox__tag" }, words.inShort),
+        h("p", part("page.intro", "about"), header.intro),
       ),
     );
-  return written(b, "about", "letter", blocks, firstPage(b), b.today);
+  const sticky = action
+    ? h(
+        "a",
+        { class: "bp-sticky", href: action.href, ...part("page.actions", "about") },
+        h("span", { class: "bp-sticky__label" }, `${action.label} →`),
+        h("small", { class: "bp-sticky__where" }),
+      )
+    : null;
+  if (sticky) blocks.push(sticky);
+  blocks.push(...studyNotes(html, "page.body", "about"));
+  const notes = written(b, "about", "notes", blocks, firstPage(b), b.today);
+  // a doodle in the margin where the notes stop, the kind drawn while thinking
+  notes[notes.length - 1]?.append(h("div", { class: "bp-notedoodle", "aria-hidden": "true" }, svg(doodle(2, seed("about-end")))));
+  return { pages: evenUp(b.copy, notes, b.spread, "/about"), sticky };
+}
+
+function about(b: Build) {
+  const { pages, sticky } = aboutPages(b);
+  const first = firstPage(b);
+  // the sticky says where the resume starts: right after these pages
+  const where = sticky && pages.flatMap((p) => [...p.querySelectorAll<HTMLElement>(".bp-sticky__where")]);
+  if (where && first !== null) for (const el of where) el.textContent = fill(b.copy.about.stapled, { n: first + pages.length });
+  return pages;
 }
 
 // ---- resume: typed, and stapled in -------------------------------------------------

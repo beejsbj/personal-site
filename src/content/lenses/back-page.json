@@ -15,7 +15,7 @@
     "about": {
       "title": ["About ", "me"],
       "name": "About me",
-      "aside": "a letter",
+      "aside": "notes",
       "klass": "the quiet one"
     },
     "resume": {
@@ -80,11 +80,8 @@
     "toProjects": "all of them, in the war book"
   },
   "about": {
-    "salute": "Dear reader,",
-    "signoff": "Yours,",
-    "signature": "Burooj",
-    "ps": "P.S.",
-    "psAfter": "is stapled in, a few pages on."
+    "inShort": "in short",
+    "stapled": "stapled in, p. {n}"
   },
   "lab": {
     "eyebrow": "{eyebrow} · in the margins",
@@ -219,9 +216,9 @@
         "first page. best page"
       ],
       "about": [
-        "dear reader…",
-        { "t": "is this a letter?", "reply": "to everyone" },
-        "it's a love letter to the web",
+        "neat notes",
+        { "t": "is this revision?", "reply": "it's notes" },
+        "who highlights this much",
         { "t": "API3?", "reply": "it's an acronym" },
         "he likes gaming. so do we",
         { "t": "people, stories…", "reply": "and dots" }
@@ -274,7 +271,7 @@
         "very posh paper",
         "don't crease it",
         "it's a nice notebook this",
-        { "t": "is this a diary?", "reply": "it's a letter" }
+        { "t": "is this a diary?", "reply": "it's notes" }
       ],
       "legal": [
         "yellow paper?",

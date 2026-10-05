@@ -36,6 +36,7 @@ async function fontsReady() {
     '700 20px "Caveat"',
     '400 20px "Caveat"',
     '400 16px "Special Elite"',
+    '400 20px "Caveat Brush"',
   ];
   await Promise.race([
     Promise.all(wanted.map((f) => document.fonts.load(f))).catch(() => {}),
