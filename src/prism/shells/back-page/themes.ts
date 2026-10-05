@@ -23,6 +23,9 @@ export const BOOKS: Shelf[] = [
   { key: "about", href: "/about", theme: "notebook" },
   { key: "lab", href: "/lab", theme: "graph" },
   { key: "projects", href: "/projects", theme: "blueprint" },
+  // kept for the writing (it arrives with /writing); until then it opens on
+  // a page that links out to it, and its href is the site's writing URL
+  { key: "writing", href: "", theme: "legal" },
 ];
 
 export const shelfOf = (key: BookKey) => BOOKS.find((b) => b.key === key)!;

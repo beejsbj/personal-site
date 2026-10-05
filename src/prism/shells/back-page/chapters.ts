@@ -930,6 +930,32 @@ function projects(b: Build) {
   return pages;
 }
 
+// ---- writings: a fresh book, barely used ----------------------------------------------
+
+/** The fifth book, kept for Burooj's writing. Writing isn't in the content
+ * yet (it arrives with /writing), so the book has no route of its own: it
+ * opens from the pile on a first page with its name, the writing's own
+ * blurb from the home page's Elsewhere list, and the way out to it; the rest
+ * of the book is blank. */
+export function writingChapter(b: Build): Chapter {
+  const { content, copy } = b;
+  const url = content.site.writingUrl;
+  const blurb = content.pages.home.elsewhere.items.find((item) => item.href === url)?.blurb;
+  const { page, flow } = blankPage(copy, "writing", "notes", "1", b.today);
+  const title = h1("");
+  title.classList.add("bp-brush");
+  title.append(h("span", { class: "bp-hl" }, copy.books.writing.name));
+  flow.append(
+    title,
+    blurb ? h("p", { class: "bp-lead" }, blurb) : h("span", { hidden: true }),
+    h("p", { class: "bp-arrowlink bp-writing__out" }, link(url, copy.newTab, `${copy.writing.link} ↗`)),
+    h("p", { class: "bp-writing__blank" }, copy.writing.blank),
+  );
+  const pages = [page];
+  if (b.spread) pages.push(blankPage(copy, "writing", "notes", "2", null).page);
+  return { key: "writing", book: "writing", rank: b.order.length + 1, label: copy.books.writing.name, pages };
+}
+
 // ---- anything else: a loose sheet, tucked in ------------------------------------------
 
 function loose(b: Build) {

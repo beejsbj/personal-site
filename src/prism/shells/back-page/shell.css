@@ -1118,6 +1118,17 @@
   box-decoration-break: clone;
 }
 
+/* ---- writings: a fresh book --------------------------------------------------------- */
+:root[data-lens="back-page"] .bp-writing__out {
+  margin-top: var(--g) !important;
+}
+:root[data-lens="back-page"] .bp-writing__blank {
+  margin-top: calc(var(--lh) * 2) !important;
+  font: 400 1.15em/var(--lh) var(--bp-hand);
+  color: var(--bp-fine);
+  transform: rotate(-1deg);
+}
+
 /* ---- slips stapled into the about book: the resume -----------------------------------
    Each role, course and the tools on its own slip: a ruled index card, a
    typed half-sheet, a till receipt, a manila library card, a scrap of graph

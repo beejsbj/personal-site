@@ -29,6 +29,12 @@
       "name": "Projects",
       "aside": "the war",
       "klass": "drawing office"
+    },
+    "writing": {
+      "title": ["Writ", "ings"],
+      "name": "Writings",
+      "aside": "barely used",
+      "klass": "first term"
     }
   },
   "papers": {
@@ -76,6 +82,10 @@
   "about": {
     "inShort": "in short",
     "stapled": "stapled in, p. {n}"
+  },
+  "writing": {
+    "link": "over to Substack",
+    "blank": "(the rest of this book is saved for the writing)"
   },
   "lab": {
     "eyebrow": "{eyebrow} · in the margins",
@@ -245,6 +255,13 @@
         "we were there",
         { "t": "is it on the map?", "reply": "back page" }
       ],
+      "writing": [
+        "a new book!",
+        "smells new",
+        { "t": "what goes here?", "reply": "words. eventually." },
+        "plenty of room",
+        { "t": "is he writing a book?", "reply": "he's writing in one" }
+      ],
       "spare": [
         "a quick war!",
         "maths is boring",
@@ -273,7 +290,7 @@
         "very yellow",
         "it's a legal pad",
         "objection!",
-        { "t": "is this a contract?", "reply": "it's a CV" },
+        { "t": "is this a contract?", "reply": "it's a draft" },
         "sign here"
       ],
       "graph": [
