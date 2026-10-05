@@ -146,15 +146,37 @@ export function tape(env: Env, full: boolean) {
     if (t !== null) lineLabel.textContent = `${monthLabel(t)} · ${session.chordAt(Math.min(t, session.end - 1e-6)).name}`;
   };
 
-  const onScroll = () => {
+  // Only a person scrolling moves the transport: a pointer, finger, wheel
+  // or key on the visible tape (not on a control), in the last moment.
+  // Programmatic scrolls (our own follow, a view swap resetting to the top,
+  // a re-measure) only move the line.
+  let userAt = -Infinity;
+  const touched = (event: Event) => {
+    if (!visible()) return;
+    const target = event.target as Element | null;
+    if (target?.closest?.("a, button, input, select, textarea, [role='slider']")) return;
+    userAt = performance.now();
+    // a finger or wheel on the moving tape takes over at once, before the
+    // follow-scroll can fight it
+    if (transport.playing && (event.type === "touchstart" || event.type === "wheel")) transport.pause();
+  };
+  for (const type of ["pointerdown", "touchstart", "wheel", "keydown"])
+    scroller.addEventListener(type, touched, { signal, passive: true });
+  const byUser = () => performance.now() - userAt < 1500;
+
+  const onScroll = (fromScroll = true) => {
     if (!visible() || !anchors.length) return showLine(null);
     const y = scroller.scrollTop + lineOffset() - listTop();
     const inside = y >= anchors[0].y - 4 && y <= anchors[anchors.length - 1].y + 4;
     if (!inside) return showLine(null);
     const t = Math.min(Math.max(tOf(y), session.from), session.end);
     showLine(t);
-    // our own follow-scroll, or the page moving under a playing transport
-    if (transport.playing || Math.abs(scroller.scrollTop - expected) < 2) return;
+    if (!fromScroll || !byUser() || Math.abs(scroller.scrollTop - expected) < 4) return;
+    // a person scrolled: they take over from a playing transport
+    if (transport.playing) {
+      transport.pause();
+      return;
+    }
     ownSeek = true;
     transport.seek(t);
     ownSeek = false;
@@ -162,7 +184,7 @@ export function tape(env: Env, full: boolean) {
   let frame = 0;
   scroller.addEventListener("scroll", () => {
     cancelAnimationFrame(frame);
-    frame = requestAnimationFrame(onScroll);
+    frame = requestAnimationFrame(() => onScroll(true));
   }, { signal, passive: true });
 
   let lastMonth = -1;
@@ -181,10 +203,6 @@ export function tape(env: Env, full: boolean) {
     showLine(t);
   }, signal);
 
-  // a finger on the page takes over from the transport
-  for (const type of ["touchstart", "wheel"])
-    scroller.addEventListener(type, () => transport.playing && transport.pause(), { signal, passive: true });
-
   // tapping a card's notes auditions it too
   list.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
@@ -197,7 +215,7 @@ export function tape(env: Env, full: boolean) {
   const observer = new ResizeObserver(() => {
     if (!visible()) return showLine(null);
     measure();
-    onScroll();
+    onScroll(false);
   });
   observer.observe(list);
   signal.addEventListener("abort", () => observer.disconnect());

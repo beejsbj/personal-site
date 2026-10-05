@@ -138,7 +138,8 @@ export function trackControls(
 /** Auditioning a clip: the sound (if on) and the clip's own little
  * playhead running across its notes, so it reads even with sound off. */
 export function auditionClip(env: Env, clip: Clip, el: HTMLElement) {
-  if (env.face) return;
+  // a timer can outlive its view; a view that has gone stays quiet
+  if (env.face || env.signal.aborted) return;
   env.transport.audition(clip);
   const seconds = clip.kind === "project" ? (clip.end - clip.start) * 3 : 1.5;
   el.style.setProperty("--hear", `${seconds}s`);
@@ -169,6 +170,7 @@ export function hoverAudition(env: Env, el: HTMLElement, clip: Clip, target = el
     timer = window.setTimeout(() => auditionClip(env, clip, target), 110);
   };
   const cancel = () => window.clearTimeout(timer);
+  env.signal.addEventListener("abort", cancel, { once: true });
   el.addEventListener("pointerenter", (event) => event.pointerType === "mouse" && start(), { signal: env.signal });
   el.addEventListener("pointerleave", cancel, { signal: env.signal });
   el.addEventListener("focus", start, { signal: env.signal });

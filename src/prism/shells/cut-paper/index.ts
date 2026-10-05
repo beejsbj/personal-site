@@ -41,7 +41,7 @@ const nextEighth = () => new Promise<void>((resolve) => setTimeout(resolve, EIGH
 
 function show(route: Route): Live {
   const controller = new AbortController();
-  ctx!.signal.addEventListener("abort", () => controller.abort());
+  ctx!.signal.addEventListener("abort", () => controller.abort(), { once: true, signal: controller.signal });
   const env: Env = {
     content: ctx!.content,
     copy: ctx!.content.lenses["cut-paper"],
@@ -118,6 +118,9 @@ async function transition(route: Route) {
     previous.el.inert = true;
   }
   const swapIn = () => {
+    // the old view stays on screen under the sweep, but stops listening now,
+    // so two views never act on the same scroller
+    previous?.controller.abort();
     scroller.append(next.el);
     scroller.scrollTop = 0;
     current = next;
@@ -133,18 +136,28 @@ async function transition(route: Route) {
     if (id !== generation) return;
     swapIn();
     land(next.el);
-    wipe.dataset.state = "cutting";
-    confetti(frame.overlay, note);
-    // the playhead sweeps across; the new view is printed behind it
-    const reveal = next.el.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)" }], { duration: SWEEP, easing: EASE_PAPER });
-    const sweep = wipe.animate([{ transform: "translateX(-100%)" }, { transform: "translateX(0)" }], { duration: SWEEP, easing: EASE_PAPER, fill: "forwards" });
-    await Promise.all([reveal.finished, sweep.finished]).catch(() => {});
-    if (id === generation) drop(previous);
-    await wipe
-      .animate([{ transform: "translateX(0)", opacity: 1 }, { transform: "translateX(3%)", opacity: 0 }], { duration: 200, easing: EASE_STAB, fill: "forwards" })
-      .finished.catch(() => {});
-    if (id === generation) wipe.dataset.state = "idle";
+    void sweepIn(id, next, previous, note);
+    return;
   }
+  if (id === generation) next.heading.focus({ preventScroll: true });
+}
+
+/** The playhead sweeps across and the new view is printed behind it. Runs
+ * after `update()` has resolved, so quick clicks never queue behind it. */
+async function sweepIn(id: number, next: Live, previous: Live | undefined, note: string) {
+  if (!frame) return;
+  const { wipe } = frame;
+  wipe.dataset.state = "cutting";
+  confetti(frame.overlay, note);
+  // the playhead sweeps across; the new view is printed behind it
+  const reveal = next.el.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)" }], { duration: SWEEP, easing: EASE_PAPER });
+  const sweep = wipe.animate([{ transform: "translateX(-100%)" }, { transform: "translateX(0)" }], { duration: SWEEP, easing: EASE_PAPER, fill: "forwards" });
+  await Promise.all([reveal.finished, sweep.finished]).catch(() => {});
+  if (id === generation) drop(previous);
+  await wipe
+    .animate([{ transform: "translateX(0)", opacity: 1 }, { transform: "translateX(3%)", opacity: 0 }], { duration: 200, easing: EASE_STAB, fill: "forwards" })
+    .finished.catch(() => {});
+  if (id === generation) wipe.dataset.state = "idle";
   if (id === generation) next.heading.focus({ preventScroll: true });
 }
 

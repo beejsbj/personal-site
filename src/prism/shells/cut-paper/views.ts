@@ -324,7 +324,7 @@ function project(env: Env, item: Project): Screen {
 
 /** Hear a sketch: its motif on the kalimba over the home chord. */
 function hearSketch(env: Env, slug: string, el: HTMLElement) {
-  if (env.face) return;
+  if (env.face || env.signal.aborted) return;
   const notes = sketchNotes(slug);
   if (soundLive())
     audition([
@@ -353,6 +353,7 @@ function pad(env: Env, item: LabEntry, index: number, big = false) {
     timer = window.setTimeout(() => hearSketch(env, item.slug, hit), 110);
   }, { signal: env.signal });
   hit.addEventListener("pointerleave", () => window.clearTimeout(timer), { signal: env.signal });
+  env.signal.addEventListener("abort", () => window.clearTimeout(timer), { once: true });
   return h("div", { class: "cp-pad", style: `--note:${noteVar(index + 2)}` }, hit);
 }
 

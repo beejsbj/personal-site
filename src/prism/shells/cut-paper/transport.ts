@@ -253,8 +253,11 @@ export class Transport {
   private loop() {
     cancelAnimationFrame(this.frame);
     if (!this.playing || this.idle) return;
-    this.frame = requestAnimationFrame((time) => {
+    this.frame = requestAnimationFrame(() => {
       if (!this.playing) return;
+      // one clock: the anchor is performance.now(), so time is read from it
+      // too (a frame's own timestamp can run on a different base)
+      const time = performance.now();
       // after a stall (a hidden tab) carry on from where the playhead was,
       // dropping what was scheduled, rather than catching up in a burst
       if (time - this.lastFrame > 400) {
