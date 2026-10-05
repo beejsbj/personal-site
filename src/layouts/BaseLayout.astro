@@ -5,6 +5,7 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import EdgeBlob from "../design/unique/EdgeBlob.astro";
 import PageTransition from "../design/unique/PageTransition.astro";
+import PeekingInitials from "../design/unique/PeekingInitials.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -72,5 +73,6 @@ const socialImage = new URL(image, siteBaseUrl).toString();
       <SiteFooter email={site.email} />
     </div>
     {clientRouting && <PageTransition />}
+    <PeekingInitials />
   </body>
 </html>

@@ -28,7 +28,6 @@
   --text-display: clamp(3.25rem, 5.3vw, 4.75rem);
   --text-display-compact: clamp(3rem, 13vw, 4.75rem);
   --text-cover: clamp(3.5rem, 11vw, 8.5rem);
-  --text-initials: clamp(15rem, 34vw, 30rem);
   --weight-medium: 600;
   --weight-bold: 700;
   --weight-black: 800;
@@ -151,15 +150,14 @@
   --layer-decoration: -1;
   --layer-skip: 10;
   --layer-cover: 20;
+  --layer-peek: 5;
+  --peek-size: clamp(9rem, 22vw, 16rem);
+  --peek-lean: 8deg;
+  --duration-peek-in: 700ms;
+  --duration-peek-out: 520ms;
+  --duration-peek-duck: 240ms;
   --page-ball-min: 4.75rem;
   --page-reach: 150vmax;
-  --bleed: calc(50% - 50vw);
-  --initials-horizon: 0.6em;
-  --initials-sink: -0.4em;
-  --initials-inset-b: -0.08em;
-  --initials-inset-j: 0.06em;
-  --initials-rise: 70%;
-  --initials-peek: 0.75rem;
   --skip-hidden: translateY(calc(-100% - var(--space-l)));
 }
 @media (max-width: 40.625rem) {

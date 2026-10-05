@@ -10,7 +10,6 @@ import TagList from "../design/primitives/TagList.astro";
 import WelcomeHero from "../design/compositions/WelcomeHero.astro";
 import CurvedArrow from "../design/unique/CurvedArrow.astro";
 import BallNav from "../design/unique/BallNav.astro";
-import GiantInitials from "../design/unique/GiantInitials.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
@@ -182,7 +181,21 @@ const anatomy = [
         transition, which swells from that ball. No-JavaScript, touch and
         Reduced Motion visitors get the same links, without the sunrise.
       </p>
-      <GiantInitials />
+    </section>
+
+    <section class="specimen" aria-labelledby="peek-specimen">
+      <SectionHeading id="peek-specimen" title="The peeking B and J" />
+      <p class="annotation">
+        v0's giant initials no longer sit at the foot of the homepage. Now and
+        then, on any page, a B or a J peeks in from a screen edge or up from
+        behind a section rule, and ducks when it is noticed or after a few
+        seconds. Rare by design: a long cooldown kept across the visit, one at a
+        time, never over text, never while scrolling. Reduced Motion turns it
+        off; without JavaScript it does not exist.
+      </p>
+      <button type="button" class="peek-now" data-peek-now hidden>
+        Peek now
+      </button>
     </section>
 
     <section class="specimen" aria-labelledby="foundations">
@@ -344,6 +357,31 @@ const anatomy = [
 <style>
   .guide {
     padding-top: var(--space-2xl);
+  }
+  .peek-now {
+    min-height: var(--control-min-height);
+    margin-top: var(--space-m);
+    padding-inline: var(--space-m);
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--ball-fill);
+    color: var(--ball-ink);
+    font: inherit;
+    cursor: pointer;
+  }
+  .peek-now:hover {
+    background: var(--ball-fill-hover);
+  }
+  .peek-now:active {
+    scale: var(--press-scale);
+  }
+  .peek-now:disabled {
+    opacity: var(--disabled-opacity);
+    cursor: default;
+  }
+  .peek-now:focus-visible {
+    outline: var(--focus-width) solid var(--color-accent);
+    outline-offset: var(--focus-offset);
   }
   .blob-specimen {
     width: var(--ball-cluster-width);
