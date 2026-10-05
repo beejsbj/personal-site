@@ -29,8 +29,32 @@ const TYPES = {
   ".woff": "font/woff",
 };
 
+// Vercel's build container sets VERCEL=1 and exposes the project's real Runtime
+// Cache (RUNTIME_CACHE_ENDPOINT), which @vercel/functions' getCache() uses during
+// builds. That cache is shared by every concurrent test process, by later builds
+// and, in the same region, by the deployed functions. A fixture must never read
+// another process's fixture archive or publish its fake (and clock-shifted)
+// posts there, so each process gets getCache()'s private in-memory store.
+const RUNTIME_CACHE_ENV = [
+  "RUNTIME_CACHE_DISABLE_BUILD_CACHE",
+  "RUNTIME_CACHE_ENDPOINT",
+  "RUNTIME_CACHE_HEADERS",
+];
+function isolateRuntimeCache() {
+  const saved = RUNTIME_CACHE_ENV.map((name) => [name, process.env[name]]);
+  process.env.RUNTIME_CACHE_DISABLE_BUILD_CACHE = "true";
+  delete process.env.RUNTIME_CACHE_ENDPOINT;
+  delete process.env.RUNTIME_CACHE_HEADERS;
+  return () => {
+    for (const [name, value] of saved)
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+  };
+}
+
 /** Real emitted Vercel handler and static assets, with a deterministic public
- * upstream. No source credentials, deployment or external content is required. */
+ * upstream. No source credentials, deployment, shared cache or external
+ * content is used: any other outbound request is recorded in `foreign`. */
 export async function serveRuntimeFixture({
   port = 0,
   posts = [
@@ -40,16 +64,21 @@ export async function serveRuntimeFixture({
 } = {}) {
   const actualFetch = globalThis.fetch;
   const actualNow = Date.now;
+  const restoreEnv = isolateRuntimeCache();
   let time = actualNow();
   const state = { posts, outage: false };
   const requests = [];
+  const foreign = [];
+  let base;
   Date.now = () => time;
   globalThis.fetch = async (input, options) => {
     const url = new URL(
       typeof input === "string" || input instanceof URL ? input : input.url,
     );
-    if (url.origin !== "https://buroojs.substack.com")
+    if (url.origin !== "https://buroojs.substack.com") {
+      if (url.origin !== base) foreign.push(url.href);
       return actualFetch(input, options);
+    }
     requests.push(url.pathname);
     if (state.outage) return new Response("", { status: 500 });
     if (url.pathname === "/api/v1/archive") return Response.json(state.posts);
@@ -97,11 +126,12 @@ export async function serveRuntimeFixture({
     });
   });
   await new Promise((done) => server.listen(port, "127.0.0.1", done));
-  const base = `http://127.0.0.1:${server.address().port}`;
+  base = `http://127.0.0.1:${server.address().port}`;
   return {
     base,
     state,
     requests,
+    foreign,
     fetch: (path) => actualFetch(`${base}${path}`),
     advance: (ms) => {
       time += ms;
@@ -109,6 +139,7 @@ export async function serveRuntimeFixture({
     async close() {
       globalThis.fetch = actualFetch;
       Date.now = actualNow;
+      restoreEnv();
       await new Promise((done) => server.close(done));
     },
   };

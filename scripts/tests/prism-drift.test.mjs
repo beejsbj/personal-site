@@ -251,6 +251,7 @@ test("content.json carries every visible entry, page and lens, with its body ren
       data.projects.length,
       "article hydration preserves authored portfolio",
     );
+    assert.deepEqual(fixture.foreign, [], "no shared cache or live network");
   } finally {
     await fixture.close();
   }
