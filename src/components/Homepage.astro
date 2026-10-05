@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import WelcomeHero from "../design/compositions/WelcomeHero.astro";
-import BallNav from "../design/unique/BallNav.astro";
 import GiantInitials from "../design/unique/GiantInitials.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
@@ -20,9 +19,7 @@ const { projects, updates, site } = Astro.props;
 <div class="home-composition shell" data-home-motion>
   <div class="welcome-region" data-motion-scene>
     <WelcomeHero social={site.social} />
-    <div class="welcome-art">
-      <BallNav />
-    </div>
+    <div class="welcome-art"></div>
   </div>
   <div class="below">
     <section class="selected-work" aria-labelledby="home-projects">
@@ -73,11 +70,18 @@ const { projects, updates, site } = Astro.props;
   installHomeMotion();
 </script>
 <style>
+  /* The right column is held open for the site nav's homepage form: the
+     header's ball cluster hangs into it (BallNav, cluster form). */
   .welcome-region {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--ball-nav-width);
+    grid-template-columns: minmax(0, 1fr) var(--ball-cluster-width);
     align-items: center;
     gap: var(--space-2xl);
+  }
+  .welcome-art {
+    align-self: start;
+    aspect-ratio: 300 / 316;
+    margin-top: var(--ball-cluster-drop);
   }
   .below {
     display: grid;

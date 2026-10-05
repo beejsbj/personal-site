@@ -1,15 +1,19 @@
 ---
 /** Primitive: label + optional decorative arrow. No nested controls.
- * Axes: treatment=text|nav|action|ball, tone=paper|wine.
+ * Axes: treatment=text|ball|pill|action, tone=paper|wine.
  * States: rest, hover, focus, active, current, disabled; no loading behavior.
  * Native anchor navigation; disabled renders a non-interactive span.
  * Hover draws the underline in from the left; arrows nudge the way they point.
- * Ball (v2's .button): a peach ball rests behind the label's first letters
- * and stretches into a pill under the whole label on hover or focus.
+ * Ball: the label sits inside a peach ball (the site navigation); the
+ * current page's ball is burgundy. Pill (v2's .button): a peach ball rests
+ * behind the label's first letters and stretches into a pill on hover.
+ * Both paint their shape on ::before, so hover lift and press squish never
+ * move the hit area: a press is always a click.
  */
-interface Props {
+import type { HTMLAttributes } from "astro/types";
+interface Props extends Omit<HTMLAttributes<"a">, "href"> {
   href: string;
-  treatment?: "text" | "nav" | "action" | "ball";
+  treatment?: "text" | "ball" | "pill" | "action";
   tone?: "paper" | "wine";
   current?: boolean;
   arrow?: boolean;
@@ -24,12 +28,14 @@ const {
   arrow = false,
   disabled = false,
   newTab = false,
+  ...attrs
 } = Astro.props;
 const Tag = disabled ? "span" : "a";
 const outbound = /^(https?:|mailto:)/.test(href);
 ---
 
 <Tag
+  {...attrs}
   href={disabled ? undefined : href}
   class:list={["ds-link", `ds-link--${treatment}`, `ds-link--${tone}`]}
   aria-current={current ? "page" : undefined}
@@ -67,17 +73,11 @@ const outbound = /^(https?:|mailto:)/.test(href);
   .ds-link:hover {
     text-decoration: underline;
   }
-  /* Text and navigation underlines are painted on the label so the ink can
-     draw in from the left; the resting pencil rule stays full width. */
-  .ds-link--text .link-label,
-  .ds-link--nav .link-label {
-    padding-bottom: var(--underline-pad);
-    background-image: linear-gradient(currentColor, currentColor);
-    background-repeat: no-repeat;
-    background-position: 100% 100%;
-    background-size: 0% var(--rule-width);
-  }
+  /* Text underlines are painted on the label so the ink can draw in from
+     the left; the resting pencil rule stays full width. */
   .ds-link--text .link-label {
+    padding-bottom: var(--underline-pad);
+    background-repeat: no-repeat;
     background-image:
       linear-gradient(currentColor, currentColor),
       linear-gradient(var(--color-link-rule), var(--color-link-rule));
@@ -88,8 +88,7 @@ const outbound = /^(https?:|mailto:)/.test(href);
       0% var(--rule-width),
       100% var(--rule-width);
   }
-  .ds-link--text:hover,
-  .ds-link--nav:hover {
+  .ds-link--text:hover {
     text-decoration: none;
   }
   .ds-link--text:is(:hover, :focus-visible) .link-label {
@@ -100,13 +99,6 @@ const outbound = /^(https?:|mailto:)/.test(href);
       100% var(--rule-width),
       100% var(--rule-width);
   }
-  .ds-link--nav .link-label {
-    background-size: 0% var(--focus-width);
-  }
-  .ds-link--nav:is(:hover, :focus-visible) .link-label {
-    background-position: 0 100%;
-    background-size: 100% var(--focus-width);
-  }
   .link-arrow {
     display: inline-block;
     width: var(--icon-inline);
@@ -114,29 +106,8 @@ const outbound = /^(https?:|mailto:)/.test(href);
     margin-left: var(--space-2xs);
     vertical-align: baseline;
   }
-  .ds-link--nav {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--control-min-height);
-    color: var(--color-text-soft);
-    white-space: nowrap;
-    text-decoration-thickness: var(--focus-width);
-  }
-  .ds-link--nav:is(:hover, :focus-visible, [aria-current]) {
-    color: var(--color-accent);
-  }
-  .ds-link--nav[aria-current] {
-    font-weight: var(--weight-bold);
-  }
-  .ds-link--nav[aria-current] .link-label {
-    background-image: none;
-  }
-  .ds-link--nav:active {
-    color: var(--color-accent-pressed);
-  }
   @media (hover: hover) and (pointer: fine) {
-    .ds-link--text .link-label,
-    .ds-link--nav .link-label {
+    .ds-link--text .link-label {
       transition: background-size var(--duration-hover) var(--ease-settle);
     }
     .link-arrow {
@@ -156,7 +127,86 @@ const outbound = /^(https?:|mailto:)/.test(href);
     outline: var(--focus-width) solid var(--color-accent);
     outline-offset: var(--focus-offset);
   }
+  /* Ball: the label inside a peach ball. Width comes from the caller (the
+     nav sets it); the ball is a circle of that width. */
   .ds-link--ball {
+    position: relative;
+    isolation: isolate;
+    display: inline-grid;
+    place-items: center;
+    aspect-ratio: 1;
+    padding: var(--space-2xs);
+    border-radius: var(--radius-round);
+    color: var(--ball-ink);
+    font-family: var(--font-serif);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-heading);
+    line-height: var(--leading-display);
+    text-align: center;
+    user-select: none;
+    -webkit-user-drag: none;
+    touch-action: manipulation;
+  }
+  .ds-link--ball > span {
+    max-inline-size: var(--ball-label-measure);
+    text-wrap: balance;
+  }
+  .ds-link--ball::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--ball-fill);
+    box-shadow: var(--ball-shadow-rest);
+  }
+  .ds-link--ball:is(:hover, :focus-visible) {
+    text-decoration: none;
+  }
+  .ds-link--ball:is(:hover, :focus-visible)::before {
+    background: var(--ball-fill-hover);
+    box-shadow: var(--shadow-ball-raised);
+  }
+  .ds-link--ball[aria-current] {
+    color: var(--ball-ink-current);
+    text-decoration: none;
+  }
+  .ds-link--ball[aria-current]::before {
+    background: var(--ball-fill-current);
+  }
+  .ds-link--ball[aria-current]:is(:hover, :focus-visible)::before {
+    background: var(--ball-fill-current-hover);
+  }
+  .ds-link--ball:active::before {
+    scale: var(--press-scale);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .ds-link--ball::before {
+      transition:
+        scale var(--duration-hover) var(--ease-pop),
+        translate var(--duration-hover) var(--ease-pop),
+        background-color var(--duration-hover) var(--ease-feedback),
+        box-shadow var(--duration-hover) var(--ease-settle);
+    }
+    .ds-link--ball:hover::before {
+      scale: var(--ball-hover-scale);
+      translate: 0 calc(-1 * var(--motion-lift));
+    }
+    .ds-link--ball:hover:active::before {
+      scale: var(--press-scale);
+      translate: none;
+      transition-duration: var(--duration-fast);
+    }
+  }
+  @media (forced-colors: active) {
+    .ds-link--ball::before {
+      border: var(--focus-width) solid CanvasText;
+    }
+    .ds-link--ball[aria-current]::before {
+      border-color: Highlight;
+    }
+  }
+  .ds-link--pill {
     position: relative;
     isolation: isolate;
     display: inline-flex;
@@ -164,7 +214,7 @@ const outbound = /^(https?:|mailto:)/.test(href);
     min-height: var(--control-min-height);
     padding-inline: var(--space-s);
   }
-  .ds-link--ball::before {
+  .ds-link--pill::before {
     content: "";
     position: absolute;
     z-index: -1;
@@ -176,19 +226,19 @@ const outbound = /^(https?:|mailto:)/.test(href);
     background: var(--color-surface-strong);
     translate: 0 -50%;
   }
-  .ds-link--ball:is(:hover, :focus-visible) {
+  .ds-link--pill:is(:hover, :focus-visible) {
     text-decoration: none;
   }
-  .ds-link--ball:is(:hover, :focus-visible)::before {
+  .ds-link--pill:is(:hover, :focus-visible)::before {
     width: 100%;
     background: var(--color-hover);
   }
-  .ds-link--ball:active::before {
+  .ds-link--pill:active::before {
     background: var(--color-surface-strong);
     scale: var(--press-scale);
   }
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .ds-link--ball::before {
+    .ds-link--pill::before {
       transition:
         width var(--duration-hover) var(--ease-pop),
         background-color var(--duration-hover) var(--ease-feedback),
@@ -217,9 +267,6 @@ const outbound = /^(https?:|mailto:)/.test(href);
     background: var(--color-hover);
     color: var(--color-accent);
     text-decoration: none;
-  }
-  .ds-link[aria-current] {
-    text-decoration: underline;
   }
   .ds-link--action:active {
     transform: scale(var(--press-scale));

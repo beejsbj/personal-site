@@ -117,7 +117,26 @@
   --control-min-height: 2.75rem;
   --ball-link-size: 2.25rem;
   --welcome-width: 52rem;
-  --ball-nav-width: 14rem;
+  /* The ball family: nav balls, action pills and the hover of every link
+     share these paints, so they read as one system. */
+  --ball-fill: var(--color-surface-strong);
+  --ball-fill-hover: var(--color-hover);
+  --ball-fill-current: var(--color-accent);
+  --ball-fill-current-hover: var(--color-accent-pressed);
+  --ball-ink: var(--color-accent);
+  --ball-ink-current: var(--color-accent-contrast);
+  --ball-shadow-rest: none;
+  --ball-nav-size: 4.25rem;
+  --ball-nav-size-compact: 3.125rem;
+  --ball-label-size-compact: 0.6875rem;
+  --ball-honeycomb-gap: 0.125rem;
+  --ball-label-size-cluster: var(--text-base);
+  --ball-label-measure: 4.6em;
+  --ball-row-gap: var(--space-2xs);
+  --ball-row-wave: 0.1875rem;
+  --ball-honeycomb-tuck: -0.4375rem;
+  --ball-cluster-width: 17rem;
+  --ball-cluster-drop: var(--space-xl);
   --ball-hover-scale: 1.06;
   --shadow-ball: -0.375rem 0.5rem 1rem #30232030;
   --shadow-ball-raised: -0.5rem 0.75rem 1.5rem #30232040;

@@ -1,156 +1,173 @@
 ---
-/** Unique: v1's ball menu, back as the homepage's secondary navigation.
- * The text menu in the header stays primary; these balls are real links
- * (one tab stop each, named by their label) laid out on the old unequal
- * cluster. The current page's ball is burgundy, as in v1.
- * Motion: the balls rise in once, like a sunrise. A press is always a
- * click: the link's hit area never moves; only the painted face lifts on
- * hover and squishes on press. CSS only, so no-JS, touch and reduced
- * motion get the same dependable links. */
+/** Unique: the site navigation, as v1's balls. One nav on every page, with
+ * all six destinations: real links, one tab stop each, named by their
+ * labels, the current page's ball filled burgundy (aria-current).
+ * Each ball is the shared Link primitive's ball treatment, so the nav and
+ * the site's action links are one family.
+ * Forms (same markup, CSS only):
+ * - row: a gently waving line of equal balls in the header (default);
+ * - compact (phones): a tight 3 + 3 honeycomb beside the name;
+ * - cluster (homepage, wide screens): v1's uneven cluster, hung from the
+ *   header into the introduction's right column. Its balls rise in once.
+ * A press is always a click: the hit area never moves, only the painted
+ * face lifts and squishes. No JavaScript involved. */
+import Link from "../primitives/Link.astro";
 interface Props {
+  nav: { label: string; href: string; external?: boolean }[];
+  email: string;
   currentPath?: string;
+  form?: "row" | "cluster";
   label?: string;
 }
-const { currentPath = Astro.url.pathname, label = "Explore" } = Astro.props;
+const {
+  nav,
+  email,
+  currentPath = Astro.url.pathname,
+  form = "row",
+  label = "Main navigation",
+} = Astro.props;
 
-// Artwork geometry (centre x/y and radius in a 280 x 290 box), from v1.
-const BOX = { width: 280, height: 290 };
-const balls = [
-  { label: "Home", href: "/", cx: 88, cy: 78, r: 62 },
-  { label: "Lab", href: "/lab", cx: 207, cy: 88, r: 47 },
-  { label: "About", href: "/about", cx: 63, cy: 176, r: 55 },
-  { label: "Projects", href: "/projects", cx: 196, cy: 217, r: 68 },
+// Cluster geometry (centre x/y and radius in a 300 x 316 box), grown from
+// v1's four-ball cluster to hold all six.
+const BOX = { width: 300, height: 316 };
+const geometry: Record<string, { cx: number; cy: number; r: number }> = {
+  Home: { cx: 78, cy: 62, r: 58 },
+  Lab: { cx: 182, cy: 48, r: 42 },
+  Writing: { cx: 255, cy: 94, r: 44 },
+  About: { cx: 54, cy: 180, r: 52 },
+  Projects: { cx: 172, cy: 176, r: 68 },
+  "Say hello": { cx: 96, cy: 268, r: 46 },
+};
+const items = [
+  { label: "Home", href: "/", external: false },
+  ...["Projects", "Lab", "About", "Writing"].flatMap((name) =>
+    nav.filter((item) => item.label === name),
+  ),
+  { label: "Say hello", href: `mailto:${email}`, external: true },
 ];
 const current = (href: string) =>
   href === "/"
     ? currentPath === "/"
     : currentPath === href || currentPath.startsWith(href + "/");
-const place = ({ cx, cy, r }: { cx: number; cy: number; r: number }) =>
-  [
-    `left:${(((cx - r) / BOX.width) * 100).toFixed(3)}%`,
-    `top:${(((cy - r) / BOX.height) * 100).toFixed(3)}%`,
-    `width:${(((2 * r) / BOX.width) * 100).toFixed(3)}%`,
+const place = (name: string, index: number) => {
+  const { cx, cy, r } = geometry[name];
+  return [
+    `--x:${(((cx - r) / BOX.width) * 100).toFixed(3)}%`,
+    `--y:${(((cy - r) / BOX.height) * 100).toFixed(3)}%`,
+    `--d:${(((2 * r) / BOX.width) * 100).toFixed(3)}%`,
+    `--i:${index}`,
   ].join(";");
+};
 ---
 
-<nav class="ball-nav" aria-label={label} data-ball-nav>
+<nav class="ball-nav" aria-label={label} data-ball-nav data-form={form}>
   <ul>
-    {balls.map((ball, index) => (
-      <li style={`${place(ball)};--i:${index}`}>
-        <a
-          class="ball"
-          href={ball.href}
+    {items.map((item, index) => (
+      <li style={place(item.label, index)}>
+        <Link
+          href={item.href}
+          treatment="ball"
+          current={current(item.href)}
+          arrow={item.external}
           data-ball
-          data-tone={current(ball.href) ? "wine" : "peach"}
-          aria-current={current(ball.href) ? "page" : undefined}
+          data-tone={current(item.href) ? "wine" : "peach"}
           draggable="false"
         >
-          <span class="ball__face">
-            <span class="ball__label">{ball.label}</span>
-          </span>
-        </a>
+          {item.label}
+        </Link>
       </li>
     ))}
   </ul>
 </nav>
 <style>
-  .ball-nav ul {
-    position: relative;
-    aspect-ratio: 280 / 290;
+  ul {
+    display: flex;
+    align-items: center;
+    gap: var(--ball-row-gap);
     margin: 0;
     padding: 0;
     list-style: none;
   }
   li {
     --i: 0;
-    position: absolute;
-  }
-  .ball {
-    display: block;
-    aspect-ratio: 1;
-    border-radius: var(--radius-round);
-    color: var(--color-accent);
-    text-decoration: none;
-    /* A press that wobbles must still be a click: no native link drag, no
-       text selection starting inside the ball. */
-    user-select: none;
-    -webkit-user-drag: none;
-    touch-action: manipulation;
-  }
-  .ball:hover {
-    text-decoration: none;
-  }
-  .ball__face {
     display: grid;
-    place-items: center;
-    width: 100%;
-    height: 100%;
-    border-radius: var(--radius-round);
-    background: var(--color-surface-strong);
-    box-shadow: var(--shadow-ball);
-    font-family: var(--font-serif);
-    font-size: var(--text-lead);
-    font-weight: var(--weight-medium);
-    letter-spacing: var(--tracking-heading);
-    line-height: var(--leading-display);
   }
-  .ball[data-tone="wine"] {
-    color: var(--color-accent-contrast);
+  li > :global(.ds-link--ball) {
+    width: var(--ball-nav-size);
+    font-size: var(--text-sm);
   }
-  .ball[data-tone="wine"] .ball__face {
-    background: var(--color-accent);
+  /* Row: equal balls on a gentle wave, so the line reads as balls laid
+     down by hand rather than a row of buttons. */
+  li:nth-child(odd) {
+    translate: 0 calc(-1 * var(--ball-row-wave));
   }
-  .ball:is(:hover, :focus-visible) .ball__face {
-    background: var(--color-hover);
-    box-shadow: var(--shadow-ball-raised);
+  li:nth-child(even) {
+    translate: 0 var(--ball-row-wave);
   }
-  .ball[data-tone="wine"]:is(:hover, :focus-visible) .ball__face {
-    background: var(--color-accent-pressed);
-  }
-  .ball:active .ball__face {
-    transform: scale(var(--press-scale));
-  }
-  .ball:focus-visible {
-    outline: var(--focus-width) solid var(--color-accent);
-    outline-offset: var(--focus-offset);
-  }
-  /* The label underline draws in like the rest of the site's links. */
-  .ball__label {
-    padding-bottom: var(--underline-pad);
-    background-image: linear-gradient(currentColor, currentColor);
-    background-repeat: no-repeat;
-    background-position: 100% 100%;
-    background-size: 0% var(--rule-width);
-  }
-  .ball:is(:hover, :focus-visible) .ball__label {
-    background-position: 0 100%;
-    background-size: 100% var(--rule-width);
-  }
-  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .ball__face {
-      transition:
-        transform var(--duration-hover) var(--ease-pop),
-        background-color var(--duration-hover) var(--ease-feedback),
-        box-shadow var(--duration-hover) var(--ease-settle);
+
+  /* Compact: a tight honeycomb, three over three, each ball still a full
+     touch target. */
+  @media (max-width: 40.625rem) {
+    ul {
+      display: grid;
+      grid-template-columns: repeat(7, calc(var(--ball-nav-size-compact) / 2));
+      gap: 0 var(--ball-honeycomb-gap);
+      justify-content: end;
     }
-    .ball:hover .ball__face {
-      transform: scale(var(--ball-hover-scale));
+    li {
+      grid-column: span 2;
+      justify-items: center;
+      translate: none;
     }
-    .ball:active .ball__face {
-      transform: scale(var(--press-scale));
+    li:nth-child(n) {
+      translate: none;
     }
-    .ball__label {
-      transition: background-size var(--duration-hover) var(--ease-settle);
+    li:nth-child(4) {
+      grid-column: 2 / span 2;
+    }
+    li:nth-child(n + 4) {
+      margin-top: var(--ball-honeycomb-tuck);
+    }
+    li > :global(.ds-link--ball) {
+      width: var(--ball-nav-size-compact);
+      font-size: var(--ball-label-size-compact);
     }
   }
-  /* Arrival, once: the peach suns rise, the burgundy ball comes up last. */
-  @media (prefers-reduced-motion: no-preference) {
-    .ball {
+
+  /* Cluster: the homepage's expressive form (the header hangs it into the
+     introduction's right column). Wide screens only; narrower, it is the
+     same row or honeycomb as every other page. */
+  @media (min-width: 62.501rem) {
+    .ball-nav[data-form="cluster"] {
+      width: var(--ball-cluster-width);
+    }
+    [data-form="cluster"] ul {
+      display: block;
+      position: relative;
+      aspect-ratio: 300 / 316;
+    }
+    [data-form="cluster"] li {
+      position: absolute;
+      top: var(--y);
+      left: var(--x);
+      width: var(--d);
+      translate: none;
+    }
+    [data-form="cluster"] li > :global(.ds-link--ball) {
+      --ball-shadow-rest: var(--shadow-ball);
+      width: 100%;
+      font-size: var(--ball-label-size-cluster);
+    }
+  }
+  /* Arrival, once, on the homepage: the peach suns rise, the burgundy
+     ball comes up last. */
+  @media (min-width: 62.501rem) and (prefers-reduced-motion: no-preference) {
+    [data-form="cluster"] li {
       animation: sunrise var(--duration-settle) var(--ease-pop)
         calc(var(--stagger) * (2 + var(--i))) backwards;
     }
-    .ball[data-tone="wine"] {
-      animation-delay: calc(var(--stagger) * 6);
+    [data-form="cluster"] li:has([aria-current]) {
+      animation-delay: calc(var(--stagger) * 8);
     }
   }
   @keyframes sunrise {
@@ -161,14 +178,6 @@ const place = ({ cx, cy, r }: { cx: number; cy: number; r: number }) =>
     to {
       opacity: 1;
       transform: none;
-    }
-  }
-  @media (forced-colors: active) {
-    .ball__face {
-      border: var(--focus-width) solid CanvasText;
-    }
-    .ball[aria-current] .ball__face {
-      border-color: Highlight;
     }
   }
 </style>

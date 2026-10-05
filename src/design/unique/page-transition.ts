@@ -95,7 +95,7 @@ export function installPageTransition() {
     };
 
     const label = (
-      link.querySelector(".link-label, .ball__label")?.textContent ??
+      link.querySelector(".link-label")?.textContent ??
       link.textContent ??
       ""
     )
@@ -108,6 +108,10 @@ export function installPageTransition() {
       // That very ball becomes the transition: same place, size and colour.
       element.dataset.from = "ball";
       element.style.setProperty("--page-ball-size", `${rect.width}px`);
+      element.style.setProperty(
+        "--page-ball-font",
+        getComputedStyle(link).fontSize,
+      );
     }
     element.style.setProperty("--page-x", `${origin.x}px`);
     element.style.setProperty("--page-y", `${origin.y}px`);
