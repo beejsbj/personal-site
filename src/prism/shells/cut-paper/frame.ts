@@ -45,7 +45,7 @@ function keysFor(ctx: ShellContext, copy: Copy): Key[] {
 }
 
 const isTyping = (target: EventTarget | null) =>
-  target instanceof HTMLElement && !!target.closest("a, button, input, textarea, select, [role='slider'], video, [contenteditable]");
+  target instanceof HTMLElement && !!target.closest("a, button, summary, input, textarea, select, [role='slider'], [role='button'], video, [contenteditable]");
 
 export function buildFrame(ctx: ShellContext): Frame {
   const { content, signal, face } = ctx;
@@ -84,7 +84,7 @@ export function buildFrame(ctx: ShellContext): Frame {
   );
   const npTitle = h("span", { class: "cp-np__title" });
   const nowPlaying = h("p", { class: "cp-np" }, h("span", { class: "cp-np__label" }, words.nowPlaying), npTitle);
-  const soundState = h("span", { class: "cp-sound__state" });
+  const soundState = h("span", { class: "cp-sound__state", "aria-hidden": "true" });
   const soundButton = h(
     "button",
     { type: "button", class: "cp-sound", "aria-pressed": "false", title: words.soundHint },
@@ -128,8 +128,8 @@ export function buildFrame(ctx: ShellContext): Frame {
     ...[...content.resume.experience.roles, ...content.resume.education.entries].map((e) => [`role:${e.id}`, e.org ?? e.title ?? e.heading] as [string, string]),
   ]);
   transport.onTick((t, playing) => {
+    // one signal for assistive tech: pressed while playing (the name stays)
     playButton.setAttribute("aria-pressed", String(playing));
-    playButton.setAttribute("aria-label", playing ? words.pause : words.play);
     playButton.title = playing ? words.pause : words.play;
     const p = position(t);
     posNum.textContent = `${p.bar}.${p.beat}.${p.eighth}`;
@@ -201,7 +201,7 @@ export function buildFrame(ctx: ShellContext): Frame {
     const step: Record<string, number> = { ArrowRight: month, ArrowUp: month, ArrowLeft: -month, ArrowDown: -month, PageUp: 1, PageDown: -1 };
     if (e.key in step) transport.seek(transport.t + step[e.key]);
     else if (e.key === "Home") transport.seek(range.from);
-    else if (e.key === "End") transport.seek(session.now);
+    else if (e.key === "End") transport.seek(range.to);
     else return;
     e.preventDefault();
   });
@@ -236,7 +236,10 @@ export function buildFrame(ctx: ShellContext): Frame {
   if (!face)
     on(document, "keydown", (event) => {
       const e = event as KeyboardEvent;
-      if (e.code !== "Space" || e.repeat || isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+      // inside the view Space scrolls the page, as it should; outside it
+      // (the bar, the keys, nothing focused) it plays
+      if (e.code !== "Space" || e.repeat || e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (isTyping(e.target) || (e.target instanceof Node && scroller.contains(e.target))) return;
       e.preventDefault();
       transport.toggle();
     });
