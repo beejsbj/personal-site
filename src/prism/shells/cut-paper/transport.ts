@@ -270,6 +270,8 @@ export class Transport {
 
   private paint(head: Head) {
     head.el.style.setProperty("--at", place(this.t, head.range).toFixed(5));
+    // outside a zoomed range the playhead is elsewhere, not pinned to an edge
+    head.el.toggleAttribute("data-out", this.t < head.range.from || this.t > head.range.to);
   }
 
   private light(entry: Watched, force = false) {
