@@ -190,8 +190,8 @@ test("one link family: no drag physics, no rectangular actions, shared ball toke
   );
   const link = read("src/design/primitives/Link.astro");
   for (const layer of [
-    /\.ds-link--ball > span \{[^}]*pointer-events: none/,
-    /\.ds-link--ball::before \{[^}]*pointer-events: none/,
+    /\.ds-link--ball > \.ds-link__body \{[^}]*pointer-events: none/,
+    /\.ball-face \{[^}]*pointer-events: none/,
   ])
     assert.match(link, layer, "painted layers ignore the pointer");
   const ballNav = read("src/design/unique/BallNav.astro");
@@ -200,7 +200,7 @@ test("one link family: no drag physics, no rectangular actions, shared ball toke
   ))
     assert.match(
       selector,
-      /ds-link--ball(::before| > span)/,
+      /ds-link--ball( \.ball-face| > \.ds-link__body)/,
       `only painted layers animate: ${selector.trim()}`,
     );
   for (const token of [
@@ -237,6 +237,44 @@ test("one link family: no drag physics, no rectangular actions, shared ball toke
       ),
       `${label} is a pill`,
     );
+  }
+});
+
+test("ball labels never wrap, and external balls wear a named badge, not an inline arrow", () => {
+  // Round 6: "Say / hello ↗" on three lines looked unpolished. Each ball is
+  // sized to its one-line label; external links get a rim badge and say
+  // where they go in words.
+  const link = read("src/design/primitives/Link.astro");
+  assert.match(link, /\.ds-link--ball \{[^}]*white-space: nowrap/);
+  assert.doesNotMatch(link, /text-wrap: balance/);
+  for (const path of ["index.html", "about/index.html"]) {
+    const html = read(`dist/client/${path}`);
+    const nav = html.match(
+      /<nav\b[^>]*data-ball-nav[^>]*>([\s\S]*?)<\/nav>/,
+    )[1];
+    const anchors = [...nav.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)];
+    for (const [, attrs, body] of anchors) {
+      const external = /href="(?:https?:|mailto:)/.test(attrs);
+      assert.doesNotMatch(
+        body,
+        /link-arrow/,
+        `${path}: no inline arrow in a ball`,
+      );
+      assert.equal(
+        /ball-badge/.test(body),
+        external,
+        `${path}: badge iff external`,
+      );
+      const note = body.match(/ds-link__note[^>]*>([^<]*)</)?.[1];
+      if (external)
+        assert.match(
+          note ?? "",
+          /^\((external site|email)\)$/,
+          `${path}: named`,
+        );
+      else assert.equal(note, undefined);
+      assert.match(body, /class="ball-face[^"]*"[^>]*aria-hidden="true"/);
+    }
   }
 });
 

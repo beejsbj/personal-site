@@ -1,6 +1,6 @@
 /** Ball life: the flavour of v1's balls, without drag and without ever
  * moving a click target. Only the painted layers move: each ball link's
- * face (::before) and label, through --face-x/-y/-sx/-sy. Both ignore the
+ * face (.ball-face) and label, through --face-x/-y/-sx/-sy. Both ignore the
  * pointer (pointer-events: none), so the hit area is always the link's own
  * still circle and every press lands.
  *

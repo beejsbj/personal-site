@@ -7,8 +7,10 @@
  * Ball: the label sits inside a peach ball (the site navigation); the
  * current page's ball is burgundy. Pill (v2's .button): a peach ball rests
  * behind the label's first letters and stretches into a pill on hover.
- * Both paint their shape on ::before, so hover lift and press squish never
- * move the hit area: a press is always a click.
+ * Both paint their shape on a layer that ignores the pointer, so hover lift
+ * and press squish never move the hit area: a press is always a click.
+ * Outbound arrows (and a ball's badge) also add a hidden "(external site)",
+ * "(opens in a new tab)" or "(email)" to the link's name.
  */
 import type { HTMLAttributes } from "astro/types";
 interface Props extends Omit<HTMLAttributes<"a">, "href"> {
@@ -32,6 +34,18 @@ const {
 } = Astro.props;
 const Tag = disabled ? "span" : "a";
 const outbound = /^(https?:|mailto:)/.test(href);
+const ball = treatment === "ball";
+// Where an arrow (or a ball's badge) marks a link as leaving the site, the
+// link's name says so too, not only the glyph.
+const note =
+  outbound && (arrow || ball)
+    ? href.startsWith("mailto:")
+      ? "(email)"
+      : newTab
+        ? "(opens in a new tab)"
+        : "(external site)"
+    : undefined;
+const arrowPath = outbound ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5";
 ---
 
 <Tag
@@ -43,11 +57,29 @@ const outbound = /^(https?:|mailto:)/.test(href);
   target={!disabled && newTab ? "_blank" : undefined}
   rel={!disabled && newTab ? "noreferrer" : undefined}
 >
-  <span>
+  {ball && (
+    <span class="ball-face" aria-hidden="true">
+      {outbound && (
+        <span class="ball-badge">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d={arrowPath} />
+          </svg>
+        </span>
+      )}
+    </span>
+  )}
+  <span class="ds-link__body">
     <span class="link-label">
       <slot />
     </span>
-    {arrow && (
+    {arrow && !ball && (
       <svg
         class:list={["link-arrow", { "link-arrow--out": outbound }]}
         aria-hidden="true"
@@ -58,9 +90,10 @@ const outbound = /^(https?:|mailto:)/.test(href);
         stroke-linecap="round"
         stroke-linejoin="round"
       >
-        <path d={outbound ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5"} />
+        <path d={arrowPath} />
       </svg>
     )}
+    {note && <span class="ds-link__note">{note}</span>}
   </span>
 </Tag>
 <style>
@@ -86,7 +119,7 @@ const outbound = /^(https?:|mailto:)/.test(href);
     background-position: 0 100%;
     background-size: 100% var(--rule-width);
   }
-  .ds-link--text > span {
+  .ds-link--text > .ds-link__body {
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
     border-radius: var(--radius-pill);
@@ -116,7 +149,7 @@ const outbound = /^(https?:|mailto:)/.test(href);
   }
   @media (hover: hover) and (pointer: fine) {
     .ds-link--text .link-label,
-    .ds-link--text > span {
+    .ds-link--text > .ds-link__body {
       transition: background-size var(--duration-hover) var(--ease-settle);
     }
     .link-arrow {
@@ -136,22 +169,24 @@ const outbound = /^(https?:|mailto:)/.test(href);
     outline: var(--focus-width) solid var(--color-accent);
     outline-offset: var(--focus-offset);
   }
-  /* Ball: the label inside a peach ball. Width comes from the caller (the
-     nav sets it); the ball is a circle of that width. */
+  /* Ball: the label inside a peach ball, always on one line. The ball is
+     sized to its label (with a floor from the caller) and is a circle, so
+     longer names make bigger balls, as in v1's uneven cluster. */
   .ds-link--ball {
     position: relative;
     isolation: isolate;
     display: inline-grid;
     place-items: center;
+    box-sizing: border-box;
     aspect-ratio: 1;
-    padding: var(--space-2xs);
+    padding-inline: var(--ball-label-pad);
     border-radius: var(--radius-round);
     color: var(--ball-ink);
     font-family: var(--font-serif);
     font-weight: var(--weight-medium);
-    letter-spacing: var(--tracking-heading);
+    letter-spacing: var(--ball-tracking);
     line-height: var(--leading-display);
-    text-align: center;
+    white-space: nowrap;
     user-select: none;
     -webkit-user-drag: none;
     touch-action: manipulation;
@@ -164,14 +199,19 @@ const outbound = /^(https?:|mailto:)/.test(href);
     --face-sy: 1;
   }
   /* The face and the label are paint only: they never take the pointer,
-     so however they move, the hit area is the link's own still circle. */
-  .ds-link--ball > span {
-    max-inline-size: var(--ball-label-measure);
-    text-wrap: balance;
+     so however they move, the hit area is the link's own still circle.
+     The label sits on the circle's optical centre: Newsreader's mixed-case
+     ink rides high in its line box, so it is nudged down a touch. */
+  .ds-link--ball > .ds-link__body {
+    position: relative;
+    top: var(--ball-label-nudge);
     pointer-events: none;
   }
-  .ds-link--ball::before {
-    content: "";
+  /* Light type on the burgundy ball reads heavier; it sheds a little. */
+  .ds-link--ball[aria-current] {
+    font-weight: var(--weight-ball-current);
+  }
+  .ball-face {
     position: absolute;
     z-index: -1;
     inset: 0;
@@ -179,6 +219,28 @@ const outbound = /^(https?:|mailto:)/.test(href);
     background: var(--ball-fill);
     box-shadow: var(--ball-shadow-rest);
     pointer-events: none;
+  }
+  /* External links wear a satellite: a small burgundy badge with a cream
+     arrow on the rim at about 45 degrees, part of the face, so it squashes
+     and wobbles with it. It is part of the link too, so it takes clicks. */
+  .ball-badge {
+    position: absolute;
+    top: var(--ball-badge-at-y);
+    left: var(--ball-badge-at-x);
+    display: grid;
+    place-items: center;
+    width: var(--ball-badge-size);
+    aspect-ratio: 1;
+    margin: calc(var(--ball-badge-size) / -2);
+    border-radius: var(--radius-round);
+    background: var(--ball-fill-current);
+    color: var(--ball-ink-current);
+    box-shadow: 0 0 0 var(--ball-badge-ring) var(--color-page);
+    pointer-events: auto;
+  }
+  .ball-badge svg {
+    width: var(--ball-badge-glyph);
+    height: var(--ball-badge-glyph);
   }
   /* The current page's ball breathes once when the page arrives: a ring
      swells off it and fades, like the portrait's. */
@@ -195,7 +257,7 @@ const outbound = /^(https?:|mailto:)/.test(href);
   .ds-link--ball:is(:hover, :focus-visible) {
     text-decoration: none;
   }
-  .ds-link--ball:is(:hover, :focus-visible)::before {
+  .ds-link--ball:is(:hover, :focus-visible) .ball-face {
     background: var(--ball-fill-hover);
     box-shadow: var(--shadow-ball-raised);
   }
@@ -203,43 +265,51 @@ const outbound = /^(https?:|mailto:)/.test(href);
     color: var(--ball-ink-current);
     text-decoration: none;
   }
-  .ds-link--ball[aria-current]::before {
+  .ds-link--ball[aria-current] .ball-face {
     background: var(--ball-fill-current);
   }
-  .ds-link--ball[aria-current]:is(:hover, :focus-visible)::before {
+  .ds-link--ball[aria-current]:is(:hover, :focus-visible) .ball-face {
     background: var(--ball-fill-current-hover);
   }
-  .ds-link--ball:not([data-alive]):active::before {
+  .ds-link--ball:not([data-alive]):active .ball-face {
     scale: var(--press-scale);
   }
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .ds-link--ball::before {
+    .ds-link--ball .ball-face {
       transition:
         scale var(--duration-hover) var(--ease-pop),
         translate var(--duration-hover) var(--ease-pop),
         background-color var(--duration-hover) var(--ease-feedback),
         box-shadow var(--duration-hover) var(--ease-settle);
     }
-    .ds-link--ball:not([data-alive]):hover::before {
+    .ds-link--ball:not([data-alive]):hover .ball-face {
       scale: var(--ball-hover-scale);
       translate: 0 calc(-1 * var(--motion-lift));
     }
-    .ds-link--ball:not([data-alive]):hover:active::before {
+    .ds-link--ball:not([data-alive]):hover:active .ball-face {
       scale: var(--press-scale);
       translate: none;
       transition-duration: var(--duration-fast);
     }
+    /* The satellite drifts a little further out along its orbit, late. */
+    .ball-badge {
+      transition: translate var(--duration-reveal) var(--ease-pop)
+        var(--duration-fast);
+    }
+    .ds-link--ball:hover .ball-badge {
+      translate: var(--ball-badge-drift) calc(-1 * var(--ball-badge-drift));
+    }
   }
   /* Alive (ball-life.ts, motion allowed): the runtime's springs own the
      face and label; CSS keeps only the colour and shadow transitions. */
-  .ds-link--ball[data-alive]::before {
+  .ds-link--ball[data-alive] .ball-face {
     translate: var(--face-x) var(--face-y);
     scale: var(--face-sx) var(--face-sy);
     transition:
       background-color var(--duration-hover) var(--ease-feedback),
       box-shadow var(--duration-hover) var(--ease-settle);
   }
-  .ds-link--ball[data-alive] > span {
+  .ds-link--ball[data-alive] > .ds-link__body {
     translate: var(--face-x) var(--face-y);
     scale: var(--face-sx) var(--face-sy);
   }
@@ -260,12 +330,24 @@ const outbound = /^(https?:|mailto:)/.test(href);
     }
   }
   @media (forced-colors: active) {
-    .ds-link--ball::before {
+    .ball-face {
       border: var(--focus-width) solid CanvasText;
     }
-    .ds-link--ball[aria-current]::before {
+    .ds-link--ball[aria-current] .ball-face {
       border-color: Highlight;
     }
+    .ball-badge {
+      border: var(--rule-width) solid CanvasText;
+    }
+  }
+  /* Said to assistive technology, not shown: where the link goes. */
+  .ds-link__note {
+    position: absolute;
+    width: var(--rule-width);
+    height: var(--rule-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   /* Pill (v2's .button), the family's action link: a peach ball rests
      behind the label's first letters and stretches into a pill on hover.

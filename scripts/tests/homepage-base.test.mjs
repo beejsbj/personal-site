@@ -118,7 +118,15 @@ test("the ball nav is the one navigation, its homepage form a real labelled list
   );
   assert.deepEqual(
     links.map((link) => link.text),
-    ["Home", "Projects", "Lab", "About", "Writing", "Say hello"],
+    [
+      "Home",
+      "Projects",
+      "Lab",
+      "About",
+      "Writing (external site)",
+      "Say hello (email)",
+    ],
+    "Six balls in order; external ones say where they go",
   );
   for (const link of links) {
     assert.ok(link.href, "Every ball is a real link");

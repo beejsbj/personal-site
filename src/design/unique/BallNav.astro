@@ -28,16 +28,19 @@ const {
   label = "Main navigation",
 } = Astro.props;
 
-// Cluster geometry (centre x/y and radius in a 300 x 316 box), grown from
-// v1's four-ball cluster to hold all six.
-const BOX = { width: 300, height: 316 };
+// Cluster geometry (centre x/y and radius in a 300 x 336 box), grown from
+// v1's four-ball cluster to hold all six. Each ball is big enough for its
+// label on one line, and the external balls' rim badges (top right, 45
+// degrees) never overlap a neighbour, so no click can land on the wrong
+// ball.
+const BOX = { width: 300, height: 336 };
 const geometry: Record<string, { cx: number; cy: number; r: number }> = {
   Home: { cx: 78, cy: 62, r: 58 },
-  Lab: { cx: 182, cy: 48, r: 42 },
-  Writing: { cx: 255, cy: 94, r: 44 },
-  About: { cx: 54, cy: 180, r: 52 },
-  Projects: { cx: 172, cy: 176, r: 68 },
-  "Say hello": { cx: 96, cy: 268, r: 46 },
+  Lab: { cx: 184, cy: 46, r: 42 },
+  Writing: { cx: 252, cy: 104, r: 48 },
+  About: { cx: 54, cy: 176, r: 50 },
+  Projects: { cx: 168, cy: 172, r: 66 },
+  "Say hello": { cx: 84, cy: 280, r: 54 },
 };
 const items = [
   { label: "Home", href: "/", external: false },
@@ -101,11 +104,11 @@ const place = (name: string, index: number) => {
     display: grid;
   }
   li > :global(.ds-link--ball) {
-    width: var(--ball-nav-size);
+    min-width: var(--ball-nav-size);
     font-size: var(--text-sm);
   }
-  /* Row: equal balls on a gentle wave, so the line reads as balls laid
-     down by hand rather than a row of buttons. */
+  /* Row: balls sized to their names on a gentle wave, so the line reads as
+     balls laid down by hand rather than a row of buttons. */
   li:nth-child(odd) {
     translate: 0 calc(-1 * var(--ball-row-wave));
   }
@@ -113,32 +116,34 @@ const place = (name: string, index: number) => {
     translate: 0 var(--ball-row-wave);
   }
 
-  /* Compact: a tight honeycomb, three over three, each ball still a full
-     touch target. */
+  /* Compact: a tight honeycomb, three over three, each ball sized to its
+     name and still a full touch target. Three content-sized columns; the
+     second row sits half a ball to the right and tucks up into the first.
+     (A static offset: nothing here moves once laid out.) */
   @media (max-width: 40.625rem) {
     ul {
       display: grid;
-      grid-template-columns: repeat(7, calc(var(--ball-nav-size-compact) / 2));
+      grid-template-columns: repeat(3, auto);
       gap: 0 var(--ball-honeycomb-gap);
       justify-content: end;
+      padding-inline-end: var(--ball-honeycomb-shift);
     }
     li {
-      grid-column: span 2;
-      justify-items: center;
+      justify-items: start;
       translate: none;
     }
     li:nth-child(n) {
       translate: none;
     }
-    li:nth-child(4) {
-      grid-column: 2 / span 2;
-    }
     li:nth-child(n + 4) {
       margin-top: var(--ball-honeycomb-tuck);
+      translate: var(--ball-honeycomb-shift) 0;
     }
     li > :global(.ds-link--ball) {
-      width: var(--ball-nav-size-compact);
+      min-width: var(--ball-nav-size-compact);
+      padding-inline: var(--ball-label-pad-compact);
       font-size: var(--ball-label-size-compact);
+      letter-spacing: var(--ball-tracking-compact);
     }
   }
 
@@ -152,7 +157,7 @@ const place = (name: string, index: number) => {
     [data-form="cluster"] ul {
       display: block;
       position: relative;
-      aspect-ratio: 300 / 316;
+      aspect-ratio: 300 / 336;
     }
     [data-form="cluster"] li {
       position: absolute;
@@ -164,7 +169,9 @@ const place = (name: string, index: number) => {
     [data-form="cluster"] li > :global(.ds-link--ball) {
       --ball-shadow-rest: var(--shadow-ball);
       width: 100%;
+      min-width: 0;
       font-size: var(--ball-label-size-cluster);
+      letter-spacing: var(--ball-tracking-cluster);
     }
   }
   /* Arrival, once, on the homepage: the peach suns rise, the burgundy
@@ -172,17 +179,17 @@ const place = (name: string, index: number) => {
   @media (min-width: 62.501rem) and (prefers-reduced-motion: no-preference) {
     /* Paint only: the face and label rise; the link itself never moves,
        so a click during the arrival still lands. */
-    [data-form="cluster"] li :global(.ds-link--ball::before),
-    [data-form="cluster"] li :global(.ds-link--ball > span) {
+    [data-form="cluster"] li :global(.ds-link--ball .ball-face),
+    [data-form="cluster"] li :global(.ds-link--ball > .ds-link__body) {
       animation: sunrise var(--duration-settle) var(--ease-pop)
         calc(var(--stagger) * (2 + var(--i))) backwards;
     }
     [data-form="cluster"]
       li:has([aria-current])
-      :global(.ds-link--ball::before),
+      :global(.ds-link--ball .ball-face),
     [data-form="cluster"]
       li:has([aria-current])
-      :global(.ds-link--ball > span) {
+      :global(.ds-link--ball > .ds-link__body) {
       animation-delay: calc(var(--stagger) * 8);
     }
   }
