@@ -9,8 +9,9 @@
  * - compact (phones): a tight 3 + 3 honeycomb beside the name;
  * - cluster (homepage, wide screens): v1's uneven cluster, hung from the
  *   header into the introduction's right column. Its balls rise in once.
- * A press is always a click: the hit area never moves, only the painted
- * face lifts and squishes. No JavaScript involved. */
+ * A press is always a click: the hit area never moves. ball-life.ts gives
+ * the painted face and label their life (lean, jelly, jostle, poke, squash
+ * and bounce); the links work the same without it. */
 import Link from "../primitives/Link.astro";
 interface Props {
   nav: { label: string; href: string; external?: boolean }[];
@@ -79,6 +80,10 @@ const place = (name: string, index: number) => {
     ))}
   </ul>
 </nav>
+<script>
+  import { installBallLife } from "./ball-life";
+  installBallLife();
+</script>
 <style>
   ul {
     display: flex;
@@ -165,11 +170,19 @@ const place = (name: string, index: number) => {
   /* Arrival, once, on the homepage: the peach suns rise, the burgundy
      ball comes up last. */
   @media (min-width: 62.501rem) and (prefers-reduced-motion: no-preference) {
-    [data-form="cluster"] li {
+    /* Paint only: the face and label rise; the link itself never moves,
+       so a click during the arrival still lands. */
+    [data-form="cluster"] li :global(.ds-link--ball::before),
+    [data-form="cluster"] li :global(.ds-link--ball > span) {
       animation: sunrise var(--duration-settle) var(--ease-pop)
         calc(var(--stagger) * (2 + var(--i))) backwards;
     }
-    [data-form="cluster"] li:has([aria-current]) {
+    [data-form="cluster"]
+      li:has([aria-current])
+      :global(.ds-link--ball::before),
+    [data-form="cluster"]
+      li:has([aria-current])
+      :global(.ds-link--ball > span) {
       animation-delay: calc(var(--stagger) * 8);
     }
   }

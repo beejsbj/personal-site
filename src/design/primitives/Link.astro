@@ -155,10 +155,20 @@ const outbound = /^(https?:|mailto:)/.test(href);
     user-select: none;
     -webkit-user-drag: none;
     touch-action: manipulation;
+    /* The squish is the tap feedback; no square flash behind a round ball. */
+    -webkit-tap-highlight-color: transparent;
+    /* Painted-layer offsets, written by ball-life.ts while it animates. */
+    --face-x: 0;
+    --face-y: 0;
+    --face-sx: 1;
+    --face-sy: 1;
   }
+  /* The face and the label are paint only: they never take the pointer,
+     so however they move, the hit area is the link's own still circle. */
   .ds-link--ball > span {
     max-inline-size: var(--ball-label-measure);
     text-wrap: balance;
+    pointer-events: none;
   }
   .ds-link--ball::before {
     content: "";
@@ -168,6 +178,19 @@ const outbound = /^(https?:|mailto:)/.test(href);
     border-radius: inherit;
     background: var(--ball-fill);
     box-shadow: var(--ball-shadow-rest);
+    pointer-events: none;
+  }
+  /* The current page's ball breathes once when the page arrives: a ring
+     swells off it and fades, like the portrait's. */
+  .ds-link--ball[aria-current]::after {
+    content: "";
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    border: var(--portrait-border) solid var(--ball-fill-current);
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
   }
   .ds-link--ball:is(:hover, :focus-visible) {
     text-decoration: none;
@@ -186,7 +209,7 @@ const outbound = /^(https?:|mailto:)/.test(href);
   .ds-link--ball[aria-current]:is(:hover, :focus-visible)::before {
     background: var(--ball-fill-current-hover);
   }
-  .ds-link--ball:active::before {
+  .ds-link--ball:not([data-alive]):active::before {
     scale: var(--press-scale);
   }
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
@@ -197,14 +220,43 @@ const outbound = /^(https?:|mailto:)/.test(href);
         background-color var(--duration-hover) var(--ease-feedback),
         box-shadow var(--duration-hover) var(--ease-settle);
     }
-    .ds-link--ball:hover::before {
+    .ds-link--ball:not([data-alive]):hover::before {
       scale: var(--ball-hover-scale);
       translate: 0 calc(-1 * var(--motion-lift));
     }
-    .ds-link--ball:hover:active::before {
+    .ds-link--ball:not([data-alive]):hover:active::before {
       scale: var(--press-scale);
       translate: none;
       transition-duration: var(--duration-fast);
+    }
+  }
+  /* Alive (ball-life.ts, motion allowed): the runtime's springs own the
+     face and label; CSS keeps only the colour and shadow transitions. */
+  .ds-link--ball[data-alive]::before {
+    translate: var(--face-x) var(--face-y);
+    scale: var(--face-sx) var(--face-sy);
+    transition:
+      background-color var(--duration-hover) var(--ease-feedback),
+      box-shadow var(--duration-hover) var(--ease-settle);
+  }
+  .ds-link--ball[data-alive] > span {
+    translate: var(--face-x) var(--face-y);
+    scale: var(--face-sx) var(--face-sy);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ds-link--ball[aria-current]::after {
+      animation: ball-breathe calc(var(--duration-settle) * 2) ease-out
+        calc(var(--duration-settle) * 2);
+    }
+  }
+  @keyframes ball-breathe {
+    from {
+      opacity: var(--ring-opacity);
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: scale(var(--ring-scale));
     }
   }
   @media (forced-colors: active) {
@@ -230,6 +282,7 @@ const outbound = /^(https?:|mailto:)/.test(href);
     white-space: nowrap;
     user-select: none;
     -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
   }
   .ds-link--pill::before {
     content: "";
