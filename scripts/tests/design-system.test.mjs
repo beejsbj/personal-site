@@ -181,7 +181,28 @@ test("one link family: no drag physics, no rectangular actions, shared ball toke
     "Ball drag/throw physics were removed on purpose",
   );
   assert.equal(existsSync("src/components/SiteNav.astro"), false);
+  // The flavour came back on the paint only (round 5): the runtime has no
+  // drag, the face and label never take the pointer, and the sunrise
+  // animates them rather than the link.
+  assert.doesNotMatch(
+    read("src/design/unique/ball-life.ts"),
+    /setPointerCapture|dragstart|preventDefault/,
+  );
   const link = read("src/design/primitives/Link.astro");
+  for (const layer of [
+    /\.ds-link--ball > span \{[^}]*pointer-events: none/,
+    /\.ds-link--ball::before \{[^}]*pointer-events: none/,
+  ])
+    assert.match(link, layer, "painted layers ignore the pointer");
+  const ballNav = read("src/design/unique/BallNav.astro");
+  for (const [, selector, body] of ballNav.matchAll(
+    /([^{}]+)\{([^{}]*animation:[^{}]*)\}/g,
+  ))
+    assert.match(
+      selector,
+      /ds-link--ball(::before| > span)/,
+      `only painted layers animate: ${selector.trim()}`,
+    );
   for (const token of [
     "--ball-fill",
     "--ball-fill-hover",

@@ -20,10 +20,16 @@ links inconsistent. Now:
   and headings, whose hover grows the same peach pill). They share the
   `--ball-*` tokens. The rectangular `action` treatment is retired. Email
   links are out of scope (separate issue).
+- **Flavour on the paint (round 5).** `ball-life.ts` brings back lean,
+  jelly, neighbour jostle, swipe pokes, press squash and release bounce
+  (touch too), but moves only each ball's face (`::before`) and label,
+  which ignore the pointer. The link's circle never moves; the cluster's
+  sunrise animates the paint as well.
 - **Peeking initials.** The B and J left the homepage's foot; on any page
-  they now peek from an edge or a section rule, rarely, never over text,
-  briefly (under 5s), and duck when noticed. Reduced motion: none. No JS:
-  nothing.
+  they now peek from an edge or a section rule, never over text, briefly
+  (under 5s), and duck when noticed. Phones (round 5) judge text line by
+  line, may peek over pictures, and peek more often (15-30s cooldown).
+  Reduced motion: none. No JS: nothing.
 
 ## Decorative circles — 12 September
 
