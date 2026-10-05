@@ -19,6 +19,11 @@ let playBus: GainNode | undefined;
 let auditionBus: GainNode | undefined;
 let wanted = false;
 let allowed = true;
+let suspendTimer = 0;
+let wokeAt = -Infinity;
+/** One gain per track under the playback bus: mute and solo set these. */
+const tracks = new Map<string, GainNode>();
+const levels = new Map<string, number>();
 const listeners = new Set<(on: boolean) => void>();
 
 try {
@@ -68,6 +73,7 @@ function build() {
 /** Wake the context. Call only from inside a user gesture. */
 function wake() {
   if (!allowed) return;
+  window.clearTimeout(suspendTimer);
   if (!context) build();
   if (!context || !master) return;
   void context.resume();
@@ -90,7 +96,10 @@ export function setSound(on: boolean) {
     master.gain.cancelScheduledValues(t);
     master.gain.setValueAtTime(master.gain.value, t);
     master.gain.linearRampToValueAtTime(0, t + 0.12);
-    setTimeout(() => void context?.suspend(), 160);
+    window.clearTimeout(suspendTimer);
+    suspendTimer = window.setTimeout(() => {
+      if (!wanted) void context?.suspend();
+    }, 160);
   }
   listeners.forEach((fn) => fn(wanted));
 }
@@ -98,11 +107,18 @@ export function setSound(on: boolean) {
 /** Sound was on before a reload: the first tap or key wakes it. */
 export function armUnlock(signal: AbortSignal) {
   const unlock = () => {
-    if (soundWanted() && context?.state !== "running") wake();
+    if (soundWanted() && context?.state !== "running") {
+      wake();
+      wokeAt = performance.now();
+    }
   };
   for (const type of ["pointerdown", "keydown"])
     window.addEventListener(type, unlock, { signal, capture: true });
 }
+
+/** The sound switch was pressed by the same gesture that woke sound after
+ * a reload: that press means "I want sound", not "turn it off". */
+export const wokeJustNow = () => performance.now() - wokeAt < 800;
 
 function bus(): GainNode | undefined {
   if (!context || !master) return undefined;
@@ -133,10 +149,12 @@ function voice(out: GainNode, kind: Voice, degree: number, when: number, seconds
     o.type = type;
     o.frequency.value = freq;
     o.detune.value = detune;
-    g.gain.value = level;
+    g.gain.setValueAtTime(level, when);
+    // a partial that stops before the note ends fades first, so it never clicks
+    g.gain.setTargetAtTime(0, Math.max(when, stopAt - 0.06), 0.015);
     o.connect(g).connect(env);
     o.start(when);
-    o.stop(stopAt);
+    o.stop(stopAt + 0.04);
   };
   const shape = (peak: number, attack: number, decay: number, release = decay) => {
     env.gain.setValueAtTime(0.0001, when);
@@ -222,18 +240,42 @@ export interface Play {
   velocity: number;
 }
 
-/** Schedule play-through notes. `when` is context time. */
-export function schedule(notes: { when: number; seconds: number; degree: number; voice: Voice; velocity: number }[]) {
-  if (!soundLive() || !context) return;
+function trackBus(track: string): GainNode | undefined {
+  if (!context) return undefined;
   playBus ??= bus();
-  if (!playBus) return;
-  for (const n of notes) voice(playBus, n.voice, n.degree, Math.max(n.when, context.currentTime), n.seconds, n.velocity);
+  if (!playBus) return undefined;
+  let gain = tracks.get(track);
+  if (!gain) {
+    gain = context.createGain();
+    gain.gain.value = levels.get(track) ?? 1;
+    gain.connect(playBus);
+    tracks.set(track, gain);
+  }
+  return gain;
+}
+
+/** Schedule play-through notes on their tracks. `when` is context time. */
+export function schedule(notes: { when: number; seconds: number; degree: number; voice: Voice; velocity: number; track: string }[]) {
+  if (!soundLive() || !context) return;
+  for (const n of notes) {
+    const out = trackBus(n.track);
+    if (out) voice(out, n.voice, n.degree, Math.max(n.when, context.currentTime), n.seconds, n.velocity);
+  }
+}
+
+/** Mute or unmute a track's playback, held notes included, in a few ms. */
+export function setTrackLevel(track: string, on: boolean) {
+  levels.set(track, on ? 1 : 0);
+  const gain = tracks.get(track);
+  if (!gain || !context) return;
+  gain.gain.setTargetAtTime(on ? 1 : 0, context.currentTime, 0.015);
 }
 
 /** Silence the play-through, including notes already scheduled. */
 export function stopPlayback() {
   fade(playBus);
   playBus = undefined;
+  tracks.clear();
 }
 
 /** Hear a few notes now, replacing whatever was auditioning. Quieter than
@@ -259,6 +301,8 @@ export function tap(degree: number, kind: Voice = "lead", velocity = 0.6) {
 }
 
 export function closeSound() {
+  window.clearTimeout(suspendTimer);
+  tracks.clear();
   playBus = undefined;
   auditionBus = undefined;
   void context?.close();

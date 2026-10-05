@@ -4,7 +4,7 @@
  * screen sits. Every readout on it reports the real playhead. */
 import { fill } from "../rich";
 import type { RouteKind, ShellContext } from "../types";
-import { armUnlock, forbidSound, onSound, setSound, soundWanted, tap } from "./audio";
+import { armUnlock, forbidSound, onSound, setSound, soundWanted, tap, wokeJustNow } from "./audio";
 import { noteVar, type Copy } from "./bits";
 import { h, link, markup } from "./dom";
 import { noteName } from "./music";
@@ -99,7 +99,7 @@ export function buildFrame(ctx: ShellContext): Frame {
   };
   paintSound(soundWanted());
   onSound(paintSound, signal);
-  on(soundButton, "click", () => setSound(!soundWanted()));
+  on(soundButton, "click", () => setSound(wokeJustNow() ? true : !soundWanted()));
 
   const bar = h(
     "header",

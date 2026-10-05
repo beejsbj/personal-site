@@ -6,7 +6,7 @@
  * while it is inside them, and it touches only those. The loop runs only
  * while playing, and stops when the page goes idle. */
 import { EIGHTH_SECONDS, BAR_EIGHTHS } from "./music";
-import { audition, now as audioNow, schedule, soundLive, stopPlayback, type Play } from "./audio";
+import { audition, now as audioNow, schedule, setTrackLevel, soundLive, stopPlayback, type Play } from "./audio";
 import type { Clip, Session, TrackId } from "./score";
 
 const YEAR_SECONDS = EIGHTH_SECONDS * BAR_EIGHTHS;
@@ -51,6 +51,8 @@ export class Transport {
   private cursor = 0;
   private lastFrame = 0;
   private returnTo: number | undefined;
+  /** Paused or scrubbed: play carries on from here rather than the top. */
+  private resumable = false;
   private heads = new Set<Head>();
   private watched = new Set<Watched>();
   private ticks = new Set<Tick>();
@@ -105,31 +107,32 @@ export class Transport {
     signal.addEventListener("abort", () => this.ticks.delete(fn));
   }
 
-  /** Play the whole session (or a region), from the top. */
+  /** Play the whole session, or a region from its start. The session
+   * resumes where it was paused or scrubbed, and starts from the top when
+   * resting at today or finished. */
   play(region?: Range) {
     if (this.idle) return;
+    // replaying a region keeps the spot to return to from the first time
+    const back = this.returnTo ?? this.t;
     if (this.playing) this.halt();
     const { session } = this;
     if (region) {
-      this.returnTo = this.t;
+      this.returnTo = back;
       this.region = region;
       this.t = region.from;
     } else {
       this.returnTo = undefined;
       this.region = { from: session.from, to: session.end };
-      // resume from a scrubbed spot; from the top when resting at today or the end
-      if (this.t >= session.now - 1 / 48 || this.t < session.from) this.t = session.from;
+      if (!this.resumable || this.t >= session.end - 1e-6 || this.t < session.from) this.t = session.from;
     }
-    this.playing = true;
-    this.anchor();
-    this.cursor = this.t;
-    this.render();
-    this.loop();
+    this.resumable = false;
+    this.start();
   }
 
   pause() {
     if (!this.playing) return;
     this.halt();
+    this.resumable = true;
     this.render();
   }
 
@@ -147,12 +150,17 @@ export class Transport {
   seek(t: number) {
     const { session } = this;
     this.t = Math.min(Math.max(t, session.from), session.end);
+    // back at rest at today, play starts from the top again
+    this.resumable = Math.abs(this.t - session.now) > 1e-6;
     if (this.playing) {
+      // leaving a playing region turns it into the whole session from here
+      if (this.t < this.region.from || this.t >= this.region.to) {
+        this.region = { from: session.from, to: session.end };
+        this.returnTo = undefined;
+      }
       stopPlayback();
-      this.anchor();
-      this.cursor = this.t;
-    }
-    this.render();
+      this.start();
+    } else this.render();
   }
 
   setIdle(idle: boolean) {
@@ -204,14 +212,36 @@ export class Transport {
     stopPlayback();
   }
 
+  /** Every track's level follows mute and solo; held notes go quiet or
+   * come back without being struck again. */
+  private applyMix() {
+    for (const track of this.session.tracks) setTrackLevel(track, this.audible(track));
+  }
+
   private mixChanged() {
     this.mixes.forEach((fn) => fn());
     for (const entry of this.watched) this.light(entry, true);
-    if (this.playing) {
-      // reschedule what is ahead with the new mix
-      stopPlayback();
-      this.cursor = this.t;
+    this.applyMix();
+  }
+
+  /** Start the clock at `t`, re-striking whatever should already be
+   * sounding there (a held chord, a bass note) for the time it has left. */
+  private start() {
+    this.playing = true;
+    this.anchor();
+    this.cursor = this.t;
+    this.applyMix();
+    if (soundLive()) {
+      const base = audioNow();
+      const t = this.t;
+      schedule(
+        this.session.events
+          .filter((e) => e.t < t - 1e-9 && e.t + e.length > t + 0.01 && e.voice !== "brush")
+          .map((e) => ({ when: base, seconds: (e.t + e.length - t) * YEAR_SECONDS, degree: e.degree, voice: e.voice, velocity: e.velocity * 0.8, track: e.track })),
+      );
     }
+    this.render();
+    this.loop();
   }
 
   private anchor() {
@@ -225,7 +255,8 @@ export class Transport {
     if (!this.playing || this.idle) return;
     this.frame = requestAnimationFrame((time) => {
       if (!this.playing) return;
-      // a stalled tab skips ahead silently rather than catching up in a burst
+      // after a stall (a hidden tab) carry on from where the playhead was,
+      // dropping what was scheduled, rather than catching up in a burst
       if (time - this.lastFrame > 400) {
         stopPlayback();
         this.anchorT = this.t;
@@ -242,13 +273,14 @@ export class Transport {
         const base = audioNow();
         schedule(
           this.session.events
-            .filter((e) => e.t >= this.cursor && e.t < until && this.audible(e.track))
+            .filter((e) => e.t >= this.cursor && e.t < until)
             .map((e) => ({
               when: base + (e.t - t) * YEAR_SECONDS,
               seconds: e.length * YEAR_SECONDS,
               degree: e.degree,
               voice: e.voice,
               velocity: e.velocity,
+              track: e.track,
             })),
         );
       }
@@ -259,6 +291,7 @@ export class Transport {
         // the last chord rings on; the playhead goes back where it rested
         this.t = this.returnTo ?? this.session.now;
         this.returnTo = undefined;
+        this.resumable = Math.abs(this.t - this.session.now) > 1e-6;
         this.region = { from: this.session.from, to: this.session.end };
         this.render();
         return;
