@@ -153,8 +153,8 @@ Each cell: how the lens presents the part, then `file:function`. Hion cells are 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
 | PI1 Header | Eyebrow "Projects", h1 "Things I've made, along the way.", intro | Constant title "Projects", invented eyebrow "Equip", Daylight h1 as subtitle, intro from `.page-header__intro`, `CC/projects.ts:projects` | `pageHead`: eyebrow/h1/intro from `route.main`, `CP/screens.ts:projects` | h1 + intro from `route.main`; eyebrow replaced by invented "Projects · the back page", `ch:projects` | `pageHead` from `route.main` (fallbacks hard-coded), `HI/screens.ts:projects` |
-| PI2 Year headings | h2 per year | — MISSING (per-slot year only) | — MISSING (year ruler 2021 to 2027 plus "now" playhead instead) | Year mark in margin of war map and roll call; no headings | Year loops with h2 year, circled in turn, `HI/screens.ts:projects` |
-| PI3 Project entry | Row: meta `dateLabel / kind`, title link, summary, 3 tools, cover | Equipment slot: year, ★, kindLabel ("Selected/Project/Arcade"), title; summary and cover only in the selected-slot detail panel (all tools, Role, Where), `CC/projects.ts:slots`, `detailPanel` | Sequencer track row: number, cover, title, `dateLabel · kind`, summary, tools, clip with piano roll positioned by `yearPosition`, `CP/screens.ts:projects` | "Roll call" row (year, title, `dateLabel`, "· arcade") + war map camp of dots per project; no summary/cover/tools, `ch:projects`, `ch:warMap` | `workCharm` per project: cover, `dateLabel · kind` (Daylight: role), title, full summary, all tools, `HI/screens.ts:workCharm` |
+| PI2 Year headings | h2 per year | — MISSING (per-slot year only) | — MISSING (a year/month ruler sized to the content's dates, with a playhead resting at "now", instead; `CP/arrange.ts`) | Year mark in margin of war map and roll call; no headings | Year loops with h2 year, circled in turn, `HI/screens.ts:projects` |
+| PI3 Project entry | Row: meta `dateLabel / kind`, title link, summary, 3 tools, cover | Equipment slot: year, ★, kindLabel ("Selected/Project/Arcade"), title; summary and cover only in the selected-slot detail panel (all tools, Role, Where), `CC/projects.ts:slots`, `detailPanel` | Arrangement track: number, cover, title link, `dateLabel · kind`, summary, tools, cue button; its clip sits at its date and draws its motif's notes (phones: clips on one swipeable tape over the list), `CP/arrange.ts:arrangement` | "Roll call" row (year, title, `dateLabel`, "· arcade") + war map camp of dots per project; no summary/cover/tools, `ch:projects`, `ch:warMap` | `workCharm` per project: cover, `dateLabel · kind` (Daylight: role), title, full summary, all tools, `HI/screens.ts:workCharm` |
 
 ### 2.4 Project detail
 
@@ -360,13 +360,12 @@ Never read: `site.nav`, any `pages.*.body`, `pages.resume.*`, `pages.*.availabil
 | `CP/screens.ts:280` | "In the crate" | flavour |
 | `CP/screens.ts:285` | "Full setlist" | replaces "All projects" |
 | `CP/screens.ts:173` | "Liner notes" | flavour |
-| `CP/screens.ts:429` | "Setlist, newest first" | replaces "Project history, newest first" |
+| `cut-paper.json` `projects.list` | "Arrangement: one track per project, at its date" | replaces "Project history, newest first" |
 | `CP/screens.ts:494` | "Setlist" | flavour eyebrow |
 | `CP/screens.ts:497` | "Credits" | flavour |
 | `CP/screens.ts:503` | "Filed" | flavour label for tags |
 | `CP/screens.ts:524` | "Back to the setlist" | replaces "Back to all projects" |
 | `CP/screens.ts:593` | "Presets" | replaces "Selected experiments" |
-| `CP/screens.ts:597` | "anim", "freq", "color", "popup", "scope" | fake drawer tabs |
 | `CP/screens.ts:623` | "Open the sketch" | dead path |
 | `CP/screens.ts:647` | "Back to the presets" | invented |
 | `CP/screens.ts:669` | "Play." / "Build." / "Repeat." | invented poster tag |
@@ -374,7 +373,7 @@ Never read: `site.nav`, any `pages.*.body`, `pages.resume.*`, `pages.*.availabil
 | `CP/screens.ts:751` | `Side ${A..D}` | flavour section labels |
 | `CP/screens.ts:821` | "clipped to the stand" | flavour |
 
-Derived "content": `yearPosition(dateLabel, year)` places clips on a fixed 2021 to 2027.5 range (`screens.ts:311-317`), so a 2028 project falls off the ruler; Update kind to note mapping (`notes.ts:80-85`); lab visual chosen by regex over slug/type (`screens.ts:540-558`); piano-roll art seeded from slug; track numbers by index.
+Derived "content": `CP/timeline.ts:modelFor` places clips (`dateLabel`), markers (`updates[].date`) and resume spans (`resume.*.start/end`) on a range that grows to fit every date and today, so a new year always fits; motifs are composed from slug and date (`CP/music.ts`); Update kind to note mapping (`notes.ts:80-85`); lab visual chosen by regex over slug/type (`screens.ts:540-558`); piano-roll art seeded from slug; track numbers by index.
 
 ### 3.3 Back Page (`BP`)
 
@@ -553,7 +552,7 @@ Selector load: `.page-header__intro` and `h1` are read by all four lenses; `.pro
 **Invented by a lens (not in `src/content/`)**
 
 - CC: arcana card, "Confidant rank MAX", "Social stats", resume "Leader/Party/Study", "Work/Lab" odometer, "New message", calendar widget, calling-card letter copy ("To whoever has a project in mind...", paraphrasing `about.md`), request status "Open", Prev/Next pager, "Take your heart".
-- CP: "c major / 120 bpm", note and Hz tables, "Side A to D", fake drawer tabs, "Play. Build. Repeat.", "Filed", track numbers, preset numbers, key hints ("N tracks").
+- CP: "c major / 120 bpm" (now the real key and tempo of the lens's music), note and Hz tables, "Side A to D", "Play. Build. Repeat.", "Filed", track numbers, preset numbers, key hints ("N tracks").
 - BP: "Dear reader," letter frame, "P.S.", "Yours, Burooj", fake page numbers, camp dot counts and hits (mean nothing), "(a quick war, during maths)", "Roll call", legend.
 - HI: portrait on About (Daylight has none), "Back to / The whole lab", Newer/Older nav, 404 rewrite, "Send a line my way".
 - All lenses invent eyebrow/back-link labels that differ from Daylight.
@@ -566,7 +565,7 @@ Selector load: `.page-header__intro` and `h1` are read by all four lenses; `.pro
 2. **Two sources for the home page.** Daylight hard-codes the hero while `home.md` holds different text that only CC and BP show, so those lenses present words Daylight never says.
 3. **Dormant lab-entry route and unused JSON fields.** No lab-entry page exists today, so all lab-entry code (and `lab[].media`, absent from JSON) is untested; `site.nav`, `status`, `tags`, `pages.*.body` for about/resume are read by no lens.
 4. **Parsing Daylight's markdown structure.** CC, CP and HI split the resume prose on h2/h3, `" · "` and a leading `<em>`; CC splits Tools on "and". An edit to `resume.md` shape or wording silently breaks three lenses.
-5. **Derived and invented values with no guard.** Update labels fall back to raw slugs, project order and featured set differ per lens, BP's hard-coded page numbers and `2026 - year`, CP's 2021 to 2027.5 ruler, HI video media breaking and `.timeline` selector in CP are dead or time-bound; Hion's whole column is provisional.
+5. **Derived and invented values with no guard.** Update labels fall back to raw slugs, project order and featured set differ per lens, BP's hard-coded page numbers and `2026 - year`, HI video media breaking and `.timeline` selector in CP are dead or time-bound; Hion's whole column is provisional.
 
 ## 6. The content contract (after drift-proofing)
 
@@ -579,3 +578,5 @@ Selector load: `.page-header__intro` and `h1` are read by all four lenses; `.pro
 **Parts.** `src/prism/parts.ts` names each piece of content (`page.title`, `project.body`, `update.item`, `resume.role`…); Daylight and every shell mark the element with `data-part` and `data-ref`. `src/prism/parity.ts` lists the routes the content generates, the parts each must show (with their words), and `GAPS`, what a lens leaves out on purpose.
 
 **Guards.** `scripts/tests/prism-drift.test.mjs` (in `test`): no 12+ character string from `src/content` in shell source, no `route.main` read outside `fallbackBody`, and `content.json` covers every entry. `scripts/tests/prism-parity.browser.mjs` (`test:prism`): every lens on every route and every fuzz fixture (`src/prism/fixtures.ts`, mounted by `/prism/harness`) shows every part, with no console errors and one visible h1. `/prism/atlas` shows every route in every lens, and in parts mode outlines a chosen part in all five.
+
+**Cut Paper's arrangement and music (fold-in of #12).** Projects is an arrangement (`CP/arrange.ts`): a ruler that is also a slider, update markers, the resume's dated entries as spans, and a track per project whose clip sits at its `dateLabel` and is as long as its motif. `CP/timeline.ts` builds that model from `content.json` alone and composes the song from it; `CP/music.ts` is the theory (C major, 120 bpm, I–vi–ii–V one chord per half year, deterministic motifs, guarded by `scripts/tests/cut-paper-music.test.mjs`); `CP/sound.ts` plays it, only after the visitor turns sound on. Crate sleeves, the project sleeve and resume credits audition the same phrases (`CP/listen.ts`). On phones the lanes become one tape that scrolls under a fixed playhead. No new gaps: every track head still carries `project.title`, `project.meta`, `project.summary` and `project.tools`.
