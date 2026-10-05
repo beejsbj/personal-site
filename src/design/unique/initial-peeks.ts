@@ -142,9 +142,7 @@ export function installInitialPeeks() {
     const obstacles = (): Rect[] => {
       const height = window.innerHeight;
       const rects: Rect[] = [];
-      for (const element of document.querySelectorAll<HTMLElement>(
-        OBSTACLES,
-      )) {
+      for (const element of document.querySelectorAll<HTMLElement>(OBSTACLES)) {
         const rect = element.getBoundingClientRect();
         if (!rect.width || !rect.height) continue;
         if (rect.bottom < 0 || rect.top > height) continue;

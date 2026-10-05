@@ -13,16 +13,20 @@
   /* The stage clips the letter: to the screen for edge peeks, and to a
      section rule (--peek-floor) when it rises from behind one. */
   .initial-peek {
+    --peek-floor: 100%;
     position: fixed;
     top: 0;
     left: 0;
     z-index: var(--layer-peek);
     width: 100%;
-    height: var(--peek-floor, 100%);
+    height: var(--peek-floor);
     overflow: hidden;
     pointer-events: none;
   }
+  /* Runtime geometry (initial-peeks.ts writes it inline per peek). */
   .initial-peek__letter {
+    --peek-from: 0 0;
+    --peek-to: 0 0;
     --peek-tilt: 0deg;
     position: absolute;
     top: 0;

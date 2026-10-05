@@ -85,7 +85,7 @@ test("dedicated style guide imports production assemblies and keeps design-syste
     "CurrentNote",
     "UpdateEntry",
     "ActivityStream",
-    "SiteNav",
+    "BallNav",
     "MediaRail",
   ]) {
     assert.match(guide, new RegExp(`import ${component} from`));
@@ -99,7 +99,7 @@ test("dedicated style guide imports production assemblies and keeps design-syste
   assert.match(
     built,
     /aria-label="Navigation specimen"/,
-    "Guide must demonstrate the real text navigation",
+    "Guide must demonstrate the real ball navigation",
   );
   assert.doesNotMatch(
     built,
@@ -121,28 +121,101 @@ test("dedicated style guide imports production assemblies and keeps design-syste
   );
 });
 
-test("text navigation stays primary, with native links and correct section markers", () => {
-  for (const [path, current] of [
-    ["index.html", "/"],
-    ["about/index.html", "/about"],
-    ["projects/index.html", "/projects"],
-    ["projects/conduit-market/index.html", "/projects"],
-    ["lab/index.html", "/lab"],
+test("one ball navigation on every page, with native links and correct section markers", () => {
+  // Burooj, round 4: no point in two navs. The balls are the site nav
+  // everywhere; the old six-link text menu must not come back beside them.
+  for (const [path, current, form] of [
+    ["index.html", "/", "cluster"],
+    ["about/index.html", "/about", "row"],
+    ["projects/index.html", "/projects", "row"],
+    ["projects/conduit-market/index.html", "/projects", "row"],
+    ["lab/index.html", "/lab", "row"],
+    ["resume/index.html", null, "row"],
   ]) {
     const html = read(`dist/client/${path}`);
-    const nav = html.match(
-      /<nav\b[^>]*aria-label="Main navigation"[^>]*>([\s\S]*?)<\/nav>/,
-    )?.[1];
-    assert.ok(nav, `${path}: missing semantic navigation`);
-    const anchors = [...nav.matchAll(/<a\b[^>]*>/g)].map(([tag]) => tag);
-    assert.equal(anchors.length, 6);
+    const navs = [...html.matchAll(/<nav\b([^>]*)>([\s\S]*?)<\/nav>/g)];
+    assert.equal(navs.length, 1, `${path}: exactly one nav`);
+    const [, attrs, body] = navs[0];
+    assert.match(attrs, /aria-label="Main navigation"/, `${path}: named`);
+    assert.match(attrs, /data-ball-nav/, `${path}: the nav is the balls`);
+    assert.match(attrs, new RegExp(`data-form="${form}"`), `${path}: form`);
+    assert.match(
+      html.slice(0, navs[0].index),
+      /<header\b[^>]*site-header/,
+      `${path}: the nav lives in the shared header`,
+    );
+    const anchors = [...body.matchAll(/<a\b[^>]*>/g)].map(([tag]) => tag);
+    assert.equal(anchors.length, 6, `${path}: all six destinations`);
+    for (const tag of anchors) {
+      assert.match(tag, /\bds-link--ball\b/, `${path}: shared ball link`);
+      assert.match(tag, /draggable="false"/, `${path}: a press never drags`);
+    }
+    for (const href of [
+      'href="/"',
+      'href="/projects"',
+      'href="/lab"',
+      'href="/about"',
+      'href="https://buroojs.substack.com"',
+      'href="mailto:',
+    ])
+      assert.ok(
+        anchors.some((tag) => tag.includes(href)),
+        `${path}: ${href}`,
+      );
     const marked = anchors.filter((tag) => tag.includes('aria-current="page"'));
-    assert.equal(marked.length, 1);
-    assert.ok(marked[0].includes(`href="${current}"`));
-    // Ball links are a homepage extra, never a replacement for this menu.
-    const ballNavs = (html.match(/data-ball-nav/g) || []).length;
-    assert.equal(ballNavs, path === "index.html" ? 1 : 0, `${path}: ball nav`);
+    if (current === null) {
+      assert.equal(marked.length, 0, `${path}: no false marker`);
+    } else {
+      assert.equal(marked.length, 1, `${path}: one current ball`);
+      assert.ok(marked[0].includes(`href="${current}"`));
+      assert.match(marked[0], /data-tone="wine"/, "current ball is burgundy");
+    }
     assert.match(html, /data-magnetic-edge/);
+  }
+});
+
+test("one link family: no drag physics, no rectangular actions, shared ball tokens", () => {
+  assert.equal(
+    existsSync("src/design/unique/ball-nav.ts"),
+    false,
+    "Ball drag/throw physics were removed on purpose",
+  );
+  assert.equal(existsSync("src/components/SiteNav.astro"), false);
+  const link = read("src/design/primitives/Link.astro");
+  for (const token of [
+    "--ball-fill",
+    "--ball-fill-hover",
+    "--ball-fill-current",
+    "--ball-ink",
+  ]) {
+    assert.match(link, new RegExp(`var\\(${token}\\)`), `Link uses ${token}`);
+  }
+  assert.doesNotMatch(link, /ds-link--action|ds-link--nav/);
+  for (const path of sources.filter((path) => path.endsWith(".astro"))) {
+    assert.doesNotMatch(
+      read(path),
+      /treatment="(?:action|nav)"/,
+      `${path}: retired link treatment`,
+    );
+  }
+  // Standalone actions are pills from the same family.
+  const home = read("dist/client/index.html");
+  for (const label of [
+    "GitHub",
+    "LinkedIn",
+    "Email",
+    "Resume",
+    "That's me",
+    "All projects",
+  ]) {
+    const escaped = label.replace("'", "(?:'|&#39;)");
+    assert.match(
+      home,
+      new RegExp(
+        `<a\\b[^>]*ds-link--pill[^>]*>(?:(?!</a>)[\\s\\S])*${escaped}`,
+      ),
+      `${label} is a pill`,
+    );
   }
 });
 

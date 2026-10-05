@@ -97,27 +97,17 @@ test("opening work uses one real feature without duplicating the selected projec
   );
 });
 
-test("ball links are a real, labelled secondary navigation beside the text menu", () => {
-  // Burooj reversed "circles are artwork, not navigation" on purpose: v1's
-  // balls are links again, while the six-link text menu stays primary.
+test("the ball nav is the one navigation, its homepage form a real labelled list", () => {
+  // Round 4 reversed "balls beside the text menu": one nav, the balls,
+  // with all six destinations and native tab order.
   const navs = [...html.matchAll(/<nav\b([^>]*)>([\s\S]*?)<\/nav>/gi)].map(
     ([, attrs, body]) => ({ ...attributes(`<nav ${attrs}>`), attrs, body }),
   );
-  const main = navs.find((nav) => nav["aria-label"] === "Main navigation");
-  assert.ok(main, "Primary text navigation is missing");
-  const mainLinks = [...main.body.matchAll(/<a\b[^>]*>/g)].map(([tag]) =>
-    attributes(tag),
-  );
-  assert.equal(mainLinks.length, 6, "Primary navigation keeps six links");
-  assert.equal(
-    mainLinks.filter((link) => link["aria-current"] === "page").length,
-    1,
-  );
-
-  const balls = navs.find((nav) => /\bdata-ball-nav\b/.test(nav.attrs));
-  assert.ok(balls, "Missing ball navigation");
-  assert.ok(balls["aria-label"], "Ball navigation needs its own name");
-  assert.notEqual(balls["aria-label"], "Main navigation");
+  assert.equal(navs.length, 1, "One nav, not two");
+  const [balls] = navs;
+  assert.match(balls.attrs, /\bdata-ball-nav\b/);
+  assert.equal(balls["aria-label"], "Main navigation");
+  assert.equal(balls["data-form"], "cluster", "Homepage uses the cluster form");
   assert.equal(balls["aria-hidden"], undefined);
   const links = [...balls.body.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].map(
     ([, attrs, body]) => ({
@@ -126,23 +116,23 @@ test("ball links are a real, labelled secondary navigation beside the text menu"
       text: plainText(body),
     }),
   );
-  assert.equal(links.length, 4, "One link per ball");
+  assert.deepEqual(
+    links.map((link) => link.text),
+    ["Home", "Projects", "Lab", "About", "Writing", "Say hello"],
+  );
   for (const link of links) {
     assert.ok(link.href, "Every ball is a real link");
-    assert.ok(link.text, `Ball ${link.href} needs an accessible name`);
     assert.match(link.attrs, /\bdata-ball\b/);
     assert.equal(link["aria-hidden"], undefined);
     assert.equal(link.tabindex, undefined, "Balls keep native tab order");
   }
-  assert.equal(
-    new Set(links.map((link) => link.href)).size,
-    links.length,
-    "No ball duplicates another",
-  );
   const current = links.filter((link) => link["aria-current"] === "page");
   assert.equal(current.length, 1, "The current page's ball is marked");
   assert.equal(current[0].href, "/");
   assert.equal(current[0]["data-tone"], "wine", "Current ball is burgundy");
+  // The giant initials no longer sit at the foot of the page; they peek
+  // from script only, so nothing of them ships in the markup.
+  assert.doesNotMatch(html, /giant-initials|class="initial-peek/);
 });
 
 test("nothing focusable hides from assistive technology or jumps the tab order", () => {

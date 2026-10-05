@@ -1,5 +1,30 @@
 # Base homepage: warm welcome
 
+## Current decision: one ball nav, one link family, peeking initials (October, PR #10 round 4)
+
+This supersedes "normal navigation" and "decorative circles" below. Burooj
+found two navs pointless, the balls' drag finicky, and the ball and text
+links inconsistent. Now:
+
+- **One nav.** `BallNav` is the site navigation on every page: a real
+  `<nav aria-label="Main navigation">` with all six destinations and
+  `aria-current`, the current page as the burgundy ball. It has three CSS
+  forms of one markup: a waving row in the header; a 3 + 3 honeycomb on
+  phones; and on the homepage above 62.5rem, v1's uneven cluster, hung from
+  the header into the intro's right column. `SiteNav` is gone.
+- **No drag.** The physics runtime is gone. A press is always a click:
+  shapes are painted on `::before`, so the hit area never moves, and
+  `draggable="false"` stops native link drags from eating wobbly clicks.
+- **One link family.** `Link` has `ball` (navigation), `pill` (every
+  standalone action; burgundy `wine` for a primary one) and `text` (prose
+  and headings, whose hover grows the same peach pill). They share the
+  `--ball-*` tokens. The rectangular `action` treatment is retired. Email
+  links are out of scope (separate issue).
+- **Peeking initials.** The B and J left the homepage's foot; on any page
+  they now peek from an edge or a section rule, rarely, never over text,
+  briefly (under 5s), and duck when noticed. Reduced motion: none. No JS:
+  nothing.
+
 ## Decorative circles — 12 September
 
 Following approval of the normal menu, Burooj asked to include the blobs
