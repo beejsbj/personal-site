@@ -126,10 +126,10 @@ Each cell: how the lens presents the part, then `file:function`. Hion cells are 
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| G1 Site nav | Header link row: Home, Projects, Lab, About, Writing↗, Say hello↗; `SiteNav.astro` | Home: seven tilted "commands" (Projects, Lab, About, Status, Phone, Writing, Calling Card), hard-coded, `CC/home.ts:commandsFor`. Inner screens: L1/R1 tab strip Projects/Lab/About/Status, `CC/chrome.ts:tabs`. Writing absent from tabs; Resume renamed Status | Keyboard of seven solfege keys: Home, Projects, Lab, About, Resume, Writing, Hello, hard-coded, `CP/notes.ts:keysFor` | Five exercise-book tabs Hello/About/Resume/Lab/Projects, hard-coded, `BP/index.ts:renderTabs` (`TABS`); Writing only in home contents slip. No Home/Say hello tab | Charms hung from the cord: home charm (`site.name`) plus each `site.nav` item (Resume included), `HI/nav.ts:createNav`; hard-coded "Menu" pull. The only lens that reads `site.nav` |
+| G1 Site nav | Header link row: Home, Projects, Lab, About, Writing↗, Say hello↗; `SiteNav.astro` | Home: seven tilted "commands" (Projects, Lab, About, Status, Phone, Writing, Calling Card), hard-coded, `CC/home.ts:commandsFor`. Inner screens: L1/R1 tab strip Projects/Lab/About/Status, `CC/chrome.ts:tabs`. Writing absent from tabs; Resume renamed Status | Keyboard of seven solfege keys: Home, Projects, Lab, About, Resume, Writing, Hello, hard-coded, `CP/notes.ts:keysFor` | A pile of five closed exercise books, Hello/About me/The lab/Projects/Writings, each with its own cover label (names from lens copy `books`), `BP/index.ts:renderShelf`. The resume is stapled into About me; Writings opens from the pile without a route (see G4). No contents slip, no Say hello | Charms hung from the cord: home charm (`site.name`) plus each `site.nav` item (Resume included), `HI/nav.ts:createNav`; hard-coded "Menu" pull. The only lens that reads `site.nav` |
 | G2 Footer | Name, email, Resume, Style guide, "Thanks for stopping by." | — MISSING (no footer; email only inside the calling-card panel, `CC/panels.ts:cardPanel`) | — MISSING (email is only the href of the "Hello" key; no visible footer) | — MISSING (email only on the home cover/inside cover, `ch:returnTo`) | Partial: "Send a line my way" + email link + social drops + Writing, `HI/screens.ts:footer`. No name, Resume, Style guide or "Thanks for stopping by." |
 | G3 Social links | GitHub/LinkedIn/Email + Resume on home hero | In the Calling Card panel only (mailto filtered, plus a hard-coded Writing row), `CC/panels.ts:cardPanel` | Home chips: all `site.social` incl. CodePen + hard-coded Resume, `CP/screens.ts:home` | Home cover/inside cover joined with " · ", mailto filtered, `ch:returnTo` | Home hero tag drops (minus CodePen, plus hard-coded Resume) and footer drops, `HI/screens.ts:home`, `footer` |
-| G4 Writing link | Nav item + home "Writing" blurb | Command + panel row (`site.writingUrl`) | "Writing" key | Contents slip entry "Writing (Substack)" | Footer drop + home fork + nav charm |
+| G4 Writing link | Nav item + home "Writing" blurb | Command + panel row (`site.writingUrl`) | "Writing" key | Writings, the fifth book: opens from the pile (URL unchanged) on a page with the Elsewhere "Writing" blurb and a link out to `site.writingUrl`, `ch:writingChapter`. Kept for `/writing` (PR #13) | Footer drop + home fork + nav charm |
 | G5 Updates feed | Home stream only | Phone panel (full list), home phone chip + calendar widget (latest), `CC/panels.ts:phonePanel`, `CC/home.ts:home` | Global "Log" drawer + scrolling "Updates" score strip on every route, `CP/frame.ts:buildFrame` | Home diary only | Home stream only |
 
 ### 2.2 Home
@@ -195,20 +195,20 @@ Each cell: how the lens presents the part, then `file:function`. Hion cells are 
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| AB1 Header | Eyebrow "About", h1 "Burooj, again!", intro, action "Experience & resume" | h1 + intro from main; eyebrow replaced by invented "Confidant · The Fool · Arcana 0"; action as "Next" card, `CC/about.ts:about` | Eyebrow, h1, intro from main; action buttons, `CP/screens.ts:about` | h1 + intro from main, no eyebrow; first action becomes P.S. link (lowercased), `ch:about` | `pageHead` from main; first action as pull-cord, `HI/screens.ts:about` |
-| AB2 Prose | Sections | Each block cloned into a "Burooj" dialogue; h2-h6 flattened into "Rank N" plates | `.prose` as-is | `.prose` moved into letter pages | `.prose` clone |
-| Invented | none | Arcana card, "Confidant rank MAX" pips, "Social stats" pentagon, bust portrait | Torn-poster portrait with "Play. Build. Repeat." tag | "Dear reader," / "Yours, Burooj" letter frame | Portrait (hard-coded) |
+| AB1 Header | Eyebrow "About", h1 "Burooj, again!", intro, action "Experience & resume" | h1 + intro from main; eyebrow replaced by invented "Confidant · The Fool · Arcana 0"; action as "Next" card, `CC/about.ts:about` | Eyebrow, h1, intro from main; action buttons, `CP/screens.ts:about` | Study notes: eyebrow as a printed subject tab, h1 in brush pen over a highlighter, intro boxed "in short", home portrait washi-taped; first action as a sticky note naming the page the resume starts on, `ch:aboutPages` | `pageHead` from main; first action as pull-cord, `HI/screens.ts:about` |
+| AB2 Prose | Sections | Each block cloned into a "Burooj" dialogue; h2-h6 flattened into "Rank N" plates | `.prose` as-is | Cut into notes, never reworded (`BP/studynotes.ts`, `BP/sentences.ts`): h2 → numbered brush heading, h3-h6 → sub-heading, each paragraph → one bullet per sentence (first a point, the rest arrows), quotations in curly quotes and blockquotes → boxed callouts, links and emphasis → highlighter; lists, tables, code and pictures kept | `.prose` clone |
+| Invented | none | Arcana card, "Confidant rank MAX" pips, "Social stats" pentagon, bust portrait | Torn-poster portrait with "Play. Build. Repeat." tag | Subject tab, "in short" box tag, sticky note with page number, washi tape, margin doodle (lens copy `about`) | Portrait (hard-coded) |
 
 ### 2.8 Resume
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| RS1 Header | Eyebrow "Resume", h1 "Burooj Rashid", intro | "Status" screen: h1 + intro from main; eyebrow dropped, `CC/resume.ts:resume` | `pageHead` from main, `CP/screens.ts:resume` | Typed contact line: title + intro, `ch:resume` | `pageHead` from main |
+| RS1 Header | Eyebrow "Resume", h1 "Burooj Rashid", intro | "Status" screen: h1 + intro from main; eyebrow dropped, `CC/resume.ts:resume` | `pageHead` from main, `CP/screens.ts:resume` | Stapled into the About book after the notes (`/resume` opens it there): a typed letterhead slip with title, intro and contacts, `ch:resume` | `pageHead` from main |
 | RS2 Contact actions | Email, LinkedIn, GitHub | All, as a "Contact" list | All, as chips | All, joined with " · " | **Only the first (email)**, as a pull-cord; LinkedIn and GitHub — MISSING |
-| RS3 Experience | h2 + h3 role entries, dates, bullets | "Party member" rows (role/org split on " · ", `<em>` date, "Leader" tag on the first), `CC/resume.ts:row` | "Side A" with numbered "cuts" (h3 split on " · "), `CP/screens.ts:resume` | Prose moved onto typed paper | Prose; h2 strung, h3 knotted |
-| RS3 Education | h2 + entries | Same rows, tag "Study" | "Side B" | same | same |
-| RS3 Tools | Paragraph | ★ chips (flattened, split on commas / "and") | "Side C" prose | same | same |
-| RS3 See the work | Paragraph + links | Dialogue box "Burooj" | "Side D" prose | same | same |
+| RS3 Experience | h2 + h3 role entries, dates, bullets | "Party member" rows (role/org split on " · ", `<em>` date, "Leader" tag on the first), `CC/resume.ts:row` | "Side A" with numbered "cuts" (h3 split on " · "), `CP/screens.ts:resume` | One slip per role, stapled on: index card, typed half-sheet, till receipt in turn; heading, date line, summary, bullets from `resume.experience.roles`, `ch:entrySlip` | Prose; h2 strung, h3 knotted |
+| RS3 Education | h2 + entries | Same rows, tag "Study" | "Side B" | One manila library-card slip per course | same |
+| RS3 Tools | Paragraph | ★ chips (flattened, split on commas / "and") | "Side C" prose | `tools.items` circled on a graph-paper scrap slip | same |
+| RS3 See the work | Paragraph + links | Dialogue box "Burooj" | "Side D" prose | Written into the notebook as study notes, after the slips | same |
 
 ### 2.9 Other (404, style guide)
 
@@ -377,6 +377,8 @@ Never read: `site.nav`, any `pages.*.body`, `pages.resume.*`, `pages.*.availabil
 Derived "content": `yearPosition(dateLabel, year)` places clips on a fixed 2021 to 2027.5 range (`screens.ts:311-317`), so a 2028 project falls off the ruler; Update kind to note mapping (`notes.ts:80-85`); lab visual chosen by regex over slug/type (`screens.ts:540-558`); piano-roll art seeded from slug; track numbers by index.
 
 ### 3.3 Back Page (`BP`)
+
+> **Round 3 (PR #11).** Superseded in part, like the rest of this section: the contents slip is gone (books are the navigation, and no label names its paper; `cover.series` prints "Book N"), the letter frame ("Dear reader,", "P.S.", "Yours,") became study notes cut from `pages.about.html`, the resume is slips stapled into the About book from `content.resume`, and the fifth book is Writings (`ch:writingChapter`), kept for `/writing`. Lens copy: `src/content/lenses/back-page.json`; gaps: `GAPS["back-page"]` in `src/prism/parity.ts`.
 
 All content logic is in `chapters.ts` (`ch`) plus `index.ts` and `dom.ts`; the other `.ts` files carry no content.
 
@@ -547,14 +549,14 @@ Selector load: `.page-header__intro` and `h1` are read by all four lenses; `.pro
 5. **Resume contact**: HI keeps only the first of three actions.
 6. **Resume**: CC flattens Tools to chips by splitting on "and", which would break "HTML and CSS" style items; headings in CC About collapse to one level.
 7. **404**: HI replaces Daylight's 404 copy and button.
-8. **Nav**: no lens reads `site.nav` except HI. CC omits Writing from tabs; BP has no Writing or Home tab; CP's "Hello" and CC/BP's tab names ("Status") differ from Daylight's "Resume"/"Say hello".
+8. **Nav**: no lens reads `site.nav` except HI. CC omits Writing from tabs; BP's Writings book has no route yet (PR #13) and there's no Say hello; CP's "Hello" and CC/BP's tab names ("Status") differ from Daylight's "Resume"/"Say hello".
 9. **Project order**: Daylight Home sorts featured by `order` (3 items); JSON sorts by year; CP, CC, HI use the JSON order, so the featured set can differ from Daylight.
 
 **Invented by a lens (not in `src/content/`)**
 
 - CC: arcana card, "Confidant rank MAX", "Social stats", resume "Leader/Party/Study", "Work/Lab" odometer, "New message", calendar widget, calling-card letter copy ("To whoever has a project in mind...", paraphrasing `about.md`), request status "Open", Prev/Next pager, "Take your heart".
 - CP: "c major / 120 bpm", note and Hz tables, "Side A to D", fake drawer tabs, "Play. Build. Repeat.", "Filed", track numbers, preset numbers, key hints ("N tracks").
-- BP: "Dear reader," letter frame, "P.S.", "Yours, Burooj", fake page numbers, camp dot counts and hits (mean nothing), "(a quick war, during maths)", "Roll call", legend.
+- BP: study-notes furniture ("in short" tag, sticky note, numbered headings), slip stocks and staples, page numbers, camp dot counts and hits (mean nothing), "(a quick war, during maths)", "Roll call", legend.
 - HI: portrait on About (Daylight has none), "Back to / The whole lab", Newer/Older nav, 404 rewrite, "Send a line my way".
 - All lenses invent eyebrow/back-link labels that differ from Daylight.
 
