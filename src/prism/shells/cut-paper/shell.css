@@ -2602,7 +2602,7 @@
   }
 
   :root[data-lens="cut-paper"] .cp-arr--roles .cp-arr__row--ruler {
-    grid-template-columns: 0 minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
   :root[data-lens="cut-paper"] .cp-arr--roles .cp-ruler__corner {
@@ -2621,8 +2621,7 @@
 
   :root[data-lens="cut-paper"] .cp-role__copy {
     border-right: 0;
-    background: transparent;
-    padding-bottom: 0;
+    padding-bottom: 4px;
   }
 
   :root[data-lens="cut-paper"] .cp-lane--role {
@@ -2734,4 +2733,36 @@
 
 :root[data-lens="cut-paper"] .cp-app .cp-info__greeting {
   color: var(--cp-ivory);
+}
+
+/* the clip editor's own track head: name, controls, then the pitch names */
+:root[data-lens="cut-paper"] .cp-piano__keys {
+  grid-template-columns: minmax(0, 1fr) 26px;
+  grid-template-rows: auto auto 1fr;
+  gap: 6px 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__keys .cp-arr__name {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  margin-top: 4px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__keys .cp-arr__name small {
+  display: block;
+  margin: 3px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__keys .cp-ms-group {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__names {
+  grid-column: 2;
+  grid-row: 1 / 4;
+  margin-top: 6px;
 }

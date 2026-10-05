@@ -126,95 +126,95 @@ Each cell: how the lens presents the part, then `file:function`. Hion cells are 
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| G1 Site nav | Header link row: Home, Projects, Lab, About, Writing↗, Say hello↗; `SiteNav.astro` | Home: seven tilted "commands" (Projects, Lab, About, Status, Phone, Writing, Calling Card), hard-coded, `CC/home.ts:commandsFor`. Inner screens: L1/R1 tab strip Projects/Lab/About/Status, `CC/chrome.ts:tabs`. Writing absent from tabs; Resume renamed Status | Keyboard of seven solfege keys: Home, Projects, Lab, About, Resume, Writing, Hello, hard-coded, `CP/notes.ts:keysFor` | Five exercise-book tabs Hello/About/Resume/Lab/Projects, hard-coded, `BP/index.ts:renderTabs` (`TABS`); Writing only in home contents slip. No Home/Say hello tab | Charms hung from the cord: home charm (`site.name`) plus each `site.nav` item (Resume included), `HI/nav.ts:createNav`; hard-coded "Menu" pull. The only lens that reads `site.nav` |
-| G2 Footer | Name, email, Resume, Style guide, "Thanks for stopping by." | — MISSING (no footer; email only inside the calling-card panel, `CC/panels.ts:cardPanel`) | — MISSING (email is only the href of the "Hello" key; no visible footer) | — MISSING (email only on the home cover/inside cover, `ch:returnTo`) | Partial: "Send a line my way" + email link + social drops + Writing, `HI/screens.ts:footer`. No name, Resume, Style guide or "Thanks for stopping by." |
-| G3 Social links | GitHub/LinkedIn/Email + Resume on home hero | In the Calling Card panel only (mailto filtered, plus a hard-coded Writing row), `CC/panels.ts:cardPanel` | Home chips: all `site.social` incl. CodePen + hard-coded Resume, `CP/screens.ts:home` | Home cover/inside cover joined with " · ", mailto filtered, `ch:returnTo` | Home hero tag drops (minus CodePen, plus hard-coded Resume) and footer drops, `HI/screens.ts:home`, `footer` |
+| G1 Site nav | Header link row: Home, Projects, Lab, About, Writing↗, Say hello↗; `SiteNav.astro` | Home: seven tilted "commands" (Projects, Lab, About, Status, Phone, Writing, Calling Card), hard-coded, `CC/home.ts:commandsFor`. Inner screens: L1/R1 tab strip Projects/Lab/About/Status, `CC/chrome.ts:tabs`. Writing absent from tabs; Resume renamed Status | Seven keys of F major in the browser (desktop: a column; phones: a bottom row): Home, Projects, Lab, About, Resume, Writing, Hello. Labels and view names are lens copy (`keys`); Writing is `site.writingUrl`, Hello `mailto:site.email`. Each key plays its scale degree on hover when sound is on, `CP/frame.ts:keysFor` | Five exercise-book tabs Hello/About/Resume/Lab/Projects, hard-coded, `BP/index.ts:renderTabs` (`TABS`); Writing only in home contents slip. No Home/Say hello tab | Charms hung from the cord: home charm (`site.name`) plus each `site.nav` item (Resume included), `HI/nav.ts:createNav`; hard-coded "Menu" pull. The only lens that reads `site.nav` |
+| G2 Footer | Name, email, Resume, Style guide, "Thanks for stopping by." | — MISSING (no footer; email only inside the calling-card panel, `CC/panels.ts:cardPanel`) | — MISSING (no footer; email is the Hello key's href) | — MISSING (email only on the home cover/inside cover, `ch:returnTo`) | Partial: "Send a line my way" + email link + social drops + Writing, `HI/screens.ts:footer`. No name, Resume, Style guide or "Thanks for stopping by." |
+| G3 Social links | GitHub/LinkedIn/Email + Resume on home hero | In the Calling Card panel only (mailto filtered, plus a hard-coded Writing row), `CC/panels.ts:cardPanel` | Home set-info chips: all `site.social` plus hero links not among them (Resume), `CP/views.ts:home` | Home cover/inside cover joined with " · ", mailto filtered, `ch:returnTo` | Home hero tag drops (minus CodePen, plus hard-coded Resume) and footer drops, `HI/screens.ts:home`, `footer` |
 | G4 Writing link | Nav item + home "Writing" blurb | Command + panel row (`site.writingUrl`) | "Writing" key | Contents slip entry "Writing (Substack)" | Footer drop + home fork + nav charm |
-| G5 Updates feed | Home stream only | Phone panel (full list), home phone chip + calendar widget (latest), `CC/panels.ts:phonePanel`, `CC/home.ts:home` | Global "Log" drawer + scrolling "Updates" score strip on every route, `CP/frame.ts:buildFrame` | Home diary only | Home stream only |
+| G5 Updates feed | Home stream only | Phone panel (full list), home phone chip + calendar widget (latest), `CC/panels.ts:phonePanel`, `CC/home.ts:home` | Markers track on every arrangement (a flag and a bell per update), the overview strip, the home locators, the phone tape's marker rows | Home diary only | Home stream only |
 
 ### 2.2 Home
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| H1 Greeting | `.greeting` paragraph, `WelcomeHero.astro` | — MISSING (home never reads `route.main`) | Kicker; read from `.greeting`, fallback string, `CP/screens.ts:home` | Hand-lettered page head; from `.greeting`, fallback, `ch:home` | Hard-coded "Hey there!" reveal line, `HI/screens.ts:home` |
-| H2 Headline | h1 "Burooj here!" | Giant ransom-lettered h1 from `pages.home.headline`, `CC/home.ts:home` | h1 text from `route.main` h1, `CP/screens.ts:home` | h1 from `pages.home.headline`, first word blue and rest red, `ch:home` | `pages.home.headline` split into word signs on the threads, orbited by one thread, `HI/screens.ts:home` |
-| H3 Occupation | "Frontend developer & designer" | `pages.home.eyebrow` ("Frontend Developer") as a plate: different string, `CC/home.ts:home` | `.occupation` line, `CP/screens.ts:home` | Typed line from `.occupation`, `ch:home` | Hard-coded copy of Daylight's string, `HI/screens.ts:home` |
-| H4 Welcome line | "I make places on the web. Feel free to look around!" | `pages.home.intro` plate: a different sentence | `.welcome` text, `CP/screens.ts:home` | `pages.home.intro` lead paragraph: a different sentence, `ch:home` | Hard-coded copy of Daylight's string |
+| H1 Greeting | `.greeting` paragraph, `WelcomeHero.astro` | — MISSING (home never reads `route.main`) | Torn tag above the headline, `pages.home.hero.greeting`, `CP/views.ts:home` | Hand-lettered page head; from `.greeting`, fallback, `ch:home` | Hard-coded "Hey there!" reveal line, `HI/screens.ts:home` |
+| H2 Headline | h1 "Burooj here!" | Giant ransom-lettered h1 from `pages.home.headline`, `CC/home.ts:home` | Set-info h1, `hero.headline` | h1 from `pages.home.headline`, first word blue and rest red, `ch:home` | `pages.home.headline` split into word signs on the threads, orbited by one thread, `HI/screens.ts:home` |
+| H3 Occupation | "Frontend developer & designer" | `pages.home.eyebrow` ("Frontend Developer") as a plate: different string, `CC/home.ts:home` | `hero.occupation` under the headline | Typed line from `.occupation`, `ch:home` | Hard-coded copy of Daylight's string, `HI/screens.ts:home` |
+| H4 Welcome line | "I make places on the web. Feel free to look around!" | `pages.home.intro` plate: a different sentence | `hero.welcome` | `pages.home.intro` lead paragraph: a different sentence, `ch:home` | Hard-coded copy of Daylight's string |
 | H5 Home body copy (Daylight does not show) | — n/a | (+) Speech bubble "Burooj": first paragraph of `pages.home.body`, markdown stripped, second paragraph dropped, `CC/home.ts:home` | — | (+) Full `pages.home.body` rendered under the lead, `ch:home` | — |
-| H6 Portrait | Peach circle photo + "That's me" -> /about | Posterised red/black cut-out, hard-coded path, `CC/portrait.ts`, `CC/home.ts:home` | Cut-paper figure; `src`/`alt` read from `.hello img`, `CP/screens.ts:home` | Taped photo, from `.hello img`, caption "that's me →", `ch:home` | Photo hung on two threads, hard-coded path/alt, caption "That's me", `HI/screens.ts:home` |
+| H6 Portrait | Peach circle photo + "That's me" -> /about | Posterised red/black cut-out, hard-coded path, `CC/portrait.ts`, `CC/home.ts:home` | Polaroid `hero.portrait` (src, alt, caption linking to `href`) | Taped photo, from `.hello img`, caption "that's me →", `ch:home` | Photo hung on two threads, hard-coded path/alt, caption "That's me", `HI/screens.ts:home` |
 | H7 Hero socials | 3 links + Resume | — MISSING on home (see G3) | Chips (all of `site.social` + Resume) | — MISSING near the hero (cover/inside cover instead) | Tag drops minus CodePen + Resume |
-| H8 Featured projects | "Some things I've built": feature + 2 rows, cover/meta/title/summary/3 tools; "All projects" link | — MISSING. Only a "★ NN Works + NN Lab" odometer from array lengths; projects live behind the Projects command, `CC/home.ts:home` | "Now spinning" turntable + "In the crate" sleeves of `featured` (else first 4), "Full setlist" link with count, `CP/screens.ts:home` | "Some things I've built" taped cover snaps (cover, title, `dateLabel`; no summary or tools) + "all of them, on the back page →", `ch:home` | `featured.slice(0,4)` as hanging charms: cover, `dateLabel · kind`, title, full summary, all tools; pull-cord "Follow the line to every project", `HI/screens.ts:workCharm` |
-| H9 Updates stream | Heading, intro, up to 8 entries (kind/source labels, title link, `dateLabel`), caption, empty state | Phone chip (latest title, count) + calendar from latest date + full chat-bubble list in panel; no intro/caption/empty copy; invented "New message"/"Daytime", `CC/home.ts:home`, `CC/panels.ts:phonePanel` | Not a home section; global log drawer + score strip (title, date, kind, source, summary), `CP/frame.ts` | Diary list: date, linked title, summary, "source · kind", tally marks; all updates; hard-coded heading + subtitle, `ch:home` | Tie rows, `slice(0,6)`: raw `source · kind · dateLabel` + title link; heading + intro hard-coded; no summary/caption/empty, `HI/screens.ts:home` |
-| H10 Currently note | bjslab paragraph + "More about me" | — MISSING | Taped aside cloned from `.current-copy`, cached in `Memory`; omitted if the visitor never saw home, `CP/screens.ts:home` | Aside "Currently: " + the `<p>`'s children; "More about me" link dropped, `ch:home` | Heading + first `<p>` of `.current-copy` (fallback `pages.home.intro`), hard-coded "More about me" pull-cord, `HI/screens.ts:home` |
-| H11 Elsewhere blurbs | "In the lab" / "Writing" with one-line blurbs | — MISSING (command help lines paraphrase them) | — MISSING | — MISSING | Two hanging forks, copy hard-coded, `HI/screens.ts:home` |
+| H8 Featured projects | "Some things I've built": feature + 2 rows, cover/meta/title/summary/3 tools; "All projects" link | — MISSING. Only a "★ NN Works + NN Lab" odometer from array lengths; projects live behind the Projects command, `CC/home.ts:home` | Every project is a track on the session arrangement (desktop) or a card on the tape (phones), so the featured set is there among them; no separate shelf. `work.link` is the "All projects" button with `derived.counts.projects` | "Some things I've built" taped cover snaps (cover, title, `dateLabel`; no summary or tools) + "all of them, on the back page →", `ch:home` | `featured.slice(0,4)` as hanging charms: cover, `dateLabel · kind`, title, full summary, all tools; pull-cord "Follow the line to every project", `HI/screens.ts:workCharm` |
+| H9 Updates stream | Heading, intro, up to 8 entries (kind/source labels, title link, `dateLabel`), caption, empty state | Phone chip (latest title, count) + calendar from latest date + full chat-bubble list in panel; no intro/caption/empty copy; invented "New message"/"Daytime", `CC/home.ts:home`, `CC/panels.ts:phonePanel` | Locators: `updates.title`, `intro`, up to `limit` rows (date button that moves the playhead and rings the bell, title link, `kindLabel · sourceLabel`), `caption`, `empty` when none. Phones show every update as a marker row on the tape instead | Diary list: date, linked title, summary, "source · kind", tally marks; all updates; hard-coded heading + subtitle, `ch:home` | Tie rows, `slice(0,6)`: raw `source · kind · dateLabel` + title link; heading + intro hard-coded; no summary/caption/empty, `HI/screens.ts:home` |
+| H10 Currently note | bjslab paragraph + "More about me" | — MISSING | Taped bone note: `currently.title`, inline `body`, `link` | Aside "Currently: " + the `<p>`'s children; "More about me" link dropped, `ch:home` | Heading + first `<p>` of `.current-copy` (fallback `pages.home.intro`), hard-coded "More about me" pull-cord, `HI/screens.ts:home` |
+| H11 Elsewhere blurbs | "In the lab" / "Writing" with one-line blurbs | — MISSING (command help lines paraphrase them) | — MISSING (Lab and Writing are keys; declared in `GAPS`) | — MISSING | Two hanging forks, copy hard-coded, `HI/screens.ts:home` |
 
 ### 2.3 Projects index
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| PI1 Header | Eyebrow "Projects", h1 "Things I've made, along the way.", intro | Constant title "Projects", invented eyebrow "Equip", Daylight h1 as subtitle, intro from `.page-header__intro`, `CC/projects.ts:projects` | `pageHead`: eyebrow/h1/intro from `route.main`, `CP/screens.ts:projects` | h1 + intro from `route.main`; eyebrow replaced by invented "Projects · the back page", `ch:projects` | `pageHead` from `route.main` (fallbacks hard-coded), `HI/screens.ts:projects` |
-| PI2 Year headings | h2 per year | — MISSING (per-slot year only) | — MISSING (year ruler 2021 to 2027 plus "now" playhead instead) | Year mark in margin of war map and roll call; no headings | Year loops with h2 year, circled in turn, `HI/screens.ts:projects` |
-| PI3 Project entry | Row: meta `dateLabel / kind`, title link, summary, 3 tools, cover | Equipment slot: year, ★, kindLabel ("Selected/Project/Arcade"), title; summary and cover only in the selected-slot detail panel (all tools, Role, Where), `CC/projects.ts:slots`, `detailPanel` | Sequencer track row: number, cover, title, `dateLabel · kind`, summary, tools, clip with piano roll positioned by `yearPosition`, `CP/screens.ts:projects` | "Roll call" row (year, title, `dateLabel`, "· arcade") + war map camp of dots per project; no summary/cover/tools, `ch:projects`, `ch:warMap` | `workCharm` per project: cover, `dateLabel · kind` (Daylight: role), title, full summary, all tools, `HI/screens.ts:workCharm` |
+| PI1 Header | Eyebrow "Projects", h1 "Things I've made, along the way.", intro | Constant title "Projects", invented eyebrow "Equip", Daylight h1 as subtitle, intro from `.page-header__intro`, `CC/projects.ts:projects` | `pageHead` from `pages.projects.header` (eyebrow, title, intro), `CP/bits.ts:pageHead` | h1 + intro from `route.main`; eyebrow replaced by invented "Projects · the back page", `ch:projects` | `pageHead` from `route.main` (fallbacks hard-coded), `HI/screens.ts:projects` |
+| PI2 Year headings | h2 per year | — MISSING (per-slot year only) | Ruler: a bar per year with month ticks (desktop); a bar line per year on the tape (phones). Range from the first dated clip to the session's end, so a new year always fits | Year mark in margin of war map and roll call; no headings | Year loops with h2 year, circled in turn, `HI/screens.ts:projects` |
+| PI3 Project entry | Row: meta `dateLabel / kind`, title link, summary, 3 tools, cover | Equipment slot: year, ★, kindLabel ("Selected/Project/Arcade"), title; summary and cover only in the selected-slot detail panel (all tools, Role, Where), `CC/projects.ts:slots`, `detailPanel` | Track: number, title link, `dateLabel · kind · voice`, summary, first 3 tools, hear / mute / solo; its clip sits at `dateLabel` and draws the motif it plays, `CP/arrangement.ts:arrangement`. Phones: a tape card (cover, title, meta, summary, tools, ▶), `CP/tape.ts`. Cover only on the tape | "Roll call" row (year, title, `dateLabel`, "· arcade") + war map camp of dots per project; no summary/cover/tools, `ch:projects`, `ch:warMap` | `workCharm` per project: cover, `dateLabel · kind` (Daylight: role), title, full summary, all tools, `HI/screens.ts:workCharm` |
 
 ### 2.4 Project detail
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| PD1 Eyebrow/title/summary | Eyebrow `kind`, h1, intro | Category line "kindLabel ★ dateLabel", ransom h1, summary, `CC/projects.ts:projectEntry` | Eyebrow "Setlist · track NN / MM · kind", h1, lede, `CP/screens.ts:project` | Eyebrow "`kind` · from the archive / selected work" (invented), h1, lead, `ch:project` | Eyebrow `kind · year`; title/intro from main h1, `HI/screens.ts:project` |
-| PD2 Role/Where/When | Three labelled blocks | "Item file" stat rows, hard-coded labels | "Credits" rows (labels hard-coded) | `<dl>` fields, labels hard-coded | Meta tags read generically from `.entry-page__meta`, `HI/screens.ts:tagsRow` |
-| PD3 Links | Action buttons (new tab) | "Shop cards" with invented verbs "Open"/"Get" | Buttons; first highlighted | Arrow list | Pull-cords |
-| PD4 Tools | Passive tag list | Chips (all) | Credits row "Tools" (comma list) | Circled list | Beads, aria-label "Tools" (not "<title> tools") |
-| PD5 Media | Rail of figures (img/video, captions) | Lead = `media[0]` (or `cover` if none), rest in a rail; captions kept, video ok | "Inserts" figures; first media dropped if equal to cover; captions kept | Taped figures; caption = `caption ?? alt` (alt leaks as caption); video ok | Hung pictures with captions, **videos break** (reads `figure img` only: empty-src image), cover fallback, `HI/screens.ts:gallery` |
-| PD6 Prose body | `.prose` | `.prose` cloned as notes | "Liner notes" (moved, not cloned) | Moved into paginated blocks, classes stripped | Story loop; h2 wefts, external links re-targeted |
-| PD7 Back link | "Back to all projects" | "Back" (sr-only " to Projects") | "Back to the setlist" | "← back to the war (all projects)" | "Back to / Every project" end tassel (+ Newer/Older) |
-| PD8 Cover, status, tags, year | Not shown on the page | Cover as media fallback; status/tags — n/a | Cover as record sleeve (+); tags as "Filed" (+); status — n/a | Kind/year/status drive eyebrow and camp colour; year not printed | Year in eyebrow (+); cover as gallery fallback |
-| Invented | — | Prev/Next pager | Prev/Next transport | Own camp corner SVG | Newer/Older along the line |
+| PD1 Eyebrow/title/summary | Eyebrow `kind`, h1, intro | Category line "kindLabel ★ dateLabel", ransom h1, summary, `CC/projects.ts:projectEntry` | Kicker "Clip · Track NN of NN · kind", h1, lede, `CP/views.ts:project` | Eyebrow "`kind` · from the archive / selected work" (invented), h1, lead, `ch:project` | Eyebrow `kind · year`; title/intro from main h1, `HI/screens.ts:project` |
+| PD2 Role/Where/When | Three labelled blocks | "Item file" stat rows, hard-coded labels | Clip properties `<dl>`: content labels for Role/Where/When, plus lens rows Voice and Over (the chords under the clip) | `<dl>` fields, labels hard-coded | Meta tags read generically from `.entry-page__meta`, `HI/screens.ts:tagsRow` |
+| PD3 Links | Action buttons (new tab) | "Shop cards" with invented verbs "Open"/"Get" | Buttons; first lit | Arrow list | Pull-cords |
+| PD4 Tools | Passive tag list | Chips (all) | Chips (all) | Circled list | Beads, aria-label "Tools" (not "<title> tools") |
+| PD5 Media | Rail of figures (img/video, captions) | Lead = `media[0]` (or `cover` if none), rest in a rail; captions kept, video ok | Inserts below the clip notes; `media[0]` dropped when it is the cover; captions kept, video ok | Taped figures; caption = `caption ?? alt` (alt leaks as caption); video ok | Hung pictures with captions, **videos break** (reads `figure img` only: empty-src image), cover fallback, `HI/screens.ts:gallery` |
+| PD6 Prose body | `.prose` | `.prose` cloned as notes | "Clip notes" (rendered `html`) | Moved into paginated blocks, classes stripped | Story loop; h2 wefts, external links re-targeted |
+| PD7 Back link | "Back to all projects" | "Back" (sr-only " to Projects") | `detail.back` ("Back to all projects") | "← back to the war (all projects)" | "Back to / Every project" end tassel (+ Newer/Older) |
+| PD8 Cover, status, tags, year | Not shown on the page | Cover as media fallback; status/tags — n/a | Cover framed above the title (+); status and tags — n/a | Kind/year/status drive eyebrow and camp colour; year not printed | Year in eyebrow (+); cover as gallery fallback |
+| Invented | — | Prev/Next pager | The clip editor: the arrangement zoomed to a year around the clip (chords, bass, the motif as a piano roll with pitch names, markers) and "Play the clip" (plays that region); prev/next track | Own camp corner SVG | Newer/Older along the line |
 
 ### 2.5 Lab index
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| LI1 Header | Eyebrow "Lab", h1, intro | Constant "Lab", eyebrow "Requests", subtitle = Daylight h1, intro in a "The Lab" dialogue box, `CC/lab.ts:lab` | `pageHead` from main | h1/intro from main; eyebrow replaced by "Lab · in the margins" | `pageHead` from main |
-| LI2 Entry | Card: cover, `type · sourceEra`, title link, summary | Request card: No.NN, constant "Open" stamp, "Client" (=`sourceEra`) and "Type", title, summary, "Accept" prompt; cover — MISSING, `CC/lab.ts:lab` | "Presets" drawer item: `type · sourceEra`, title link, summary, generated art instead of cover (cover — MISSING), `CP/screens.ts:lab`, `labVisual` | Article with doodle, h2, summary, `type · sourceEra`; cover — MISSING, `ch:lab`, `ch:labCard` | Hanging charm: `type · sourceEra`, title, summary; cover — MISSING, `HI/screens.ts:lab` |
-| LI3 "More sketches on CodePen" | Link | — MISSING | Moved in from `.lab-more` | — MISSING | Hard-coded pull-cord + URL |
-| LI4 Aside | Paragraph with Projects + Style Guide links | — MISSING | Moved in from `.lab-aside` | — MISSING | Cloned from `.lab-aside`, links kept |
+| LI1 Header | Eyebrow "Lab", h1, intro | Constant "Lab", eyebrow "Requests", subtitle = Daylight h1, intro in a "The Lab" dialogue box, `CC/lab.ts:lab` | `pageHead` from `pages.lab.header` | h1/intro from main; eyebrow replaced by "Lab · in the margins" | `pageHead` from main |
+| LI2 Entry | Card: cover, `type · sourceEra`, title link, summary | Request card: No.NN, constant "Open" stamp, "Client" (=`sourceEra`) and "Type", title, summary, "Accept" prompt; cover — MISSING, `CC/lab.ts:lab` | Rack slot: a pad (button) that plays the sketch's motif, `type · sourceEra`, title link to `detail`, summary; cover — MISSING (none in content), `CP/views.ts:lab` | Article with doodle, h2, summary, `type · sourceEra`; cover — MISSING, `ch:lab`, `ch:labCard` | Hanging charm: `type · sourceEra`, title, summary; cover — MISSING, `HI/screens.ts:lab` |
+| LI3 "More sketches on CodePen" | Link | — MISSING | `pages.lab.more` button | — MISSING | Hard-coded pull-cord + URL |
+| LI4 Aside | Paragraph with Projects + Style Guide links | — MISSING | `pages.lab.aside` (inline markdown) | — MISSING | Cloned from `.lab-aside`, links kept |
 
 ### 2.6 Lab entry (dormant route)
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| LE1 Eyebrow/title/summary | "Lab", h1, intro | "Request No.NN" + "Open" stamp, title, summary, `CC/lab.ts:labEntry` | Eyebrow "Lab · preset NN", h1, lede, `CP/screens.ts:labEntry` | Hard-coded "Lab", title/summary from main, `ch:labEntry` | Hard-coded "Lab", title/intro from main, `HI/screens.ts:labEntry` |
-| LE2 Type/Era | Labelled blocks | "Type" and "Client" (renamed) | "Type", "Era" credits | `<dl>` Type/Era | Tags Type/Era |
-| LE3 Links | Action buttons | Shop cards "Accept"/"Get" (+ dead "Open the experiment") | Buttons (+ dead "Open the sketch") | Arrow list (+ synthesised "Try it on {sourceEra}") | Pull-cords (+ dead "Open the live experiment") |
-| LE4 Media | Rail | — MISSING | — MISSING | — MISSING | Gallery from `.media-rail figure` (shown) |
-| LE5 Prose | `.prose` | Cloned | Moved | Moved | Story loop |
-| LE6 Cover | Not shown | (+) Shown (`entry.cover`, empty alt) | (+) Generated preset plate | — n/a | — n/a |
-| Back link | none | "Back" | "Back to the presets" (+) | via book nav | "Back to / The whole lab" (+) |
+| LE1 Eyebrow/title/summary | "Lab", h1, intro | "Request No.NN" + "Open" stamp, title, summary, `CC/lab.ts:labEntry` | Kicker "Rack" + `detail.eyebrow` link, h1, lede, `CP/views.ts:labEntry` | Hard-coded "Lab", title/summary from main, `ch:labEntry` | Hard-coded "Lab", title/intro from main, `HI/screens.ts:labEntry` |
+| LE2 Type/Era | Labelled blocks | "Type" and "Client" (renamed) | `<dl>` with `detail.labels` | `<dl>` Type/Era | Tags Type/Era |
+| LE3 Links | Action buttons | Shop cards "Accept"/"Get" (+ dead "Open the experiment") | Buttons; `href` first as lens copy "Open the sketch" | Arrow list (+ synthesised "Try it on {sourceEra}") | Pull-cords (+ dead "Open the live experiment") |
+| LE4 Media | Rail | — MISSING | — MISSING (not in content.json) | — MISSING | Gallery from `.media-rail figure` (shown) |
+| LE5 Prose | `.prose` | Cloned | Rendered `html` | Moved | Story loop |
+| LE6 Cover | Not shown | (+) Shown (`entry.cover`, empty alt) | — n/a (the big pad stands in) | — n/a | — n/a |
+| Back link | none | "Back" | "Back to the rack" (+) | via book nav | "Back to / The whole lab" (+) |
 
 ### 2.7 About
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| AB1 Header | Eyebrow "About", h1 "Burooj, again!", intro, action "Experience & resume" | h1 + intro from main; eyebrow replaced by invented "Confidant · The Fool · Arcana 0"; action as "Next" card, `CC/about.ts:about` | Eyebrow, h1, intro from main; action buttons, `CP/screens.ts:about` | h1 + intro from main, no eyebrow; first action becomes P.S. link (lowercased), `ch:about` | `pageHead` from main; first action as pull-cord, `HI/screens.ts:about` |
-| AB2 Prose | Sections | Each block cloned into a "Burooj" dialogue; h2-h6 flattened into "Rank N" plates | `.prose` as-is | `.prose` moved into letter pages | `.prose` clone |
-| Invented | none | Arcana card, "Confidant rank MAX" pips, "Social stats" pentagon, bust portrait | Torn-poster portrait with "Play. Build. Repeat." tag | "Dear reader," / "Yours, Burooj" letter frame | Portrait (hard-coded) |
+| AB1 Header | Eyebrow "About", h1 "Burooj, again!", intro, action "Experience & resume" | h1 + intro from main; eyebrow replaced by invented "Confidant · The Fool · Arcana 0"; action as "Next" card, `CC/about.ts:about` | Kicker "Set notes" + eyebrow, h1, intro, actions as buttons, `CP/views.ts:about` | h1 + intro from main, no eyebrow; first action becomes P.S. link (lowercased), `ch:about` | `pageHead` from main; first action as pull-cord, `HI/screens.ts:about` |
+| AB2 Prose | Sections | Each block cloned into a "Burooj" dialogue; h2-h6 flattened into "Rank N" plates | Rendered `pages.about.html` | `.prose` moved into letter pages | `.prose` clone |
+| Invented | none | Arcana card, "Confidant rank MAX" pips, "Social stats" pentagon, bust portrait | Portrait from `hero.portrait`, torn scraps | "Dear reader," / "Yours, Burooj" letter frame | Portrait (hard-coded) |
 
 ### 2.8 Resume
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| RS1 Header | Eyebrow "Resume", h1 "Burooj Rashid", intro | "Status" screen: h1 + intro from main; eyebrow dropped, `CC/resume.ts:resume` | `pageHead` from main, `CP/screens.ts:resume` | Typed contact line: title + intro, `ch:resume` | `pageHead` from main |
+| RS1 Header | Eyebrow "Resume", h1 "Burooj Rashid", intro | "Status" screen: h1 + intro from main; eyebrow dropped, `CC/resume.ts:resume` | `pageHead` from `pages.resume.header`, `CP/views.ts:resume` | Typed contact line: title + intro, `ch:resume` | `pageHead` from main |
 | RS2 Contact actions | Email, LinkedIn, GitHub | All, as a "Contact" list | All, as chips | All, joined with " · " | **Only the first (email)**, as a pull-cord; LinkedIn and GitHub — MISSING |
-| RS3 Experience | h2 + h3 role entries, dates, bullets | "Party member" rows (role/org split on " · ", `<em>` date, "Leader" tag on the first), `CC/resume.ts:row` | "Side A" with numbered "cuts" (h3 split on " · "), `CP/screens.ts:resume` | Prose moved onto typed paper | Prose; h2 strung, h3 knotted |
-| RS3 Education | h2 + entries | Same rows, tag "Study" | "Side B" | same | same |
-| RS3 Tools | Paragraph | ★ chips (flattened, split on commas / "and") | "Side C" prose | same | same |
-| RS3 See the work | Paragraph + links | Dialogue box "Burooj" | "Side D" prose | same | same |
+| RS3 Experience | h2 + h3 role entries, dates, bullets | "Party member" rows (role/org split on " · ", `<em>` date, "Leader" tag on the first), `CC/resume.ts:row` | The Roles track drawn out: one row per `experience.roles` entry (title · org, `dateLine`, summary, bullets) with its clip spanning `start`–`end` on the ruler; undated entries say so | Prose moved onto typed paper | Prose; h2 strung, h3 knotted |
+| RS3 Education | h2 + entries | Same rows, tag "Study" | Same rows for `education.entries` (they are on the Roles track too) | same | same |
+| RS3 Tools | Paragraph | ★ chips (flattened, split on commas / "and") | Chips of `tools.items` | same | same |
+| RS3 See the work | Paragraph + links | Dialogue box "Burooj" | Rendered `pages.resume.html` | same | same |
 
 ### 2.9 Other (404, style guide)
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| OT1 404 text | "404 / That page wandered off. / ... / Return home" | Whole `route.main` moved onto a "Mementos / Document" sheet, `CC/other.ts:other` (full fidelity) | Moved onto a "sheet clipped to the stand", `CP/screens.ts:sheet` (full fidelity) | "Loose sheet" tucked into the book, `ch:loose` (full fidelity) | **Rewritten**: eyebrow "A loose end", new intro, "Follow the threads home" replacing "Return home", `HI/screens.ts:other` |
+| OT1 404 text | "404 / That page wandered off. / ... / Return home" | Whole `route.main` moved onto a "Mementos / Document" sheet, `CC/other.ts:other` (full fidelity) | `fallbackBody` on a bone sheet in a "Text view" (full fidelity) | "Loose sheet" tucked into the book, `ch:loose` (full fidelity) | **Rewritten**: eyebrow "A loose end", new intro, "Follow the threads home" replacing "Return home", `HI/screens.ts:other` |
 | OT2 Style guide | Page | Same fallback | Same | Same | Same fallback (no 404 rewrite) |
 
 ## 3. Coupling inventory (for drift guards)
@@ -302,79 +302,49 @@ Derived "content": odometer counts (`home.ts` `projects.length`, `lab.length`; A
 
 ### 3.2 Cut Paper (`CP`)
 
+**Rework (`prism/daw-timeline`).** Cut Paper is a DAW session whose heart is the arrangement. It reads only `content.json`: flavour copy comes from `src/content/lenses/cut-paper.json`, and `route.main` is read only through `fallbackBody` for `other` routes. The instrument shell's turntable, crate, presets drawer, fake tabs, poster tag and key hints are gone. So are the knobs, faders, meters, device chain, channel strip and sentence-as-note piano roll of #12.
+
+**Modules.** `music.ts` and `score.ts` are pure (Node-tested in `scripts/tests/cut-paper-music.test.mjs`). `audio.ts` holds the instruments, `transport.ts` the playhead and scheduler, and `frame.ts` the window. `arrangement.ts` is the horizontal timeline, `tape.ts` the phone timeline, and `views.ts` has one view per route. `bits.ts` holds the shared pieces.
+
 **content.json reads**
 
 | Field | Where |
 |---|---|
-| `site.name` | `frame.ts:77`, `screens.ts:720` |
-| `site.email` | `notes.ts:68` (mailto only) |
-| `site.writingUrl` | `notes.ts:61` |
-| `site.social[]` | `screens.ts:132` |
-| `pages.home.headline/eyebrow/intro` | `screens.ts:123-125` (fallbacks only) |
-| `pages.about.title/description` | `screens.ts:659,688` (fallbacks only) |
-| `projects[]`: slug, href, title, summary, kind, year, dateLabel, role, location, tools, featured, cover, links, media, tags | `screens.ts` (`home`, `projects`, `project`) |
-| `projects.length`, `lab.length` | `notes.ts:47,54`, `screens.ts:286,600` |
-| `lab[]`: slug, detail, href, title, summary, type, sourceEra, links | `screens.ts` (`lab`, `labEntry`) |
-| `updates[]`: kind, source, title, date, dateLabel, summary, href; `.length` | `frame.ts:129-148,178-191` |
+| `site.name`, `site.email`, `site.writingUrl`, `site.social` | `frame.ts` (logo label, keys), `views.ts:home` |
+| `pages.home` (hero, work.link, currently, updates copy and `limit`) | `views.ts:home` |
+| `pages.projects` (header, listLabel, detail.back, detail.labels) | `views.ts:projects`, `project` |
+| `pages.lab` (header, listLabel, more, aside, detail) | `views.ts:lab`, `labEntry` |
+| `pages.about` (header, html), `pages.resume` (header, html) | `views.ts:about`, `resume` |
+| `projects[]`: slug, href, title, summary, kind, year, dateLabel, role, location, tools, cover, links, media, html | `score.ts` (date, kind to voice), `arrangement.ts`, `tape.ts`, `views.ts:project` |
+| `lab[]`: slug, detail, href, hasPage, title, summary, type, sourceEra, links, html | `views.ts:lab`, `labEntry`; slug seeds the sketch's motif |
+| `updates[]`: id, kind, kindLabel, sourceLabel, title, date, dateLabel, href | `score.ts` (date and kind to a bell), `arrangement.ts:markersLane`, `tape.ts`, `views.ts:home` |
+| `resume.experience`, `resume.education` (id, title, org, start, end, current, dateLine, summary, bullets), `resume.tools` | `score.ts` (start/end become the Roles track), `views.ts:resume` |
+| `derived.counts.projects` | `views.ts:home` |
+| `lenses["cut-paper"]` | everywhere: DAW words, track legends, voice names |
 
-Never read: `site.nav`, any `pages.*.body`, `pages.resume.*`, `pages.*.availability`, `projects[].status/order`, `lab[].cover/media/order`, `updates[].linkLabel/relatedProject`.
+Never read: `site.nav`, `pages.home.elsewhere` (declared gap), `featured` (every project is a track), `projects[].status/tags/order`, `lab[].cover/media`, `updates[].summary/linkLabel/relatedProject`.
 
-**route.main selectors**
+**The music (derived, deterministic).**
 
-| Selector | Where | Depends on |
-|---|---|---|
-| `.greeting`, `.occupation`, `.welcome`, `.hello img` | `screens.ts:122-126` | `WelcomeHero.astro`, `Portrait.astro` (fallback strings if absent) |
-| `h1` | `screens.ts:123,321,659,805` | page headings |
-| `.current-copy` | `screens.ts:127` | `CurrentNote.astro` |
-| `.page-header__intro`, `.page-header__eyebrow` | `screens.ts:322,329,688,686` | `PageHeader.astro` |
-| `.timeline` + `.previousElementSibling` | `screens.ts:419` | **dead**: `.timeline` is first child in Daylight, so the trail never renders |
-| `.prose` | `screens.ts:507,646,705,733` | `<article class="prose">`; resume split walks direct children `H2`, `H3`, `P`, `P > EM` (`:740-777`) |
-| `.lab-more`, `.lab-aside` | `screens.ts:582-583` | `lab/index.astro` |
-| `.entry-page` | `screens.ts:622` | existence check |
-| `.page-header__actions a` | `screens.ts:662,721` | `PageHeader` actions slot |
-| `[aria-labelledby]`, `[id]` | `screens.ts:67-68` | adoption of moved fragments |
-| whole `route.main` (moved, not cloned) | `screens.ts:802` | fallback sheet |
+- **Key and changes.** F major, 12/8. One month is an eighth note (250ms), so a year is a bar and the career plays in about 21 seconds. The changes are I–vi–ii–V with sevenths (Fmaj7 Dm7 Gm7 C7), one chord per half bar. The last half bar is always V, so every play-through lands on a held I.
+- **Projects.** Each sings a six-eighth motif seeded by its slug: a 12/8 rhythm cell and a contour. Realised over the chords at its date, strong beats take chord tones, the notes between step through the scale, and the last note settles on a chord tone. Arcade projects play an 8-bit voice; the rest a felt piano. The clip draws exactly the notes it plays.
+- **Roles.** Every dated role or course is a clip on one Roles track. The bass walks (root, fifth, approach) only while one runs. Undated entries stay off the timeline.
+- **Markers.** Each update rings a bell on a tone of the chord it lands on (by kind); same-day updates strum.
+- **Lab sketches.** They carry no date, so they sit in a rack, not on the timeline; each has a motif over the home chord.
+- **Range.** The session runs from the half bar before the first dated clip to the later of today and the last clip's end, so a new year (fixture `new-year`) always fits.
 
-`take()` moves nodes out of `route.main`, so re-rendering the same `route` finds `.prose`, `.lab-more`, `.lab-aside` empty.
+**Behaviour contracts.**
 
-**Hard-coded strings**
+- **Sound is opt-in.** No AudioContext exists until the Sound switch is pressed, or, after a reload with sound on, until the first tap or key. Never in a face.
+- **Hover auditions.** A mouse resting 110ms on a clip, or focus on it, plays that clip in place; the next audition replaces it. Fingers use the ▶ buttons.
+- **Mute and solo** change what is scheduled (verified by instrumenting Web Audio).
+- **Idle and face.** `data-prism-idle` pauses playback; a face shows the resting state, with the playhead at today and no sound switch.
 
-| file:line | String | Kind |
-|---|---|---|
-| `CP/frame.ts:78` | "Burooj." | duplicates name |
-| `CP/frame.ts:84` | "burooj" | chip |
-| `CP/frame.ts:86` | "frontend developer" | paraphrases occupation |
-| `CP/frame.ts:95` | "c major" | invented |
-| `CP/frame.ts:97` | "120 bpm" | invented |
-| `CP/frame.ts:67` | "Log" | flavour for updates |
-| `CP/frame.ts:226` | "Updates" | score strip |
-| `CP/notes.ts:41` | "Home", "/" (nav labels `:41-67`) | duplicates nav |
-| `CP/notes.ts:47` | `${n} tracks` (`:54` `${n} presets`) | derived hint |
-| `CP/notes.ts:56` | hint "poster" (`:57` "credits", `:63` "substack", `:70` "email") | invented |
-| `CP/notes.ts:67` | "Hello" | invented nav label (Daylight: "Say hello") |
-| `CP/screens.ts:122` | "Hey there!" | duplicates `WelcomeHero.astro:17` |
-| `CP/screens.ts:123` | "Burooj here!" | duplicates |
-| `CP/screens.ts:124` | "Frontend developer" | fallback |
-| `CP/screens.ts:133` | "Resume" | duplicates hero link |
-| `CP/screens.ts:235` | "Now spinning" | flavour |
-| `CP/screens.ts:280` | "In the crate" | flavour |
-| `CP/screens.ts:285` | "Full setlist" | replaces "All projects" |
-| `CP/screens.ts:173` | "Liner notes" | flavour |
-| `CP/screens.ts:429` | "Setlist, newest first" | replaces "Project history, newest first" |
-| `CP/screens.ts:494` | "Setlist" | flavour eyebrow |
-| `CP/screens.ts:497` | "Credits" | flavour |
-| `CP/screens.ts:503` | "Filed" | flavour label for tags |
-| `CP/screens.ts:524` | "Back to the setlist" | replaces "Back to all projects" |
-| `CP/screens.ts:593` | "Presets" | replaces "Selected experiments" |
-| `CP/screens.ts:597` | "anim", "freq", "color", "popup", "scope" | fake drawer tabs |
-| `CP/screens.ts:623` | "Open the sketch" | dead path |
-| `CP/screens.ts:647` | "Back to the presets" | invented |
-| `CP/screens.ts:669` | "Play." / "Build." / "Repeat." | invented poster tag |
-| `CP/screens.ts:684` | "Burooj Rashid wearing round sunglasses" | duplicates Portrait alt (about hard-codes it) |
-| `CP/screens.ts:751` | `Side ${A..D}` | flavour section labels |
-| `CP/screens.ts:821` | "clipped to the stand" | flavour |
+**Hard-coded strings.** None of content. Chord and note names (`Fmaj7`, `B♭`) come from `music.ts`; month initials on the zoomed ruler and month abbreviations on the tape are in `arrangement.ts` and `transport.ts`.
 
-Derived "content": `yearPosition(dateLabel, year)` places clips on a fixed 2021 to 2027.5 range (`screens.ts:311-317`), so a 2028 project falls off the ruler; Update kind to note mapping (`notes.ts:80-85`); lab visual chosen by regex over slug/type (`screens.ts:540-558`); piano-roll art seeded from slug; track numbers by index.
+**Room for writing.** When posts arrive in `content.json`, they become one more dated track: `score.ts` adds clips with a voice, and `arrangement.ts` and `tape.ts` lay out any dated track. A post could ring like a marker or sing like a project. Until then, the Writing key links out to Substack.
+
+**Phones (≤760px).** Time runs down the page, oldest first (the tape). A fixed playhead line scrubs as you scroll; play scrolls the career under it, and a touch hands control back. Mute and solo are desktop-only.
 
 ### 3.3 Back Page (`BP`)
 
@@ -534,11 +504,11 @@ Selector load: `.page-header__intro` and `h1` are read by all four lenses; `.pro
    - Featured projects: CC drops them; BP drops summary and tools.
    - "Currently" (bjslab): CC drops it; BP drops the "More about me" link; HI takes only the first `<p>`.
    - "Elsewhere" blurbs: CC, CP, BP drop them.
-   - Updates intro/caption/empty text: CC, CP, BP drop them; HI drops caption/empty and shows 6 of 8.
-   - Update kind/source labels: HI, CC and BP show raw slugs ("pull request", "github"); CP shows lowercased slugs.
+   - Updates intro/caption/empty text: CC, BP drop them; HI drops caption/empty and shows 6 of 8. CP shows them on its locators (desktop); phones show every update on the tape without them.
+   - Update kind/source labels: HI, CC and BP show raw slugs ("pull request", "github"); CP shows `kindLabel` and `sourceLabel`.
    - Hero greeting: CC drops it.
 3. **Projects**:
-   - Year headings are lost in CC, CP, BP.
+   - Year headings are lost in CC and BP; CP shows years as bars on its ruler and tape.
    - Tags and `status` are shown nowhere (Daylight does not show them either).
    - Tools: CC caps nothing, HI shows all, Daylight shows 3 on lists.
    - HI replaces `role` with `kind`.
@@ -553,7 +523,7 @@ Selector load: `.page-header__intro` and `h1` are read by all four lenses; `.pro
 **Invented by a lens (not in `src/content/`)**
 
 - CC: arcana card, "Confidant rank MAX", "Social stats", resume "Leader/Party/Study", "Work/Lab" odometer, "New message", calendar widget, calling-card letter copy ("To whoever has a project in mind...", paraphrasing `about.md`), request status "Open", Prev/Next pager, "Take your heart".
-- CP: "c major / 120 bpm", note and Hz tables, "Side A to D", fake drawer tabs, "Play. Build. Repeat.", "Filed", track numbers, preset numbers, key hints ("N tracks").
+- CP (DAW rework): the whole music layer (key, changes, motifs, bass, bells), all derived from content and declared in 3.2; track numbers; the clip editor; view names on the keys ("session", "arrangement", "rack"…); "Clip notes", "Set notes", "Text view".
 - BP: "Dear reader," letter frame, "P.S.", "Yours, Burooj", fake page numbers, camp dot counts and hits (mean nothing), "(a quick war, during maths)", "Roll call", legend.
 - HI: portrait on About (Daylight has none), "Back to / The whole lab", Newer/Older nav, 404 rewrite, "Send a line my way".
 - All lenses invent eyebrow/back-link labels that differ from Daylight.
