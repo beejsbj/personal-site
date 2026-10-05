@@ -242,23 +242,37 @@ export function playSong(events: MusicEvent[], from: number): () => void {
     const left = event.at + event.len - from;
     if (event.voice !== "bell" && left > 1) sound(out, event, origin + from * EIGHTH, left);
   }
+  let ringsUntil = ctx.currentTime;
+  let timer: ReturnType<typeof setInterval> | undefined;
+  let done: ReturnType<typeof setTimeout> | undefined;
   const pump = () => {
     const horizon = ctx.currentTime + 0.3;
     while (index < events.length && origin + events[index].at * EIGHTH < horizon) {
       const event = events[index];
-      sound(out, event, Math.max(origin + event.at * EIGHTH, ctx.currentTime));
+      const when = Math.max(origin + event.at * EIGHTH, ctx.currentTime);
+      sound(out, event, when);
+      ringsUntil = Math.max(ringsUntil, when + event.len * EIGHTH + 0.5);
       index += 1;
     }
+    if (index >= events.length && timer !== undefined) {
+      // all scheduled: the song is over once the last note rings out
+      clearInterval(timer);
+      timer = undefined;
+      done = setTimeout(() => {
+        if (song === handle) song = undefined;
+      }, (ringsUntil - ctx.currentTime) * 1000);
+    }
   };
-  pump();
-  const timer = setInterval(pump, 60);
   const handle = {
     stop() {
-      clearInterval(timer);
+      if (timer !== undefined) clearInterval(timer);
+      clearTimeout(done);
       fadeOut(out, 0.15);
       if (song === handle) song = undefined;
     },
   };
+  timer = setInterval(pump, 60);
+  pump();
   song = handle;
   return () => handle.stop();
 }

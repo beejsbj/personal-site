@@ -10,7 +10,7 @@ import type { LensShell, Route, ShellContext } from "../types";
 import { onNext } from "./beat";
 import { h, setNewTabNote } from "./dom";
 import { buildFrame, type Frame } from "./frame";
-import { buildScreen } from "./screens";
+import { buildScreen, type Screen } from "./screens";
 import { closeSound } from "./sound";
 
 const EIGHTH = 250; // ms at 120 bpm
@@ -21,6 +21,7 @@ const EASE_SWING = "cubic-bezier(.7, -0.2, .3, 1.2)";
 let ctx: ShellContext | undefined;
 let frame: Frame | undefined;
 let current: HTMLElement | undefined;
+let currentScreen: Screen | undefined;
 let currentPath = "";
 let generation = 0;
 
@@ -87,9 +88,11 @@ async function transition(route: Route) {
 
   const swap = () => {
     frame!.settle(route);
+    currentScreen?.destroy?.();
     previous?.remove();
     stage.insertBefore(next.el, tear);
     current = next.el;
+    currentScreen = next;
   };
 
   if (ctx.face) {
@@ -153,6 +156,9 @@ const shell: LensShell = {
     const first = show(context.route);
     frame.stage.insertBefore(first.el, frame.tear);
     current = first.el;
+    currentScreen = first;
+    // the prism idling the page holds the screen still (and silent)
+    context.onIdleChange((idle) => currentScreen?.idle?.(idle));
     currentPath = context.route.path;
     const style = document.createElement("style");
     style.dataset.shellStyle = "cut-paper";
@@ -184,6 +190,8 @@ const shell: LensShell = {
   },
   unmount() {
     generation += 1;
+    currentScreen?.destroy?.();
+    currentScreen = undefined;
     closeSound();
     ctx = undefined;
     frame = undefined;

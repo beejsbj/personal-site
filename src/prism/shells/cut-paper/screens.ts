@@ -1,16 +1,21 @@
 /** Screens: what sits on the stage for each route. Home is the play screen,
- * projects a sequencer arrangement, a project its album sleeve and liner
- * notes, the lab a drawer of presets, about a torn jazz poster, the resume
+ * projects the arrangement (the career on a timeline, played through), a
+ * project its album sleeve and liner notes, the lab a drawer of presets, about a torn jazz poster, the resume
  * the credits, and anything else a sheet of music clipped to the stand. */
 import { part } from "../../parts";
 import { blocks, fallbackBody, featured, fill, inline, rich, type LinkMaker } from "../rich";
 import type { ResumeEntry, Route, SiteContent } from "../types";
+import { arrangement } from "./arrange";
 import { h, link, markup, seeded, type Child } from "./dom";
-import { noteAt, NOTES, noteVar, yearPosition } from "./notes";
+import { noteAt, noteVar } from "./notes";
 
 export interface Screen {
   el: HTMLElement;
   heading: HTMLElement;
+  /** The screen leaves the stage: stop what it runs. */
+  destroy?(): void;
+  /** The prism idles the page (or wakes it). */
+  idle?(idle: boolean): void;
 }
 
 export interface ScreenOptions {
@@ -329,19 +334,6 @@ function home(content: SiteContent, copy: Copy, options: ScreenOptions): Screen 
 
 /* ── projects: the arrangement ───────────────────────────── */
 
-/** The arrangement runs from the first year with a project to a year and a
- * half past the newest, so a new year always fits on the ruler. */
-const span = (content: SiteContent) => ({
-  from: content.derived.firstYear,
-  to: content.derived.lastYear + 1.5,
-});
-const placer = ({ from, to }: { from: number; to: number }) => (year: number) =>
-  Math.min(Math.max((year - from) / (to - from), 0), 1);
-const NOW = (() => {
-  const date = new Date();
-  return date.getFullYear() + date.getMonth() / 12 + date.getDate() / 365;
-})();
-
 /** A page's opening, from its header in content. */
 function pageHead(
   header: SiteContent["pages"]["projects"]["header"],
@@ -362,113 +354,14 @@ function pageHead(
   };
 }
 
-function projects(content: SiteContent, copy: Copy): Screen {
+function projects(content: SiteContent, copy: Copy, options: ScreenOptions): Screen {
   const { h1, head } = pageHead(content.pages.projects.header, "projects", "cp-seq");
-  const range = span(content);
-  const place = placer(range);
-  const years: number[] = [];
-  for (let year = range.from; year <= Math.floor(range.to); year += 1) years.push(year);
-
-  const ruler = h(
-    "div",
-    { class: "cp-seq__ruler", "aria-hidden": "true" },
-    h("span", { class: "cp-seq__ruler-head" }, copy.projects.track),
-    h(
-      "span",
-      { class: "cp-seq__ruler-lane" },
-      years.map((year) =>
-        h(
-          "span",
-          { class: "cp-seq__bar", style: `--at:${place(year)}` },
-          h("b", null, String(year)),
-          h("small", null, `'${String(year).slice(2)}`),
-        ),
-      ),
-    ),
-  );
-
-  const tracks = h(
-    "ol",
-    { class: "cp-seq__tracks" },
-    content.projects.map((project, index) => {
-      const note = noteAt(index);
-      const at = yearPosition(project.dateLabel, project.year);
-      return h(
-        "li",
-        { class: "cp-track", style: `--note:${noteVar(note.id)}; --at:${place(at)}; --len:${0.85 / (range.to - range.from)}` },
-        h(
-          "a",
-          { class: "cp-track__link", href: project.href, "data-state": "rest" },
-          h(
-            "span",
-            { class: "cp-track__head" },
-            h("span", { class: "cp-track__no", "aria-hidden": "true" }, String(index + 1).padStart(2, "0")),
-            project.cover
-              ? h("img", { class: "cp-track__art", src: project.cover, alt: "", loading: "lazy", decoding: "async" })
-              : h("span", { class: "cp-track__art", "aria-hidden": "true" }),
-            h(
-              "span",
-              { class: "cp-track__copy" },
-              h("span", { class: "cp-track__title", ...part("project.title", project.slug) }, project.title),
-              h("span", { class: "cp-track__meta", ...part("project.meta", project.slug) }, `${project.dateLabel} · ${project.kind}`),
-              h("span", { class: "cp-track__sum", ...part("project.summary", project.slug) }, project.summary),
-              project.tools.length
-                ? h("span", { class: "cp-track__tools", ...part("project.tools", project.slug) }, project.tools.join(" · "))
-                : null,
-            ),
-          ),
-          h(
-            "span",
-            { class: "cp-track__lane", "aria-hidden": "true" },
-            h(
-              "span",
-              { class: "cp-clip" },
-              h("span", { class: "cp-clip__name" }, project.title),
-              roll(project.slug),
-            ),
-          ),
-        ),
-      );
-    }),
-  );
-
-  const arrangement = h(
-    "div",
-    { class: "cp-seq__arrangement", style: `--now:${place(NOW)}` },
-    ruler,
-    bar(tracks, 1, 4),
-    // the run spans the lane up to "now"; the playhead rides its right edge
-    // so a sweep is one transform, no layout
-    h(
-      "span",
-      { class: "cp-seq__run", "aria-hidden": "true" },
-      h(
-        "span",
-        { class: "cp-seq__playhead" },
-        h("span", { class: "cp-seq__now" }, copy.projects.now),
-      ),
-    ),
-  );
+  const arranged = arrangement(content, copy, options);
   return {
-    el: screen(
-      "projects",
-      h(
-        "div",
-        { class: "cp-seq" },
-        bar(head, 2),
-        h(
-          "section",
-          { class: "cp-seq__body", "aria-label": copy.projects.list },
-          h(
-            "div",
-            { class: "cp-seq__bar-tape", "aria-hidden": "true" },
-            NOTES.map((n) => h("i", { style: `--note:${noteVar(n.id)}` })),
-          ),
-          arrangement,
-        ),
-      ),
-    ),
+    el: screen("projects", h("div", { class: "cp-seq" }, bar(head, 2), arranged.el)),
     heading: h1,
+    destroy: arranged.destroy,
+    idle: arranged.idle,
   };
 }
 
@@ -804,7 +697,7 @@ function resume(content: SiteContent, copy: Copy): Screen {
         ? h("ul", null, entry.bullets.map((bullet) => h("li", null, inline(bullet, makeLink))))
         : null,
     ];
-    return h(
+    const el = h(
       "article",
       { class: "cp-cut", ...part(kind, entry.id) },
       h("span", { class: "cp-cut__no", "aria-hidden": "true" }, String(cutIndex).padStart(2, "0")),
@@ -812,6 +705,7 @@ function resume(content: SiteContent, copy: Copy): Screen {
       entry.dateLine ? h("p", { class: "cp-cut__when" }, entry.dateLine) : null,
       lines.some(Boolean) ? proseOf(lines) : null,
     );
+    return el;
   };
 
   const { experience, education, tools } = content.resume;
@@ -883,7 +777,7 @@ export function buildScreen(
     case "home":
       return home(content, copy, options);
     case "projects":
-      return projects(content, copy);
+      return projects(content, copy, options);
     case "project": {
       const item = content.projects.find((entry) => entry.slug === route.slug);
       return item ? project(content, copy, item) : sheet(route, copy);

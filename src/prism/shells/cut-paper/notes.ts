@@ -71,13 +71,3 @@ export function noteForUpdate(kind: string): Note {
   };
   return NOTES.find((note) => note.id === (map[kind] ?? "sol")) ?? NOTES[0];
 }
-
-const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-
-/** "Sep 2026" -> 2026.67 */
-export function yearPosition(label: string, fallbackYear: number) {
-  const [month, year] = label.toLowerCase().split(/\s+/);
-  const index = MONTHS.indexOf(month?.slice(0, 3) ?? "");
-  const y = Number(year) || fallbackYear;
-  return y + (index >= 0 ? index / 12 : 0);
-}

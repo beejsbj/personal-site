@@ -69,12 +69,17 @@
 /* ── colour-only responses (safe under reduced motion) ──────── */
 
 :root[data-lens="cut-paper"] .cp-cut:hover .cp-cut__no,
-:root[data-lens="cut-paper"] .cp-track__link:hover .cp-track__no {
+:root[data-lens="cut-paper"] .cp-cut[data-heard] .cp-cut__no,
+:root[data-lens="cut-paper"] .cp-tr:hover .cp-tr__no {
   color: var(--note, var(--cp-ivory));
 }
 
 :root[data-lens="cut-paper"] .cp-sleeve:hover .cp-sleeve__side {
   color: var(--cp-ivory-2);
+}
+
+:root[data-lens="cut-paper"] .cp-sound[data-nudge] {
+  box-shadow: 0 0 0 2px var(--cp-brass), var(--cp-glow-brass);
 }
 
 :root[data-lens="cut-paper"] .cp-sound__wave {
@@ -482,64 +487,78 @@
     transform: rotate(-0.4deg);
   }
 
-  /* ── projects: the playhead sweeps in, clips flash as it passes */
+  /* ── projects: the playhead drops in at now; clips answer it ── */
 
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] .cp-seq__run {
-    animation: cut-paper-sweep var(--cp-bar) linear both;
+  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] .cp-run__line {
+    animation: cut-paper-drop 0.72s var(--cp-ease-swing) both;
     animation-delay: calc(var(--cp-beat) * 2);
+    transform-origin: top;
   }
 
-  @keyframes cut-paper-sweep {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
+  /* a clip being heard: a flash on the beat, then it breathes with it */
+  :root[data-lens="cut-paper"] .cp-tr[data-heard] .cp-clip,
+  :root[data-lens="cut-paper"] .cp-tape__clip[data-heard] {
+    animation:
+      cut-paper-heard var(--cp-8th) var(--cp-ease-stab) both,
+      cut-paper-breathe var(--cp-beat) var(--cp-ease-brush) var(--cp-8th) infinite alternate;
   }
 
-  :root[data-lens="cut-paper"] .cp-clip::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--cp-ivory);
-    opacity: 0;
-    pointer-events: none;
+  @keyframes cut-paper-heard {
+    0% { filter: brightness(1.5); transform: scaleY(1.16) translateY(-2px); }
+    100% { filter: brightness(1.08); transform: scaleY(1.08); }
   }
 
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] .cp-clip {
-    animation: cut-paper-hit-clip var(--cp-8th) var(--cp-ease-stab) both;
-    animation-delay: calc(var(--cp-beat) * 2 + var(--at) / var(--now) * var(--cp-bar));
+  @keyframes cut-paper-breathe {
+    from { transform: scaleY(1.08); }
+    to { transform: scaleY(1.02); }
   }
 
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-screen[data-state="live"] .cp-clip::after {
-    animation: cut-paper-hit-flash var(--cp-8th) var(--cp-ease-brush) both;
-    animation-delay: calc(var(--cp-beat) * 2 + var(--at) / var(--now) * var(--cp-bar));
+  /* the playhead crossing a clip's first note */
+  :root[data-lens="cut-paper"] .cp-arr[data-playing="true"] .cp-tr[data-live] .cp-clip,
+  :root[data-lens="cut-paper"] .cp-arr[data-playing="true"] .cp-tape__clip[data-live] {
+    animation: cut-paper-heard var(--cp-8th) var(--cp-ease-stab) both;
   }
 
-  @keyframes cut-paper-hit-clip {
-    0% { transform: scaleY(1); }
-    30% { transform: scaleY(1.14) translateY(-2px); }
-    100% { transform: scaleY(1); }
-  }
-
-  @keyframes cut-paper-hit-flash {
-    0% { opacity: 0; }
-    20% { opacity: 0.55; }
-    100% { opacity: 0; }
-  }
-
-  :root[data-lens="cut-paper"] .cp-track__art {
+  :root[data-lens="cut-paper"] .cp-tr__art {
     transition: rotate var(--cp-dur-ui) var(--cp-ease-swing), translate var(--cp-dur-ui) var(--cp-ease-swing);
   }
 
-  :root[data-lens="cut-paper"] .cp-track__link:hover .cp-track__art {
+  :root[data-lens="cut-paper"] .cp-tr:hover .cp-tr__art {
     rotate: -3deg;
     translate: 0 -2px;
   }
 
-  :root[data-lens="cut-paper"] .cp-track__no {
+  :root[data-lens="cut-paper"] .cp-tr__no {
     transition: translate var(--cp-dur-ui) var(--cp-ease-swing), color var(--cp-dur-ui) var(--cp-ease-brush);
   }
 
-  :root[data-lens="cut-paper"] .cp-track__link:hover .cp-track__no {
+  :root[data-lens="cut-paper"] .cp-tr:hover .cp-tr__no {
     translate: 3px 0;
+  }
+
+  /* sound is off and something wanted to play: the switch waves */
+  :root[data-lens="cut-paper"] .cp-sound[data-nudge] {
+    animation: cut-paper-nudge calc(var(--cp-8th) * 3) var(--cp-ease-swing) 2;
+  }
+
+  @keyframes cut-paper-nudge {
+    0%, 100% { transform: none; }
+    30% { transform: translateY(-3px) rotate(-3deg); }
+    60% { transform: translateY(1px) rotate(2deg); }
+  }
+
+  /* a record or a credit being heard */
+  :root[data-lens="cut-paper"] .cp-sleeve[data-heard]::before {
+    scale: 2.4 1;
+  }
+
+  :root[data-lens="cut-paper"] .cp-cut[data-heard] .cp-cut__no {
+    animation: cut-paper-heard-no var(--cp-beat) var(--cp-ease-brush) infinite alternate;
+  }
+
+  @keyframes cut-paper-heard-no {
+    from { translate: 0 0; }
+    to { translate: 0 -3px; }
   }
 
   /* ── a project: pull the record, peel the sticker ─────────── */

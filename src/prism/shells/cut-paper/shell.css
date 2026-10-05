@@ -1745,52 +1745,178 @@
   font-size: 15px;
 }
 
-:root[data-lens="cut-paper"] .cp-seq__body {
+:root[data-lens="cut-paper"] .cp-arr {
+  --head: 380px;
   position: relative;
   z-index: 1;
   margin-top: 26px;
-}
-
-:root[data-lens="cut-paper"] .cp-seq__bar-tape {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  height: 4px;
-  margin-bottom: 14px;
-}
-
-:root[data-lens="cut-paper"] .cp-seq__bar-tape i {
-  background: var(--note);
-}
-
-:root[data-lens="cut-paper"] .cp-seq__trail {
-  margin: 0 0 14px;
-  color: var(--cp-ivory-3);
-  font-size: 12px;
-}
-
-:root[data-lens="cut-paper"] .cp-seq__arrangement {
-  --head: 380px;
-  position: relative;
   background: color-mix(in srgb, var(--cp-ink) 82%, transparent);
   box-shadow: var(--cp-ring);
   border-radius: 12px;
 }
 
-:root[data-lens="cut-paper"] .cp-seq__ruler {
+/* the deck: transport and ruler stay in reach as the tracks scroll */
+:root[data-lens="cut-paper"] .cp-arr__deck {
   position: sticky;
   top: 0;
-  z-index: 3;
-  display: grid;
-  grid-template-columns: var(--head) minmax(0, 1fr);
-  height: 34px;
-  border-bottom: 1px solid var(--cp-hairline);
+  z-index: 6;
   background: var(--cp-ink-2);
+  border-bottom: 1px solid var(--cp-hairline);
   border-radius: 12px 12px 0 0;
 }
 
-:root[data-lens="cut-paper"] .cp-seq__ruler-head {
+:root[data-lens="cut-paper"] .cp-tp {
   display: flex;
   align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-tp__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--cp-ink-3);
+  box-shadow: var(--cp-ring);
+  color: var(--cp-ivory);
+  font: 400 17px/1 var(--cp-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--cp-dur-tap) var(--cp-ease-brush), color var(--cp-dur-tap);
+}
+
+:root[data-lens="cut-paper"] .cp-tp__btn svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__btn:hover {
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-tp__btn--play {
+  padding: 0 14px 0 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__btn--play[aria-pressed="true"] {
+  background: var(--cp-brass-fill);
+  box-shadow: var(--cp-glow-brass);
+  color: var(--cp-brass-edge);
+}
+
+:root[data-lens="cut-paper"] .cp-tp__i-pause,
+:root[data-lens="cut-paper"] .cp-tp__btn--play[aria-pressed="true"] .cp-tp__i-play {
+  display: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__btn--play[aria-pressed="true"] .cp-tp__i-pause {
+  display: inline;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__pos {
+  display: grid;
+  margin: 0 0 0 8px;
+  line-height: 1;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__num {
+  color: var(--cp-ivory);
+  font: 400 26px/1 var(--cp-display);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__num b {
+  font-weight: 400;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__num i {
+  color: var(--cp-ivory-4);
+  font-style: normal;
+}
+
+:root[data-lens="cut-paper"] .cp-arr[data-playing="true"] .cp-tp__num {
+  color: var(--cp-brass-hi);
+}
+
+:root[data-lens="cut-paper"] .cp-tp__pos small {
+  margin-top: 3px;
+  color: var(--cp-ivory-3);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__np {
+  display: grid;
+  justify-items: end;
+  min-width: 0;
+  margin: 0 0 0 auto;
+  line-height: 1;
+  text-align: right;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__label {
+  color: var(--cp-ivory-3);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__title {
+  max-width: 100%;
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--note, var(--cp-ivory));
+  font: 400 21px/1 var(--cp-display);
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__title:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__between {
+  margin-top: 6px;
+  color: var(--cp-ivory-4);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__title[hidden],
+:root[data-lens="cut-paper"] .cp-tp__between[hidden] {
+  display: none;
+}
+
+/* rows: a head column, then time */
+:root[data-lens="cut-paper"] .cp-arr__row {
+  display: grid;
+  grid-template-columns: var(--head) minmax(0, 1fr);
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row + .cp-arr__row,
+:root[data-lens="cut-paper"] .cp-arr__tracks {
+  border-top: 1px solid var(--cp-hairline-2);
+}
+
+:root[data-lens="cut-paper"] .cp-arr__corner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding-left: 16px;
   color: var(--cp-ivory-3);
   font: 400 14px/1 var(--cp-display);
@@ -1798,12 +1924,62 @@
   text-transform: uppercase;
 }
 
-:root[data-lens="cut-paper"] .cp-seq__ruler-lane {
+:root[data-lens="cut-paper"] .cp-arr__corner small {
+  color: var(--cp-ivory-4);
+  font: 500 10px/1 var(--cp-mono);
+  letter-spacing: 0.08em;
+}
+
+:root[data-lens="cut-paper"] .cp-lane,
+:root[data-lens="cut-paper"] .cp-ruler__lane {
   position: relative;
+  container-type: inline-size;
   box-shadow: inset 1px 0 0 var(--cp-hairline);
 }
 
-:root[data-lens="cut-paper"] .cp-seq__bar {
+:root[data-lens="cut-paper"] .cp-lane__year {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--at) * 100%);
+  width: 1px;
+  background: var(--cp-hairline);
+  pointer-events: none;
+}
+
+/* time not yet lived: hatched */
+:root[data-lens="cut-paper"] .cp-lane__future {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: calc(var(--at) * 100%);
+  background: repeating-linear-gradient(135deg, var(--cp-hairline-2) 0 1px, transparent 1px 7px);
+  pointer-events: none;
+}
+
+/* the ruler is the scrubber */
+:root[data-lens="cut-paper"] .cp-ruler__lane {
+  height: 36px;
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+:root[data-lens="cut-paper"] .cp-ruler__lane:focus-visible {
+  outline-offset: -2px;
+}
+
+:root[data-lens="cut-paper"] .cp-ruler__month {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--at) * 100%);
+  width: 1px;
+  height: 5px;
+  background: var(--cp-ivory-4);
+}
+
+:root[data-lens="cut-paper"] .cp-ruler__year {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -1817,86 +1993,288 @@
   letter-spacing: 0.08em;
 }
 
-:root[data-lens="cut-paper"] .cp-seq__bar b {
+:root[data-lens="cut-paper"] .cp-ruler__year b {
   font-weight: 400;
 }
 
-:root[data-lens="cut-paper"] .cp-seq__bar small {
+:root[data-lens="cut-paper"] .cp-ruler__year small {
   display: none;
   font: inherit;
 }
 
-:root[data-lens="cut-paper"] .cp-seq__tracks {
+:root[data-lens="cut-paper"] .cp-ruler__now {
+  position: absolute;
+  top: 3px;
+  left: calc(var(--at) * 100%);
+  margin-left: 5px;
+  color: var(--cp-brass);
+  font: 400 11px/1 var(--cp-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* a playhead per lane: one transform a frame, no layout */
+:root[data-lens="cut-paper"] .cp-run {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  width: 2px;
+  pointer-events: none;
+  transform: translateX(calc(var(--at, 0) * 100cqi - 1px));
+}
+
+:root[data-lens="cut-paper"] .cp-run__line {
+  position: absolute;
+  inset: 0;
+  background: var(--cp-brass-fill);
+  box-shadow: var(--cp-glow-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-run--ruler .cp-run__line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 12px;
+  height: 9px;
+  background: var(--cp-brass);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform: translateX(-50%);
+}
+
+/* markers: one flag per update, staggered so close dates stay legible */
+:root[data-lens="cut-paper"] .cp-arr__row--markers {
+  position: relative;
+  z-index: 4;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row--markers .cp-lane {
+  height: 42px;
+}
+
+:root[data-lens="cut-paper"] .cp-lane__items {
+  position: absolute;
+  inset: 0;
   margin: 0;
   padding: 0;
   list-style: none;
-  counter-reset: cp-track;
 }
 
-:root[data-lens="cut-paper"] .cp-track + .cp-track {
-  border-top: 1px solid var(--cp-hairline-2);
+:root[data-lens="cut-paper"] .cp-marker-slot {
+  position: absolute;
+  top: calc(6px + var(--row) * 10px);
+  left: calc(var(--at) * 100%);
 }
 
-:root[data-lens="cut-paper"] .cp-track__link {
+:root[data-lens="cut-paper"] .cp-marker {
+  position: relative;
+  display: block;
+  width: 12px;
+  height: 14px;
+  margin-left: -1px;
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-marker__flag {
+  position: absolute;
+  inset: 0;
+  background: var(--note);
+  clip-path: polygon(0 0, 100% 0, 72% 40%, 100% 80%, 16% 80%, 16% 100%, 0 100%);
+  transition: transform var(--cp-dur-ui) var(--cp-ease-swing), filter var(--cp-dur-ui);
+  transform-origin: 0 100%;
+}
+
+:root[data-lens="cut-paper"] .cp-marker:hover .cp-marker__flag,
+:root[data-lens="cut-paper"] .cp-marker:focus-visible .cp-marker__flag,
+:root[data-lens="cut-paper"] .cp-marker-slot[data-live] .cp-marker__flag {
+  filter: drop-shadow(0 0 6px var(--note));
+  transform: scale(1.35);
+}
+
+:root[data-lens="cut-paper"] .cp-marker__tip {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: -6px;
+  z-index: 8;
+  width: max-content;
+  max-width: 300px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: var(--cp-ink-3);
+  box-shadow: var(--cp-ring), 0 8px 18px rgba(0, 0, 0, 0.5);
+  color: var(--cp-ivory);
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity var(--cp-dur-tap), transform var(--cp-dur-ui) var(--cp-ease-stab);
+}
+
+:root[data-lens="cut-paper"] .cp-marker__tip time {
+  display: block;
+  color: var(--note);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-marker:hover .cp-marker__tip,
+:root[data-lens="cut-paper"] .cp-marker:focus-visible .cp-marker__tip {
+  opacity: 1;
+  transform: none;
+}
+
+/* credits: the resume's spans, under the markers */
+:root[data-lens="cut-paper"] .cp-arr__row--spans .cp-lane {
+  height: calc(var(--rows) * 18px + 12px);
+}
+
+:root[data-lens="cut-paper"] .cp-span-slot {
+  position: absolute;
+  top: calc(6px + var(--row) * 18px);
+  left: calc(var(--at) * 100%);
+  width: calc(var(--len) * 100%);
+  height: 14px;
+}
+
+:root[data-lens="cut-paper"] .cp-span {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 6px;
+  border-left: 2px solid var(--cp-ivory-3);
+  border-radius: 0 3px 3px 0;
+  background: var(--cp-ink-4);
+  color: var(--cp-ivory-2);
+  font: 500 9.5px/14px var(--cp-mono);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), color var(--cp-dur-ui);
+}
+
+:root[data-lens="cut-paper"] .cp-span:hover,
+:root[data-lens="cut-paper"] .cp-span-slot[data-live] .cp-span {
+  border-left-color: var(--cp-brass);
+  background: var(--cp-ink-5);
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-span:focus-visible {
+  outline-offset: 1px;
+}
+
+/* tracks: a head (the project) and a lane (its clip in time) */
+:root[data-lens="cut-paper"] .cp-arr__tracks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tr {
   display: grid;
   grid-template-columns: var(--head) minmax(0, 1fr);
-  min-height: 92px;
-  color: var(--cp-ivory);
-  text-decoration: none;
+  min-height: 96px;
   transition: background var(--cp-dur-ui) var(--cp-ease-brush);
 }
 
-:root[data-lens="cut-paper"] .cp-track__link:hover {
+:root[data-lens="cut-paper"] .cp-tr + .cp-tr {
+  border-top: 1px solid var(--cp-hairline-2);
+}
+
+:root[data-lens="cut-paper"] .cp-tr:hover,
+:root[data-lens="cut-paper"] .cp-tr:focus-within {
   background: var(--cp-ink-2);
 }
 
-:root[data-lens="cut-paper"] .cp-track__link:focus-visible {
-  outline-offset: -2px;
-}
-
-:root[data-lens="cut-paper"] .cp-track__head {
+:root[data-lens="cut-paper"] .cp-tr__head {
+  position: relative;
   display: grid;
-  grid-template-columns: 26px 64px minmax(0, 1fr);
+  grid-template-columns: 26px 64px minmax(0, 1fr) auto;
   align-items: start;
   gap: 12px;
-  padding: 14px 16px 14px 14px;
+  padding: 14px 12px 14px 14px;
+  box-shadow: inset 3px 0 0 transparent;
+  transition: box-shadow var(--cp-dur-ui) var(--cp-ease-brush);
 }
 
-:root[data-lens="cut-paper"] .cp-track__no {
+:root[data-lens="cut-paper"] .cp-tr[data-live] .cp-tr__head {
+  box-shadow: inset 3px 0 0 var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-tr__no {
   padding-top: 2px;
-  color: var(--note);
+  color: var(--cp-ivory-4);
   font: 400 20px/1 var(--cp-display);
+  transition: color var(--cp-dur-ui) var(--cp-ease-brush);
 }
 
-:root[data-lens="cut-paper"] .cp-track__art {
+:root[data-lens="cut-paper"] .cp-tr[data-live] .cp-tr__no {
+  color: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-tr__art {
   width: 64px;
   height: 48px;
   border-radius: 4px;
+  background: var(--cp-ink-4);
   object-fit: cover;
   box-shadow: var(--cp-ring);
 }
 
-:root[data-lens="cut-paper"] .cp-track__copy {
+:root[data-lens="cut-paper"] .cp-tr__copy {
   display: grid;
   gap: 3px;
   min-width: 0;
 }
 
-:root[data-lens="cut-paper"] .cp-track__title {
+:root[data-lens="cut-paper"] .cp-tr__copy p {
+  margin: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-tr__title {
+  margin: 0;
   font: 400 25px/1 var(--cp-display);
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-:root[data-lens="cut-paper"] .cp-track__meta,
-:root[data-lens="cut-paper"] .cp-track__tools {
+:root[data-lens="cut-paper"] .cp-tr__link {
+  color: var(--cp-ivory);
+  text-decoration: none;
+}
+
+/* the whole head opens the project */
+:root[data-lens="cut-paper"] .cp-tr__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+:root[data-lens="cut-paper"] .cp-tr__link:focus-visible {
+  outline: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tr__link:focus-visible::after {
+  outline: 2px solid var(--cp-ivory);
+  outline-offset: -3px;
+}
+
+:root[data-lens="cut-paper"] .cp-tr__meta,
+:root[data-lens="cut-paper"] .cp-tr__tools {
   color: var(--cp-ivory-3);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-:root[data-lens="cut-paper"] .cp-track__sum {
+:root[data-lens="cut-paper"] .cp-tr__sum {
   display: -webkit-box;
   overflow: hidden;
   color: var(--cp-ivory-2);
@@ -1906,44 +2284,71 @@
   -webkit-line-clamp: 2;
 }
 
-:root[data-lens="cut-paper"] .cp-track__lane {
+:root[data-lens="cut-paper"] .cp-tr__cue {
   position: relative;
-  box-shadow: inset 1px 0 0 var(--cp-hairline);
-  background:
-    repeating-linear-gradient(90deg, var(--cp-hairline) 0 1px, transparent 1px calc(100% / 6.5)),
-    repeating-linear-gradient(90deg, var(--cp-hairline-2) 0 1px, transparent 1px calc(100% / 26));
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--cp-ink-3);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--note) 55%, transparent);
+  color: var(--note);
+  cursor: pointer;
+  transition: background var(--cp-dur-tap), color var(--cp-dur-tap);
+}
+
+:root[data-lens="cut-paper"] .cp-tr__cue svg {
+  width: 12px;
+  height: 12px;
+  margin-left: 2px;
+  fill: currentColor;
+}
+
+:root[data-lens="cut-paper"] .cp-tr__cue:hover,
+:root[data-lens="cut-paper"] .cp-tr[data-heard] .cp-tr__cue {
+  background: var(--note);
+  color: var(--cp-ink);
 }
 
 :root[data-lens="cut-paper"] .cp-clip {
   position: absolute;
   top: 16px;
-  bottom: 16px;
-  left: min(calc(var(--at) * 100%), calc(100% - 84px));
+  height: 64px;
+  left: calc(var(--at) * 100%);
   width: calc(var(--len) * 100%);
-  min-width: 84px;
   overflow: hidden;
   border-radius: 5px;
   background: var(--note);
   color: var(--cp-ink);
+  text-decoration: none;
   box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform-origin: left center;
-  transition: transform var(--cp-dur-ui) var(--cp-ease-swing), filter var(--cp-dur-ui);
+  transition: transform var(--cp-dur-ui) var(--cp-ease-swing), filter var(--cp-dur-ui), box-shadow var(--cp-dur-ui);
 }
 
-:root[data-lens="cut-paper"] .cp-track__link:hover .cp-clip,
-:root[data-lens="cut-paper"] .cp-track__link:focus-visible .cp-clip {
+:root[data-lens="cut-paper"] .cp-tr:hover .cp-clip {
   filter: brightness(1.08);
   transform: scaleY(1.08);
+}
+
+:root[data-lens="cut-paper"] .cp-tr[data-live] .cp-clip,
+:root[data-lens="cut-paper"] .cp-tape__clip[data-live] {
+  box-shadow: 0 0 0 2px var(--cp-ivory), 0 0 18px color-mix(in srgb, var(--note) 70%, transparent);
 }
 
 :root[data-lens="cut-paper"] .cp-clip__name {
   position: absolute;
   top: 4px;
-  left: 7px;
-  right: 7px;
+  left: 6px;
+  right: 6px;
   overflow: hidden;
-  font: 400 14px/1.15 var(--cp-display);
+  font: 400 13px/1.15 var(--cp-display);
   letter-spacing: 0.06em;
+  text-align: left;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1951,44 +2356,15 @@
 
 :root[data-lens="cut-paper"] .cp-roll {
   position: absolute;
-  inset: 22px 6px 6px;
-  width: calc(100% - 12px);
-  height: calc(100% - 28px);
-  fill: rgba(10, 9, 8, 0.62);
+  inset: 21px 5px 5px;
+  width: calc(100% - 10px);
+  height: calc(100% - 26px);
+  fill: rgba(10, 9, 8, 0.66);
 }
 
-:root[data-lens="cut-paper"] .cp-seq__run {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: var(--head);
-  width: calc((100% - var(--head)) * var(--now));
-  pointer-events: none;
-}
-
-:root[data-lens="cut-paper"] .cp-seq__playhead {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: -1px;
-  width: 2px;
-  background: var(--cp-brass-fill);
-  box-shadow: var(--cp-glow-brass);
-  pointer-events: none;
-  transform-origin: top;
-  animation: cut-paper-drop 0.72s var(--cp-ease-swing) both;
-}
-
-:root[data-lens="cut-paper"] .cp-seq__now {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  padding: 4px 6px 2px;
-  background: var(--cp-brass-fill);
-  color: var(--cp-brass-edge);
-  font: 400 14px/1 var(--cp-display);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+/* the phone's tape: hidden while there is room for the whole arrangement */
+:root[data-lens="cut-paper"] .cp-tape {
+  display: none;
 }
 
 @keyframes cut-paper-drop {
@@ -2811,12 +3187,16 @@
     display: none;
   }
 
-  :root[data-lens="cut-paper"] .cp-seq__arrangement {
+  :root[data-lens="cut-paper"] .cp-arr {
     --head: 300px;
   }
 
-  :root[data-lens="cut-paper"] .cp-track__sum {
+  :root[data-lens="cut-paper"] .cp-tr__sum {
     -webkit-line-clamp: 1;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tr__tools {
+    display: none;
   }
 
   :root[data-lens="cut-paper"] .cp-liner {
@@ -3072,82 +3452,287 @@
     grid-row: auto !important;
   }
 
-  :root[data-lens="cut-paper"] .cp-seq__arrangement {
+  /* projects: the tape over the track list */
+  :root[data-lens="cut-paper"] .cp-arr {
     --head: 0px;
+    margin-top: 20px;
+    margin-inline: calc(var(--cp-gutter) * -1);
+    border-radius: 0;
+    box-shadow: none;
+    background: none;
   }
 
-  :root[data-lens="cut-paper"] .cp-seq__ruler {
-    grid-template-columns: minmax(0, 1fr);
-    height: 28px;
+  :root[data-lens="cut-paper"] .cp-arr__deck {
+    border-radius: 0;
+    border-top: 1px solid var(--cp-hairline);
   }
 
-  :root[data-lens="cut-paper"] .cp-seq__ruler-head {
+  :root[data-lens="cut-paper"] .cp-arr__row,
+  :root[data-lens="cut-paper"] .cp-tr__lane {
     display: none;
   }
 
-  :root[data-lens="cut-paper"] .cp-seq__bar {
-    padding-left: 4px;
-    font-size: 13px;
+  :root[data-lens="cut-paper"] .cp-arr__tracks {
+    border-top: 0;
   }
 
-  :root[data-lens="cut-paper"] .cp-seq__bar b {
+  :root[data-lens="cut-paper"] .cp-tp {
+    gap: 8px;
+    min-height: 48px;
+    padding: 6px 12px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tp__btn--play {
+    padding: 0 12px 0 10px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tp__pos {
+    margin-left: 4px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tp__num {
+    font-size: 22px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tp__title {
+    font-size: 18px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape {
+    position: relative;
+    display: block;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__scroller {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    outline: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__scroller::-webkit-scrollbar {
     display: none;
   }
 
-  :root[data-lens="cut-paper"] .cp-seq__bar small {
-    display: inline;
+  :root[data-lens="cut-paper"] .cp-tape__scroller:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--cp-ivory);
   }
 
-  :root[data-lens="cut-paper"] .cp-track__link {
+  :root[data-lens="cut-paper"] .cp-tape__strip {
+    --pad: 50vw;
+    --ruler-h: 22px;
+    --markers-h: 26px;
+    --span-h: 14px;
+    --clip-h: 36px;
+    position: relative;
+    width: calc(var(--span) * var(--year) + var(--pad) * 2);
+    height: calc(var(--ruler-h) + var(--markers-h) + var(--span-rows) * var(--span-h) + var(--clip-rows) * var(--clip-h) + 10px);
+  }
+
+  /* everything on the tape sits at its time: pad + years * scale */
+  :root[data-lens="cut-paper"] .cp-tape__month,
+  :root[data-lens="cut-paper"] .cp-tape__year,
+  :root[data-lens="cut-paper"] .cp-tape__now,
+  :root[data-lens="cut-paper"] .cp-tape__marker,
+  :root[data-lens="cut-paper"] .cp-tape__span,
+  :root[data-lens="cut-paper"] .cp-tape__clip,
+  :root[data-lens="cut-paper"] .cp-tape__future {
+    position: absolute;
+    left: calc(var(--pad) + var(--x) * var(--year));
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__ruler {
+    position: absolute;
+    inset: 0 0 auto;
+    height: var(--ruler-h);
+    border-bottom: 1px solid var(--cp-hairline);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__month {
+    bottom: 0;
+    width: 1px;
+    height: 5px;
+    background: var(--cp-ivory-4);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__year {
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+    border-left: 1px solid var(--cp-ivory-4);
+    color: var(--cp-ivory-2);
+    font: 400 14px/1 var(--cp-display);
+    letter-spacing: 0.08em;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__year b {
+    font-weight: 400;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__now {
+    top: 4px;
+    margin-left: 5px;
+    color: var(--cp-brass);
+    font: 400 11px/1 var(--cp-display);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__future {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(135deg, var(--cp-hairline-2) 0 1px, transparent 1px 7px);
+    pointer-events: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__markers {
+    position: absolute;
+    top: var(--ruler-h);
+    inset-inline: 0;
+    height: var(--markers-h);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__marker {
+    top: calc(5px + var(--row) * 6px);
+    width: 7px;
+    height: 7px;
+    margin-left: -3px;
+    background: var(--note);
+    transform: rotate(45deg);
+    transition: transform var(--cp-dur-ui) var(--cp-ease-swing), box-shadow var(--cp-dur-ui);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__marker[data-live] {
+    box-shadow: 0 0 8px var(--note);
+    transform: rotate(45deg) scale(1.6);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__spans {
+    position: absolute;
+    top: calc(var(--ruler-h) + var(--markers-h));
+    inset-inline: 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__span {
+    top: calc(var(--row) * var(--span-h));
+    width: calc(var(--w) * var(--year));
+    height: calc(var(--span-h) - 3px);
+    overflow: hidden;
+    padding: 0 5px;
+    border-left: 2px solid var(--cp-ivory-3);
+    border-radius: 0 3px 3px 0;
+    background: var(--cp-ink-4);
+    color: var(--cp-ivory-3);
+    font: 500 8.5px/11px var(--cp-mono);
+    letter-spacing: 0.08em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__span[data-live] {
+    border-left-color: var(--cp-brass);
+    color: var(--cp-ivory);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__clips {
+    position: absolute;
+    top: calc(var(--ruler-h) + var(--markers-h) + var(--span-rows) * var(--span-h) + 4px);
+    inset-inline: 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__clip {
+    top: calc(var(--row) * var(--clip-h));
+    width: calc(var(--w) * var(--year));
+    height: calc(var(--clip-h) - 5px);
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background: var(--note);
+    color: var(--cp-ink);
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: box-shadow var(--cp-dur-ui);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__clip .cp-clip__name {
+    top: 3px;
+    font-size: 12px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__clip .cp-roll {
+    inset: 17px 4px 3px;
+    width: calc(100% - 8px);
+    height: calc(100% - 20px);
+  }
+
+  /* the head: fixed at the middle; the career passes under it */
+  :root[data-lens="cut-paper"] .cp-tape__head {
+    position: absolute;
+    top: 0;
+    bottom: 18px;
+    left: 50%;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--cp-brass-fill);
+    box-shadow: var(--cp-glow-brass);
+    pointer-events: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__head::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 12px;
+    height: 9px;
+    background: var(--cp-brass);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform: translateX(-50%);
+  }
+
+  :root[data-lens="cut-paper"] .cp-tape__hint {
+    margin: 0;
+    padding: 2px 12px 6px;
+    color: var(--cp-ivory-4);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tr {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto 46px;
     min-height: 0;
   }
 
-  :root[data-lens="cut-paper"] .cp-track__head {
-    grid-template-columns: 22px 56px minmax(0, 1fr);
-    padding: 14px 12px 8px 10px;
+  :root[data-lens="cut-paper"] .cp-tr__head {
+    grid-template-columns: 22px 56px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 14px var(--cp-gutter) 14px 12px;
   }
 
-  :root[data-lens="cut-paper"] .cp-track__art {
+  :root[data-lens="cut-paper"] .cp-tr__art {
     width: 56px;
     height: 42px;
   }
 
-  :root[data-lens="cut-paper"] .cp-track__title {
+  :root[data-lens="cut-paper"] .cp-tr__title {
     font-size: 23px;
   }
 
-  :root[data-lens="cut-paper"] .cp-track__sum {
+  :root[data-lens="cut-paper"] .cp-tr__sum {
     -webkit-line-clamp: 2;
   }
 
-  :root[data-lens="cut-paper"] .cp-track__lane {
-    margin: 0 0 10px;
-  }
-
-  :root[data-lens="cut-paper"] .cp-clip {
-    top: 6px;
-    bottom: 6px;
-    min-width: 70px;
-  }
-
-  :root[data-lens="cut-paper"] .cp-clip__name {
-    display: none;
-  }
-
-  :root[data-lens="cut-paper"] .cp-roll {
-    inset: 5px;
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
-  }
-
-  :root[data-lens="cut-paper"] .cp-seq__playhead {
-    display: none;
-  }
-
-  :root[data-lens="cut-paper"] .cp-clip {
-    left: min(calc(var(--at) * 100%), calc(100% - 70px));
+  :root[data-lens="cut-paper"] .cp-tr__cue {
+    width: 36px;
+    height: 36px;
   }
 
   /* liner */
@@ -3295,7 +3880,7 @@
   :root[data-lens="cut-paper"] .cp-record,
   :root[data-lens="cut-paper"] .cp-viz--lotus path,
   :root[data-lens="cut-paper"] .cp-viz--beats > *,
-  :root[data-lens="cut-paper"] .cp-seq__playhead,
+  :root[data-lens="cut-paper"] .cp-run__line,
   :root[data-lens="cut-paper"] .cp-string {
     animation: none !important;
   }

@@ -44,8 +44,25 @@
   },
   "projects": {
     "track": "track",
+    "tracks": "Tracks",
     "now": "now",
-    "list": "Setlist, newest first"
+    "list": "Arrangement: one track per project, at its date",
+    "play": "Play",
+    "pause": "Pause",
+    "playLabel": "Play the career, from {from} to now",
+    "pauseLabel": "Pause the career",
+    "stop": "Stop",
+    "stopLabel": "Stop, and press again to return to now",
+    "position": "Playhead",
+    "nowPlaying": "Now playing",
+    "between": "between tracks",
+    "markers": "Markers",
+    "audition": "Hear {title}",
+    "cue": "Cue {title} and hear it",
+    "soundOff": "Sound is off. Turn it on, top right, to hear the career.",
+    "playing": "Playing from {when}",
+    "paused": "Paused at {when}",
+    "tapeHint": "swipe the years · tap a clip to hear it"
   },
   "project": {
     "setlist": "Setlist",
