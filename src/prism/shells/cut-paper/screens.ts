@@ -7,7 +7,9 @@ import { blocks, fallbackBody, featured, fill, inline, rich, type LinkMaker } fr
 import type { ResumeEntry, Route, SiteContent } from "../types";
 import { arrangement } from "./arrange";
 import { h, link, markup, seeded, type Child } from "./dom";
+import { listen } from "./listen";
 import { noteAt, noteVar } from "./notes";
+import { clipPhrase, modelFor, spanPhrase } from "./timeline";
 
 export interface Screen {
   el: HTMLElement;
@@ -70,6 +72,13 @@ function adopt(fragment: DocumentFragment | Element) {
   fragment.querySelectorAll("[aria-labelledby]").forEach((node) => node.removeAttribute("aria-labelledby"));
   fragment.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
   return fragment;
+}
+
+/** Make `el` sound like a project's clip when hovered, tapped or focused:
+ * the same motif the arrangement plays at its date. */
+function sounds(el: HTMLElement, content: SiteContent, item: Project) {
+  const clip = modelFor(content).clips.find((entry) => entry.project.slug === item.slug);
+  if (clip) listen(el, `clip:${item.slug}`, () => clipPhrase(clip));
 }
 
 /** Links inside content copy, made the shell's way. */
@@ -289,6 +298,7 @@ function home(content: SiteContent, copy: Copy, options: ScreenOptions): Screen 
         h("span", { class: "cp-sleeve__side", "aria-hidden": "true" }, `A${index + 1}`),
       );
       sleeves.push(sleeve);
+      if (!options.face) sounds(sleeve, content, project);
       sleeve.addEventListener("pointerenter", () => cue(project));
       sleeve.addEventListener("focus", () => cue(project));
       return h("li", null, sleeve);
@@ -402,6 +412,8 @@ function project(content: SiteContent, copy: Copy, item: Project): Screen {
     scrap(BRAND[index % 4], "tri", "cp-sleeve-art__scrap-a"),
     scrap(BRAND[(index + 1) % 4], "torn", "cp-sleeve-art__scrap-b"),
   );
+  // pulling the record out plays it
+  sounds(sleeve, content, item);
 
   const transport = h(
     "nav",
@@ -663,6 +675,7 @@ function resume(content: SiteContent, copy: Copy): Screen {
     ),
   );
 
+  const { spans, now } = modelFor(content);
   const sides = h("div", { class: "cp-cv__sides" });
   let sideIndex = 0;
   let cutIndex = 0;
@@ -705,6 +718,9 @@ function resume(content: SiteContent, copy: Copy): Screen {
       entry.dateLine ? h("p", { class: "cp-cut__when" }, entry.dateLine) : null,
       lines.some(Boolean) ? proseOf(lines) : null,
     );
+    // a credit sounds the chords where it starts and ends
+    const dated = spans.find((span) => span.entry.id === entry.id);
+    listen(el, `span:${entry.id}`, () => spanPhrase(dated ?? { start: now, end: now }));
     return el;
   };
 
