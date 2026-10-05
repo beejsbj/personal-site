@@ -3,13 +3,18 @@
  * screen edge or up from behind a section rule, then ducks away.
  *
  * Rules that keep it from ever fighting reading:
- * - rare: the first peek waits a while, then a long cooldown follows each
+ * - occasional: the first peek waits a while, then a cooldown follows each
  *   one; the cooldown is kept for the session (sessionStorage), so moving
  *   between pages never makes them more frequent;
  * - one at a time, never in a page's first moments, never while the page
  *   is scrolling, hidden or mid-transition;
- * - never over text: a placement whose visible part would touch text,
- *   media or a control is rejected, and if none fits the peek waits;
+ * - never over text: a placement whose visible part would touch text or a
+ *   control is rejected, and if none fits the peek waits;
+ * - compact screens (phones, touch): the cooldown is shorter and the first
+ *   peek sooner. Text is judged line by line (the rendered text lines, not
+ *   their blocks), and a peek may come over images and video, rising from
+ *   behind a picture's lower edge, or sit in a margin beside short lines.
+ *   Wide screens keep media off limits too;
  * - brief: in, a short hold, out, well under five seconds (WCAG 2.2.2);
  * - shy: it ducks the moment it is noticed (pointer approaching or over
  *   it, a tap, a scroll) or after its hold.
@@ -17,6 +22,7 @@
  * The runtime cleans up on Astro navigation and remounts on page-load.
  */
 const MOTION = "(prefers-reduced-motion: no-preference)";
+const COMPACT = "(max-width: 40.625rem), (pointer: coarse)";
 const STORE_KEY = "daylight:initials-next-peek";
 
 export const PEEK = {
@@ -30,6 +36,14 @@ export const PEEK = {
   notice: 96, // px: a pointer this close to the letter is noticed
   show: 0.42, // share of the letter's box that peeks into view
   clearance: 24, // px kept between the peek and any text or control
+  compact: {
+    firstDelay: [5_000, 10_000],
+    cooldown: [15_000, 30_000],
+    retry: [2_500, 5_000],
+    settle: 2_500,
+    clearance: 12,
+    show: 0.5,
+  },
 } as const;
 
 const OBSTACLES = [
@@ -55,6 +69,10 @@ const OBSTACLES = [
   "time",
 ].join(",");
 const HORIZONS = "[data-peek-horizon], .site-footer";
+// Compact screens judge text by its rendered lines, so these only add the
+// controls; media is allowed.
+const CONTROLS = "a, button, input, select, textarea, label";
+const MEDIA = "img, video";
 
 type Rect = { left: number; top: number; right: number; bottom: number };
 type Placement = {
@@ -67,7 +85,6 @@ type Placement = {
 
 const between = ([min, max]: readonly [number, number]) =>
   min + Math.random() * (max - min);
-const pick = <T>(items: T[]) => items[Math.floor(Math.random() * items.length)];
 const shuffle = <T>(items: T[]) =>
   items
     .map((item) => ({ item, key: Math.random() }))
@@ -97,7 +114,9 @@ function writeNext(value: number) {
 
 export function installInitialPeeks() {
   const motion = window.matchMedia(MOTION);
-  let nextAt = readNext() ?? Date.now() + between(PEEK.firstDelay);
+  const compact = window.matchMedia(COMPACT);
+  const timing = () => (compact.matches ? PEEK.compact : PEEK);
+  let nextAt = readNext() ?? Date.now() + between(timing().firstDelay);
   writeNext(nextAt);
   let cleanup: (() => void) | undefined;
 
@@ -134,30 +153,60 @@ export function installInitialPeeks() {
       clearTimer();
       if (!motion.matches) return;
       const now = Date.now();
-      const wait = Math.max(at - now, mountedAt + PEEK.settle - now, 0);
+      const wait = Math.max(at - now, mountedAt + timing().settle - now, 0);
       timer = setTimeout(() => attempt(false), wait);
     };
-    const retry = () => schedule(Date.now() + between(PEEK.retry));
+    const retry = () => schedule(Date.now() + between(timing().retry));
 
-    const obstacles = (): Rect[] => {
-      const height = window.innerHeight;
+    const inView = (rect: Rect & { width: number; height: number }) =>
+      rect.width > 0 &&
+      rect.height > 0 &&
+      rect.bottom >= 0 &&
+      rect.top <= window.innerHeight;
+    const rectsOf = (selector: string) => {
       const rects: Rect[] = [];
-      for (const element of document.querySelectorAll<HTMLElement>(OBSTACLES)) {
+      for (const element of document.querySelectorAll<HTMLElement>(selector)) {
+        if (element.closest(".initial-peek")) continue;
+        // An image link has no words to cover; its picture is fair game.
+        if (compact.matches && !element.textContent?.trim()) continue;
         const rect = element.getBoundingClientRect();
-        if (!rect.width || !rect.height) continue;
-        if (rect.bottom < 0 || rect.top > height) continue;
-        rects.push(rect);
+        if (inView(rect)) rects.push(rect);
       }
       return rects;
     };
+    // The text itself: every rendered line of every visible text node.
+    const textLines = () => {
+      const rects: Rect[] = [];
+      const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT,
+      );
+      const range = document.createRange();
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (!node.textContent?.trim()) continue;
+        if (node.parentElement?.closest(".initial-peek, script, style"))
+          continue;
+        range.selectNodeContents(node);
+        for (const rect of range.getClientRects())
+          if (inView(rect)) rects.push(rect);
+      }
+      return rects;
+    };
+    const obstacles = (): Rect[] =>
+      compact.matches
+        ? [...textLines(), ...rectsOf(CONTROLS)]
+        : rectsOf(OBSTACLES);
 
     const placements = (width: number, height: number): Placement[] => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const showX = width * PEEK.show;
-      const showY = height * PEEK.show;
+      const showX = width * timing().show;
+      const showY = height * timing().show;
       const options: Placement[] = [];
-      for (const share of [0.22, 0.42, 0.62]) {
+      const shares = compact.matches
+        ? [0.16, 0.28, 0.4, 0.52, 0.64, 0.76]
+        : [0.22, 0.42, 0.62];
+      for (const share of shares) {
         const y = Math.round(vh * share - height / 2);
         if (y < 0 || y + height > vh) continue;
         options.push({
@@ -202,6 +251,30 @@ export function installInitialPeeks() {
           });
         }
       }
+      // Compact: rise from behind a picture's lower edge, over the picture.
+      if (compact.matches) {
+        for (const media of document.querySelectorAll<HTMLElement>(MEDIA)) {
+          const rect = media.getBoundingClientRect();
+          const floor = Math.round(Math.min(rect.bottom, vh));
+          if (rect.width < width || floor - Math.max(rect.top, 0) < showY)
+            continue;
+          if (floor < showY || rect.top > vh) continue;
+          for (const x of [rect.left, rect.right - width].map(Math.round)) {
+            options.push({
+              edge: "horizon",
+              floor,
+              from: [x, floor],
+              to: [x, Math.round(floor - showY)],
+              visible: {
+                left: x,
+                top: floor - showY,
+                right: x + width,
+                bottom: floor,
+              },
+            });
+          }
+        }
+      }
       return options;
     };
 
@@ -235,23 +308,34 @@ export function installInitialPeeks() {
       stage.setAttribute("aria-hidden", "true");
       const letter = document.createElement("span");
       letter.className = "initial-peek__letter";
-      letter.textContent = pick(["B", "J"]);
       letter.dataset.peek = "measure";
       stage.append(letter);
       document.body.append(stage);
-      const box = letter.getBoundingClientRect();
-      const blocked = forced ? [] : obstacles();
-      const placement = shuffle(placements(box.width, box.height)).find(
-        (option) =>
-          !blocked.some((rect) =>
-            overlaps(option.visible, rect, PEEK.clearance),
-          ),
+      // Each letter peeks with the side that reads: J's hook from the left,
+      // B's bowls from the right or rising from below.
+      const measure = (glyph: "B" | "J") => {
+        letter.textContent = glyph;
+        const { width, height } = letter.getBoundingClientRect();
+        return { glyph, width, height };
+      };
+      const boxes = [measure("B"), measure("J")].filter((box) => box.width);
+      const options = boxes.flatMap((box) =>
+        placements(box.width, box.height)
+          .filter((option) => (option.edge === "left") === (box.glyph === "J"))
+          .map((option) => ({ ...option, glyph: box.glyph })),
       );
-      if (!placement || !box.width) {
+      const blocked = forced ? [] : obstacles();
+      const clearance = timing().clearance;
+      const placement = shuffle(options).find(
+        (option) =>
+          !blocked.some((rect) => overlaps(option.visible, rect, clearance)),
+      );
+      if (!placement) {
         stage.remove();
         return forced ? undefined : retry();
       }
 
+      letter.textContent = placement.glyph;
       stage.dataset.edge = placement.edge;
       if (placement.floor !== undefined)
         stage.style.setProperty("--peek-floor", `${placement.floor}px`);
@@ -265,7 +349,7 @@ export function installInitialPeeks() {
       );
       letter.dataset.peek = "hidden";
       active = { stage, letter, visible: placement.visible, leaving: false };
-      nextAt = now + between(PEEK.cooldown);
+      nextAt = now + between(timing().cooldown);
       writeNext(nextAt);
       // Commit the hidden position, then let the transition carry it in.
       void letter.getBoundingClientRect();
