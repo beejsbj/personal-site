@@ -83,7 +83,6 @@
   },
   "lab": {
     "presets": "Presets",
-    "tabs": ["anim", "freq", "color", "popup", "scope"],
     "open": "open",
     "apply": "apply",
     "entryKicker": " · preset {no}",

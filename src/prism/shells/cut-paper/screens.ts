@@ -536,11 +536,9 @@ function lab(content: SiteContent, copy: Copy): Screen {
           { class: "cp-drawer", "aria-label": copy.lab.presets },
           h(
             "div",
-            { class: "cp-drawer__tabs", "aria-hidden": "true" },
-            copy.lab.tabs.map((tab, i) =>
-              h("span", { class: "cp-drawer__tab", "data-state": i === 0 ? "on" : "off" }, tab),
-            ),
-            h("span", { class: "cp-drawer__count" }, String(content.derived.counts.lab).padStart(2, "0")),
+            { class: "cp-drawer__tabs" },
+            h("h2", { class: "cp-drawer__tab", "data-state": "on" }, copy.lab.presets),
+            h("span", { class: "cp-drawer__count", "aria-hidden": "true" }, String(content.derived.counts.lab).padStart(2, "0")),
           ),
           bar(presets, 2, 4),
         ),
