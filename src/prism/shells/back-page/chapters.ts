@@ -1,9 +1,9 @@
 /** Every route is a chapter in one of the exercise books on the desk: a run
  * of pages written in that book's pens. There's a book for each section,
- * each on its own paper (themes.ts): hello in the squared maths copy, a
- * letter in the quiet notebook, the typed resume stapled into a legal pad,
- * doodles in the graph book, and the war on blueprint, its map first and a
- * page for each project after.
+ * each on its own paper (themes.ts): hello in the squared maths copy, study
+ * notes in the quiet notebook with the resume stapled in after them, slip by
+ * slip, doodles in the graph book, and the war on blueprint, its map first
+ * and a page for each project after.
  *
  * Every word comes from content: the portfolio and Daylight's copy from
  * `content`, the books' own handwriting from `content.lenses["back-page"]`. */
@@ -81,8 +81,9 @@ export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
   add("home", "/", names.home, 1);
   page = 1;
   add("about", "/about", names.about, 1);
-  page = 1;
-  add("resume", "/resume", names.resume, 1);
+  // the resume is stapled into the about book, after the notes (its first
+  // page is counted from the notes when it's written: see `resume`)
+  add("about", "/resume", names.resume, 1);
   page = 1;
   add("lab", "/lab", names.lab, ALLOWANCE.labHead);
   content.lab
@@ -104,7 +105,7 @@ export function bookOf(route: Route): BookKey | null {
     case "about":
       return "about";
     case "resume":
-      return "resume";
+      return "about";
     case "lab":
     case "lab-entry":
       return "lab";
@@ -138,7 +139,7 @@ export interface Build {
   today: string;
 }
 
-type Paper = "squared" | "kraft" | "kraft-in" | "typed" | "notes";
+type Paper = "squared" | "kraft" | "kraft-in" | "notes";
 
 /** The number of the route's first page, from the book's order. */
 const firstPage = (b: Build) =>
@@ -164,15 +165,7 @@ export function blankPage(
     );
   }
   const flow = h("div", { class: "bp-flow" });
-  if (paper === "typed") {
-    const sheet = h(
-      "div",
-      { class: "bp-sheet" },
-      h("i", { class: "bp-staple", "aria-hidden": "true" }),
-      flow,
-    );
-    page.append(sheet);
-  } else page.append(flow);
+  page.append(flow);
   return { page, flow };
 }
 
@@ -540,55 +533,104 @@ function about(b: Build) {
   return pages;
 }
 
-// ---- resume: typed, and stapled in -------------------------------------------------
+// ---- resume: slips stapled into the about book ---------------------------------------
 
-/** The structured resume, typed out: a heading for each section, then each
- * role or course as its heading, its dates, its summary and its bullets. */
-function typed(content: SiteContent): HTMLElement[] {
-  const { resume } = content;
-  const groups = [
-    { title: resume.experience.title, entries: resume.experience.roles, name: "resume.role" as const },
-    { title: resume.education.title, entries: resume.education.entries, name: "resume.education" as const },
-  ];
-  const out: HTMLElement[] = [];
-  for (const group of groups) {
-    out.push(h("h2", null, group.title));
-    for (const entry of group.entries) {
-      const mark = part(group.name, entry.id);
-      out.push(h("h3", { ...mark }, entry.heading));
-      if (entry.dateLine) out.push(h("p", { ...mark }, h("em", null, entry.dateLine)));
-      if (entry.summary) out.push(h("p", { ...mark }, inline(entry.summary)));
-      if (entry.bullets.length)
-        out.push(h("ul", { ...mark }, ...entry.bullets.map((bullet) => h("li", null, inline(bullet)))));
-    }
-  }
-  out.push(
-    h("h2", null, resume.tools.title),
-    h("p", { ...part("resume.tools") }, resume.tools.sentence),
+/** The paper each slip is cut from, in turn: a ruled index card written by
+ * hand, a typed half-sheet, a till receipt. */
+const STOCKS = ["index", "typed", "receipt"] as const;
+type Stock = (typeof STOCKS)[number] | "letterhead" | "manila" | "scrap";
+
+/** A slip of paper stapled onto the page: its own stock, a slight turn, and
+ * one or two staples through its top. */
+function slip(stock: Stock, key: string, mark: ReturnType<typeof part> | null, ...kids: (Node | null)[]) {
+  const rng = seed(key);
+  const tilt = ((rng() - 0.5) * 2.6).toFixed(2);
+  const staples = stock === "typed" || stock === "letterhead" ? 2 : 1;
+  const at = staples === 2 ? [22 + rng() * 6, 72 + rng() * 6] : [38 + rng() * 24];
+  return h(
+    "div",
+    {
+      class: "bp-slip",
+      "data-stock": stock,
+      style: `--tilt:${tilt}deg;--ox:${at[0].toFixed(0)}%`,
+      ...mark,
+    },
+    ...at.map((x) =>
+      h("i", {
+        class: "bp-staple",
+        "aria-hidden": "true",
+        style: `left:${x.toFixed(0)}%;--st:${((rng() - 0.5) * 14).toFixed(1)}deg`,
+      }),
+    ),
+    ...kids,
   );
-  return out;
 }
 
+/** One role or course, on its slip. */
+function entrySlip(entry: SiteContent["resume"]["experience"]["roles"][number], stock: Stock, name: "resume.role" | "resume.education") {
+  return slip(
+    stock,
+    entry.id,
+    part(name, entry.id),
+    h("h3", { class: "bp-slip__title" }, entry.heading),
+    entry.dateLine ? h("p", { class: "bp-slip__date" }, entry.dateLine) : null,
+    entry.summary ? h("p", null, inline(entry.summary)) : null,
+    entry.bullets.length ? h("ul", null, ...entry.bullets.map((bullet) => h("li", null, inline(bullet)))) : null,
+  );
+}
+
+/** A heading written on the notebook page, above a run of slips. */
+const stapledHead = (title: string) => h("h2", { class: "bp-stapledhead" }, title);
+
 function resume(b: Build) {
-  const { header, html } = b.content.pages.resume;
-  const blocks: HTMLElement[] = [
-    h(
-      "header",
-      { class: "bp-typedhead" },
-      h1(header.title, part("page.title", "resume")),
-      header.intro ? h("p", { class: "bp-typedhead__intro", ...part("page.intro", "resume") }, header.intro) : null,
-      header.actions.length
-        ? h(
-            "p",
-            { class: "bp-typedhead__contact", ...part("page.actions", "resume") },
-            ...header.actions.flatMap((a, i) => [i ? "  ·  " : "", link(a.href, b.copy.newTab, a.label)]),
-          )
-        : null,
-    ),
-    ...typed(b.content),
-    ...prose(html, "page.body", "resume"),
-  ];
-  return written(b, "resume", "typed", blocks, firstPage(b), b.today);
+  const { content, copy } = b;
+  const { header, html } = content.pages.resume;
+  const { resume } = content;
+  const head = slip(
+    "letterhead",
+    "letterhead",
+    null,
+    h1(header.title, part("page.title", "resume")),
+    header.intro ? h("p", { class: "bp-slip__intro", ...part("page.intro", "resume") }, header.intro) : null,
+    header.actions.length
+      ? h(
+          "p",
+          { class: "bp-slip__contact", ...part("page.actions", "resume") },
+          ...header.actions.flatMap((a, i) => [i ? " · " : "", link(a.href, copy.newTab, a.label)]),
+        )
+      : null,
+  );
+  const blocks: HTMLElement[] = [head];
+  if (resume.experience.roles.length) {
+    blocks.push(stapledHead(resume.experience.title));
+    resume.experience.roles.forEach((role, i) => blocks.push(entrySlip(role, STOCKS[i % STOCKS.length], "resume.role")));
+  }
+  if (resume.education.entries.length) {
+    blocks.push(stapledHead(resume.education.title));
+    resume.education.entries.forEach((entry) => blocks.push(entrySlip(entry, "manila", "resume.education")));
+  }
+  if (resume.tools.items.length) {
+    blocks.push(
+      stapledHead(resume.tools.title),
+      slip(
+        "scrap",
+        "tools",
+        part("resume.tools"),
+        h("ul", { class: "bp-circled", "aria-label": resume.tools.title }, ...resume.tools.items.map((t) => h("li", null, t))),
+      ),
+    );
+  }
+  blocks.push(...studyNotes(html, "page.body", "resume"));
+  return written(b, "resume", "notes", blocks, resumeStart(b), b.today);
+}
+
+/** The resume's first page: the next after the notes, however many pages
+ * the notes run to at this size. */
+function resumeStart(b: Build) {
+  const notes = b.order.find((stop) => stop.key === "/about");
+  if (!notes) return firstPage(b);
+  const route: Route = { ...b.route, kind: "about", path: notes.href };
+  return notes.page + aboutPages({ ...b, route }).pages.length;
 }
 
 // ---- the lab: doodles in the margin ----------------------------------------------------

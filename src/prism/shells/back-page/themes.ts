@@ -21,7 +21,6 @@ export interface Shelf {
 export const BOOKS: Shelf[] = [
   { key: "home", href: "/", theme: "lamplight" },
   { key: "about", href: "/about", theme: "notebook" },
-  { key: "resume", href: "/resume", theme: "legal" },
   { key: "lab", href: "/lab", theme: "graph" },
   { key: "projects", href: "/projects", theme: "blueprint" },
 ];

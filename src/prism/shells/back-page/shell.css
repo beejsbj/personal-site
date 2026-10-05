@@ -335,8 +335,7 @@
   --mx: 3.3em;
 }
 :root[data-lens="back-page"] .bp-page[data-paper="squared"]::before,
-:root[data-lens="back-page"] .bp-page[data-paper="notes"]::before,
-:root[data-lens="back-page"] .bp-page[data-paper="typed"]::before {
+:root[data-lens="back-page"] .bp-page[data-paper="notes"]::before {
   content: "";
   position: absolute;
   top: 0;
@@ -478,11 +477,6 @@
 :root[data-lens="back-page"] .bp-flow blockquote {
   padding-left: 0.8em;
   border-left: 2px solid var(--bp-red);
-}
-:root[data-lens="back-page"] .bp-sheet .bp-flow :is(h4, h5, h6) {
-  margin: 0.8em 0 0.15em;
-  font: 1em/1.35 var(--bp-type);
-  color: #111;
 }
 
 /* ---- handwriting ------------------------------------------------------------------ */
@@ -1124,92 +1118,212 @@
   box-decoration-break: clone;
 }
 
-/* ---- typed, and stapled in ------------------------------------------------------------ */
-:root[data-lens="back-page"] .bp-sheet {
-  position: absolute;
-  top: calc(var(--lh) * 2.2);
-  bottom: 1.2em;
-  left: calc(var(--mx) - 1.6em);
-  right: 0.9em;
-  background:
-    radial-gradient(ellipse at 40% 20%, rgba(255, 255, 255, 0.7), transparent 70%),
-    #fbf9f3;
-  box-shadow:
-    0 1px 1px rgba(0, 0, 0, 0.2),
-    0 8px 18px rgba(60, 40, 20, 0.3);
-  transform: rotate(-0.6deg);
+/* ---- slips stapled into the about book: the resume -----------------------------------
+   Each role, course and the tools on its own slip: a ruled index card, a
+   typed half-sheet, a till receipt, a manila library card, a scrap of graph
+   paper. Each is stapled at the top, turned a little, and lifts off the page;
+   reaching for one lifts it further, pivoting on its staple. */
+:root[data-lens="back-page"] .bp-flow .bp-stapledhead {
+  margin: calc(var(--g) * 0.4) 0 0;
+  font: 400 1.45em/var(--lh) var(--bp-brush);
+  color: var(--bp-blue);
 }
+:root[data-lens="back-page"] .bp-slip {
+  --slip: #fdfcf8;
+  --slip-ink: #24222a;
+  position: relative;
+  margin: calc(var(--g) * 0.7) 0.5em calc(var(--g) * 1.4) 0.1em;
+  padding: 1em 0.9em 0.6em;
+  font: 0.78em/1.42 var(--bp-type);
+  color: var(--slip-ink);
+  background: var(--slip);
+  transform: rotate(var(--tilt, 0deg));
+  transform-origin: var(--ox, 50%) 0.5em;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.16),
+    0 7px 14px -4px rgba(60, 40, 20, 0.34),
+    0 16px 18px -14px rgba(60, 40, 20, 0.4);
+}
+:root[data-lens="back-page"] .bp-slip p,
+:root[data-lens="back-page"] .bp-slip ul {
+  margin: 0 0 0.45em !important;
+}
+:root[data-lens="back-page"] .bp-slip ul {
+  padding-left: 1.1em;
+  list-style: "– ";
+}
+:root[data-lens="back-page"] .bp-slip li::marker {
+  font: inherit;
+  color: inherit;
+}
+:root[data-lens="back-page"] .bp-flow .bp-slip a {
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-flow .bp-slip .bp-slip__title {
+  margin: 0 0 0.1em;
+  font: 1.08em/1.3 var(--bp-type);
+  color: #111;
+}
+:root[data-lens="back-page"] .bp-slip__date {
+  color: #6b6560;
+}
+/* the staple: a bent wire through the paper, its ends pressed in */
 :root[data-lens="back-page"] .bp-staple {
   position: absolute;
   z-index: 2;
-  left: 1.1em;
-  top: 0.9em;
+  top: 0.4em;
   width: 1.9em;
-  height: 0.28em;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #d8dde0, #8d9397);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
-  transform: rotate(-32deg);
+  height: 0.3em;
+  margin-left: -0.95em;
+  border-radius: 1px;
+  background: linear-gradient(180deg, #f2f4f5 0%, #b9bfc3 35%, #7d8489 70%, #a9afb3 100%);
+  box-shadow:
+    0 1px 0.5px rgba(0, 0, 0, 0.45),
+    0 0 0 0.5px rgba(40, 44, 48, 0.35);
+  transform: rotate(var(--st, 0deg));
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow {
-  top: 2em;
-  bottom: 1.8em;
-  left: 1.6em;
-  right: 1.5em;
-  padding-left: 0;
-  font: 0.84em/1.55 var(--bp-type);
-  color: #232120;
+:root[data-lens="back-page"] .bp-staple::before,
+:root[data-lens="back-page"] .bp-staple::after {
+  content: "";
+  position: absolute;
+  top: -0.12em;
+  width: 0.2em;
+  height: 0.54em;
+  border-radius: 1px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(60, 50, 40, 0.38), transparent 70%);
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow p,
-:root[data-lens="back-page"] .bp-sheet .bp-flow ul,
-:root[data-lens="back-page"] .bp-sheet .bp-flow ol {
-  margin-bottom: 0.7em;
+:root[data-lens="back-page"] .bp-staple::before {
+  left: -0.1em;
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow ul {
-  padding-left: 1.2em;
-  list-style: "- ";
+:root[data-lens="back-page"] .bp-staple::after {
+  right: -0.1em;
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow li::marker {
-  font-family: var(--bp-type);
-  color: #232120;
+/* a ruled index card, written in by hand */
+:root[data-lens="back-page"] .bp-slip[data-stock="index"] {
+  --slip-ink: var(--bp-letter);
+  padding-top: 1.1em;
+  font: 0.9em/1.5em var(--bp-print);
+  background:
+    linear-gradient(transparent 0.95em, rgba(206, 70, 70, 0.6) 0.95em 1.05em, transparent 1.05em) 0 0 / 100% 100% no-repeat,
+    linear-gradient(transparent calc(1.5em - 1px), rgba(92, 140, 196, 0.38) calc(1.5em - 1px)) 0 1.1em / 100% 1.5em,
+    #fffefb;
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow h2 {
-  margin: 0.9em 0 0.5em;
-  font: 1.15em/1.3 var(--bp-type);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+:root[data-lens="back-page"] .bp-flow .bp-slip[data-stock="index"] .bp-slip__title {
+  font: 400 1.3em/1.5em var(--bp-brush);
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="index"] .bp-slip__date {
+  font: 700 1.1em/1.5em var(--bp-hand);
   color: var(--bp-red);
-  border-bottom: 1.5px solid rgba(192, 30, 42, 0.5);
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow h3 {
-  margin: 0.8em 0 0.15em;
-  font: 1.05em/1.35 var(--bp-type);
-  color: #111;
+:root[data-lens="back-page"] .bp-slip[data-stock="index"] ul {
+  list-style: "→ ";
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow em {
-  font-style: normal;
-  color: var(--bp-fine);
+:root[data-lens="back-page"] .bp-slip[data-stock="index"] :is(p, ul) {
+  margin-bottom: 0 !important;
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow a {
-  color: #1d2f80;
+/* a typed half-sheet, and the letterhead: white bond, typewriter */
+:root[data-lens="back-page"] .bp-slip[data-stock="typed"],
+:root[data-lens="back-page"] .bp-slip[data-stock="letterhead"] {
+  background:
+    radial-gradient(ellipse at 40% 20%, rgba(255, 255, 255, 0.7), transparent 70%),
+    #fbf9f3;
 }
-:root[data-lens="back-page"] .bp-sheet .bp-h1 {
-  font: 1.9em/1.2 var(--bp-type);
+:root[data-lens="back-page"] .bp-slip[data-stock="letterhead"] {
+  padding-bottom: 0.7em;
+  border-bottom: 3px double rgba(35, 33, 32, 0.35);
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="letterhead"] .bp-h1 {
+  font: 1.75em/1.25 var(--bp-type);
   color: #111;
   transform: none;
   letter-spacing: 0.02em;
 }
-:root[data-lens="back-page"] .bp-typedhead {
-  margin-bottom: 0.4em;
-  padding-bottom: 0.6em;
-  border-bottom: 1.5px dashed rgba(35, 33, 32, 0.4);
+:root[data-lens="back-page"] .bp-slip__contact {
+  font-size: 0.94em;
 }
-:root[data-lens="back-page"] .bp-typedhead__intro {
-  margin: 0.2em 0 0.3em !important;
+/* a till receipt: narrow thermal paper, torn zigzag at both ends */
+:root[data-lens="back-page"] .bp-slip[data-stock="receipt"] {
+  --slip: #fbfbf7;
+  width: min(86%, 21em);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1.2em 1em 1.1em;
+  font: 0.78em/1.4 "Courier New", var(--bp-type), monospace;
+  letter-spacing: 0.02em;
+  --zig: 0.45em;
+  clip-path: polygon(
+    0 var(--zig), 5% 0, 10% var(--zig), 15% 0, 20% var(--zig), 25% 0, 30% var(--zig), 35% 0, 40% var(--zig), 45% 0, 50% var(--zig), 55% 0, 60% var(--zig), 65% 0, 70% var(--zig), 75% 0, 80% var(--zig), 85% 0, 90% var(--zig), 95% 0, 100% var(--zig),
+    100% calc(100% - var(--zig)), 95% 100%, 90% calc(100% - var(--zig)), 85% 100%, 80% calc(100% - var(--zig)), 75% 100%, 70% calc(100% - var(--zig)), 65% 100%, 60% calc(100% - var(--zig)), 55% 100%, 50% calc(100% - var(--zig)), 45% 100%, 40% calc(100% - var(--zig)), 35% 100%, 30% calc(100% - var(--zig)), 25% 100%, 20% calc(100% - var(--zig)), 15% 100%, 10% calc(100% - var(--zig)), 5% 100%, 0 calc(100% - var(--zig))
+  );
+  filter: drop-shadow(0 6px 6px rgba(60, 40, 20, 0.3));
+  box-shadow: none;
 }
-:root[data-lens="back-page"] .bp-typedhead__contact {
+:root[data-lens="back-page"] .bp-flow .bp-slip[data-stock="receipt"] .bp-slip__title {
+  padding-bottom: 0.35em;
+  margin-bottom: 0.35em;
+  border-bottom: 1.5px dashed rgba(36, 34, 42, 0.5);
+  font: 700 1em/1.35 "Courier New", var(--bp-type), monospace;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 0.08em;
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="receipt"] .bp-slip__date {
+  text-align: center;
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="receipt"] ul {
+  list-style: "* ";
+  border-top: 1.5px dashed rgba(36, 34, 42, 0.5);
+  padding-top: 0.4em;
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="receipt"] .bp-staple {
+  top: 0.8em;
+}
+/* a manila library card: buff, a printed rule down the left */
+:root[data-lens="back-page"] .bp-slip[data-stock="manila"] {
+  --slip: #ead9ad;
+  --slip-ink: #3a301c;
+  padding-left: 1.6em;
+  background:
+    linear-gradient(90deg, transparent 0.9em, rgba(150, 70, 40, 0.45) 0.9em 1.02em, transparent 1.02em),
+    radial-gradient(ellipse at 30% 20%, rgba(255, 245, 215, 0.6), transparent 70%),
+    var(--slip);
+}
+:root[data-lens="back-page"] .bp-flow .bp-slip[data-stock="manila"] .bp-slip__title {
+  font: 700 1.05em/1.3 var(--bp-type);
+  color: #2b2414;
+}
+/* a scrap torn from graph paper, the tools circled on it */
+:root[data-lens="back-page"] .bp-slip[data-stock="scrap"] {
+  --gs: 0.62em;
+  padding: 1.2em 0.8em 0.5em;
+  font: 0.95em/1.5 var(--bp-print);
+  background:
+    linear-gradient(rgba(46, 140, 110, 0.2) 1px, transparent 1px) 0 0 / var(--gs) var(--gs),
+    linear-gradient(90deg, rgba(46, 140, 110, 0.2) 1px, transparent 1px) 0 0 / var(--gs) var(--gs),
+    #fbfbf5;
+  clip-path: polygon(0 1%, 9% 0, 21% 1.6%, 33% 0.2%, 47% 1.4%, 62% 0, 74% 1.5%, 88% 0.3%, 100% 1.2%, 100% 97%, 91% 100%, 78% 98.4%, 64% 100%, 50% 98.6%, 37% 100%, 22% 98.2%, 10% 100%, 0 98.5%);
+  filter: drop-shadow(0 6px 6px rgba(60, 40, 20, 0.3));
+  box-shadow: none;
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="scrap"] .bp-circled {
   margin: 0 !important;
-  font-size: 0.92em;
+}
+/* reaching for a slip lifts it on its staple */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="back-page"] .bp-slip {
+    transition:
+      transform 0.32s cubic-bezier(0.2, 0.8, 0.3, 1.25),
+      box-shadow 0.32s ease;
+  }
+  :root[data-lens="back-page"] .bp-book .bp-slip:is(:hover, :focus-within) {
+    transform: rotate(calc(var(--tilt, 0deg) * -0.6 - 1.4deg)) translateY(-3px);
+    box-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.12),
+      0 14px 22px -6px rgba(60, 40, 20, 0.42),
+      0 26px 26px -18px rgba(60, 40, 20, 0.45);
+    z-index: 1;
+  }
 }
 
 /* ---- entries: projects and lab notes ----------------------------------------------- */

@@ -22,7 +22,10 @@ const SOLID = [
   "svg:not(.bp-life svg, .bp-life, .bp-life-ink, .bp-underline, .bp-scribble)",
   ".bp-taped",
   ".bp-note",
-  ".bp-sheet",
+  ".bp-slip",
+  ".bp-sticky",
+  ".bp-keybox",
+  ".bp-callout",
   // on the war map, its camps (the old flicks between them are open paper)
   ".bp-camp",
   ".bp-map__legend",

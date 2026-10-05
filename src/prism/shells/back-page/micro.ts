@@ -138,7 +138,7 @@ function writeIn(page: HTMLElement, delay: number) {
  * in the corner, headings, margin notes, and the body itself, a line at a
  * time. Each line is uncovered left to right as the pen crosses it, the
  * lines overlapping so a whole page is down in about a second and a half. On
- * typed paper the lines are typed, a few characters at a clack. */
+ * a typed slip the lines are typed, a few characters at a clack. */
 const WRITTEN =
   ".bp-page__head b, .bp-flow :is(p, li, dt, dd, h2, h3, h4, figcaption, blockquote, time)";
 const NOT_WRITTEN = ".bp-h1, .bp-sr, .bp-loose, .bp-label, .bp-return, .bp-belongs, .bp-map";
@@ -154,7 +154,8 @@ function writeLines(page: HTMLElement, start: number) {
       (el.textContent ?? "").trim().length > 0,
   );
   if (!els.length) return;
-  const typed = page.dataset.paper === "typed";
+  // typed slips are typed in, a few characters at a clack
+  const typed = (el: HTMLElement) => !!el.closest('[data-stock="typed"], [data-stock="letterhead"], [data-stock="receipt"]');
   const fs = parseFloat(getComputedStyle(page).fontSize) || 18;
   const jobs = els.map((el) => {
     const lh = parseFloat(getComputedStyle(el).lineHeight) || fs * 1.5;
@@ -171,7 +172,7 @@ function writeLines(page: HTMLElement, start: number) {
   let t = start;
   for (const j of jobs) {
     const dur = j.per + (j.lines - 1) * gap * 1.6;
-    sweep(j, t, dur, typed, fs);
+    sweep(j, t, dur, typed(j.el), fs);
     t += j.lines * gap;
   }
 }
