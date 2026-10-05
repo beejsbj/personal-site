@@ -26,11 +26,11 @@ const { social, level = 1, id = "home-title" } = Astro.props;
       {social
         .filter((link) => ["GitHub", "LinkedIn", "Email"].includes(link.label))
         .map((link) => (
-          <Link href={link.href} arrow>
+          <Link href={link.href} treatment="pill" arrow>
             {link.label}
           </Link>
         ))}
-      <Link href="/resume" arrow>
+      <Link href="/resume" treatment="pill" arrow>
         Resume
       </Link>
     </div>

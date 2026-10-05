@@ -1,6 +1,6 @@
 ---
 /** Primitive: label + optional decorative arrow. No nested controls.
- * Axes: treatment=text|ball|pill|action, tone=paper|wine.
+ * Axes: treatment=text|ball|pill, tone=paper|wine.
  * States: rest, hover, focus, active, current, disabled; no loading behavior.
  * Native anchor navigation; disabled renders a non-interactive span.
  * Hover draws the underline in from the left; arrows nudge the way they point.
@@ -13,7 +13,7 @@
 import type { HTMLAttributes } from "astro/types";
 interface Props extends Omit<HTMLAttributes<"a">, "href"> {
   href: string;
-  treatment?: "text" | "ball" | "pill" | "action";
+  treatment?: "text" | "ball" | "pill";
   tone?: "paper" | "wine";
   current?: boolean;
   arrow?: boolean;
@@ -73,31 +73,39 @@ const outbound = /^(https?:|mailto:)/.test(href);
   .ds-link:hover {
     text-decoration: underline;
   }
-  /* Text underlines are painted on the label so the ink can draw in from
-     the left; the resting pencil rule stays full width. */
+  /* Text links rest on a pencil rule painted on the label. Their hover
+     belongs to the ball family: the rule gives way to a peach pill that
+     grows behind the words from the left (the whole link, arrow too). */
   .ds-link--text .link-label {
     padding-bottom: var(--underline-pad);
     background-repeat: no-repeat;
-    background-image:
-      linear-gradient(currentColor, currentColor),
-      linear-gradient(var(--color-link-rule), var(--color-link-rule));
-    background-position:
-      100% 100%,
-      0 100%;
-    background-size:
-      0% var(--rule-width),
-      100% var(--rule-width);
+    background-image: linear-gradient(
+      var(--color-link-rule),
+      var(--color-link-rule)
+    );
+    background-position: 0 100%;
+    background-size: 100% var(--rule-width);
+  }
+  .ds-link--text > span {
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    border-radius: var(--radius-pill);
+    background-image: linear-gradient(
+      var(--ball-fill-hover),
+      var(--ball-fill-hover)
+    );
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 0% 100%;
   }
   .ds-link--text:hover {
     text-decoration: none;
   }
+  .ds-link--text:is(:hover, :focus-visible) > span {
+    background-size: 100% 100%;
+  }
   .ds-link--text:is(:hover, :focus-visible) .link-label {
-    background-position:
-      0 100%,
-      0 100%;
-    background-size:
-      100% var(--rule-width),
-      100% var(--rule-width);
+    background-size: 0% var(--rule-width);
   }
   .link-arrow {
     display: inline-block;
@@ -107,7 +115,8 @@ const outbound = /^(https?:|mailto:)/.test(href);
     vertical-align: baseline;
   }
   @media (hover: hover) and (pointer: fine) {
-    .ds-link--text .link-label {
+    .ds-link--text .link-label,
+    .ds-link--text > span {
       transition: background-size var(--duration-hover) var(--ease-settle);
     }
     .link-arrow {
@@ -206,6 +215,9 @@ const outbound = /^(https?:|mailto:)/.test(href);
       border-color: Highlight;
     }
   }
+  /* Pill (v2's .button), the family's action link: a peach ball rests
+     behind the label's first letters and stretches into a pill on hover.
+     Wine: the pill is already full and burgundy (a primary action). */
   .ds-link--pill {
     position: relative;
     isolation: isolate;
@@ -213,6 +225,11 @@ const outbound = /^(https?:|mailto:)/.test(href);
     align-items: center;
     min-height: var(--control-min-height);
     padding-inline: var(--space-s);
+    border-radius: var(--radius-pill);
+    color: var(--ball-ink);
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-drag: none;
   }
   .ds-link--pill::before {
     content: "";
@@ -223,7 +240,7 @@ const outbound = /^(https?:|mailto:)/.test(href);
     width: var(--ball-link-size);
     height: var(--ball-link-size);
     border-radius: var(--ball-link-size);
-    background: var(--color-surface-strong);
+    background: var(--ball-fill);
     translate: 0 -50%;
   }
   .ds-link--pill:is(:hover, :focus-visible) {
@@ -231,10 +248,20 @@ const outbound = /^(https?:|mailto:)/.test(href);
   }
   .ds-link--pill:is(:hover, :focus-visible)::before {
     width: 100%;
-    background: var(--color-hover);
+    background: var(--ball-fill-hover);
+  }
+  .ds-link--pill.ds-link--wine {
+    padding-inline: var(--space-m);
+    color: var(--ball-ink-current);
+  }
+  .ds-link--pill.ds-link--wine::before {
+    width: 100%;
+    background: var(--ball-fill-current);
+  }
+  .ds-link--pill.ds-link--wine:is(:hover, :focus-visible)::before {
+    background: var(--ball-fill-current-hover);
   }
   .ds-link--pill:active::before {
-    background: var(--color-surface-strong);
     scale: var(--press-scale);
   }
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
@@ -245,31 +272,10 @@ const outbound = /^(https?:|mailto:)/.test(href);
         scale var(--duration-fast) var(--ease-feedback);
     }
   }
-  .ds-link--action {
-    display: inline-grid;
-    place-items: center;
-    flex-shrink: 0;
-    background: var(--color-surface-strong);
-    font-size: var(--text-sm);
-    line-height: var(--leading-tight);
-    white-space: nowrap;
-    transition: transform var(--duration-fast) var(--ease-feedback);
-  }
-  .ds-link--action {
-    padding: var(--space-s) var(--space-m);
-    border: var(--rule-width) solid var(--color-accent);
-  }
-  .ds-link--wine {
-    background: var(--color-accent);
-    color: var(--color-accent-contrast);
-  }
-  .ds-link--action:hover {
-    background: var(--color-hover);
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-  .ds-link--action:active {
-    transform: scale(var(--press-scale));
+  @media (forced-colors: active) {
+    .ds-link--pill::before {
+      border: var(--rule-width) solid CanvasText;
+    }
   }
   .ds-link[aria-disabled] {
     opacity: var(--disabled-opacity);

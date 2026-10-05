@@ -52,6 +52,7 @@
   --focus-offset: 0.375rem;
   --underline-offset: 0.3125rem;
   --radius-round: 50%;
+  --radius-pill: 999rem;
   --radius-note: 0 2.8125rem 0 0;
   --radius-portrait: 50% 50% 46% 54%;
   --shell-max: 71.25rem;

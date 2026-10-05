@@ -48,7 +48,7 @@ const { Content } = await labEntry.render();
     {labEntry.data.links.length > 0 && (
       <div class="entry-page__links">
         {labEntry.data.links.map((link: { label: string; url: string }) => (
-          <Link treatment="action" href={link.url} newTab>
+          <Link treatment="pill" href={link.url} arrow newTab>
             {link.label}
           </Link>
         ))}
