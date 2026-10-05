@@ -1,470 +1,259 @@
-/** The instrument itself: status bar, log drawer, stage, the score of
- * updates and the seven-key keyboard that is the site's navigation. It
- * persists across routes; only the screen on the stage changes. */
-import type { Route, ShellContext } from "../types";
+/** The DAW window, which persists across routes: the transport bar, the
+ * overview (the whole career, scrubbable), the browser (seven keys in F
+ * major that are the site's navigation) and the view where each route's
+ * screen sits. Every readout on it reports the real playhead. */
 import { fill } from "../rich";
-import { part } from "../../parts";
+import type { RouteKind, ShellContext } from "../types";
+import { armUnlock, forbidSound, onSound, setSound, soundWanted, tap } from "./audio";
+import { noteVar, type Copy } from "./bits";
 import { h, link, markup } from "./dom";
-import { keysFor, noteForKind, noteForUpdate, NOTES, noteVar, type Key } from "./notes";
-import { play, setSound, soundOn } from "./sound";
-import { onNext, setClock } from "./beat";
+import { noteName } from "./music";
+import { sessionFor, type Session } from "./score";
+import { monthLabel, place, position, Transport } from "./transport";
 
 export interface Frame {
   app: HTMLElement;
-  stage: HTMLElement;
-  tear: HTMLElement;
-  tearLabel: HTMLElement;
-  beat: HTMLElement;
-  keys: Key[];
-  /** Light the key for this route immediately (before the screen swaps). */
-  light(route: Route): void;
-  /** Settle chrome layout for this route (called while the tear covers). */
-  settle(route: Route): void;
+  scroller: HTMLElement;
+  overlay: HTMLElement;
+  wipe: HTMLElement;
+  session: Session;
+  transport: Transport;
+  /** Light the key for this route. */
+  light(kind: RouteKind): void;
 }
 
-const shortDate = (iso: string) => {
-  const [, month, day] = iso.split("-");
-  return day && month ? `${day}.${month}` : iso;
-};
+interface Key {
+  degree: number;
+  label: string;
+  view: string;
+  href: string;
+  kinds: RouteKind[];
+}
+
+function keysFor(ctx: ShellContext, copy: Copy): Key[] {
+  const { site } = ctx.content;
+  const k = copy.keys;
+  return [
+    { degree: 0, ...k.home, href: "/", kinds: ["home"] },
+    { degree: 1, ...k.projects, href: "/projects", kinds: ["projects", "project"] },
+    { degree: 2, ...k.lab, href: "/lab", kinds: ["lab", "lab-entry"] },
+    { degree: 3, ...k.about, href: "/about", kinds: ["about"] },
+    { degree: 4, ...k.resume, href: "/resume", kinds: ["resume"] },
+    { degree: 5, ...k.writing, href: site.writingUrl, kinds: [] },
+    { degree: 6, ...k.hello, href: `mailto:${site.email}`, kinds: [] },
+  ];
+}
+
+const isTyping = (target: EventTarget | null) =>
+  target instanceof HTMLElement && !!target.closest("a, button, input, textarea, select, [role='slider'], video, [contenteditable]");
 
 export function buildFrame(ctx: ShellContext): Frame {
   const { content, signal, face } = ctx;
-  const copy = content.lenses["cut-paper"].frame;
-  const updatesCount = content.updates.length;
-  const keys = keysFor(content);
+  const copy = content.lenses["cut-paper"];
+  const words = copy.frame;
+  const session = sessionFor(content);
+  const transport = new Transport(session);
+  signal.addEventListener("abort", () => transport.destroy());
+  if (face) forbidSound();
+  else armUnlock(signal);
   const on = (target: EventTarget, type: string, fn: (event: Event) => void) =>
     target.addEventListener(type, fn, { signal });
 
-  /* ── status bar ─────────────────────────────────────────── */
-  const beat = h(
-    "div",
-    { class: "cp-beat", "aria-hidden": "true" },
-    h("i", { "data-cell": "1" }),
-    h("i", { "data-cell": "2" }),
-    h("i", { "data-cell": "3" }),
-    h("i", { "data-cell": "4" }),
+  const app = h("div", { class: "cp-app", "data-face": face ? "" : null });
+
+  /* ── transport bar ─────────────────────────────────────── */
+  const playButton = h(
+    "button",
+    { type: "button", class: "cp-tp cp-tp--play", "aria-pressed": "false", "aria-label": words.play, title: words.play },
+    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path class="cp-tp__play" d="M4 2.5v11L13.5 8z"/><path class="cp-tp__pause" d="M4 3h3v10H4zM9 3h3v10H9z"/></svg>'),
   );
-  const readoutNote = h("span", { class: "cp-readout__note" }, NOTES[0].sol);
-  const readoutWhere = h("span", { class: "cp-readout__where" }, copy.home);
+  const stopButton = h(
+    "button",
+    { type: "button", class: "cp-tp cp-tp--stop", "aria-label": words.stopHint, title: words.stopHint },
+    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5h9v9h-9z"/></svg>'),
+  );
+  const posNum = h("span", { class: "cp-pos__num" });
+  const posMonth = h("span", { class: "cp-pos__month" });
+  const pos = h("p", { class: "cp-pos" }, posNum, posMonth);
+  const chordName = h("b", { class: "cp-meter__chord" });
+  const meter = h(
+    "p",
+    { class: "cp-meter" },
+    h("span", null, h("b", null, `${noteName(0)} ${words.major}`), h("small", null, `${words.meter} · ${words.tempo}`)),
+    h("span", { class: "cp-meter__now" }, chordName, h("small", null, words.chord)),
+  );
+  const npTitle = h("span", { class: "cp-np__title" });
+  const nowPlaying = h("p", { class: "cp-np" }, h("span", { class: "cp-np__label" }, words.nowPlaying), npTitle);
+  const soundState = h("span", { class: "cp-sound__state" });
   const soundButton = h(
     "button",
-    {
-      type: "button",
-      class: "cp-sound",
-      "aria-pressed": "false",
-      "data-state": "off",
-    },
-    markup(
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="cp-sound__wave" pathLength="1" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="cp-sound__mute" d="M16 9l6 6M22 9l-6 6"/></svg>',
-    ),
-    h("span", { class: "cp-sound__label" }, copy.sound),
-    h("span", { class: "cp-sound__state" }, copy.soundOff),
+    { type: "button", class: "cp-sound", "aria-pressed": "false", title: words.soundHint },
+    markup('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="cp-sound__wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="cp-sound__mute" d="M16 9l6 6M22 9l-6 6"/></svg>'),
+    h("span", { class: "cp-sound__label" }, words.sound),
+    soundState,
   );
-  const logButton = h(
-    "button",
-    {
-      type: "button",
-      class: "cp-logbtn",
-      "aria-expanded": "false",
-      "aria-controls": "cp-log",
-    },
-    h("span", { class: "cp-logbtn__label" }, copy.log),
-    h("span", { class: "cp-logbtn__count" }, String(updatesCount)),
-    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h8"/></svg>'),
-  );
+  const paintSound = (onNow: boolean) => {
+    soundButton.setAttribute("aria-pressed", String(onNow));
+    soundButton.dataset.state = onNow ? "on" : "off";
+    soundState.textContent = onNow ? words.soundOn : words.soundOff;
+  };
+  paintSound(soundWanted());
+  onSound(paintSound, signal);
+  on(soundButton, "click", () => setSound(!soundWanted()));
 
-  const top = h(
+  const bar = h(
     "header",
-    { class: "cp-top" },
-    h(
-      "a",
-      { class: "cp-logo", href: "/", "aria-label": `${content.site.name}, home` },
-      h("span", { class: "cp-logo__paper", "aria-hidden": "true" }, copy.logo),
-    ),
-    h(
-      "p",
-      { class: "cp-chip" },
-      h("span", { class: "cp-chip__swatch", "aria-hidden": "true" }),
-      h("span", { class: "cp-chip__name" }, copy.chipName),
-      h("span", { class: "cp-chip__sep", "aria-hidden": "true" }, " · "),
-      h("span", { class: "cp-chip__role" }, content.pages.home.hero.occupation.toLowerCase()),
-    ),
-    h(
-      "p",
-      { class: "cp-readout" },
-      readoutNote,
-      h("span", { class: "cp-readout__sep", "aria-hidden": "true" }, "·"),
-      readoutWhere,
-      h("span", { class: "cp-readout__sep", "aria-hidden": "true" }, "·"),
-      h("span", null, copy.key),
-      h("span", { class: "cp-readout__sep", "aria-hidden": "true" }, "·"),
-      h("span", { class: "cp-readout__bpm" }, copy.tempo),
-    ),
-    beat,
-    logButton,
+    { class: "cp-bar" },
+    link("/", { class: "cp-logo", "aria-label": content.site.name }, h("span", { class: "cp-logo__paper", "aria-hidden": "true" }, words.logo)),
+    h("p", { class: "cp-file" }, words.file),
+    h("div", { class: "cp-deck", role: "group", "aria-label": words.transport }, playButton, stopButton, pos),
+    meter,
+    nowPlaying,
     face ? null : soundButton,
   );
 
-  /* ── log drawer (all updates) ───────────────────────────── */
-  const logClose = h(
-    "button",
-    { type: "button", class: "cp-log__close", "aria-label": copy.closeLog },
-    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13"/></svg>'),
-  );
-  const log = h(
-    "section",
-    {
-      class: "cp-log",
-      id: "cp-log",
-      "aria-labelledby": "cp-log-title",
-      "data-state": "closed",
-      inert: true,
-    },
-    h(
-      "div",
-      { class: "cp-log__head" },
-      h("h2", { class: "cp-log__title", id: "cp-log-title" }, copy.log),
-      h("p", { class: "cp-log__meta" }, fill(copy.logMeta, { n: updatesCount })),
-      logClose,
-    ),
-    h(
-      "ol",
-      { class: "cp-log__list" },
-      content.updates.map((update, index) => {
-        const note = noteForUpdate(update.kind);
-        return h(
-          "li",
-          {
-            class: "cp-log__event",
-            style: `--note:${noteVar(note.id)}; --i:${index}`,
-            ...part("update.item", update.id),
-          },
-          h("time", { class: "cp-log__date", datetime: update.date }, update.dateLabel),
-          h(
-            "p",
-            { class: "cp-log__kind" },
-            h("span", { class: "cp-log__sol", "aria-hidden": "true" }, note.sol),
-            `${update.source} · ${update.kind.replace(/-/g, " ")}`,
-          ),
-          h(
-            "h3",
-            { class: "cp-log__name" },
-            link(update.href, { class: "cp-log__link" }, update.title),
-          ),
-          update.summary ? h("p", { class: "cp-log__sum" }, update.summary) : null,
-        );
-      }),
-    ),
-  );
+  on(playButton, "click", () => {
+    transport.toggle();
+    // playing with sound off: point at the switch once, never turn it on
+    if (transport.playing && !soundWanted()) {
+      soundButton.removeAttribute("data-nudge");
+      void soundButton.offsetWidth;
+      soundButton.setAttribute("data-nudge", "");
+    }
+  });
+  on(stopButton, "click", () => transport.stop());
 
-  /* ── stage ──────────────────────────────────────────────── */
-  const strings = h(
+  const names = new Map<string, string>([
+    ...content.projects.map((p) => [`project:${p.slug}`, p.title] as [string, string]),
+    ...[...content.resume.experience.roles, ...content.resume.education.entries].map((e) => [`role:${e.id}`, e.org ?? e.title ?? e.heading] as [string, string]),
+  ]);
+  transport.onTick((t, playing) => {
+    playButton.setAttribute("aria-pressed", String(playing));
+    playButton.setAttribute("aria-label", playing ? words.pause : words.play);
+    playButton.title = playing ? words.pause : words.play;
+    const p = position(t);
+    posNum.textContent = `${p.bar}.${p.beat}.${p.eighth}`;
+    posMonth.textContent = monthLabel(t);
+    pos.setAttribute("aria-label", fill(words.position, { when: monthLabel(t) }));
+    chordName.textContent = session.chordAt(Math.min(t, session.end - 1e-6)).name;
+    const here = (kind: string) =>
+      session.clips.filter((c) => c.kind === kind && t >= c.start && t < c.end && transport.audible(c.track)).at(-1);
+    const clip = here("project") ?? here("role");
+    npTitle.textContent = clip ? (names.get(clip.id) ?? words.rest) : words.rest;
+    app.toggleAttribute("data-playing", playing);
+  }, signal);
+
+  /* ── overview: the whole career, scrubbable ─────────────── */
+  const range = { from: session.from, to: session.end };
+  const years: number[] = [];
+  for (let y = Math.ceil(range.from); y <= Math.floor(range.to); y += 1) years.push(y);
+  const ovHead = h("span", { class: "cp-run" }, h("span", { class: "cp-run__head" }));
+  transport.playhead(ovHead, range, signal);
+  const ovTrack = h(
+    "span",
+    { class: "cp-ov__track", "aria-hidden": "true" },
+    years.map((y) => h("span", { class: "cp-ov__year", style: `--at:${place(y, range)}` }, h("b", null, `'${String(y).slice(2)}`))),
+    session.clips.map((clip) => {
+      const index = content.projects.findIndex((p) => `project:${p.slug}` === clip.id);
+      const mark = h("span", {
+        class: `cp-ov__clip cp-ov__clip--${clip.kind}`,
+        style: `--at:${place(clip.start, range)}; --len:${(clip.end - clip.start) / (range.to - range.from)}; --note:${index >= 0 ? noteVar(index) : "var(--cp-ivory-3)"}`,
+      });
+      transport.watch(mark, clip.start, clip.end, signal, clip.track);
+      return mark;
+    }),
+    h("span", { class: "cp-future", style: `--at:${place(session.now, range)}` }),
+    ovHead,
+  );
+  const overview = h(
     "div",
-    { class: "cp-strings", "aria-hidden": "true" },
-    NOTES.map((note) => h("i", { class: "cp-string", "data-note": note.id })),
+    {
+      class: "cp-ov",
+      role: "slider",
+      tabindex: face ? null : "0",
+      "aria-label": words.overview,
+      "aria-valuemin": range.from.toFixed(2),
+      "aria-valuemax": range.to.toFixed(2),
+    },
+    ovTrack,
   );
-  const tearLabel = h("span", { class: "cp-tear__label" });
-  const tear = h(
-    "div",
-    { class: "cp-tear", "aria-hidden": "true" },
-    h("span", { class: "cp-tear__confetti" }),
-    tearLabel,
-  );
-  const stage = h(
-    "main",
-    { class: "cp-stage", id: "cp-stage", tabindex: "-1" },
-    strings,
-    tear,
-  );
+  transport.onTick((t) => {
+    overview.setAttribute("aria-valuenow", t.toFixed(2));
+    overview.setAttribute("aria-valuetext", monthLabel(t));
+  }, signal);
+  const scrubTo = (event: PointerEvent) => {
+    const box = ovTrack.getBoundingClientRect();
+    const share = Math.min(Math.max((event.clientX - box.left) / box.width, 0), 1);
+    transport.seek(range.from + share * (range.to - range.from));
+  };
+  on(overview, "pointerdown", (event) => {
+    const e = event as PointerEvent;
+    overview.setPointerCapture(e.pointerId);
+    scrubTo(e);
+  });
+  on(overview, "pointermove", (event) => {
+    const e = event as PointerEvent;
+    if (overview.hasPointerCapture(e.pointerId)) scrubTo(e);
+  });
+  on(overview, "keydown", (event) => {
+    const e = event as KeyboardEvent;
+    const month = 1 / 12;
+    const step: Record<string, number> = { ArrowRight: month, ArrowUp: month, ArrowLeft: -month, ArrowDown: -month, PageUp: 1, PageDown: -1 };
+    if (e.key in step) transport.seek(transport.t + step[e.key]);
+    else if (e.key === "Home") transport.seek(range.from);
+    else if (e.key === "End") transport.seek(session.now);
+    else return;
+    e.preventDefault();
+  });
 
-  /* ── score: the updates as a strip of pattern tokens ─────── */
-  const tokens = (hidden: boolean) =>
-    h(
-      "ul",
-      { class: "cp-score__run", ...(hidden ? { "aria-hidden": "true" } : {}) },
-      h("li", { class: "cp-score__tick" }, copy.scoreOpen),
-      content.updates.map((update) => {
-        const note = noteForUpdate(update.kind);
-        const anchor = link(update.href, { class: "cp-tok__link" }, update.title);
-        if (hidden) anchor.setAttribute("tabindex", "-1");
-        return h(
-          "li",
-          { class: "cp-tok", style: `--note:${noteVar(note.id)}` },
-          h("span", { class: "cp-tok__brace", "aria-hidden": "true" }, "{"),
-          anchor,
-          h("span", { class: "cp-tok__at" }, `@${shortDate(update.date)}`),
-          h("span", { class: "cp-tok__brace", "aria-hidden": "true" }, "}"),
-          h("span", { class: "cp-tok__rest", "aria-hidden": "true" }, "~"),
-        );
-      }),
-      h("li", { class: "cp-score__tick" }, copy.scoreClose),
-    );
-  const tape = h("div", { class: "cp-score__tape" }, tokens(false), tokens(true));
-  const pauseButton = h(
-    "button",
-    {
-      type: "button",
-      class: "cp-score__play",
-      "aria-pressed": "false",
-      "aria-label": copy.pauseTape,
-    },
-    markup(
-      '<svg viewBox="0 0 16 16" aria-hidden="true"><path class="cp-score__icon-pause" d="M5 3v10M11 3v10"/><path class="cp-score__icon-play" d="M4 2.5v11L13.5 8z"/></svg>',
-    ),
-  );
-  const scoreCount = h(
-    "button",
-    {
-      type: "button",
-      class: "cp-score__count",
-      "aria-controls": "cp-log",
-      "aria-expanded": "false",
-      "aria-label": fill(copy.openLog, { n: updatesCount }),
-    },
-    h("span", null, String(updatesCount)),
-    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h8"/></svg>'),
-  );
-  const score = h(
-    "section",
-    {
-      class: "cp-score",
-      "aria-label": content.pages.home.updates.title,
-      "data-state": "playing",
-    },
-    pauseButton,
-    h(
-      "div",
-      { class: "cp-score__window" },
-      h("p", { class: "cp-score__label" }, copy.score),
-      h("div", { class: "cp-score__viewport" }, tape),
-    ),
-    scoreCount,
-  );
-
-  /* ── keyboard: the navigation ───────────────────────────── */
-  const keyLinks = keys.map((key, index) => {
-    const anchor = link(
+  /* ── browser: the navigation, a keyboard in F major ─────── */
+  const keys = keysFor(ctx, copy);
+  const keyLinks = keys.map((key) => {
+    const a = link(
       key.href,
-      {
-        class: "cp-key",
-        "data-note": key.note.id,
-        "data-state": "rest",
-        style: `--note:${noteVar(key.note.id)}; --i:${index}`,
-      },
-      h(
-        "span",
-        { class: "cp-key__sol", "aria-hidden": "true" },
-        key.note.sol,
-        h("small", null, key.note.pitch),
-      ),
-      h("span", { class: "cp-key__name" }, key.label),
-      h("span", { class: "cp-key__hint", "aria-hidden": "true" }, key.hint),
-      h("span", { class: "cp-key__led", "aria-hidden": "true" }),
+      { class: "cp-key", style: `--note:${noteVar(key.degree)}`, "data-kinds": key.kinds.join(" ") },
+      h("span", { class: "cp-key__note", "aria-hidden": "true" }, noteName(key.degree)),
+      h("span", { class: "cp-key__label" }, key.label),
+      h("span", { class: "cp-key__view", "aria-hidden": "true" }, key.view),
     );
-    return anchor;
-  });
-  const fold = h(
-    "button",
-    {
-      type: "button",
-      class: "cp-keys__fold",
-      "aria-expanded": "true",
-      "aria-label": copy.foldKeys,
-    },
-    markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg>'),
-  );
-  const nav = h(
-    "nav",
-    { class: "cp-keys", "aria-label": copy.keys },
-    fold,
-    h(
-      "ul",
-      { class: "cp-keys__row" },
-      keyLinks.map((anchor) => h("li", { class: "cp-keys__slot" }, anchor)),
-    ),
-  );
-
-  const skip = h("a", { class: "cp-skip", href: "#cp-stage" }, content.site.skipLink);
-  const app = h(
-    "div",
-    {
-      class: "cp-app",
-      "data-route": ctx.route.kind,
-      "data-keys": "open",
-      ...(face ? { "data-face": "" } : {}),
-    },
-    skip,
-    top,
-    log,
-    stage,
-    score,
-    nav,
-  );
-
-  /* ── behaviour ──────────────────────────────────────────── */
-  setClock(beat);
-  on(skip, "click", (event) => {
-    event.preventDefault();
-    const heading = stage.querySelector<HTMLElement>(".cp-screen:not([inert]) h1");
-    (heading ?? stage).focus();
-  });
-
-  // keys: hover blooms the string, press stabs, sound when opted in
-  const hover = (note: string | null) => {
-    if (note) app.dataset.hover = note;
-    else delete app.dataset.hover;
-  };
-  keyLinks.forEach((anchor, index) => {
-    const key = keys[index];
-    let cancelHover = () => {};
-    const release = () => {
-      anchor.dataset.state = anchor.getAttribute("aria-current") ? "held" : "rest";
-    };
-    // the string blooms on the next sixteenth, not the instant the pointer lands
-    on(anchor, "pointerenter", (event) => {
-      const mouse = (event as PointerEvent).pointerType === "mouse";
-      cancelHover();
-      const bloom = () => {
-        hover(key.note.id);
-        if (mouse) play(key.note.frequency, 0.55);
-      };
-      if (ctx.reducedMotion) bloom();
-      else cancelHover = onNext(4, bloom);
-    });
-    on(anchor, "pointerleave", () => {
-      cancelHover();
-      hover(null);
-      release();
-    });
-    on(anchor, "pointerdown", () => {
-      anchor.dataset.state = "pressed";
-      play(key.note.frequency, 1);
-    });
-    on(anchor, "pointerup", release);
-    on(anchor, "pointercancel", release);
-    on(anchor, "focus", () => {
-      hover(key.note.id);
-      if (anchor.matches(":focus-visible")) play(key.note.frequency, 0.55);
-    });
-    on(anchor, "blur", () => hover(null));
-    on(anchor, "keydown", (event) => {
-      const { key: pressed } = event as KeyboardEvent;
-      const moves: Record<string, number> = {
-        ArrowRight: index + 1,
-        ArrowDown: index + 1,
-        ArrowLeft: index - 1,
-        ArrowUp: index - 1,
-        Home: 0,
-        End: keyLinks.length - 1,
-      };
-      if (!(pressed in moves)) return;
-      event.preventDefault();
-      const next = (moves[pressed] + keyLinks.length) % keyLinks.length;
-      keyLinks[next].focus();
-    });
-  });
-
-  // fold / unfold the keyboard (inner routes start folded)
-  const setKeys = (open: boolean) => {
-    app.dataset.keys = open ? "open" : "closed";
-    fold.setAttribute("aria-expanded", String(open));
-    fold.setAttribute("aria-label", open ? copy.foldKeys : copy.unfoldKeys);
-  };
-  on(fold, "click", () => setKeys(app.dataset.keys !== "open"));
-
-  // sound: off until asked
-  on(soundButton, "click", () => {
-    const next = !soundOn();
-    setSound(next);
-    soundButton.setAttribute("aria-pressed", String(next));
-    soundButton.dataset.state = next ? "on" : "off";
-    soundButton.querySelector(".cp-sound__state")!.textContent = next ? copy.soundOn : copy.soundOff;
-    if (next) play(NOTES[0].frequency, 0.8);
-  });
-
-  // score: pause / play the moving tape
-  const setTape = (playing: boolean) => {
-    score.dataset.state = playing ? "playing" : "paused";
-    pauseButton.setAttribute("aria-pressed", String(!playing));
-    pauseButton.setAttribute("aria-label", playing ? copy.pauseTape : copy.playTape);
-  };
-  on(pauseButton, "click", () => setTape(score.dataset.state !== "playing"));
-  if (ctx.reducedMotion) setTape(false);
-
-  // log drawer: slides down from the status bar, never fades
-  let returnFocus: HTMLElement | null = null;
-  const setLog = (open: boolean, from?: HTMLElement) => {
-    log.dataset.state = open ? "open" : "closed";
-    log.inert = !open;
-    for (const button of [logButton, scoreCount])
-      button.setAttribute("aria-expanded", String(open));
-    if (open) {
-      returnFocus = from ?? null;
-      logClose.focus({ preventScroll: true });
-    } else if (returnFocus) {
-      returnFocus.focus({ preventScroll: true });
-      returnFocus = null;
+    if (!face) {
+      on(a, "pointerenter", (event) => (event as PointerEvent).pointerType === "mouse" && tap(key.degree + 7, "lead", 0.45));
+      on(a, "focus", () => tap(key.degree + 7, "lead", 0.45));
     }
-  };
-  on(logButton, "click", () => setLog(log.dataset.state !== "open", logButton));
-  on(scoreCount, "click", () => setLog(log.dataset.state !== "open", scoreCount));
-  on(logClose, "click", () => setLog(false));
-  on(document, "keydown", (event) => {
-    if ((event as KeyboardEvent).key === "Escape" && log.dataset.state === "open")
-      setLog(false);
+    return a;
   });
-  on(document, "pointerdown", (event) => {
-    if (log.dataset.state !== "open") return;
-    const target = event.target as Node;
-    if (!log.contains(target) && !logButton.contains(target) && !scoreCount.contains(target))
-      setLog(false);
-  });
-  on(log, "click", (event) => {
-    if ((event.target as Element).closest("a")) setLog(false);
-  });
+  const browser = h("nav", { class: "cp-browser", "aria-label": words.browser }, h("ul", null, keyLinks.map((a) => h("li", null, a))));
 
-  /* ── route reactions ────────────────────────────────────── */
-  const light = (route: Route) => {
-    const note = noteForKind(keys, route.kind);
-    keyLinks.forEach((anchor, index) => {
-      const held = keys[index].note === note;
-      if (held) anchor.setAttribute("aria-current", "page");
-      else anchor.removeAttribute("aria-current");
-      anchor.dataset.state = held ? "held" : "rest";
+  /* ── the view ──────────────────────────────────────────── */
+  const wipe = h("div", { class: "cp-wipe", "aria-hidden": "true", "data-state": "idle" });
+  const scroller = h("main", { class: "cp-scroll", id: "cp-main", tabindex: "-1" });
+  const overlay = h("div", { class: "cp-overlay", "aria-hidden": "true" }, wipe);
+  const view = h("div", { class: "cp-view" }, scroller, overlay);
+
+  app.append(bar, overview, browser, view);
+
+  // space plays, unless a control has focus
+  if (!face)
+    on(document, "keydown", (event) => {
+      const e = event as KeyboardEvent;
+      if (e.code !== "Space" || e.repeat || isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+      e.preventDefault();
+      transport.toggle();
     });
-    app.dataset.note = note?.id ?? "none";
-    const sol = note?.sol ?? "—";
-    const where = keys.find((key) => key.note === note)?.label.toLowerCase() ?? copy.sheet;
-    if (face || ctx.reducedMotion || readoutNote.textContent === sol) {
-      readoutNote.textContent = sol;
-      readoutWhere.textContent = where;
-    } else {
-      // the old note tears off, the new one slides up under it
-      const rip: Keyframe[] = [
-        { transform: "translateY(0) skewX(0)", opacity: 1 },
-        { transform: "translateY(-10px) skewX(-10deg)", opacity: 0, offset: 0.42 },
-        { transform: "translateY(10px) skewX(8deg)", opacity: 0, offset: 0.5 },
-        { transform: "translateY(0) skewX(0)", opacity: 1 },
-      ];
-      for (const el of [readoutNote, readoutWhere])
-        el.animate(rip, { duration: 360, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" });
-      setTimeout(() => {
-        readoutNote.textContent = sol;
-        readoutWhere.textContent = where;
-      }, 160);
-    }
-    tearLabel.textContent = `${keys.find((key) => key.note === note)?.label ?? copy.sheetTear}.`;
-    tear.style.setProperty("--note", note ? noteVar(note.id) : "var(--cp-ivory)");
+
+  return {
+    app,
+    scroller,
+    overlay,
+    wipe,
+    session,
+    transport,
+    light(kind) {
+      keyLinks.forEach((a) => {
+        const lit = (a.dataset.kinds ?? "").split(" ").includes(kind);
+        if (lit) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
+      });
+    },
   };
-
-  const settle = (route: Route) => {
-    app.dataset.route = route.kind;
-    setKeys(route.kind === "home");
-    if (log.dataset.state === "open") setLog(false);
-  };
-
-  light(ctx.route);
-  settle(ctx.route);
-
-  return { app, stage, tear, tearLabel, beat, keys, light, settle };
 }
