@@ -840,6 +840,230 @@ function resume(content: SiteContent, copy: Copy): Screen {
   };
 }
 
+/* ── writing: sheets on the music stand ──────────────────── */
+
+/** The same sheet as a loose page, with the lens's own reading typography
+ * and every word supplied by the shared writing contract. */
+function writingSheet(
+  content: SiteContent,
+  kind: string,
+  ...children: Child[]
+) {
+  const words = content.lenses["cut-paper"].sheet;
+  return screen(
+    kind,
+    h(
+      "div",
+      { class: "cp-sheet cp-writing", style: `--note:${noteVar("la")}` },
+      bar(
+        h(
+          "div",
+          { class: "cp-sheet__stand", "aria-hidden": "true" },
+          h("span", null, words.label),
+          h("b", null, content.pages.writing.title),
+          h("span", null, words.stand),
+        ),
+        2,
+      ),
+      h("div", { class: "cp-sheet__paper" }, ...children),
+    ),
+  );
+}
+
+function writing(content: SiteContent): Screen {
+  const page = content.pages.writing;
+  const { copy } = page;
+  const { posts, status } = content.writing;
+  const { h1, head } = pageHead(page.header, "writing", "cp-writing");
+  const actions = buttons(
+    page.header.actions.map((item) => ({ label: item.label, url: item.href })),
+    "cp-writing__links",
+    part("page.actions", "writing"),
+  );
+  const list =
+    posts.length && status === "available"
+      ? h(
+          "ol",
+          { class: "cp-writing__list", "aria-label": copy.listLabel },
+          posts.map((post, index) =>
+            h(
+              "li",
+              { class: "cp-writing__item" },
+              h(
+                "span",
+                { class: "cp-writing__no", "aria-hidden": "true" },
+                String(index + 1).padStart(2, "0"),
+              ),
+              h(
+                "article",
+                { "aria-labelledby": `cp-writing-${post.slug}` },
+                h(
+                  "time",
+                  {
+                    class: "cp-kicker",
+                    datetime: post.date,
+                    ...part("writing.meta", post.slug),
+                  },
+                  post.dateLabel,
+                ),
+                h(
+                  "h2",
+                  {
+                    class: "cp-writing__post-title",
+                    id: `cp-writing-${post.slug}`,
+                    ...part("writing.title", post.slug),
+                  },
+                  link(post.href, {}, post.title),
+                ),
+                h(
+                  "p",
+                  {
+                    class: "cp-writing__summary",
+                    ...part("writing.summary", post.slug),
+                  },
+                  post.subtitle || post.description,
+                ),
+              ),
+            ),
+          ),
+        )
+      : h(
+          "p",
+          {
+            class: "cp-writing__state",
+            role: status === "unavailable" ? "status" : undefined,
+            ...part("page.body", "writing"),
+          },
+          status === "unavailable"
+            ? copy.unavailableMessage
+            : copy.emptyMessage,
+        );
+  return {
+    el: writingSheet(
+      content,
+      "writing",
+      bar(head, 2),
+      actions,
+      bar(list, 2, 4),
+    ),
+    heading: h1,
+  };
+}
+
+function writingEntry(content: SiteContent, route: Route): Screen {
+  const page = content.pages.writing;
+  const { copy } = page;
+  const entry = content.writing.entry;
+  const post =
+    entry?.slug === route.slug && content.writing.entryStatus === "available"
+      ? entry
+      : undefined;
+  if (!post) {
+    const { h1, head } = pageHead(page.header, "writing", "cp-writing");
+    const message =
+      content.writing.entryStatus === "missing"
+        ? copy.entryMissingMessage
+        : copy.entryUnavailableMessage;
+    const links = buttons(
+      [
+        { label: copy.backLabel, url: "/writing" },
+        { label: copy.sourceLabel, url: content.site.writingUrl },
+        {
+          label: copy.subscribeLabel,
+          url: `${content.site.writingUrl}/subscribe`,
+        },
+      ],
+      "cp-writing__links",
+      part("writing.links", route.slug),
+    );
+    return {
+      el: writingSheet(
+        content,
+        "writing-entry",
+        bar(head, 2),
+        h(
+          "p",
+          {
+            class: "cp-writing__state",
+            role: "status",
+            ...part("writing.body", route.slug),
+          },
+          message,
+        ),
+        links,
+      ),
+      heading: h1,
+    };
+  }
+  const h1 = heading(post.title, "cp-writing__title");
+  h1.setAttribute("data-part", "writing.title");
+  h1.setAttribute("data-ref", post.slug);
+  const head = h(
+    "header",
+    { class: "cp-writing__head" },
+    page.header.eyebrow ? kicker(page.header.eyebrow) : null,
+    h1,
+    post.subtitle
+      ? h(
+          "p",
+          {
+            class: "cp-writing__intro",
+            ...part("writing.subtitle", post.slug),
+          },
+          post.subtitle,
+        )
+      : null,
+    h(
+      "time",
+      {
+        class: "cp-writing__date",
+        datetime: post.date,
+        ...part("writing.meta", post.slug),
+      },
+      post.dateLabel,
+    ),
+    link(post.canonical, { class: "cp-writing__origin" }, copy.originLabel),
+  );
+  const end = h(
+    "aside",
+    {
+      class: "cp-note cp-writing__end",
+      "aria-labelledby": "cp-writing-end",
+      ...part("writing.end", post.slug),
+    },
+    h("span", { class: "cp-note__tape", "aria-hidden": "true" }),
+    h(
+      "div",
+      { class: "cp-note__copy" },
+      h("h2", { id: "cp-writing-end" }, copy.endHeading),
+      h("p", null, copy.endBody),
+    ),
+  );
+  const links = buttons(
+    [
+      {
+        label: copy.subscribeLabel,
+        url: `${content.site.writingUrl}/subscribe`,
+      },
+      { label: copy.originLabel, url: post.canonical },
+      { label: copy.backLabel, url: "/writing" },
+    ],
+    "cp-writing__links",
+    part("writing.links", post.slug),
+  );
+  return {
+    el: writingSheet(
+      content,
+      "writing-entry",
+      bar(head, 2),
+      prose(post.html, "cp-writing__body", part("writing.body", post.slug)),
+      bar(end, 2, 4),
+      links,
+    ),
+    heading: h1,
+  };
+}
+
 /* ── anything else: a sheet on the music stand ───────────── */
 
 function sheet(route: Route, copy: Copy): Screen {
@@ -898,6 +1122,10 @@ export function buildScreen(
       return about(content, copy);
     case "resume":
       return resume(content, copy);
+    case "writing":
+      return writing(content);
+    case "writing-entry":
+      return writingEntry(content, route);
     default:
       return sheet(route, copy);
   }

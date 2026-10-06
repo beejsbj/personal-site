@@ -40,11 +40,13 @@ export const TABS = [
   { id: "lab", kind: "lab", href: "/lab" },
   { id: "about", kind: "about", href: "/about" },
   { id: "resume", kind: "resume", href: "/resume" },
+  { id: "writing", kind: "writing", href: "/writing" },
 ] as const;
 
 export function tabFor(kind: Route["kind"]) {
   if (kind === "project" || kind === "projects") return "projects";
   if (kind === "lab" || kind === "lab-entry") return "lab";
+  if (kind === "writing" || kind === "writing-entry") return "writing";
   if (kind === "about" || kind === "resume") return kind;
   return undefined;
 }

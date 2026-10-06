@@ -44,6 +44,14 @@ export const PARTS = [
   "lab.body",
   "lab.more",
   "lab.aside",
+  // public writing entries from the runtime source
+  "writing.title",
+  "writing.summary",
+  "writing.subtitle",
+  "writing.meta",
+  "writing.body",
+  "writing.links",
+  "writing.end",
   // one update in a list of them
   "update.item",
   // the structured resume

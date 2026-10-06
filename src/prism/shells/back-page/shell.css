@@ -1433,6 +1433,53 @@
   margin: 0 auto var(--g);
 }
 
+/* ---- writing: dated essays in the exercise book ------------------------------------ */
+:root[data-lens="back-page"] .bp-writing-list {
+  list-style: none;
+  padding: 0 !important;
+}
+:root[data-lens="back-page"] .bp-writing-list li {
+  margin-bottom: var(--g);
+}
+:root[data-lens="back-page"] .bp-writing-list .bp-h2 {
+  margin-top: 0;
+  font-size: 1.45em;
+  line-height: var(--lh);
+}
+:root[data-lens="back-page"] .bp-writing-list .bp-h2 a {
+  text-decoration: none;
+}
+:root[data-lens="back-page"] .bp-writing-date,
+:root[data-lens="back-page"] .bp-writing-origin {
+  font: 0.7em/1.55 var(--bp-type);
+  color: var(--bp-fine);
+}
+:root[data-lens="back-page"] .bp-writing-date {
+  display: block;
+  margin-bottom: 0.2em;
+}
+:root[data-lens="back-page"] .bp-writing-summary {
+  margin-bottom: 0 !important;
+}
+:root[data-lens="back-page"] .bp-writing-head .bp-h1 {
+  font-size: 2.2em;
+  line-height: calc(var(--lh) * 1.5);
+}
+:root[data-lens="back-page"] .bp-writing-end {
+  margin-top: var(--g);
+  transform: rotate(-0.5deg);
+}
+:root[data-lens="back-page"] .bp-writing-end .bp-h2 {
+  margin: 0 0 0.2em;
+  font-size: 1.4em;
+  line-height: 1.25;
+  color: var(--bp-red);
+}
+:root[data-lens="back-page"] .bp-writing-end .bp-arrows {
+  margin-bottom: 0;
+  font-size: 0.88em;
+}
+
 /* ---- the war on the back page --------------------------------------------------------- */
 :root[data-lens="back-page"] .bp-roster {
   list-style: none;

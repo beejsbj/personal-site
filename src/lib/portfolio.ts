@@ -22,12 +22,7 @@ import {
 } from "./rules";
 
 export type PageId =
-  | "home"
-  | "about"
-  | "resume"
-  | "projects"
-  | "lab"
-  | "not-found";
+  "home" | "about" | "resume" | "projects" | "lab" | "not-found" | "writing";
 export type ProjectEntry = CollectionEntry<"projects">;
 export type LabEntry = CollectionEntry<"lab">;
 export type UpdateEntry = CollectionEntry<"updates">;
@@ -136,6 +131,7 @@ export async function getUpdates(): Promise<UpdateEntry[]> {
   const byId = new Map(entries.map((entry) => [updateId(entry), entry]));
   return selectActivitySnapshot(
     entries.map((entry) => ({ ...entry.data, id: updateId(entry) })),
+    new Date(__PORTFOLIO_BUILD_TIME__),
   ).map((data: { id: string }) => byId.get(data.id)!);
 }
 
@@ -160,10 +156,12 @@ export async function getHome() {
     updates,
     elsewhere: {
       label: elsewhere.label,
-      items: elsewhere.items.map((item: { title: string; href: string; blurb: string }) => ({
-        ...item,
-        href: resolve({ label: item.title, href: item.href }).href,
-      })),
+      items: elsewhere.items.map(
+        (item: { title: string; href: string; blurb: string }) => ({
+          ...item,
+          href: resolve({ label: item.title, href: item.href }).href,
+        }),
+      ),
     },
   };
 }
@@ -180,7 +178,10 @@ export async function getProjectsPage() {
     header: headerOf(site, data, "projects"),
     listLabel: need(data.listLabel, "listLabel in pages/projects.md"),
     detail: {
-      back: resolveLink(site, need(detail.back, "entry.back in pages/projects.md")),
+      back: resolveLink(
+        site,
+        need(detail.back, "entry.back in pages/projects.md"),
+      ),
       labels: {
         role: need(detail.labels.role, "entry.labels.role"),
         location: need(detail.labels.location, "entry.labels.location"),
@@ -241,11 +242,15 @@ export async function getResume() {
     ongoing,
     experience: {
       title: experience.title,
-      roles: experience.roles.map((role: ResumeEntryData) => resumeEntry(role, ongoing)),
+      roles: experience.roles.map((role: ResumeEntryData) =>
+        resumeEntry(role, ongoing),
+      ),
     },
     education: {
       title: education.title,
-      entries: education.entries.map((entry: ResumeEntryData) => resumeEntry(entry, ongoing)),
+      entries: education.entries.map((entry: ResumeEntryData) =>
+        resumeEntry(entry, ongoing),
+      ),
     },
     tools: { ...tools, sentence: `${listSentence(tools.items)}.` },
   };
@@ -268,9 +273,41 @@ export async function getDerived() {
     getFeatured(),
   ]);
   return derive({
-    projects: projects.map((entry) => ({ year: entry.data.year, slug: entry.slug })),
+    projects: projects.map((entry) => ({
+      year: entry.data.year,
+      slug: entry.slug,
+    })),
     lab,
     updates: updates.map((entry) => entry.data),
     featured,
   });
+}
+
+// Runtime writing enters through the same portfolio access boundary as the
+// authored collections. Source/cache mechanics remain inside the adapter.
+export { getPosts, getPost } from "./writing";
+export async function getWritingPage() {
+  const site = await getSite();
+  const entry = await getPageEntry("writing");
+  const data = entry.data;
+  const copy = need(data.writing, "writing copy in pages/writing.md");
+  const header = headerOf(site, data, "writing");
+  return {
+    entry,
+    title: data.title,
+    description: data.description,
+    header: {
+      ...header,
+      actions: header.actions.length
+        ? header.actions
+        : [
+            {
+              label: copy.subscribeLabel,
+              href: `${site.writingUrl}/subscribe`,
+            },
+            { label: copy.sourceLabel, href: site.writingUrl },
+          ],
+    },
+    copy,
+  };
 }

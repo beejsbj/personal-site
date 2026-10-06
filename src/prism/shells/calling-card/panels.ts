@@ -153,7 +153,7 @@ export function cardPanel(content: SiteContent): Panel {
         "ul",
         { class: "cc-card__links", "aria-label": copy.card.elsewhere },
         socials.map((s) => h("li", {}, h("a", { href: s.href, rel: "noreferrer" }, s.label, h("span", { "aria-hidden": "true" }, " ↗")))),
-        h("li", {}, h("a", { href: site.writingUrl, rel: "noreferrer" }, copy.card.writing, h("span", { "aria-hidden": "true" }, " ↗"))),
+        h("li", {}, h("a", { href: "/writing", "data-cc-title": copy.sections.writing }, copy.card.writing)),
       ),
       h("p", { class: "cc-card__sign" }, "— ", site.name, h("span", {}, content.pages.home.hero.occupation)),
       close,

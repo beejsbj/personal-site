@@ -14,6 +14,7 @@ import {
   bookOrder,
   chapter,
   coverPage,
+  rankOf,
   today,
   writingChapter,
   type Build,
@@ -225,9 +226,13 @@ class App {
   }
 
   async goNow(route: Route, force = false) {
+    // A writing refresh may add metadata stops while the book stays mounted.
+    this.order = bookOrder(this.ctx.content, this.copy);
+    this.paged.rank = rankOf(this.pagedRoute, this.order);
+    if (this.sheet) this.sheet.rank = rankOf(this.route, this.order);
     const was = this.current();
     // the runtime may hand us the page we're already on: nothing to turn
-    if (route.path === this.route.path && !force) {
+    if (route.path === this.route.path && !force && !route.refresh) {
       this.route = route;
       return;
     }

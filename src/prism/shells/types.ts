@@ -128,6 +128,37 @@ export interface Lenses {
   hion: typeof HionCopy;
 }
 
+export interface WritingCopy {
+  subscribeLabel: string;
+  sourceLabel: string;
+  originLabel: string;
+  backLabel: string;
+  listLabel: string;
+  emptyMessage: string;
+  unavailableMessage: string;
+  entryUnavailableMessage: string;
+  entryMissingMessage: string;
+  endHeading: string;
+  endBody: string;
+}
+export interface WritingPost {
+  slug: string;
+  href: string;
+  title: string;
+  subtitle?: string;
+  date: string;
+  dateLabel: string;
+  canonical: string;
+  cover?: string;
+  description: string;
+}
+export interface WritingContent {
+  posts: WritingPost[];
+  status: "available" | "unavailable";
+  entry?: WritingPost & { html: string };
+  entryStatus?: "available" | "missing" | "unavailable";
+}
+
 export interface SiteContent {
   site: {
     name: string;
@@ -173,10 +204,21 @@ export interface SiteContent {
         items: { title: string; href: string; blurb: string }[];
       };
     };
+    writing: {
+      title: string;
+      description: string;
+      header: Header;
+      copy: WritingCopy;
+    };
     about: { title: string; description: string; header: Header; html: string };
     /** The resume page's header and its free markdown body ("See the
      * work"); the structure is in `content.resume`. */
-    resume: { title: string; description: string; header: Header; html: string };
+    resume: {
+      title: string;
+      description: string;
+      header: Header;
+      html: string;
+    };
     projects: {
       title: string;
       description: string;
@@ -210,6 +252,7 @@ export interface SiteContent {
      * lens that reads it as rich text. */
     html: string;
   };
+  writing: WritingContent;
   /** Every visible project, in the one project order (newest year first,
    * then `order`). */
   projects: Project[];
@@ -227,7 +270,12 @@ export interface SiteContent {
     lastYear: number;
     latestUpdate: string | null;
     latestProject: string | null;
-    counts: { projects: number; lab: number; updates: number; featured: number };
+    counts: {
+      projects: number;
+      lab: number;
+      updates: number;
+      featured: number;
+    };
   };
   lenses: Lenses;
 }
@@ -240,12 +288,16 @@ export type RouteKind =
   | "lab-entry"
   | "about"
   | "resume"
+  | "writing"
+  | "writing-entry"
   | "other";
 
 export interface Route {
   kind: RouteKind;
   path: string;
   slug?: string;
+  /** Live writing changed on the same URL; rebuild the retained screen. */
+  refresh?: boolean;
   /** Document title of the page. */
   title: string;
   /** Daylight rendered its 404 here. */

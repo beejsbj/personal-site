@@ -25,8 +25,16 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
+      customSitemaps: ["https://burooj.dev/writing/sitemap.xml"],
       filter: (page) => !excludedPaths.has(new URL(page).pathname),
     }),
   ],
+  // Runtime writing must not change the authored update snapshot that the
+  // static Daylight homepage and every lens share within this deployment.
+  vite: {
+    define: {
+      __PORTFOLIO_BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    },
+  },
   adapter: vercel(),
 });

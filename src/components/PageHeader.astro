@@ -8,6 +8,7 @@ interface Props {
   title: string;
   intro?: string;
   level?: 1 | 2;
+  scale?: "page" | "post";
   /** Action links under the intro; mail links go without an arrow. */
   actions?: { label: string; href: string }[];
   /** The page id, when this header is a page's own: marks page.* parts. */
@@ -20,6 +21,7 @@ const {
   title,
   intro,
   level = 1,
+  scale = "page",
   actions = [],
   page,
   marks = {},
@@ -30,11 +32,19 @@ const mark = (slot: Slot) =>
 
 <header class="page-header">
   <div class="page-header__main">
-    {eyebrow && <p class="page-header__eyebrow" {...mark("eyebrow")}>{eyebrow}</p>}
-    <Heading level={level} scale="page" {...mark("title")}>
+    {eyebrow && (
+      <p class="page-header__eyebrow" {...mark("eyebrow")}>
+        {eyebrow}
+      </p>
+    )}
+    <Heading level={level} scale={scale} {...mark("title")}>
       {title}
     </Heading>
-    {intro && <p class="page-header__intro" {...mark("intro")}>{intro}</p>}
+    {intro && (
+      <p class="page-header__intro" {...mark("intro")}>
+        {intro}
+      </p>
+    )}
     {(actions.length > 0 || Astro.slots.has("actions")) && (
       <div class="page-header__actions" {...mark("actions")}>
         {actions.map((action) => (

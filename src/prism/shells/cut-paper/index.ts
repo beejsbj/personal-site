@@ -75,7 +75,7 @@ const land = (el: HTMLElement) => {
 async function transition(route: Route) {
   if (!ctx || !frame) return;
   // the runtime also syncs on the first page-load; same page, nothing to do
-  if (route.path === currentPath) return;
+  if (route.path === currentPath && !route.refresh) return;
   currentPath = route.path;
   const id = ++generation;
   const { stage, tear } = frame;

@@ -726,6 +726,194 @@ function resume(content: SiteContent) {
   );
 }
 
+/* ---------- Writing ---------- */
+
+/** Posts hang along a single reading thread, rather than borrowing the
+ * server page. Metadata and prose arrive through the same content contract
+ * as every other screen. */
+function writing(content: SiteContent) {
+  const page = content.pages.writing;
+  const { copy } = page;
+  const { posts, status } = content.writing;
+  const list =
+    posts.length && status === "available"
+      ? h(
+          "ol",
+          { class: "hion-row hion-row--writing", "data-cord": "" },
+          posts.map((post, i) => {
+            const id = `hion-writing-${post.slug}`;
+            return hung(
+              "li",
+              "pair",
+              {
+                class: "hion-work hion-work--writing",
+                "data-hang": "",
+                "data-hue": i % 2 ? "m" : "c",
+              },
+              h(
+                "article",
+                { "aria-labelledby": id },
+                h(
+                  "time",
+                  {
+                    class: "hion-meta",
+                    datetime: post.date,
+                    ...part("writing.meta", post.slug),
+                  },
+                  post.dateLabel,
+                ),
+                h(
+                  "h2",
+                  {
+                    class: "hion-work__title",
+                    id,
+                    ...part("writing.title", post.slug),
+                  },
+                  link(post.href, {}, post.title),
+                ),
+                h(
+                  "p",
+                  {
+                    class: "hion-work__summary",
+                    ...part("writing.summary", post.slug),
+                  },
+                  post.subtitle || post.description,
+                ),
+              ),
+            );
+          }),
+        )
+      : h(
+          "p",
+          {
+            class: "hion-prose",
+            "data-reveal": "",
+            role: status === "unavailable" ? "status" : undefined,
+            ...part("page.body", "writing"),
+          },
+          status === "unavailable"
+            ? copy.unavailableMessage
+            : copy.emptyMessage,
+        );
+  return screen(
+    "writing",
+    "hion-page-title",
+    h(
+      "div",
+      { class: "hion-entry-head" },
+      pageTitle(page.header, "writing"),
+      actions(content.lenses.hion, page.header, "writing"),
+    ),
+    loop({ class: "hion-loop--writing", "aria-label": copy.listLabel }, list),
+  );
+}
+
+function writingEntry(content: SiteContent, route: Route) {
+  const page = content.pages.writing;
+  const { copy } = page;
+  const entry = content.writing.entry;
+  const post =
+    entry?.slug === route.slug && content.writing.entryStatus === "available"
+      ? entry
+      : undefined;
+  if (!post) {
+    const message =
+      content.writing.entryStatus === "missing"
+        ? copy.entryMissingMessage
+        : copy.entryUnavailableMessage;
+    return screen(
+      "writing-entry",
+      "hion-page-title",
+      h("div", { class: "hion-entry-head" }, pageTitle(page.header, "writing")),
+      loop(
+        { class: "hion-loop--story", "aria-label": page.title },
+        h(
+          "p",
+          {
+            class: "hion-prose",
+            "data-reveal": "",
+            role: "status",
+            ...part("writing.body", route.slug),
+          },
+          message,
+        ),
+        pulls(
+          [
+            { label: copy.backLabel, url: "/writing" },
+            { label: copy.sourceLabel, url: content.site.writingUrl },
+            {
+              label: copy.subscribeLabel,
+              url: `${content.site.writingUrl}/subscribe`,
+            },
+          ],
+          content.lenses.hion.entry.links,
+          part("writing.links", route.slug),
+        ),
+      ),
+    );
+  }
+  return screen(
+    "writing-entry",
+    "hion-page-title",
+    h(
+      "div",
+      { class: "hion-entry-head" },
+      hungTitle(
+        "hion-page-title",
+        post.title,
+        page.header.eyebrow,
+        post.subtitle,
+        {
+          title: part("writing.title", post.slug),
+          intro: part("writing.subtitle", post.slug),
+        },
+      ),
+      hung(
+        "p",
+        "drop",
+        { class: "hion-writing__origin", "data-hue": "m" },
+        h(
+          "time",
+          {
+            class: "hion-meta",
+            datetime: post.date,
+            ...part("writing.meta", post.slug),
+          },
+          post.dateLabel,
+        ),
+        link(post.canonical, {}, copy.originLabel),
+      ),
+    ),
+    story(
+      post.html,
+      post.title,
+      "hion-loop--writing-story",
+      part("writing.body", post.slug),
+    ),
+    loop(
+      {
+        class: "hion-loop--note hion-loop--writing-end",
+        "aria-labelledby": "hion-writing-end",
+        ...part("writing.end", post.slug),
+      },
+      strung("h2", "hion-writing-end", copy.endHeading),
+      h("p", { class: "hion-prose", "data-reveal": "" }, copy.endBody),
+      pulls(
+        [
+          {
+            label: copy.subscribeLabel,
+            url: `${content.site.writingUrl}/subscribe`,
+          },
+          { label: copy.originLabel, url: post.canonical },
+          { label: copy.backLabel, url: "/writing" },
+        ],
+        content.lenses.hion.entry.links,
+        part("writing.links", post.slug),
+      ),
+    ),
+  );
+}
+
 /* ---------- Anything else ---------- */
 
 /** The 404: Hion's own loose end, under Daylight's title. */
@@ -795,6 +983,10 @@ export function buildScreen(content: SiteContent, route: Route): HTMLElement {
       return about(content);
     case "resume":
       return resume(content);
+    case "writing":
+      return writing(content);
+    case "writing-entry":
+      return writingEntry(content, route);
     default:
       return other(content, route);
   }
@@ -805,7 +997,7 @@ export function buildScreen(content: SiteContent, route: Route): HTMLElement {
 export function footer(content: SiteContent) {
   const { site } = content;
   const copy = content.lenses.hion.footer;
-  const writing = site.nav.filter((item) => item.href === site.writingUrl);
+  const writing = site.nav.filter((item) => item.href === "/writing");
   return h(
     "footer",
     { class: "hion-foot" },

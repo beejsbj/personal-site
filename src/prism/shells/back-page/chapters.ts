@@ -112,6 +112,9 @@ export function bookOf(route: Route): BookKey | null {
     case "projects":
     case "project":
       return "projects";
+    case "writing":
+    case "writing-entry":
+      return "writing";
     default:
       return null;
   }
@@ -122,6 +125,8 @@ export function rankOf(route: Route, order: Stop[]) {
   if (at >= 0) return at;
   const lab = order.findIndex((stop) => stop.key === "/lab");
   if (route.kind === "lab-entry") return lab + 0.5;
+  if (route.kind === "writing-entry")
+    return order.findIndex((stop) => stop.key === "/writing") + 0.5;
   if (route.kind === "project")
     return order.findIndex((stop) => stop.key === "/projects") + 0.5;
   return 0.5;
@@ -698,6 +703,188 @@ function labEntry(b: Build): HTMLElement[] | null {
   return written(b, "lab-entry", "squared", blocks, firstPage(b), null);
 }
 
+// ---- writing: essays in the same hand, fetched only when opened ---------------------
+
+function writing(b: Build) {
+  const { content } = b;
+  const { header, copy: words } = content.pages.writing;
+  const opening = h(
+    "header",
+    { class: "bp-entryhead" },
+    header.eyebrow
+      ? h(
+          "p",
+          { class: "bp-eyebrow", ...part("page.eyebrow", "writing") },
+          header.eyebrow,
+        )
+      : null,
+    withUnderline(
+      h1(header.title, part("page.title", "writing")),
+      RED,
+      "writing-title",
+    ),
+    header.intro
+      ? h(
+          "p",
+          { class: "bp-lead", ...part("page.intro", "writing") },
+          header.intro,
+        )
+      : null,
+    arrows(
+      b,
+      header.actions.map((action) => ({
+        label: action.label,
+        url: action.href,
+      })),
+      part("page.actions", "writing"),
+    ),
+  );
+  const list = h("ol", {
+    class: "bp-writing-list",
+    "aria-label": words.listLabel,
+  });
+  for (const post of content.writing.posts) {
+    list.append(
+      h(
+        "li",
+        null,
+        h(
+          "time",
+          {
+            class: "bp-writing-date",
+            datetime: post.date,
+            ...part("writing.meta", post.slug),
+          },
+          post.dateLabel,
+        ),
+        h(
+          "h2",
+          { class: "bp-h2", ...part("writing.title", post.slug) },
+          h("a", { href: post.href }, post.title),
+        ),
+        h(
+          "p",
+          {
+            class: "bp-writing-summary",
+            ...part("writing.summary", post.slug),
+          },
+          post.subtitle || post.description,
+        ),
+      ),
+    );
+  }
+  const status =
+    content.writing.status === "unavailable"
+      ? words.unavailableMessage
+      : content.writing.posts.length === 0
+        ? words.emptyMessage
+        : null;
+  const body = status
+    ? h("p", { class: "bp-note", role: "status" }, status)
+    : list;
+  return written(b, "writing", "squared", [opening, body], firstPage(b), null);
+}
+
+function writingEntry(b: Build) {
+  const { content, route } = b;
+  const { header, copy: words } = content.pages.writing;
+  // The runtime replaces this one entry for the requested route. Never use a
+  // previous essay's body, and never read the server page to fill in a gap.
+  const entry =
+    content.writing.entry?.slug === route.slug
+      ? content.writing.entry
+      : undefined;
+  const post =
+    entry ?? content.writing.posts.find((item) => item.slug === route.slug);
+  const ref = route.slug ?? "";
+  const available = !!entry && content.writing.entryStatus === "available";
+  const opening = h(
+    "header",
+    { class: "bp-entryhead bp-writing-head" },
+    header.eyebrow ? h("p", { class: "bp-eyebrow" }, header.eyebrow) : null,
+    withUnderline(
+      h1(
+        available ? entry!.title : header.title,
+        available ? part("writing.title", ref) : part("page.title", "writing"),
+      ),
+      RED,
+      `writing-${ref}`,
+      true,
+    ),
+    !available && post
+      ? h("h2", { class: "bp-h2", ...part("writing.title", ref) }, post.title)
+      : null,
+    post?.subtitle
+      ? h(
+          "p",
+          { class: "bp-lead", ...part("writing.subtitle", ref) },
+          post.subtitle,
+        )
+      : null,
+    post
+      ? h(
+          "p",
+          { class: "bp-writing-origin" },
+          h(
+            "time",
+            { datetime: post.date, ...part("writing.meta", ref) },
+            post.dateLabel,
+          ),
+          " · ",
+          markPart(
+            link(post.canonical, b.copy.newTab, words.originLabel),
+            "writing.links",
+            ref,
+          ),
+        )
+      : null,
+  );
+  const body = available
+    ? prose(entry!.html, "writing.body", ref)
+    : [
+        h(
+          "p",
+          { class: "bp-note", role: "status" },
+          content.writing.entryStatus === "missing"
+            ? words.entryMissingMessage
+            : words.entryUnavailableMessage,
+        ),
+      ];
+  const ending = h(
+    "aside",
+    { class: "bp-note bp-writing-end", ...part("writing.end", ref) },
+    h("h2", { class: "bp-h2" }, words.endHeading),
+    h("p", null, words.endBody),
+    arrows(
+      b,
+      [
+        {
+          label: words.subscribeLabel,
+          url: `${content.site.writingUrl}/subscribe`,
+        },
+        {
+          label: post ? words.originLabel : words.sourceLabel,
+          url: post?.canonical ?? content.site.writingUrl,
+        },
+      ],
+      part("writing.links", ref),
+    ),
+  );
+  const back = h(
+    "p",
+    { class: "bp-arrowlink", ...part("writing.links", ref) },
+    h("a", { href: "/writing" }, `← ${words.backLabel}`),
+  );
+  return written(
+    b,
+    "writing-entry",
+    "squared",
+    [opening, ...body, ending, back],
+    firstPage(b),
+    post?.dateLabel ?? null,
+  );
+}
+
 // ---- a project: its own page, the screenshot taped in -------------------------------
 
 function fields(rows: [string, string][], mark: ReturnType<typeof part>) {
@@ -974,7 +1161,10 @@ function loose(b: Build) {
 export function chapter(b: Build): Chapter {
   const { route, order } = b;
   const rank = rankOf(route, order);
-  const label = order.find((s) => s.key === route.path)?.label ?? route.title.split("|")[0].trim();
+  const label = order.find((s) => s.key === route.path)?.label
+    ?? (route.kind === "writing-entry"
+      ? b.content.pages.writing.header.title
+      : route.title.split("|")[0].trim());
   let pages: HTMLElement[] | null = null;
   switch (route.kind) {
     case "home":
@@ -991,6 +1181,12 @@ export function chapter(b: Build): Chapter {
       break;
     case "lab-entry":
       pages = labEntry(b);
+      break;
+    case "writing":
+      pages = writing(b);
+      break;
+    case "writing-entry":
+      pages = writingEntry(b);
       break;
     case "project":
       pages = project(b);

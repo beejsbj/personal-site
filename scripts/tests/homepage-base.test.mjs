@@ -3,6 +3,7 @@ import { readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import test from "node:test";
+import { isServerRoute } from "./lib/server-routes.mjs";
 
 // Run after `pnpm build`: these assertions inspect what will actually ship.
 const outputDir = fileURLToPath(new URL("../../dist/client/", import.meta.url));
@@ -179,13 +180,14 @@ test("local links, stylesheets, icons, and image sources resolve in built output
       join(outputDir, pathname, "index.html"),
     ];
     assert.ok(
-      candidates.some((path) => {
-        try {
-          return statSync(path).isFile();
-        } catch {
-          return false;
-        }
-      }),
+      isServerRoute(pathname) ||
+        candidates.some((path) => {
+          try {
+            return statSync(path).isFile();
+          } catch {
+            return false;
+          }
+        }),
       `Local reference does not resolve in dist/client: ${reference}`,
     );
   }
