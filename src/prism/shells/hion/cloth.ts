@@ -239,38 +239,70 @@ export function createCloth(options: ClothOptions) {
    * life runs free. Cyan leans in from the left and magenta from the right,
    * as they run down either side of a section; they meet in the middle. */
   function selvages(): Sow[] {
-    if (narrow()) return [];
     const out: Sow[] = [];
     const top = Math.ceil(170 / S);
-    const BAND = Math.ceil(420 / S);
-    for (let y0 = top, band = 0; y0 < life.h - 4; y0 += BAND, band++) {
-      const y1 = Math.min(life.h, y0 + BAND - 2);
-      // Columns in from each edge with nothing held in this band.
-      const clear = (x: number) => {
-        for (let y = y0; y < y1; y++) if (life.isHeld(x, y)) return false;
-        return true;
-      };
-      let left = 0;
-      while (left < life.w / 3 && clear(left)) left++;
-      let right = 0;
-      while (right < life.w / 3 && clear(life.w - 1 - right)) right++;
-      const strips: [number, number, Species][] = [];
-      // Keep a crossing of black paper between a strip and the words.
-      if (left >= 7) strips.push([Math.max(0, left - 19), left - 2, 1]);
-      if (right >= 7) strips.push([life.w - right + 1, Math.min(life.w - 1, life.w - right + 18), 2]);
-      strips.forEach(([x0, x1, lean], si) => {
-        const rand = rng(si * 7907 + band * 131 + 1);
-        out.push({
-          key: y0 * S,
-          run() {
-            for (let y = y0; y < y1; y++) {
-              for (let x = x0; x <= x1; x++) {
-                if (rand() < 0.28) life.set(x, y, rand() < 0.72 ? lean : lean === 1 ? 2 : 1);
-              }
+    const soup = (x0: number, x1: number, y0: number, y1: number, lean: Species, seed: number): Sow => {
+      const rand = rng(seed);
+      return {
+        key: y0 * S,
+        run() {
+          for (let y = y0; y <= y1; y++) {
+            for (let x = x0; x <= x1; x++) {
+              if (rand() < 0.28) life.set(x, y, rand() < 0.72 ? lean : lean === 1 ? 2 : 1);
             }
-          },
-        });
-      });
+          }
+        },
+      };
+    };
+    // Down the edges, a band at a time (wide pages only).
+    const BAND = Math.ceil(420 / S);
+    let left = new Int32Array(0);
+    let right = new Int32Array(0);
+    if (!narrow()) {
+      left = new Int32Array(life.h);
+      right = new Int32Array(life.h);
+      for (let y0 = top, band = 0; y0 < life.h - 4; y0 += BAND, band++) {
+        const y1 = Math.min(life.h, y0 + BAND - 2);
+        // Columns in from each edge with nothing held in this band.
+        const clear = (x: number) => {
+          for (let y = y0; y < y1; y++) if (life.isHeld(x, y)) return false;
+          return true;
+        };
+        let l = 0;
+        while (l < life.w / 3 && clear(l)) l++;
+        let r = 0;
+        while (r < life.w / 3 && clear(life.w - 1 - r)) r++;
+        // Keep a crossing of black paper between a strip and the words.
+        if (l >= 7) out.push(soup(Math.max(0, l - 19), l - 2, y0, y1 - 1, 1, band * 131 + 1));
+        if (r >= 7) out.push(soup(life.w - r + 1, Math.min(life.w - 1, life.w - r + 18), y0, y1 - 1, 2, band * 131 + 7908));
+        for (let y = y0; y < y0 + BAND && y < life.h; y++) {
+          left[y] = l >= 7 ? l : 0;
+          right[y] = r >= 7 ? r : 0;
+        }
+      }
+    }
+    // Across the gaps between sections: rows with nothing held between the
+    // strips, six or more of them together. The cloth runs through.
+    const rowClear = (y: number) => {
+      const x0 = (left[y] ?? 0) + 1;
+      const x1 = life.w - (right[y] ?? 0) - 2;
+      for (let x = x0; x <= x1; x++) if (life.isHeld(x, y)) return false;
+      return true;
+    };
+    let run = 0;
+    for (let y = top; y <= life.h; y++) {
+      if (y < life.h && rowClear(y)) {
+        run++;
+        continue;
+      }
+      if (run >= 6) {
+        const y0 = y - run + 1;
+        const y1 = y - 2;
+        const x0 = (left[y0] ?? 0) + 2;
+        const x1 = life.w - (right[y0] ?? 0) - 3;
+        out.push(soup(x0, x1, y0, y1, y0 % 2 ? 1 : 2, y0 * 977 + 3));
+      }
+      run = 0;
     }
     return out;
   }
@@ -617,12 +649,12 @@ export function createCloth(options: ClothOptions) {
   }
 
   function wake() {
-    if (instant || frame || timer || asleep() || !built) return;
+    if (instant || frame || timer || asleep() || !built || layer.dataset.state === "settling") return;
     frame = requestAnimationFrame(tick);
   }
 
   function onScroll() {
-    if (!built) return;
+    if (!built || layer.dataset.state === "settling") return;
     cull();
     if (instant) {
       paint(Infinity);
@@ -702,16 +734,56 @@ export function createCloth(options: ClothOptions) {
     }, 220);
   });
 
+  /** Let the cloth live out of sight for up to n generations (until only
+   * still and blinking things are left), a few milliseconds at a time and
+   * never while the prism holds the page still; then show it. */
+  let settling = 0;
+  function settle(n: number) {
+    const mine = ++settling;
+    layer.dataset.state = "settling";
+    let waiting = false;
+    const slice = () => {
+      if (mine !== settling || signal.aborted) return;
+      if (options.isIdle()) {
+        if (!waiting) {
+          waiting = true;
+          options.onIdleChange((idle) => {
+            if (idle || !waiting) return;
+            waiting = false;
+            slice();
+          });
+        }
+        return;
+      }
+      const end = performance.now() + 6;
+      while (n > 0 && performance.now() < end) {
+        life.step();
+        n = life.settled || !life.changes ? 0 : n - 1;
+      }
+      if (n > 0) {
+        timer = window.setTimeout(slice, 16);
+        return;
+      }
+      timer = 0;
+      settling++;
+      delete layer.dataset.state;
+      dirty.clear();
+      for (const tile of tiles.values()) tile.el.remove();
+      tiles.clear();
+      cull();
+      paint(Infinity);
+      wake();
+    };
+    slice();
+  }
+
   /** Start over on the new layout: sow what the hions have already reached,
    * and let it settle a little out of sight. */
   function rebuild() {
     build();
     sowDue(instant ? Infinity : loom.reach());
     weaveSome(Infinity);
-    life.run(instant ? 400 : 60);
-    cull();
-    paint(Infinity);
-    wake();
+    settle(instant ? 400 : 60);
   }
 
   return {
@@ -719,13 +791,6 @@ export function createCloth(options: ClothOptions) {
       seenWidth = page.clientWidth;
       seenHeight = page.scrollHeight;
       build();
-      if (instant) {
-        sowDue(Infinity);
-        weaveSome(Infinity);
-        life.run(400);
-      }
-      cull();
-      paint(Infinity);
       observer.observe(page);
       addEventListener("scroll", onScroll, { passive: true, signal });
       addEventListener("resize", onScroll, { passive: true, signal });
@@ -743,7 +808,15 @@ export function createCloth(options: ClothOptions) {
         clearTimeout(timer);
         clearTimeout(resizeTimer);
       });
-      wake();
+      if (instant) {
+        sowDue(Infinity);
+        weaveSome(Infinity);
+        settle(400);
+      } else {
+        cull();
+        paint(Infinity);
+        wake();
+      }
     },
     /** Let the cloth go. Toward a point (page px): it magnifies round it,
      * as if you leant in to look at one thread. */

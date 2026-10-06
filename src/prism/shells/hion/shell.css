@@ -306,6 +306,14 @@
   inset: 0 0 auto;
   z-index: 0;
   pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+/* Living out of sight until it has settled (reduced motion, a still face,
+   a new layout). */
+:root[data-lens="hion"] .hion-cloth[data-state="settling"] {
+  opacity: 0;
+  transition: none;
 }
 
 :root[data-lens="hion"] .hion-cloth__tile {
