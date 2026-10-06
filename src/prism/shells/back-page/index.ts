@@ -218,8 +218,11 @@ class App {
       this.sheet = null;
       this.book.setLoose(null, true);
     }
-    const view = land ? this.views(ch) - 1 : 0;
+    let view = land ? this.views(ch) - 1 : 0;
     if (ch.book !== this.bookKey) {
+      // on a phone the book opens by swinging its own cover away, so Hello's
+      // printed cover (its first page there) is skipped rather than shown twice
+      if (!view && !this.book.geo.spread && ch.pages.length > 1 && ch.pages[0].dataset.kind === "cover") view = 1;
       await this.swap(ch, view);
       this.paged = ch;
       this.pagedRoute = route;
