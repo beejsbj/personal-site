@@ -1200,9 +1200,15 @@ class Troupe {
       "keydown",
       (event) => {
         if (event.key !== "Escape" || !hold) return;
-        hold.off = true;
+        // put down for good: the rest of this drag and its release do nothing
+        const { target, id } = hold;
         clearAim();
-        hold.pulled = true;
+        hold = null;
+        try {
+          target.releasePointerCapture(id);
+        } catch {
+          /* fine */
+        }
       },
       { signal },
     );
