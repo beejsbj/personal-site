@@ -240,7 +240,7 @@ test("one link family: no drag physics, no rectangular actions, shared ball toke
   }
 });
 
-test("ball labels never wrap, and external balls wear a named badge, not an inline arrow", () => {
+test("ball labels never wrap, and external balls wear a named satellite on the rim", () => {
   // Round 6: "Say / hello ↗" on three lines looked unpolished. Each ball is
   // sized to its one-line label; external links get a rim badge and say
   // where they go in words.
@@ -255,15 +255,10 @@ test("ball labels never wrap, and external balls wear a named badge, not an inli
     const anchors = [...nav.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)];
     for (const [, attrs, body] of anchors) {
       const external = /href="(?:https?:|mailto:)/.test(attrs);
-      assert.doesNotMatch(
-        body,
-        /link-arrow/,
-        `${path}: no inline arrow in a ball`,
-      );
       assert.equal(
-        /ball-badge/.test(body),
+        /class="link-sat\b/.test(body),
         external,
-        `${path}: badge iff external`,
+        `${path}: satellite iff external`,
       );
       const note = body.match(/ds-link__note[^>]*>([^<]*)</)?.[1];
       if (external)
@@ -276,6 +271,44 @@ test("ball labels never wrap, and external balls wear a named badge, not an inli
       assert.match(body, /class="ball-face[^"]*"[^>]*aria-hidden="true"/);
     }
   }
+});
+
+test("one arrow language: every arrow is the satellite, one inked glyph turned for outbound", () => {
+  // Round 7: balls, pills and text links had three different arrows. Now
+  // each is a small burgundy ball carrying the same hand-inked path;
+  // leaving the site only turns it.
+  const link = read("src/design/primitives/Link.astro");
+  assert.equal(
+    (link.match(/<path\b/g) || []).length,
+    1,
+    "one arrow glyph in the family",
+  );
+  assert.match(link, /\.link-sat--out \{[^}]*--sat-turn: -45deg/);
+  assert.match(
+    link,
+    /prefers-reduced-motion: no-preference\) \{[\s\S]*?\.link-sat \{\s*translate/,
+    "the kick only plays when motion is welcome",
+  );
+  assert.match(link, /forced-colors: active\) \{\s*\.link-sat \{\s*border/);
+  const paths = new Set();
+  for (const page of ["index.html", "about/index.html", "projects/index.html"]) {
+    const html = read(`dist/client/${page}`);
+    assert.doesNotMatch(html, /link-arrow|ball-badge/, `${page}: retired arrows`);
+    for (const [, attrs, body] of html.matchAll(
+      /<a\b([^>]*ds-link--(?:pill|text|ball)[^>]*)>([\s\S]*?)<\/a>/g,
+    )) {
+      const sat = body.match(
+        /<span class="link-sat( link-sat--out)?"[^>]*aria-hidden="true"[^>]*>[\s\S]*?<path d="([^"]+)"/,
+      );
+      if (!sat) continue;
+      paths.add(sat[2]);
+      const outbound = /href="(?:https?:|mailto:)/.test(attrs);
+      assert.equal(Boolean(sat[1]), outbound, `${page}: turned iff outbound`);
+      if (outbound)
+        assert.match(body, /ds-link__note[^>]*>\(/, `${page}: says where`);
+    }
+  }
+  assert.equal(paths.size, 1, "every satellite carries the same glyph");
 });
 
 test("all generated pages have shared chrome and resolving local links and media", () => {

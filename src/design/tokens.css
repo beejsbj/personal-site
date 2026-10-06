@@ -139,12 +139,10 @@
   --ball-tracking-compact: 0.012em;
   --ball-tracking-cluster: -0.012em;
   --weight-ball-current: 500;
-  --ball-badge-size: 1.3em;
-  --ball-badge-glyph: 55%;
-  --ball-badge-ring: 0.125rem;
-  --ball-badge-drift: 0.125rem;
-  --ball-badge-at-x: 85.355%;
-  --ball-badge-at-y: 14.645%;
+  --link-sat-rim-size: 1.3em;
+  --link-sat-rim-ring: 0.125rem;
+  --link-sat-rim-x: 85.355%;
+  --link-sat-rim-y: 14.645%;
   --ball-row-gap: var(--space-2xs);
   --ball-row-wave: 0.1875rem;
   --ball-honeycomb-tuck: -0.4375rem;
@@ -155,8 +153,13 @@
   --shadow-ball-raised: -0.5rem 0.75rem 1.5rem #30232040;
   --welcome-copy-width: 32ch;
   --feature-media-width: 45%;
-  --icon-inline: 0.72em;
-  --link-arrow-lift: 0.1875rem;
+  /* The satellite: the family's one arrow (a small ball, hand-inked). */
+  --link-sat-size: min(1.125em, 1.5rem);
+  --link-sat-glyph: 68%;
+  --link-sat-gap: 0.3em;
+  --link-sat-kick: 0.1875rem;
+  --link-sat-kick-diagonal: 0.135rem;
+  --link-sat-lead: 0.5;
   --ease-feedback: ease;
   --press-scale: 0.97;
   --disabled-opacity: 0.5;
