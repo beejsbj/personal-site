@@ -537,6 +537,29 @@
   color: var(--hion-c);
 }
 
+/* Woven type (woven.ts): the word's ink is woven by life on a canvas
+   behind it; the text stays, invisible, for reading and selecting. */
+:root[data-lens="hion"] [data-woven] {
+  position: relative;
+}
+
+:root[data-lens="hion"] .hion-title__text[data-woven] {
+  display: inline-block;
+}
+
+:root[data-lens="hion"] [data-woven-state] {
+  color: transparent;
+  background: none;
+  -webkit-text-fill-color: transparent;
+}
+
+:root[data-lens="hion"] .hion-woven {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px rgb(79 233 245 / 0.18)) drop-shadow(0 0 7px rgb(255 92 200 / 0.14));
+}
+
 :root[data-lens="hion"] .hion-display {
   margin: 0;
   font: 800 clamp(4.2rem, 9.4vw, 8.4rem)/0.9 var(--hion-serif);

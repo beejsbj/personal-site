@@ -134,7 +134,7 @@ function hungTitle(
       "h1",
       "sign",
       { ...marks.title, class: "hion-title", id, "data-hang": "" },
-      h("span", { class: "hion-title__text" }, title),
+      h("span", { class: "hion-title__text", "data-woven": "m" }, title),
     ),
     intro
       ? h("p", { ...marks.intro, class: "hion-intro", "data-reveal": "" }, intro)
@@ -293,6 +293,7 @@ function home(content: SiteContent) {
               "data-hang": i === 0 ? "" : undefined,
               "data-hang-from": i === 0 ? undefined : "prev",
               "data-hue": i % 2 ? "c" : "m",
+              "data-woven": "",
             },
             word,
           ),

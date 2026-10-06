@@ -73,10 +73,16 @@ function float(a: Pt, b: Pt, rand: () => number, over: number): number[] {
   return out;
 }
 
-export function stitches(size: number, dpr: number): Stitches {
+/** Sprites for a cloth of crossings `size` apart. `heavy` lays thicker
+ * thread for a fine cloth that has to read (woven type). */
+export function stitches(size: number, dpr: number, heavy = false): Stitches {
   const pad = Math.ceil(size * 0.7 + 6);
   const ply = size >= 17 ? 2 : 1;
-  const weight = size >= 17 ? Math.min(4.4, size * 0.13) : Math.max(1.5, size * 0.15);
+  const weight = heavy
+    ? size * 0.5
+    : size >= 17
+      ? Math.min(4.4, size * 0.13)
+      : Math.max(1.5, size * 0.15);
   const threads: HTMLCanvasElement[][][] = [];
   const knots: HTMLCanvasElement[][] = [];
   HUES.forEach((hue, hi) => {
@@ -139,7 +145,7 @@ export function stitches(size: number, dpr: number): Stitches {
       const half = size * (0.68 + rand() * 0.06);
       const a: Pt = hi ? [pad - half, pad] : [pad, pad - half];
       const b: Pt = hi ? [pad + half, pad] : [pad, pad + half];
-      paint(ctx, mark(Kind.Stroke, hue, weight * 0.75, 0.24 + rand() * 0.08, float(a, b, rand, 0), rand() * 1e6, undefined, false), pats);
+      paint(ctx, mark(Kind.Stroke, hue, weight * 0.75, (heavy ? 0.8 : 0.24) + rand() * 0.08, float(a, b, rand, 0), rand() * 1e6, undefined, false), pats);
       return canvas;
     }),
   );
