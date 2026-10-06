@@ -909,6 +909,8 @@ class Troupe {
       const width = (0.9 + rng() * 0.5).toFixed(2);
       for (const l of lives) {
         const o = this.offset(l);
+        // only the pages it crosses take the ink (and count it)
+        if (Math.max(a.x, end.x) < o || Math.min(a.x, end.x) > o + l.space.w) continue;
         const line = el("path", {
           class: "bp-life-flick",
           d: `M${f(a.x - o)} ${f(a.y)}L${f(end.x - o)} ${f(end.y)}`,
