@@ -100,7 +100,7 @@ function show(route: Route, first: boolean) {
     loom,
     signal: controller.signal,
     instant: still(),
-    scale: route.kind === "project" || route.kind === "lab-entry" ? 2 : 1,
+    scale: close(route) ? 2 : 1,
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
   });
@@ -135,12 +135,16 @@ function show(route: Route, first: boolean) {
   if (!first && !ctx.face) main.focus({ preventScroll: true });
 }
 
+/** A single thing seen close: a project, a lab entry, a post. */
+const close = (route: Route) =>
+  route.kind === "project" || route.kind === "lab-entry" || route.kind === "writing-entry";
+
 /** The link you followed, when it opens one thing out of a cloth of many
- * (a project from a list): the cloth magnifies round it on the way. */
+ * (a project or a post from a list): the cloth magnifies round it on the way. */
 let followed: { el: HTMLAnchorElement; at: number } | undefined;
 
 function closer(page: HTMLElement, route: Route): [number, number] | undefined {
-  if (route.kind !== "project" && route.kind !== "lab-entry") return undefined;
+  if (!close(route)) return undefined;
   if (!followed || performance.now() - followed.at > 2000 || !page.contains(followed.el)) return undefined;
   if (new URL(followed.el.href, location.href).pathname.replace(/\/$/, "") !== route.path.replace(/\/$/, "")) {
     return undefined;

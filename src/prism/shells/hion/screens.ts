@@ -756,6 +756,7 @@ function writing(content: SiteContent) {
                 class: "hion-work hion-work--writing",
                 "data-hang": "",
                 "data-hue": i % 2 ? "m" : "c",
+                "data-frame": post.slug,
               },
               h(
                 "article",
@@ -864,7 +865,8 @@ function writingEntry(content: SiteContent, route: Route) {
     "hion-page-title",
     h(
       "div",
-      { class: "hion-entry-head" },
+      // The same tape as its charm on the list, seen close.
+      { class: "hion-entry-head", "data-frame": post.slug },
       hungTitle(
         "hion-page-title",
         post.title,
