@@ -838,6 +838,63 @@
   padding-left: 0.2em;
 }
 
+/* The writing archive is a reading thread: one post after another, with
+   the same hung marks and scroll reveal as the rest of the loom. */
+:root[data-lens="hion"] .hion-row--writing {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 64px;
+  max-width: 66ch;
+  margin: 20px auto 0;
+}
+
+:root[data-lens="hion"] .hion-work--writing,
+:root[data-lens="hion"] .hion-work--writing:nth-child(2n) {
+  --hion-drop: 40px;
+}
+
+:root[data-lens="hion"] .hion-work--writing .hion-work__title {
+  margin: 0.25em 0 0.4em;
+  font-size: clamp(1.55rem, 2.4vw, 2rem);
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="hion"] .hion-writing__origin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 24px;
+  max-width: 64ch;
+  margin-top: 32px;
+  font-size: 0.95rem;
+}
+
+:root[data-lens="hion"] .hion-writing__origin a {
+  color: var(--hion-ml);
+  text-underline-offset: 4px;
+}
+
+:root[data-lens="hion"] .hion-loop--writing-story .hion-prose,
+:root[data-lens="hion"] .hion-loop--writing-end > .hion-prose {
+  max-width: 68ch;
+  margin-inline: auto;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="hion"] .hion-loop--writing-story figure {
+  margin-inline: 0;
+}
+
+:root[data-lens="hion"] .hion-loop--writing-story figcaption {
+  margin-top: 12px;
+  color: var(--hion-ml);
+  font: 600 1.1rem/1.5 var(--hion-hand);
+}
+
+:root[data-lens="hion"] .hion-loop--writing-end > .hion-row--pulls {
+  margin-top: 48px;
+}
+
 :root[data-lens="hion"] .hion-row--lab {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -53,7 +53,7 @@ export function keysFor(content: SiteContent): Key[] {
     key(lab, copy.lab, "/lab", ["lab", "lab-entry"], counts.lab),
     key(about, copy.about, "/about", ["about"]),
     key(resume, copy.resume, "/resume", ["resume"]),
-    key(writing, copy.writing, content.site.writingUrl, []),
+    key(writing, copy.writing, "/writing", ["writing", "writing-entry"]),
     key(hello, copy.hello, `mailto:${content.site.email}`, []),
   ];
 }

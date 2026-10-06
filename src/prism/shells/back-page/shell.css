@@ -1130,6 +1130,53 @@
   margin: 0 auto var(--g);
 }
 
+/* ---- writing: dated essays in the exercise book ------------------------------------ */
+:root[data-lens="back-page"] .bp-writing-list {
+  list-style: none;
+  padding: 0 !important;
+}
+:root[data-lens="back-page"] .bp-writing-list li {
+  margin-bottom: var(--g);
+}
+:root[data-lens="back-page"] .bp-writing-list .bp-h2 {
+  margin-top: 0;
+  font-size: 1.45em;
+  line-height: var(--lh);
+}
+:root[data-lens="back-page"] .bp-writing-list .bp-h2 a {
+  text-decoration: none;
+}
+:root[data-lens="back-page"] .bp-writing-date,
+:root[data-lens="back-page"] .bp-writing-origin {
+  font: 0.7em/1.55 var(--bp-type);
+  color: var(--bp-fine);
+}
+:root[data-lens="back-page"] .bp-writing-date {
+  display: block;
+  margin-bottom: 0.2em;
+}
+:root[data-lens="back-page"] .bp-writing-summary {
+  margin-bottom: 0 !important;
+}
+:root[data-lens="back-page"] .bp-writing-head .bp-h1 {
+  font-size: 2.2em;
+  line-height: calc(var(--lh) * 1.5);
+}
+:root[data-lens="back-page"] .bp-writing-end {
+  margin-top: var(--g);
+  transform: rotate(-0.5deg);
+}
+:root[data-lens="back-page"] .bp-writing-end .bp-h2 {
+  margin: 0 0 0.2em;
+  font-size: 1.4em;
+  line-height: 1.25;
+  color: var(--bp-red);
+}
+:root[data-lens="back-page"] .bp-writing-end .bp-arrows {
+  margin-bottom: 0;
+  font-size: 0.88em;
+}
+
 /* ---- the war on the back page --------------------------------------------------------- */
 :root[data-lens="back-page"] .bp-roster {
   list-style: none;
@@ -1336,6 +1383,9 @@
   --tab: #d9e5cf;
 }
 :root[data-lens="back-page"] .bp-tabs li:nth-child(5) a {
+  --tab: #e7ddf0;
+}
+:root[data-lens="back-page"] .bp-tabs li:nth-child(6) a {
   --tab: #f3d0ca;
 }
 :root[data-lens="back-page"] .bp-tabs a[data-state="current"] {
@@ -1356,15 +1406,15 @@
 :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs li {
   top: auto;
   bottom: 0;
-  left: calc(var(--i) * 20% + 2px);
-  width: calc(20% - 4px);
+  left: calc(var(--i) * 100% / var(--tabs) + 2px);
+  width: calc(100% / var(--tabs) - 4px);
 }
 :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a {
   width: 100%;
   height: 2.2em;
   padding: 0 0.2em;
   justify-content: center;
-  font-size: 1.1em;
+  font-size: min(1.1em, calc(var(--pw) / 23));
   border-radius: 7px 7px 0 0;
   transform: translateY(0.5em);
   box-shadow:

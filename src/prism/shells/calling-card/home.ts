@@ -22,14 +22,13 @@ interface Command {
   label: string;
   help: string;
   href?: string;
-  external?: boolean;
   panel?: "phone" | "card";
 }
 
 let remembered = 0;
 
 export function commandsFor(env: Env): Command[] {
-  const { site, derived } = env.content;
+  const { derived } = env.content;
   const { commands } = copyOf(env.content).home;
   return [
     { id: "projects", ...commands.projects, href: "/projects" },
@@ -46,8 +45,7 @@ export function commandsFor(env: Env): Command[] {
       id: "writing",
       label: commands.writing.label,
       help: commands.writing.help,
-      href: site.writingUrl,
-      external: true,
+      href: "/writing",
     },
     { id: "card", ...commands.card, panel: "card" },
   ];
@@ -57,6 +55,7 @@ export function commandsFor(env: Env): Command[] {
 export function rememberCommand(kind: Route["kind"]) {
   const map: Partial<Record<Route["kind"], number>> = {
     projects: 0, project: 0, lab: 1, "lab-entry": 1, about: 2, resume: 3,
+    writing: 5, "writing-entry": 5,
   };
   if (map[kind] !== undefined) remembered = map[kind]!;
 }
@@ -141,7 +140,6 @@ export function home(route: Route, env: Env): Screen {
       h("span", { class: "cc-cmd__shard", "aria-hidden": "true" }),
       h("span", { class: "cc-cmd__plate", "aria-hidden": "true" }),
       ransom(command.label, { boxes: 0.12, salt: i + 3, tilt: 6 }),
-      command.external ? h("span", { class: "cc-sr" }, " ", copy.home.commands.writing.opens) : null,
       tapCue(copy.chrome.tapAgain),
     ];
     const attrs = {

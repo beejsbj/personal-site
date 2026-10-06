@@ -2785,6 +2785,112 @@
   outline: none;
 }
 
+/* Writing keeps the clipped sheet, set in the instrument's own ink and
+   ivory. The readable column stays narrow even on the wide stage. */
+:root[data-lens="cut-paper"] .cp-writing .cp-sheet__paper {
+  max-width: 980px;
+  padding: clamp(32px, 5vw, 64px) clamp(22px, 5vw, 64px);
+  background: var(--cp-ink-2);
+  color: var(--cp-ivory);
+  font-family: var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-writing__head {
+  max-width: 72ch;
+  margin-bottom: 32px;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__title {
+  margin: 10px 0 22px;
+  font: 400 clamp(38px, 5.2vw, 72px)/1.03 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__intro,
+:root[data-lens="cut-paper"] .cp-writing__summary,
+:root[data-lens="cut-paper"] .cp-writing__state {
+  max-width: 64ch;
+  margin: 0 0 20px;
+  color: var(--cp-ivory-2);
+  font: 400 14.5px/1.75 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-writing__date {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--cp-ivory-3);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__origin {
+  color: var(--cp-ivory);
+  font-size: 12px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--cp-la);
+}
+
+:root[data-lens="cut-paper"] .cp-writing__links {
+  margin: 24px 0 42px;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 16px;
+  padding: 28px 0;
+  border-top: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-writing__no {
+  padding-top: 2px;
+  color: var(--cp-la);
+  font: 400 24px/1 var(--cp-display);
+}
+
+:root[data-lens="cut-paper"] .cp-writing__post-title {
+  margin: 8px 0 12px;
+  font: 400 clamp(26px, 3vw, 36px)/1.15 var(--cp-display);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__post-title a {
+  color: var(--cp-ivory);
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__post-title a:hover {
+  color: var(--cp-la);
+}
+
+:root[data-lens="cut-paper"] .cp-writing__body {
+  margin-top: 48px;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__body figure {
+  margin-inline: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__body figcaption {
+  margin-top: 8px;
+  color: var(--cp-ivory-3);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-writing__end {
+  max-width: 64ch;
+  margin: 54px 0 32px;
+}
+
 /* ── screen entrance hooks (animator: extend here) ─────────── */
 
 :root[data-lens="cut-paper"] .cp-screen[data-state="entering"] .cp-arm {

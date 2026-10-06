@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
+import { isServerRoute } from "./lib/server-routes.mjs";
 
 const walk = (path) =>
   readdirSync(path, { withFileTypes: true }).flatMap((entry) =>
@@ -163,17 +164,19 @@ test("all generated pages have shared chrome and resolving local links and media
       );
       if (url.origin !== root.origin) continue;
       const target = join(output, decodeURIComponent(url.pathname));
-      const found = [
-        target,
-        join(target, "index.html"),
-        target.replace(/\/$/, "") + ".html",
-      ].some((candidate) => {
-        try {
-          return statSync(candidate).isFile();
-        } catch {
-          return false;
-        }
-      });
+      const found =
+        isServerRoute(url.pathname) ||
+        [
+          target,
+          join(target, "index.html"),
+          target.replace(/\/$/, "") + ".html",
+        ].some((candidate) => {
+          try {
+            return statSync(candidate).isFile();
+          } catch {
+            return false;
+          }
+        });
       assert.ok(found, `${path}: broken local reference ${value}`);
     }
   }
