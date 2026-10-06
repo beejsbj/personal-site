@@ -291,9 +291,17 @@ test("one arrow language: every arrow is the satellite, one inked glyph turned f
   );
   assert.match(link, /forced-colors: active\) \{\s*\.link-sat \{\s*border/);
   const paths = new Set();
-  for (const page of ["index.html", "about/index.html", "projects/index.html"]) {
+  for (const page of [
+    "index.html",
+    "about/index.html",
+    "projects/index.html",
+  ]) {
     const html = read(`dist/client/${page}`);
-    assert.doesNotMatch(html, /link-arrow|ball-badge/, `${page}: retired arrows`);
+    assert.doesNotMatch(
+      html,
+      /link-arrow|ball-badge/,
+      `${page}: retired arrows`,
+    );
     for (const [, attrs, body] of html.matchAll(
       /<a\b([^>]*ds-link--(?:pill|text|ball)[^>]*)>([\s\S]*?)<\/a>/g,
     )) {
