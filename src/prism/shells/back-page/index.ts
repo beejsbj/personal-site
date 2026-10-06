@@ -1,7 +1,7 @@
 /** Back Page: the portfolio is a pile of exercise books on a desk under a
- * lamp, one for each section, each on its own paper from Dotfight (a squared
- * maths copy, a feint-ruled notebook, a legal pad, a graph book, blueprint)
- * and written in that paper's pens. Every URL is a place in one of them.
+ * lamp, one for each section, each on its own paper (a squared maths copy, a
+ * feint-ruled notebook, a graph book and blueprint from Dotfight, and a
+ * marbled composition book for the essays) and written in that paper's pens. Every URL is a place in one of them.
  * Within a book, following a link turns the pages there (a flurry of leaves
  * when it's far), and the corners, the arrow keys or a swipe turn one page.
  * Going to another section shuts the open book, puts it back on the pile,
@@ -16,7 +16,6 @@ import {
   coverPage,
   rankOf,
   today,
-  writingChapter,
   type Build,
   type Chapter,
   type Copy,
@@ -29,6 +28,7 @@ import { BOOKS, shelfOf, type BookKey } from "./themes";
 import "./shell.css";
 import "./themes.css";
 import "./books.css";
+import "./composition.css";
 import "./micro.css";
 import "./soldiers.css";
 
@@ -163,47 +163,13 @@ class App {
     return this.sheet ?? this.paged;
   }
 
-  /** The writings book is open: it has no route, so the URL is still the
-   * page it was opened from. */
-  writing() {
-    return !this.sheet && this.paged?.book === "writing";
-  }
-
-  /** Take the writings book off the pile and open it. */
-  openWriting() {
-    this.queue = this.queue
-      .then(async () => {
-        if (this.writing()) return;
-        if (this.sheet) {
-          this.sheet = null;
-          this.book.setLoose(null, true);
-        }
-        const ch = writingChapter(this.buildFor(this.route));
-        await this.swap(ch, 0);
-        this.paged = ch;
-        this.view = 0;
-        this.settle();
-      })
-      .catch((error) => console.error(error));
-  }
-
-  /** Put the writings book back and open the page the URL is on. */
-  reopen() {
-    this.landAtEnd = false;
-    this.queue = this.queue
-      .then(() => this.goNow(this.route, true))
-      .catch((error) => console.error(error));
-  }
-
   /** The open chapter, written again (a new window size). */
   rebuild() {
-    return this.writing() ? writingChapter(this.buildFor(this.route)) : this.build(this.pagedRoute);
+    return this.build(this.pagedRoute);
   }
 
   /** How far through the open book: the stops before this one, and the view. */
   depth() {
-    // the writings book: hardly a page written in it yet
-    if (this.writing()) return 0.03;
     const stops = this.order.filter((s) => s.book === this.bookKey);
     const at = Math.max(0, stops.findIndex((s) => s.key === this.paged.key));
     const views = this.views(this.paged) || 1;
@@ -225,20 +191,20 @@ class App {
     return this.queue;
   }
 
-  async goNow(route: Route, force = false) {
+  async goNow(route: Route) {
     // A writing refresh may add metadata stops while the book stays mounted.
     this.order = bookOrder(this.ctx.content, this.copy);
     this.paged.rank = rankOf(this.pagedRoute, this.order);
     if (this.sheet) this.sheet.rank = rankOf(this.route, this.order);
     const was = this.current();
     // the runtime may hand us the page we're already on: nothing to turn
-    if (route.path === this.route.path && !force && !route.refresh) {
+    if (route.path === this.route.path && !route.refresh) {
       this.route = route;
       return;
     }
     this.route = route;
     const ch = this.build(route);
-    const land = this.landAtEnd && !force;
+    const land = this.landAtEnd;
     this.landAtEnd = false;
 
     if (ch.loose) {
@@ -342,12 +308,6 @@ class App {
   // ---- turning one page ---------------------------------------------------------
 
   neighbour(step: 1 | -1): Stop | null {
-    if (this.writing()) {
-      // out of the writings book, only back to the page it was opened from
-      if (step > 0) return null;
-      const here = this.order.find((s) => s.key === this.route.path);
-      return here ?? { key: this.route.path, href: this.route.path, label: this.copy.chapters.home, book: "home", page: 1 };
-    }
     const rank = this.current().rank;
     if (step > 0) {
       const next = this.order.find((_, i) => i > rank);
@@ -372,7 +332,6 @@ class App {
     }
     const stop = this.neighbour(step);
     if (!stop) return;
-    if (this.writing()) return this.reopen();
     this.landAtEnd = step < 0;
     void navigate(stop.href);
   }
@@ -407,7 +366,6 @@ class App {
     BOOKS.forEach((b, i) => {
       const open = b.key === this.bookKey;
       const book = words[b.key];
-      const href = b.key === "writing" ? this.ctx.content.site.writingUrl : b.href;
       list.append(
         h(
           "li",
@@ -415,7 +373,7 @@ class App {
           h(
             "a",
             {
-              href,
+              href: b.href,
               class: "bp-shelf__book",
               "aria-current": open ? "true" : null,
               "data-state": open ? "open" : null,
@@ -504,27 +462,6 @@ class App {
         }
       },
       { signal },
-    );
-
-    // the writings book opens from the pile, and while it's open a link back
-    // to the page the URL is on puts it away again
-    this.desk.addEventListener(
-      "click",
-      (event) => {
-        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        const a = (event.target as Element).closest<HTMLAnchorElement>("a[href]");
-        if (!a) return;
-        if (a.closest('.bp-shelf [data-book="writing"]')) {
-          event.preventDefault();
-          if (!this.busy) this.openWriting();
-          return;
-        }
-        if (this.writing() && a.origin === location.origin && a.pathname === this.route.path) {
-          event.preventDefault();
-          this.reopen();
-        }
-      },
-      { signal, capture: true },
     );
 
     // a finger drags the page over, and the leaf follows it

@@ -2,14 +2,15 @@
  * of pages written in that book's pens. There's a book for each section,
  * each on its own paper (themes.ts): hello in the squared maths copy, study
  * notes in the quiet notebook with the resume stapled in after them, slip by
- * slip, doodles in the graph book, and the war on blueprint, its map first
- * and a page for each project after.
+ * slip, doodles in the graph book, the war on blueprint, its map first
+ * and a page for each project after, and the essays written out in a marbled
+ * composition book, its contents first and each essay after.
  *
  * Every word comes from content: the portfolio and Daylight's copy from
  * `content`, the books' own handwriting from `content.lenses["back-page"]`. */
 import { markPart, part, type Part } from "../../parts";
 import { blocks, fallbackBody, featured, fill, inline } from "../rich";
-import type { Route, SiteContent } from "../types";
+import type { Route, SiteContent, WritingPost } from "../types";
 import { h, handDate, link, shortDate, svg } from "./dom";
 import {
   BLUE,
@@ -67,6 +68,10 @@ const ALLOWANCE = {
   /** The war map's pages, before the projects'. */
   war: 2,
   project: 3,
+  /** The composition book's contents, before the essays'. Essays are
+   * given a fixed run each: their bodies load only when one is opened. */
+  contents: 4,
+  essay: 6,
 };
 
 /** Every stop in every book, book by book, in the order the books lie. */
@@ -94,6 +99,9 @@ export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
   content.projects.forEach((project) =>
     add("projects", project.href, project.title, ALLOWANCE.project),
   );
+  page = 1;
+  add("writing", "/writing", names.writing, ALLOWANCE.contents);
+  content.writing.posts.forEach((post) => add("writing", post.href, post.title, ALLOWANCE.essay));
   return stops;
 }
 
@@ -144,7 +152,7 @@ export interface Build {
   today: string;
 }
 
-type Paper = "squared" | "kraft" | "kraft-in" | "notes";
+type Paper = "squared" | "kraft" | "kraft-in" | "notes" | "ruled";
 
 /** The number of the route's first page, from the book's order. */
 const firstPage = (b: Build) =>
@@ -286,16 +294,18 @@ function taped(
 
 // ---- the cover --------------------------------------------------------------------
 
-/** The name label on a book's cover: which book in the pile it is, its title,
- * and the name, subject and class written in. */
+/** The name label on a book's cover: which book in the pile it is (or what
+ * kind, printed, for a book that says so), its title, and the name, subject
+ * and class written in. */
 function label(content: SiteContent, copy: Copy, key: BookKey) {
   const words = copy.cover;
   const book = copy.books[key];
   const [first, second] = book.title;
+  const series = "series" in book ? book.series : fill(words.series, { n: BOOKS.findIndex((b) => b.key === key) + 1 });
   return h(
     "div",
     { class: "bp-label" },
-    h("p", { class: "bp-label__school" }, fill(words.series, { n: BOOKS.findIndex((b) => b.key === key) + 1 })),
+    h("p", { class: "bp-label__school" }, series),
     h(
       "p",
       { class: "bp-label__title", "aria-hidden": "true" },
@@ -354,6 +364,9 @@ export function coverPage(b: Build, withReturn: boolean, key: BookKey = "home") 
   flow.append(label(b.content, b.copy, key));
   if (withReturn) flow.append(returnTo(b.content, b.copy));
   flow.append(svg(coverDoodle(key)));
+  // the maker's small print, at the foot of a bought book's cover
+  const book = b.copy.books[key];
+  if ("print" in book) flow.append(h("p", { class: "bp-cover-print", "aria-hidden": "true" }, book.print));
   return page;
 }
 
@@ -703,188 +716,6 @@ function labEntry(b: Build): HTMLElement[] | null {
   return written(b, "lab-entry", "squared", blocks, firstPage(b), null);
 }
 
-// ---- writing: essays in the same hand, fetched only when opened ---------------------
-
-function writing(b: Build) {
-  const { content } = b;
-  const { header, copy: words } = content.pages.writing;
-  const opening = h(
-    "header",
-    { class: "bp-entryhead" },
-    header.eyebrow
-      ? h(
-          "p",
-          { class: "bp-eyebrow", ...part("page.eyebrow", "writing") },
-          header.eyebrow,
-        )
-      : null,
-    withUnderline(
-      h1(header.title, part("page.title", "writing")),
-      RED,
-      "writing-title",
-    ),
-    header.intro
-      ? h(
-          "p",
-          { class: "bp-lead", ...part("page.intro", "writing") },
-          header.intro,
-        )
-      : null,
-    arrows(
-      b,
-      header.actions.map((action) => ({
-        label: action.label,
-        url: action.href,
-      })),
-      part("page.actions", "writing"),
-    ),
-  );
-  const list = h("ol", {
-    class: "bp-writing-list",
-    "aria-label": words.listLabel,
-  });
-  for (const post of content.writing.posts) {
-    list.append(
-      h(
-        "li",
-        null,
-        h(
-          "time",
-          {
-            class: "bp-writing-date",
-            datetime: post.date,
-            ...part("writing.meta", post.slug),
-          },
-          post.dateLabel,
-        ),
-        h(
-          "h2",
-          { class: "bp-h2", ...part("writing.title", post.slug) },
-          h("a", { href: post.href }, post.title),
-        ),
-        h(
-          "p",
-          {
-            class: "bp-writing-summary",
-            ...part("writing.summary", post.slug),
-          },
-          post.subtitle || post.description,
-        ),
-      ),
-    );
-  }
-  const status =
-    content.writing.status === "unavailable"
-      ? words.unavailableMessage
-      : content.writing.posts.length === 0
-        ? words.emptyMessage
-        : null;
-  const body = status
-    ? h("p", { class: "bp-note", role: "status" }, status)
-    : list;
-  return written(b, "writing", "squared", [opening, body], firstPage(b), null);
-}
-
-function writingEntry(b: Build) {
-  const { content, route } = b;
-  const { header, copy: words } = content.pages.writing;
-  // The runtime replaces this one entry for the requested route. Never use a
-  // previous essay's body, and never read the server page to fill in a gap.
-  const entry =
-    content.writing.entry?.slug === route.slug
-      ? content.writing.entry
-      : undefined;
-  const post =
-    entry ?? content.writing.posts.find((item) => item.slug === route.slug);
-  const ref = route.slug ?? "";
-  const available = !!entry && content.writing.entryStatus === "available";
-  const opening = h(
-    "header",
-    { class: "bp-entryhead bp-writing-head" },
-    header.eyebrow ? h("p", { class: "bp-eyebrow" }, header.eyebrow) : null,
-    withUnderline(
-      h1(
-        available ? entry!.title : header.title,
-        available ? part("writing.title", ref) : part("page.title", "writing"),
-      ),
-      RED,
-      `writing-${ref}`,
-      true,
-    ),
-    !available && post
-      ? h("h2", { class: "bp-h2", ...part("writing.title", ref) }, post.title)
-      : null,
-    post?.subtitle
-      ? h(
-          "p",
-          { class: "bp-lead", ...part("writing.subtitle", ref) },
-          post.subtitle,
-        )
-      : null,
-    post
-      ? h(
-          "p",
-          { class: "bp-writing-origin" },
-          h(
-            "time",
-            { datetime: post.date, ...part("writing.meta", ref) },
-            post.dateLabel,
-          ),
-          " · ",
-          markPart(
-            link(post.canonical, b.copy.newTab, words.originLabel),
-            "writing.links",
-            ref,
-          ),
-        )
-      : null,
-  );
-  const body = available
-    ? prose(entry!.html, "writing.body", ref)
-    : [
-        h(
-          "p",
-          { class: "bp-note", role: "status" },
-          content.writing.entryStatus === "missing"
-            ? words.entryMissingMessage
-            : words.entryUnavailableMessage,
-        ),
-      ];
-  const ending = h(
-    "aside",
-    { class: "bp-note bp-writing-end", ...part("writing.end", ref) },
-    h("h2", { class: "bp-h2" }, words.endHeading),
-    h("p", null, words.endBody),
-    arrows(
-      b,
-      [
-        {
-          label: words.subscribeLabel,
-          url: `${content.site.writingUrl}/subscribe`,
-        },
-        {
-          label: post ? words.originLabel : words.sourceLabel,
-          url: post?.canonical ?? content.site.writingUrl,
-        },
-      ],
-      part("writing.links", ref),
-    ),
-  );
-  const back = h(
-    "p",
-    { class: "bp-arrowlink", ...part("writing.links", ref) },
-    h("a", { href: "/writing" }, `← ${words.backLabel}`),
-  );
-  return written(
-    b,
-    "writing-entry",
-    "squared",
-    [opening, ...body, ending, back],
-    firstPage(b),
-    post?.dateLabel ?? null,
-  );
-}
-
 // ---- a project: its own page, the screenshot taped in -------------------------------
 
 function fields(rows: [string, string][], mark: ReturnType<typeof part>) {
@@ -1117,30 +948,151 @@ function projects(b: Build) {
   return pages;
 }
 
-// ---- writings: a fresh book, barely used ----------------------------------------------
+// ---- writings: the marbled composition book ---------------------------------------------
 
-/** The fifth book, kept for Burooj's writing. Writing isn't in the content
- * yet (it arrives with /writing), so the book has no route of its own: it
- * opens from the pile on a first page with its name, the writing's own
- * blurb from the home page's Elsewhere list, and the way out to it; the rest
- * of the book is blank. */
-export function writingChapter(b: Build): Chapter {
+/** The day a post went out, as the hand writes it ("24 Nov 2024"). */
+const postDay = (post: WritingPost) => post.date.slice(0, 10);
+
+/** The composition book's first pages: the essays written in it so far,
+ * each an entry as if in its contents. The year is written across the line
+ * where it turns; each essay's date is in the margin, its title in the hand
+ * with the page it starts on, its opening lines after, and the way out to
+ * where it was first published. Bodies load only when an essay is opened. */
+function writing(b: Build) {
   const { content, copy } = b;
-  const url = content.site.writingUrl;
-  const blurb = content.pages.home.elsewhere.items.find((item) => item.href === url)?.blurb;
-  const { page, flow } = blankPage(copy, "writing", "notes", "1", b.today);
-  const title = h1("");
-  title.classList.add("bp-brush");
-  title.append(h("span", { class: "bp-hl" }, copy.books.writing.name));
-  flow.append(
-    title,
-    blurb ? h("p", { class: "bp-lead" }, blurb) : h("span", { hidden: true }),
-    h("p", { class: "bp-arrowlink bp-writing__out" }, link(url, copy.newTab, `${copy.writing.link} ↗`)),
-    h("p", { class: "bp-writing__blank" }, copy.writing.blank),
+  const { header, copy: words } = content.pages.writing;
+  const { posts, status } = content.writing;
+  const title = h1("", part("page.title", "writing"));
+  title.classList.add("bp-essaytitle");
+  title.append(header.title);
+  const blocks: HTMLElement[] = [
+    h(
+      "header",
+      { class: "bp-essayhead" },
+      header.eyebrow ? h("p", { class: "bp-ntab", ...part("page.eyebrow", "writing") }, header.eyebrow) : null,
+      withUnderline(title, RED, "writing-title", true),
+      header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "writing") }, header.intro) : null,
+    ),
+  ];
+  const note = status === "unavailable" ? words.unavailableMessage : posts.length ? null : words.emptyMessage;
+  if (note) {
+    blocks.push(h("p", { class: "bp-pencilled", role: "status" }, note));
+    return written(b, "writing", "ruled", blocks, firstPage(b), b.today, 1);
+  }
+  const list = h("ol", { class: "bp-essays", "aria-label": words.listLabel });
+  let year = "";
+  for (const post of posts) {
+    const day = postDay(post);
+    const turn = day.slice(0, 4) !== year;
+    year = day.slice(0, 4);
+    const starts = b.order.find((stop) => stop.key === post.href)?.page;
+    list.append(
+      h(
+        "li",
+        { class: "bp-essay", "data-year": turn ? year : null },
+        turn ? h("p", { class: "bp-essay__year" }, year) : null,
+        h(
+          "time",
+          { class: "bp-mnote", datetime: post.date, ...part("writing.meta", post.slug) },
+          shortDate(day, copy.months),
+        ),
+        h(
+          "h2",
+          { class: "bp-essay__title", ...part("writing.title", post.slug) },
+          h(
+            "a",
+            { href: post.href },
+            h("span", { class: "bp-essay__name" }, post.title),
+            starts ? h("span", { class: "bp-essay__no" }, h("span", { class: "bp-sr" }, `, ${copy.page.number} `), String(starts)) : null,
+          ),
+        ),
+        h(
+          "p",
+          { class: "bp-essay__opening" },
+          h("span", part("writing.summary", post.slug), post.subtitle || post.description),
+          link(post.canonical, copy.newTab, `${copy.writing.substack} ↗`),
+        ),
+      ),
+    );
+  }
+  blocks.push(list);
+  return written(b, "writing", "ruled", blocks, firstPage(b), b.today, b.spread ? 1 : 0);
+}
+
+/** The composition book's opening, on a wide desk: the inside of the cover,
+ * then the contents. */
+function writingBook(b: Build) {
+  const pages = writing(b);
+  return b.spread ? [insideCover(b), ...pages] : pages;
+}
+
+/** One essay, written out in the composition book: the date in the margin,
+ * the title as the essay's heading, ruled under twice, and where it was
+ * first published; then the essay, and a P.S. at its end. Only this route's
+ * own body is ever used, never another's, and never the server's page. */
+function essay(b: Build) {
+  const { content, route, copy } = b;
+  const { header, copy: words } = content.pages.writing;
+  const entry = content.writing.entry?.slug === route.slug ? content.writing.entry : undefined;
+  const post = entry ?? content.writing.posts.find((item) => item.slug === route.slug);
+  const ref = route.slug ?? "";
+  const available = !!entry && content.writing.entryStatus === "available";
+  const title = h1("", available ? part("writing.title", ref) : part("page.title", "writing"));
+  title.classList.add("bp-essaytitle");
+  title.append(available ? entry!.title : header.title);
+  const head = h(
+    "header",
+    { class: "bp-essayhead" },
+    post ? h("time", { class: "bp-mnote", datetime: post.date, "aria-hidden": "true" }, shortDate(postDay(post), copy.months)) : null,
+    withUnderline(title, RED, `essay-${ref}`, true),
+    !available && post ? h("h2", { class: "bp-essay__title", ...part("writing.title", ref) }, post.title) : null,
+    post?.subtitle ? h("p", { class: "bp-essay__sub", ...part("writing.subtitle", ref) }, post.subtitle) : null,
+    post
+      ? h(
+          "p",
+          { class: "bp-essay__origin" },
+          h("time", { datetime: post.date, ...part("writing.meta", ref) }, post.dateLabel),
+          " · ",
+          markPart(link(post.canonical, copy.newTab, `${words.originLabel} ↗`), "writing.links", ref),
+        )
+      : null,
   );
-  const pages = [page];
-  if (b.spread) pages.push(blankPage(copy, "writing", "notes", "2", null).page);
-  return { key: "writing", book: "writing", rank: b.order.length + 1, label: copy.books.writing.name, pages };
+  const body = available
+    ? prose(entry!.html, "writing.body", ref)
+    : [
+        h(
+          "p",
+          { class: "bp-pencilled", role: "status" },
+          content.writing.entryStatus === "missing" ? words.entryMissingMessage : words.entryUnavailableMessage,
+        ),
+      ];
+  const ps = h(
+    "aside",
+    { class: "bp-ps", ...part("writing.end", ref) },
+    h("p", { class: "bp-ps__head" }, h("b", null, `${copy.writing.ps} `), words.endHeading),
+    h("p", null, words.endBody),
+    arrows(
+      b,
+      [
+        { label: `${words.subscribeLabel} ↗`, url: `${content.site.writingUrl}/subscribe` },
+        { label: `${post ? words.originLabel : words.sourceLabel} ↗`, url: post?.canonical ?? content.site.writingUrl },
+      ],
+      part("writing.links", ref),
+    ),
+  );
+  const back = h(
+    "p",
+    { class: "bp-arrowlink", ...part("writing.links", ref) },
+    h("a", { href: "/writing" }, `← ${words.backLabel}`),
+  );
+  return written(
+    b,
+    "essay",
+    "ruled",
+    [head, ...body, ps, back],
+    firstPage(b),
+    post ? handDate(postDay(post), copy.months) : null,
+  );
 }
 
 // ---- anything else: a loose sheet, tucked in ------------------------------------------
@@ -1183,10 +1135,10 @@ export function chapter(b: Build): Chapter {
       pages = labEntry(b);
       break;
     case "writing":
-      pages = writing(b);
+      pages = writingBook(b);
       break;
     case "writing-entry":
-      pages = writingEntry(b);
+      pages = essay(b);
       break;
     case "project":
       pages = project(b);

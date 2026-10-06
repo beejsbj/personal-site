@@ -33,8 +33,10 @@
     "writing": {
       "title": ["Writ", "ings"],
       "name": "Writings",
-      "aside": "barely used",
-      "klass": "first term"
+      "aside": "essays",
+      "klass": "late nights",
+      "series": "Composition Book",
+      "print": "100 sheets"
     }
   },
   "papers": {
@@ -44,14 +46,14 @@
     "notebook": {
       "pens": ["Blue", "Red"]
     },
-    "legal": {
-      "pens": ["Black", "Red"]
-    },
     "graph": {
       "pens": ["Lead", "Red"]
     },
     "blueprint": {
       "pens": ["White", "Yellow"]
+    },
+    "composition": {
+      "pens": ["Blue", "Red"]
     }
   },
   "chapters": {
@@ -60,6 +62,7 @@
     "resume": "Resume",
     "lab": "The lab",
     "projects": "The war",
+    "writing": "Writings",
     "close": "Back to the start"
   },
   "page": {
@@ -84,8 +87,8 @@
     "stapled": "stapled in, p. {n}"
   },
   "writing": {
-    "link": "over to Substack",
-    "blank": "(the rest of this book is saved for the writing)"
+    "substack": "on Substack",
+    "ps": "P.S."
   },
   "lab": {
     "eyebrow": "{eyebrow} · in the margins",
@@ -256,11 +259,20 @@
         { "t": "is it on the map?", "reply": "back page" }
       ],
       "writing": [
-        "a new book!",
-        "smells new",
-        { "t": "what goes here?", "reply": "words. eventually." },
-        "plenty of room",
-        { "t": "is he writing a book?", "reply": "he's writing in one" }
+        "a proper essay book",
+        "shh, he's writing",
+        { "t": "is this homework?", "reply": "it's an essay" },
+        "wide ruled. roomy",
+        { "t": "what's it about?", "reply": "read it and see" },
+        "nice handwriting, for once"
+      ],
+      "essay": [
+        "we're in an essay",
+        { "t": "how long is this?", "reply": "keep reading" },
+        "I'm a full stop",
+        "don't skip ahead",
+        { "t": "is there a test?", "reply": "there's a P.S." },
+        { "t": "are we in it?", "reply": "we're the margin" }
       ],
       "spare": [
         "a quick war!",
@@ -284,15 +296,6 @@
         "it's a nice notebook this",
         { "t": "is this a diary?", "reply": "it's notes" }
       ],
-      "legal": [
-        "yellow paper?",
-        "is this legal",
-        "very yellow",
-        "it's a legal pad",
-        "objection!",
-        { "t": "is this a contract?", "reply": "it's a draft" },
-        "sign here"
-      ],
       "graph": [
         "graph paper. respect",
         "we're on a graph",
@@ -308,6 +311,14 @@
         "chalk. fancy",
         "I feel architectural",
         { "t": "are we built yet?", "reply": "phase two" }
+      ],
+      "composition": [
+        "marble cover. posh",
+        "it's a composition book",
+        "wide ruled, lovely",
+        "it smells of school",
+        { "t": "is this marble?", "reply": "it's cardboard" },
+        "mind the stitching"
       ]
     },
     "say": {

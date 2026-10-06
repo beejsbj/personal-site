@@ -1,8 +1,9 @@
 /** The books on the desk, and the paper each one is. The papers are Dotfight's
  * themes (PR #16, `src/theme.ts`): a squared maths copy under the lamp, the
- * quiet feint-ruled notebook, a canary legal pad, a graph book fought in
- * pencil, and blueprint in white and yellow chalk. Each section of the
- * portfolio is its own exercise book on one of them. The colours live in
+ * quiet feint-ruled notebook, a graph book fought in pencil, and blueprint in
+ * white and yellow chalk; and one of the site's own, the marbled composition
+ * book the essays are written in. Each section of the portfolio is its own
+ * exercise book on one of them. The colours live in
  * themes.css (as `[data-theme]` variables); the words (what each book and
  * paper is called, and what the soldiers call their pens) live in the lens
  * copy, `content.lenses["back-page"]`; this is only which is which. */
@@ -23,9 +24,7 @@ export const BOOKS: Shelf[] = [
   { key: "about", href: "/about", theme: "notebook" },
   { key: "lab", href: "/lab", theme: "graph" },
   { key: "projects", href: "/projects", theme: "blueprint" },
-  // kept for the writing (it arrives with /writing); until then it opens on
-  // a page that links out to it, and its href is the site's writing URL
-  { key: "writing", href: "", theme: "legal" },
+  { key: "writing", href: "/writing", theme: "composition" },
 ];
 
 export const shelfOf = (key: BookKey) => BOOKS.find((b) => b.key === key)!;

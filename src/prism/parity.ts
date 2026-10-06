@@ -319,14 +319,10 @@ export const GAPS: Partial<
         "No Elsewhere section: Lab and Writing are keys on the keyboard, without their blurbs.",
     },
   },
-  // Back Page's fifth book, Writings, has no route or parts to check: writing
-  // isn't in the content contract until /writing (PR #13, synced Substack
-  // posts) lands. Until then the book opens from the pile, without changing
-  // the URL, on a page that links out to `site.writingUrl`.
   "back-page": {
     home: {
       "home.elsewhere":
-        "The books have no Elsewhere page: the lab is a book of its own on the pile, and so is Writing, the fifth book, kept for the writing and opening for now on a page that links out to it.",
+        "The books have no Elsewhere page: the lab is a book of its own on the pile, and so is Writings, the marbled composition book the essays are written in.",
     },
     projects: {
       "project.summary":

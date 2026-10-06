@@ -1,4 +1,5 @@
-/* The papers. Each book on the desk is one of Dotfight's themes (PR #16):
+/* The papers. Each book on the desk is one of Dotfight's themes (PR #16), or
+   the composition book's own (composition.css):
    its paper and ruling, its two pens (and the pencil the soldiers talk in),
    its cover board and label. A `[data-theme]` element sets them for
    everything inside it: the desk for the open book and the pens beside it, and
@@ -54,32 +55,6 @@
   --bp-ear-2: #ece5d5;
   --bp-glow: rgba(255, 252, 242, 0.5);
   --bp-circle-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M64 5 C 100 3, 117 13, 115 26 C 113 41, 82 47, 56 46 C 26 45, 5 38, 6 24 C 7 11, 33 4, 76 7' fill='none' stroke='%23c2252f' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
-}
-
-/* the legal pad: canary yellow, a red gummed top, black and red pens */
-:root[data-lens="back-page"] [data-theme="legal"] {
-  --bp-paper: #f7ea98;
-  --bp-blue: #17171d;
-  --bp-red: #b81d27;
-  --bp-pencil: #34312a;
-  --bp-fine: #5a5442;
-  --bp-letter: #17171d;
-  --bp-pencil-a: #3b3a40;
-  --bp-pencil-b: #a0322f;
-  --bp-tape: #ece6d4;
-  --bp-kraft: #5c2320;
-  --bp-label: #fbf7ea;
-  --bp-label-ink: #2c3a55;
-  --bp-title-a: #16161c;
-  --bp-title-b: #c4202a;
-  --bp-grid: rgba(80, 136, 160, 0.5);
-  --bp-margin: rgba(210, 46, 46, 0.62);
-  --bp-edge-1: #f6e894;
-  --bp-edge-2: #d9c76c;
-  --bp-ear-1: #e3d27c;
-  --bp-ear-2: #f3e48f;
-  --bp-glow: rgba(255, 250, 210, 0.45);
-  --bp-circle-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M64 5 C 100 3, 117 13, 115 26 C 113 41, 82 47, 56 46 C 26 45, 5 38, 6 24 C 7 11, 33 4, 76 7' fill='none' stroke='%23c4202a' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
 }
 
 /* the graph book: a pencil fight on 2 mm squares, lead against red */
@@ -142,26 +117,17 @@
 :root[data-lens="back-page"] [data-theme] .bp-page:not([data-paper^="kraft"]) {
   background-color: var(--bp-paper);
 }
-/* feint ruled (the notebook) and the legal pad: a line under every line of
-   writing, none across the head of the page */
-:root[data-lens="back-page"] :is([data-theme="notebook"], [data-theme="legal"]) .bp-page:not([data-paper^="kraft"]) {
+/* feint ruled (the notebook): a line under every line of writing, none
+   across the head of the page */
+:root[data-lens="back-page"] [data-theme="notebook"] .bp-page:not([data-paper^="kraft"]) {
   background:
-    radial-gradient(ellipse 90% 70% at 38% 28%, var(--bp-glow), transparent 72%),
-    linear-gradient(var(--bp-paper), var(--bp-paper)) 0 0 / 100% calc(var(--lh) * 2.1) no-repeat,
-    linear-gradient(transparent calc(var(--lh) - 1.2px), var(--bp-grid) calc(var(--lh) - 1.2px)) 0 calc(var(--lh) * 0.34) / 100% var(--lh),
-    var(--bp-paper);
-}
-:root[data-lens="back-page"] [data-theme="legal"] .bp-page:not([data-paper^="kraft"]) {
-  background:
-    linear-gradient(180deg, #a3302a, #7f231f) 0 0 / 100% 7px no-repeat,
-    linear-gradient(180deg, rgba(60, 20, 10, 0.18), transparent) 0 7px / 100% 6px no-repeat,
     radial-gradient(ellipse 90% 70% at 38% 28%, var(--bp-glow), transparent 72%),
     linear-gradient(var(--bp-paper), var(--bp-paper)) 0 0 / 100% calc(var(--lh) * 2.1) no-repeat,
     linear-gradient(transparent calc(var(--lh) - 1.2px), var(--bp-grid) calc(var(--lh) - 1.2px)) 0 calc(var(--lh) * 0.34) / 100% var(--lh),
     var(--bp-paper);
 }
 /* two red lines down the margin */
-:root[data-lens="back-page"] :is([data-theme="notebook"], [data-theme="legal"]) .bp-page::before {
+:root[data-lens="back-page"] [data-theme="notebook"] .bp-page::before {
   border-left: 5px double var(--bp-margin) !important;
 }
 /* graph paper: fine squares, a bold line every fifth */

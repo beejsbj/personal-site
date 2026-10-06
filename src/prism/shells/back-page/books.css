@@ -66,8 +66,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
   transform: rotate(-7deg);
 }
-:root[data-lens="back-page"] .bp-shelf [data-theme="notebook"] .bp-shelf__paper,
-:root[data-lens="back-page"] .bp-shelf [data-theme="legal"] .bp-shelf__paper {
+:root[data-lens="back-page"] .bp-shelf [data-theme="notebook"] .bp-shelf__paper {
   background:
     linear-gradient(90deg, transparent 18%, var(--bp-margin) 18% 21%, transparent 21%),
     linear-gradient(transparent 5px, var(--bp-grid) 5px) 0 0 / 100% 6px,
