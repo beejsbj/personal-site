@@ -181,16 +181,48 @@
   position: relative;
 }
 
-:root[data-lens="hion"] .hion-charm[data-current] {
-  color: var(--hion-cl);
-}
-
 :root[data-lens="hion"] .hion-charm[data-current][data-hue="m"] {
   color: var(--hion-ml);
 }
 
 :root[data-lens="hion"] .hion-charm:hover {
   color: var(--hion-cl);
+}
+
+:root[data-lens="hion"] .hion-charm[data-current] {
+  color: var(--hion-cl);
+}
+
+/* Under each name, a swatch of that page's cloth (fabric.ts): folded up
+   short, let down a little when you reach for it, and pulled all the way
+   down for the page you are on. */
+:root[data-lens="hion"] .hion-swatch {
+  display: block;
+  width: 44px;
+  height: 10px;
+  margin: 6px auto 0;
+  overflow: hidden;
+  opacity: 0.8;
+  transition:
+    height 0.7s var(--hion-ease-swing),
+    opacity 0.3s;
+}
+
+:root[data-lens="hion"] .hion-swatch__cloth {
+  display: block;
+  width: 44px;
+  height: 104px;
+}
+
+:root[data-lens="hion"] .hion-charm:hover .hion-swatch,
+:root[data-lens="hion"] .hion-charm:focus-visible .hion-swatch {
+  height: 22px;
+  opacity: 1;
+}
+
+:root[data-lens="hion"] .hion-charm[data-current] .hion-swatch {
+  height: 46px;
+  opacity: 1;
 }
 
 :root[data-lens="hion"] .hion-charm--home {
@@ -264,6 +296,26 @@
   transition:
     opacity 0.38s ease,
     transform 0.38s var(--hion-ease-out);
+}
+
+/* A new page is its fabric pulled down from the line: it unrolls from the
+   top. */
+:root[data-lens="hion"] .hion-page[data-unroll] {
+  animation: hion-unroll 0.75s cubic-bezier(0.3, 0.9, 0.35, 1);
+}
+
+:root[data-lens="hion"] .hion[data-still] .hion-page[data-unroll] {
+  animation: none;
+}
+
+@keyframes hion-unroll {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
 }
 
 :root[data-lens="hion"] .hion-page > main,

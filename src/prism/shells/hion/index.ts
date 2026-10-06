@@ -20,6 +20,7 @@ import type { LensShell, Route, ShellContext } from "../types";
 import { h, setNewTabNote, wait } from "./dom";
 import { ink } from "./ink";
 import { createCloth } from "./cloth";
+import { fabricOf } from "./fabric";
 import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
@@ -66,9 +67,18 @@ function show(route: Route, first: boolean) {
   const controller = new AbortController();
   ctx.signal.addEventListener("abort", () => controller.abort(), { once: true });
   const main = buildScreen(ctx.content, route);
+  const fabric = fabricOf(route.kind);
   const page = h(
     "div",
-    { class: "hion-page", "data-kind": route.kind, "data-state": first ? "arriving" : "entering" },
+    {
+      class: "hion-page",
+      "data-kind": route.kind,
+      "data-fabric": fabric,
+      "data-state": first ? "arriving" : "entering",
+      // Its fabric pulled down from the line (not on arrival: the line and
+      // the page come together then).
+      "data-unroll": first ? undefined : "",
+    },
     main,
     footer(ctx.content),
   );
@@ -102,6 +112,7 @@ function show(route: Route, first: boolean) {
     signal: controller.signal,
     instant: still(),
     scale: close(route) ? 2 : 1,
+    fabric,
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
   });
@@ -121,7 +132,7 @@ function show(route: Route, first: boolean) {
     loom.start();
     cloth.start();
     life?.start();
-    weaveType(page, { instant: still(), signal: controller.signal, isIdle: ctx.isIdle });
+    weaveType(page, { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric });
     page.dataset.state = "here";
   });
   // Keyboard travel ahead of the drawing brings the drawing with it.

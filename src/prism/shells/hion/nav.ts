@@ -14,7 +14,30 @@
 import type { SiteContent } from "../types";
 import { h, newTab } from "./dom";
 import { ink } from "./ink";
+import { type Fabric, fabricAt } from "./fabric";
 import { Kind, Path, paint, paintGlows, patterns, thread, type Pt } from "./pastel";
+import { drape, paintCrossing, stitches } from "./stitch";
+
+/** A swatch of a page's cloth, hanging under its name: woven through, both
+ * colours at every crossing, so the fabric's structure shows. Drawn long;
+ * CSS shows as much of it as is pulled down. */
+const PITCH = 4;
+function swatch(fabric: Fabric) {
+  const cols = 11;
+  const rows = 26;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const canvas = h("canvas", { class: "hion-swatch__cloth" });
+  canvas.width = cols * PITCH * dpr;
+  canvas.height = rows * PITCH * dpr;
+  const ctx = canvas.getContext("2d")!;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const st = stitches(PITCH, dpr, true);
+  const hang = drape(cols, rows, PITCH, 7);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) paintCrossing(ctx, st, x, y, 3, hang, fabric);
+  }
+  return h("span", { class: "hion-swatch", "aria-hidden": "true", "data-fabric": fabric }, canvas);
+}
 
 export interface Nav {
   el: HTMLElement;
@@ -47,6 +70,7 @@ export function createNav(
       "data-hue": "m",
     },
     h("span", { class: "hion-charm__label" }, content.site.name),
+    face ? null : swatch(fabricAt("/")),
   );
   const list = h("ul", { class: "hion-nav__list", id: "hion-nav-list" });
   content.site.nav.forEach((item, i) => {
@@ -66,6 +90,7 @@ export function createNav(
             ...(item.external ? { target: "_blank", rel: "noreferrer" } : {}),
           },
           h("span", { class: "hion-charm__label" }, item.label),
+          item.external || face ? null : swatch(fabricAt(item.href)),
           item.external ? newTab() : null,
         ),
       ),

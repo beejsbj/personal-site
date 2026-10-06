@@ -12,11 +12,14 @@
  * A visitor who prefers less motion, and a still prism face, get the woven
  * word at once. Nothing runs while the prism holds the page idle: the word
  * is simply finished. */
+import type { Fabric } from "./fabric";
 import { Immigration, type Species } from "./immigration";
 import { rng } from "./pastel";
 import { drape, paintGround, paintRegion, stitches } from "./stitch";
 
 interface WovenOptions {
+  /** The page's weave. */
+  fabric: Fabric;
   /** Weave the finished word at once. */
   instant: boolean;
   signal: AbortSignal;
@@ -149,7 +152,7 @@ function weaveWord(el: HTMLElement, options: WovenOptions) {
     ctx.globalCompositeOperation = "destination-over";
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        if (woven.mask[y * cols + x]) paintGround(ctx, life, st, x, y, hang);
+        if (woven.mask[y * cols + x]) paintGround(ctx, life, st, x, y, hang, options.fabric);
       }
     }
     ctx.restore();

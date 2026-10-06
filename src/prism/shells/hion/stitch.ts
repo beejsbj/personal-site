@@ -15,6 +15,7 @@
  * scale (a cloth seen close up) each thread is itself two plies twisting
  * round each other: the same weave inside the thread. */
 import type { Immigration } from "./immigration";
+import { type Fabric, topAt } from "./fabric";
 import { css, type Hue, Kind, mark, paint, patterns, type Pt, rng } from "./pastel";
 
 /** Directions thread runs from a crossing (the others are drawn from the
@@ -180,9 +181,29 @@ export function drape(w: number, h: number, size: number, seed: number): Drape {
 /** Variant for a thread, the same every time it is drawn. */
 const variant = (x: number, y: number, d: number) => ((x * 73856093) ^ (y * 19349663) ^ (d * 83492791)) >>> 0;
 
-/** Lay the woven ground of one crossing (on a canvas that is never
- * cleared: the ground only grows). With both colours, the one on top
- * alternates crossing by crossing, the plain weave. */
+/** Lay one crossing of woven ground: the float of each colour that has
+ * passed through (`bits`: 1 cyan, 2 magenta), and where both have, only
+ * the one the fabric puts on top, as in a real weave. */
+export function paintCrossing(
+  ctx: CanvasRenderingContext2D,
+  st: Stitches,
+  x: number,
+  y: number,
+  bits: number,
+  drape: Drape,
+  fabric: Fabric,
+) {
+  if (!bits) return;
+  const S = st.size;
+  const di = x + y * drape.w;
+  const px = x * S + S / 2 - st.pad + drape.dx[di];
+  const py = y * S + S / 2 - st.pad + drape.dy[di];
+  const bit = bits === 3 ? topAt(fabric, x, y) : bits;
+  const g = st.ground[bit - 1][variant(x, y, 5) % VARIANTS];
+  ctx.drawImage(g, px, py, g.width / st.dpr, g.height / st.dpr);
+}
+
+/** Lay the woven ground of one crossing of a living cloth. */
 export function paintGround(
   ctx: CanvasRenderingContext2D,
   life: Immigration,
@@ -190,20 +211,38 @@ export function paintGround(
   x: number,
   y: number,
   drape: Drape,
+  fabric: Fabric,
 ) {
-  const bits = life.woven[x + y * life.w];
-  if (!bits) return;
+  paintCrossing(ctx, st, x, y, life.woven[x + y * life.w], drape, fabric);
+}
+
+/** A crossing's ground changed after it was laid (the ground canvas is
+ * never cleared): clear its square and lay it, and the floats of its
+ * neighbours that reach into it, again. */
+export function repaintGround(
+  ctx: CanvasRenderingContext2D,
+  life: Immigration,
+  st: Stitches,
+  x: number,
+  y: number,
+  drape: Drape,
+  fabric: Fabric,
+) {
   const S = st.size;
   const di = x + y * drape.w;
-  const px = x * S + S / 2 - st.pad + drape.dx[di];
-  const py = y * S + S / 2 - st.pad + drape.dy[di];
-  const v = variant(x, y, 5) % VARIANTS;
-  const first = (x + y) & 1 ? 1 : 2;
-  for (const bit of [first, 3 - first]) {
-    if (!(bits & bit)) continue;
-    const g = st.ground[bit - 1][v];
-    ctx.drawImage(g, px, py, g.width / st.dpr, g.height / st.dpr);
+  const cx = x * S + drape.dx[di];
+  const cy = y * S + drape.dy[di];
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(cx, cy, S, S);
+  ctx.clip();
+  ctx.clearRect(cx, cy, S, S);
+  for (let yy = Math.max(0, y - 1); yy <= Math.min(life.h - 1, y + 1); yy++) {
+    for (let xx = Math.max(0, x - 1); xx <= Math.min(life.w - 1, x + 1); xx++) {
+      paintGround(ctx, life, st, xx, yy, drape, fabric);
+    }
   }
+  ctx.restore();
 }
 
 /** Repaint the live threads in one rectangle of crossings [x0, x1) ×

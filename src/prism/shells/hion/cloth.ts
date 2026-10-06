@@ -37,7 +37,8 @@
 import { Immigration, orient, PATTERNS, type Pattern, type PatternName, size as sizeOf, type Species, stamp } from "./immigration";
 import type { createLoom } from "./loom";
 import { rng, type Pt } from "./pastel";
-import { drape, type Drape, GLOW, paintGround, paintRegion, stitches, type Stitches } from "./stitch";
+import type { Fabric } from "./fabric";
+import { drape, type Drape, GLOW, paintGround, paintRegion, repaintGround, stitches, type Stitches } from "./stitch";
 
 type Loom = ReturnType<typeof createLoom>;
 
@@ -49,6 +50,8 @@ interface ClothOptions {
   instant: boolean;
   /** How close the cloth is seen: 2 doubles the weave. */
   scale?: number;
+  /** The page's weave: which colour lies on top where both have been. */
+  fabric: Fabric;
   isIdle(): boolean;
   onIdleChange(listener: (idle: boolean) => void): void;
 }
@@ -441,8 +444,6 @@ export function createCloth(options: ClothOptions) {
     tileH = chunkPx * Math.max(1, Math.round(1024 / chunkPx));
     tileRows = Math.ceil(height / tileH);
     layer.style.height = `${height}px`;
-    for (const tile of tiles.values()) tile.el.remove();
-    tiles.clear();
     dirty.clear();
     // Measure where things will rest, not where they are swinging in from.
     page.classList.add("hion-measuring");
@@ -505,7 +506,10 @@ export function createCloth(options: ClothOptions) {
     for (let t = t0; t <= t1; t++) {
       const tile = tiles.get(t);
       // A tile still laying its ground will reach this row itself.
-      if (tile && tile.groundRow > y) paintGround(tile.wctx, life, st, x, y, hang);
+      if (!tile || tile.groundRow <= y) continue;
+      // A second colour: the fabric decides which shows, so lay it afresh.
+      if (life.woven[x + y * life.w] === 3) repaintGround(tile.wctx, life, st, x, y, hang, options.fabric);
+      else paintGround(tile.wctx, life, st, x, y, hang, options.fabric);
     }
   }
 
@@ -551,7 +555,7 @@ export function createCloth(options: ClothOptions) {
       const last = Math.min(life.h, (tile.index + 1) * rowsPerTile + 2);
       while (tile.groundRow < last) {
         const y = tile.groundRow++;
-        for (let x = 0; x < life.w; x++) paintGround(tile.wctx, life, st, x, y, hang);
+        for (let x = 0; x < life.w; x++) paintGround(tile.wctx, life, st, x, y, hang, options.fabric);
         if (performance.now() > deadline) return true;
       }
     }
@@ -623,7 +627,7 @@ export function createCloth(options: ClothOptions) {
 
   function tick(now: number) {
     frame = 0;
-    if (asleep()) return;
+    if (asleep() || busy) return;
     const dt = Math.min(100, now - (last || now));
     last = now;
     sowAndTouch(loom.reach());
@@ -655,12 +659,12 @@ export function createCloth(options: ClothOptions) {
   }
 
   function wake() {
-    if (instant || frame || timer || asleep() || !built || layer.dataset.state === "settling") return;
+    if (instant || frame || timer || asleep() || !built || busy) return;
     frame = requestAnimationFrame(tick);
   }
 
   function onScroll() {
-    if (!built || layer.dataset.state === "settling") return;
+    if (!built || busy) return;
     cull();
     if (instant) {
       paint(Infinity);
@@ -761,11 +765,16 @@ export function createCloth(options: ClothOptions) {
 
   /** Let the cloth live out of sight for up to n generations (until only
    * still and blinking things are left), a few milliseconds at a time and
-   * never while the prism holds the page still; then show it. */
+   * never while the prism holds the page still; then show it. A cloth
+   * already showing stays until the new one is ready (a picture loading
+   * changes the page's height, and the cloth must not blink). */
   let settling = 0;
+  let busy = false;
+  let settleTimer = 0;
   function settle(n: number) {
     const mine = ++settling;
-    layer.dataset.state = "settling";
+    busy = true;
+    if (!tiles.size) layer.dataset.state = "settling";
     let waiting = false;
     const slice = () => {
       if (mine !== settling || signal.aborted) return;
@@ -786,12 +795,13 @@ export function createCloth(options: ClothOptions) {
         n = life.settled || !life.changes ? 0 : n - 1;
       }
       if (n > 0) {
-        timer = window.setTimeout(slice, 16);
+        settleTimer = window.setTimeout(slice, 16);
         return;
       }
-      timer = 0;
       settling++;
+      busy = false;
       delete layer.dataset.state;
+      // The old cloth goes as the new one is laid, in the same frame.
       dirty.clear();
       for (const tile of tiles.values()) tile.el.remove();
       tiles.clear();
@@ -831,6 +841,7 @@ export function createCloth(options: ClothOptions) {
         observer.disconnect();
         cancelAnimationFrame(frame);
         clearTimeout(timer);
+        clearTimeout(settleTimer);
         clearTimeout(resizeTimer);
       });
       if (instant) {
