@@ -456,6 +456,7 @@ export class Book {
     if (this.still) {
       this.slots.forEach((slot) => slot.replaceChildren());
       this.showing = [];
+      this.corners.dataset.state = "";
       return;
     }
     const spread = this.geo.spread;
@@ -515,7 +516,8 @@ export class Book {
   private async openSingle(pages: HTMLElement[], cover: HTMLElement, from: DOMRect) {
     this.fresh(pages);
     this.corners.dataset.state = "turning";
-    this.slots[0].replaceChildren(pages[0] ?? "");
+    // On mobile, pages[0] is the cover; reveal pages[1] (the first inner page)
+    this.slots[0].replaceChildren(pages[1] ?? pages[0] ?? "");
     this.markSides();
     const leaf = this.leaf(cover, null);
     leaf.classList.add("bp-leaf--cover");

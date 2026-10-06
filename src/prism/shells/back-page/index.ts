@@ -313,6 +313,10 @@ class App {
       const next = this.order.find((_, i) => i > rank);
       return next ?? { key: "/", href: "/", label: this.copy.chapters.close, book: "home", page: 1 };
     }
+    // On the Writing contents page, go back to home shelf instead of previous project
+    if (this.route.kind === "writing" && this.route.slug === undefined) {
+      return { key: "/", href: "/", label: this.copy.chapters.home, book: "home", page: 1 };
+    }
     for (let i = this.order.length - 1; i >= 0; i--)
       if (i < rank) return this.order[i];
     return null;

@@ -393,6 +393,53 @@ function insideCover(b: Build) {
   return page;
 }
 
+/** The composition book's inside cover: multiplication tables and unit conversions. */
+function compositionInsideCover(b: Build) {
+  const { page, flow } = blankPage(b.copy, "inside-cover", "kraft-in");
+  const { insideCover: ic } = b.copy.writing;
+
+  // Multiplication table
+  const tableHead = h("h3", { class: "bp-ref-title" }, ic.tables);
+  const tableGrid = h("div", { class: "bp-times-table" });
+  for (let i = 1; i <= 12; i++) {
+    const row = h("div", { class: "bp-table-row" });
+    for (let j = 1; j <= 12; j++) {
+      const cell = h("div", { class: "bp-table-cell" }, `${i * j}`);
+      row.append(cell);
+    }
+    tableGrid.append(row);
+  }
+
+  // Unit conversions (as reference text)
+  const convHead = h("h3", { class: "bp-ref-title" }, ic.conversionHeader);
+  const convs = h("div", { class: "bp-conversions" });
+  convs.append(
+    h("p", { class: "bp-conv-section" },
+      h("strong", null, ic.length), ": 1 inch = 2.54 cm · 1 foot = 0.305 m · 1 mile = 1.61 km"
+    ),
+    h("p", { class: "bp-conv-section" },
+      h("strong", null, ic.weight), ": 1 ounce = 28.35 g · 1 pound = 0.454 kg"
+    ),
+    h("p", { class: "bp-conv-section" },
+      h("strong", null, ic.volume), ": 1 fluid ounce = 29.6 mL · 1 cup = 236.6 mL"
+    )
+  );
+
+  flow.append(
+    h("div", { class: "bp-owner-label" },
+      h("p", { class: "bp-belongs" },
+        `${b.copy.cover.belongs} `,
+        h("b", null, b.content.site.name),
+      )
+    ),
+    tableHead,
+    tableGrid,
+    convHead,
+    convs
+  );
+  return page;
+}
+
 // ---- home: hello, the diary, the camps worth a look -------------------------------
 
 function home(b: Build): HTMLElement[] {
@@ -1023,7 +1070,7 @@ function writing(b: Build) {
  * then the contents. */
 function writingBook(b: Build) {
   const pages = writing(b);
-  return b.spread ? [insideCover(b), ...pages] : pages;
+  return b.spread ? [compositionInsideCover(b), ...pages] : pages;
 }
 
 /** One essay, written out in the composition book: the date in the margin,

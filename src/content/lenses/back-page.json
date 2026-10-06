@@ -88,7 +88,14 @@
   },
   "writing": {
     "substack": "on Substack",
-    "ps": "P.S."
+    "ps": "P.S.",
+    "insideCover": {
+      "tables": "Times Tables",
+      "conversionHeader": "Useful Conversions",
+      "length": "Length",
+      "weight": "Weight",
+      "volume": "Volume"
+    }
   },
   "lab": {
     "eyebrow": "{eyebrow} · in the margins",
