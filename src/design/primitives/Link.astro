@@ -57,22 +57,19 @@ const arrowPath = outbound ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5";
   target={!disabled && newTab ? "_blank" : undefined}
   rel={!disabled && newTab ? "noreferrer" : undefined}
 >
-  {ball && (
-    <span class="ball-face" aria-hidden="true">
-      {outbound && (
-        <span class="ball-badge">
-          <svg
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d={arrowPath} />
-          </svg>
-        </span>
-      )}
+  {ball && <span class="ball-face" aria-hidden="true"></span>}
+  {ball && outbound && (
+    <span class="ball-badge">
+      <svg
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d={arrowPath} />
+      </svg>
     </span>
   )}
   <span class="ds-link__body">
@@ -221,8 +218,8 @@ const arrowPath = outbound ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5";
     pointer-events: none;
   }
   /* External links wear a satellite: a small burgundy badge with a cream
-     arrow on the rim at about 45 degrees, part of the face, so it squashes
-     and wobbles with it. It is part of the link too, so it takes clicks. */
+     arrow on the rim at about 45 degrees. It is positioned on the link
+     itself (not the animated face), so the hit target never moves. */
   .ball-badge {
     position: absolute;
     top: var(--ball-badge-at-y);
@@ -237,6 +234,8 @@ const arrowPath = outbound ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5";
     color: var(--ball-ink-current);
     box-shadow: 0 0 0 var(--ball-badge-ring) var(--color-page);
     pointer-events: auto;
+    /* The badge drifts visually on hover, but remains at this exact position
+       for click detection, consistent with the design invariant. */
   }
   .ball-badge svg {
     width: var(--ball-badge-glyph);
@@ -291,10 +290,12 @@ const arrowPath = outbound ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5";
       translate: none;
       transition-duration: var(--duration-fast);
     }
-    /* The satellite drifts a little further out along its orbit, late. */
+    /* The badge drifts visually on hover, but remains clickable at its
+       position; the translate is visual feedback only. */
     .ball-badge {
       transition: translate var(--duration-reveal) var(--ease-pop)
         var(--duration-fast);
+      pointer-events: auto;
     }
     .ds-link--ball:hover .ball-badge {
       translate: var(--ball-badge-drift) calc(-1 * var(--ball-badge-drift));
