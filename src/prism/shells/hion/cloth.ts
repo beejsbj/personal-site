@@ -3,29 +3,37 @@
  * Behind every screen lies a cloth of thread crossings, and it is alive
  * (immigration.ts): cyan and magenta threads are born, live and die by the
  * Game of Life, and the cloth keeps reweaving itself into still knots,
- * breathing blinkers and gliders that tumble away across it. The two hions
- * are its shuttles. Where they cross on their way down the page they sow
- * it: a glider, a knot, a burst that burns a while and settles into lace.
+ * breathing blinkers and gliders that tumble away across it. Every crossing
+ * life passes through keeps a faint float of its colour (stitch.ts), so the
+ * cloth records where life has been: busy places become woven ground, and
+ * a glider leaves a woven trail. The two hions are its shuttles: where they
+ * cross on their way down the page they sow it.
  *
  * Content shapes the cloth rather than sitting in boxes on it:
- *   - words hold their crossings empty, so text always sits on black paper;
- *   - a framed thing (`data-frame`) is ringed by still knots that keep their
- *     shape: a border that is part of the life, drawn from a signature (a
- *     project's slug), so each project has its own lace;
- *   - headings (`data-weft`) have a band of knots along their weft, so the
- *     cloth is densest where a section begins;
- *   - a click or tap on the paper sows a glider there, and passing over a
- *     link sends one off it.
+ *   - words, pictures and links hold their crossings empty, so text always
+ *     sits on black paper;
+ *   - the page's edges are selvages, living strips cyan-leaning on the left
+ *     and magenta-leaning on the right, and the gaps between sections are
+ *     sown too, each when the hions reach it;
+ *   - a framed thing (`data-frame`) gets woven tape at two corners, like a
+ *     mount, its pattern drawn from a signature (a project's slug), so each
+ *     project has its own tape and its page shows the same tape magnified;
+ *   - headings (`data-weft`) get tape along their weft, tied off in a knot:
+ *     the cloth is densest where a section begins;
+ *   - a click or tap on the paper sows a glider or a burst there, and
+ *     passing over a link flings a glider off it.
  * Generations pass slowly with time, faster as you scroll: reading moves the
  * cloth along. A screen seen close (`scale` 2: a project, a lab entry) is
- * the same weave magnified, each thread showing its two plies.
+ * the same weave magnified, each thread showing its two plies, and following
+ * a project out of a list magnifies the cloth round the link on the way.
  *
  * Cheap on purpose: the life is a coarse grid in typed arrays; only the
- * parts of the cloth that changed are repainted, onto page-space tiles that
- * exist only near the viewport. The loop sleeps while the prism holds the
- * page still, while the tab is hidden, and once nothing is moving; for a
- * reduced-motion visitor (or a still prism face) the cloth is settled before
- * it is shown, and never moves. */
+ * chunks that changed, near the viewport, are repainted, onto page-space
+ * tiles that exist only near the viewport; the woven ground has a canvas of
+ * its own that is only ever added to. The loop sleeps while the prism holds
+ * the page still, while the tab is hidden, and once nothing is moving; for a
+ * reduced-motion visitor (or a still prism face) the cloth is settled out of
+ * sight before it is shown, and never moves. */
 import { Immigration, orient, PATTERNS, type Pattern, type PatternName, size as sizeOf, type Species, stamp } from "./immigration";
 import type { createLoom } from "./loom";
 import { rng, type Pt } from "./pastel";
@@ -112,7 +120,6 @@ export function createCloth(options: ClothOptions) {
   /** Where the screen starts on the page, measured when the cloth is built
    * (reading it every frame would force a layout mid-scroll). */
   let pageTop = 0;
-  const hostTop = () => pageTop;
 
   /* ---------- Reading the screen onto the cloth ---------- */
 
@@ -505,7 +512,7 @@ export function createCloth(options: ClothOptions) {
 
   /** Keep tiles near the viewport; drop far ones. */
   function cull() {
-    const top = scrollY - hostTop();
+    const top = scrollY - pageTop;
     const from = Math.max(0, Math.floor((top - innerHeight * 0.5) / tileH));
     const to = Math.min(tileRows - 1, Math.floor((top + innerHeight * 1.6) / tileH));
     for (const [index, tile] of tiles) {
@@ -553,7 +560,7 @@ export function createCloth(options: ClothOptions) {
     const chunksPerTile = rowsPerTile / CHUNK;
     // Only what is on screen, or about to be: the rest stays dirty until
     // you scroll to it. Nearest the middle of the screen first.
-    const top = scrollY - hostTop();
+    const top = scrollY - pageTop;
     const px = CHUNK * S;
     const from = Math.floor((top - innerHeight * 0.3) / px);
     const to = Math.floor((top + innerHeight * 1.3) / px);
@@ -685,7 +692,7 @@ export function createCloth(options: ClothOptions) {
     if (!built || event.button > 0) return;
     const target = event.target as Element;
     if (target.closest("a, button, input, .hion-top")) return;
-    const top = hostTop();
+    const top = pageTop;
     const px = event.clientX;
     const py = event.clientY + scrollY - top;
     if (py < 0 || py > height) return;

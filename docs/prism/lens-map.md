@@ -444,6 +444,20 @@ Derived "content": page numbers are hard-coded (`ch:45-48,276-281`, labs `15+i`,
 
 ### 3.4 Hion (`HI`, provisional)
 
+**The living weave (exploration, `prism/hion-living-weave`).** Under the two dancing hions every screen now has a cloth (`HI/cloth.ts`): a coarse grid of thread crossings running two-species Game of Life (Immigration, `HI/immigration.ts`), drawn as pastel thread between neighbouring live crossings, with a faint woven ground wherever life has been (`HI/stitch.ts`). It reads no content of its own; it reads the screen's layout:
+
+| What the screen has | What the cloth does with it | Read from |
+|---|---|---|
+| Any text, `img`, `video`, `svg`, `a`, `button` in `main`/`footer` | Holds those crossings empty, so words always sit on black paper | text-node line boxes and element boxes, measured with transforms off (`.hion-measuring`) |
+| Columns clear of content down the page edges (wide screens) | Selvages: living strips, cyan-leaning left, magenta-leaning right, sown band by band as the hions reach them | the held map |
+| Six or more clear rows between sections | A soup across the gap, so life runs between sections (phones get their cloth here) | the held map |
+| Where the cyan and magenta hions cross | A glider, a burst (R-pentomino, pi) or a blinker, sown when the drawing reaches it | `loom.journeys()` |
+| `[data-frame]` (project charms, lab charms, the portrait, a project's or lab entry's head) | Woven tape at two corners with a still knot at each; the pattern comes from the attribute's value (the slug), so a project's tape on the list and on its page match | `HI/screens.ts` |
+| `[data-weft]` headings | Tape along the weft, out from the words both ways, tied off in a knot | `HI/screens.ts` |
+| Project and lab-entry routes | The same cloth at twice the scale; each thread shows two twisting plies. Following a project link out of a list magnifies the old cloth round the link | `route.kind`, the clicked link |
+
+No new copy, no new reads of `content.json`, no `route.main`: the cloth's only inputs are layout and slugs.
+
 Line numbers are from the current tree and are still moving. `S` = `HI/screens.ts`.
 
 **content.json reads**
