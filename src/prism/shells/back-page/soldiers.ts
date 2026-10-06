@@ -673,10 +673,11 @@ class Troupe {
       const hy = m.y;
       m.busy = true;
       this.moveTo(m, x, y, 900, 6);
-      this.after(900 + rand(1400, 2600), () => {
+      // a plain timer, not after(): going idle mustn't strand him out of camp, busy
+      setTimeout(() => {
         if (m.alive) this.moveTo(m, hx, hy, 800, 5);
         setTimeout(() => (m.busy = false), 820);
-      });
+      }, 900 + rand(1400, 2600));
       if (chance(0.35)) this.after(1000, () => this.say(m, pick(this.talk.wander)));
       return;
     }
