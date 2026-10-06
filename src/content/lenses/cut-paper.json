@@ -102,6 +102,23 @@
     "legend": "Each role and course is a clip on the Roles track, spanning its real dates. The bass walks while one runs.",
     "undated": "undated"
   },
+  "writing": {
+    "send": "Send",
+    "sends": "Sends",
+    "bus": "Send A",
+    "busVoice": "to Substack",
+    "legend": "Each post leaves the session as a bounce: a flag on the send at the date it went out, and a motif sung over the chord it was written in.",
+    "bounces": "Bounces",
+    "bounce": "B{no}",
+    "hear": "Hear {name}",
+    "bounced": "Bounced",
+    "over": "Over",
+    "motif": "Motif",
+    "liner": "Liner notes",
+    "return": "Return",
+    "noSignal": "No signal",
+    "silence": "Silence"
+  },
   "other": {
     "label": "Text view"
   },
