@@ -44,7 +44,9 @@ for touch and reduced motion. The guide imports these production specimens.
 
 The root PHP site, `templates/`, `data/`, `styles/`, `images/`, `projects/`, and
 older scripts are preserved historical material, not the current Astro source.
-The existing Docker configuration still serves that PHP archive. Do not rerun
+The existing Docker configuration still serves that PHP archive; Vercel excludes
+it from deployment inputs. See the [runtime/archive boundary](docs/runtime-archive.md)
+for the full inventory, media policy, and recovery guardrails. Do not rerun
 `scripts/migrate-to-astro-content.mjs` casually: it is a one-shot importer that
 can overwrite authored content.
 
