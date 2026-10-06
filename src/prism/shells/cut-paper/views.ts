@@ -309,38 +309,50 @@ function labEntry(env: Env, item: LabEntry): Screen {
   };
 }
 
-/* ── about: the set notes ────────────────────────────────── */
+/* ── about: the set notes, pasted up as a torn jazz poster ── */
 
 function about(env: Env): Screen {
   const { content, copy } = env;
   const page = content.pages.about;
   const { header } = page;
   const portrait = content.pages.home.hero.portrait;
-  const h1 = heading(header.title, "cp-head__title", "page.title", "about");
+  const h1 = heading(header.title, "cp-poster__title", "page.title", "about");
+  const tag = h("p", { class: "cp-poster__tag", "aria-hidden": "true" }, copy.about.tag.map((word) => h("span", null, word)));
+  bar(tag, 4, 8);
+  const poster = bar(
+    h(
+      "section",
+      { class: "cp-poster", "aria-label": copy.about.notes },
+      scrap("tomato", "torn", "cp-poster__a"),
+      scrap("plum", "stairs", "cp-poster__b"),
+      scrap("mustard", "tri", "cp-poster__c"),
+      scrap("bone", "strip", "cp-poster__d"),
+      scrap("pine", "dot", "cp-poster__e"),
+      h("figure", { class: "cp-poster__portrait" }, h("img", { src: portrait.src, alt: portrait.alt, decoding: "async" })),
+      h("p", { class: "cp-head__kicker cp-poster__kicker" }, h("span", { class: "cp-tag" }, copy.about.notes), header.eyebrow ? h("span", part("page.eyebrow", "about"), header.eyebrow) : null),
+      h1,
+      header.intro ? h("p", { class: "cp-poster__intro", ...part("page.intro", "about") }, header.intro) : null,
+      tag,
+    ),
+    2,
+  );
+  tag.removeAttribute("data-beat");
   return {
     el: screen(
       "about",
       h(
         "div",
         { class: "cp-about" },
-        h(
-          "div",
-          { class: "cp-about__side" },
-          scrap("plum", "stairs", "cp-about__scrap-a"),
-          scrap("tomato", "torn", "cp-about__scrap-b"),
-          h("figure", { class: "cp-portrait cp-portrait--big" }, h("img", { src: portrait.src, alt: portrait.alt, decoding: "async" })),
-        ),
+        poster,
         bar(
           h(
             "article",
-            { class: "cp-about__notes" },
-            h("p", { class: "cp-head__kicker" }, h("span", { class: "cp-tag" }, copy.about.notes), header.eyebrow ? h("span", part("page.eyebrow", "about"), header.eyebrow) : null),
-            h1,
-            header.intro ? h("p", { class: "cp-head__intro", ...part("page.intro", "about") }, header.intro) : null,
+            { class: "cp-about__body", "aria-label": copy.about.body },
             prose(page.html, part("page.body", "about")),
             buttons(header.actions.map((a) => ({ label: a.label, url: a.href })), part("page.actions", "about")),
           ),
-          1,
+          2,
+          2,
         ),
       ),
     ),

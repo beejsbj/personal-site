@@ -93,7 +93,9 @@
     "back": "Back to the rack"
   },
   "about": {
-    "notes": "Set notes"
+    "notes": "Set notes",
+    "tag": ["Play.", "Build.", "Repeat."],
+    "body": "About Burooj"
   },
   "resume": {
     "roles": "Roles",

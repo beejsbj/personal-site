@@ -29,6 +29,7 @@
   --cp-plum: #6b3fa0;
   --cp-bone: #efe6d0;
   --cp-mustard: #f0b137;
+  --cp-pine: #1f4d3f;
 
   /* the seven degrees of F major; ink text holds >= 6:1 on each */
   --cp-do: #ee6f38;
@@ -54,6 +55,8 @@
   --cp-torn: polygon(0% 10%, 4% 0%, 13% 7%, 24% 1%, 36% 6%, 49% 0%, 61% 7%, 74% 1%, 86% 6%, 97% 0%, 100% 14%, 98.5% 50%, 100% 86%, 96% 100%, 84% 93%, 71% 100%, 58% 94%, 45% 100%, 31% 93%, 18% 100%, 6% 94%, 0% 100%, 1.5% 50%);
   --cp-torn-v: polygon(0 0, 100% 0, 84% 6%, 100% 13%, 80% 21%, 100% 30%, 86% 38%, 100% 47%, 78% 55%, 100% 63%, 84% 72%, 100% 80%, 82% 89%, 100% 96%, 90% 100%, 0 100%);
   --cp-cut-tab: polygon(3% 0%, 99% 5%, 100% 88%, 97% 100%, 1% 95%, 0% 9%);
+  /* faint cut-paper litter, for the poster wall */
+  --cp-confetti: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'><g fill='%23f4efe6' fill-opacity='0.05'><path d='M20 30 44 18 38 46z'/><circle cx='120' cy='40' r='6'/><rect x='190' y='22' width='26' height='7' transform='rotate(-24 203 25)'/><path d='M60 120l14-22 10 26z'/><circle cx='220' cy='130' r='11'/><rect x='130' y='150' width='8' height='30' transform='rotate(18 134 165)'/><path d='M30 210h30l-6 14H36z'/><circle cx='98' cy='238' r='4'/><path d='M180 210l30 6-22 20z'/><rect x='240' y='60' width='6' height='6'/></g></svg>");
 
   --cp-bar-h: 56px;
   --cp-ov-h: 30px;
@@ -2402,55 +2405,141 @@
   color: var(--cp-ivory-2);
 }
 
-/* ── about: the set notes ──────────────────────────────────── */
+/* ── about: the set notes, a torn jazz poster ──────────────── */
 
 :root[data-lens="cut-paper"] .cp-about {
   display: grid;
-  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.5fr);
-  align-items: start;
-  gap: 40px;
-  padding: var(--cp-pad) var(--cp-pad) 72px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 100%;
 }
 
-:root[data-lens="cut-paper"] .cp-about__side {
+:root[data-lens="cut-paper"] .cp-poster {
   position: sticky;
-  top: 20px;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: max(calc(100dvh - var(--cp-bar-h) - var(--cp-ov-h)), 560px);
+  padding: 48px 40px 40px;
+  overflow: hidden;
+  background: var(--cp-confetti), var(--cp-ink);
+  border-right: 1px solid var(--cp-hairline);
 }
 
-:root[data-lens="cut-paper"] .cp-about__side .cp-scrap {
-  position: absolute;
+:root[data-lens="cut-paper"] .cp-poster > :not(.cp-scrap) {
+  position: relative;
+  z-index: 2;
 }
 
-:root[data-lens="cut-paper"] .cp-about__scrap-a {
-  right: -20px;
-  bottom: -26px;
-  width: 140px;
-  height: 90px;
+:root[data-lens="cut-paper"] .cp-poster__a {
+  top: -20px;
+  left: -30px;
+  width: 64%;
+  height: 40%;
+  --tilt: -5deg;
 }
 
-:root[data-lens="cut-paper"] .cp-about__scrap-b {
-  top: -14px;
-  left: -16px;
+:root[data-lens="cut-paper"] .cp-poster__b {
+  right: -2%;
+  bottom: 0;
+  width: 44%;
+  height: 34%;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__c {
+  top: 5%;
+  left: 8%;
+  width: 90px;
+  height: 100px;
+  --tilt: -14deg;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__d {
+  z-index: 3;
+  top: 9%;
+  right: 16%;
   width: 120px;
-  height: 46px;
+  height: 26px;
+  --tilt: -24deg;
 }
 
-:root[data-lens="cut-paper"] .cp-portrait--big {
+:root[data-lens="cut-paper"] .cp-poster__e {
+  top: 44%;
+  right: 8%;
+  width: 70px;
+  height: 70px;
+}
+
+:root[data-lens="cut-paper"] .cp-poster > .cp-poster__portrait {
+  position: absolute;
+  top: 7%;
+  right: 12%;
+  z-index: 2;
+  width: 38%;
+  max-width: 250px;
+  margin: 0;
+  aspect-ratio: 3 / 4;
+  filter: drop-shadow(10px 10px 0 var(--cp-ink));
+  transform: rotate(3deg);
+}
+
+:root[data-lens="cut-paper"] .cp-poster__portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 25%;
+  clip-path: polygon(0 3%, 96% 0, 100% 62%, 97% 100%, 4% 97%, 2% 60%);
+}
+
+:root[data-lens="cut-paper"] .cp-poster__kicker {
+  margin-bottom: 10px;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__title {
+  margin: 0;
+  color: var(--cp-ivory);
+  font: 400 clamp(72px, 7.6vw, 140px) / 0.94 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-shadow: 7px 7px 0 var(--cp-plum);
+  text-transform: uppercase;
+  outline: none;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__intro {
+  max-width: 34ch;
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  background: var(--cp-ink);
+  box-shadow: var(--cp-ring);
+  color: var(--cp-ivory);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__tag {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.4em;
+  margin: 18px 0 0;
+  color: var(--cp-mustard);
+  font: 400 26px/1 var(--cp-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-about__body {
+  --note: var(--cp-fa);
   position: relative;
   z-index: 1;
-  width: 100%;
-  max-width: 320px;
-  margin: 0;
-  transform: rotate(-2deg);
+  padding: 40px 44px 72px;
 }
 
-:root[data-lens="cut-paper"] .cp-about__notes {
-  display: grid;
-  gap: 14px;
-}
-
-:root[data-lens="cut-paper"] .cp-about__notes .cp-head__title {
-  text-shadow: 4px 4px 0 var(--cp-plum);
+:root[data-lens="cut-paper"] .cp-about__body .cp-prose > :first-child {
+  color: var(--cp-ivory);
+  font-size: 17px;
+  line-height: 1.6;
 }
 
 /* ── the resume: the Roles track drawn out ─────────────────── */
@@ -2849,10 +2938,12 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  :root[data-lens="cut-paper"] .cp-about__side {
+  :root[data-lens="cut-paper"] .cp-poster {
     position: relative;
-    top: 0;
-    max-width: 260px;
+    height: auto;
+    min-height: 600px;
+    border-right: 0;
+    border-bottom: 1px solid var(--cp-hairline);
   }
 }
 
@@ -3131,6 +3222,30 @@
     top: 30px;
   }
 
+  :root[data-lens="cut-paper"] .cp-poster {
+    min-height: 620px;
+    padding: 30px var(--cp-pad);
+  }
+
+  :root[data-lens="cut-paper"] .cp-poster > .cp-poster__portrait {
+    top: 5%;
+    right: 8%;
+    width: 46%;
+  }
+
+  :root[data-lens="cut-paper"] .cp-poster__title {
+    font-size: clamp(60px, 19vw, 92px);
+    text-shadow: 5px 5px 0 var(--cp-plum);
+  }
+
+  :root[data-lens="cut-paper"] .cp-poster__intro {
+    font-size: 14px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-about__body {
+    padding: 28px var(--cp-pad) 56px;
+  }
+
   :root[data-lens="cut-paper"] .cp-rack {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
@@ -3220,10 +3335,6 @@
   top: 12px;
   bottom: auto;
   height: 58px;
-}
-
-:root[data-lens="cut-paper"] .cp-about__notes .cp-head__title {
-  margin-bottom: 10px;
 }
 
 :root[data-lens="cut-paper"] .cp-ruler__corner .cp-arr__name {
