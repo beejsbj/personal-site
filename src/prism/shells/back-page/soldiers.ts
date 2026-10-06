@@ -870,7 +870,9 @@ class Troupe {
         // anyone standing there budges up
         for (const x of others) this.moveTo(x, x.x + (x.x < from.x - o ? -1 : 1) * m.r * 2.4, x.y, 260, 2);
         this.moveTo(m, from.x - o, from.y, 380, 3);
-        setTimeout(() => this.snipe(m, to, by), 430);
+        setTimeout(() => {
+          if (m.alive) this.snipe(m, to, by);
+        }, 430);
         return;
       }
     }
@@ -902,7 +904,8 @@ class Troupe {
     }
 
     setTimeout(() => {
-      if (!m.life.page.isConnected) return;
+      // crossed out while winding up: the shot dies with him
+      if (!m.life.page.isConnected || !m.alive) return;
       m.busy = false;
       this.react(m, "recoil", deg);
       // the ink, on every open page it crosses, under the words
@@ -984,7 +987,7 @@ class Troupe {
     const ride = clamp(len * 1.5, 280, 650);
     const ease = "cubic-bezier(.25,.7,.3,1)";
     setTimeout(() => {
-      if (!life.page.isConnected) return;
+      if (!life.page.isConnected || !m.alive) return;
       const line = el("path", {
         class: "bp-life-flick",
         d: `M${f(m.x)} ${f(m.y)}L${f(tx)} ${f(ty)}`,
