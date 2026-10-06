@@ -1,13 +1,16 @@
-/** Every route is a chapter of the exercise book: a run of pages written in
- * biro. The book's order is fixed, like a real book's: the cover and hello,
- * a letter, the typed resume stapled in, doodles from the lab, the essays,
- * a page for each project, and the war map on the back page.
+/** Every route is a chapter in one of the exercise books on the desk: a run
+ * of pages written in that book's pens. There's a book for each section,
+ * each on its own paper (themes.ts): hello in the squared maths copy, study
+ * notes in the quiet notebook with the resume stapled in after them, slip by
+ * slip, doodles in the graph book, the war on blueprint, its map first
+ * and a page for each project after, and the essays written out in a marbled
+ * composition book, its contents first and each essay after.
  *
  * Every word comes from content: the portfolio and Daylight's copy from
- * `content`, the book's own handwriting from `content.lenses["back-page"]`. */
+ * `content`, the books' own handwriting from `content.lenses["back-page"]`. */
 import { markPart, part, type Part } from "../../parts";
 import { blocks, fallbackBody, featured, fill, inline } from "../rich";
-import type { Route, SiteContent } from "../types";
+import type { Route, SiteContent, WritingPost } from "../types";
 import { h, handDate, link, shortDate, svg } from "./dom";
 import {
   BLUE,
@@ -22,6 +25,8 @@ import {
   underline,
 } from "./ink";
 import { paginate, type Blank } from "./paginate";
+import { studyNotes } from "./studynotes";
+import { BOOKS, type BookKey } from "./themes";
 
 type Project = SiteContent["projects"][number];
 type LabItem = SiteContent["lab"][number];
@@ -30,6 +35,8 @@ export type Copy = SiteContent["lenses"]["back-page"];
 
 export interface Chapter {
   key: string;
+  /** Which book it's in. */
+  book: BookKey;
   rank: number;
   label: string;
   pages: HTMLElement[];
@@ -41,62 +48,84 @@ export interface Stop {
   key: string;
   href: string;
   label: string;
-  /** What's written for it in the contents. */
-  no: string;
-  /** The number of its first page; null for the back page. */
-  page: number | null;
+  /** Which book it's in. */
+  book: BookKey;
+  /** The number of its first page, counted in its own book. */
+  page: number;
 }
 
-// ---- the book's order ------------------------------------------------------
+// ---- the books' order ------------------------------------------------------
 
-/** How many pages each chapter is given, filled or not, so where a chapter
- * starts never depends on how far the ones before it run today. The lab
- * gives its own pages to the entries that have one, inside it. */
+/** How many pages each stop is given, filled or not, so where a stop starts
+ * never depends on how far the ones before it run today. Every book counts
+ * its own pages from 1: the lab opens with its own pages and gives each
+ * entry that has one a pair of its own after; the war is its map and roll
+ * call first, then a few pages for each project. */
 const ALLOWANCE = {
-  home: 4,
-  about: 4,
-  resume: 4,
   /** The lab's own opening pages, before its entries'. */
   labHead: 2,
-  /** The least room kept for lab entries, however few there are. */
-  labEntries: 4,
-  /** Index room and a fixed allowance per essay: bodies load only on demand. */
-  writingHead: 2,
-  writingEntry: 4,
+  labEntry: 2,
+  /** The war map's pages, before the projects'. */
+  war: 2,
   project: 3,
+  /** The composition book's contents, before the essays'. Essays are
+   * given a fixed run each: their bodies load only when one is opened. */
+  contents: 4,
+  essay: 6,
 };
 
+/** Every stop in every book, book by book, in the order the books lie. */
 export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
   const names = copy.chapters;
   const stops: Stop[] = [];
   let page = 1;
-  const add = (href: string, label: string, pages: number) => {
-    stops.push({ key: href, href, label, no: String(page), page });
+  const add = (book: BookKey, href: string, label: string, pages: number) => {
+    stops.push({ key: href, href, label, book, page });
     page += pages;
   };
-  add("/", names.home, ALLOWANCE.home);
-  add("/about", names.about, ALLOWANCE.about);
-  add("/resume", names.resume, ALLOWANCE.resume);
-  const lab = page;
-  const own = content.lab.filter((item) => item.hasPage);
-  add("/lab", names.lab, ALLOWANCE.labHead);
-  own.forEach((item) => add(item.detail, item.title, 1));
-  page = lab + ALLOWANCE.labHead + Math.max(ALLOWANCE.labEntries, own.length);
-  add("/writing", names.writing, ALLOWANCE.writingHead);
-  content.writing.posts.forEach((post) =>
-    add(post.href, post.title, ALLOWANCE.writingEntry),
-  );
+  add("home", "/", names.home, 1);
+  page = 1;
+  add("about", "/about", names.about, 1);
+  // the resume is stapled into the about book, after the notes (its first
+  // page is counted from the notes when it's written: see `resume`)
+  add("about", "/resume", names.resume, 1);
+  page = 1;
+  add("lab", "/lab", names.lab, ALLOWANCE.labHead);
+  content.lab
+    .filter((item) => item.hasPage)
+    .forEach((item) => add("lab", item.detail, item.title, ALLOWANCE.labEntry));
+  page = 1;
+  add("projects", "/projects", names.projects, ALLOWANCE.war);
   content.projects.forEach((project) =>
-    add(project.href, project.title, ALLOWANCE.project),
+    add("projects", project.href, project.title, ALLOWANCE.project),
   );
-  stops.push({
-    key: "/projects",
-    href: "/projects",
-    label: names.projects,
-    no: copy.page.back,
-    page: null,
-  });
+  page = 1;
+  add("writing", "/writing", names.writing, ALLOWANCE.contents);
+  content.writing.posts.forEach((post) => add("writing", post.href, post.title, ALLOWANCE.essay));
   return stops;
+}
+
+/** Which book a route is in; null for the loose sheets tucked into any. */
+export function bookOf(route: Route): BookKey | null {
+  switch (route.kind) {
+    case "home":
+      return "home";
+    case "about":
+      return "about";
+    case "resume":
+      return "about";
+    case "lab":
+    case "lab-entry":
+      return "lab";
+    case "projects":
+    case "project":
+      return "projects";
+    case "writing":
+    case "writing-entry":
+      return "writing";
+    default:
+      return null;
+  }
 }
 
 export function rankOf(route: Route, order: Stop[]) {
@@ -107,7 +136,7 @@ export function rankOf(route: Route, order: Stop[]) {
   if (route.kind === "writing-entry")
     return order.findIndex((stop) => stop.key === "/writing") + 0.5;
   if (route.kind === "project")
-    return order.findIndex((stop) => stop.key === "/projects") - 0.5;
+    return order.findIndex((stop) => stop.key === "/projects") + 0.5;
   return 0.5;
 }
 
@@ -123,7 +152,7 @@ export interface Build {
   today: string;
 }
 
-type Paper = "squared" | "kraft" | "kraft-in" | "typed" | "letter";
+type Paper = "squared" | "kraft" | "kraft-in" | "notes" | "ruled";
 
 /** The number of the route's first page, from the book's order. */
 const firstPage = (b: Build) =>
@@ -149,15 +178,7 @@ export function blankPage(
     );
   }
   const flow = h("div", { class: "bp-flow" });
-  if (paper === "typed") {
-    const sheet = h(
-      "div",
-      { class: "bp-sheet" },
-      h("i", { class: "bp-staple", "aria-hidden": "true" }),
-      flow,
-    );
-    page.append(sheet);
-  } else page.append(flow);
+  page.append(flow);
   return { page, flow };
 }
 
@@ -271,20 +292,25 @@ function taped(
   return fig;
 }
 
-// ---- the cover, and the contents -------------------------------------------------
+// ---- the cover --------------------------------------------------------------------
 
-function label(content: SiteContent, copy: Copy) {
+/** The name label on a book's cover: which book in the pile it is (or what
+ * kind, printed, for a book that says so), its title, and the name, subject
+ * and class written in. */
+function label(content: SiteContent, copy: Copy, key: BookKey) {
   const words = copy.cover;
-  const [port, folio] = words.title;
+  const book = copy.books[key];
+  const [first, second] = book.title;
+  const series = "series" in book ? book.series : fill(words.series, { n: BOOKS.findIndex((b) => b.key === key) + 1 });
   return h(
     "div",
     { class: "bp-label" },
-    h("p", { class: "bp-label__school" }, words.school),
+    h("p", { class: "bp-label__school" }, series),
     h(
       "p",
       { class: "bp-label__title", "aria-hidden": "true" },
-      h("span", { class: "bp-blue" }, port),
-      h("span", { class: "bp-red" }, folio),
+      h("span", { class: "bp-blue" }, first),
+      h("span", { class: "bp-red" }, second),
     ),
     h(
       "p",
@@ -296,55 +322,14 @@ function label(content: SiteContent, copy: Copy) {
       "p",
       { class: "bp-label__field" },
       h("span", null, words.subject),
-      h("b", null, content.pages.home.hero.occupation),
+      h("b", null, key === "home" ? content.pages.home.hero.occupation : book.aside),
     ),
     h(
       "p",
       { class: "bp-label__field" },
       h("span", null, words.class),
-      h("b", null, words.classValue),
+      h("b", null, book.klass),
     ),
-  );
-}
-
-/** The contents slip: the book's sections, and where each starts. */
-const SECTIONS = [
-  ["/", "home"],
-  ["/about", "about"],
-  ["/resume", "resume"],
-  ["/lab", "lab"],
-  ["/writing", "writing"],
-  ["/projects", "projects"],
-] as const;
-
-function contents(b: Build) {
-  const { order, route, copy } = b;
-  const words = copy.contents;
-  const list = h("ol", { class: "bp-contents__list" });
-  for (const [href, key] of SECTIONS) {
-    const entry: { name: string; aside?: string } = words[key];
-    const stop = order.find((s) => s.key === href);
-    const here = route.path === href;
-    list.append(
-      h(
-        "li",
-        { "data-ink": href === "/projects" ? "red" : "blue" },
-        h(
-          "a",
-          { href, "aria-current": here ? "page" : null },
-          h("span", { class: "bp-contents__name" }, entry.name),
-          entry.aside ? h("small", null, ` (${entry.aside})`) : null,
-          h("span", { class: "bp-contents__dots", "aria-hidden": "true" }),
-          h("span", { class: "bp-contents__no" }, h("span", { class: "bp-sr" }, `${words.page} `), stop?.no ?? ""),
-        ),
-      ),
-    );
-  }
-  return h(
-    "nav",
-    { class: "bp-contents", "aria-label": words.label },
-    h("p", { class: "bp-contents__title", "aria-hidden": "true" }, words.title),
-    list,
   );
 }
 
@@ -371,21 +356,28 @@ function returnTo(content: SiteContent, copy: Copy) {
 }
 
 /** The outside of the book: the name label on brown paper. On a phone the
- * cover is also where the contents slip is tucked. */
-export function coverPage(b: Build, withContents: boolean) {
+ * first book's cover is also where the return address is written, since it
+ * has no inside cover to show. */
+export function coverPage(b: Build, withReturn: boolean, key: BookKey = "home") {
   const { page, flow } = blankPage(b.copy, "cover", "kraft");
-  flow.append(label(b.content, b.copy));
-  if (withContents) flow.append(contents(b), returnTo(b.content, b.copy));
-  else flow.append(svg(coverDoodle()));
+  page.dataset.book = key;
+  flow.append(label(b.content, b.copy, key));
+  if (withReturn) flow.append(returnTo(b.content, b.copy));
+  flow.append(svg(coverDoodle(key)));
+  // the maker's small print, at the foot of a bought book's cover
+  const book = b.copy.books[key];
+  if ("print" in book) flow.append(h("p", { class: "bp-cover-print", "aria-hidden": "true" }, book.print));
   return page;
 }
 
-function coverDoodle() {
-  const rng = seed("cover");
+function coverDoodle(key: string) {
+  const rng = seed(`cover-${key}`);
   return `<svg class="bp-cover-doodle" viewBox="0 0 200 120" aria-hidden="true">${flick(40, 90, 150, 30, BLUE, rng, 0.2)}${flick(150, 30, 60, 100, RED, rng, 0.3)}${camp({ cx: 40, cy: 90, r: 16, ink: BLUE, enemy: RED, dots: 5, hits: 1, rng })}${camp({ cx: 150, cy: 30, r: 16, ink: RED, enemy: BLUE, dots: 6, hits: 2, rng })}</svg>`;
 }
 
-/** The inside of the front cover: the contents slip, and who to return it to. */
+/** The inside of the front cover: whose book it is, a war fought there when
+ * it was new, and who to return it to. The books themselves are the way
+ * round: each lies on the pile with its own label. */
 function insideCover(b: Build) {
   const { page, flow } = blankPage(b.copy, "inside-cover", "kraft-in");
   flow.append(
@@ -395,8 +387,47 @@ function insideCover(b: Build) {
       `${b.copy.cover.belongs} `,
       h("b", null, b.content.site.name),
     ),
-    contents(b),
+    svg(coverDoodle("inside")),
     returnTo(b.content, b.copy),
+  );
+  return page;
+}
+
+/** The composition book's inside cover, printed as the bought ones are: a
+ * times table and a few conversions in black on the grey board, and the
+ * owner's name written in above them. The printed matter is furniture, so
+ * it's kept from screen readers; the name isn't. */
+function compositionInsideCover(b: Build) {
+  const { page, flow } = blankPage(b.copy, "inside-cover", "kraft-in");
+  const { insideCover: ic } = b.copy.writing;
+  const n = Array.from({ length: 12 }, (_, i) => i + 1);
+  const table = h(
+    "table",
+    { class: "bp-times" },
+    h("caption", null, ic.tables),
+    h("thead", null, h("tr", null, h("th", null, "×"), ...n.map((j) => h("th", null, String(j))))),
+    h(
+      "tbody",
+      null,
+      ...n.map((i) =>
+        h("tr", null, h("th", null, String(i)), ...n.map((j) => h("td", { class: i === j ? "bp-times__sq" : null }, String(i * j)))),
+      ),
+    ),
+  );
+  const conversions: [string, string[]][] = [
+    [ic.length, ["1 in = 2.54 cm", "1 ft = 0.305 m", "1 mi = 1.61 km"]],
+    [ic.weight, ["1 oz = 28.35 g", "1 lb = 0.454 kg"]],
+    [ic.volume, ["1 fl oz = 29.6 mL", "1 cup = 236.6 mL"]],
+  ];
+  const convs = h(
+    "div",
+    { class: "bp-convs" },
+    h("p", { class: "bp-convs__title" }, ic.conversionHeader),
+    ...conversions.map(([name, rows]) => h("dl", null, h("dt", null, name), ...rows.map((r) => h("dd", null, r)))),
+  );
+  flow.append(
+    h("p", { class: "bp-belongs" }, `${b.copy.cover.belongs} `, h("b", null, b.content.site.name)),
+    h("div", { class: "bp-printed", "aria-hidden": "true" }, table, convs),
   );
   return page;
 }
@@ -501,85 +532,162 @@ function home(b: Build): HTMLElement[] {
   return [cover, ...pages];
 }
 
-// ---- about: a letter -----------------------------------------------------------------
+// ---- about: a note-taker's notebook ------------------------------------------------
 
-function about(b: Build) {
+/** The about page as study notes: a subject tab, the title in brush pen over
+ * a highlighter swipe, the intro boxed as the key fact, a small taped photo,
+ * a sticky note pointing to the resume stapled in at the back, then the body
+ * as numbered headings, bullets and boxed callouts (studynotes.ts). */
+function aboutPages(b: Build) {
   const { header, html } = b.content.pages.about;
+  const { portrait } = b.content.pages.home.hero;
   const words = b.copy.about;
   const [action] = header.actions;
-  const blocks: HTMLElement[] = [
-    h(
-      "header",
-      { class: "bp-letterhead" },
-      withUnderline(h1(header.title, part("page.title", "about")), BLUE, "about-title"),
-      header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "about") }, header.intro) : null,
-    ),
-    h("p", { class: "bp-salute" }, words.salute),
-    ...prose(html, "page.body", "about"),
-    h("p", { class: "bp-signoff" }, words.signoff, h("br"), h("span", null, words.signature)),
-  ];
-  if (action)
+
+  const photo = taped(portrait.src, portrait.alt, "about-photo", { cls: "bp-notephoto", caption: jotted(portrait.caption) });
+  const title = h1("", part("page.title", "about"));
+  title.classList.add("bp-brush");
+  title.append(h("span", { class: "bp-hl" }, header.title));
+  const head = h(
+    "header",
+    { class: "bp-noteshead" },
+    photo,
+    header.eyebrow ? h("p", { class: "bp-ntab", ...part("page.eyebrow", "about") }, header.eyebrow) : null,
+    title,
+  );
+  const blocks: HTMLElement[] = [head];
+  if (header.intro)
     blocks.push(
       h(
-        "p",
-        { class: "bp-ps", ...part("page.actions", "about") },
-        `${words.ps} `,
-        h("a", { href: action.href }, action.label.toLowerCase()),
-        ` ${words.psAfter}`,
+        "div",
+        { class: "bp-keybox" },
+        h("span", { class: "bp-keybox__tag" }, words.inShort),
+        h("p", part("page.intro", "about"), header.intro),
       ),
     );
-  return written(b, "about", "letter", blocks, firstPage(b), b.today);
+  const sticky = action
+    ? h(
+        "a",
+        { class: "bp-sticky", href: action.href, ...part("page.actions", "about") },
+        h("span", { class: "bp-sticky__label" }, `${action.label} →`),
+        h("small", { class: "bp-sticky__where" }),
+      )
+    : null;
+  if (sticky) blocks.push(sticky);
+  blocks.push(...studyNotes(html, "page.body", "about"));
+  const notes = written(b, "about", "notes", blocks, firstPage(b), b.today);
+  // a doodle in the margin where the notes stop, the kind drawn while thinking
+  notes[notes.length - 1]?.append(h("div", { class: "bp-notedoodle", "aria-hidden": "true" }, svg(doodle(2, seed("about-end")))));
+  return { pages: evenUp(b.copy, notes, b.spread, "/about"), sticky };
 }
 
-// ---- resume: typed, and stapled in -------------------------------------------------
+function about(b: Build) {
+  const { pages, sticky } = aboutPages(b);
+  const first = firstPage(b);
+  // the sticky says where the resume starts: right after these pages
+  const where = sticky && pages.flatMap((p) => [...p.querySelectorAll<HTMLElement>(".bp-sticky__where")]);
+  if (where && first !== null) for (const el of where) el.textContent = fill(b.copy.about.stapled, { n: first + pages.length });
+  return pages;
+}
 
-/** The structured resume, typed out: a heading for each section, then each
- * role or course as its heading, its dates, its summary and its bullets. */
-function typed(content: SiteContent): HTMLElement[] {
-  const { resume } = content;
-  const groups = [
-    { title: resume.experience.title, entries: resume.experience.roles, name: "resume.role" as const },
-    { title: resume.education.title, entries: resume.education.entries, name: "resume.education" as const },
-  ];
-  const out: HTMLElement[] = [];
-  for (const group of groups) {
-    out.push(h("h2", null, group.title));
-    for (const entry of group.entries) {
-      const mark = part(group.name, entry.id);
-      out.push(h("h3", { ...mark }, entry.heading));
-      if (entry.dateLine) out.push(h("p", { ...mark }, h("em", null, entry.dateLine)));
-      if (entry.summary) out.push(h("p", { ...mark }, inline(entry.summary)));
-      if (entry.bullets.length)
-        out.push(h("ul", { ...mark }, ...entry.bullets.map((bullet) => h("li", null, inline(bullet)))));
-    }
-  }
-  out.push(
-    h("h2", null, resume.tools.title),
-    h("p", { ...part("resume.tools") }, resume.tools.sentence),
+// ---- resume: slips stapled into the about book ---------------------------------------
+
+/** The paper each slip is cut from, in turn: a ruled index card written by
+ * hand, a typed half-sheet, a till receipt. */
+const STOCKS = ["index", "typed", "receipt"] as const;
+type Stock = (typeof STOCKS)[number] | "letterhead" | "manila" | "scrap";
+
+/** A slip of paper stapled onto the page: its own stock, a slight turn, and
+ * one or two staples through its top. */
+function slip(stock: Stock, key: string, mark: ReturnType<typeof part> | null, ...kids: (Node | null)[]) {
+  const rng = seed(key);
+  const tilt = ((rng() - 0.5) * 2.6).toFixed(2);
+  const staples = stock === "typed" || stock === "letterhead" ? 2 : 1;
+  const at = staples === 2 ? [22 + rng() * 6, 72 + rng() * 6] : [38 + rng() * 24];
+  return h(
+    "div",
+    {
+      class: "bp-slip",
+      "data-stock": stock,
+      style: `--tilt:${tilt}deg;--ox:${at[0].toFixed(0)}%`,
+      ...mark,
+    },
+    ...at.map((x) =>
+      h("i", {
+        class: "bp-staple",
+        "aria-hidden": "true",
+        style: `left:${x.toFixed(0)}%;--st:${((rng() - 0.5) * 14).toFixed(1)}deg`,
+      }),
+    ),
+    ...kids,
   );
-  return out;
 }
+
+/** One role or course, on its slip. */
+function entrySlip(entry: SiteContent["resume"]["experience"]["roles"][number], stock: Stock, name: "resume.role" | "resume.education") {
+  return slip(
+    stock,
+    entry.id,
+    part(name, entry.id),
+    h("h3", { class: "bp-slip__title" }, entry.heading),
+    entry.dateLine ? h("p", { class: "bp-slip__date" }, entry.dateLine) : null,
+    entry.summary ? h("p", null, inline(entry.summary)) : null,
+    entry.bullets.length ? h("ul", null, ...entry.bullets.map((bullet) => h("li", null, inline(bullet)))) : null,
+  );
+}
+
+/** A heading written on the notebook page, above a run of slips. */
+const stapledHead = (title: string) => h("h2", { class: "bp-stapledhead" }, title);
 
 function resume(b: Build) {
-  const { header, html } = b.content.pages.resume;
-  const blocks: HTMLElement[] = [
-    h(
-      "header",
-      { class: "bp-typedhead" },
-      h1(header.title, part("page.title", "resume")),
-      header.intro ? h("p", { class: "bp-typedhead__intro", ...part("page.intro", "resume") }, header.intro) : null,
-      header.actions.length
-        ? h(
-            "p",
-            { class: "bp-typedhead__contact", ...part("page.actions", "resume") },
-            ...header.actions.flatMap((a, i) => [i ? "  ·  " : "", link(a.href, b.copy.newTab, a.label)]),
-          )
-        : null,
-    ),
-    ...typed(b.content),
-    ...prose(html, "page.body", "resume"),
-  ];
-  return written(b, "resume", "typed", blocks, firstPage(b), b.today);
+  const { content, copy } = b;
+  const { header, html } = content.pages.resume;
+  const { resume } = content;
+  const head = slip(
+    "letterhead",
+    "letterhead",
+    null,
+    h1(header.title, part("page.title", "resume")),
+    header.intro ? h("p", { class: "bp-slip__intro", ...part("page.intro", "resume") }, header.intro) : null,
+    header.actions.length
+      ? h(
+          "p",
+          { class: "bp-slip__contact", ...part("page.actions", "resume") },
+          ...header.actions.flatMap((a, i) => [i ? " · " : "", link(a.href, copy.newTab, a.label)]),
+        )
+      : null,
+  );
+  const blocks: HTMLElement[] = [head];
+  if (resume.experience.roles.length) {
+    blocks.push(stapledHead(resume.experience.title));
+    resume.experience.roles.forEach((role, i) => blocks.push(entrySlip(role, STOCKS[i % STOCKS.length], "resume.role")));
+  }
+  if (resume.education.entries.length) {
+    blocks.push(stapledHead(resume.education.title));
+    resume.education.entries.forEach((entry) => blocks.push(entrySlip(entry, "manila", "resume.education")));
+  }
+  if (resume.tools.items.length) {
+    blocks.push(
+      stapledHead(resume.tools.title),
+      slip(
+        "scrap",
+        "tools",
+        part("resume.tools"),
+        h("ul", { class: "bp-circled", "aria-label": resume.tools.title }, ...resume.tools.items.map((t) => h("li", null, t))),
+      ),
+    );
+  }
+  blocks.push(...studyNotes(html, "page.body", "resume"));
+  return written(b, "resume", "notes", blocks, resumeStart(b), b.today);
+}
+
+/** The resume's first page: the next after the notes, however many pages
+ * the notes run to at this size. */
+function resumeStart(b: Build) {
+  const notes = b.order.find((stop) => stop.key === "/about");
+  if (!notes) return firstPage(b);
+  const route: Route = { ...b.route, kind: "about", path: notes.href };
+  return notes.page + aboutPages({ ...b, route }).pages.length;
 }
 
 // ---- the lab: doodles in the margin ----------------------------------------------------
@@ -645,188 +753,6 @@ function labEntry(b: Build): HTMLElement[] | null {
     ...prose(item.html, "lab.body", item.slug),
   ];
   return written(b, "lab-entry", "squared", blocks, firstPage(b), null);
-}
-
-// ---- writing: essays in the same hand, fetched only when opened ---------------------
-
-function writing(b: Build) {
-  const { content } = b;
-  const { header, copy: words } = content.pages.writing;
-  const opening = h(
-    "header",
-    { class: "bp-entryhead" },
-    header.eyebrow
-      ? h(
-          "p",
-          { class: "bp-eyebrow", ...part("page.eyebrow", "writing") },
-          header.eyebrow,
-        )
-      : null,
-    withUnderline(
-      h1(header.title, part("page.title", "writing")),
-      RED,
-      "writing-title",
-    ),
-    header.intro
-      ? h(
-          "p",
-          { class: "bp-lead", ...part("page.intro", "writing") },
-          header.intro,
-        )
-      : null,
-    arrows(
-      b,
-      header.actions.map((action) => ({
-        label: action.label,
-        url: action.href,
-      })),
-      part("page.actions", "writing"),
-    ),
-  );
-  const list = h("ol", {
-    class: "bp-writing-list",
-    "aria-label": words.listLabel,
-  });
-  for (const post of content.writing.posts) {
-    list.append(
-      h(
-        "li",
-        null,
-        h(
-          "time",
-          {
-            class: "bp-writing-date",
-            datetime: post.date,
-            ...part("writing.meta", post.slug),
-          },
-          post.dateLabel,
-        ),
-        h(
-          "h2",
-          { class: "bp-h2", ...part("writing.title", post.slug) },
-          h("a", { href: post.href }, post.title),
-        ),
-        h(
-          "p",
-          {
-            class: "bp-writing-summary",
-            ...part("writing.summary", post.slug),
-          },
-          post.subtitle || post.description,
-        ),
-      ),
-    );
-  }
-  const status =
-    content.writing.status === "unavailable"
-      ? words.unavailableMessage
-      : content.writing.posts.length === 0
-        ? words.emptyMessage
-        : null;
-  const body = status
-    ? h("p", { class: "bp-note", role: "status" }, status)
-    : list;
-  return written(b, "writing", "squared", [opening, body], firstPage(b), null);
-}
-
-function writingEntry(b: Build) {
-  const { content, route } = b;
-  const { header, copy: words } = content.pages.writing;
-  // The runtime replaces this one entry for the requested route. Never use a
-  // previous essay's body, and never read the server page to fill in a gap.
-  const entry =
-    content.writing.entry?.slug === route.slug
-      ? content.writing.entry
-      : undefined;
-  const post =
-    entry ?? content.writing.posts.find((item) => item.slug === route.slug);
-  const ref = route.slug ?? "";
-  const available = !!entry && content.writing.entryStatus === "available";
-  const opening = h(
-    "header",
-    { class: "bp-entryhead bp-writing-head" },
-    header.eyebrow ? h("p", { class: "bp-eyebrow" }, header.eyebrow) : null,
-    withUnderline(
-      h1(
-        available ? entry!.title : header.title,
-        available ? part("writing.title", ref) : part("page.title", "writing"),
-      ),
-      RED,
-      `writing-${ref}`,
-      true,
-    ),
-    !available && post
-      ? h("h2", { class: "bp-h2", ...part("writing.title", ref) }, post.title)
-      : null,
-    post?.subtitle
-      ? h(
-          "p",
-          { class: "bp-lead", ...part("writing.subtitle", ref) },
-          post.subtitle,
-        )
-      : null,
-    post
-      ? h(
-          "p",
-          { class: "bp-writing-origin" },
-          h(
-            "time",
-            { datetime: post.date, ...part("writing.meta", ref) },
-            post.dateLabel,
-          ),
-          " · ",
-          markPart(
-            link(post.canonical, b.copy.newTab, words.originLabel),
-            "writing.links",
-            ref,
-          ),
-        )
-      : null,
-  );
-  const body = available
-    ? prose(entry!.html, "writing.body", ref)
-    : [
-        h(
-          "p",
-          { class: "bp-note", role: "status" },
-          content.writing.entryStatus === "missing"
-            ? words.entryMissingMessage
-            : words.entryUnavailableMessage,
-        ),
-      ];
-  const ending = h(
-    "aside",
-    { class: "bp-note bp-writing-end", ...part("writing.end", ref) },
-    h("h2", { class: "bp-h2" }, words.endHeading),
-    h("p", null, words.endBody),
-    arrows(
-      b,
-      [
-        {
-          label: words.subscribeLabel,
-          url: `${content.site.writingUrl}/subscribe`,
-        },
-        {
-          label: post ? words.originLabel : words.sourceLabel,
-          url: post?.canonical ?? content.site.writingUrl,
-        },
-      ],
-      part("writing.links", ref),
-    ),
-  );
-  const back = h(
-    "p",
-    { class: "bp-arrowlink", ...part("writing.links", ref) },
-    h("a", { href: "/writing" }, `← ${words.backLabel}`),
-  );
-  return written(
-    b,
-    "writing-entry",
-    "squared",
-    [opening, ...body, ending, back],
-    firstPage(b),
-    post?.dateLabel ?? null,
-  );
 }
 
 // ---- a project: its own page, the screenshot taped in -------------------------------
@@ -1049,7 +975,7 @@ function projects(b: Build) {
   const rosterHead = withUnderline(h("h2", { class: "bp-h2" }, words.roll), BLUE, "roll");
 
   // measure the page the map goes on: all of it
-  const probe = blankPage(copy, "projects", "squared", copy.page.back, null);
+  const probe = blankPage(copy, "projects", "squared", String(firstPage(b)), null);
   stage.append(probe.page);
   const w = probe.flow.clientWidth - parseFloat(getComputedStyle(probe.flow).paddingLeft);
   const room = probe.flow.clientHeight;
@@ -1057,8 +983,155 @@ function projects(b: Build) {
   const map = warMap(b, w, Math.max(320, room - 4), b.spread);
   map.dataset.bpBreak = "right";
   const blocks = [head, rosterHead, roster, map];
-  const pages = written(b, "projects", "squared", blocks, copy.page.back, words.date);
+  const pages = written(b, "projects", "squared", blocks, firstPage(b), words.date);
   return pages;
+}
+
+// ---- writings: the marbled composition book ---------------------------------------------
+
+/** The day a post went out, as the hand writes it ("24 Nov 2024"). */
+const postDay = (post: WritingPost) => post.date.slice(0, 10);
+
+/** The composition book's first pages: the essays written in it so far,
+ * each an entry as if in its contents. The year is written across the line
+ * where it turns; each essay's date is in the margin, its title in the hand
+ * with the page it starts on, its opening lines after, and the way out to
+ * where it was first published. Bodies load only when an essay is opened. */
+function writing(b: Build) {
+  const { content, copy } = b;
+  const { header, copy: words } = content.pages.writing;
+  const { posts, status } = content.writing;
+  const title = h1("", part("page.title", "writing"));
+  title.classList.add("bp-essaytitle");
+  title.append(header.title);
+  const blocks: HTMLElement[] = [
+    h(
+      "header",
+      { class: "bp-essayhead" },
+      header.eyebrow ? h("p", { class: "bp-ntab", ...part("page.eyebrow", "writing") }, header.eyebrow) : null,
+      withUnderline(title, RED, "writing-title", true),
+      header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "writing") }, header.intro) : null,
+    ),
+  ];
+  const note = status === "unavailable" ? words.unavailableMessage : posts.length ? null : words.emptyMessage;
+  if (note) {
+    blocks.push(h("p", { class: "bp-pencilled", role: "status" }, note));
+    return written(b, "writing", "ruled", blocks, firstPage(b), b.today, 1);
+  }
+  const list = h("ol", { class: "bp-essays", "aria-label": words.listLabel });
+  let year = "";
+  for (const post of posts) {
+    const day = postDay(post);
+    const turn = day.slice(0, 4) !== year;
+    year = day.slice(0, 4);
+    const starts = b.order.find((stop) => stop.key === post.href)?.page;
+    list.append(
+      h(
+        "li",
+        { class: "bp-essay", "data-year": turn ? year : null },
+        turn ? h("p", { class: "bp-essay__year" }, year) : null,
+        h(
+          "time",
+          { class: "bp-mnote", datetime: post.date, ...part("writing.meta", post.slug) },
+          shortDate(day, copy.months),
+        ),
+        h(
+          "h2",
+          { class: "bp-essay__title", ...part("writing.title", post.slug) },
+          h(
+            "a",
+            { href: post.href },
+            h("span", { class: "bp-essay__name" }, post.title),
+            starts ? h("span", { class: "bp-essay__no" }, h("span", { class: "bp-sr" }, `, ${copy.page.number} `), String(starts)) : null,
+          ),
+        ),
+        h(
+          "p",
+          { class: "bp-essay__opening" },
+          h("span", part("writing.summary", post.slug), post.subtitle || post.description),
+          link(post.canonical, copy.newTab, `${copy.writing.substack} ↗`),
+        ),
+      ),
+    );
+  }
+  blocks.push(list);
+  return written(b, "writing", "ruled", blocks, firstPage(b), b.today, b.spread ? 1 : 0);
+}
+
+/** The composition book's opening, on a wide desk: the inside of the cover,
+ * then the contents. */
+function writingBook(b: Build) {
+  const pages = writing(b);
+  return b.spread ? [compositionInsideCover(b), ...pages] : pages;
+}
+
+/** One essay, written out in the composition book: the date in the margin,
+ * the title as the essay's heading, ruled under twice, and where it was
+ * first published; then the essay, and a P.S. at its end. Only this route's
+ * own body is ever used, never another's, and never the server's page. */
+function essay(b: Build) {
+  const { content, route, copy } = b;
+  const { header, copy: words } = content.pages.writing;
+  const entry = content.writing.entry?.slug === route.slug ? content.writing.entry : undefined;
+  const post = entry ?? content.writing.posts.find((item) => item.slug === route.slug);
+  const ref = route.slug ?? "";
+  const available = !!entry && content.writing.entryStatus === "available";
+  const title = h1("", available ? part("writing.title", ref) : part("page.title", "writing"));
+  title.classList.add("bp-essaytitle");
+  title.append(available ? entry!.title : header.title);
+  const head = h(
+    "header",
+    { class: "bp-essayhead" },
+    post ? h("time", { class: "bp-mnote", datetime: post.date, "aria-hidden": "true" }, shortDate(postDay(post), copy.months)) : null,
+    withUnderline(title, RED, `essay-${ref}`, true),
+    !available && post ? h("h2", { class: "bp-essay__title", ...part("writing.title", ref) }, post.title) : null,
+    post?.subtitle ? h("p", { class: "bp-essay__sub", ...part("writing.subtitle", ref) }, post.subtitle) : null,
+    post
+      ? h(
+          "p",
+          { class: "bp-essay__origin" },
+          h("time", { datetime: post.date, ...part("writing.meta", ref) }, post.dateLabel),
+          " · ",
+          markPart(link(post.canonical, copy.newTab, `${words.originLabel} ↗`), "writing.links", ref),
+        )
+      : null,
+  );
+  const body = available
+    ? prose(entry!.html, "writing.body", ref)
+    : [
+        h(
+          "p",
+          { class: "bp-pencilled", role: "status" },
+          content.writing.entryStatus === "missing" ? words.entryMissingMessage : words.entryUnavailableMessage,
+        ),
+      ];
+  const ps = h(
+    "aside",
+    { class: "bp-ps", ...part("writing.end", ref) },
+    h("p", { class: "bp-ps__head" }, h("b", null, `${copy.writing.ps} `), words.endHeading),
+    h("p", null, words.endBody),
+    arrows(
+      b,
+      [
+        { label: `${words.subscribeLabel} ↗`, url: `${content.site.writingUrl}/subscribe` },
+        { label: `${post ? words.originLabel : words.sourceLabel} ↗`, url: post?.canonical ?? content.site.writingUrl },
+      ],
+      part("writing.links", ref),
+    ),
+  );
+  const back = h(
+    "p",
+    { class: "bp-arrowlink", ...part("writing.links", ref) },
+    h("a", { href: "/writing" }, `← ${words.backLabel}`),
+  );
+  return written(
+    b,
+    "essay",
+    "ruled",
+    [head, ...body, ps, back],
+    firstPage(b),
+    post ? handDate(postDay(post), copy.months) : null,
+  );
 }
 
 // ---- anything else: a loose sheet, tucked in ------------------------------------------
@@ -1101,10 +1174,10 @@ export function chapter(b: Build): Chapter {
       pages = labEntry(b);
       break;
     case "writing":
-      pages = writing(b);
+      pages = writingBook(b);
       break;
     case "writing-entry":
-      pages = writingEntry(b);
+      pages = essay(b);
       break;
     case "project":
       pages = project(b);
@@ -1113,8 +1186,9 @@ export function chapter(b: Build): Chapter {
       pages = projects(b);
       break;
   }
-  if (!pages) return { key: route.path, rank, label, pages: [], loose: loose(b) };
-  return { key: route.path, rank, label, pages: evenUp(b.copy, pages, b.spread, route.path) };
+  const book = bookOf(route) ?? "home";
+  if (!pages) return { key: route.path, book, rank, label, pages: [], loose: loose(b) };
+  return { key: route.path, book, rank, label, pages: evenUp(b.copy, pages, b.spread, route.path) };
 }
 
 export const today = (copy: Copy) => handDate(new Date(), copy.months);

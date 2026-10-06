@@ -32,7 +32,21 @@ export function append(el: Element, kids: (Kid | Kid[])[]) {
 export function svg(markup: string): SVGSVGElement {
   const t = document.createElement("template");
   t.innerHTML = markup.trim();
-  return t.content.firstElementChild as SVGSVGElement;
+  const root = t.content.firstElementChild as SVGSVGElement;
+  paint(root);
+  for (const el of root.querySelectorAll("[fill^='var('], [stroke^='var(']")) paint(el);
+  return root;
+}
+
+/** Ink that names a theme variable can't be an SVG attribute: make it a style. */
+export function paint(el: Element) {
+  for (const key of ["fill", "stroke"]) {
+    const v = el.getAttribute(key);
+    if (v?.startsWith("var(")) {
+      (el as SVGElement).style.setProperty(key, v);
+      el.removeAttribute(key);
+    }
+  }
 }
 
 export const isExternal = (href: string) => /^(https?:|mailto:)/.test(href);

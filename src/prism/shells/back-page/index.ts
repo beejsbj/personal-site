@@ -1,8 +1,11 @@
-/** Back Page: the portfolio is an exercise book lying open on a desk under a
- * lamp, written in blue and red biro. The book has one order, like any book;
- * every URL is a place in it. Following a link turns the pages there (a
- * flurry of leaves when it's far), the sticky tabs on the edge jump between
- * sections, and the corners, the arrow keys or a swipe turn one page. */
+/** Back Page: the portfolio is a pile of exercise books on a desk under a
+ * lamp, one for each section, each on its own paper (a squared maths copy, a
+ * feint-ruled notebook, a graph book and blueprint from Dotfight, and a
+ * marbled composition book for the essays) and written in that paper's pens. Every URL is a place in one of them.
+ * Within a book, following a link turns the pages there (a flurry of leaves
+ * when it's far), and the corners, the arrow keys or a swipe turn one page.
+ * Going to another section shuts the open book, puts it back on the pile,
+ * takes the other one off and opens it. */
 import { navigate } from "astro:transitions/client";
 import { fill } from "../rich";
 import type { LensShell, Route, ShellContext } from "../types";
@@ -20,18 +23,14 @@ import {
 } from "./chapters";
 import { h } from "./dom";
 import { mountMicro } from "./micro";
+import { mountSoldiers } from "./soldiers";
+import { BOOKS, shelfOf, type BookKey } from "./themes";
 import "./shell.css";
+import "./themes.css";
+import "./books.css";
+import "./composition.css";
 import "./micro.css";
-
-/** The sticky tabs on the book's edge, each a section's first page. */
-const TABS = [
-  ["/", "home"],
-  ["/about", "about"],
-  ["/resume", "resume"],
-  ["/lab", "lab"],
-  ["/writing", "writing"],
-  ["/projects", "projects"],
-] as const;
+import "./soldiers.css";
 
 async function fontsReady() {
   const wanted = [
@@ -39,6 +38,7 @@ async function fontsReady() {
     '700 20px "Caveat"',
     '400 20px "Caveat"',
     '400 16px "Special Elite"',
+    '400 20px "Caveat Brush"',
   ];
   await Promise.race([
     Promise.all(wanted.map((f) => document.fonts.load(f))).catch(() => {}),
@@ -63,6 +63,8 @@ class App {
   queue: Promise<unknown> = Promise.resolve();
   landAtEnd = false;
   busy = false;
+  /** The book lying open. */
+  bookKey: BookKey = "home";
 
   constructor(private ctx: ShellContext) {
     this.root = ctx.root;
@@ -83,9 +85,10 @@ class App {
       h("div", { class: "bp-pen bp-pen--red", "aria-hidden": "true" }),
     );
     this.root.replaceChildren(this.desk);
-    this.book = new Book(this.desk, ctx.reducedMotion, this.copy.tabs.label);
+    this.book = new Book(this.desk, ctx.reducedMotion, this.copy.books.label);
     this.desk.append(this.live);
     mountMicro(ctx, this.book, this.desk);
+    mountSoldiers(ctx, this.book, this.desk);
   }
 
   build(route: Route): Chapter {
@@ -122,7 +125,7 @@ class App {
       this.pagedRoute = this.route;
     }
     this.view = 0;
-    this.renderTabs();
+    this.setBook(this.paged.book);
     const pages = this.pagesAt(this.paged, 0);
     if (this.sheet) this.book.setLoose(this.sheet.loose!, false);
     this.book.setDepth(this.depth());
@@ -160,8 +163,23 @@ class App {
     return this.sheet ?? this.paged;
   }
 
+  /** The open chapter, written again (a new window size). */
+  rebuild() {
+    return this.build(this.pagedRoute);
+  }
+
+  /** How far through the open book: the stops before this one, and the view. */
   depth() {
-    return Math.max(0, Math.min(1, this.current().rank / (this.order.length - 1)));
+    const stops = this.order.filter((s) => s.book === this.bookKey);
+    const at = Math.max(0, stops.findIndex((s) => s.key === this.paged.key));
+    const views = this.views(this.paged) || 1;
+    return Math.max(0, Math.min(1, (at + this.view / views + 0.5) / Math.max(1, stops.length)));
+  }
+
+  setBook(key: BookKey) {
+    this.bookKey = key;
+    this.desk.dataset.theme = shelfOf(key).theme;
+    this.renderShelf();
   }
 
   // ---- routes -------------------------------------------------------------------
@@ -175,16 +193,19 @@ class App {
 
   async goNow(route: Route) {
     // A writing refresh may add metadata stops while the book stays mounted.
-    // Rebuild the order from the live index; the article bodies are not needed.
     this.order = bookOrder(this.ctx.content, this.copy);
     this.paged.rank = rankOf(this.pagedRoute, this.order);
     if (this.sheet) this.sheet.rank = rankOf(this.route, this.order);
     const was = this.current();
+    // the runtime may hand us the page we're already on: nothing to turn
+    if (route.path === this.route.path && !route.refresh) {
+      this.route = route;
+      return;
+    }
     this.route = route;
     const ch = this.build(route);
     const land = this.landAtEnd;
     this.landAtEnd = false;
-    this.renderTabs();
 
     if (ch.loose) {
       this.sheet = ch;
@@ -197,7 +218,18 @@ class App {
       this.sheet = null;
       this.book.setLoose(null, true);
     }
-    const view = land ? this.views(ch) - 1 : 0;
+    let view = land ? this.views(ch) - 1 : 0;
+    if (ch.book !== this.bookKey) {
+      // on a phone the book opens by swinging its own cover away, so Hello's
+      // printed cover (its first page there) is skipped rather than shown twice
+      if (!view && !this.book.geo.spread && ch.pages.length > 1 && ch.pages[0].dataset.kind === "cover") view = 1;
+      await this.swap(ch, view);
+      this.paged = ch;
+      this.pagedRoute = route;
+      this.view = view;
+      this.settle();
+      return;
+    }
     if (ch.key === this.paged.key) {
       this.paged = ch;
       this.pagedRoute = route;
@@ -221,6 +253,28 @@ class App {
     this.pagedRoute = route;
     this.view = view;
     this.settle();
+  }
+
+  /** To another book: shut this one, put it back on the pile, take the other
+   * off it, and open it at `view`. */
+  async swap(ch: Chapter, view: number) {
+    const spot = (key: BookKey) =>
+      this.book.shelf.querySelector(`[data-book="${key}"] .bp-shelf__book`)?.getBoundingClientRect() ??
+      new DOMRect(innerWidth - 60, 40, 40, 56);
+    this.busy = true;
+    this.showOnShelf(ch.book);
+    try {
+      const leaving = this.bookKey;
+      await this.book.close(coverPage(this.buildFor(this.route), false, leaving));
+      await this.book.stow(spot(leaving));
+      this.setBook(ch.book);
+      this.book.setDepth(0);
+      const cover = coverPage(this.buildFor(this.route), false, ch.book);
+      await this.book.open(this.pagesAt(ch, view), cover, spot(ch.book));
+    } finally {
+      this.busy = false;
+      this.book.el.style.opacity = "";
+    }
   }
 
   /** After a route change: corners, depth, focus, and say where we are. */
@@ -260,7 +314,11 @@ class App {
     const rank = this.current().rank;
     if (step > 0) {
       const next = this.order.find((_, i) => i > rank);
-      return next ?? { key: "/", href: "/", label: this.copy.chapters.close, no: "", page: null };
+      return next ?? { key: "/", href: "/", label: this.copy.chapters.close, book: "home", page: 1 };
+    }
+    // On the Writing contents page, go back to home shelf instead of previous project
+    if (this.route.kind === "writing" && this.route.slug === undefined) {
+      return { key: "/", href: "/", label: this.copy.chapters.home, book: "home", page: 1 };
     }
     for (let i = this.order.length - 1; i >= 0; i--)
       if (i < rank) return this.order[i];
@@ -294,42 +352,55 @@ class App {
       this.busy = false;
     }
     this.view = target;
+    this.book.setDepth(this.depth());
     this.renderCorners();
     this.announce();
   }
 
   // ---- chrome: tabs and corners ------------------------------------------------
 
-  renderTabs() {
-    const path = this.route.path;
-    const near =
-      this.route.kind === "project"
-        ? "/projects"
-        : this.route.kind === "lab-entry"
-          ? "/lab"
-          : this.route.kind === "writing-entry"
-            ? "/writing"
-            : null;
+  /** On a phone the row of books scrolls: bring a book into view. */
+  showOnShelf(key: BookKey) {
+    const shelf = this.book.shelf;
+    const li = shelf.querySelector<HTMLElement>(`[data-book="${key}"]`);
+    if (!li || shelf.scrollWidth <= shelf.clientWidth + 1) return;
+    shelf.scrollLeft = Math.max(0, li.offsetLeft - (shelf.clientWidth - li.offsetWidth) / 2);
+  }
+
+  /** The books lying on the desk: the open one's place is empty. */
+  renderShelf() {
     const list = h("ul");
-    TABS.forEach(([href, key], i) => {
+    const words = this.copy.books;
+    BOOKS.forEach((b, i) => {
+      const open = b.key === this.bookKey;
+      const book = words[b.key];
       list.append(
         h(
           "li",
-          { style: `--i:${i}`, "data-tab": String(i) },
+          { style: `--i:${i}`, "data-book": b.key, "data-theme": b.theme },
           h(
             "a",
             {
-              href,
-              "aria-current": path === href ? "page" : null,
-              "data-state": path === href ? "current" : near === href ? "near" : null,
+              href: b.href,
+              class: "bp-shelf__book",
+              "aria-current": open ? "true" : null,
+              "aria-label": open ? `${book.name} ${words.openOnDesk}` : book.name,
+              "data-state": open ? "open" : null,
+              "data-open": words.open,
             },
-            this.copy.tabs[key],
+            h("span", { class: "bp-shelf__paper", "aria-hidden": "true" }),
+            h(
+              "span",
+              { class: "bp-shelf__label" },
+              h("b", null, book.name),
+              h("small", null, book.aside),
+              open ? h("span", { class: "bp-sr" }, words.openOnDesk) : null,
+            ),
           ),
         ),
       );
     });
-    this.book.tabs.style.setProperty("--tabs", String(TABS.length));
-    this.book.tabs.replaceChildren(list);
+    this.book.shelf.replaceChildren(list);
   }
 
   renderCorners() {
@@ -381,7 +452,7 @@ class App {
         if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
         const target = event.target as HTMLElement | null;
         if (target?.closest("input, textarea, select, [contenteditable], video")) return;
-        const menu = target?.closest<HTMLElement>(".bp-tabs, .bp-contents");
+        const menu = target?.closest<HTMLElement>(".bp-shelf");
         const arrows = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
         if (menu && arrows.includes(event.key)) {
           const links = [...menu.querySelectorAll<HTMLElement>("a")];
@@ -455,6 +526,7 @@ class App {
           this.busy = false;
           if (commit) {
             this.view += step;
+            this.book.setDepth(this.depth());
             this.renderCorners();
             this.announce();
           }
@@ -488,11 +560,11 @@ class App {
     const firstPage = before.spread ? this.view * 2 : this.view;
     this.book.layout(geo);
     if (sameShape(before, geo)) return;
-    this.paged = this.build(this.pagedRoute);
+    this.paged = this.rebuild();
     const page = Math.min(firstPage, this.paged.pages.length - 1);
     this.view = geo.spread ? Math.floor(page / 2) : page;
     this.book.place(this.pagesAt(this.paged, this.view));
-    this.renderTabs();
+    this.renderShelf();
     this.settle(false);
   }
 }

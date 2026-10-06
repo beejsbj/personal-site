@@ -65,7 +65,8 @@ export class Book {
   slots: HTMLElement[] = [];
   leaves: HTMLElement;
   corners: HTMLElement;
-  tabs: HTMLElement;
+  /** The other books, lying on the desk beside this one. */
+  shelf: HTMLElement;
   stage: HTMLElement;
   loose: HTMLElement | null = null;
   geo!: Geometry;
@@ -74,15 +75,17 @@ export class Book {
   /** Told when a page lands open for the first time (after a turn, or as the
    * book arrives), so the hand can write its heading in. */
   land?: (page: HTMLElement, delay: number) => void;
+  /** Told whenever pages lie open (the soldiers camp on them once they're still). */
+  placed?: (pages: HTMLElement[]) => void;
   private landDelay = 0;
 
   constructor(
     private host: HTMLElement,
     private still: boolean,
-    tabsLabel: string,
+    shelfLabel: string,
   ) {
     this.el = h("div", { class: "bp-book" });
-    this.tabs = h("nav", { class: "bp-tabs", "aria-label": tabsLabel });
+    this.shelf = h("nav", { class: "bp-shelf", "aria-label": shelfLabel });
     this.main = h("main", { class: "bp-spread", id: "bp-main", tabindex: "-1" });
     this.leaves = h("div", { class: "bp-leaves", "aria-hidden": "true" });
     this.corners = h("div", { class: "bp-corners" });
@@ -90,12 +93,11 @@ export class Book {
     this.el.append(
       h("div", { class: "bp-board", "aria-hidden": "true" }),
       h("div", { class: "bp-edges", "aria-hidden": "true" }),
-      this.tabs,
       this.main,
       this.leaves,
       this.corners,
     );
-    host.append(this.el, this.stage);
+    host.append(this.shelf, this.el, this.stage);
   }
 
   /** Size the book for the window. */
@@ -109,6 +111,7 @@ export class Book {
     s.left = `${geo.x}px`;
     s.top = `${geo.y}px`;
     this.el.dataset.mode = geo.spread ? "spread" : "single";
+    this.host.dataset.mode = this.el.dataset.mode;
     // the desk knows where the book lies, so the pens can lie beside it
     const d = this.host.style;
     d.setProperty("--bx", `${geo.x}px`);
@@ -156,6 +159,7 @@ export class Book {
       delete page.dataset.fresh;
       this.land?.(page, this.landDelay);
     }
+    this.placed?.(pages);
   }
 
   /** Pages about to be turned to: their ink stays off the paper until they
@@ -356,12 +360,17 @@ export class Book {
     };
   }
 
-  /** The book arrives on the desk; on a wide desk, closed, then opened. */
-  async open(pages: HTMLElement[], cover: HTMLElement | null) {
+  /** The book arrives on the desk; on a wide desk, closed, then opened. Taken
+   * off the shelf (`from`, the book's place there), it comes from there, and
+   * opens on a phone too. */
+  async open(pages: HTMLElement[], cover: HTMLElement | null, from?: DOMRect) {
+    this.el.style.opacity = "";
     if (this.still) {
       this.place(pages);
+      if (from) await this.el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220 }).finished.catch(() => {});
       return;
     }
+    if (cover && from && !this.geo.spread) return this.openSingle(pages, cover, from);
     if (!cover || !this.geo.spread) {
       this.fresh(pages);
       this.landDelay = 420;
@@ -387,27 +396,34 @@ export class Book {
     leaf.classList.add("bp-leaf--cover");
     const shift = `translateX(${-this.geo.pw / 2}px)`;
     const arrive = this.el.animate(
-      [
-        { transform: `${shift} translateY(40px) rotate(-3deg)`, opacity: 0 },
-        { transform: `${shift}`, opacity: 1 },
-      ],
-      { duration: 600, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" },
+      from
+        ? [
+            { transform: this.toward(from), opacity: 0, offset: 0 },
+            { opacity: 1, offset: 0.25 },
+            { transform: shift, opacity: 1 },
+          ]
+        : [
+            { transform: `${shift} translateY(40px) rotate(-3deg)`, opacity: 0 },
+            { transform: `${shift}`, opacity: 1 },
+          ],
+      { duration: from ? 460 : 600, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" },
     );
     await arrive.finished.catch(() => {});
-    await new Promise((r) => setTimeout(r, 380));
+    await new Promise((r) => setTimeout(r, from ? 70 : 380));
     delete this.el.dataset.closed;
+    const swingMs = from ? 760 : 1000;
     const slide = this.el.animate([{ transform: shift }, { transform: "none" }], {
-      duration: 1000,
+      duration: swingMs,
       easing: EASE,
       fill: "both",
     });
     const swing = leaf.animate(
       [{ transform: "rotateY(0deg)" }, { transform: "rotateY(-180deg)" }],
-      { duration: 1000, easing: EASE, fill: "both" },
+      { duration: swingMs, easing: EASE, fill: "both" },
     );
     const shades = leaf.querySelectorAll<HTMLElement>(".bp-leaf__shade");
-    shades[0].animate([{ opacity: 0 }, { opacity: 0.55, offset: 0.5 }, { opacity: 0.55 }], { duration: 1000, easing: EASE, fill: "both" });
-    shades[1].animate([{ opacity: 0.6 }, { opacity: 0.6, offset: 0.5 }, { opacity: 0 }], { duration: 1000, easing: EASE, fill: "both" });
+    shades[0].animate([{ opacity: 0 }, { opacity: 0.55, offset: 0.5 }, { opacity: 0.55 }], { duration: swingMs, easing: EASE, fill: "both" });
+    shades[1].animate([{ opacity: 0.6 }, { opacity: 0.6, offset: 0.5 }, { opacity: 0 }], { duration: swingMs, easing: EASE, fill: "both" });
     await Promise.all([slide.finished, swing.finished]).catch(() => {});
     leaf.remove();
     arrive.cancel();
@@ -415,9 +431,120 @@ export class Book {
     this.place(pages);
     this.corners.dataset.state = "";
   }
+
+  /** The transform that puts the closed book (its cover) over `rect`, a
+   * book lying on the shelf: the cover's centre on the rect's, at its size. */
+  private toward(rect: DOMRect) {
+    const { pw, ph, x, y, spread } = this.geo;
+    // the closed book's cover sits on the transform origin (the book's centre
+    // once a spread is shifted half a page left, or a single page's centre)
+    const ox = spread ? x + pw : x + pw / 2;
+    const oy = y + ph / 2;
+    const tx = rect.left + rect.width / 2 - ox;
+    const ty = rect.top + rect.height / 2 - oy;
+    const s = Math.max(0.05, rect.width / pw);
+    const shift = spread ? ` translateX(${-pw / 2}px)` : "";
+    return `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${s.toFixed(4)}) rotate(${spread ? 4 : 2}deg)${shift}`;
+  }
+
+  /** Shut the book: on a wide desk the left-hand pages and the cover swing
+   * over onto the right; on a phone the cover swings back over the page.
+   * It's left lying closed, its cover up. */
+  async close(cover: HTMLElement) {
+    this.corners.dataset.state = "turning";
+    this.corners.replaceChildren();
+    if (this.still) {
+      this.slots.forEach((slot) => slot.replaceChildren());
+      this.showing = [];
+      this.corners.dataset.state = "";
+      return;
+    }
+    const spread = this.geo.spread;
+    const ms = spread ? 540 : 460;
+    const timing: KeyframeAnimationOptions = { duration: ms, easing: EASE, fill: "both" };
+    let leaf: HTMLElement;
+    let slide: Animation | null = null;
+    if (spread) {
+      const [left] = this.showing;
+      this.slots[0].replaceChildren();
+      leaf = this.leaf(cover, left ?? null);
+      leaf.classList.add("bp-leaf--cover");
+      leaf.animate([{ transform: "rotateY(-180deg)" }, { transform: "rotateY(0deg)" }], timing);
+      const [f, b] = leaf.querySelectorAll<HTMLElement>(".bp-leaf__shade");
+      f.animate([{ opacity: 0.55 }, { opacity: 0.55, offset: 0.5 }, { opacity: 0 }], timing);
+      b.animate([{ opacity: 0 }, { opacity: 0.55, offset: 0.5 }, { opacity: 0.55 }], timing);
+      slide = this.el.animate([{ transform: "none" }, { transform: `translateX(${-this.geo.pw / 2}px)` }], timing);
+    } else {
+      leaf = this.leaf(cover, null);
+      leaf.classList.add("bp-leaf--cover");
+      leaf.animate([{ transform: "rotateY(-178deg)" }, { transform: "rotateY(0deg)" }], timing);
+    }
+    await Promise.all(leaf.getAnimations().map((a) => a.finished)).catch(() => {});
+    // lying closed: the cover in the right-hand slot, the board under it only
+    this.el.dataset.closed = spread ? "" : "single";
+    this.slots[spread ? 1 : 0].replaceChildren(cover);
+    if (spread) this.slots[0].replaceChildren();
+    this.showing = [];
+    leaf.remove();
+    if (slide) {
+      this.el.style.transform = `translateX(${-this.geo.pw / 2}px)`;
+      slide.cancel();
+    }
+  }
+
+  /** The closed book goes back on the shelf, to `rect`, and out of sight. */
+  async stow(rect: DOMRect) {
+    if (this.still) return;
+    const from = this.el.style.transform || "none";
+    const a = this.el.animate(
+      [
+        { transform: from, opacity: 1 },
+        { opacity: 1, offset: 0.7 },
+        { transform: this.toward(rect), opacity: 0 },
+      ],
+      { duration: 400, easing: "cubic-bezier(.45,.05,.55,.95)", fill: "forwards" },
+    );
+    await a.finished.catch(() => {});
+    this.el.style.opacity = "0";
+    this.el.style.transform = "";
+    a.cancel();
+    delete this.el.dataset.closed;
+    this.slots.forEach((slot) => slot.replaceChildren());
+  }
+
+  /** On a phone: the book comes off the shelf closed, and its cover swings open. */
+  private async openSingle(pages: HTMLElement[], cover: HTMLElement, from: DOMRect) {
+    this.fresh(pages);
+    this.corners.dataset.state = "turning";
+    this.slots[0].replaceChildren(pages[0] ?? "");
+    this.markSides();
+    const leaf = this.leaf(cover, null);
+    leaf.classList.add("bp-leaf--cover");
+    this.el.style.opacity = "";
+    const arrive = this.el.animate(
+      [
+        { transform: this.toward(from), opacity: 0, offset: 0 },
+        { opacity: 1, offset: 0.25 },
+        { transform: "none", opacity: 1 },
+      ],
+      { duration: 480, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" },
+    );
+    await arrive.finished.catch(() => {});
+    await new Promise((r) => setTimeout(r, 120));
+    const swing = leaf.animate([{ transform: "rotateY(0deg)" }, { transform: "rotateY(-178deg)" }], {
+      duration: 640,
+      easing: EASE,
+      fill: "both",
+    });
+    await swing.finished.catch(() => {});
+    leaf.remove();
+    arrive.cancel();
+    this.place(pages);
+    this.corners.dataset.state = "";
+  }
 }
 
-/** The back of a leaf on a phone: squares, and the ink of the other side
+/** The back of a leaf on a phone: the paper, and the ink of the other side
  * showing through. */
 function backOfPage() {
   return h("div", { class: "bp-page", "data-paper": "squared", "data-kind": "back" });

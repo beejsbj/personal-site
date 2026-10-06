@@ -322,17 +322,17 @@ export const GAPS: Partial<
   "back-page": {
     home: {
       "home.elsewhere":
-        "The book has no Elsewhere page: the lab and Writing are lines in the contents slip on the inside cover.",
+        "The books have no Elsewhere page: the lab is a book of its own on the pile, and so is Writings, the marbled composition book the essays are written in.",
     },
     projects: {
       "project.summary":
-        "The back page is a roll call of names and dates and the war map; each project's summary is on its own page.",
+        "The war book's first pages are a roll call of names and dates and the war map; each project's summary is on its own page.",
     },
     lab: {
       "lab.more":
         "The lab chapter is the doodles only; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
-        "The lab chapter is the doodles only; Projects is in the contents and the style guide is not in the book.",
+        "The lab chapter is the doodles only; Projects is a book of its own on the pile, and the style guide is not in any book.",
     },
   },
   hion: {},
