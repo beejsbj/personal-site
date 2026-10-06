@@ -23,20 +23,23 @@ export function ruler(env: Env, range: Range, corner: Node | string, monthLabels
   const lane = h(
     "div",
     { class: "cp-ruler__lane", role: "presentation", title: copy.tracks.ruler },
-    years.map((y) =>
-      h(
+    years.map((y) => {
+      const yearStart = Math.max(y, range.from);
+      const yearEnd = Math.min(y + 1, range.to);
+      const yearRange: Range = { from: yearStart, to: yearEnd };
+      return h(
         "span",
-        { class: "cp-ruler__year", style: span(Math.max(y, range.from), y + 1, range) + `; --months:${Math.round((Math.min(y + 1, range.to) - Math.max(y, range.from)) * 12)}` },
+        { class: "cp-ruler__year", style: span(yearStart, y + 1, range) + `; --months:${Math.round((yearEnd - yearStart) * 12)}` },
         y >= range.from ? h("b", null, String(y)) : null,
         monthLabels
           ? Array.from({ length: 12 }, (_, m) =>
               y + m / 12 >= range.from - 1e-6 && y + m / 12 < range.to
-                ? h("i", { class: "cp-ruler__month", style: `--at:${place(y + m / 12, range)}` }, ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][m])
+                ? h("i", { class: "cp-ruler__month", style: `--at:${place(y + m / 12, yearRange)}` }, ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][m])
                 : null,
             )
           : null,
-      ),
-    ),
+      );
+    }),
   );
   if (!env.face) {
     const seekAt = (event: PointerEvent) => {

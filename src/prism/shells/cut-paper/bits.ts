@@ -146,7 +146,9 @@ export function auditionClip(env: Env, clip: Clip, el: HTMLElement) {
   el.removeAttribute("data-hearing");
   void el.offsetWidth;
   el.setAttribute("data-hearing", "");
-  window.setTimeout(() => el.removeAttribute("data-hearing"), seconds * 1000 + 80);
+  // Tie timeout to env.signal so route teardown clears it (same as lab-pad hover)
+  const timer = window.setTimeout(() => el.removeAttribute("data-hearing"), seconds * 1000 + 80);
+  env.signal.addEventListener("abort", () => window.clearTimeout(timer), { once: true });
 }
 
 export function hearButton(env: Env, clip: Clip, name: string, target: HTMLElement) {

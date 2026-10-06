@@ -2668,6 +2668,487 @@
   margin: 26px 0;
 }
 
+/* ── writing: the Send ─────────────────────────────────────── */
+
+/* the send lane: the session's ruler and a flag per post at its date */
+:root[data-lens="cut-paper"] .cp-arr--sends {
+  --head: 196px;
+  margin: 14px 0 34px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row--sends {
+  border-bottom: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row--sends .cp-arr__name {
+  color: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-lane--sends {
+  min-height: 52px;
+}
+
+:root[data-lens="cut-paper"] .cp-send {
+  position: absolute;
+  top: calc(8px + var(--row) * 12px);
+  left: calc(var(--at) * 100%);
+  width: 18px;
+  height: 22px;
+  margin-left: -1px;
+  pointer-events: auto;
+}
+
+/* a paper dart on a stem: sent, at this date */
+:root[data-lens="cut-paper"] .cp-send__pin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 12px;
+  border-left: 2px solid var(--cp-ivory-3);
+  background: var(--cp-ivory-3);
+  clip-path: polygon(0 0, 100% 50%, 0 100%, 30% 50%);
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), transform var(--cp-dur-tap) var(--cp-ease-stab);
+}
+
+:root[data-lens="cut-paper"] .cp-send::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: -30px;
+  left: 0;
+  border-left: 2px solid var(--cp-ivory-4);
+}
+
+:root[data-lens="cut-paper"] .cp-send:hover .cp-send__pin,
+:root[data-lens="cut-paper"] .cp-send[data-live] .cp-send__pin {
+  background: var(--note);
+  transform: translateX(3px);
+}
+
+:root[data-lens="cut-paper"] .cp-send[data-live]::after {
+  border-color: var(--cp-brass-hi);
+}
+
+/* the bounces: a wall of bone sheets, one per post */
+:root[data-lens="cut-paper"] .cp-bounces__label small {
+  letter-spacing: 0.08em;
+}
+
+:root[data-lens="cut-paper"] .cp-bounces {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px 26px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 24px 20px 30px;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  clip-path: polygon(0 0, 100% 1%, 99% 93%, 93% 100%, 81% 95%, 68% 100%, 55% 94%, 42% 100%, 29% 95%, 16% 100%, 4% 95%, 0 100%);
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 360ms var(--cp-ease-swing), background var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce:hover,
+:root[data-lens="cut-paper"] .cp-bounce:focus-within {
+  transform: rotate(0deg) translateY(-3px);
+}
+
+/* the playhead on its date: the sheet straightens and lights */
+:root[data-lens="cut-paper"] .cp-bounce[data-live] {
+  background: var(--cp-ivory);
+  transform: rotate(0deg) translateY(-6px);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__tape {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 74px;
+  height: 14px;
+  background: color-mix(in srgb, var(--note) 78%, transparent);
+  transform: translateX(-50%) rotate(-2deg);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce[data-live] .cp-bounce__tape {
+  background: var(--cp-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 0;
+  color: rgba(10, 9, 8, 0.7);
+  font: 600 10.5px/1.2 var(--cp-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__no {
+  padding: 3px 6px 2px;
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+  font: 400 14px/1 var(--cp-display);
+  letter-spacing: 0.1em;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__chord {
+  margin-left: auto;
+}
+
+/* the motif strip: a button that plays the bounce */
+:root[data-lens="cut-paper"] .cp-bounce__hit {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 58px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 4px;
+  background: var(--cp-ink);
+  cursor: pointer;
+  transition: transform var(--cp-dur-tap) var(--cp-ease-stab), filter var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit .cp-roll {
+  top: 10px;
+  right: 5%;
+  bottom: 10px;
+  left: 5%;
+  width: 90%;
+  height: calc(100% - 20px);
+  fill: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit:hover {
+  filter: brightness(1.25);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit:active,
+:root[data-lens="cut-paper"] .cp-bounce__hit[data-hearing] {
+  transform: scale(0.98);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit:disabled {
+  cursor: default;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit--big {
+  height: 132px;
+  border-radius: 8px;
+  background: var(--note);
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.25);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit--big .cp-roll {
+  top: 22px;
+  bottom: 26px;
+  height: calc(100% - 48px);
+  fill: rgba(10, 9, 8, 0.7);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit--big .cp-clip__run {
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-bounces .cp-bounce__title {
+  margin: 4px 0 0;
+  color: var(--cp-ink);
+  font: 400 32px/0.95 var(--cp-display);
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* the whole sheet opens the post; the strip stays its own button */
+:root[data-lens="cut-paper"] .cp-bounce__title a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__title a:hover,
+:root[data-lens="cut-paper"] .cp-bounce__title a:focus-visible {
+  text-decoration: underline;
+  text-decoration-color: var(--note);
+  text-decoration-thickness: 4px;
+  text-underline-offset: 4px;
+  outline: none;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce:has(.cp-bounce__title a:focus-visible) {
+  outline: 3px solid var(--note);
+  outline-offset: -3px;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__sum {
+  margin: 0;
+  color: #3a352f;
+  font: 400 13px/1.6 var(--cp-mono);
+}
+
+/* a slip of bone for the quiet states: unavailable, empty, missing */
+:root[data-lens="cut-paper"] .cp-slip {
+  position: relative;
+  max-width: 560px;
+  margin-top: 8px;
+  padding: 30px 24px 28px;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  clip-path: polygon(0 0, 100% 1%, 99% 92%, 94% 100%, 83% 95%, 70% 100%, 57% 94%, 44% 100%, 30% 95%, 16% 100%, 4% 95%, 0 100%);
+  transform: rotate(-1deg);
+}
+
+:root[data-lens="cut-paper"] .cp-slip__tape {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 70px;
+  height: 14px;
+  background: color-mix(in srgb, var(--note) 78%, transparent);
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-slip .cp-slip__tag {
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-slip__msg {
+  margin: 14px 0 0;
+  font: 400 14px/1.6 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-slip__go {
+  margin: 16px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-btn--ink {
+  box-shadow: inset 0 0 0 1.5px var(--cp-ink);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-btn--ink:hover {
+  background: rgba(10, 9, 8, 0.08);
+}
+
+:root[data-lens="cut-paper"] .cp-slip :focus-visible {
+  outline-color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-sends__missing {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+}
+
+/* the sheet takes the column's width, however wide its code runs */
+:root[data-lens="cut-paper"] .cp-liner__view .cp-clipview__main {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* a post: the bounce beside its liner notes, and in view while they
+   scroll by */
+@media (min-width: 981px) {
+  :root[data-lens="cut-paper"] .cp-liner__view {
+    grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-liner__side {
+    position: sticky;
+    top: var(--cp-pad);
+  }
+}
+
+:root[data-lens="cut-paper"] .cp-liner__bounce {
+  display: grid;
+  gap: 8px;
+  border-radius: 9px;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__bounce .cp-bounce__meta {
+  color: var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-liner__bounce .cp-bounce__no {
+  background: var(--note);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-liner__bounce[data-live] {
+  outline: 2px solid var(--cp-brass);
+  outline-offset: 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__side .cp-buttons {
+  margin: 10px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__back {
+  margin: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__back .cp-back {
+  margin-top: 6px;
+}
+
+:root[data-lens="cut-paper"] .cp-liner {
+  position: relative;
+  max-width: 860px;
+  padding: 46px 56px 48px;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  /* torn across the top in pixels, so a long post tears like a short one */
+  clip-path: polygon(0 12px, 5% 3px, 13% 10px, 24% 1px, 36% 9px, 49% 2px, 61% 11px, 74% 2px, 86% 9px, 95% 0, 100% 7px, 100% 100%, 0 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-liner__tape {
+  position: absolute;
+  top: 18px;
+  left: 42px;
+  width: 92px;
+  height: 18px;
+  background: color-mix(in srgb, var(--note) 78%, transparent);
+  transform: rotate(-4deg);
+}
+
+:root[data-lens="cut-paper"] .cp-liner__scrap {
+  top: 22px;
+  right: 26px;
+  width: 38px;
+  height: 38px;
+  --tilt: 14deg;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin: 18px 52px 30px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--cp-ink);
+  font: 400 22px/1 var(--cp-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__head span + span {
+  font: 600 11px/22px var(--cp-mono);
+  letter-spacing: 0.14em;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose {
+  max-width: 68ch;
+  color: #2b2723;
+  font-size: 15px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-liner .cp-prose :is(h1, h2, h3, h4),
+:root[data-lens="cut-paper"] .cp-liner .cp-prose :is(strong, em, a) {
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose pre {
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose code {
+  font-family: var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose :not(pre) > code {
+  padding: 1px 5px;
+  background: rgba(10, 9, 8, 0.08);
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose figure {
+  margin-inline: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose img {
+  display: block;
+  padding: 6px;
+  background: var(--cp-ink);
+  transform: rotate(-0.6deg);
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose figcaption {
+  margin-top: 8px;
+  color: rgba(10, 9, 8, 0.65);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose hr {
+  border: 0;
+  border-top: 2px dashed rgba(10, 9, 8, 0.25);
+}
+
+:root[data-lens="cut-paper"] .cp-liner :focus-visible {
+  outline-color: var(--cp-ink);
+}
+
+/* the return: where the send comes back, an ink slip pasted at the end */
+:root[data-lens="cut-paper"] .cp-return {
+  position: relative;
+  max-width: 600px;
+  margin-top: 44px;
+  padding: 28px 26px 22px;
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+  clip-path: var(--cp-cut-tab);
+  transform: rotate(-0.8deg);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-return .cp-return__tag {
+  background: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-liner .cp-return__title {
+  margin: 14px 0 8px;
+  color: var(--cp-ivory);
+  font: 400 40px/0.95 var(--cp-display);
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-return__body {
+  margin: 0;
+  color: var(--cp-ivory-2);
+  font: 400 13.5px/1.65 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-return .cp-buttons {
+  margin: 18px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-return :focus-visible {
+  outline-color: var(--cp-ivory);
+}
+
 /* ── the text view ─────────────────────────────────────────── */
 
 :root[data-lens="cut-paper"] .cp-sheet .cp-head__kicker {
@@ -3300,6 +3781,35 @@
   :root[data-lens="cut-paper"] .cp-sheet__paper {
     padding: 18px;
   }
+
+  :root[data-lens="cut-paper"] .cp-arr--sends {
+    --head: 84px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--sends .cp-arr__name small,
+  :root[data-lens="cut-paper"] .cp-arr--sends .cp-ruler__corner small {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--sends .cp-ruler__year b {
+    font-size: 12px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-bounces {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-liner {
+    padding: 34px 18px 28px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-liner__head {
+    margin-right: 44px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-liner__scrap {
+    right: 14px;
+  }
 }
 
 /* ── reduced motion and faces ──────────────────────────────── */
@@ -3331,6 +3841,24 @@
   :root[data-lens="cut-paper"] .cp-tt__arm,
   :root[data-lens="cut-paper"] .cp-crate__rec {
     transition: none;
+  }
+
+  /* the sheets stay pasted where they are; the playhead still lights them */
+  :root[data-lens="cut-paper"] .cp-bounce,
+  :root[data-lens="cut-paper"] .cp-send__pin,
+  :root[data-lens="cut-paper"] .cp-bounce__hit {
+    transition: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-bounce:hover,
+  :root[data-lens="cut-paper"] .cp-bounce:focus-within,
+  :root[data-lens="cut-paper"] .cp-bounce[data-live] {
+    transform: rotate(var(--tilt, 0deg));
+  }
+
+  :root[data-lens="cut-paper"] .cp-send .cp-send__pin,
+  :root[data-lens="cut-paper"] .cp-bounce__hit[data-hearing] {
+    transform: none;
   }
 }
 

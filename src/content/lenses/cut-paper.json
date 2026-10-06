@@ -103,17 +103,21 @@
     "undated": "undated"
   },
   "writing": {
-    "subscribeLabel": "Subscribe",
-    "sourceLabel": "Read on Substack",
-    "originLabel": "Originally published on Substack",
-    "backLabel": "Back to all writing",
-    "listLabel": "Posts, newest first",
-    "emptyMessage": "No public posts are available yet.",
-    "unavailableMessage": "Writing is temporarily unavailable.",
-    "entryUnavailableMessage": "This post is temporarily unavailable. Please try again or read it on Substack.",
-    "entryMissingMessage": "This post is not publicly available.",
-    "endHeading": "Liked this one?",
-    "endBody": "New posts go out by email first. Subscribe on Substack and they'll find you."
+    "send": "Send",
+    "sends": "Sends",
+    "bus": "Send A",
+    "busVoice": "to Substack",
+    "legend": "Each post leaves the session as a bounce: a flag on the send at the date it went out, and a motif sung over the chord it was written in.",
+    "bounces": "Bounces",
+    "bounce": "B{no}",
+    "hear": "Hear {name}",
+    "bounced": "Bounced",
+    "over": "Over",
+    "motif": "Motif",
+    "liner": "Liner notes",
+    "return": "Return",
+    "noSignal": "No signal",
+    "silence": "Silence"
   },
   "other": {
     "label": "Text view"

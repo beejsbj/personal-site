@@ -152,6 +152,12 @@ export class Transport {
     this.t = Math.min(Math.max(t, session.from), session.end);
     // back at rest at today, play starts from the top again
     this.resumable = Math.abs(this.t - session.now) > 1e-6;
+    // Reset region when stopping (returning to rest at today)
+    const atRest = !this.playing && !this.resumable;
+    if (atRest) {
+      this.region = { from: session.from, to: session.end };
+      this.returnTo = undefined;
+    }
     if (this.playing) {
       // leaving a playing region turns it into the whole session from here
       if (this.t < this.region.from || this.t >= this.region.to) {

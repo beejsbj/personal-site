@@ -92,13 +92,16 @@ export function setSound(on: boolean) {
   }
   if (wanted) wake();
   else if (context && master) {
+    stopPlayback();
     const t = context.currentTime;
     master.gain.cancelScheduledValues(t);
     master.gain.setValueAtTime(master.gain.value, t);
     master.gain.linearRampToValueAtTime(0, t + 0.12);
     window.clearTimeout(suspendTimer);
     suspendTimer = window.setTimeout(() => {
-      if (!wanted) void context?.suspend();
+      // Re-check that sound is still disabled; re-enabling sound clears this timeout,
+      // but only if the callback hasn't started running
+      if (!soundWanted()) void context?.suspend();
     }, 160);
   }
   listeners.forEach((fn) => fn(wanted));

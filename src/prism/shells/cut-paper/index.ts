@@ -41,7 +41,13 @@ const nextEighth = () => new Promise<void>((resolve) => setTimeout(resolve, EIGH
 
 function show(route: Route): Live {
   const controller = new AbortController();
-  ctx!.signal.addEventListener("abort", () => controller.abort(), { once: true, signal: controller.signal });
+  // Propagate parent abort to this screen's controller
+  const abortListener = () => controller.abort();
+  ctx!.signal.addEventListener("abort", abortListener, { once: true });
+  // Remove the parent listener when this screen is dropped (controller aborts)
+  controller.signal.addEventListener("abort", () => {
+    ctx!.signal.removeEventListener("abort", abortListener);
+  }, { once: true });
   const env: Env = {
     content: ctx!.content,
     copy: ctx!.content.lenses["cut-paper"],
@@ -101,8 +107,10 @@ function confetti(host: HTMLElement, note: string) {
 
 async function transition(route: Route) {
   if (!ctx || !frame) return;
-  // the runtime also syncs on the first page load; same page, nothing to do
-  if (route.path === currentPath) return;
+  // the runtime also syncs on the first page load; same page, nothing to
+  // do, unless live writing changed under it
+  const refresh = route.path === currentPath;
+  if (refresh && !route.refresh) return;
   currentPath = route.path;
   const id = ++generation;
   const { scroller, wipe } = frame;
@@ -126,6 +134,15 @@ async function transition(route: Route) {
     current = next;
   };
 
+  // a refresh swaps in place: no sweep, no confetti, focus stays put
+  if (refresh) {
+    const top = scroller.scrollTop;
+    drop(previous);
+    swapIn();
+    scroller.scrollTop = top;
+    land(next.el);
+    return;
+  }
   if (ctx.face || ctx.reducedMotion) {
     drop(previous);
     swapIn();
@@ -150,6 +167,8 @@ async function sweepIn(id: number, next: Live, previous: Live | undefined, note:
   wipe.dataset.state = "cutting";
   confetti(frame.overlay, note);
   // the playhead sweeps across; the new view is printed behind it
+  // Reset opacity before sweep: the previous fade animation retained opacity: 0
+  wipe.style.opacity = "1";
   const reveal = next.el.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)" }], { duration: SWEEP, easing: EASE_PAPER });
   const sweep = wipe.animate([{ transform: "translateX(-100%)" }, { transform: "translateX(0)" }], { duration: SWEEP, easing: EASE_PAPER, fill: "forwards" });
   await Promise.all([reveal.finished, sweep.finished]).catch(() => {});

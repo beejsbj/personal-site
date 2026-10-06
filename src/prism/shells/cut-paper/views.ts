@@ -3,8 +3,9 @@
  * arrangement in full. A project opens as its clip, zoomed into the
  * arrangement, with its story as clip notes. The lab is a rack of undated
  * sketches; about is the set notes; the resume is the Roles track drawn
- * out; anything else is a text view. Phones get the tape (./tape) wherever
- * the arrangement runs left to right. */
+ * out; writing is the Send, its posts bounced out of the session
+ * (./writing); anything else is a text view. Phones get the tape (./tape)
+ * wherever the arrangement runs left to right. */
 import { part } from "../../parts";
 import { fallbackBody, fill } from "../rich";
 import type { LabEntry, Project, ResumeEntry, Route } from "../types";
@@ -33,6 +34,7 @@ import { chord, noteName, voicing } from "./music";
 import { MONTH, sketchNotes, type Clip } from "./score";
 import { home } from "./home";
 import { tape } from "./tape";
+import { writing, writingEntry } from "./writing";
 
 /* ── projects: the arrangement ───────────────────────────── */
 
@@ -476,8 +478,9 @@ export function buildScreen(route: Route, env: Env): Screen {
     case "resume":
       return resume(env);
     case "writing":
+      return writing(env);
     case "writing-entry":
-      return other(env, route);
+      return writingEntry(env, route);
     default:
       return other(env, route);
   }
