@@ -4,7 +4,6 @@ import { join } from "node:path";
 import test from "node:test";
 
 const archiveRoots = [
-  "about",
   "assets",
   "data",
   "images",
