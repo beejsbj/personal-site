@@ -19,6 +19,7 @@
 import type { LensShell, Route, ShellContext } from "../types";
 import { h, setNewTabNote, wait } from "./dom";
 import { ink } from "./ink";
+import { createCloth } from "./cloth";
 import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
@@ -31,6 +32,7 @@ interface Live {
   path: string;
   page: HTMLElement;
   loom: ReturnType<typeof createLoom>;
+  cloth: ReturnType<typeof createCloth>;
   life: ReturnType<typeof createLife> | undefined;
   controller: AbortController;
 }
@@ -92,6 +94,16 @@ function show(route: Route, first: boolean) {
       return composition;
     },
   });
+  // The living cloth under it all; a single thing is seen close up.
+  const cloth = createCloth({
+    page,
+    loom,
+    signal: controller.signal,
+    instant: still(),
+    scale: route.kind === "project" || route.kind === "lab-entry" ? 2 : 1,
+    isIdle: ctx.isIdle,
+    onIdleChange: ctx.onIdleChange,
+  });
   // What moves over the drawing, for a visitor who can see it move.
   const life = still()
     ? undefined
@@ -103,9 +115,10 @@ function show(route: Route, first: boolean) {
         isIdle: ctx.isIdle,
         onIdleChange: ctx.onIdleChange,
       });
-  live = { path: route.path, page, loom, life, controller };
+  live = { path: route.path, page, loom, cloth, life, controller };
   requestAnimationFrame(() => {
     loom.start();
+    cloth.start();
     life?.start();
     page.dataset.state = "here";
   });
@@ -120,6 +133,21 @@ function show(route: Route, first: boolean) {
     { signal: controller.signal },
   );
   if (!first && !ctx.face) main.focus({ preventScroll: true });
+}
+
+/** The link you followed, when it opens one thing out of a cloth of many
+ * (a project from a list): the cloth magnifies round it on the way. */
+let followed: { el: HTMLAnchorElement; at: number } | undefined;
+
+function closer(page: HTMLElement, route: Route): [number, number] | undefined {
+  if (route.kind !== "project" && route.kind !== "lab-entry") return undefined;
+  if (!followed || performance.now() - followed.at > 2000 || !page.contains(followed.el)) return undefined;
+  if (new URL(followed.el.href, location.href).pathname.replace(/\/$/, "") !== route.path.replace(/\/$/, "")) {
+    return undefined;
+  }
+  const p = page.getBoundingClientRect();
+  const r = followed.el.getBoundingClientRect();
+  return [(r.left + r.right) / 2 - p.left, (r.top + r.bottom) / 2 - p.top];
 }
 
 const shell: LensShell = {
@@ -153,6 +181,14 @@ const shell: LensShell = {
     for (const [key, url] of Object.entries(urls)) {
       world.style.setProperty(`--hion-tooth-${key}`, `url("${url}")`);
     }
+    world.addEventListener(
+      "click",
+      (event) => {
+        const el = (event.target as Element).closest?.("a");
+        if (el) followed = { el, at: performance.now() };
+      },
+      { capture: true, signal },
+    );
     root.replaceChildren(world);
     // Let the faces arrive before measuring words to hang them.
     await Promise.race([document.fonts?.ready, wait(600)]);
@@ -169,6 +205,7 @@ const shell: LensShell = {
       leaving.page.dataset.state = "leaving";
       leaving.page.setAttribute("inert", "");
       leaving.loom.release();
+      leaving.cloth.release(closer(leaving.page, route));
       leaving.life?.release();
       await wait(430);
       if (mine !== token) return;

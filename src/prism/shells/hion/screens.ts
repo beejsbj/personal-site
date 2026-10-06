@@ -215,7 +215,7 @@ function workCharm(copy: Copy, project: Project, level: "h2" | "h3", i: number) 
   return hung(
     "li",
     "pair",
-    { class: "hion-work", "data-hang": "", "data-hue": i % 2 ? "m" : "c" },
+    { class: "hion-work", "data-hang": "", "data-hue": i % 2 ? "m" : "c", "data-frame": project.slug },
     h(
       "article",
       { "aria-labelledby": id },
@@ -326,7 +326,7 @@ function home(content: SiteContent) {
       picture(
         image(hero.portrait.src, hero.portrait.alt),
         "c",
-        { ...part("home.portrait"), class: "hion-portrait", "data-hang": "" },
+        { ...part("home.portrait"), class: "hion-portrait", "data-hang": "", "data-frame": "portrait" },
         link(hero.portrait.href, { class: "hion-portrait__link" }, hero.portrait.caption),
       ),
     ),
@@ -562,7 +562,8 @@ function project(content: SiteContent, data: Project) {
     "hion-page-title",
     h(
       "div",
-      { class: "hion-entry-head" },
+      // The same lace as its charm on the list, seen close.
+      { class: "hion-entry-head", "data-frame": data.slug },
       hungTitle("hion-page-title", data.title, `${data.kind} · ${data.year}`, data.summary, {
         title: part("project.title", ref),
         intro: part("project.summary", ref),
@@ -602,7 +603,7 @@ function labEntry(content: SiteContent, data: SiteContent["lab"][number]) {
     "hion-page-title",
     h(
       "div",
-      { class: "hion-entry-head" },
+      { class: "hion-entry-head", "data-frame": data.slug },
       hungTitle("hion-page-title", data.title, detail.eyebrow, data.summary, {
         title: part("lab.title", ref),
         intro: part("lab.summary", ref),
@@ -648,7 +649,12 @@ function lab(content: SiteContent) {
           return hung(
             "li",
             "drop",
-            { class: "hion-work hion-work--lab", "data-hang": "", "data-hue": i % 2 ? "m" : "c" },
+            {
+              class: "hion-work hion-work--lab",
+              "data-hang": "",
+              "data-hue": i % 2 ? "m" : "c",
+              "data-frame": entry.slug,
+            },
             h(
               "article",
               { "aria-labelledby": id },
@@ -700,6 +706,7 @@ function about(content: SiteContent) {
         picture(image(portrait.src, portrait.alt), "m", {
           class: "hion-portrait",
           "data-hang": "",
+          "data-frame": "portrait",
         }),
       ),
     ),

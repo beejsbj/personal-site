@@ -299,6 +299,38 @@
 
 
 
+/* The living cloth (cloth.ts): under the hions, page-tall, drawn only
+   near the viewport. Its light is a quarter-resolution canvas, scaled up. */
+:root[data-lens="hion"] .hion-cloth {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+:root[data-lens="hion"] .hion-cloth__tile {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+:root[data-lens="hion"] .hion-cloth__tile canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Measuring where things rest: everything still for one read. */
+:root[data-lens="hion"] .hion-measuring *,
+:root[data-lens="hion"] .hion-measuring *::before,
+:root[data-lens="hion"] .hion-measuring *::after {
+  transform: none !important;
+  rotate: none !important;
+  translate: none !important;
+  transition: none !important;
+}
+
 :root[data-lens="hion"] .hion-loom__tile {
   position: absolute;
   left: 0;
