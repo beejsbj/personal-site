@@ -526,6 +526,7 @@ class App {
           this.busy = false;
           if (commit) {
             this.view += step;
+            this.book.setDepth(this.depth());
             this.renderCorners();
             this.announce();
           }
