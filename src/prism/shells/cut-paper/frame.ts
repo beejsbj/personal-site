@@ -39,7 +39,7 @@ function keysFor(ctx: ShellContext, copy: Copy): Key[] {
     { degree: 2, ...k.lab, href: "/lab", kinds: ["lab", "lab-entry"] },
     { degree: 3, ...k.about, href: "/about", kinds: ["about"] },
     { degree: 4, ...k.resume, href: "/resume", kinds: ["resume"] },
-    { degree: 5, ...k.writing, href: site.writingUrl, kinds: [] },
+    { degree: 5, ...k.writing, href: "/writing", kinds: ["writing", "writing-entry"] },
     { degree: 6, ...k.hello, href: `mailto:${site.email}`, kinds: [] },
   ];
 }

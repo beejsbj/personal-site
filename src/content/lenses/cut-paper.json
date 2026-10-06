@@ -102,19 +102,6 @@
     "legend": "Each role and course is a clip on the Roles track, spanning its real dates. The bass walks while one runs.",
     "undated": "undated"
   },
-  "writing": {
-    "subscribeLabel": "Subscribe",
-    "sourceLabel": "Read on Substack",
-    "originLabel": "Originally published on Substack",
-    "backLabel": "Back to all writing",
-    "listLabel": "Posts, newest first",
-    "emptyMessage": "No public posts are available yet.",
-    "unavailableMessage": "Writing is temporarily unavailable.",
-    "entryUnavailableMessage": "This post is temporarily unavailable. Please try again or read it on Substack.",
-    "entryMissingMessage": "This post is not publicly available.",
-    "endHeading": "Liked this one?",
-    "endBody": "New posts go out by email first. Subscribe on Substack and they'll find you."
-  },
   "other": {
     "label": "Text view"
   },
