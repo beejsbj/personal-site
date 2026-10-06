@@ -349,6 +349,7 @@ class App {
       this.busy = false;
     }
     this.view = target;
+    this.book.setDepth(this.depth());
     this.renderCorners();
     this.announce();
   }
@@ -380,6 +381,7 @@ class App {
               href: b.href,
               class: "bp-shelf__book",
               "aria-current": open ? "true" : null,
+              "aria-label": open ? `${book.name} ${words.openOnDesk}` : book.name,
               "data-state": open ? "open" : null,
               "data-open": words.open,
             },
