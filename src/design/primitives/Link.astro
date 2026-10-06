@@ -234,8 +234,6 @@ const arrowPath = outbound ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5";
     color: var(--ball-ink-current);
     box-shadow: 0 0 0 var(--ball-badge-ring) var(--color-page);
     pointer-events: auto;
-    /* The badge drifts visually on hover, but remains at this exact position
-       for click detection, consistent with the design invariant. */
   }
   .ball-badge svg {
     width: var(--ball-badge-glyph);
@@ -290,12 +288,11 @@ const arrowPath = outbound ? "M4 12 12 4M4 4h8v8" : "M2 8h11M8 3l5 5-5 5";
       translate: none;
       transition-duration: var(--duration-fast);
     }
-    /* The badge drifts visually on hover, but remains clickable at its
-       position; the translate is visual feedback only. */
+    /* The satellite drifts a little further out along its orbit, late.
+       Hover only: a press never moves it. */
     .ball-badge {
       transition: translate var(--duration-reveal) var(--ease-pop)
         var(--duration-fast);
-      pointer-events: auto;
     }
     .ds-link--ball:hover .ball-badge {
       translate: var(--ball-badge-drift) calc(-1 * var(--ball-badge-drift));
