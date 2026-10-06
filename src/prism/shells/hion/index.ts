@@ -20,11 +20,12 @@ import type { LensShell, Route, ShellContext } from "../types";
 import { h, setNewTabNote, wait } from "./dom";
 import { ink } from "./ink";
 import { createCloth } from "./cloth";
-import { fabricOf } from "./fabric";
+import { type Fabric, fabricOf } from "./fabric";
 import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
+import { clothCanvas } from "./stitch";
 import { weaveCovers, weaveType } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { compose } from "./weave";
@@ -75,14 +76,14 @@ function show(route: Route, first: boolean) {
       "data-kind": route.kind,
       "data-fabric": fabric,
       "data-state": first ? "arriving" : "entering",
-      // Its fabric pulled down from the line (not on arrival: the line and
-      // the page come together then).
-      "data-unroll": first ? undefined : "",
     },
     main,
     footer(ctx.content),
   );
   stage.replaceChildren(page);
+  // Its fabric pulled down from the line like a blind (not on arrival: the
+  // line and the page come together then).
+  if (!first && !still()) pullDown(page, fabric);
   nav.setCurrent(route.path);
   // Which side the threads drop on, so the screen's head keeps clear of them.
   const drop = nav.origin();
@@ -148,6 +149,27 @@ function show(route: Route, first: boolean) {
     { signal: controller.signal },
   );
   if (!first && !ctx.face) main.focus({ preventScroll: true });
+}
+
+/** Pull a new screen down from the line: its first screenful drops into
+ * view like cloth let down, a woven hem of its own fabric at the leading
+ * edge, landing with a little bounce; then the hem rolls away. */
+function pullDown(page: HTMLElement, fabric: Fabric) {
+  const fold = innerHeight;
+  page.style.setProperty("--hion-fold", `${fold}px`);
+  const width = page.clientWidth || innerWidth;
+  const band = clothCanvas(fabric, Math.ceil(width / 5), 5, 5, 41);
+  band.className = "hion-hem__cloth";
+  const hem = h("div", { class: "hion-hem", "aria-hidden": "true" }, band);
+  page.append(hem);
+  page.dataset.unroll = "";
+  const done = (event: AnimationEvent) => {
+    if (event.target !== page) return;
+    delete page.dataset.unroll;
+    page.removeEventListener("animationend", done);
+  };
+  page.addEventListener("animationend", done);
+  hem.addEventListener("animationend", () => hem.remove(), { once: true });
 }
 
 /** A single thing seen close: a project, a lab entry, a post. */

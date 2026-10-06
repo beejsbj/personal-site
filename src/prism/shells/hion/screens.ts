@@ -239,7 +239,8 @@ function workCharm(copy: Copy, project: Project, level: "h2" | "h3", i: number) 
       h(
         level,
         { ...part("project.title", project.slug), class: "hion-work__title", id },
-        link(project.href, {}, project.title),
+        // Woven by life, where it is set large enough to read so.
+        link(project.href, { "data-woven": "" }, project.title),
       ),
       h(
         "p",

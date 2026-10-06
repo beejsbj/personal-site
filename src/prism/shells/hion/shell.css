@@ -298,23 +298,58 @@
     transform 0.38s var(--hion-ease-out);
 }
 
-/* A new page is its fabric pulled down from the line: it unrolls from the
-   top. */
+/* A new page is its fabric pulled down from the line (index.ts pullDown):
+   its first screenful drops into view like a blind let down, a woven hem
+   of its own cloth at the leading edge, and lands with a little give. */
 :root[data-lens="hion"] .hion-page[data-unroll] {
-  animation: hion-unroll 0.75s cubic-bezier(0.3, 0.9, 0.35, 1);
+  animation: hion-pull 0.95s cubic-bezier(0.32, 1.28, 0.5, 1);
 }
 
-:root[data-lens="hion"] .hion[data-still] .hion-page[data-unroll] {
-  animation: none;
-}
-
-@keyframes hion-unroll {
+/* It comes out from behind the line at the top (clipped above it), so
+   nothing of it shows until it has passed under the names hanging from
+   it. */
+@keyframes hion-pull {
   from {
-    clip-path: inset(0 0 100% 0);
+    translate: 0 calc(-1 * var(--hion-fold));
+    clip-path: inset(calc(var(--hion-fold) + 150px) 0 calc(100% - var(--hion-fold)) 0);
   }
 
   to {
-    clip-path: inset(0 0 0 0);
+    translate: 0 0;
+    clip-path: inset(150px 0 calc(100% - var(--hion-fold)) 0);
+  }
+}
+
+:root[data-lens="hion"] .hion-hem {
+  position: absolute;
+  top: calc(var(--hion-fold) - 25px);
+  left: 0;
+  z-index: 3;
+  width: 100%;
+  height: 25px;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  animation: hion-hem 1.5s ease-in both;
+}
+
+:root[data-lens="hion"] .hion-hem__cloth {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 6px 10px rgb(6 4 8 / 0.9));
+}
+
+/* Hangs there while it falls, then is rolled up out of the way. */
+@keyframes hion-hem {
+  0%,
+  62% {
+    opacity: 1;
+    scale: 1 1;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1 0;
   }
 }
 
@@ -953,6 +988,97 @@
   margin: 0;
   font-size: 1rem;
   line-height: 1.65;
+}
+
+/* Swatch and label (wide screens): not a card. A project is a piece of
+   its cloth (the woven cover), tilted as it was pinned, with its label
+   hung beside it: big woven title, a tag of when, a few lines, its tools
+   on beads. They take turns left and right down the page, so the two
+   hions run between them. */
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-row--works,
+  :root[data-lens="hion"] .hion-loop--year[data-count="1"] .hion-row--works {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 88px;
+  }
+
+  :root[data-lens="hion"] .hion-row--works > .hion-work {
+    width: min(100%, 880px);
+  }
+
+  :root[data-lens="hion"] .hion-row--works > .hion-work:nth-child(2n) {
+    margin-left: auto;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work article {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-auto-flow: dense;
+    column-gap: 40px;
+    align-items: start;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work article > * {
+    grid-column: 2;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work article > .hion-work__picture {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    margin: 0;
+    rotate: -2deg;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) article {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) article > * {
+    grid-column: 1;
+    text-align: right;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) article > .hion-work__picture {
+    grid-column: 2;
+    rotate: 1.6deg;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) .hion-beads {
+    justify-content: flex-end;
+  }
+
+  /* The label: when, like a tag tied on; the name woven large. */
+  :root[data-lens="hion"] .hion-row--works .hion-meta {
+    margin-top: 1.4em;
+    font-size: 1.45rem;
+    rotate: -3deg;
+    transform-origin: 0 50%;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) .hion-meta {
+    rotate: 3deg;
+    transform-origin: 100% 50%;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work__title {
+    margin: 0.05em 0 0.25em;
+    font-size: clamp(2.4rem, 4.6vw, 3.7rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work__title a[data-woven] {
+    display: inline-block;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work__summary {
+    max-width: 24em;
+    font-size: 1.02rem;
+  }
+
+  :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) .hion-work__summary {
+    margin-left: auto;
+  }
 }
 
 :root[data-lens="hion"] .hion-work--lab {

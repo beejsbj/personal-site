@@ -349,3 +349,21 @@ export function paintRegion(
     gctx.restore();
   }
 }
+
+/** A piece of cloth woven right through (both colours at every crossing,
+ * so the fabric's structure shows), `cols` × `rows` crossings `pitch`
+ * apart: a swatch, a hem. */
+export function clothCanvas(fabric: Fabric, cols: number, rows: number, pitch: number, seed = 7) {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(cols * pitch * dpr);
+  canvas.height = Math.ceil(rows * pitch * dpr);
+  const ctx = canvas.getContext("2d")!;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const st = stitches(pitch, dpr, true);
+  const hang = drape(cols, rows, pitch, seed);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) paintCrossing(ctx, st, x, y, 3, hang, fabric);
+  }
+  return canvas;
+}
