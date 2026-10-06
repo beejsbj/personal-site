@@ -34,7 +34,7 @@ let generation = 0;
 const live = new Set<Live>();
 
 /** The key (scale degree) each kind of route lives on. */
-const DEGREE: Partial<Record<RouteKind, number>> = { home: 0, projects: 1, project: 1, lab: 2, "lab-entry": 2, about: 3, resume: 4 };
+const DEGREE: Partial<Record<RouteKind, number>> = { home: 0, projects: 1, project: 1, lab: 2, "lab-entry": 2, about: 3, resume: 4, writing: 5, "writing-entry": 5 };
 
 /** Wait for the next eighth note of the session's tempo. */
 const nextEighth = () => new Promise<void>((resolve) => setTimeout(resolve, EIGHTH - (performance.now() % EIGHTH)));

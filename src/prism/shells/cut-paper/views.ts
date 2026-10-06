@@ -475,6 +475,9 @@ export function buildScreen(route: Route, env: Env): Screen {
       return about(env);
     case "resume":
       return resume(env);
+    case "writing":
+    case "writing-entry":
+      return other(env, route);
     default:
       return other(env, route);
   }
