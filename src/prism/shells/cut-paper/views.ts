@@ -1,5 +1,5 @@
-/** A view of the session for each route. Home is the session: set info
- * beside the whole arrangement and its locators. Projects is the
+/** A view of the session for each route. Home is the set info beside a
+ * turntable and the crate (./home), with the locators underneath. Projects is the
  * arrangement in full. A project opens as its clip, zoomed into the
  * arrangement, with its story as clip notes. The lab is a rack of undated
  * sketches; about is the set notes; the resume is the Roles track drawn
@@ -11,7 +11,6 @@ import type { LabEntry, Project, ResumeEntry, Route } from "../types";
 import { audition, soundLive } from "./audio";
 import {
   adopt,
-  auditionClip,
   bar,
   buttons,
   heading,
@@ -19,6 +18,7 @@ import {
   inlineCopy,
   noteVar,
   pageHead,
+  playButton,
   prose,
   roll,
   scrap,
@@ -28,124 +28,11 @@ import {
   type Screen,
 } from "./bits";
 import { arrangement, changesLane, markersLane, overlay, rolesLane, ruler, span } from "./arrangement";
-import { h, link, markup } from "./dom";
+import { h, link } from "./dom";
 import { chord, noteName, voicing } from "./music";
 import { MONTH, sketchNotes, type Clip } from "./score";
+import { home } from "./home";
 import { tape } from "./tape";
-import { monthLabel } from "./transport";
-
-const playIcon = () =>
-  markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path class="cp-tp__play" d="M4 2.5v11L13.5 8z"/><path class="cp-tp__pause" d="M4 3h3v10H4zM9 3h3v10H9z"/></svg>');
-
-/** A big play button bound to the transport (the whole career, or a
- * region). It shows the transport's real state. */
-function playButton(env: Env, label: string, region?: { from: number; to: number }) {
-  const { transport, signal, face } = env;
-  const button = h("button", { type: "button", class: "cp-play", "aria-pressed": "false", disabled: face }, playIcon(), h("span", null, label));
-  const mine = () =>
-    region
-      ? transport.region.from === region.from && transport.region.to === region.to
-      : transport.region.from === env.session.from && transport.region.to === env.session.end;
-  button.addEventListener("click", () => {
-    if (transport.playing && mine()) transport.pause();
-    else transport.play(region);
-  }, { signal });
-  transport.onTick((_, playing) => button.setAttribute("aria-pressed", String(playing && mine())), signal);
-  return button;
-}
-
-/* ── home: the session ───────────────────────────────────── */
-
-function home(env: Env): Screen {
-  const { content, copy, session, transport, signal } = env;
-  const page = content.pages.home;
-  const { hero, currently } = page;
-  const words = copy.home;
-  const h1 = heading(hero.headline, "cp-info__title", "page.title", "home");
-  const links = [
-    ...content.site.social.map((item) => ({ label: item.label, url: item.href })),
-    ...hero.links.filter((item) => !content.site.social.some((s) => s.href === item.href)).map((item) => ({ label: item.label, url: item.href })),
-  ];
-
-  const info = h(
-    "section",
-    { class: "cp-info", "aria-label": words.info },
-    scrap("tomato", "torn", "cp-info__scrap-a"),
-    scrap("mustard", "tri", "cp-info__scrap-b"),
-    h(
-      "figure",
-      { class: "cp-portrait", ...part("home.portrait") },
-      h("img", { src: hero.portrait.src, alt: hero.portrait.alt, width: 1080, height: 1920, decoding: "async" }),
-      h("figcaption", null, link(hero.portrait.href, {}, hero.portrait.caption)),
-    ),
-    h("p", { class: "cp-tag cp-info__greeting", ...part("home.greeting") }, hero.greeting),
-    h1,
-    h("p", { class: "cp-info__role", ...part("home.occupation") }, hero.occupation),
-    h("p", { class: "cp-info__welcome", ...part("home.welcome") }, hero.welcome),
-    h("ul", { class: "cp-chips", ...part("home.links") }, links.map((item) => h("li", null, link(item.url, { class: "cp-chip" }, item.label)))),
-    h(
-      "aside",
-      { class: "cp-note", ...part("home.currently") },
-      h("span", { class: "cp-note__tape", "aria-hidden": "true" }),
-      h("h2", null, currently.title),
-      h("p", null, inlineCopy(currently.body)),
-      link(currently.link.href, { class: "cp-note__more" }, currently.link.label, h("span", { "aria-hidden": "true" }, " →")),
-    ),
-  );
-
-  const seconds = Math.round((session.end - session.from) * 3);
-  const locators = page.updates;
-  const shown = content.updates.slice(0, locators.limit);
-  const sessionPanel = h(
-    "section",
-    { class: "cp-session", "aria-labelledby": "cp-session-title" },
-    h(
-      "header",
-      { class: "cp-session__head" },
-      h("h2", { class: "cp-tag", id: "cp-session-title" }, words.session),
-      playButton(env, words.play),
-      h("p", { class: "cp-session__length" }, fill(words.length, { n: seconds, from: monthLabel(session.from) })),
-      h("p", { class: "cp-session__legend" }, words.legend),
-    ),
-    h("div", { class: "cp-wide" }, arrangement(env, false)),
-    h("div", { class: "cp-narrow" }, tape(env, false)),
-    h(
-      "section",
-      { class: "cp-locators cp-wide", "aria-labelledby": "cp-locators-title" },
-      h("h2", { class: "cp-label", id: "cp-locators-title" }, words.locators, h("small", null, ` · ${locators.title}`)),
-      h("p", { class: "cp-locators__intro" }, locators.intro),
-      shown.length
-        ? h(
-            "ol",
-            { class: "cp-locators__list", "aria-label": locators.listLabel },
-            shown.map((update) => {
-              const clip = session.clips.find((c) => c.id === `update:${update.id}`);
-              const when = h("button", { type: "button", class: "cp-loc__when", "aria-label": fill(words.jump, { when: update.dateLabel }), disabled: env.face }, update.dateLabel);
-              const li = h(
-                "li",
-                { class: "cp-loc", ...part("update.item", update.id) },
-                when,
-                link(update.href, { class: "cp-loc__title" }, update.title),
-                h("small", null, `${update.kindLabel} · ${update.sourceLabel}`),
-              );
-              if (clip) {
-                when.addEventListener("click", () => {
-                  transport.seek(clip.start);
-                  auditionClip(env, clip, li);
-                }, { signal });
-                transport.watch(li, clip.start, clip.start + MONTH, signal, "markers");
-              }
-              return li;
-            }),
-          )
-        : h("p", { class: "cp-locators__empty" }, locators.empty),
-      h("p", { class: "cp-locators__caption" }, locators.caption),
-    ),
-    link(page.work.link.href, { class: "cp-btn cp-btn--lit cp-session__all" }, page.work.link.label, h("small", null, ` ${content.derived.counts.projects}`)),
-  );
-  bar(info, 1);
-  return { el: screen("home", h("div", { class: "cp-home" }, info, sessionPanel)), heading: h1 };
-}
 
 /* ── projects: the arrangement ───────────────────────────── */
 

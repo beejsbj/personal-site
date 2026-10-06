@@ -177,11 +177,12 @@ export function hoverAudition(env: Env, el: HTMLElement, clip: Clip, target = el
   el.addEventListener("blur", cancel, { signal: env.signal });
 }
 
-/** Number children so they enter on successive sixteenths. */
+/** Number children so they enter on successive sixteenths. Scraps are
+ * skipped: decoration is already on the stage. */
 export function bar(container: HTMLElement, step = 1, from = 0) {
   let i = from;
   for (const child of container.children) {
-    if (!(child instanceof HTMLElement)) continue;
+    if (!(child instanceof HTMLElement) || child.classList.contains("cp-scrap")) continue;
     child.dataset.beat = "";
     child.style.setProperty("--i", String(i));
     i += step;
@@ -192,3 +193,23 @@ export function bar(container: HTMLElement, step = 1, from = 0) {
 /** A torn scrap of brand paper, decoration only. */
 export const scrap = (colour: string, shape: string, extra = "") =>
   h("span", { class: `cp-scrap cp-scrap--${shape} ${extra}`.trim(), style: `--paper:var(--cp-${colour})`, "aria-hidden": "true" });
+
+const playIcon = () =>
+  markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path class="cp-tp__play" d="M4 2.5v11L13.5 8z"/><path class="cp-tp__pause" d="M4 3h3v10H4zM9 3h3v10H9z"/></svg>');
+
+/** A big play button bound to the transport (the whole career, or a
+ * region). It shows the transport's real state. */
+export function playButton(env: Env, label: string, region?: { from: number; to: number }) {
+  const { transport, signal, face } = env;
+  const button = h("button", { type: "button", class: "cp-play", "aria-pressed": "false", disabled: face }, playIcon(), h("span", null, label));
+  const mine = () =>
+    region
+      ? transport.region.from === region.from && transport.region.to === region.to
+      : transport.region.from === env.session.from && transport.region.to === env.session.end;
+  button.addEventListener("click", () => {
+    if (transport.playing && mine()) transport.pause();
+    else transport.play(region);
+  }, { signal });
+  transport.onTick((_, playing) => button.setAttribute("aria-pressed", String(playing && mine())), signal);
+  return button;
+}
