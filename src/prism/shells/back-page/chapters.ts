@@ -393,49 +393,41 @@ function insideCover(b: Build) {
   return page;
 }
 
-/** The composition book's inside cover: multiplication tables and unit conversions. */
+/** The composition book's inside cover, printed as the bought ones are: a
+ * times table and a few conversions in black on the grey board, and the
+ * owner's name written in above them. The printed matter is furniture, so
+ * it's kept from screen readers; the name isn't. */
 function compositionInsideCover(b: Build) {
   const { page, flow } = blankPage(b.copy, "inside-cover", "kraft-in");
   const { insideCover: ic } = b.copy.writing;
-
-  // Multiplication table
-  const tableHead = h("h3", { class: "bp-ref-title" }, ic.tables);
-  const tableGrid = h("div", { class: "bp-times-table" });
-  for (let i = 1; i <= 12; i++) {
-    const row = h("div", { class: "bp-table-row" });
-    for (let j = 1; j <= 12; j++) {
-      const cell = h("div", { class: "bp-table-cell" }, `${i * j}`);
-      row.append(cell);
-    }
-    tableGrid.append(row);
-  }
-
-  // Unit conversions (as reference text)
-  const convHead = h("h3", { class: "bp-ref-title" }, ic.conversionHeader);
-  const convs = h("div", { class: "bp-conversions" });
-  convs.append(
-    h("p", { class: "bp-conv-section" },
-      h("strong", null, ic.length), ": 1 inch = 2.54 cm · 1 foot = 0.305 m · 1 mile = 1.61 km"
+  const n = Array.from({ length: 12 }, (_, i) => i + 1);
+  const table = h(
+    "table",
+    { class: "bp-times" },
+    h("caption", null, ic.tables),
+    h("thead", null, h("tr", null, h("th", null, "×"), ...n.map((j) => h("th", null, String(j))))),
+    h(
+      "tbody",
+      null,
+      ...n.map((i) =>
+        h("tr", null, h("th", null, String(i)), ...n.map((j) => h("td", { class: i === j ? "bp-times__sq" : null }, String(i * j)))),
+      ),
     ),
-    h("p", { class: "bp-conv-section" },
-      h("strong", null, ic.weight), ": 1 ounce = 28.35 g · 1 pound = 0.454 kg"
-    ),
-    h("p", { class: "bp-conv-section" },
-      h("strong", null, ic.volume), ": 1 fluid ounce = 29.6 mL · 1 cup = 236.6 mL"
-    )
   );
-
+  const conversions: [string, string[]][] = [
+    [ic.length, ["1 in = 2.54 cm", "1 ft = 0.305 m", "1 mi = 1.61 km"]],
+    [ic.weight, ["1 oz = 28.35 g", "1 lb = 0.454 kg"]],
+    [ic.volume, ["1 fl oz = 29.6 mL", "1 cup = 236.6 mL"]],
+  ];
+  const convs = h(
+    "div",
+    { class: "bp-convs" },
+    h("p", { class: "bp-convs__title" }, ic.conversionHeader),
+    ...conversions.map(([name, rows]) => h("dl", null, h("dt", null, name), ...rows.map((r) => h("dd", null, r)))),
+  );
   flow.append(
-    h("div", { class: "bp-owner-label" },
-      h("p", { class: "bp-belongs" },
-        `${b.copy.cover.belongs} `,
-        h("b", null, b.content.site.name),
-      )
-    ),
-    tableHead,
-    tableGrid,
-    convHead,
-    convs
+    h("p", { class: "bp-belongs" }, `${b.copy.cover.belongs} `, h("b", null, b.content.site.name)),
+    h("div", { class: "bp-printed", "aria-hidden": "true" }, table, convs),
   );
   return page;
 }
