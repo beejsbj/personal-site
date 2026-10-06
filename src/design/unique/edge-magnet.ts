@@ -116,6 +116,12 @@ export function installEdgeMagnet() {
         { signal, passive: true },
       );
       document.addEventListener("pointerleave", leave, { signal });
+      // Clear the pointer cursor when the page scrolls (e.g., via blob click),
+      // since there's no pointer movement to trigger a cursor update.
+      const clearAim = () => {
+        delete root.dataset.aim;
+      };
+      document.addEventListener("scroll", clearAim, { signal, passive: true });
       // v1/v2's Easter egg: clicking the big circle rolls you to the bottom
       // of the page, or back to the top once you are past halfway. The
       // artwork sits under the page, so the click is read from the document:
