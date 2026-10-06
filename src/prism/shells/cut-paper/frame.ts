@@ -229,8 +229,10 @@ export function buildFrame(ctx: ShellContext): Frame {
   const scroller = h("main", { class: "cp-scroll", id: "cp-main", tabindex: "-1" });
   const overlay = h("div", { class: "cp-overlay", "aria-hidden": "true" }, wipe);
   const view = h("div", { class: "cp-view" }, scroller, overlay);
+  // Skip link for keyboard users: bypass transport, overview, and browser keys
+  const skipLink = link("#cp-main", { class: "skip-link" }, "Skip to main");
 
-  app.append(bar, overview, browser, view);
+  app.append(skipLink, bar, overview, browser, view);
 
   // space plays, unless a control has focus
   if (!face)
