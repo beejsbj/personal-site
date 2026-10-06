@@ -4,16 +4,17 @@
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
- * Serves dist/client (or tests BASE=http://127.0.0.1:4407 when given).
+ * Serves the built Vercel handler with deterministic public writing fixtures
+ * (or tests BASE=http://127.0.0.1:4407 when given).
  * Chromium: PRISM_CHROMIUM, else the newest cached Playwright headless
  * shell; the test skips, saying so, when neither exists. Only these:
  * PRISM_LENSES=hion,cut-paper  PRISM_ONLY=routes|fixtures. */
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { createServer } from "node:http";
+import { existsSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
-import { extname, join } from "node:path";
+import { join } from "node:path";
 import test from "node:test";
+import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
 import {
   expectedParts,
   isGap,
@@ -21,7 +22,9 @@ import {
   routesFor,
 } from "../../src/prism/parity.ts";
 
-const LENSES = (process.env.PRISM_LENSES ?? "daylight,calling-card,cut-paper,back-page,hion").split(",");
+const LENSES = (
+  process.env.PRISM_LENSES ?? "daylight,calling-card,cut-paper,back-page,hion"
+).split(",");
 const SHELLS = LENSES.filter((lens) => lens !== "daylight");
 const ONLY = process.env.PRISM_ONLY ?? "";
 
@@ -33,54 +36,14 @@ function chromium() {
     .filter((name) => name.startsWith("chromium_headless_shell-"))
     .sort((a, b) => Number(b.split("-")[1]) - Number(a.split("-")[1]))
     .map((name) =>
-      join(cache, name, "chrome-headless-shell-mac-arm64/chrome-headless-shell"),
+      join(
+        cache,
+        name,
+        "chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      ),
     )
     .find((path) => existsSync(path));
   return found ?? null;
-}
-
-const TYPES = {
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".webp": "image/webp",
-  ".gif": "image/gif",
-  ".woff2": "font/woff2",
-  ".woff": "font/woff",
-  ".mp4": "video/mp4",
-  ".webm": "video/webm",
-};
-
-/** A static server for dist/client, with Astro's directory pages and 404. */
-function serve(root) {
-  const file = (path) => {
-    try {
-      return statSync(path).isFile() ? path : null;
-    } catch {
-      return null;
-    }
-  };
-  const server = createServer((request, response) => {
-    const pathname = decodeURIComponent(new URL(request.url, "http://x").pathname);
-    const target =
-      file(join(root, pathname)) ??
-      file(join(root, pathname, "index.html")) ??
-      file(join(root, `${pathname.replace(/\/$/, "")}.html`));
-    const status = target ? 200 : 404;
-    const path = target ?? join(root, "404.html");
-    response.writeHead(status, { "Content-Type": TYPES[extname(path)] ?? "application/octet-stream" });
-    response.end(readFileSync(path));
-  });
-  return new Promise((resolve) =>
-    server.listen(0, "127.0.0.1", () =>
-      resolve({ base: `http://127.0.0.1:${server.address().port}`, close: () => server.close() }),
-    ),
-  );
 }
 
 /** Everything a page shows: its parts (inside the active lens's own root),
@@ -102,7 +65,9 @@ async function survey(page, lens) {
           text: el.textContent ?? "",
         }));
       const h1 = [...document.querySelectorAll("h1")].filter(shown).length;
-      const turn = !!root?.querySelector("[data-prism-turn='next']:not([disabled])");
+      const turn = !!root?.querySelector(
+        "[data-prism-turn='next']:not([disabled])",
+      );
       return { parts, h1, turn };
     }, lens);
   let seen = await collect();
@@ -124,7 +89,8 @@ function problems({ lens, route, expected, parts, h1, errors }) {
   for (const want of expected) {
     if (isGap(lens, route.kind, want.part)) continue;
     const matching = parts.filter(
-      (p) => p.part === want.part && (want.ref === undefined || p.ref === want.ref),
+      (p) =>
+        p.part === want.part && (want.ref === undefined || p.ref === want.ref),
     );
     const label = `${want.part}${want.ref === undefined ? "" : `[${want.ref}]`}`;
     if (!matching.length) {
@@ -143,7 +109,10 @@ async function visit(context, url, lens) {
   const page = await context.newPage();
   const errors = [];
   page.on("console", (message) => {
-    if (message.type() === "error" && !/Failed to load resource/.test(message.text()))
+    if (
+      message.type() === "error" &&
+      !/Failed to load resource/.test(message.text())
+    )
       errors.push(message.text());
   });
   page.on("pageerror", (error) => errors.push(error.message));
@@ -176,64 +145,123 @@ const skip = executable
   ? false
   : "no Chromium: set PRISM_CHROMIUM or install a Playwright headless shell";
 
-test("every lens shows every part, error-free, with one h1", { skip, timeout: 30 * 60_000 }, async (t) => {
-  const { chromium: browserType } = await import("playwright-core");
-  const external = process.env.BASE;
-  if (!external) assert.ok(existsSync("dist/client/index.html"), "build first: dist/client is missing");
-  const server = external ? null : await serve("dist/client");
-  const base = external ?? server.base;
-  const browser = await browserType.launch({ executablePath: executable });
-  const content = await (await fetch(`${base}/prism/content.json`)).json();
-  const failures = [];
-  const record = (where, list) => list.length && failures.push(`${where}\n    ${list.join("\n    ")}`);
-  try {
-    if (ONLY !== "fixtures") {
-      const jobs = LENSES.flatMap((lens) =>
-        routesFor(content).map((route) => async () => {
-          const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: "reduce" });
-          const { page, errors } = await visit(context, `${base}${route.path}?lens=${lens}`, lens);
-          const { parts, h1 } = await survey(page, lens);
-          record(`${lens} ${route.path}`, problems({ lens, route, expected: expectedParts(route, content), parts, h1, errors }));
-          await context.close();
-        }),
+test(
+  "every lens shows every part, error-free, with one h1",
+  { skip, timeout: 30 * 60_000 },
+  async (t) => {
+    const { chromium: browserType } = await import("playwright-core");
+    const external = process.env.BASE;
+    if (!external)
+      assert.ok(
+        existsSync("dist/client/index.html"),
+        "build first: dist/client is missing",
       );
-      await t.test(`${jobs.length} lens × route pages`, async () => {
-        await pool(jobs);
-      });
-    }
-    if (ONLY !== "routes") {
-      // the harness lists its fixtures and each fixture's routes
-      const context = await browser.newContext();
-      const probe = await context.newPage();
-      await probe.goto(`${base}/prism/harness?lens=daylight`);
-      await probe.waitForFunction(() => window.prismHarness?.ready);
-      const fixtures = await probe.evaluate(() => window.prismHarness.fixtures);
-      const plans = [];
-      for (const fixture of fixtures) {
-        await probe.goto(`${base}/prism/harness?lens=daylight&fixture=${fixture}`);
-        await probe.waitForFunction(() => window.prismHarness?.ready);
-        const routes = await probe.evaluate(() => window.prismHarness.routes);
-        for (const route of routes) for (const lens of SHELLS) plans.push({ fixture, route, lens });
+    const server = external ? null : await serveRuntimeFixture();
+    const base = external ?? server.base;
+    const browser = await browserType.launch({ executablePath: executable });
+    const content = await (await fetch(`${base}/prism/content.json`)).json();
+    const failures = [];
+    const record = (where, list) =>
+      list.length && failures.push(`${where}\n    ${list.join("\n    ")}`);
+    try {
+      if (ONLY !== "fixtures") {
+        const jobs = LENSES.flatMap((lens) =>
+          routesFor(content).map((route) => async () => {
+            const context = await browser.newContext({
+              viewport: { width: 1280, height: 800 },
+              reducedMotion: "reduce",
+            });
+            const { page, errors } = await visit(
+              context,
+              `${base}${route.path}?lens=${lens}`,
+              lens,
+            );
+            const { parts, h1 } = await survey(page, lens);
+            const data =
+              route.kind === "writing-entry"
+                ? await (
+                    await fetch(
+                      `${base}/prism/content.json?writing=${encodeURIComponent(route.slug)}`,
+                    )
+                  ).json()
+                : content;
+            record(
+              `${lens} ${route.path}`,
+              problems({
+                lens,
+                route,
+                expected: expectedParts(route, data),
+                parts,
+                h1,
+                errors,
+              }),
+            );
+            await context.close();
+          }),
+        );
+        await t.test(`${jobs.length} lens × route pages`, async () => {
+          await pool(jobs);
+        });
       }
-      await context.close();
-      const jobs = plans.map(({ fixture, route, lens }) => async () => {
-        const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: "reduce" });
-        const url = `${base}/prism/harness?lens=${lens}&fixture=${fixture}&route=${encodeURIComponent(route.path)}`;
-        const { page, errors } = await visit(context, url, lens);
-        await page.waitForFunction(() => window.prismHarness?.ready, null, { timeout: 15000 }).catch(() => {});
-        const state = await page.evaluate(() => ({ expected: window.prismHarness?.expected ?? [], error: window.prismHarness?.error }));
-        if (state.error) errors.push(state.error);
-        const { parts, h1 } = await survey(page, lens);
-        record(`${lens} fixture ${fixture} ${route.path}`, problems({ lens, route, expected: state.expected, parts, h1, errors }));
+      if (ONLY !== "routes") {
+        // the harness lists its fixtures and each fixture's routes
+        const context = await browser.newContext();
+        const probe = await context.newPage();
+        await probe.goto(`${base}/prism/harness?lens=daylight`);
+        await probe.waitForFunction(() => window.prismHarness?.ready);
+        const fixtures = await probe.evaluate(
+          () => window.prismHarness.fixtures,
+        );
+        const plans = [];
+        for (const fixture of fixtures) {
+          await probe.goto(
+            `${base}/prism/harness?lens=daylight&fixture=${fixture}`,
+          );
+          await probe.waitForFunction(() => window.prismHarness?.ready);
+          const routes = await probe.evaluate(() => window.prismHarness.routes);
+          for (const route of routes)
+            for (const lens of SHELLS) plans.push({ fixture, route, lens });
+        }
         await context.close();
-      });
-      await t.test(`${jobs.length} lens × fixture pages`, async () => {
-        await pool(jobs);
-      });
+        const jobs = plans.map(({ fixture, route, lens }) => async () => {
+          const context = await browser.newContext({
+            viewport: { width: 1280, height: 800 },
+            reducedMotion: "reduce",
+          });
+          const url = `${base}/prism/harness?lens=${lens}&fixture=${fixture}&route=${encodeURIComponent(route.path)}`;
+          const { page, errors } = await visit(context, url, lens);
+          await page
+            .waitForFunction(() => window.prismHarness?.ready, null, {
+              timeout: 15000,
+            })
+            .catch(() => {});
+          const state = await page.evaluate(() => ({
+            expected: window.prismHarness?.expected ?? [],
+            error: window.prismHarness?.error,
+          }));
+          if (state.error) errors.push(state.error);
+          const { parts, h1 } = await survey(page, lens);
+          record(
+            `${lens} fixture ${fixture} ${route.path}`,
+            problems({
+              lens,
+              route,
+              expected: state.expected,
+              parts,
+              h1,
+              errors,
+            }),
+          );
+          await context.close();
+        });
+        await t.test(`${jobs.length} lens × fixture pages`, async () => {
+          await pool(jobs);
+        });
+      }
+    } finally {
+      await browser.close();
+      await server?.close();
     }
-  } finally {
-    await browser.close();
-    server?.close();
-  }
-  assert.equal(failures.length, 0, `\n${failures.sort().join("\n")}`);
-});
+    assert.equal(failures.length, 0, `\n${failures.sort().join("\n")}`);
+  },
+);

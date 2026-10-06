@@ -161,7 +161,7 @@ const shell: LensShell = {
   },
 
   async update(route) {
-    if (live && route.path === live.path) return;
+    if (live && route.path === live.path && !route.refresh) return;
     const mine = ++token;
     const leaving = live;
     nav.close();

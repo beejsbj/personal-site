@@ -1,0 +1,137 @@
+---
+import { getEntry } from "astro:content";
+import { getWritingPage } from "../../lib/portfolio";
+import { part } from "../../prism/parts";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import Note from "../../design/primitives/Note.astro";
+import Heading from "../../design/primitives/Heading.astro";
+import Link from "../../design/primitives/Link.astro";
+import { formatDate, getPost, isoDay, writingHeaders } from "../../lib/writing";
+
+export const prerender = false;
+
+const site = (await getEntry("site", "config"))?.data;
+if (!site) throw new Error("Missing site config entry.");
+const page = await getWritingPage();
+const copy = page.copy;
+let entry: Awaited<ReturnType<typeof getPost>> = null;
+let unavailable = false;
+try {
+  entry = await getPost(Astro.params.slug ?? "");
+} catch {
+  unavailable = true;
+}
+if (!entry) {
+  Astro.response.status = unavailable ? 503 : 404;
+  Astro.response.headers.set("Cache-Control", "no-store");
+  if (unavailable) Astro.response.headers.set("Retry-After", "60");
+} else {
+  for (const [name, value] of Object.entries(writingHeaders))
+    Astro.response.headers.set(name, value);
+}
+const title = entry?.data.title ?? page.title;
+const description = entry?.data.description ?? page.description;
+const { subtitle, date, canonical, cover } = entry?.data ?? {};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={cover}
+  canonical={canonical}
+  pageClass="page-entry"
+>
+  {entry ? (
+    <section class="shell entry-page post-page">
+      <PageHeader
+        marks={{
+          title: part("writing.title", entry.slug),
+          intro: part("writing.subtitle", entry.slug),
+        }}
+        eyebrow={page.header.eyebrow}
+        title={title}
+        intro={subtitle}
+        scale="post"
+      />
+
+      <p class="post-origin" {...part("writing.meta", entry.slug)}>
+        <time datetime={isoDay(date!)}>{formatDate(date!)}</time>
+        <span aria-hidden="true"> / </span>
+        <Link href={canonical!} newTab arrow>
+          {copy.originLabel}
+        </Link>
+      </p>
+
+      <article class="prose post-body" {...part("writing.body", entry.slug)}>
+        <Fragment set:html={entry.body} />
+      </article>
+
+      <aside
+        class="post-end"
+        aria-labelledby="post-end-title"
+        {...part("writing.end", entry.slug)}
+      >
+        <Note>
+          <div class="post-end__copy">
+            <Heading id="post-end-title" level={2} scale="card">
+              {copy.endHeading}
+            </Heading>
+            <p>{copy.endBody}</p>
+            <div
+              class="entry-page__links"
+              {...part("writing.links", entry.slug)}
+            >
+              <Link
+                treatment="action"
+                tone="wine"
+                href={`${site.writingUrl}/subscribe`}
+                newTab
+                arrow
+              >
+                {copy.subscribeLabel}
+              </Link>
+              <Link treatment="action" href={canonical!} newTab arrow>
+                {copy.originLabel}
+              </Link>
+            </div>
+          </div>
+        </Note>
+      </aside>
+
+      <div class="entry-page__links" {...part("writing.links", entry.slug)}>
+        <Link href="/writing" arrow>
+          {copy.backLabel}
+        </Link>
+      </div>
+    </section>
+  ) : (
+    <section class="shell page-section">
+      <PageHeader
+        page="writing"
+        eyebrow={page.header.eyebrow}
+        title={page.header.title}
+        intro={
+          unavailable ? copy.entryUnavailableMessage : copy.entryMissingMessage
+        }
+      />
+      <div class="entry-page__links">
+        <Link href="/writing" arrow>
+          {copy.backLabel}
+        </Link>
+        <Link href={site.writingUrl} newTab arrow>
+          {copy.sourceLabel}
+        </Link>
+        <Link href={`${site.writingUrl}/subscribe`} newTab arrow>
+          {copy.subscribeLabel}
+        </Link>
+      </div>
+    </section>
+  )}
+</BaseLayout>
+<style>
+  .post-end__copy {
+    display: grid;
+    gap: var(--space-s);
+  }
+</style>

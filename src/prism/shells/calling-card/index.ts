@@ -17,6 +17,7 @@ import { lab, labEntry } from "./lab";
 import { about } from "./about";
 import { resume } from "./resume";
 import { other } from "./other";
+import { writing, writingEntry } from "./writing";
 import { createWipe, type Wipe } from "./wipe";
 import { pressPrompt, setMotion, shake, wireClicks } from "./micro";
 
@@ -28,6 +29,8 @@ const FACTORIES: Record<Route["kind"], ScreenFactory> = {
   "lab-entry": labEntry,
   about,
   resume,
+  writing,
+  "writing-entry": writingEntry,
   other,
 };
 
@@ -144,7 +147,7 @@ function onKey(event: KeyboardEvent) {
 async function go(route: Route) {
   if (!ctx) return;
   // The runtime also calls update() for the page it just mounted.
-  if (route.path === currentPath && !pendingTitle) return;
+  if (route.path === currentPath && !pendingTitle && !route.refresh) return;
   closePanel(false);
   // The wipe's title card: the link's own name, else the screen's.
   const title = pendingTitle ?? copyOf(ctx.content).sections[route.kind];

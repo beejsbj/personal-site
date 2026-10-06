@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { basename, join } from "node:path";
 import test from "node:test";
+import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
 import { selectActivitySnapshot } from "../../src/lib/activity.mjs";
 
 // Guards against lenses drifting from the content. Lens shells must take
@@ -12,12 +13,18 @@ const read = (path) => readFileSync(path, "utf8");
 const walk = (dir) =>
   existsSync(dir)
     ? readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
-        entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)],
+        entry.isDirectory()
+          ? walk(join(dir, entry.name))
+          : [join(dir, entry.name)],
       )
     : [];
 
-const shellSources = walk("src/prism/shells").filter((path) => path.endsWith(".ts"));
-const contentFiles = walk("src/content").filter((path) => /\.(md|json)$/.test(path));
+const shellSources = walk("src/prism/shells").filter((path) =>
+  path.endsWith(".ts"),
+);
+const contentFiles = walk("src/content").filter((path) =>
+  /\.(md|json)$/.test(path),
+);
 const corpus = contentFiles.map(read).join("\n");
 
 /** String literals in TypeScript source, comments skipped. Template
@@ -84,7 +91,8 @@ test("lens shells hold no content: every word of 12+ characters comes from src/c
       const text = literal.trim();
       // kebab-case identifiers ("pull-request") are data keys, not copy
       if (/^[a-z0-9]+(-[a-z0-9]+)+$/.test(text)) continue;
-      if (text.length >= 12 && corpus.includes(text)) leaks.push(`${path}: "${text}"`);
+      if (text.length >= 12 && corpus.includes(text))
+        leaks.push(`${path}: "${text}"`);
     }
   }
   assert.deepEqual(
@@ -109,13 +117,20 @@ test("lens copy files never repeat portfolio content", () => {
         ? Object.values(value).flatMap(strings)
         : [];
   const repeats = [];
-  for (const path of walk("src/content/lenses").filter((p) => p.endsWith(".json")))
+  for (const path of walk("src/content/lenses").filter((p) =>
+    p.endsWith(".json"),
+  ))
     for (const value of strings(JSON.parse(read(path))))
       for (const piece of value.split(/\{[^}]*\}/)) {
         const text = piece.trim();
-        if (text.length >= 16 && portfolio.includes(text)) repeats.push(`${path}: "${text}"`);
+        if (text.length >= 16 && portfolio.includes(text))
+          repeats.push(`${path}: "${text}"`);
       }
-  assert.deepEqual(repeats, [], "Lens copy repeats portfolio content; read it from content.json instead");
+  assert.deepEqual(
+    repeats,
+    [],
+    "Lens copy repeats portfolio content; read it from content.json instead",
+  );
 });
 
 test("lens shells read Daylight's page only through fallbackBody, for other routes", () => {
@@ -127,10 +142,18 @@ test("lens shells read Daylight's page only through fallbackBody, for other rout
       /\b\w*[rR]oute\w*\s*\??\.\s*main\b/g,
       /\{[^{}]*\bmain\b[^{}]*\}\s*=\s*[\w.]*[rR]oute\b/g,
     ])
-      for (const [match] of source.matchAll(pattern)) reads.push(`${path}: ${match}`);
+      for (const [match] of source.matchAll(pattern))
+        reads.push(`${path}: ${match}`);
   }
-  assert.deepEqual(reads, [], "Render from content.json; use fallbackBody(route) only for `other` routes");
-  assert.match(read("src/prism/shells/rich.ts"), /export function fallbackBody/);
+  assert.deepEqual(
+    reads,
+    [],
+    "Render from content.json; use fallbackBody(route) only for `other` routes",
+  );
+  assert.match(
+    read("src/prism/shells/rich.ts"),
+    /export function fallbackBody/,
+  );
 });
 
 /** Front matter of a markdown file, as raw "key: value" lines. */
@@ -141,51 +164,95 @@ const field = (path, key) =>
     ?.trim();
 const markdown = (dir) => walk(dir).filter((path) => path.endsWith(".md"));
 const slug = (path) => basename(path).replace(/\.(md|json)$/, "");
-const content = () => JSON.parse(read("dist/client/prism/content.json"));
 
-test("content.json carries every visible entry, page and lens, with its body rendered", () => {
-  const data = content();
-  const hasBody = (path) => read(path).split(/^---$/m).slice(2).join("---").trim().length > 0;
+test("content.json carries every visible entry, page and lens, with its body rendered", async () => {
+  const fixture = await serveRuntimeFixture();
+  try {
+    const data = await (await fixture.fetch("/prism/content.json")).json();
+    const hasBody = (path) =>
+      read(path).split(/^---$/m).slice(2).join("---").trim().length > 0;
 
-  for (const [dir, list] of [
-    ["src/content/projects", data.projects],
-    ["src/content/lab", data.lab],
-  ]) {
-    const visible = markdown(dir).filter((path) => field(path, "hidden") !== "true");
-    assert.deepEqual(
-      list.map((entry) => entry.slug).sort(),
-      visible.map(slug).sort(),
-      `${dir}: content.json is missing or adding entries`,
-    );
-    for (const path of visible) {
-      const entry = list.find((item) => item.slug === slug(path));
-      assert.equal(typeof entry.html, "string", `${path}: no html`);
-      if (hasBody(path)) assert.ok(entry.html.trim(), `${path}: body not rendered`);
+    for (const [dir, list] of [
+      ["src/content/projects", data.projects],
+      ["src/content/lab", data.lab],
+    ]) {
+      const visible = markdown(dir).filter(
+        (path) => field(path, "hidden") !== "true",
+      );
+      assert.deepEqual(
+        list.map((entry) => entry.slug).sort(),
+        visible.map(slug).sort(),
+        `${dir}: content.json is missing or adding entries`,
+      );
+      for (const path of visible) {
+        const entry = list.find((item) => item.slug === slug(path));
+        assert.equal(typeof entry.html, "string", `${path}: no html`);
+        if (hasBody(path))
+          assert.ok(entry.html.trim(), `${path}: body not rendered`);
+      }
     }
+
+    for (const page of [
+      "home",
+      "about",
+      "resume",
+      "projects",
+      "lab",
+      "notFound",
+      "writing",
+    ])
+      assert.ok(data.pages[page], `content.json is missing pages.${page}`);
+    assert.ok(data.pages.about.html.trim(), "about body not rendered");
+    assert.ok(
+      data.resume.html.includes('data-part="resume.role"'),
+      "resume structure not rendered",
+    );
+    assert.ok(data.resume.experience.roles.length, "resume has no roles");
+
+    const updates = markdown("src/content/updates").map((path) => ({
+      id: slug(path),
+      date: field(path, "date"),
+      expiresAt: field(path, "expiresAt"),
+    }));
+    assert.deepEqual(
+      data.updates.map((u) => u.id).sort(),
+      selectActivitySnapshot(updates)
+        .map((u) => u.id)
+        .sort(),
+      "content.json updates differ from the due, unexpired updates",
+    );
+
+    for (const path of walk("src/content/lenses"))
+      assert.ok(
+        data.lenses[slug(path)],
+        `content.json is missing lenses.${slug(path)}`,
+      );
+
+    const slugs = new Set(data.projects.map((p) => p.slug));
+    assert.ok(data.featured.length > 0, "the featured set is never empty");
+    for (const s of data.featured)
+      assert.ok(slugs.has(s), `featured "${s}" is not a project`);
+    assert.equal(data.derived.counts.projects, data.projects.length);
+    assert.equal(data.writing.status, "available");
+    assert.equal(data.writing.posts.length, fixture.state.posts.length);
+    assert.equal(
+      data.writing.entry,
+      undefined,
+      "index must not fetch every article body",
+    );
+    assert.deepEqual(fixture.requests, ["/api/v1/archive"]);
+    const detail = await (
+      await fixture.fetch("/prism/content.json?writing=fixture-writing")
+    ).json();
+    assert.equal(detail.writing.entry.slug, "fixture-writing");
+    assert.match(detail.writing.entry.html, /Full native body/);
+    assert.equal(
+      detail.projects.length,
+      data.projects.length,
+      "article hydration preserves authored portfolio",
+    );
+    assert.deepEqual(fixture.foreign, [], "no shared cache or live network");
+  } finally {
+    await fixture.close();
   }
-
-  for (const page of ["home", "about", "resume", "projects", "lab", "notFound"])
-    assert.ok(data.pages[page], `content.json is missing pages.${page}`);
-  assert.ok(data.pages.about.html.trim(), "about body not rendered");
-  assert.ok(data.resume.html.includes('data-part="resume.role"'), "resume structure not rendered");
-  assert.ok(data.resume.experience.roles.length, "resume has no roles");
-
-  const updates = markdown("src/content/updates").map((path) => ({
-    id: slug(path),
-    date: field(path, "date"),
-    expiresAt: field(path, "expiresAt"),
-  }));
-  assert.deepEqual(
-    data.updates.map((u) => u.id).sort(),
-    selectActivitySnapshot(updates).map((u) => u.id).sort(),
-    "content.json updates differ from the due, unexpired updates",
-  );
-
-  for (const path of walk("src/content/lenses"))
-    assert.ok(data.lenses[slug(path)], `content.json is missing lenses.${slug(path)}`);
-
-  const slugs = new Set(data.projects.map((p) => p.slug));
-  assert.ok(data.featured.length > 0, "the featured set is never empty");
-  for (const s of data.featured) assert.ok(slugs.has(s), `featured "${s}" is not a project`);
-  assert.equal(data.derived.counts.projects, data.projects.length);
 });

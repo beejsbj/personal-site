@@ -13,11 +13,7 @@ import type { Part } from "./parts";
 import type { RouteKind, SiteContent } from "./shells/types";
 
 export type LensId =
-  | "daylight"
-  | "calling-card"
-  | "cut-paper"
-  | "back-page"
-  | "hion";
+  "daylight" | "calling-card" | "cut-paper" | "back-page" | "hion";
 
 export interface RouteRef {
   kind: RouteKind;
@@ -50,6 +46,12 @@ export function routesFor(content: SiteContent): RouteRef[] {
         path: entry.detail,
         slug: entry.slug,
       })),
+    { kind: "writing", path: "/writing" },
+    ...content.writing.posts.map((entry) => ({
+      kind: "writing-entry" as const,
+      path: entry.href,
+      slug: entry.slug,
+    })),
     { kind: "about", path: "/about" },
     { kind: "resume", path: "/resume" },
   ];
@@ -93,7 +95,20 @@ const decode = (text: string) =>
     return ENTITIES[code] ?? match;
   });
 
-const VOID = new Set(["img", "br", "hr", "input", "source", "meta", "link", "col", "wbr", "area", "embed", "track"]);
+const VOID = new Set([
+  "img",
+  "br",
+  "hr",
+  "input",
+  "source",
+  "meta",
+  "link",
+  "col",
+  "wbr",
+  "area",
+  "embed",
+  "track",
+]);
 
 /** The words of each top-level block of rendered HTML. Each block is cut to
  * its first `max` characters: enough to prove the block is there, short
@@ -141,9 +156,9 @@ export function expectedParts(
         { part: "home.greeting", texts: [home.hero.greeting] },
         { part: "home.occupation", texts: [home.hero.occupation] },
         { part: "home.welcome", texts: [home.hero.welcome] },
-        ...content.featured.slice(0, home.work.limit).map((slug) =>
-          page("project.title", slug, bySlug.get(slug)?.title),
-        ),
+        ...content.featured
+          .slice(0, home.work.limit)
+          .map((slug) => page("project.title", slug, bySlug.get(slug)?.title)),
         ...content.updates
           .slice(0, home.updates.limit)
           .map((u) => page("update.item", u.id, u.title)),
@@ -168,7 +183,9 @@ export function expectedParts(
       return [
         page("project.title", p.slug, p.title),
         page("project.summary", p.slug, p.summary),
-        ...(p.html ? [page("project.body", p.slug, ...blockTexts(p.html))] : []),
+        ...(p.html
+          ? [page("project.body", p.slug, ...blockTexts(p.html))]
+          : []),
         ...(p.links.length
           ? [page("project.links", p.slug, ...p.links.map((l) => l.label))]
           : []),
@@ -198,6 +215,51 @@ export function expectedParts(
         ...(entry.links.length
           ? [page("lab.links", entry.slug, ...entry.links.map((l) => l.label))]
           : []),
+      ];
+    }
+    case "writing":
+      return [
+        page("page.title", "writing", pages.writing.header.title),
+        page("page.intro", "writing", pages.writing.header.intro),
+        ...content.writing.posts.flatMap((entry) => [
+          page("writing.title", entry.slug, entry.title),
+          page(
+            "writing.summary",
+            entry.slug,
+            entry.subtitle || entry.description,
+          ),
+        ]),
+      ];
+    case "writing-entry": {
+      const entry = content.writing.entry;
+      if (
+        !entry ||
+        entry.slug !== route.slug ||
+        content.writing.entryStatus !== "available"
+      )
+        return [page("page.title", "writing", pages.writing.header.title)];
+      return [
+        page("writing.title", entry.slug, entry.title),
+        ...(entry.subtitle
+          ? [page("writing.subtitle", entry.slug, entry.subtitle)]
+          : []),
+        page("writing.meta", entry.slug, entry.dateLabel),
+        ...(entry.html
+          ? [page("writing.body", entry.slug, ...blockTexts(entry.html))]
+          : []),
+        page(
+          "writing.links",
+          entry.slug,
+          pages.writing.copy.originLabel,
+          pages.writing.copy.subscribeLabel,
+          pages.writing.copy.backLabel,
+        ),
+        page(
+          "writing.end",
+          entry.slug,
+          pages.writing.copy.endHeading,
+          pages.writing.copy.endBody,
+        ),
       ];
     }
     case "about":

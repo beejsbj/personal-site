@@ -1,7 +1,10 @@
 /** Mounts, updates and unmounts lens shells. A shell module and its CSS load
  * only when its lens is active. If a shell fails, the server-rendered
  * Daylight page is revealed rather than leaving the visitor with nothing. */
-import type { LensShell, Route, RouteKind, SiteContent } from "./shells/types";
+import { kindOf } from "./routes";
+export { kindOf } from "./routes";
+import { createContentLoader, writingChanged } from "./content-client";
+import type { LensShell, Route, SiteContent } from "./shells/types";
 
 const SHELLS: Record<string, () => Promise<{ default: LensShell }>> = {
   "calling-card": () => import("./shells/calling-card/index"),
@@ -19,42 +22,48 @@ export function prewarmShell(lens: string) {
   loadContent().catch(() => {});
 }
 
-let content: Promise<SiteContent> | undefined;
-const loadContent = () =>
-  (content ??= fetch("/prism/content.json").then((response) =>
-    response.json(),
-  ));
+const contentLoader = createContentLoader();
+let fixtureContent: SiteContent | undefined;
+const loadContent = (route?: Route) =>
+  fixtureContent
+    ? Promise.resolve(fixtureContent)
+    : contentLoader.load(
+        route?.kind === "writing-entry" ? route.slug : undefined,
+        route?.kind === "writing" || route?.kind === "writing-entry",
+      );
 
 /** The test harness mounts shells on fixture content at a pretend route. */
 let pretend: (() => Route) | undefined;
-export function useSource(source: { content: SiteContent; route: () => Route }) {
-  content = Promise.resolve(source.content);
+export function useSource(source: {
+  content: SiteContent;
+  route: () => Route;
+}) {
+  fixtureContent = source.content;
   pretend = source.route;
-}
-
-/** What kind of route a path is. */
-export function kindOf(path: string): { kind: RouteKind; slug?: string } {
-  const [first, slug] = path.split("/").filter(Boolean);
-  const kinds: Record<string, RouteKind> = {
-    projects: slug ? "project" : "projects",
-    lab: slug ? "lab-entry" : "lab",
-    about: "about",
-    resume: "resume",
-  };
-  return { kind: path === "/" ? "home" : (kinds[first] ?? "other"), slug };
 }
 
 export function currentRoute(): Route {
   if (pretend) return pretend();
   const path = location.pathname.replace(/\/+$/, "") || "/";
-  const { kind, slug } = kindOf(path);
+  const { kind, slug } = kindOf(location.pathname);
   const main = (document.getElementById("main-content")?.cloneNode(true) ??
     document.createElement("main")) as HTMLElement;
   main.removeAttribute("id");
   const notFound = !!main.querySelector(
     '[data-part="page.title"][data-ref="not-found"]',
   );
-  return { kind, path, slug, title: document.title, notFound, main };
+  const safeKind =
+    notFound && (kind === "writing" || kind === "writing-entry")
+      ? "other"
+      : kind;
+  return {
+    kind: safeKind,
+    path,
+    slug: safeKind === "other" ? undefined : slug,
+    title: document.title,
+    notFound,
+    main,
+  };
 }
 
 // A prism face is a preview inside someone else's page: it must never take
@@ -73,7 +82,12 @@ new MutationObserver(() => {
 });
 
 let active:
-  | { lens: string; shell: LensShell; controller: AbortController }
+  | {
+      lens: string;
+      shell: LensShell;
+      controller: AbortController;
+      content: SiteContent;
+    }
   | undefined;
 let pending: Promise<void> = Promise.resolve();
 
@@ -89,15 +103,42 @@ function shellRoot() {
 
 async function mount(lens: string) {
   const root = shellRoot();
-  if (active?.lens === lens) return active.shell.update(currentRoute());
+  const route = currentRoute();
+  if (active?.lens === lens) {
+    try {
+      const data = await loadContent(route);
+      if (
+        currentRoute().path !== route.path ||
+        document.documentElement.dataset.lens !== lens
+      )
+        return;
+      const refresh =
+        (route.kind === "writing" || route.kind === "writing-entry") &&
+        writingChanged(active.content, data);
+      Object.assign(active.content, data);
+      return await active.shell.update({ ...route, refresh });
+    } catch (error) {
+      console.error(`Lens shell "${lens}" failed; showing Daylight.`, error);
+      unmount();
+      document.documentElement.removeAttribute("data-lens-shell");
+      return;
+    }
+  }
   unmount();
   if (!hasShell(lens)) return;
   const controller = new AbortController();
   try {
-    const [module, data] = await Promise.all([SHELLS[lens](), loadContent()]);
-    if (document.documentElement.dataset.lens !== lens) return;
+    const [module, data] = await Promise.all([
+      SHELLS[lens](),
+      loadContent(route),
+    ]);
+    if (
+      document.documentElement.dataset.lens !== lens ||
+      currentRoute().path !== route.path
+    )
+      return;
     const shell = module.default;
-    active = { lens, shell, controller };
+    active = { lens, shell, controller, content: data };
     root.dataset.shell = lens;
     const listeners = new Set<(idle: boolean) => void>();
     controller.signal.addEventListener("abort", () =>
@@ -106,17 +147,24 @@ async function mount(lens: string) {
     await shell.mount({
       root,
       content: data,
-      route: currentRoute(),
+      route,
       face: document.documentElement.hasAttribute("data-prism-face"),
       reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches,
       signal: controller.signal,
-      isIdle: () =>
-        document.documentElement.hasAttribute("data-prism-idle"),
+      isIdle: () => document.documentElement.hasAttribute("data-prism-idle"),
       onIdleChange(listener) {
         listeners.add(listener);
         idleListeners.add(listener);
       },
     });
+    if (
+      document.documentElement.dataset.lens !== lens ||
+      currentRoute().path !== route.path
+    ) {
+      unmount();
+      return;
+    }
+    document.documentElement.setAttribute("data-lens-shell", "");
     document.documentElement.setAttribute("data-shell-ready", "");
   } catch (error) {
     console.error(`Lens shell "${lens}" failed; showing Daylight.`, error);
