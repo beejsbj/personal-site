@@ -1118,12 +1118,16 @@ class Troupe {
           if (mate) void this.say(mate, pick(this.talk.say.pokeDead), { force: !this.talking });
           return;
         }
+        // mid-walk, mid-lunge, winding up: not his to take
+        if (man.busy) return;
         try {
           target.setPointerCapture(event.pointerId);
         } catch {
           /* fine */
         }
         hold = { m: man, id: event.pointerId, x: event.clientX, y: event.clientY, pulled: false, off: false, v: { x: 0, y: 0 }, aim: null, target };
+        // in the visitor's hand: the war can't pick him meanwhile
+        man.busy = true;
       },
       { signal },
     );
