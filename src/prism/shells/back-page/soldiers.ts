@@ -730,8 +730,11 @@ class Troupe {
       const mate = pick(m.camp.men.filter((o) => o.alive && o !== m)) ?? null;
       if (mate)
         setTimeout(() => {
-          if (!this.alive || mate.alive) this.react(mate, "look", angle(mate, m));
-          void this.answer(mate, reply, m, w);
+          // crossed out meanwhile: another mate answers, or no one does
+          const by = mate.alive ? mate : pick(m.camp.men.filter((o) => o.alive && o !== m));
+          if (!by) return;
+          this.react(by, "look", angle(by, m));
+          void this.answer(by, reply, m, w);
         }, Math.min(w.eraseAt - 400, 1150 + text.length * 30));
     }
     await w.done;
