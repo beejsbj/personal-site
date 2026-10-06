@@ -4,7 +4,11 @@ import { ClientRouter } from "astro:transitions";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import EdgeBlob from "../design/unique/EdgeBlob.astro";
+import LensBoot from "../prism/LensBoot.astro";
+import LensDecor from "../prism/LensDecor.astro";
+import Prism from "../prism/Prism.astro";
 import "../styles/global.css";
+import "../prism/prism.css";
 
 interface Props {
   title?: string;
@@ -12,7 +16,11 @@ interface Props {
   image?: string;
   pageClass?: string;
   noindex?: boolean;
+  canonical?: string;
   clientRouting?: boolean;
+  /** A tool page (/prism/harness, /prism/atlas): the site's chrome, but no
+   * lens, prism or client router of its own, and never indexed. */
+  tool?: boolean;
 }
 
 const siteEntry = await getEntry("site", "config");
@@ -26,20 +34,24 @@ const {
   description = site.siteDescription,
   image = "/images/burooj4.jpg",
   pageClass = "page-default",
-  noindex = false,
-  clientRouting = true,
+  canonical,
+  tool = false,
+  noindex = tool,
+  clientRouting = !tool,
 } = Astro.props;
 
 const pageTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
-const canonicalUrl = new URL(Astro.url.pathname, siteBaseUrl).toString();
+const canonicalUrl =
+  canonical ?? new URL(Astro.url.pathname, siteBaseUrl).toString();
 const socialImage = new URL(image, siteBaseUrl).toString();
 ---
 
 <!doctype html>
-<html lang="en" data-theme="default">
+<html lang="en" data-lens="daylight">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {!tool && <LensBoot />}
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, follow" />}
@@ -56,19 +68,18 @@ const socialImage = new URL(image, siteBaseUrl).toString();
 
   <body class={pageClass}>
     <a class="skip-link" href="#main-content">
-      Skip to content
+      {site.skipLink}
     </a>
+    <div id="lens-shell" transition:persist="lens-shell"></div>
     <div class="site-frame">
-      <EdgeBlob />
-      <SiteHeader
-        nav={site.nav}
-        currentPath={Astro.url.pathname}
-        email={site.email}
-      />
+      {!tool && <LensDecor />}
+      {!tool && <EdgeBlob />}
+      <SiteHeader site={site} currentPath={Astro.url.pathname} />
       <main id="main-content" tabindex="-1">
         <slot />
       </main>
-      <SiteFooter email={site.email} />
+      <SiteFooter site={site} />
     </div>
+    {!tool && <Prism />}
   </body>
 </html>

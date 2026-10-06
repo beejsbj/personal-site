@@ -2,7 +2,10 @@
 import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
 import MediaFrame from "../design/primitives/MediaFrame.astro";
+import { part } from "../prism/parts";
 interface Props {
+  /** The entry's slug, marking its parts. */
+  slug?: string;
   href: string;
   title: string;
   summary: string;
@@ -10,20 +13,22 @@ interface Props {
   sourceEra: string;
   cover?: string;
 }
-const { href, title, summary, type, sourceEra, cover } = Astro.props;
+const { slug, href, title, summary, type, sourceEra, cover } = Astro.props;
+const mark = (name: Parameters<typeof part>[0]) =>
+  slug === undefined ? {} : part(name, slug);
 ---
 
 <article class="lab-card">
   {cover && <MediaFrame src={cover} alt="" fit="cover" />}
-  <p class="meta">
+  <p class="meta" {...mark("lab.meta")}>
     {type} · {sourceEra}
   </p>
-  <Heading level={2} scale="card">
+  <Heading level={2} scale="card" {...mark("lab.title")}>
     <Link href={href} arrow>
       {title}
     </Link>
   </Heading>
-  <p>{summary}</p>
+  <p {...mark("lab.summary")}>{summary}</p>
 </article>
 <style>
   .lab-card {

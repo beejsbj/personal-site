@@ -1,0 +1,17 @@
+---
+/** Primitive: a short line of copy with inline markdown (**strong**, _em_,
+ * `code`, [links](/x)). links=design renders the Link primitive; links=plain
+ * renders bare anchors, for prose that styles its own links. Each element
+ * sits on one line so no stray whitespace lands inside it. */
+import Link from "./Link.astro";
+import { parseInline, type InlineToken } from "../../lib/inline";
+interface Props {
+  text?: string;
+  tokens?: InlineToken[];
+  links?: "design" | "plain";
+}
+const { text = "", links = "design" } = Astro.props;
+const tokens = Astro.props.tokens ?? parseInline(text);
+---
+
+{tokens.map((token) => token.type === "text" ? token.text : token.type === "code" ? <code>{token.text}</code> : token.type === "strong" ? <strong><Astro.self tokens={token.children} links={links} /></strong> : token.type === "em" ? <em><Astro.self tokens={token.children} links={links} /></em> : links === "plain" ? <a href={token.href}><Astro.self tokens={token.children} links={links} /></a> : <Link href={token.href}><Astro.self tokens={token.children} links={links} /></Link>)}

@@ -1,17 +1,19 @@
 ---
+import type { SiteData } from "../content.config";
 import Link from "../design/primitives/Link.astro";
+import { resolveLink } from "../lib/rules";
 interface Props {
-  email: string;
+  site: SiteData;
 }
-const { email } = Astro.props;
+const { site } = Astro.props;
+const links = site.footer.links.map((link) => resolveLink(site, link));
 ---
 
 <footer class="site-footer shell">
-  <span>Burooj Rashid</span>
-  <Link href={`mailto:${email}`}>{email}</Link>
-  <Link href="/resume">Resume</Link>
-  <Link href="/style-guide">Style guide</Link>
-  <span class="thanks">Thanks for stopping by.</span>
+  <span>{site.name}</span>
+  <Link href={`mailto:${site.email}`}>{site.email}</Link>
+  {links.map((link) => <Link href={link.href}>{link.label}</Link>)}
+  <span class="thanks">{site.footer.signoff}</span>
 </footer>
 <style>
   .site-footer {

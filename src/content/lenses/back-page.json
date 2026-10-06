@@ -1,0 +1,522 @@
+{
+  "months": ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"],
+  "skip": "Skip to the page",
+  "newTab": "opens in a new tab",
+  "books": {
+    "label": "Books on the desk",
+    "open": "open",
+    "openOnDesk": ", open on the desk",
+    "home": {
+      "title": ["Port", "folio"],
+      "name": "Hello",
+      "aside": "start here",
+      "klass": "after lights out"
+    },
+    "about": {
+      "title": ["About ", "me"],
+      "name": "About me",
+      "aside": "notes",
+      "klass": "the quiet one"
+    },
+    "lab": {
+      "title": ["The ", "lab"],
+      "name": "The lab",
+      "aside": "doodles",
+      "klass": "pencil fight"
+    },
+    "projects": {
+      "title": ["The ", "war"],
+      "name": "Projects",
+      "aside": "the war",
+      "klass": "drawing office"
+    },
+    "writing": {
+      "title": ["Writ", "ings"],
+      "name": "Writings",
+      "aside": "essays",
+      "klass": "late nights",
+      "series": "Composition Book",
+      "print": "100 sheets"
+    }
+  },
+  "papers": {
+    "lamplight": {
+      "pens": ["Blue", "Red"]
+    },
+    "notebook": {
+      "pens": ["Blue", "Red"]
+    },
+    "graph": {
+      "pens": ["Lead", "Red"]
+    },
+    "blueprint": {
+      "pens": ["White", "Yellow"]
+    },
+    "composition": {
+      "pens": ["Blue", "Red"]
+    }
+  },
+  "chapters": {
+    "home": "Hello",
+    "about": "About me",
+    "resume": "Resume",
+    "lab": "The lab",
+    "projects": "The war",
+    "writing": "Writings",
+    "close": "Back to the start"
+  },
+  "page": {
+    "number": "Page No.",
+    "date": "Date",
+    "spare": "(a quick war, during maths)",
+    "spareYours": "(a quick war, during maths. Your go: pull a {pen} man back, let go)"
+  },
+  "cover": {
+    "name": "Name",
+    "subject": "Subject",
+    "class": "Class",
+    "belongs": "This book belongs to",
+    "returnTo": "If found, please return to",
+    "series": "Book {n}"
+  },
+  "home": {
+    "toProjects": "all of them, in the war book"
+  },
+  "about": {
+    "inShort": "in short",
+    "stapled": "stapled in, p. {n}"
+  },
+  "writing": {
+    "substack": "on Substack",
+    "ps": "P.S.",
+    "insideCover": {
+      "tables": "Times Tables",
+      "conversionHeader": "Useful Conversions",
+      "length": "Length",
+      "weight": "Weight",
+      "volume": "Volume"
+    }
+  },
+  "lab": {
+    "eyebrow": "{eyebrow} · in the margins",
+    "tryIt": "Try it on {era}"
+  },
+  "project": {
+    "selected": "selected work",
+    "archive": "from the archive",
+    "tools": "{title} tools",
+    "back": "back to the war map (all projects)"
+  },
+  "projects": {
+    "eyebrow": "{eyebrow} · the war",
+    "date": "the whole war",
+    "roll": "Roll call",
+    "map": "Projects on the map",
+    "selected": "selected work",
+    "archive": "the archive"
+  },
+  "loose": {
+    "tag": "tucked in"
+  },
+  "turner": {
+    "label": "Turn the page",
+    "next": "turn over",
+    "prev": "back"
+  },
+  "live": {
+    "loose": "{label}: a loose sheet, tucked into the book.",
+    "spread": "{label}, pages {n} of {total}.",
+    "single": "{label}, page {n} of {total}.",
+    "one": "{label}."
+  },
+  "soldiers": {
+    "idle": [
+      "for Dawood!",
+      "mum?",
+      "hold the line",
+      "…",
+      "hm",
+      "is it lunch?",
+      "I spy…",
+      "whose go is it?",
+      "is Dawood watching?",
+      "my feet hurt",
+      "anyone got a rubber?",
+      "what's the plan",
+      "dot dot dot",
+      "I need a wee",
+      "who drew me",
+      "is this a test",
+      "I'm bored",
+      "is that a smudge",
+      "ooh, a fly",
+      "why are we dots",
+      "who holds the pen",
+      "do dots dream",
+      "is the lamp god",
+      { "t": "is any of this real", "mood": "tiny" },
+      "I'm knackered",
+      "five more minutes",
+      "not it",
+      "at least I'm round",
+      "I'd rather be a square",
+      "mind the margin",
+      "somebody's drawn on this",
+      "don't turn it yet",
+      "*yawn*",
+      "*cough*",
+      "cosy in here",
+      "the ring holds",
+      "who's on watch",
+      "shh, he's reading",
+      "mind the words",
+      "I'm in the margin",
+      "who's reading us?",
+      "Burooj drew me small",
+      "this is a nice book",
+      "we're on squared paper",
+      "it smells of biro"
+    ],
+    "chats": [
+      { "t": "what's the plan", "reply": "no idea" },
+      { "t": "you alright?", "reply": "no" },
+      { "t": "is it lunch?", "reply": "it's always lunch" },
+      { "t": "who's Dawood?", "reply": "the boss" },
+      { "t": "did you see that", "reply": "I saw nothing" },
+      { "t": "I'm going to lunge", "reply": "don't" },
+      { "t": "cover me", "reply": "with what" },
+      { "t": "are we winning", "reply": "define winning" },
+      { "t": "I spy…", "reply": "a dot" },
+      { "t": "nice weather", "reply": "it's a lamp" },
+      { "t": "psst", "reply": "what" },
+      { "t": "hold the line", "reply": "which line" },
+      { "t": "left or right", "reply": "yes" },
+      { "t": "scared?", "reply": "obviously" },
+      { "t": "I've got a plan", "reply": "oh no" },
+      { "t": "any sweets?", "reply": "one. mine." },
+      { "t": "what if we lose", "reply": "new page" },
+      { "t": "we're outnumbered", "reply": "count again" },
+      { "t": "my feet hurt", "reply": "you're a dot" },
+      { "t": "is this the front?", "reply": "it's all front" },
+      { "t": "where's Dawood?", "reply": "holding the pen" },
+      { "t": "we're winning!", "reply": "don't jinx it" },
+      { "t": "you blinked", "reply": "I don't have eyes" },
+      { "t": "shall we sing?", "reply": "please don't" },
+      { "t": "I think I'm smudged", "reply": "suits you" },
+      { "t": "tell my mum", "reply": "tell her what" },
+      { "t": "did he miss?", "reply": "he always misses" },
+      { "t": "why are we round", "reply": "ask the pen" },
+      { "t": "I'm knackered", "reply": "you've not moved" },
+      { "t": "do erasers hurt?", "reply": "shh" },
+      { "t": "I'll go first", "reply": "after you" },
+      { "t": "someone's reading", "reply": "act natural" },
+      { "t": "is this homework?", "reply": "it's a portfolio" },
+      { "t": "who's Burooj?", "reply": "the one with the pen" },
+      { "t": "who invented this game?", "reply": "Dawood. in maths." },
+      { "t": "are we in maths?", "reply": "always" },
+      { "t": "Dawood or Burooj?", "reply": "don't make me choose" },
+      { "t": "why the margin?", "reply": "the words get the middle" },
+      { "t": "can you read?", "reply": "only the big words" },
+      { "t": "what page is this", "reply": "a good one" },
+      { "t": "he's turning the page", "reply": "hold on to something" }
+    ],
+    "page": {
+      "home": [
+        "hello reader!",
+        "that's him in the photo",
+        { "t": "is that Burooj?", "reply": "nice glasses" },
+        { "t": "what's a home page", "reply": "this. we live here." },
+        "welcome in",
+        "first page. best page"
+      ],
+      "about": [
+        "neat notes",
+        { "t": "is this revision?", "reply": "it's notes" },
+        "who highlights this much",
+        { "t": "API3?", "reply": "it's an acronym" },
+        "he likes gaming. so do we",
+        { "t": "people, stories…", "reply": "and dots" }
+      ],
+      "resume": [
+        "we're in his CV",
+        "hire us too",
+        { "t": "are we on the resume?", "reply": "under hobbies" },
+        "it's typed. posh.",
+        { "t": "is that a staple?", "reply": "don't touch it" },
+        "references: Dawood"
+      ],
+      "lab": [
+        "are we the experiment?",
+        { "t": "what's a lab?", "reply": "where doodles go" },
+        "nice lotus",
+        { "t": "is this science?", "reply": "it's doodling" },
+        "I helped with the spiral"
+      ],
+      "lab-entry": [
+        "are we the experiment?",
+        "I'd try that",
+        { "t": "does it work?", "reply": "mostly" }
+      ],
+      "project": [
+        "I helped build this",
+        { "t": "is it shipped?", "reply": "it's shipped" },
+        "nice screenshot",
+        { "t": "who made this?", "reply": "Burooj. and us." },
+        "we were there",
+        { "t": "is it on the map?", "reply": "back page" }
+      ],
+      "writing": [
+        "a proper essay book",
+        "shh, he's writing",
+        { "t": "is this homework?", "reply": "it's an essay" },
+        "wide ruled. roomy",
+        { "t": "what's it about?", "reply": "read it and see" },
+        "nice handwriting, for once"
+      ],
+      "essay": [
+        "we're in an essay",
+        { "t": "how long is this?", "reply": "keep reading" },
+        "I'm a full stop",
+        "don't skip ahead",
+        { "t": "is there a test?", "reply": "there's a P.S." },
+        { "t": "are we in it?", "reply": "we're the margin" }
+      ],
+      "spare": [
+        "a quick war!",
+        "maths is boring",
+        { "t": "is it maths?", "reply": "it's war" },
+        "don't tell sir"
+      ]
+    },
+    "paper": {
+      "lamplight": [
+        "squared paper. classy",
+        "who did the sums here",
+        "it's a maths copy",
+        "the lamp's in my eyes",
+        "2 mm squares, lovely"
+      ],
+      "notebook": [
+        "a quiet notebook",
+        "very posh paper",
+        "don't crease it",
+        "it's a nice notebook this",
+        { "t": "is this a diary?", "reply": "it's notes" }
+      ],
+      "graph": [
+        "graph paper. respect",
+        "we're on a graph",
+        "plot me",
+        "x marks the dead",
+        "it's all squares",
+        "pencil? we're pencil?"
+      ],
+      "blueprint": [
+        "we're on a blueprint",
+        "it's very blue",
+        "are we a plan",
+        "chalk. fancy",
+        "I feel architectural",
+        { "t": "are we built yet?", "reply": "phase two" }
+      ],
+      "composition": [
+        "marble cover. posh",
+        "it's a composition book",
+        "wide ruled, lovely",
+        "it smells of school",
+        { "t": "is this marble?", "reply": "it's cardboard" },
+        "mind the stitching"
+      ]
+    },
+    "say": {
+      "poke": [
+        "oi!",
+        "that tickles",
+        "hey!",
+        "me?",
+        "I'm ready",
+        "I was napping",
+        "pick me!",
+        "careful",
+        "boop",
+        "ready!",
+        "right then",
+        "at last",
+        "yes?"
+      ],
+      "pokeAgain": [
+        "stop it",
+        "I bruise easily",
+        "I'm telling Dawood",
+        "rude",
+        "oi! again?",
+        "still here",
+        "that's my dot"
+      ],
+      "pokeRed": [
+        "wrong side",
+        "you're not my pen",
+        "Dawood's my pen",
+        "off!",
+        "are you Dawood?",
+        "I'm {me}, thanks"
+      ],
+      "pokeDead": [
+        "let him rest",
+        "he's resting",
+        "too late, mate",
+        "leave him"
+      ],
+      "hint": [
+        "pull me back!",
+        "pull me & let go",
+        "aim me!",
+        "flick me at {them}"
+      ],
+      "aim": [
+        "steady…",
+        "hold still",
+        "don't miss",
+        "a bit left",
+        "deep breath",
+        { "t": "I'm scared", "mood": "tiny" },
+        "don't sneeze",
+        "aim for the big one"
+      ],
+      "phew": [
+        "phew",
+        "close one",
+        "my hat!",
+        "oi!",
+        "missed me",
+        "rude",
+        "hey!",
+        { "t": "HEY!", "mood": "shout" },
+        "I felt that",
+        "watch it"
+      ],
+      "dread": [
+        "!",
+        "!!",
+        "eep",
+        "not me not me",
+        "mum?",
+        "oh no",
+        "gulp",
+        "why me",
+        "I'm too round to die"
+      ],
+      "kill": [
+        "got him!",
+        "yes!",
+        "down!",
+        "ha!",
+        "for Dawood!",
+        "another one",
+        "sorry mate",
+        "one for the book",
+        { "t": "YES!", "mood": "shout" },
+        "nothing personal"
+      ],
+      "miss": [
+        "missed",
+        "the wind",
+        "I meant that",
+        "warning shot",
+        "I wasn't ready",
+        "the pen slipped",
+        { "t": "oops", "mood": "tiny" }
+      ],
+      "mourn": [
+        "no…",
+        "he owed me lunch",
+        "we'll remember him",
+        "…",
+        "he was so young",
+        "Dawood, why",
+        "avenge him",
+        "that was my bunk mate",
+        "he had a sandwich",
+        { "t": "not him", "mood": "tiny" }
+      ],
+      "lunge": [
+        { "t": "Luuunge!", "mood": "shout" },
+        { "t": "Chaaarge!", "mood": "shout" },
+        { "t": "fooor Dawooood!", "mood": "shout" },
+        { "t": "Geronimooo!", "mood": "shout" },
+        { "t": "wheeee!", "mood": "shout" },
+        { "t": "banzaaai!", "mood": "shout" },
+        "hold my hat!"
+      ],
+      "snipe": [
+        { "t": "Baaang!", "mood": "shout" },
+        "eat this!",
+        { "t": "Fiiire!", "mood": "shout" },
+        "take that!",
+        "pew pew!",
+        "incoming!"
+      ],
+      "deny": [
+        "not in our camp!",
+        "gotcha!",
+        "who's next?",
+        "nice try",
+        "denied!",
+        "wrong camp mate",
+        { "t": "GET OUT!", "mood": "shout" },
+        "no entry",
+        "we saw you coming"
+      ],
+      "more": [
+        "One more!"
+      ],
+      "last": [
+        "it's just us",
+        "hold the line!",
+        "we few",
+        "to the last!",
+        "not like this",
+        "they shall not pass",
+        { "t": "it's been an honour", "mood": "tiny" }
+      ],
+      "botGo": [
+        "my go",
+        "Dawood's go",
+        "your turn's over",
+        "now us",
+        "watch this",
+        "nice miss, {them}"
+      ],
+      "banter": [
+        "oi {them}!",
+        "{them} can't aim",
+        "{them}'s scared",
+        "your camp's wonky",
+        "nice miss {them}",
+        "come and get us",
+        "who drew you",
+        "run home {them}",
+        "{them}'s pen leaks",
+        "is {them} even a colour",
+        "{me} is the best colour",
+        { "t": "{them} look scared", "reply": "so do you" }
+      ],
+      "ended": [
+        "is it over?",
+        "we survived",
+        "count us",
+        "never again",
+        "I need a lie down"
+      ]
+    },
+    "lastStand": "LAST STAND!",
+    "wander": [
+      "it's cold out here",
+      "I'm very alone",
+      "can I come back in",
+      "it's quiet. too quiet",
+      "long way from camp",
+      "just stretching"
+    ]
+  }
+}

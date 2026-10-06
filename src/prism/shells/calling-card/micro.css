@@ -1,0 +1,655 @@
+/* Microanimations: the snappy, jittery, overshooting life of a Persona 5
+   menu. Loaded after the screens so it can retune their state changes.
+   Everything that moves sits inside prefers-reduced-motion: no-preference;
+   reduced motion keeps the colour snaps the base layer already has.
+   Ambient loops use the individual translate/rotate/scale properties so
+   they compose with each element's own transform. */
+
+/* ---------- Click burst (JS-spawned) ---------- */
+:root[data-lens="calling-card"] .cc-burst {
+  position: absolute;
+  z-index: 45;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+:root[data-lens="calling-card"] .cc-burst__bit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  background: var(--cc-white);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  transform: translate(-50%, -50%) scale(0);
+}
+:root[data-lens="calling-card"] .cc-burst__bit--1 {
+  width: 10px;
+  height: 10px;
+  background: var(--cc-red);
+  clip-path: polygon(0 20%, 100% 0, 40% 100%);
+}
+:root[data-lens="calling-card"] .cc-burst__bit--2 {
+  width: 8px;
+  height: 8px;
+  background: var(--cc-black);
+  outline: 2px solid var(--cc-white);
+  clip-path: none;
+}
+
+/* ---------- Press: every button punches ---------- */
+:root[data-lens="calling-card"] .cc-cmd,
+:root[data-lens="calling-card"] .cc-slot,
+:root[data-lens="calling-card"] .cc-request {
+  transition-property: transform, scale, box-shadow;
+  transition-duration: 150ms, 70ms, 120ms;
+}
+:root[data-lens="calling-card"] .cc-cmd:active,
+:root[data-lens="calling-card"] .cc-slot:active,
+:root[data-lens="calling-card"] .cc-request:active {
+  scale: 0.96;
+}
+:root[data-lens="calling-card"] .cc-back:active,
+:root[data-lens="calling-card"] .cc-tabs__tab:active,
+:root[data-lens="calling-card"] .cc-tabs__shoulder:active,
+:root[data-lens="calling-card"] .cc-shop__card:active,
+:root[data-lens="calling-card"] .cc-pager:active,
+:root[data-lens="calling-card"] .cc-phonechip:active,
+:root[data-lens="calling-card"] .cc-panel__close:active,
+:root[data-lens="calling-card"] .cc-msg__link:active,
+:root[data-lens="calling-card"] .cc-card__email:active,
+:root[data-lens="calling-card"] .cc-card__links a:active,
+:root[data-lens="calling-card"] .cc-status__contacts a:active {
+  translate: 3px 3px;
+  box-shadow: none;
+}
+
+/* ---------- Phone typing indicator (state, not motion) ---------- */
+:root[data-lens="calling-card"] .cc-msg--typing .cc-msg__bubble {
+  justify-self: start;
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  min-height: 2.4rem;
+  padding: 0.6rem 1rem;
+}
+:root[data-lens="calling-card"] .cc-msg__dots i {
+  display: block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-msg__dots i:nth-child(2) {
+  background: var(--cc-red);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ========== Keyframes ========== */
+  @keyframes calling-card-letter-pop {
+    0% {
+      transform: translateY(calc(var(--y, 0em) + 0.3em)) rotate(calc(var(--r, 0deg) + 24deg)) scale(0);
+      opacity: 0;
+    }
+    55% {
+      transform: translateY(calc(var(--y, 0em) - 0.08em)) rotate(calc(var(--r, 0deg) - 5deg)) scale(1.18);
+      opacity: 1;
+    }
+    80% {
+      transform: translateY(var(--y, 0em)) rotate(calc(var(--r, 0deg) + 2deg)) scale(0.96);
+    }
+    100% {
+      transform: translateY(var(--y, 0em)) rotate(var(--r, 0deg)) scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes calling-card-letter-hop {
+    0% { transform: translateY(var(--y, 0em)) rotate(var(--r, 0deg)) scale(1); }
+    35% { transform: translateY(calc(var(--y, 0em) - 0.16em)) rotate(calc(var(--r, 0deg) - 7deg)) scale(1.14, 0.9); }
+    65% { transform: translateY(calc(var(--y, 0em) + 0.04em)) rotate(calc(var(--r, 0deg) + 4deg)) scale(0.94, 1.08); }
+    100% { transform: translateY(var(--y, 0em)) rotate(var(--r, 0deg)) scale(1); }
+  }
+  @keyframes calling-card-plate-snap {
+    0% { transform: scale(0, 1.3); }
+    55% { transform: scale(1.1, 0.82); }
+    78% { transform: scale(0.97, 1.06); }
+    100% { transform: scale(1, 1); }
+  }
+  @keyframes calling-card-shard-in {
+    0% { transform: scaleX(0) rotate(-30deg); }
+    60% { transform: scaleX(1.2) rotate(-2deg); }
+    100% { transform: scaleX(1) rotate(-6deg); }
+  }
+  @keyframes calling-card-cursor {
+    from { transform: scaleX(1) rotate(-6deg) translateX(0); }
+    to { transform: scaleX(1) rotate(-6deg) translateX(-0.12em); }
+  }
+  @keyframes calling-card-arrow-bob {
+    from { translate: 0 -50%; }
+    to { translate: -0.35rem -50%; }
+  }
+  @keyframes calling-card-bob {
+    from { translate: 0 0; rotate: 0deg; }
+    to { translate: 0.06em -0.08em; rotate: -1.2deg; }
+  }
+  @keyframes calling-card-breathe {
+    from { transform: translateY(0) rotate(0deg) scale(1); }
+    to { transform: translateY(-0.4%) rotate(0.5deg) scale(1.008); }
+  }
+  @keyframes calling-card-num-slam {
+    0% { transform: scale(2.4) rotate(9deg) skewX(-8deg); opacity: 0; }
+    45% { transform: scale(0.88) rotate(-4deg); opacity: 1; }
+    70% { transform: scale(1.08) rotate(1deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  @keyframes calling-card-star-burst {
+    0% { rotate: 0deg; animation-timing-function: cubic-bezier(0.2, 1.6, 0.4, 1); }
+    9% { rotate: 72deg; }
+    100% { rotate: 72deg; }
+  }
+  @keyframes calling-card-drift {
+    from { translate: 0 0; }
+    to { translate: 12px -12px; }
+  }
+  /* A phone buzz: 400ms of rattle at the top of a 4.8s cycle. */
+  @keyframes calling-card-buzz {
+    0%, 9%, 100% { rotate: 0deg; }
+    1% { rotate: -9deg; }
+    2.5% { rotate: 8deg; }
+    4% { rotate: -7deg; }
+    5.5% { rotate: 6deg; }
+    7% { rotate: -3deg; }
+    8% { rotate: 2deg; }
+  }
+  @keyframes calling-card-rattle {
+    0%, 100% { rotate: 0deg; }
+    25% { rotate: -8deg; }
+    75% { rotate: 8deg; }
+  }
+  @keyframes calling-card-badge {
+    0%, 100% { scale: 1; }
+    8% { scale: 1.45; }
+    14% { scale: 0.9; }
+    20% { scale: 1.12; }
+    26% { scale: 1; }
+  }
+  @keyframes calling-card-stamp {
+    0% { scale: 3; rotate: 12deg; opacity: 0; }
+    55% { scale: 0.9; rotate: -3deg; opacity: 1; }
+    75% { scale: 1.06; rotate: 1deg; }
+    100% { scale: 1; rotate: 0deg; opacity: 1; }
+  }
+  @keyframes calling-card-pop {
+    0% { scale: 0; opacity: 0; }
+    60% { scale: 1.16; opacity: 1; }
+    100% { scale: 1; opacity: 1; }
+  }
+  @keyframes calling-card-slot-in {
+    from {
+      transform: translateX(calc(mod(var(--i, 0), 3) * 0.7rem - 90px)) skewX(-26deg);
+      opacity: 0;
+    }
+    60% {
+      transform: translateX(calc(mod(var(--i, 0), 3) * 0.7rem + 8px)) skewX(-4deg);
+      opacity: 1;
+    }
+  }
+  @keyframes calling-card-row-in {
+    from { translate: 60px 0; rotate: 1deg; opacity: 0; }
+    60% { translate: -4px 0; rotate: 0deg; opacity: 1; }
+  }
+  @keyframes calling-card-wobble {
+    0% { rotate: 0deg; }
+    30% { rotate: 2.4deg; }
+    60% { rotate: -1.6deg; }
+    80% { rotate: 0.8deg; }
+    100% { rotate: 0deg; }
+  }
+  @keyframes calling-card-flutter {
+    0% { rotate: 0deg; translate: 0 0; }
+    50% { rotate: 0.9deg; translate: 2px -4px; }
+    100% { rotate: -0.6deg; translate: -1px 2px; }
+  }
+  @keyframes calling-card-photo-in {
+    0% { transform: rotate(11deg) scale(1.12); opacity: 0; }
+    60% { transform: rotate(1deg) scale(0.98); opacity: 1; }
+    100% { transform: rotate(3deg) scale(1); opacity: 1; }
+  }
+  @keyframes calling-card-key-bounce {
+    from { translate: 0 0; }
+    to { translate: 0 -3px; }
+  }
+  @keyframes calling-card-dot {
+    0%, 60%, 100% { translate: 0 0; scale: 1; }
+    30% { translate: 0 -0.35rem; scale: 1.15; }
+  }
+  @keyframes calling-card-spin-in {
+    from { rotate: -200deg; scale: 0; }
+    70% { rotate: 10deg; scale: 1.15; }
+    to { rotate: 0deg; scale: 1; }
+  }
+  @keyframes calling-card-sway {
+    from { rotate: -0.8deg; }
+    to { rotate: 0.8deg; }
+  }
+  @keyframes calling-card-pip {
+    0% { scale: 0; rotate: -90deg; }
+    60% { scale: 1.5; rotate: 10deg; }
+    100% { scale: 1; rotate: 0deg; }
+  }
+  @keyframes calling-card-label-in {
+    from { opacity: 0; translate: 0 6px; }
+  }
+  @keyframes calling-card-blink {
+    50% { opacity: 0.35; }
+  }
+
+  /* ========== Ransom letters: staggered pops on arrival ========== */
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-title .cc-l,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-item__title .cc-l,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-confidant__title .cc-l,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-brief__title .cc-l,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-status__logo .cc-l,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-status__name .cc-l,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-doc__stamp .cc-l,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-home__name .cc-l,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-command__logo .cc-l,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-request__title .cc-l {
+    animation: calling-card-letter-pop 300ms var(--cc-snap) both;
+    animation-delay: calc(140ms + var(--n, 0) * 26ms);
+  }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-home__name .cc-l {
+    animation-delay: calc(260ms + var(--n, 0) * 30ms);
+  }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-request__title .cc-l {
+    animation-delay: calc(260ms + var(--i, 0) * 80ms + var(--n, 0) * 22ms);
+  }
+  :root[data-lens="calling-card"] .cc-file__name .cc-l {
+    animation: calling-card-letter-pop 260ms var(--cc-snap) both;
+    animation-delay: calc(60ms + var(--n, 0) * 18ms);
+  }
+  :root[data-lens="calling-card"] .cc-wipe__title .cc-l {
+    animation: calling-card-letter-pop 220ms var(--cc-snap) both;
+    animation-delay: calc(190ms + var(--n, 0) * 16ms);
+  }
+  :root[data-lens="calling-card"] .cc-card__headline .cc-l {
+    animation: calling-card-letter-pop 280ms var(--cc-snap) both;
+    animation-delay: calc(520ms + var(--n, 0) * 24ms);
+  }
+  /* Hovered titles and the email link: letters hop one by one. */
+  :root[data-lens="calling-card"] .cc-card__email:hover .cc-l,
+  :root[data-lens="calling-card"] .cc-card__email:focus-visible .cc-l,
+  :root[data-lens="calling-card"] .cc-home__name:hover .cc-l,
+  :root[data-lens="calling-card"] .cc-command__logo:hover .cc-l {
+    animation: calling-card-letter-hop 360ms var(--cc-snap);
+    animation-delay: calc(var(--n, 0) * 24ms);
+  }
+
+  /* ========== COMMAND: the menu ========== */
+  /* The selected command's letters jitter into place, one after another. */
+  :root[data-lens="calling-card"] .cc-cmd[data-state="selected"] .cc-l {
+    animation: calling-card-letter-hop 320ms var(--cc-snap);
+    animation-delay: calc(var(--n, 0) * 22ms);
+  }
+  :root[data-lens="calling-card"] .cc-cmd[data-state="selected"] .cc-ransom__ink {
+    animation: calling-card-shake 140ms linear;
+  }
+  /* Red plate snaps in with a squash-and-stretch. */
+  :root[data-lens="calling-card"] .cc-cmd[data-state="selected"] .cc-cmd__plate {
+    animation: calling-card-plate-snap 240ms var(--cc-out);
+  }
+  /* The white shard is the cursor: it snaps in, then keeps bouncing. */
+  :root[data-lens="calling-card"] .cc-cmd[data-state="selected"] .cc-cmd__shard {
+    transition: none;
+    animation:
+      calling-card-shard-in 200ms var(--cc-snap) both,
+      calling-card-cursor 520ms ease-in-out 200ms infinite alternate;
+  }
+  /* Unselected commands idle-bob, out of phase. */
+  :root[data-lens="calling-card"] .cc-cmd[data-state="idle"] .cc-ransom {
+    display: inline-block;
+    animation: calling-card-bob 2.8s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i, 0) * -0.7s);
+  }
+  :root[data-lens="calling-card"] .cc-cmd[data-state="idle"]:hover .cc-ransom {
+    animation-duration: 0.5s;
+  }
+
+  /* The cut-out breathes after landing. */
+  :root[data-lens="calling-card"] .cc-home__portrait {
+    transform-origin: 50% 100%;
+    animation:
+      calling-card-fly-up 520ms var(--cc-out) both,
+      calling-card-breathe 4.6s ease-in-out 520ms infinite alternate;
+  }
+  :root[data-lens="calling-card"] .cc-confidant__portrait {
+    transform-origin: 50% 100%;
+    animation:
+      calling-card-fly-up 480ms var(--cc-out) both,
+      calling-card-breathe 5.2s ease-in-out 480ms infinite alternate;
+  }
+  /* Big 01-07: a fresh digit slams down on every selection change. */
+  :root[data-lens="calling-card"] .cc-home__num-value {
+    animation: none;
+  }
+  :root[data-lens="calling-card"] .cc-home__num-digit {
+    display: inline-block;
+    animation: calling-card-num-slam 300ms var(--cc-out) both;
+  }
+  /* Stars spin in bursts; halftone dots drift. */
+  :root[data-lens="calling-card"] .cc-home__corner-star,
+  :root[data-lens="calling-card"] .cc-requests__star,
+  :root[data-lens="calling-card"] .cc-item__star,
+  :root[data-lens="calling-card"] .cc-card__star,
+  :root[data-lens="calling-card"] .cc-equip__star,
+  :root[data-lens="calling-card"] .cc-doc__star {
+    animation: calling-card-star-burst 7s linear infinite;
+  }
+  :root[data-lens="calling-card"] .cc-requests__star,
+  :root[data-lens="calling-card"] .cc-doc__star {
+    animation-delay: -2.5s;
+  }
+  :root[data-lens="calling-card"] .cc-item__star,
+  :root[data-lens="calling-card"] .cc-equip__star {
+    animation-duration: 9s;
+    animation-delay: -4s;
+  }
+  :root[data-lens="calling-card"] .cc-card__star {
+    animation-duration: 5s;
+    animation-delay: 900ms;
+  }
+  :root[data-lens="calling-card"] .cc-home__dots {
+    animation: calling-card-drift 8s linear infinite;
+  }
+  /* Calendar: the widget stamps in, the sun spins up, "Daytime" blinks once. */
+  :root[data-lens="calling-card"] .cc-home .cc-date__day {
+    animation: calling-card-stamp 340ms var(--cc-out) both 300ms;
+  }
+  :root[data-lens="calling-card"] .cc-date__weather {
+    animation: calling-card-spin-in 520ms var(--cc-snap) both 620ms;
+  }
+  :root[data-lens="calling-card"] .cc-date__time {
+    animation: calling-card-pop 240ms var(--cc-snap) both 1000ms;
+  }
+  :root[data-lens="calling-card"] .cc-date__note {
+    animation: calling-card-fade 200ms ease-out both 1120ms;
+  }
+  /* Name plates land one after another. */
+  :root[data-lens="calling-card"] .cc-home__plates > :nth-child(1) { animation: calling-card-stamp 320ms var(--cc-out) both 160ms; }
+  :root[data-lens="calling-card"] .cc-home__plates > :nth-child(3) { animation: calling-card-fly-right 320ms var(--cc-out) both 380ms; }
+  :root[data-lens="calling-card"] .cc-home__plates > :nth-child(4) { animation: calling-card-stamp 300ms var(--cc-out) both 520ms; }
+  /* Speech bubble: slams in, then sways gently. */
+  :root[data-lens="calling-card"] .cc-home__bubble {
+    animation:
+      calling-card-slam 360ms var(--cc-out) both 360ms,
+      calling-card-sway 3.4s ease-in-out 800ms infinite alternate;
+  }
+  /* The phone buzzes every few seconds; the badge pulses. */
+  :root[data-lens="calling-card"] .cc-phonechip__icon {
+    animation: calling-card-buzz 4.8s linear 1.6s infinite;
+  }
+  :root[data-lens="calling-card"] .cc-phonechip__badge {
+    animation: calling-card-badge 4.8s ease-out 1.6s infinite;
+  }
+  :root[data-lens="calling-card"] .cc-phonechip:hover .cc-phonechip__icon {
+    animation: calling-card-rattle 160ms linear infinite;
+  }
+  /* Money counter: the star sign pops once the digits stop rolling. */
+  :root[data-lens="calling-card"] .cc-money__sign {
+    display: inline-block;
+    animation: calling-card-pop 260ms var(--cc-snap) both 1300ms;
+  }
+  /* Controller prompts: the confirm key breathes. */
+  :root[data-lens="calling-card"] .cc-prompts__item:nth-child(2) kbd {
+    animation: calling-card-key-bounce 700ms ease-in-out infinite alternate;
+  }
+
+  /* ========== Hover shakes ========== */
+  :root[data-lens="calling-card"] .cc-back:hover,
+  :root[data-lens="calling-card"] .cc-tabs__tab:hover,
+  :root[data-lens="calling-card"] .cc-tabs__shoulder:hover,
+  :root[data-lens="calling-card"] .cc-shop__card:hover,
+  :root[data-lens="calling-card"] .cc-pager:hover,
+  :root[data-lens="calling-card"] .cc-panel__close:hover,
+  :root[data-lens="calling-card"] .cc-msg__link:hover,
+  :root[data-lens="calling-card"] .cc-card__links a:hover,
+  :root[data-lens="calling-card"] .cc-status__contacts a:hover {
+    animation: calling-card-shake 180ms linear;
+  }
+  :root[data-lens="calling-card"] .cc-back:hover .cc-back__key,
+  :root[data-lens="calling-card"] .cc-panel__close:hover kbd {
+    animation: calling-card-pop 240ms var(--cc-snap);
+  }
+  /* The current tab jolts once when a screen lands. */
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-tabs__tab[data-state="current"] {
+    animation: calling-card-stamp 300ms var(--cc-out) both 360ms;
+  }
+
+  /* ========== EQUIP: projects ========== */
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-slot {
+    animation: calling-card-slot-in 340ms var(--cc-out) both;
+    animation-delay: calc(140ms + var(--i, 0) * 45ms);
+  }
+  :root[data-lens="calling-card"] .cc-slot[data-state="selected"]::before {
+    animation: calling-card-arrow-bob 420ms ease-in-out infinite alternate;
+  }
+  :root[data-lens="calling-card"] .cc-slot[data-state="selected"] .cc-slot__name {
+    display: inline-block;
+    animation: calling-card-shake 160ms linear;
+  }
+  :root[data-lens="calling-card"] .cc-slot[data-state="selected"] .cc-slot__cat {
+    animation: calling-card-pop 220ms var(--cc-snap);
+  }
+  :root[data-lens="calling-card"] .cc-slot[data-state="selected"] .cc-slot__shard {
+    animation: calling-card-plate-snap 220ms var(--cc-out);
+  }
+  :root[data-lens="calling-card"] .cc-file__cover img {
+    animation: calling-card-photo-in 340ms var(--cc-out) both;
+  }
+  :root[data-lens="calling-card"] .cc-file__cat {
+    animation: calling-card-stamp 260ms var(--cc-out) both 80ms;
+  }
+  :root[data-lens="calling-card"] .cc-file__open kbd {
+    animation: calling-card-key-bounce 600ms ease-in-out infinite alternate;
+  }
+  :root[data-lens="calling-card"] .cc-equip__detail:hover .cc-file__cover img {
+    animation: calling-card-wobble 400ms ease-out;
+    transform-origin: 50% 0;
+  }
+
+  /* ========== ITEM FILE ========== */
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-item__cat,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-confidant__eyebrow,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-titleblock__eyebrow {
+    animation: calling-card-stamp 300ms var(--cc-out) both 120ms;
+  }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-chips li,
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-skills li {
+    animation: calling-card-pop 240ms var(--cc-snap) both;
+    animation-delay: calc(360ms + var(--i, 0) * 40ms);
+  }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-chips li:nth-child(2) { --i: 1; }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-chips li:nth-child(3) { --i: 2; }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-chips li:nth-child(4) { --i: 3; }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-chips li:nth-child(5) { --i: 4; }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-chips li:nth-child(n + 6) { --i: 5; }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-shop li {
+    animation: calling-card-stamp 320ms var(--cc-out) both;
+    animation-delay: calc(420ms + var(--i, 0) * 70ms);
+  }
+  :root[data-lens="calling-card"] .cc-item__cover:hover img {
+    animation: calling-card-wobble 400ms ease-out;
+    transform-origin: 50% 0;
+  }
+  :root[data-lens="calling-card"] .cc-pager:hover kbd {
+    display: inline-block;
+    animation: calling-card-key-bounce 360ms ease-in-out infinite alternate;
+  }
+
+  /* ========== REQUESTS: the lab ========== */
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-request__status {
+    animation: calling-card-stamp 320ms var(--cc-out) both;
+    animation-delay: calc(480ms + var(--i, 0) * 80ms);
+  }
+  :root[data-lens="calling-card"] .cc-request[data-state="selected"] {
+    transform-origin: 50% 0;
+    animation: calling-card-wobble 420ms ease-out;
+  }
+  :root[data-lens="calling-card"] .cc-request[data-state="selected"] .cc-request__accept kbd {
+    animation: calling-card-key-bounce 500ms ease-in-out infinite alternate;
+  }
+  :root[data-lens="calling-card"] .cc-request[data-state="selected"] .cc-request__status {
+    animation: calling-card-pop 240ms var(--cc-snap);
+  }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-requests__intro {
+    animation: calling-card-slam 380ms var(--cc-out) both 500ms;
+  }
+  :root[data-lens="calling-card"] .cc-brief__no span {
+    display: inline-block;
+    animation: calling-card-stamp 320ms var(--cc-out) both 420ms;
+  }
+
+  /* ========== CONFIDANT: about ========== */
+  :root[data-lens="calling-card"] .cc-arcana {
+    transform-origin: 50% 0;
+    animation:
+      calling-card-slam 460ms var(--cc-out) both 160ms,
+      calling-card-sway 4.4s ease-in-out 620ms infinite alternate;
+  }
+  :root[data-lens="calling-card"] .cc-arcana__art {
+    animation: calling-card-spin-in 600ms var(--cc-snap) both 420ms;
+  }
+  :root[data-lens="calling-card"] .cc-confidant__rank-value {
+    display: inline-block;
+    animation: calling-card-num-slam 340ms var(--cc-out) both 700ms;
+  }
+  :root[data-lens="calling-card"] .cc-confidant__pips span {
+    animation: calling-card-pip 260ms var(--cc-snap) both;
+    animation-delay: calc(820ms + var(--i, 0) * 55ms);
+  }
+  :root[data-lens="calling-card"] .cc-social__star {
+    transform-origin: 100px 100px;
+    transform-box: view-box;
+    animation: calling-card-spin-in 600ms var(--cc-snap) both 700ms;
+  }
+  :root[data-lens="calling-card"] .cc-social__chart text {
+    animation: calling-card-label-in 240ms ease-out both;
+  }
+  :root[data-lens="calling-card"] .cc-social__chart text:nth-of-type(1) { animation-delay: 900ms; }
+  :root[data-lens="calling-card"] .cc-social__chart text:nth-of-type(2) { animation-delay: 960ms; }
+  :root[data-lens="calling-card"] .cc-social__chart text:nth-of-type(3) { animation-delay: 1020ms; }
+  :root[data-lens="calling-card"] .cc-social__chart text:nth-of-type(4) { animation-delay: 1080ms; }
+  :root[data-lens="calling-card"] .cc-social__chart text:nth-of-type(5) { animation-delay: 1140ms; }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-talk > * {
+    animation: calling-card-row-in 320ms var(--cc-out) both;
+    animation-delay: calc(360ms + var(--i, 0) * 90ms);
+  }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-talk > .cc-rankup {
+    animation: calling-card-stamp 320ms var(--cc-out) both;
+    animation-delay: calc(360ms + var(--i, 0) * 90ms);
+  }
+  :root[data-lens="calling-card"] .cc-say__name {
+    animation: calling-card-pop 240ms var(--cc-snap) both;
+    animation-delay: calc(560ms + var(--i, 0) * 90ms);
+  }
+  :root[data-lens="calling-card"] .cc-rankup__tag {
+    animation: calling-card-stamp 260ms var(--cc-out) both;
+    animation-delay: calc(560ms + var(--i, 0) * 90ms);
+  }
+
+  /* ========== STATUS: resume ========== */
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-member {
+    animation: calling-card-row-in 340ms var(--cc-out) both;
+    animation-delay: calc(300ms + var(--i, 0) * 70ms);
+  }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-member__tag {
+    animation: calling-card-stamp 280ms var(--cc-out) both;
+    animation-delay: calc(480ms + var(--i, 0) * 70ms);
+  }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-status__lv {
+    animation: calling-card-stamp 300ms var(--cc-out) both 460ms;
+  }
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-status__section {
+    animation: calling-card-fly-left 300ms var(--cc-out) both;
+    animation-delay: calc(200ms + var(--i, 0) * 60ms);
+  }
+  :root[data-lens="calling-card"] .cc-member:hover .cc-member__tag {
+    animation: calling-card-wobble 360ms ease-out;
+  }
+
+  /* ========== Phone ========== */
+  :root[data-lens="calling-card"] .cc-phone__device {
+    transform-origin: 50% 100%;
+    animation:
+      calling-card-phone-in 380ms var(--cc-out) both,
+      calling-card-sway 5s ease-in-out 380ms infinite alternate;
+  }
+  :root[data-lens="calling-card"] .cc-phone__app {
+    animation: calling-card-spin-in 520ms var(--cc-snap) both 260ms;
+  }
+  :root[data-lens="calling-card"] .cc-msg {
+    transform-origin: 0 20%;
+    animation-delay: calc(260ms + var(--i, 0) * 110ms);
+  }
+  :root[data-lens="calling-card"] .cc-msg__avatar {
+    animation: calling-card-pop 240ms var(--cc-snap) both;
+    animation-delay: calc(200ms + var(--i, 0) * 110ms);
+  }
+  :root[data-lens="calling-card"] .cc-phone__day {
+    animation: calling-card-stamp 260ms var(--cc-out) both;
+    animation-delay: 220ms;
+  }
+  :root[data-lens="calling-card"] .cc-msg--typing {
+    animation-delay: calc(420ms + var(--i, 0) * 110ms);
+  }
+  :root[data-lens="calling-card"] .cc-msg__dots i {
+    animation: calling-card-dot 1.1s ease-in-out infinite;
+  }
+  :root[data-lens="calling-card"] .cc-msg__dots i:nth-child(2) { animation-delay: 140ms; }
+  :root[data-lens="calling-card"] .cc-msg__dots i:nth-child(3) { animation-delay: 280ms; }
+
+  /* ========== Calling card ========== */
+  :root[data-lens="calling-card"] .cc-card__paper {
+    animation:
+      calling-card-throw 620ms var(--cc-out) both,
+      calling-card-flutter 3.8s ease-in-out 700ms infinite alternate;
+  }
+  :root[data-lens="calling-card"] .cc-card__to {
+    animation: calling-card-fly-left 260ms var(--cc-out) both 480ms;
+  }
+  :root[data-lens="calling-card"] .cc-card__body {
+    animation: calling-card-fly-up 300ms var(--cc-out) both 680ms;
+  }
+  :root[data-lens="calling-card"] .cc-card__ask {
+    animation: calling-card-stamp 300ms var(--cc-out) both 860ms;
+  }
+  :root[data-lens="calling-card"] .cc-card__email {
+    animation: calling-card-slam 340ms var(--cc-out) both 940ms;
+  }
+  :root[data-lens="calling-card"] .cc-card__links li {
+    animation: calling-card-pop 240ms var(--cc-snap) both;
+  }
+  :root[data-lens="calling-card"] .cc-card__links li:nth-child(1) { animation-delay: 1060ms; }
+  :root[data-lens="calling-card"] .cc-card__links li:nth-child(2) { animation-delay: 1120ms; }
+  :root[data-lens="calling-card"] .cc-card__links li:nth-child(3) { animation-delay: 1180ms; }
+  :root[data-lens="calling-card"] .cc-card__links li:nth-child(n + 4) { animation-delay: 1240ms; }
+  :root[data-lens="calling-card"] .cc-card__sign {
+    animation: calling-card-fly-right 300ms var(--cc-out) both 1200ms;
+  }
+  :root[data-lens="calling-card"] .cc-card .cc-panel__close {
+    animation: calling-card-fade 200ms ease-out both 1300ms;
+  }
+
+  /* ========== Document ========== */
+  :root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-doc__label {
+    animation: calling-card-fade 240ms ease-out both 420ms;
+  }
+}
+
+/* Mobile: the desktop-only cursor arrow and heavy idle loops step aside. */
+@media (max-width: 760px), (max-aspect-ratio: 5/6) {
+  :root[data-lens="calling-card"] .cc-home__portrait,
+  :root[data-lens="calling-card"] .cc-confidant__portrait {
+    animation-name: calling-card-fly-up;
+  }
+}

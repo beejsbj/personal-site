@@ -1,0 +1,19 @@
+/* Lens: back-page.
+   Dotfight's world: a war fought with a ballpoint pen on the back page of a
+   squared exercise book, under a desk lamp, grades 5 and 6. The portfolio is
+   the exercise book itself; its shell (src/prism/shells/back-page) draws it.
+   This file only holds what must be there before the shell arrives: the dark
+   desk, so there's no flash of Daylight, and the book's three hands. */
+@import "@fontsource/caveat/400.css";
+@import "@fontsource/caveat/700.css";
+@import "@fontsource/caveat-brush/400.css";
+@import "@fontsource/patrick-hand/400.css";
+@import "@fontsource/special-elite/400.css";
+
+:root[data-lens="back-page"][data-lens-shell],
+:root[data-lens="back-page"][data-lens-shell] body {
+  background: #1f120c;
+  color: #f3efe4;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
