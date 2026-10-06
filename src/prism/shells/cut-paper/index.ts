@@ -107,8 +107,10 @@ function confetti(host: HTMLElement, note: string) {
 
 async function transition(route: Route) {
   if (!ctx || !frame) return;
-  // the runtime also syncs on the first page load; same page, nothing to do
-  if (route.path === currentPath) return;
+  // the runtime also syncs on the first page load; same page, nothing to
+  // do, unless live writing changed under it
+  const refresh = route.path === currentPath;
+  if (refresh && !route.refresh) return;
   currentPath = route.path;
   const id = ++generation;
   const { scroller, wipe } = frame;
@@ -132,6 +134,15 @@ async function transition(route: Route) {
     current = next;
   };
 
+  // a refresh swaps in place: no sweep, no confetti, focus stays put
+  if (refresh) {
+    const top = scroller.scrollTop;
+    drop(previous);
+    swapIn();
+    scroller.scrollTop = top;
+    land(next.el);
+    return;
+  }
   if (ctx.face || ctx.reducedMotion) {
     drop(previous);
     swapIn();
