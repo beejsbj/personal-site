@@ -41,7 +41,13 @@ const nextEighth = () => new Promise<void>((resolve) => setTimeout(resolve, EIGH
 
 function show(route: Route): Live {
   const controller = new AbortController();
-  ctx!.signal.addEventListener("abort", () => controller.abort(), { once: true, signal: controller.signal });
+  // Propagate parent abort to this screen's controller
+  const abortListener = () => controller.abort();
+  ctx!.signal.addEventListener("abort", abortListener, { once: true });
+  // Remove the parent listener when this screen is dropped (controller aborts)
+  controller.signal.addEventListener("abort", () => {
+    ctx!.signal.removeEventListener("abort", abortListener);
+  }, { once: true });
   const env: Env = {
     content: ctx!.content,
     copy: ctx!.content.lenses["cut-paper"],
@@ -150,6 +156,8 @@ async function sweepIn(id: number, next: Live, previous: Live | undefined, note:
   wipe.dataset.state = "cutting";
   confetti(frame.overlay, note);
   // the playhead sweeps across; the new view is printed behind it
+  // Reset opacity before sweep: the previous fade animation retained opacity: 0
+  wipe.style.opacity = "1";
   const reveal = next.el.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)" }], { duration: SWEEP, easing: EASE_PAPER });
   const sweep = wipe.animate([{ transform: "translateX(-100%)" }, { transform: "translateX(0)" }], { duration: SWEEP, easing: EASE_PAPER, fill: "forwards" });
   await Promise.all([reveal.finished, sweep.finished]).catch(() => {});
