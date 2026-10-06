@@ -1225,6 +1225,8 @@ class Troupe {
   private reply(shooter: Man) {
     if (!this.alive) return;
     const lives = this.showing();
+    // the visitor has turned the page since: that fight's over
+    if (!lives.includes(shooter.life)) return;
     const reds = this.living(lives).filter((x) => x.side === "red" && !x.busy);
     if (!reds.length) return;
     const shot = this.lane(reds, lives, shooter.camp);
