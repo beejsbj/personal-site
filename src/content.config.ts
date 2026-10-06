@@ -71,6 +71,21 @@ const pageSchema = z.object({
   title: z.string(),
   description: z.string(),
   header: headerSchema.optional(),
+  writing: z
+    .object({
+      subscribeLabel: z.string(),
+      sourceLabel: z.string(),
+      originLabel: z.string(),
+      backLabel: z.string(),
+      listLabel: z.string(),
+      emptyMessage: z.string(),
+      unavailableMessage: z.string(),
+      entryUnavailableMessage: z.string(),
+      entryMissingMessage: z.string(),
+      endHeading: z.string(),
+      endBody: z.string(),
+    })
+    .optional(),
 
   // Home
   hero: z
@@ -144,9 +159,7 @@ const pageSchema = z.object({
   education: z
     .object({ title: z.string(), entries: z.array(roleSchema) })
     .optional(),
-  tools: z
-    .object({ title: z.string(), items: z.array(z.string()) })
-    .optional(),
+  tools: z.object({ title: z.string(), items: z.array(z.string()) }).optional(),
   /** The end of a date line for a role with no end date. */
   ongoing: z.string().optional(),
 });

@@ -44,6 +44,6 @@ elsewhere:
       href: /lab
       blurb: Experiments, prototypes, and smaller things.
     - title: Writing
-      href: "site:writing"
+      href: /writing
       blurb: My notes and writing on Substack.
 ---

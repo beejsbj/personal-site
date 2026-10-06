@@ -102,13 +102,24 @@ function resumeHtml(content: SiteContent): string {
       .join("");
   return (
     group(resume.experience.title, "resume.role", resume.experience.roles) +
-    group(resume.education.title, "resume.education", resume.education.entries) +
+    group(
+      resume.education.title,
+      "resume.education",
+      resume.education.entries,
+    ) +
     `<h2>${resume.tools.title}</h2><p data-part="resume.tools">${resume.tools.sentence}</p>` +
     `<div class="resume-body" data-part="page.body" data-ref="resume">${content.pages.resume.html}</div>`
   );
 }
 
-const KINDS = ["project", "pull-request", "repository", "writing", "lab", "milestone"];
+const KINDS = [
+  "project",
+  "pull-request",
+  "repository",
+  "writing",
+  "lab",
+  "milestone",
+];
 const SOURCES = ["site", "github", "substack", "bjslab", "manual"];
 
 function updates(count: number): Update[] {
@@ -136,10 +147,48 @@ function updates(count: number): Update[] {
 const LONG_TITLE =
   "A project whose title runs on and on, far past where any layout expects a title to stop";
 
+function writingFixture(
+  content: SiteContent,
+  mode: "rich" | "empty" | "missing" | "unavailable",
+): SiteContent {
+  const post = {
+    slug: "fixture-essay",
+    href: "/writing/fixture-essay",
+    title: "A writing fixture with a long title, images and code",
+    subtitle: "The same public article, refracted through every lens.",
+    date: "2025-01-01T00:00:00.000Z",
+    dateLabel: "1 January 2025",
+    canonical: "https://buroojs.substack.com/p/fixture-essay",
+    description: "A deterministic article for the writing harness.",
+  };
+  return {
+    ...content,
+    writing: {
+      posts: mode === "empty" || mode === "unavailable" ? [] : [post],
+      status: mode === "unavailable" ? "unavailable" : "available",
+      entryStatus:
+        mode === "rich"
+          ? "available"
+          : mode === "unavailable"
+            ? "unavailable"
+            : "missing",
+      ...(mode === "rich"
+        ? {
+            entry: {
+              ...post,
+              html: '<p>This public writing fixture has a paragraph, <strong>emphasis</strong>, and a <a href="/projects">local reference</a>.</p><h2>Pictures and code</h2><figure><img src="/images/burooj6.jpg" alt="A local image fixture"><figcaption>A caption that belongs to the article.</figcaption></figure><pre tabindex="0"><code>const writing = await getPosts();\n\nreturn writing;</code></pre><blockquote><p>The article remains the same across every reading surface.</p></blockquote>',
+            },
+          }
+        : {}),
+    },
+  };
+}
+
 export const FIXTURES: Record<string, Fixture> = {
   "long-title": {
     name: "long-title",
-    about: "A newest, featured project with a 90-character title and no cover, tools or links.",
+    about:
+      "A newest, featured project with a 90-character title and no cover, tools or links.",
     apply(content) {
       const p = project(content, {
         slug: "a-very-long-title",
@@ -157,7 +206,8 @@ export const FIXTURES: Record<string, Fixture> = {
   },
   "new-year": {
     name: "new-year",
-    about: "A project from a year the portfolio has never had (the year after the newest).",
+    about:
+      "A project from a year the portfolio has never had (the year after the newest).",
     apply(content) {
       const year = content.derived.lastYear + 1;
       const p = project(content, {
@@ -191,7 +241,8 @@ export const FIXTURES: Record<string, Fixture> = {
   },
   "odd-about": {
     name: "odd-about",
-    about: "An about page whose markdown has an h4, nested lists, a table, code and an image.",
+    about:
+      "An about page whose markdown has an h4, nested lists, a table, code and an image.",
     apply(content) {
       const html = [
         "<p>An opening paragraph, then everything markdown can do.</p>",
@@ -200,7 +251,7 @@ export const FIXTURES: Record<string, Fixture> = {
         "<ul><li>A list item<ul><li>A nested item</li><li>Another nested item<ol><li>Deeper still</li></ol></li></ul></li><li>Back out again</li></ul>",
         "<table><thead><tr><th>Tool</th><th>Years</th></tr></thead><tbody><tr><td>Vue</td><td>Four</td></tr><tr><td>Astro</td><td>Two</td></tr></tbody></table>",
         "<pre><code>const place = makeOnTheWeb();\nplace.feel();</code></pre>",
-        "<p>Inline <code>code</code>, <strong>bold</strong>, <em>emphasis</em> and <a href=\"/projects\">a link</a>.</p>",
+        '<p>Inline <code>code</code>, <strong>bold</strong>, <em>emphasis</em> and <a href="/projects">a link</a>.</p>',
         `<p><img src="${content.pages.home.hero.portrait.src}" alt="A picture in the middle of the prose"></p>`,
         "<blockquote><p>A quotation, set apart from the rest.</p></blockquote>",
         "<h3>A closing heading</h3>",
@@ -215,19 +266,39 @@ export const FIXTURES: Record<string, Fixture> = {
   },
   "resume-shapes": {
     name: "resume-shapes",
-    about: "Eight roles: a current one with no end date, and one with no bullets.",
+    about:
+      "Eight roles: a current one with no end date, and one with no bullets.",
     apply(content) {
       const roles = [
         entry(content, {
           title: "Staff Frontend Engineer",
           org: "Somewhere New",
           start: "2026-03",
-          bullets: ["Leading the [design system](/projects) work, still going."],
+          bullets: [
+            "Leading the [design system](/projects) work, still going.",
+          ],
         }),
-        entry(content, { title: "Consultant", org: "Quiet Client", start: "2025-10", end: "2026-02" }),
+        entry(content, {
+          title: "Consultant",
+          org: "Quiet Client",
+          start: "2025-10",
+          end: "2026-02",
+        }),
         ...content.resume.experience.roles,
-        entry(content, { title: "Volunteer Web Helper", org: "Local Library", start: "2019", end: "2020", bullets: ["Kept the events page current."] }),
-        entry(content, { title: "Student Developer", kind: "Coursework", start: "2018-09", end: "2019-04", bullets: ["Built small things to learn."] }),
+        entry(content, {
+          title: "Volunteer Web Helper",
+          org: "Local Library",
+          start: "2019",
+          end: "2020",
+          bullets: ["Kept the events page current."],
+        }),
+        entry(content, {
+          title: "Student Developer",
+          kind: "Coursework",
+          start: "2018-09",
+          end: "2019-04",
+          bullets: ["Built small things to learn."],
+        }),
       ].slice(0, 8);
       const next: SiteContent = {
         ...content,
@@ -265,7 +336,56 @@ export const FIXTURES: Record<string, Fixture> = {
     },
     routes: () => [
       { kind: "lab", path: "/lab" },
-      { kind: "lab-entry", path: "/lab/fixture-sketch", slug: "fixture-sketch" },
+      {
+        kind: "lab-entry",
+        path: "/lab/fixture-sketch",
+        slug: "fixture-sketch",
+      },
+    ],
+  },
+  "writing-rich": {
+    name: "writing-rich",
+    about:
+      "A public article with a long title, image, caption, code and quote.",
+    apply: (content) => writingFixture(content, "rich"),
+    routes: () => [
+      { kind: "writing", path: "/writing" },
+      {
+        kind: "writing-entry",
+        path: "/writing/fixture-essay",
+        slug: "fixture-essay",
+      },
+    ],
+  },
+  "writing-empty": {
+    name: "writing-empty",
+    about: "A confirmed empty public-writing archive.",
+    apply: (content) => writingFixture(content, "empty"),
+    routes: () => [{ kind: "writing", path: "/writing" }],
+  },
+  "writing-missing": {
+    name: "writing-missing",
+    about: "A removed or no-longer-public article with no stale body.",
+    apply: (content) => writingFixture(content, "missing"),
+    routes: () => [
+      {
+        kind: "writing-entry",
+        path: "/writing/fixture-essay",
+        slug: "fixture-essay",
+      },
+    ],
+  },
+  "writing-unavailable": {
+    name: "writing-unavailable",
+    about: "A transient source outage with no usable cached public content.",
+    apply: (content) => writingFixture(content, "unavailable"),
+    routes: () => [
+      { kind: "writing", path: "/writing" },
+      {
+        kind: "writing-entry",
+        path: "/writing/fixture-essay",
+        slug: "fixture-essay",
+      },
     ],
   },
 };

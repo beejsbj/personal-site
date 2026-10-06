@@ -8,6 +8,7 @@
     "about": "About",
     "resume": "Resume",
     "lab": "Lab",
+    "writing": "Writing",
     "projects": "Projects"
   },
   "chapters": {
@@ -15,6 +16,7 @@
     "about": "About me",
     "resume": "Resume",
     "lab": "The lab",
+    "writing": "Writing",
     "projects": "The back page",
     "close": "Close the book"
   },
@@ -43,7 +45,7 @@
     "resume": { "name": "Resume", "aside": "stapled in" },
     "lab": { "name": "The lab", "aside": "doodles" },
     "projects": { "name": "Projects", "aside": "the war" },
-    "writing": { "name": "Writing", "aside": "Substack" }
+    "writing": { "name": "Writing", "aside": "essays" }
   },
   "home": {
     "toProjects": "all of them, on the back page"

@@ -14,19 +14,28 @@ import {
   getSite,
   getTextPage,
   getUpdates,
+  getWritingPage,
+  getPosts,
+  getPost,
   labDetail,
   labHasPage,
   updateId,
 } from "../../lib/portfolio";
 import { resolveLink } from "../../lib/rules";
-import type { SiteContent } from "../../prism/shells/types";
+import { formatDate, writingHeaders } from "../../lib/writing";
+import type { WritingEntry } from "../../lib/writing";
+import type {
+  SiteContent,
+  WritingPost,
+  WritingContent,
+} from "../../prism/shells/types";
 
 /** The whole portfolio as data, for lens shells: every entry with its
  * markdown rendered to HTML, every line of copy Daylight shows, the resume
  * as structure, the shared order and featured set, values derived from the
  * data, and each lens's own flavour copy. A shell renders this and nothing
  * else (see src/prism/shells/types.ts). */
-export const prerender = true;
+export const prerender = false;
 
 type Renderable = { render(): Promise<{ Content: unknown }> };
 
@@ -34,7 +43,10 @@ type Renderable = { render(): Promise<{ Content: unknown }> };
 const clean = (markup: string) =>
   markup.replace(/\s+data-astro-[\w-]+="[^"]*"/g, "").trim();
 
-export const GET: APIRoute = async () => {
+// The authored portfolio is immutable within a deployment. Render its
+// Markdown once per warm function; writing is attached on every request.
+let authored: Promise<Omit<SiteContent, "writing">> | undefined;
+async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
   const container = await AstroContainer.create();
   const html = async (entry: Renderable) => {
     const { Content } = await entry.render();
@@ -46,7 +58,7 @@ export const GET: APIRoute = async () => {
   };
 
   const site = await getSite();
-  const [home, about, notFound, resume, projectsPage, labPage] =
+  const [home, about, notFound, resume, projectsPage, labPage, writingPage] =
     await Promise.all([
       getHome(),
       getTextPage("about"),
@@ -54,6 +66,7 @@ export const GET: APIRoute = async () => {
       getResume(),
       getProjectsPage(),
       getLabPage(),
+      getWritingPage(),
     ]);
   const [projects, lab, updates, featured, derived] = await Promise.all([
     getProjects(),
@@ -78,7 +91,7 @@ export const GET: APIRoute = async () => {
   };
 
   const { updateKinds, updateSources } = site;
-  const content: SiteContent = {
+  const content: Omit<SiteContent, "writing"> = {
     site: {
       ...site,
       footer: {
@@ -89,6 +102,7 @@ export const GET: APIRoute = async () => {
     pages: {
       home: strip(home),
       about: { ...strip(about), html: await html(about.entry) },
+      writing: strip(writingPage),
       resume: {
         title: resume.title,
         description: resume.description,
@@ -138,15 +152,60 @@ export const GET: APIRoute = async () => {
       return {
         ...data,
         id: updateId(entry),
-        kindLabel: updateKinds[data.kind as keyof typeof updateKinds] ?? data.kind,
-        sourceLabel: updateSources[data.source as keyof typeof updateSources] ?? data.source,
+        kindLabel:
+          updateKinds[data.kind as keyof typeof updateKinds] ?? data.kind,
+        sourceLabel:
+          updateSources[data.source as keyof typeof updateSources] ??
+          data.source,
       };
     }),
     featured: featured.map((entry) => entry.slug),
     derived,
     lenses,
   };
-  return new Response(JSON.stringify(content), {
-    headers: { "Content-Type": "application/json" },
+  return content;
+}
+const summary = (entry: WritingEntry): WritingPost => ({
+  ...entry.data,
+  slug: entry.slug,
+  href: `/writing/${entry.slug}`,
+  date: entry.data.date.toISOString(),
+  dateLabel: formatDate(entry.data.date),
+});
+export const GET: APIRoute = async ({ url }) => {
+  authored ??= authoredPortfolio().catch((error) => {
+    authored = undefined;
+    throw error;
+  });
+  const base = await authored;
+  const writing: WritingContent = { posts: [], status: "unavailable" };
+  try {
+    writing.posts = (await getPosts()).map(summary);
+    writing.status = "available";
+  } catch {
+    /* Other portfolio routes remain usable during source outages. */
+  }
+  const slug = url.searchParams.get("writing");
+  if (slug !== null) {
+    try {
+      const entry = await getPost(slug);
+      writing.entryStatus = entry ? "available" : "missing";
+      if (entry) writing.entry = { ...summary(entry), html: entry.body ?? "" };
+    } catch {
+      writing.entryStatus = "unavailable";
+    }
+  }
+  return new Response(JSON.stringify({ ...base, writing }), {
+    headers: {
+      ...writingHeaders,
+      "Content-Type": "application/json; charset=utf-8",
+      ...(writing.status === "unavailable" ||
+      writing.entryStatus === "unavailable"
+        ? {
+            "Cache-Control": "no-store",
+            "Vercel-CDN-Cache-Control": "no-store",
+          }
+        : {}),
+    },
   });
 };

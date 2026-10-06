@@ -8,7 +8,8 @@ import type { Project, Route, SiteContent } from "./types";
 export { plainInline as plain };
 
 /** A rendered markdown body (content.json `html`) as nodes to place, style
- * and rearrange. Built at build time from Burooj's own markdown. */
+ * and rearrange. Authored markdown is rendered by the server; runtime Substack HTML must pass
+ * the source adapter's allowlist sanitizer before reaching this function. */
 export function rich(html: string): DocumentFragment {
   const template = document.createElement("template");
   template.innerHTML = html;

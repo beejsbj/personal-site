@@ -8,6 +8,8 @@
     "lab-entry": "Request",
     "about": "About",
     "resume": "Status",
+    "writing": "Writing",
+    "writing-entry": "Writing",
     "other": "Mementos"
   },
   "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
@@ -49,8 +51,7 @@
       "phone": { "label": "Phone", "help": "Updates · {n} new message{s}" },
       "writing": {
         "label": "Writing",
-        "help": "Substack · essays, off-site ↗",
-        "opens": "(opens Substack)"
+        "help": "Essays · notes from building things"
       },
       "card": { "label": "Calling Card", "help": "Contact · send a calling card" }
     },

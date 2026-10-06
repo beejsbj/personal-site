@@ -11,6 +11,7 @@ import {
   bookOrder,
   chapter,
   coverPage,
+  rankOf,
   today,
   type Build,
   type Chapter,
@@ -28,6 +29,7 @@ const TABS = [
   ["/about", "about"],
   ["/resume", "resume"],
   ["/lab", "lab"],
+  ["/writing", "writing"],
   ["/projects", "projects"],
 ] as const;
 
@@ -172,12 +174,12 @@ class App {
   }
 
   async goNow(route: Route) {
+    // A writing refresh may add metadata stops while the book stays mounted.
+    // Rebuild the order from the live index; the article bodies are not needed.
+    this.order = bookOrder(this.ctx.content, this.copy);
+    this.paged.rank = rankOf(this.pagedRoute, this.order);
+    if (this.sheet) this.sheet.rank = rankOf(this.route, this.order);
     const was = this.current();
-    // the runtime may hand us the page we're already on: nothing to turn
-    if (route.path === this.route.path) {
-      this.route = route;
-      return;
-    }
     this.route = route;
     const ch = this.build(route);
     const land = this.landAtEnd;
@@ -305,7 +307,9 @@ class App {
         ? "/projects"
         : this.route.kind === "lab-entry"
           ? "/lab"
-          : null;
+          : this.route.kind === "writing-entry"
+            ? "/writing"
+            : null;
     const list = h("ul");
     TABS.forEach(([href, key], i) => {
       list.append(
@@ -324,6 +328,7 @@ class App {
         ),
       );
     });
+    this.book.tabs.style.setProperty("--tabs", String(TABS.length));
     this.book.tabs.replaceChildren(list);
   }
 
