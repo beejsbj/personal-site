@@ -1,78 +1,88 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import WelcomeHero from "../design/compositions/WelcomeHero.astro";
-import DecorativeBlobs from "../design/unique/DecorativeBlobs.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
 import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
 import ProjectRow from "./ProjectRow.astro";
+import { part } from "../prism/parts";
+import type { getHome } from "../lib/portfolio";
+import type { UpdateData } from "../content.config";
 interface Props {
-  projects: (CollectionEntry<"projects">["data"] & { href: string })[];
-  updates: CollectionEntry<"updates">["data"][];
-  site: { writingUrl: string; social: { label: string; href: string }[] };
+  home: Awaited<ReturnType<typeof getHome>>;
+  projects: (CollectionEntry<"projects">["data"] & {
+    href: string;
+    slug: string;
+  })[];
+  updates: (UpdateData & { id: string })[];
+  labels: { kinds: Record<string, string>; sources: Record<string, string> };
 }
-const { projects, updates, site } = Astro.props;
+const { home, projects, updates, labels } = Astro.props;
 ---
 
-<div class="home-composition shell">
-  <div class="welcome-region">
-    <WelcomeHero social={site.social} />
-    <div class="welcome-art" aria-hidden="true">
-      <DecorativeBlobs />
-    </div>
+<div class="home-composition shell" data-home-motion>
+  <div class="welcome-region" data-motion-scene>
+    <WelcomeHero hero={home.hero} />
+    <div class="welcome-art"></div>
   </div>
-  <div class="below">
+  <div class="below" data-peek-horizon>
     <section class="selected-work" aria-labelledby="home-projects">
       <SectionHeading
         id="home-projects"
-        title="Some things I've built"
-        href="/projects"
-        linkLabel="All projects"
+        title={home.work.title}
+        href={home.work.link.href}
+        linkLabel={home.work.link.label}
       />
       {projects.map((project, index) => (
         <ProjectRow {...project} layout={index === 0 ? "feature" : "row"} />
       ))}
     </section>
-    <aside aria-label="Current work and updates">
+    <aside aria-label={home.sidebarLabel}>
       <div class="current-note">
-        <CurrentNote variant="plain" />
+        <CurrentNote note={home.currently} variant="plain" />
       </div>
       <section class="updates" aria-labelledby="home-updates">
-        <SectionHeading id="home-updates" title="Recent updates" />
-        <ActivityStream updates={updates} />
+        <SectionHeading id="home-updates" title={home.updates.title} />
+        <ActivityStream updates={updates} copy={home.updates} labels={labels} />
       </section>
     </aside>
   </div>
-  <section class="elsewhere" aria-label="Elsewhere on the site">
-    <div>
-      <Heading>
-        <Link href="/lab" arrow>
-          In the lab
-        </Link>
-      </Heading>
-      <p>Experiments, prototypes, and smaller things.</p>
-    </div>
-    <div>
-      <Heading>
-        <Link href={site.writingUrl} arrow>
-          Writing
-        </Link>
-      </Heading>
-      <p>My notes and writing on Substack.</p>
-    </div>
+  <section
+    class="elsewhere"
+    aria-label={home.elsewhere.label}
+    data-peek-horizon
+  >
+    {home.elsewhere.items.map((item: { title: string; href: string; blurb: string }, index: number) => (
+      <div {...part("home.elsewhere", index)}>
+        <Heading>
+          <Link href={item.href} arrow>
+            {item.title}
+          </Link>
+        </Heading>
+        <p>{item.blurb}</p>
+      </div>
+    ))}
   </section>
 </div>
+<script>
+  import { installHomeMotion } from "../design/unique/home-motion";
+  installHomeMotion();
+</script>
 <style>
+  /* The right column is held open for the site nav's homepage form: the
+     header's ball cluster hangs into it (BallNav, cluster form). */
   .welcome-region {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--blob-art-width);
+    grid-template-columns: minmax(0, 1fr) var(--ball-cluster-width);
     align-items: center;
     gap: var(--space-2xl);
   }
   .welcome-art {
-    pointer-events: none;
+    align-self: start;
+    aspect-ratio: 300 / 332;
+    margin-top: var(--ball-cluster-drop);
   }
   .below {
     display: grid;
@@ -107,6 +117,55 @@ const { projects, updates, site } = Astro.props;
   .elsewhere p {
     margin-top: var(--space-s);
     color: var(--color-text-soft);
+  }
+  /* Arrival: the work block follows the welcome. Scroll reveals hide an
+     element only once the script marks it (data-reveal) and show it when it
+     enters the viewport (data-in); --i staggers a batch. Event marks pop in
+     after their row; the current note settles like a sheet of paper. */
+  @media (prefers-reduced-motion: no-preference) {
+    .below {
+      animation: below-in var(--duration-settle) var(--ease-settle)
+        calc(var(--stagger) * 6) backwards;
+    }
+    .home-composition :global([data-reveal]) {
+      --i: 0;
+      opacity: 0;
+      transform: translateY(var(--motion-rise));
+    }
+    .home-composition :global(.current-note[data-reveal]) {
+      transform-origin: 0 0;
+      transform: translateY(var(--motion-rise)) rotate(var(--settle-angle));
+    }
+    .home-composition :global([data-reveal][data-in]) {
+      opacity: 1;
+      transform: none;
+      transition:
+        opacity var(--duration-reveal) var(--ease-settle),
+        transform var(--duration-reveal) var(--ease-settle);
+      transition-delay: calc(var(--stagger) * var(--i));
+    }
+    .home-composition :global([data-reveal] .event-mark) {
+      opacity: 0;
+      transform: scale(var(--pop-scale));
+    }
+    .home-composition :global([data-reveal][data-in] .event-mark) {
+      opacity: 1;
+      transform: none;
+      transition:
+        opacity var(--duration-reveal) var(--ease-settle),
+        transform var(--duration-reveal) var(--ease-pop);
+      transition-delay: calc(var(--stagger) * (var(--i) + 1));
+    }
+  }
+  @keyframes below-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--motion-rise));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
   @media (max-width: 62.5rem) {
     .welcome-region {

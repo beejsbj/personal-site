@@ -1,5 +1,7 @@
 ---
-/** Cropped v1 artwork. Its optional magnetic runtime never intercepts clicks. */
+/** Cropped v1 artwork with v1's job back: clicking the circle rolls the page
+ * to the bottom, or back to the top. Its magnetic runtime
+ * never intercepts clicks meant for content. */
 ---
 
 <div class="edge-blob" data-magnetic-edge aria-hidden="true">
@@ -37,6 +39,11 @@
       left: var(--edge-left-compact);
       height: var(--edge-height-compact);
     }
+  }
+  /* The circle's purpose: a click on it scrolls the page (edge-magnet.ts).
+     While a fine pointer is over it, the page says so. */
+  :global(html:has([data-magnetic-edge][data-aim])) {
+    cursor: pointer;
   }
   @media (prefers-reduced-motion: reduce) {
     .edge-blob__surface {

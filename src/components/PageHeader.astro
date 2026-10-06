@@ -1,23 +1,63 @@
 ---
 import Heading from "../design/primitives/Heading.astro";
+import Link from "../design/primitives/Link.astro";
+import { part, type PartAttrs } from "../prism/parts";
+type Slot = "eyebrow" | "title" | "intro" | "actions";
 interface Props {
   eyebrow?: string;
   title: string;
   intro?: string;
   level?: 1 | 2;
+  scale?: "page" | "post";
+  /** Action links under the intro: pills with an arrow; a mail link stays
+   * plain text. */
+  actions?: { label: string; href: string }[];
+  /** The page id, when this header is a page's own: marks page.* parts. */
+  page?: string;
+  /** Or mark each slot as some other part (a project's title, say). */
+  marks?: Partial<Record<Slot, PartAttrs>>;
 }
-const { eyebrow, title, intro, level = 1 } = Astro.props;
+const {
+  eyebrow,
+  title,
+  intro,
+  level = 1,
+  scale = "page",
+  actions = [],
+  page,
+  marks = {},
+} = Astro.props;
+const mark = (slot: Slot) =>
+  marks[slot] ?? (page === undefined ? {} : part(`page.${slot}`, page));
 ---
 
 <header class="page-header">
   <div class="page-header__main">
-    {eyebrow && <p class="page-header__eyebrow">{eyebrow}</p>}
-    <Heading level={level} scale="page">
+    {eyebrow && (
+      <p class="page-header__eyebrow" {...mark("eyebrow")}>
+        {eyebrow}
+      </p>
+    )}
+    <Heading level={level} scale={scale} {...mark("title")}>
       {title}
     </Heading>
-    {intro && <p class="page-header__intro">{intro}</p>}
-    {Astro.slots.has("actions") && (
-      <div class="page-header__actions">
+    {intro && (
+      <p class="page-header__intro" {...mark("intro")}>
+        {intro}
+      </p>
+    )}
+    {(actions.length > 0 || Astro.slots.has("actions")) && (
+      <div class="page-header__actions" {...mark("actions")}>
+        {actions.map((action) => (
+          <Link
+            href={action.href}
+            {...(action.href.startsWith("mailto:")
+              ? {}
+              : { treatment: "pill", arrow: true })}
+          >
+            {action.label}
+          </Link>
+        ))}
         <slot name="actions" />
       </div>
     )}

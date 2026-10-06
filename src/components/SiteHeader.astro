@@ -1,21 +1,25 @@
 ---
-import SiteNav from "./SiteNav.astro";
+import type { SiteData } from "../content.config";
+import BallNav from "../design/unique/BallNav.astro";
 interface Props {
-  nav: { label: string; href: string; external?: boolean }[];
+  site: SiteData;
   currentPath: string;
-  email: string;
 }
-const { nav, currentPath, email } = Astro.props;
+const { site, currentPath } = Astro.props;
+// One nav everywhere. On the homepage it takes its expressive form: the
+// big cluster that hangs into the introduction (wide screens only).
+const form = currentPath === "/" ? "cluster" : "row";
 ---
 
 <header class="site-header shell">
-  <a class="home-link" href="/" aria-label="Burooj — home">
-    burooj.
+  <a class="home-link" href="/" aria-label={site.mark.label}>
+    {site.mark.text}
   </a>
-  <SiteNav nav={nav} currentPath={currentPath} email={email} />
+  <BallNav site={site} currentPath={currentPath} form={form} />
 </header>
 <style>
   .site-header {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -30,11 +34,21 @@ const { nav, currentPath, email } = Astro.props;
     font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-heading);
   }
+  /* Homepage, wide: the nav's cluster hangs from the header into the
+     introduction's right column, which Homepage holds open for it. */
+  @media (min-width: 62.501rem) {
+    .site-header > :global([data-form="cluster"]) {
+      position: absolute;
+      top: calc(100% + var(--ball-cluster-drop));
+      right: 0;
+    }
+  }
   @media (max-width: 40.625rem) {
     .home-link {
       margin-left: var(--space-xl);
     }
     .site-header {
+      column-gap: var(--space-s);
       padding-block: var(--space-m) var(--space-s);
     }
   }

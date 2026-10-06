@@ -1,17 +1,33 @@
 ---
 /** Primitive: label + optional decorative arrow. No nested controls.
- * Axes: treatment=text|nav|action, tone=paper|wine.
+ * Axes: treatment=text|ball|pill, tone=paper|wine.
  * States: rest, hover, focus, active, current, disabled; no loading behavior.
  * Native anchor navigation; disabled renders a non-interactive span.
+ * Ball: the label sits inside a peach ball (the site navigation); the
+ * current page's ball is burgundy. Pill (v2's .button): a peach ball rests
+ * behind the label's first letters and stretches into a pill on hover.
+ * Both paint their shape on a layer that ignores the pointer, so hover lift
+ * and press squish never move the hit area: a press is always a click.
+ * One arrow for the whole family, the satellite: a small burgundy ball
+ * carrying one hand-inked arrow. Inside the site it points along the line;
+ * leaving the site, the same arrow turns to point out of the page. It sits
+ * after a pill's or text link's words, and on a ball's rim. On hover the
+ * peach reaches it (the pill's stretch, the text link's pill, the ball's
+ * swell) and kicks it a little way along its arrow.
+ * Outbound arrows (and a ball's satellite) also add a hidden "(external
+ * site)", "(opens in a new tab)" or "(email)" to the link's name.
  */
-interface Props {
+import type { HTMLAttributes } from "astro/types";
+interface Props extends Omit<HTMLAttributes<"a">, "href"> {
   href: string;
-  treatment?: "text" | "nav" | "action";
+  treatment?: "text" | "ball" | "pill";
   tone?: "paper" | "wine";
   current?: boolean;
   arrow?: boolean;
   disabled?: boolean;
   newTab?: boolean;
+  /** Prism part markers (see src/prism/parts.ts). */
+  [data: `data-${string}`]: string | undefined;
 }
 const {
   href,
@@ -21,11 +37,31 @@ const {
   arrow = false,
   disabled = false,
   newTab = false,
+  ...attrs
 } = Astro.props;
 const Tag = disabled ? "span" : "a";
+const outbound = /^(https?:|mailto:)/.test(href);
+const ball = treatment === "ball";
+// Where an arrow (or a ball's satellite) marks a link as leaving the site, the
+// link's name says so too, not only the glyph.
+const note =
+  outbound && (arrow || ball)
+    ? href.startsWith("mailto:")
+      ? "(email)"
+      : newTab
+        ? "(opens in a new tab)"
+        : "(external site)"
+    : undefined;
+// One hand-inked arrow (artwork): the shaft is a little throw, rising from
+// low left and landing on the line, with a head of uneven arms set to the
+// arc's landing angle. Outbound turns it; it is never a second glyph.
+const ARROW =
+  "M2.5 9.4C5.3 7.5 9 7.4 13 8.2M9.5 4.6c1.3 1.2 2.4 2.3 3.5 3.6-1.4.9-2.6 2-3.6 3.5";
+const satellite = ball ? outbound : arrow;
 ---
 
 <Tag
+  {...attrs}
   href={disabled ? undefined : href}
   class:list={["ds-link", `ds-link--${treatment}`, `ds-link--${tone}`]}
   aria-current={current ? "page" : undefined}
@@ -33,29 +69,30 @@ const Tag = disabled ? "span" : "a";
   target={!disabled && newTab ? "_blank" : undefined}
   rel={!disabled && newTab ? "noreferrer" : undefined}
 >
-  <span>
-    <slot />
-    {arrow && (
+  {ball && <span class="ball-face" aria-hidden="true"></span>}
+  <span class="ds-link__body">
+    <span class="link-label">
+      <slot />
+    </span>
+    {note && <span class="ds-link__note">{note}</span>}
+  </span>
+  {satellite && (
+    <span
+      class:list={["link-sat", { "link-sat--out": outbound }]}
+      aria-hidden="true"
+    >
       <svg
-        class="link-arrow"
-        aria-hidden="true"
         viewBox="0 0 16 16"
         fill="none"
         stroke="currentColor"
-        stroke-width="1.5"
+        stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       >
-        <path
-          d={
-            /^(https?:|mailto:)/.test(href)
-              ? "M4 12 12 4M4 4h8v8"
-              : "M2 8h11M8 3l5 5-5 5"
-          }
-        />
+        <path d={ARROW} />
       </svg>
-    )}
-  </span>
+    </span>
+  )}
 </Tag>
 <style>
   .ds-link {
@@ -67,83 +104,332 @@ const Tag = disabled ? "span" : "a";
   .ds-link:hover {
     text-decoration: underline;
   }
-  .ds-link--text {
-    text-decoration: underline;
-    text-decoration-color: var(--color-link-rule);
-    text-decoration-thickness: var(--rule-width);
-    text-decoration-skip-ink: auto;
+  /* Text links rest on a pencil rule painted on the label. Their hover
+     belongs to the ball family: the rule gives way to a peach pill that
+     grows behind the words from the left, toward the satellite. */
+  .ds-link--text .link-label {
+    padding-bottom: var(--underline-pad);
+    background-repeat: no-repeat;
+    background-image: linear-gradient(
+      var(--color-link-rule),
+      var(--color-link-rule)
+    );
+    background-position: 0 100%;
+    background-size: 100% var(--rule-width);
   }
-  .ds-link--text:is(:hover, :focus-visible) {
-    text-decoration-color: currentColor;
+  .ds-link--text > .ds-link__body {
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    border-radius: var(--radius-pill);
+    background-image: linear-gradient(
+      var(--ball-fill-hover),
+      var(--ball-fill-hover)
+    );
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 0% 100%;
   }
-  .link-arrow {
-    display: inline-block;
-    width: var(--icon-inline);
-    height: var(--icon-inline);
-    margin-left: var(--space-2xs);
-    vertical-align: baseline;
+  .ds-link--text:hover {
+    text-decoration: none;
   }
-  .ds-link--nav {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--control-min-height);
-    color: var(--color-text-soft);
-    white-space: nowrap;
-    text-decoration-thickness: var(--focus-width);
+  .ds-link--text:is(:hover, :focus-visible) > .ds-link__body {
+    background-size: 100% 100%;
   }
-  .ds-link--nav:is(:hover, :focus-visible, [aria-current]) {
-    color: var(--color-accent);
-    text-decoration: underline;
-  }
-  .ds-link--nav[aria-current] {
-    font-weight: var(--weight-bold);
-  }
-  .ds-link--nav:active {
-    color: var(--color-accent-pressed);
+  .ds-link--text:is(:hover, :focus-visible) .link-label {
+    background-size: 0% var(--rule-width);
   }
   @media (hover: hover) and (pointer: fine) {
-    .link-arrow {
-      transition: transform var(--duration-fast) var(--ease-feedback);
+    .ds-link--text .link-label,
+    .ds-link--text > .ds-link__body {
+      transition: background-size var(--duration-hover) var(--ease-settle);
     }
-    .ds-link:hover .link-arrow {
-      transform: translate(
-        var(--link-arrow-lift),
-        calc(-1 * var(--link-arrow-lift))
-      );
+  }
+  /* The satellite: the family's one arrow. A small burgundy ball with a
+     cream, hand-inked arrow; outbound, the same arrow turns to point out of
+     the page. On hover the peach reaches it and kicks it along its arrow,
+     with the ink leading a touch further than the ball. */
+  .link-sat {
+    --sat-turn: 0deg;
+    --sat-dx: var(--link-sat-kick);
+    --sat-dy: 0;
+    display: inline-grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: var(--link-sat-size);
+    aspect-ratio: 1;
+    margin-left: var(--link-sat-gap);
+    border-radius: var(--radius-round);
+    background: var(--ball-fill-current);
+    color: var(--ball-ink-current);
+    vertical-align: middle;
+    pointer-events: none;
+  }
+  .link-sat--out {
+    --sat-turn: -45deg;
+    --sat-dx: var(--link-sat-kick-diagonal);
+    --sat-dy: calc(-1 * var(--link-sat-kick-diagonal));
+  }
+  .link-sat svg {
+    width: var(--link-sat-glyph);
+    height: var(--link-sat-glyph);
+    rotate: var(--sat-turn);
+  }
+  /* On a burgundy (wine) pill the satellite is the page's colour. */
+  .ds-link--wine .link-sat {
+    background: var(--ball-ink-current);
+    color: var(--ball-fill-current);
+  }
+  /* On a ball it rides the rim at about 45 degrees, ringed in the page's
+     colour. It is positioned on the link itself (not the animated face),
+     so the hit target never moves, and it takes clicks as part of the
+     link. */
+  .ds-link--ball > .link-sat {
+    position: absolute;
+    top: var(--link-sat-rim-y);
+    left: var(--link-sat-rim-x);
+    width: var(--link-sat-rim-size);
+    margin: calc(var(--link-sat-rim-size) / -2);
+    box-shadow: 0 0 0 var(--link-sat-rim-ring) var(--color-page);
+    pointer-events: auto;
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .link-sat,
+    .link-sat svg {
+      transition: translate var(--duration-hover) var(--ease-settle);
+    }
+    /* Late, so it moves when the stretch or swell arrives, and with a
+       little overshoot. Hover only: a press never moves it. */
+    .ds-link:is(:hover, :focus-visible) .link-sat,
+    .ds-link:is(:hover, :focus-visible) .link-sat svg {
+      transition: translate var(--duration-reveal) var(--ease-pop)
+        var(--duration-fast);
+    }
+    .ds-link:is(:hover, :focus-visible) .link-sat {
+      translate: var(--sat-dx) var(--sat-dy);
+    }
+    .ds-link:is(:hover, :focus-visible) .link-sat svg {
+      translate: calc(var(--sat-dx) * var(--link-sat-lead))
+        calc(var(--sat-dy) * var(--link-sat-lead));
+    }
+  }
+  @media (forced-colors: active) {
+    .link-sat {
+      border: var(--rule-width) solid CanvasText;
     }
   }
   .ds-link:focus-visible {
     outline: var(--focus-width) solid var(--color-accent);
     outline-offset: var(--focus-offset);
   }
-  .ds-link--action {
+  /* Ball: the label inside a peach ball, always on one line. The ball is
+     sized to its label (with a floor from the caller) and is a circle, so
+     longer names make bigger balls, as in v1's uneven cluster. */
+  .ds-link--ball {
+    position: relative;
+    isolation: isolate;
     display: inline-grid;
     place-items: center;
-    flex-shrink: 0;
-    background: var(--color-surface-strong);
-    font-size: var(--text-sm);
-    line-height: var(--leading-tight);
+    box-sizing: border-box;
+    aspect-ratio: 1;
+    padding-inline: var(--ball-label-pad);
+    border-radius: var(--radius-round);
+    color: var(--ball-ink);
+    font-family: var(--font-serif);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--ball-tracking);
+    line-height: var(--leading-display);
     white-space: nowrap;
-    transition: transform var(--duration-fast) var(--ease-feedback);
+    user-select: none;
+    -webkit-user-drag: none;
+    touch-action: manipulation;
+    /* The squish is the tap feedback; no square flash behind a round ball. */
+    -webkit-tap-highlight-color: transparent;
+    /* Painted-layer offsets, written by ball-life.ts while it animates. */
+    --face-x: 0;
+    --face-y: 0;
+    --face-sx: 1;
+    --face-sy: 1;
   }
-  .ds-link--action {
-    padding: var(--space-s) var(--space-m);
-    border: var(--rule-width) solid var(--color-accent);
+  /* The face and the label are paint only: they never take the pointer,
+     so however they move, the hit area is the link's own still circle.
+     The label sits on the circle's optical centre: Newsreader's mixed-case
+     ink rides high in its line box, so it is nudged down a touch. */
+  .ds-link--ball > .ds-link__body {
+    position: relative;
+    top: var(--ball-label-nudge);
+    pointer-events: none;
   }
-  .ds-link--wine {
-    background: var(--color-accent);
-    color: var(--color-accent-contrast);
+  /* Light type on the burgundy ball reads heavier; it sheds a little. */
+  .ds-link--ball[aria-current] {
+    font-weight: var(--weight-ball-current);
   }
-  .ds-link--action:hover {
-    background: var(--color-hover);
-    color: var(--color-accent);
+  .ball-face {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--ball-fill);
+    box-shadow: var(--ball-shadow-rest);
+    pointer-events: none;
+  }
+  /* The current page's ball breathes once when the page arrives: a ring
+     swells off it and fades, like the portrait's. */
+  .ds-link--ball[aria-current]::after {
+    content: "";
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    border: var(--portrait-border) solid var(--ball-fill-current);
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ds-link--ball:is(:hover, :focus-visible) {
     text-decoration: none;
   }
-  .ds-link[aria-current] {
-    text-decoration: underline;
+  .ds-link--ball:is(:hover, :focus-visible) .ball-face {
+    background: var(--ball-fill-hover);
+    box-shadow: var(--shadow-ball-raised);
   }
-  .ds-link--action:active {
-    transform: scale(var(--press-scale));
+  .ds-link--ball[aria-current] {
+    color: var(--ball-ink-current);
+    text-decoration: none;
+  }
+  .ds-link--ball[aria-current] .ball-face {
+    background: var(--ball-fill-current);
+  }
+  .ds-link--ball[aria-current]:is(:hover, :focus-visible) .ball-face {
+    background: var(--ball-fill-current-hover);
+  }
+  .ds-link--ball:not([data-alive]):active .ball-face {
+    scale: var(--press-scale);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .ds-link--ball .ball-face {
+      transition:
+        scale var(--duration-hover) var(--ease-pop),
+        translate var(--duration-hover) var(--ease-pop),
+        background-color var(--duration-hover) var(--ease-feedback),
+        box-shadow var(--duration-hover) var(--ease-settle);
+    }
+    .ds-link--ball:not([data-alive]):hover .ball-face {
+      scale: var(--ball-hover-scale);
+      translate: 0 calc(-1 * var(--motion-lift));
+    }
+    .ds-link--ball:not([data-alive]):hover:active .ball-face {
+      scale: var(--press-scale);
+      translate: none;
+      transition-duration: var(--duration-fast);
+    }
+  }
+  /* Alive (ball-life.ts, motion allowed): the runtime's springs own the
+     face and label; CSS keeps only the colour and shadow transitions. */
+  .ds-link--ball[data-alive] .ball-face {
+    translate: var(--face-x) var(--face-y);
+    scale: var(--face-sx) var(--face-sy);
+    transition:
+      background-color var(--duration-hover) var(--ease-feedback),
+      box-shadow var(--duration-hover) var(--ease-settle);
+  }
+  .ds-link--ball[data-alive] > .ds-link__body {
+    translate: var(--face-x) var(--face-y);
+    scale: var(--face-sx) var(--face-sy);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ds-link--ball[aria-current]::after {
+      animation: ball-breathe calc(var(--duration-settle) * 2) ease-out
+        calc(var(--duration-settle) * 2);
+    }
+  }
+  @keyframes ball-breathe {
+    from {
+      opacity: var(--ring-opacity);
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: scale(var(--ring-scale));
+    }
+  }
+  @media (forced-colors: active) {
+    .ball-face {
+      border: var(--focus-width) solid CanvasText;
+    }
+    .ds-link--ball[aria-current] .ball-face {
+      border-color: Highlight;
+    }
+  }
+  /* Said to assistive technology, not shown: where the link goes. */
+  .ds-link__note {
+    position: absolute;
+    width: var(--rule-width);
+    height: var(--rule-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* Pill (v2's .button), the family's action link: a peach ball rests
+     behind the label's first letters and stretches into a pill on hover.
+     Wine: the pill is already full and burgundy (a primary action). */
+  .ds-link--pill {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--control-min-height);
+    padding-inline: var(--space-s);
+    border-radius: var(--radius-pill);
+    color: var(--ball-ink);
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ds-link--pill::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 0;
+    width: var(--ball-link-size);
+    height: var(--ball-link-size);
+    border-radius: var(--ball-link-size);
+    background: var(--ball-fill);
+    translate: 0 -50%;
+  }
+  .ds-link--pill:is(:hover, :focus-visible) {
+    text-decoration: none;
+  }
+  .ds-link--pill:is(:hover, :focus-visible)::before {
+    width: 100%;
+    background: var(--ball-fill-hover);
+  }
+  .ds-link--pill.ds-link--wine {
+    padding-inline: var(--space-m);
+    color: var(--ball-ink-current);
+  }
+  .ds-link--pill.ds-link--wine::before {
+    width: 100%;
+    background: var(--ball-fill-current);
+  }
+  .ds-link--pill.ds-link--wine:is(:hover, :focus-visible)::before {
+    background: var(--ball-fill-current-hover);
+  }
+  .ds-link--pill:active::before {
+    scale: var(--press-scale);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .ds-link--pill::before {
+      transition:
+        width var(--duration-hover) var(--ease-pop),
+        background-color var(--duration-hover) var(--ease-feedback),
+        scale var(--duration-fast) var(--ease-feedback);
+    }
+  }
+  @media (forced-colors: active) {
+    .ds-link--pill::before {
+      border: var(--rule-width) solid CanvasText;
+    }
   }
   .ds-link[aria-disabled] {
     opacity: var(--disabled-opacity);
@@ -151,11 +437,8 @@ const Tag = disabled ? "span" : "a";
   }
   @media (prefers-reduced-motion: reduce) {
     .ds-link,
-    .link-arrow {
+    .link-label {
       transition: none;
-    }
-    .ds-link:hover .link-arrow {
-      transform: none;
     }
     .ds-link:active {
       transform: none;

@@ -9,11 +9,10 @@ import Note from "../design/primitives/Note.astro";
 import TagList from "../design/primitives/TagList.astro";
 import WelcomeHero from "../design/compositions/WelcomeHero.astro";
 import CurvedArrow from "../design/unique/CurvedArrow.astro";
-import DecorativeBlobs from "../design/unique/DecorativeBlobs.astro";
+import BallNav from "../design/unique/BallNav.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
-import SiteNav from "../components/SiteNav.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import ProjectRow from "../components/ProjectRow.astro";
 import ProjectTimeline from "../components/ProjectTimeline.astro";
@@ -21,7 +20,10 @@ import LabCard from "../components/LabCard.astro";
 import PageHeader from "../components/PageHeader.astro";
 import SectionIntro from "../components/SectionIntro.astro";
 import MediaRail from "../components/MediaRail.astro";
+import { getHome } from "../lib/portfolio";
 const site = (await getEntry("site", "config"))!.data;
+const home = await getHome();
+const labels = { kinds: site.updateKinds, sources: site.updateSources };
 const project = (await getCollection("projects")).find(
   (entry: CollectionEntry<"projects">) =>
     entry.data.featured && !entry.data.hidden,
@@ -44,15 +46,15 @@ const colors = [
 ];
 const anatomy = [
   [
-    "SiteNav",
-    "Semantic navigation list → shared Link primitive",
-    "Text links; current / hover / focus / press",
-    "Always visible and wrapping on small screens. Current page has a strong underline; project details retain the Projects marker. No navigation animation or JavaScript dependency.",
+    "BallNav",
+    "Semantic navigation list → shared Link primitive (ball)",
+    "Row / compact honeycomb / homepage cluster; current / hover / focus / press",
+    "The one site navigation, on every page. Current page is the burgundy ball; project details retain the Projects marker. CSS only: no JavaScript dependency, and the hit area never moves.",
   ],
   [
     "Link",
     "Label → optional decorative arrow",
-    "Text / navigation / action; paper / wine",
+    "Text / ball / pill / action; paper / wine",
     "Native navigation; hover, focus, press, current, disabled. Disabled is a span.",
   ],
   [
@@ -105,7 +107,7 @@ const anatomy = [
   ],
   [
     "SiteHeader / SiteFooter",
-    "Identity + SiteNav / identity + contact Links",
+    "Identity + BallNav / identity + contact Links",
     "Same shared chrome on every route",
     "Active route is semantic; Resume remains available in footer.",
   ],
@@ -151,7 +153,7 @@ const anatomy = [
         href="/"
         linkLabel="Actual homepage"
       />
-      <WelcomeHero social={site.social} level={2} id="guide-welcome" />
+      <WelcomeHero hero={home.hero} level={2} id="guide-welcome" />
       <CurvedArrow />
       <p class="annotation">
         Composition → WelcomeHero imports Heading, Link, and the singular
@@ -163,18 +165,40 @@ const anatomy = [
     <section class="specimen" aria-labelledby="decorative-specimen">
       <SectionHeading
         id="decorative-specimen"
-        title="Circles, without controls"
+        title="The ball nav, homepage form"
       />
       <div class="blob-specimen">
-        <DecorativeBlobs />
+        <BallNav
+          site={site}
+          currentPath="/"
+          form="cluster"
+          label="Ball navigation specimen"
+        />
       </div>
       <p class="annotation">
-        The old menu's unequal burgundy and peach circles return as static
-        artwork beside the desktop introduction. They have no labels, hover
-        effects or click targets and are hidden from assistive technology.
-        Compact layouts omit the cluster so the text and real navigation retain
-        their space.
+        On the homepage the same nav takes v1's uneven cluster and hangs into
+        the introduction; narrower than 62.5rem it is the ordinary row. A ball
+        lifts under the pointer and squishes when pressed, but its target never
+        moves, so a press is always a click. A clicked ball becomes the page
+        transition, which swells from that ball. No-JavaScript, touch and
+        Reduced Motion visitors get the same links, without the sunrise.
       </p>
+    </section>
+
+    <section class="specimen" aria-labelledby="peek-specimen">
+      <SectionHeading id="peek-specimen" title="The peeking B and J" />
+      <p class="annotation">
+        v0's giant initials no longer sit at the foot of the homepage. Now and
+        then, on any page, a B or a J peeks in from a screen edge or up from
+        behind a section rule (on phones, from behind a picture too), and ducks
+        when it is noticed or after a few seconds. One at a time, never over a
+        line of text, never while scrolling; phones see them more often than
+        wide screens. Reduced Motion turns it off; without JavaScript it does
+        not exist.
+      </p>
+      <button type="button" class="peek-now" data-peek-now hidden>
+        Peek now
+      </button>
     </section>
 
     <section class="specimen" aria-labelledby="foundations">
@@ -211,37 +235,42 @@ const anatomy = [
 
     <section class="specimen" aria-labelledby="controls">
       <SectionHeading id="controls" title="Links and wayfinding" />
-      <SiteNav
-        nav={site.nav}
-        currentPath="/"
-        email={site.email}
-        label="Navigation specimen"
-      />
+      <BallNav site={site} currentPath="/projects" label="Navigation specimen" />
       <p class="annotation">
-        A regular menu uses the same typography and link language as the rest of
-        the site. The current destination has a burgundy underline and stronger
-        weight. Every destination stays visible on mobile and works without
-        JavaScript.
+        The site navigation is one row of balls on every page, a tight honeycomb
+        on phones. The current destination is the burgundy ball. Every
+        destination stays visible on mobile and works without JavaScript.
       </p>
       <div class="specimen-row">
         <Link href="/about" arrow>
           A text link
         </Link>
-        <Link href="/projects" treatment="action" tone="wine">
-          See projects
+        <Link href="/projects" treatment="pill" arrow>
+          A pill
         </Link>
-        <Link href="/about" treatment="action">
-          About
+        <Link href="https://github.com/beejsbj/" treatment="pill" arrow newTab>
+          An outbound pill
         </Link>
-        <Link href="/" treatment="action" disabled>
+        <Link href="/projects" treatment="pill" tone="wine" arrow>
+          A primary pill
+        </Link>
+        <Link href="/" treatment="pill" disabled>
           Unavailable
         </Link>
       </div>
       <p class="annotation">
-        Text links use a quiet underline and small directional arrows. Outbound
-        arrows lift with the pointer. Tab has a visible ring. Navigation remains
-        text; stronger rectangular actions are reserved for project
-        destinations.
+        Every arrow is the satellite: a small burgundy ball carrying one
+        hand-inked arrow, after a link's words or on a ball's rim. Leaving the
+        site, the same arrow turns to point out of the page. On hover the peach
+        reaches it and kicks it a little way along its arrow.
+      </p>
+      <p class="annotation">
+        One link language, one set of ball tokens. Navigation is balls; a
+        standalone action is a pill, a peach ball resting behind its first
+        letters that stretches under the whole label on hover; a primary action
+        is the burgundy pill. Links inside prose stay text on a pencil rule, and
+        on hover the same peach pill grows behind the words. Arrows nudge the
+        way they point, and Tab shows a ring that follows the shape.
       </p>
     </section>
 
@@ -262,11 +291,11 @@ const anatomy = [
           />
         </div>
         <div>
-          <CurrentNote id="guide-currently" variant="plain" />
+          <CurrentNote note={home.currently} id="guide-currently" variant="plain" />
           <div class="spaced">
-            <UpdateEntry {...update.data} detailed />
+            <UpdateEntry {...update.data} labels={labels} detailed />
           </div>
-          <ActivityStream updates={updates} />
+          <ActivityStream updates={updates} copy={home.updates} labels={labels} />
           <Note>
             <p>
               A note can hold arbitrary content without inventing a new card
@@ -335,8 +364,33 @@ const anatomy = [
   .guide {
     padding-top: var(--space-2xl);
   }
+  .peek-now {
+    min-height: var(--control-min-height);
+    margin-top: var(--space-m);
+    padding-inline: var(--space-m);
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--ball-fill);
+    color: var(--ball-ink);
+    font: inherit;
+    cursor: pointer;
+  }
+  .peek-now:hover {
+    background: var(--ball-fill-hover);
+  }
+  .peek-now:active {
+    scale: var(--press-scale);
+  }
+  .peek-now:disabled {
+    opacity: var(--disabled-opacity);
+    cursor: default;
+  }
+  .peek-now:focus-visible {
+    outline: var(--focus-width) solid var(--color-accent);
+    outline-offset: var(--focus-offset);
+  }
   .blob-specimen {
-    width: var(--blob-art-width);
+    width: var(--ball-cluster-width);
   }
   .direction {
     display: grid;

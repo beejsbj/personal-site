@@ -1,0 +1,140 @@
+/* Writing uses the pinned document, with Calling Card's own paper and ink
+   instead of inheriting the server-rendered page's styling. */
+:root[data-lens="calling-card"] .cc-writing__sheet {
+  background: var(--cc-paper);
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-writing__page {
+  display: grid;
+  gap: 1.8rem;
+  width: min(44rem, 100%);
+  margin-inline: auto;
+  padding-inline: clamp(1.1rem, 4vw, 3rem);
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+}
+:root[data-lens="calling-card"] .cc-writing__opening,
+:root[data-lens="calling-card"] .cc-writing__post article {
+  display: grid;
+  gap: 0.65rem;
+}
+:root[data-lens="calling-card"] .cc-writing__eyebrow {
+  justify-self: start;
+  margin: 0;
+  padding: 0.15rem 0.6rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+:root[data-lens="calling-card"] .cc-writing__title {
+  margin: 0;
+  font-family: var(--cc-display);
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+:root[data-lens="calling-card"] .cc-writing__intro,
+:root[data-lens="calling-card"] .cc-writing__summary,
+:root[data-lens="calling-card"] .cc-writing__notice {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+:root[data-lens="calling-card"] .cc-writing__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.1rem;
+  margin-top: 0.35rem;
+}
+:root[data-lens="calling-card"] .cc-writing__page a {
+  color: var(--cc-black);
+  text-decoration: underline;
+  text-decoration-color: var(--cc-red-ink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+:root[data-lens="calling-card"] .cc-writing__page a:hover {
+  background: var(--cc-red-ink);
+  color: var(--cc-white);
+  text-decoration-color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-writing__page :focus-visible {
+  outline-color: var(--cc-red-ink);
+  box-shadow: 0 0 0 7px var(--cc-paper);
+}
+:root[data-lens="calling-card"] .cc-writing__posts {
+  display: grid;
+  gap: 1.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-writing__post + .cc-writing__post {
+  padding-top: 1.6rem;
+  border-top: 2px solid var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-writing__date,
+:root[data-lens="calling-card"] .cc-writing__origin {
+  margin: 0;
+  font-family: var(--cc-mono);
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+:root[data-lens="calling-card"] .cc-writing__post-title {
+  margin: 0;
+  font-family: var(--cc-display);
+  font-size: 1.55rem;
+  line-height: 1.2;
+}
+:root[data-lens="calling-card"] .cc-writing .cc-prose {
+  min-width: 0;
+}
+:root[data-lens="calling-card"] .cc-writing .cc-prose li::marker,
+:root[data-lens="calling-card"] .cc-writing .cc-prose th {
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .cc-writing .cc-prose :is(th, td) {
+  border-bottom-color: rgb(0 0 0 / 0.25);
+}
+:root[data-lens="calling-card"] .cc-writing .cc-prose :is(h2, h3, h4, h5, h6) {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+:root[data-lens="calling-card"] .cc-writing .cc-prose img {
+  max-height: none;
+  box-sizing: border-box;
+}
+:root[data-lens="calling-card"] .cc-writing__end {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.25rem;
+  border: 3px solid var(--cc-black);
+  box-shadow: 6px 6px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-writing__end h2 {
+  margin: 0;
+  font-family: var(--cc-display);
+  font-size: 1.6rem;
+  line-height: 1.2;
+}
+:root[data-lens="calling-card"] .cc-writing__end p,
+:root[data-lens="calling-card"] .cc-writing__return {
+  margin: 0;
+}
+/* A fifth section still fits on narrow phones without clipping a tab. */
+@media (max-width: 400px) {
+  :root[data-lens="calling-card"] .cc-tabs__tab {
+    padding-inline: 0.35rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+  }
+}
+@media (max-width: 760px), (max-aspect-ratio: 5/6) {
+  :root[data-lens="calling-card"] .cc-writing__page {
+    padding-inline: 0.75rem;
+  }
+}

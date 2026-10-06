@@ -1,0 +1,216 @@
+---
+/** Unique: the site navigation, as v1's balls. One nav on every page, with
+ * all six destinations: real links, one tab stop each, named by their
+ * labels, the current page's ball filled burgundy (aria-current).
+ * Each ball is the shared Link primitive's ball treatment, so the nav and
+ * the site's action links are one family.
+ * Forms (same markup, CSS only):
+ * - row: a gently waving line of equal balls in the header (default);
+ * - compact (phones): a tight 3 + 3 honeycomb beside the name;
+ * - cluster (homepage, wide screens): v1's uneven cluster, hung from the
+ *   header into the introduction's right column. Its balls rise in once.
+ * A press is always a click: the hit area never moves. ball-life.ts gives
+ * the painted face and label their life (lean, jelly, jostle, poke, squash
+ * and bounce); the links work the same without it. */
+import type { SiteData } from "../../content.config";
+import Link from "../primitives/Link.astro";
+interface Props {
+  site: Pick<SiteData, "nav" | "email" | "header">;
+  currentPath?: string;
+  form?: "row" | "cluster";
+  label?: string;
+}
+const {
+  site,
+  currentPath = Astro.url.pathname,
+  form = "row",
+  label = site.header.label,
+} = Astro.props;
+
+// Cluster geometry (centre x/y and radius in a 300 x 336 box), grown from
+// v1's four-ball cluster to hold all six. Keyed by destination, not by
+// label, so the words stay in content. Each ball is big enough for its
+// label on one line, and an external ball's rim satellite (top right, 45
+// degrees) never overlaps a neighbour, so no click can land on the wrong
+// ball.
+const BOX = { width: 300, height: 336 };
+const HELLO = "hello";
+const geometry: Record<string, { cx: number; cy: number; r: number }> = {
+  "/": { cx: 78, cy: 62, r: 58 },
+  "/lab": { cx: 184, cy: 46, r: 42 },
+  "/writing": { cx: 252, cy: 104, r: 48 },
+  "/about": { cx: 54, cy: 176, r: 50 },
+  "/projects": { cx: 168, cy: 172, r: 66 },
+  [HELLO]: { cx: 84, cy: 280, r: 54 },
+};
+// The header's choice of destinations (site.header, from content): Home,
+// the chosen nav items in order, then Say hello by email. A ball is
+// outbound when its href leaves the site; the Link primitive gives it the
+// rim satellite.
+const items = [
+  { key: "/", label: site.header.home, href: "/" },
+  ...site.header.items.flatMap((name) =>
+    site.nav
+      .filter((item) => item.label === name)
+      .map((item) => ({ key: item.href, ...item })),
+  ),
+  { key: HELLO, label: site.header.hello, href: `mailto:${site.email}` },
+];
+const current = (href: string) =>
+  href === "/"
+    ? currentPath === "/"
+    : currentPath === href || currentPath.startsWith(href + "/");
+const place = (key: string, index: number) => {
+  const spot = geometry[key];
+  // A destination with no cluster spot still works as a ball in the row
+  // and honeycomb; the cluster just has nowhere to hang it.
+  if (!spot) return `--i:${index}`;
+  const { cx, cy, r } = spot;
+  return [
+    `--x:${(((cx - r) / BOX.width) * 100).toFixed(3)}%`,
+    `--y:${(((cy - r) / BOX.height) * 100).toFixed(3)}%`,
+    `--d:${(((2 * r) / BOX.width) * 100).toFixed(3)}%`,
+    `--i:${index}`,
+  ].join(";");
+};
+---
+
+<nav class="ball-nav" aria-label={label} data-ball-nav data-form={form}>
+  <ul>
+    {items.map((item, index) => (
+      <li style={place(item.key, index)}>
+        <Link
+          href={item.href}
+          treatment="ball"
+          current={current(item.href)}
+          data-ball
+          data-tone={current(item.href) ? "wine" : "peach"}
+          draggable="false"
+        >
+          {item.label}
+        </Link>
+      </li>
+    ))}
+  </ul>
+</nav>
+<script>
+  import { installBallLife } from "./ball-life";
+  installBallLife();
+</script>
+<style>
+  ul {
+    display: flex;
+    align-items: center;
+    gap: var(--ball-row-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    --i: 0;
+    --x: 0;
+    --y: 0;
+    --d: 0;
+    display: grid;
+  }
+  li > :global(.ds-link--ball) {
+    min-width: var(--ball-nav-size);
+    font-size: var(--text-sm);
+  }
+  /* Row: balls sized to their names on a gentle wave, so the line reads as
+     balls laid down by hand rather than a row of buttons. */
+  li:nth-child(odd) {
+    translate: 0 calc(-1 * var(--ball-row-wave));
+  }
+  li:nth-child(even) {
+    translate: 0 var(--ball-row-wave);
+  }
+
+  /* Compact: a tight honeycomb, three over three, each ball sized to its
+     name and still a full touch target. Three content-sized columns; the
+     second row sits half a ball to the right and tucks up into the first.
+     (A static offset: nothing here moves once laid out.) */
+  @media (max-width: 40.625rem) {
+    ul {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 0 var(--ball-honeycomb-gap);
+      justify-content: end;
+      padding-inline-end: var(--ball-honeycomb-shift);
+    }
+    li {
+      justify-items: start;
+      translate: none;
+    }
+    li:nth-child(n) {
+      translate: none;
+    }
+    li:nth-child(n + 4) {
+      margin-top: var(--ball-honeycomb-tuck);
+      translate: var(--ball-honeycomb-shift) 0;
+    }
+    li > :global(.ds-link--ball) {
+      min-width: var(--ball-nav-size-compact);
+      padding-inline: var(--ball-label-pad-compact);
+      font-size: var(--ball-label-size-compact);
+      letter-spacing: var(--ball-tracking-compact);
+    }
+  }
+
+  /* Cluster: the homepage's expressive form (the header hangs it into the
+     introduction's right column). Wide screens only; narrower, it is the
+     same row or honeycomb as every other page. */
+  @media (min-width: 62.501rem) {
+    .ball-nav[data-form="cluster"] {
+      width: var(--ball-cluster-width);
+    }
+    [data-form="cluster"] ul {
+      display: block;
+      position: relative;
+      aspect-ratio: 300 / 336;
+    }
+    [data-form="cluster"] li {
+      position: absolute;
+      top: var(--y);
+      left: var(--x);
+      width: var(--d);
+      translate: none;
+    }
+    [data-form="cluster"] li > :global(.ds-link--ball) {
+      --ball-shadow-rest: var(--shadow-ball);
+      width: 100%;
+      min-width: 0;
+      font-size: var(--ball-label-size-cluster);
+      letter-spacing: var(--ball-tracking-cluster);
+    }
+  }
+  /* Arrival, once, on the homepage: the peach suns rise, the burgundy
+     ball comes up last. */
+  @media (min-width: 62.501rem) and (prefers-reduced-motion: no-preference) {
+    /* Paint only: the face and label rise; the link itself never moves,
+       so a click during the arrival still lands. */
+    [data-form="cluster"] li :global(.ds-link--ball .ball-face),
+    [data-form="cluster"] li :global(.ds-link--ball > .ds-link__body) {
+      animation: sunrise var(--duration-settle) var(--ease-pop)
+        calc(var(--stagger) * (2 + var(--i))) backwards;
+    }
+    [data-form="cluster"]
+      li:has([aria-current])
+      :global(.ds-link--ball .ball-face),
+    [data-form="cluster"]
+      li:has([aria-current])
+      :global(.ds-link--ball > .ds-link__body) {
+      animation-delay: calc(var(--stagger) * 8);
+    }
+  }
+  @keyframes sunrise {
+    from {
+      opacity: 0;
+      transform: translateY(var(--motion-sunrise)) scale(var(--pop-scale));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
