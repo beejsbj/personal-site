@@ -1025,7 +1025,7 @@ class Troupe {
           this.react(m, "gasp", (toward * 1), at + 3 * FRAME, 0.5);
         });
         const last = 140 + (defenders.length - 1) * 55 + 3 * FRAME + 40;
-        m.camp = c;
+        // he dies one of his own camp's: they mourn him, not the men who killed him
         this.die(m, c.side, last);
         setTimeout(() => {
           for (const d of defenders) if (d.alive) this.react(d, "hop", -90, rand(0, 120), 0.6);
