@@ -170,6 +170,7 @@
   --duration-peek-out: 520ms;
   --duration-peek-duck: 240ms;
   --page-ball-min: 4.75rem;
+  --page-ball-max: 12rem;
   --page-reach: 150vmax;
   --skip-hidden: translateY(calc(-100% - var(--space-l)));
 }
