@@ -38,6 +38,7 @@
     display: grid;
     place-items: center;
     min-width: var(--page-ball-min);
+    max-width: 200px;
     aspect-ratio: 1;
     padding: var(--space-s);
     border-radius: var(--radius-round);
@@ -47,12 +48,15 @@
     font-weight: var(--weight-bold);
     line-height: var(--leading-tight);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     translate: -50% -50%;
   }
   /* A ball link: the cover ball takes its exact size and serif label. */
   .page-cover[data-from="ball"] .page-cover__ball {
     width: var(--page-ball-size);
     min-width: 0;
+    max-width: none;
     padding: 0;
     font-family: var(--font-serif);
     font-size: var(--page-ball-font);
@@ -61,6 +65,8 @@
     line-height: var(--leading-display);
     text-align: center;
     white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
   .page-cover__sheet {
     position: absolute;
