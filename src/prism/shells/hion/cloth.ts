@@ -115,7 +115,6 @@ export function createCloth(options: ClothOptions) {
   let budget = 0;
   let lastScroll = scrollY;
   let built = false;
-  let hue: Species = 1;
 
   /** Where the screen starts on the page, measured when the cloth is built
    * (reading it every frame would force a layout mid-scroll). */
@@ -681,36 +680,55 @@ export function createCloth(options: ClothOptions) {
     const x = Math.round(px / S) - 1;
     const y = Math.round(py / S) - 1;
     if (!free(pattern, x, y)) return false;
-    stamp(life, pattern, x, y, species ?? (hue = hue === 1 ? 2 : 1));
+    stamp(life, pattern, x, y, species ?? hueNear(px, py));
     touch(x + 1, y + 1);
     budget = Math.max(budget, 1);
     wake();
     return true;
   }
 
+  /** The colour you sow: the hion you tap nearest; away from both, the
+   * side of the page (cyan's selvage left, magenta's right). */
+  function hueNear(px: number, py: number): Species {
+    let best = 160 * 160;
+    let found: Species | undefined;
+    for (const journey of loom.journeys()) {
+      const pts = journey.points;
+      for (let i = 0; i < pts.length; i += 3) {
+        const dx = pts[i][0] - px;
+        const dy = pts[i][1] - py;
+        const d = dx * dx + dy * dy;
+        if (d < best) {
+          best = d;
+          found = journey.hue === "c" ? 1 : 2;
+        }
+      }
+    }
+    return found ?? (px < width / 2 ? 1 : 2);
+  }
+
   function onDown(event: PointerEvent) {
     if (!built || event.button > 0) return;
     const target = event.target as Element;
     if (target.closest("a, button, input, .hion-top")) return;
-    const top = pageTop;
     const px = event.clientX;
-    const py = event.clientY + scrollY - top;
+    const py = event.clientY + scrollY - pageTop;
     if (py < 0 || py > height) return;
-    const rand = Math.random();
-    if (rand < 0.3) {
+    const species = hueNear(px, py);
+    if (Math.random() < 0.3) {
       // Now and then a burst instead: it burns a while, then settles.
       const pattern = orient(PATTERNS.rPentomino, Math.floor(Math.random() * 4));
       const x = Math.round(px / S) - 1;
       const y = Math.round(py / S) - 1;
       if (free(pattern, x, y)) {
-        stamp(life, pattern, x, y, (dx, dy) => ((dx + dy) & 1 ? 1 : 2));
+        stamp(life, pattern, x, y, species);
         touch(x + 1, y + 1);
         budget = Math.max(budget, 1);
         wake();
         return;
       }
     }
-    launch(px, py, [px > width / 2 ? 1 : -1, Math.random() < 0.5 ? 1 : -1]);
+    launch(px, py, [px > width / 2 ? 1 : -1, Math.random() < 0.5 ? 1 : -1], species);
   }
 
   /** Passing over a link sends a glider off it, outward. */
