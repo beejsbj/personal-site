@@ -4,6 +4,7 @@ summary: "What if shapes could keep time? A black-and-white rhythm experiment th
 type: "Audio + interaction"
 sourceEra: "CodePen"
 href: "https://codepen.io/beejsbj/pen/BaeoNPG"
+cover: "/images/lab/beating-shapes.png"
 order: 2
 ---
 

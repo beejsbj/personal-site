@@ -68,14 +68,3 @@ export function link(
       : null,
   );
 }
-
-/** Deterministic small PRNG so decorations are stable per slug. */
-export function seeded(seed: string) {
-  let n = 2166136261;
-  for (const char of seed) n = Math.imul(n ^ char.charCodeAt(0), 16777619);
-  return () => {
-    n = Math.imul(n ^ (n >>> 15), 2246822507);
-    n = Math.imul(n ^ (n >>> 13), 3266489909);
-    return ((n ^= n >>> 16) >>> 0) / 4294967296;
-  };
-}
