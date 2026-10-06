@@ -7,6 +7,7 @@ const read = (path) => readFileSync(path, "utf8");
 test("project history includes applications and the learning arcade in dated order", () => {
   const html = read("dist/client/projects/index.html");
   for (const slug of [
+    "dayshaper",
     "conduit-market",
     "api3-ecosystem",
     "flashcards",
@@ -20,7 +21,7 @@ test("project history includes applications and the learning arcade in dated ord
   const years = [...html.matchAll(/id="year-(\d{4})"/g)].map((match) =>
     Number(match[1]),
   );
-  assert.deepEqual(years, [2025, 2024, 2022, 2021]);
+  assert.deepEqual(years, [2026, 2025, 2024, 2022, 2021]);
   assert.ok(
     html.indexOf('href="/projects/flashcards"') <
       html.indexOf('href="/projects/qrng"'),

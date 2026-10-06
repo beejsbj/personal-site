@@ -89,11 +89,11 @@ test("opening work uses one real feature without duplicating the selected projec
     1,
   );
   assert.ok(projects[0].class.split(/\s+/).includes("project-row--feature"));
-  assert.match(projects[0].body, /href="\/projects\/conduit-market"/);
+  assert.match(projects[0].body, /href="\/projects\/dayshaper"/);
   assert.match(projects[0].body, /<img\b/);
   assert.match(
     plainText(projects[0].body),
-    /Frontend Engineering &amp; Design System/,
+    /Personal design &amp; development/,
   );
 });
 
@@ -124,14 +124,14 @@ test("homepage preserves canonical and social metadata", () => {
   assert.equal(meta("name", "twitter:image"), meta("property", "og:image"));
 });
 
-test("real featured projects, current work, and dated updates remain present", () => {
+test("homepage projects, current work, and dated updates remain present", () => {
   const links = [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].map(
     ([, attrs, body]) => ({ ...attributes(attrs), text: plainText(body) }),
   );
   for (const [slug, title] of [
+    ["dayshaper", "Dayshaper"],
     ["api3-ecosystem", "API3 Ecosystem"],
     ["conduit-market", "Conduit Market"],
-    ["qrng", "QRNG Demo Apps"],
   ]) {
     assert.ok(
       links.some(
