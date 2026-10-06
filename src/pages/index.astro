@@ -1,50 +1,35 @@
 ---
-import { getCollection, getEntry } from "astro:content";
+import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Homepage from "../components/Homepage.astro";
+import { getFeatured, getHome, getSite, updateId } from "../lib/portfolio";
 
-const homeEntry = await getEntry("pages", "home");
-if (!homeEntry) {
-  throw new Error("Missing home content entry.");
-}
+const home = await getHome();
+const site = await getSite();
 
-const siteEntry = await getEntry("site", "config");
-if (!siteEntry) {
-  throw new Error("Missing site config entry.");
-}
-const site = siteEntry.data;
-
-const featuredProjects: CollectionEntry<"projects">[] = (
-  await getCollection("projects")
-)
-  .filter(
-    (entry: CollectionEntry<"projects">) =>
-      !entry.data.hidden && entry.data.featured,
-  )
-  .sort(
-    (left: CollectionEntry<"projects">, right: CollectionEntry<"projects">) =>
-      left.data.order - right.data.order,
-  )
-  .slice(0, 3);
+// Featured by the shared rule (src/lib/rules.ts), as many as home.md asks.
+const featuredProjects = (await getFeatured()).slice(0, home.work.limit);
 
 // The shared stream filters eligibility before applying its display limit.
 const recentUpdates: CollectionEntry<"updates">[] = await getCollection("updates");
 
 const homepageData = {
-  site,
+  home,
   projects: featuredProjects.map((project) => ({
     ...project.data,
+    slug: project.slug,
     href: `/projects/${project.slug}`,
   })),
-  updates: recentUpdates.map((update) => update.data),
+  updates: recentUpdates.map((update) => ({ ...update.data, id: updateId(update) })),
+  labels: { kinds: site.updateKinds, sources: site.updateSources },
 };
 ---
 
 <BaseLayout
-  title={homeEntry.data.title}
-  description={homeEntry.data.description}
-  image="/images/burooj4.jpg"
+  title={home.title}
+  description={home.description}
+  image={home.hero.portrait.src}
   pageClass="page-warm-home"
 >
   <Homepage {...homepageData} />

@@ -20,7 +20,10 @@ import LabCard from "../components/LabCard.astro";
 import PageHeader from "../components/PageHeader.astro";
 import SectionIntro from "../components/SectionIntro.astro";
 import MediaRail from "../components/MediaRail.astro";
+import { getHome } from "../lib/portfolio";
 const site = (await getEntry("site", "config"))!.data;
+const home = await getHome();
+const labels = { kinds: site.updateKinds, sources: site.updateSources };
 const project = (await getCollection("projects")).find(
   (entry: CollectionEntry<"projects">) =>
     entry.data.featured && !entry.data.hidden,
@@ -150,7 +153,7 @@ const anatomy = [
         href="/"
         linkLabel="Actual homepage"
       />
-      <WelcomeHero social={site.social} level={2} id="guide-welcome" />
+      <WelcomeHero hero={home.hero} level={2} id="guide-welcome" />
       <CurvedArrow />
       <p class="annotation">
         Composition → WelcomeHero imports Heading, Link, and the singular
@@ -166,8 +169,7 @@ const anatomy = [
       />
       <div class="blob-specimen">
         <BallNav
-          nav={site.nav}
-          email={site.email}
+          site={site}
           currentPath="/"
           form="cluster"
           label="Ball navigation specimen"
@@ -233,12 +235,7 @@ const anatomy = [
 
     <section class="specimen" aria-labelledby="controls">
       <SectionHeading id="controls" title="Links and wayfinding" />
-      <BallNav
-        nav={site.nav}
-        email={site.email}
-        currentPath="/projects"
-        label="Navigation specimen"
-      />
+      <BallNav site={site} currentPath="/projects" label="Navigation specimen" />
       <p class="annotation">
         The site navigation is one row of balls on every page, a tight honeycomb
         on phones. The current destination is the burgundy ball. Every
@@ -294,11 +291,11 @@ const anatomy = [
           />
         </div>
         <div>
-          <CurrentNote id="guide-currently" variant="plain" />
+          <CurrentNote note={home.currently} id="guide-currently" variant="plain" />
           <div class="spaced">
-            <UpdateEntry {...update.data} detailed />
+            <UpdateEntry {...update.data} labels={labels} detailed />
           </div>
-          <ActivityStream updates={updates} />
+          <ActivityStream updates={updates} copy={home.updates} labels={labels} />
           <Note>
             <p>
               A note can hold arbitrary content without inventing a new card

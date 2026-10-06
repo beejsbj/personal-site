@@ -1,21 +1,21 @@
 ---
+import type { SiteData } from "../content.config";
 import BallNav from "../design/unique/BallNav.astro";
 interface Props {
-  nav: { label: string; href: string; external?: boolean }[];
+  site: SiteData;
   currentPath: string;
-  email: string;
 }
-const { nav, currentPath, email } = Astro.props;
+const { site, currentPath } = Astro.props;
 // One nav everywhere. On the homepage it takes its expressive form: the
 // big cluster that hangs into the introduction (wide screens only).
 const form = currentPath === "/" ? "cluster" : "row";
 ---
 
 <header class="site-header shell">
-  <a class="home-link" href="/" aria-label="Burooj — home">
-    burooj.
+  <a class="home-link" href="/" aria-label={site.mark.label}>
+    {site.mark.text}
   </a>
-  <BallNav nav={nav} currentPath={currentPath} email={email} form={form} />
+  <BallNav site={site} currentPath={currentPath} form={form} />
 </header>
 <style>
   .site-header {

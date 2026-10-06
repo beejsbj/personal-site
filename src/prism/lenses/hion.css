@@ -1,0 +1,15 @@
+/* Lens: hion. The portfolio drawn in two threads of light, cyan and
+   magenta, in chalk pastel on black paper. This file only holds what must
+   exist before the shell's JS arrives: the black paper itself, so there is
+   no flash, and the faces the shell writes in. Everything else lives in
+   shells/hion/shell.css. */
+@import "@fontsource/shippori-mincho/latin-500.css";
+@import "@fontsource/shippori-mincho/latin-800.css";
+@import "@fontsource/caveat/latin-600.css";
+
+:root[data-lens="hion"],
+:root[data-lens="hion"] body {
+  background: #060408;
+  color: rgb(205 240 245);
+  color-scheme: dark;
+}

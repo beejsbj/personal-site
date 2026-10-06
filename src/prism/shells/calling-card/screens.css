@@ -1,0 +1,1587 @@
+/* Inner screens: EQUIP (projects), item file (project), requests (lab),
+   request brief (lab entry), confidant (about), STATUS (resume) and the
+   pinned document (everything else). */
+
+/* ---------- Shared entrance ---------- */
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-titleblock,
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-back {
+  animation: calling-card-fly-left 380ms var(--cc-out) both 60ms;
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-tabs {
+  animation: calling-card-fly-right 380ms var(--cc-out) both 40ms;
+}
+
+/* ---------- Scroll columns ---------- */
+:root[data-lens="calling-card"] .cc-item__file,
+:root[data-lens="calling-card"] .cc-confidant__file,
+:root[data-lens="calling-card"] .cc-status__body {
+  mask-image: linear-gradient(transparent, #000 1.6rem, #000 calc(100% - 1.6rem), transparent);
+}
+:root[data-lens="calling-card"] .cc-item__file,
+:root[data-lens="calling-card"] .cc-confidant__file,
+:root[data-lens="calling-card"] .cc-status__body,
+:root[data-lens="calling-card"] .cc-brief__paper,
+:root[data-lens="calling-card"] .cc-doc__sheet {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cc-red) transparent;
+}
+
+/* =====================================================================
+   EQUIP: projects
+   ===================================================================== */
+:root[data-lens="calling-card"] .cc-equip .cc-screen__bg {
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-equip__rays {
+  inset: 0;
+  background: repeating-conic-gradient(from 0deg at 8% 14%, rgb(255 255 255 / 0.07) 0 4deg, transparent 4deg 10deg);
+}
+:root[data-lens="calling-card"] .cc-equip__red {
+  inset: 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1.7px, transparent 2.3px) 0 0 / 10px 10px,
+    linear-gradient(160deg, var(--cc-red) 30%, var(--cc-red-deep));
+  clip-path: polygon(54% 0, 100% 0, 100% 100%, 44% 100%, 47% 64%, 45% 62%);
+}
+:root[data-lens="calling-card"] .cc-equip__star {
+  left: -12vmax;
+  bottom: -18vmax;
+  width: 52vmax;
+  aspect-ratio: 1;
+  transform: rotate(12deg);
+}
+:root[data-lens="calling-card"] .cc-equip__col {
+  position: absolute;
+  z-index: 3;
+  top: 1rem;
+  left: 1.5rem;
+  bottom: 3.6rem;
+  width: min(36rem, 44vw);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+:root[data-lens="calling-card"] .cc-equip__head,
+:root[data-lens="calling-card"] .cc-requests__head {
+  display: grid;
+  justify-items: start;
+  gap: 1.1rem;
+}
+:root[data-lens="calling-card"] .cc-requests__head {
+  position: absolute;
+  z-index: 3;
+  top: 1rem;
+  left: 1.5rem;
+}
+:root[data-lens="calling-card"] .cc-equip__intro {
+  max-width: 28rem;
+  margin: 0.2rem 0 0 1rem;
+  color: var(--cc-grey);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+:root[data-lens="calling-card"] .cc-say.cc-requests__intro {
+  position: absolute;
+  z-index: 3;
+  left: 2rem;
+  bottom: 4.5rem;
+  width: min(22rem, 26vw);
+  transform: rotate(-2deg);
+}
+:root[data-lens="calling-card"] .cc-equip__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.6rem 1rem 1.2rem 2.4rem;
+  scrollbar-width: none;
+}
+:root[data-lens="calling-card"] .cc-equip__list ol {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-slot {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  padding: 0.15rem 0.9rem 0.15rem 0.2rem;
+  color: var(--cc-white);
+  text-decoration: none;
+  transform: translateX(calc(mod(var(--i), 3) * 0.7rem)) skewX(-8deg);
+  transition: transform 140ms var(--cc-snap);
+  animation: calling-card-fly-left 360ms var(--cc-out) both;
+  animation-delay: calc(120ms + var(--i) * 35ms);
+}
+:root[data-lens="calling-card"] .cc-slot__shard {
+  position: absolute;
+  inset: -0.2rem -0.4rem -0.2rem -0.6rem;
+  z-index: -1;
+  background: var(--cc-ink);
+  border: 2px solid rgb(255 255 255 / 0.9);
+  clip-path: polygon(0 10%, 100% 0, 98% 90%, 1% 100%);
+  transition: background 80ms;
+}
+:root[data-lens="calling-card"] .cc-slot__cat {
+  padding: 0.1rem 0.45rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+:root[data-lens="calling-card"] .cc-slot__name {
+  font-family: var(--cc-display);
+  font-size: clamp(1.15rem, 1.9vw, 1.45rem);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+:root[data-lens="calling-card"] .cc-slot__thumb {
+  display: none;
+}
+:root[data-lens="calling-card"] .cc-slot__sum {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+:root[data-lens="calling-card"] .cc-slot[data-state="selected"] {
+  z-index: 2;
+  transform: translateX(calc(mod(var(--i), 3) * 0.7rem + 1.4rem)) skewX(-8deg) scale(1.06);
+}
+:root[data-lens="calling-card"] .cc-slot[data-state="selected"] .cc-slot__shard {
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.2) 0 1.5px, transparent 2px) 0 0 / 8px 8px,
+    var(--cc-red);
+  border-color: var(--cc-white);
+  animation: calling-card-snap-in 160ms var(--cc-out);
+  transform-origin: left;
+}
+:root[data-lens="calling-card"] .cc-slot[data-state="selected"]::before {
+  content: "";
+  position: absolute;
+  left: -2.2rem;
+  top: 50%;
+  width: 1.8rem;
+  height: 1.6rem;
+  translate: 0 -50%;
+  background: var(--cc-white);
+  clip-path: polygon(0 0, 100% 50%, 0 100%, 25% 50%);
+}
+:root[data-lens="calling-card"] .cc-slot[data-state="selected"] .cc-slot__cat {
+  background: var(--cc-black);
+  color: var(--cc-white);
+}
+
+:root[data-lens="calling-card"] .cc-equip__detail {
+  position: absolute;
+  z-index: 2;
+  right: 2.5vw;
+  top: 5.2rem;
+  bottom: 3.6rem;
+  width: min(40rem, 47vw);
+  cursor: pointer;
+}
+:root[data-lens="calling-card"] .cc-file {
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto auto auto auto auto;
+  justify-items: start;
+  align-content: end;
+  gap: 0.55rem;
+}
+:root[data-lens="calling-card"] .cc-file > * {
+  margin: 0;
+  animation: calling-card-fly-right 300ms var(--cc-out) both;
+}
+:root[data-lens="calling-card"] .cc-file > :nth-child(2) { animation-delay: 30ms; }
+:root[data-lens="calling-card"] .cc-file > :nth-child(3) { animation-delay: 60ms; }
+:root[data-lens="calling-card"] .cc-file > :nth-child(4) { animation-delay: 90ms; }
+:root[data-lens="calling-card"] .cc-file > :nth-child(n + 5) { animation-delay: 120ms; }
+:root[data-lens="calling-card"] .cc-file__cover {
+  justify-self: stretch;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 0.4rem 1.5rem 0.8rem;
+}
+:root[data-lens="calling-card"] .cc-file__cover img {
+  max-height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  border: 6px solid var(--cc-white);
+  outline: 3px solid var(--cc-black);
+  box-shadow: 14px 14px 0 var(--cc-black);
+  transform: rotate(3deg);
+  background: var(--cc-black);
+}
+/* A project with no cover shows the star where the cover would be. */
+:root[data-lens="calling-card"] .cc-cover-star {
+  display: block;
+  height: 100%;
+  max-height: 16rem;
+  min-height: 0;
+  aspect-ratio: 1;
+  transform: rotate(-8deg);
+}
+:root[data-lens="calling-card"] .cc-file__cat {
+  padding: 0.1rem 0.7rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: skewX(-12deg) rotate(-2deg);
+}
+:root[data-lens="calling-card"] .cc-file__name {
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  line-height: 1;
+  color: var(--cc-white);
+  text-shadow: var(--cc-outline);
+  transform: rotate(-3deg);
+}
+:root[data-lens="calling-card"] .cc-file__summary {
+  max-width: 34rem;
+  padding: 0.7rem 1rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-size: 1rem;
+  line-height: 1.5;
+  clip-path: polygon(0 3%, 100% 0, 99.5% 100%, 0.5% 97%);
+}
+:root[data-lens="calling-card"] .cc-file__stats,
+:root[data-lens="calling-card"] .cc-item__stats {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-stat {
+  display: grid;
+  grid-template-columns: 5.2rem 1fr;
+  align-items: center;
+  gap: 0.6rem;
+}
+:root[data-lens="calling-card"] .cc-stat__label {
+  padding: 0.05rem 0.5rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: right;
+  transform: skewX(-14deg);
+}
+:root[data-lens="calling-card"] .cc-stat__value {
+  margin: 0;
+  padding: 0.05rem 0.6rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+:root[data-lens="calling-card"] .cc-file__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.9rem 0.2rem 0.25rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border-radius: 999px;
+  font-family: var(--cc-display);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-file__open kbd {
+  display: inline-grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  border-radius: 50%;
+}
+
+/* =====================================================================
+   ITEM FILE: a project
+   ===================================================================== */
+:root[data-lens="calling-card"] .cc-item .cc-screen__bg {
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-item__red {
+  inset: 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1.7px, transparent 2.3px) 0 0 / 10px 10px,
+    linear-gradient(200deg, var(--cc-red) 30%, var(--cc-red-deep));
+  clip-path: polygon(0 0, 38% 0, 46% 100%, 0 100%);
+}
+:root[data-lens="calling-card"] .cc-item__star {
+  left: 30%;
+  bottom: -10vmax;
+  width: 26vmax;
+  aspect-ratio: 1;
+  transform: rotate(-14deg);
+  opacity: 0.9;
+}
+:root[data-lens="calling-card"] .cc-item__visual {
+  position: absolute;
+  z-index: 2;
+  left: 3vw;
+  top: 5rem;
+  bottom: 4rem;
+  width: 40vw;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 1.2rem;
+  align-items: center;
+}
+:root[data-lens="calling-card"] .cc-item__cover {
+  margin: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  max-height: 100%;
+  animation: calling-card-slam 420ms var(--cc-out) both 80ms;
+}
+:root[data-lens="calling-card"] .cc-item__cover img,
+:root[data-lens="calling-card"] .cc-item__cover video {
+  max-height: 58vh;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  border: 8px solid var(--cc-white);
+  outline: 3px solid var(--cc-black);
+  box-shadow: 18px 18px 0 var(--cc-black);
+  transform: rotate(-4deg);
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-item__cover figcaption,
+:root[data-lens="calling-card"] .cc-item__media figcaption {
+  margin-top: 0.8rem;
+  padding: 0.1rem 0.5rem;
+  background: var(--cc-black);
+  font-size: 0.85rem;
+}
+:root[data-lens="calling-card"] .cc-item__rail {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.5rem;
+}
+:root[data-lens="calling-card"] .cc-item__media {
+  flex: 0 0 auto;
+  margin: 0;
+  width: min(16rem, 18vw);
+}
+:root[data-lens="calling-card"] .cc-item__media img {
+  display: block;
+  width: 100%;
+  border: 4px solid var(--cc-white);
+  box-shadow: 7px 7px 0 var(--cc-black);
+  transform: rotate(3deg);
+}
+:root[data-lens="calling-card"] .cc-item__file {
+  position: absolute;
+  z-index: 3;
+  top: 4.2rem;
+  right: 0;
+  bottom: 3.2rem;
+  width: 52vw;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 1rem;
+  padding: 1.4rem 3vw 3rem 2rem;
+}
+:root[data-lens="calling-card"] .cc-item__file > * {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-item__file > * {
+  animation: calling-card-fly-right 360ms var(--cc-out) both;
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-item__file > :nth-child(3) { animation-delay: 50ms; }
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-item__file > :nth-child(4) { animation-delay: 90ms; }
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-item__file > :nth-child(n + 5) { animation-delay: 130ms; }
+:root[data-lens="calling-card"] .cc-item__cat,
+:root[data-lens="calling-card"] .cc-confidant__eyebrow {
+  padding: 0.1rem 0.7rem;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: skewX(-12deg) rotate(-2deg);
+  box-shadow: 4px 4px 0 var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-item__title,
+:root[data-lens="calling-card"] .cc-confidant__title,
+:root[data-lens="calling-card"] .cc-brief__title {
+  margin: 0;
+  font-size: clamp(2.8rem, 5.4vw, 5rem);
+  line-height: 0.95;
+  color: var(--cc-white);
+  text-shadow: var(--cc-outline);
+  transform: rotate(-4deg);
+  transform-origin: left;
+}
+:root[data-lens="calling-card"] .cc-item__title:focus,
+:root[data-lens="calling-card"] .cc-confidant__title:focus,
+:root[data-lens="calling-card"] .cc-brief__title:focus,
+:root[data-lens="calling-card"] .cc-status__name:focus {
+  outline: none;
+}
+:root[data-lens="calling-card"] .cc-item__summary,
+:root[data-lens="calling-card"] .cc-confidant__intro {
+  max-width: 38rem;
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.35;
+}
+:root[data-lens="calling-card"] .cc-item__stats {
+  justify-self: stretch;
+  max-width: 34rem;
+}
+:root[data-lens="calling-card"] .cc-item__notes {
+  justify-self: stretch;
+  max-width: 44rem;
+  margin-top: 0.6rem !important;
+}
+:root[data-lens="calling-card"] .cc-item__notes .cc-prose > p,
+:root[data-lens="calling-card"] .cc-item__notes .cc-prose > ul,
+:root[data-lens="calling-card"] .cc-item__notes .cc-prose > ol {
+  padding: 0.9rem 1.1rem;
+  background: rgb(10 10 10 / 0.88);
+  border-left: 4px solid var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-item__notes .cc-prose > ul,
+:root[data-lens="calling-card"] .cc-item__notes .cc-prose > ol {
+  padding-left: 2.4rem;
+}
+:root[data-lens="calling-card"] .cc-item__pager {
+  justify-self: stretch;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 44rem;
+  margin-top: 1.4rem !important;
+}
+:root[data-lens="calling-card"] .cc-pager {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.5rem;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.9rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  text-decoration: none;
+  transform: skewX(-10deg);
+  box-shadow: 5px 5px 0 var(--cc-red);
+  transition: transform 120ms var(--cc-snap);
+}
+:root[data-lens="calling-card"] .cc-pager--next {
+  grid-template-columns: 1fr auto;
+  text-align: right;
+}
+:root[data-lens="calling-card"] .cc-pager kbd {
+  grid-row: span 2;
+  font-size: 1.4rem;
+}
+:root[data-lens="calling-card"] .cc-pager__dir {
+  font-family: var(--cc-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .cc-pager__name {
+  font-family: var(--cc-display);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+:root[data-lens="calling-card"] .cc-pager:hover {
+  transform: skewX(-10deg) translateY(-3px);
+}
+
+/* =====================================================================
+   REQUESTS: the lab
+   ===================================================================== */
+:root[data-lens="calling-card"] .cc-requests .cc-screen__bg,
+:root[data-lens="calling-card"] .cc-brief .cc-screen__bg {
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-requests__curtain {
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.35) 0 14px, transparent 14px 46px, rgb(255 255 255 / 0.06) 46px 50px, transparent 50px 70px),
+    linear-gradient(180deg, var(--cc-red-deep), var(--cc-red-dark));
+  clip-path: polygon(40% 0, 100% 0, 100% 100%, 30% 100%);
+}
+:root[data-lens="calling-card"] .cc-requests__star {
+  right: -8vmax;
+  top: -8vmax;
+  width: 30vmax;
+  aspect-ratio: 1;
+  transform: rotate(20deg);
+}
+:root[data-lens="calling-card"] .cc-requests__board {
+  position: absolute;
+  z-index: 3;
+  left: 30vw;
+  right: 3vw;
+  top: 7rem;
+  bottom: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4rem;
+  margin: 0;
+  padding: 0 1rem;
+  list-style: none;
+  overflow-x: auto;
+}
+:root[data-lens="calling-card"] .cc-requests__board > li {
+  flex: 0 1 22rem;
+  min-width: 17rem;
+}
+:root[data-lens="calling-card"] .cc-request {
+  position: relative;
+  display: grid;
+  gap: 0.7rem;
+  padding: 1.6rem 1.4rem 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.06) 0 1.4px, transparent 1.9px) 0 0 / 9px 9px,
+    var(--cc-paper);
+  color: var(--cc-black);
+  text-decoration: none;
+  border: 3px solid var(--cc-black);
+  box-shadow: 12px 12px 0 var(--cc-black);
+  transform: rotate(calc(-4deg + var(--i) * 6deg)) translateY(calc(var(--i) * 1.6rem));
+  transition: transform 160ms var(--cc-snap), box-shadow 120ms;
+  animation: calling-card-fly-up 420ms var(--cc-out) both;
+  animation-delay: calc(100ms + var(--i) * 80ms);
+}
+:root[data-lens="calling-card"] .cc-request__no {
+  font-family: var(--cc-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .cc-request__status {
+  position: absolute;
+  top: 0.9rem;
+  right: 1rem;
+  padding: 0.1rem 0.6rem;
+  border: 3px solid var(--cc-red-ink);
+  color: var(--cc-red-ink);
+  font-family: var(--cc-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: rotate(10deg);
+}
+:root[data-lens="calling-card"] .cc-request__title {
+  font-size: 2.3rem;
+  line-height: 1;
+  --cc-box-bg: var(--cc-black);
+  --cc-box-fg: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-request__meta {
+  display: grid;
+  gap: 0.1rem;
+  font-size: 0.9rem;
+}
+:root[data-lens="calling-card"] .cc-request__meta b {
+  font-family: var(--cc-display);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .cc-request__summary {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+:root[data-lens="calling-card"] .cc-request__accept {
+  margin: 0.4rem -1.4rem 0;
+  padding: 0.7rem 1.4rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-request__accept kbd {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border-radius: 50%;
+}
+:root[data-lens="calling-card"] .cc-request[data-state="selected"] {
+  z-index: 2;
+  transform: rotate(calc(-2deg + var(--i) * 3deg)) translateY(calc(var(--i) * 1.6rem - 0.9rem)) scale(1.05);
+  box-shadow: 12px 12px 0 var(--cc-red), 12px 12px 0 3px var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-request[data-state="selected"] .cc-request__accept {
+  background: var(--cc-red);
+}
+
+/* Brief: a lab entry */
+:root[data-lens="calling-card"] .cc-brief__paper {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 4.6rem;
+  max-height: calc(100% - 8.2rem);
+  width: min(46rem, 92vw);
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 1rem;
+  padding: 1.6rem 2rem 2.4rem;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.06) 0 1.4px, transparent 1.9px) 0 0 / 9px 9px,
+    var(--cc-paper);
+  color: var(--cc-black);
+  border: 3px solid var(--cc-black);
+  box-shadow: 14px 14px 0 var(--cc-black);
+  transform: translateX(-50%) rotate(-1.2deg);
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-brief__paper {
+  animation: calling-card-fly-up 420ms var(--cc-out) both 80ms;
+}
+:root[data-lens="calling-card"] .cc-brief__paper > * {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-brief__no {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-family: var(--cc-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .cc-brief__no span {
+  padding: 0 0.5rem;
+  border: 3px solid var(--cc-red-ink);
+  transform: rotate(8deg);
+}
+:root[data-lens="calling-card"] .cc-brief__title {
+  color: var(--cc-black);
+  text-shadow: none;
+  --cc-box-bg: var(--cc-black);
+  --cc-box-fg: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-brief__summary {
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.35;
+}
+:root[data-lens="calling-card"] .cc-brief__meta {
+  display: flex;
+  gap: 1.4rem;
+}
+:root[data-lens="calling-card"] .cc-brief__meta dt {
+  font-family: var(--cc-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .cc-brief__meta dd {
+  margin: 0;
+  font-weight: 700;
+}
+:root[data-lens="calling-card"] .cc-brief__paper .cc-prose a {
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-brief__paper .cc-back {
+  box-shadow: 4px 4px 0 var(--cc-red);
+}
+
+/* =====================================================================
+   CONFIDANT: about
+   ===================================================================== */
+:root[data-lens="calling-card"] .cc-confidant .cc-screen__bg {
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-confidant__rays {
+  inset: 0;
+  background: repeating-conic-gradient(from 0deg at 20% 38%, #f2f2f2 0 5deg, var(--cc-black) 5deg 11deg);
+  clip-path: polygon(0 0, 44% 0, 36% 100%, 0 100%);
+}
+:root[data-lens="calling-card"] .cc-confidant__red {
+  inset: 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1.7px, transparent 2.3px) 0 0 / 10px 10px,
+    var(--cc-red);
+  clip-path: polygon(8% 0, 40% 0, 30% 100%, 0 100%, 0 60%);
+}
+:root[data-lens="calling-card"] .cc-confidant__side {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 40vw;
+}
+:root[data-lens="calling-card"] .cc-confidant__portrait {
+  position: absolute;
+  left: 2vw;
+  bottom: -2vh;
+  width: 34vw;
+  aspect-ratio: 1110 / 1150;
+  animation: calling-card-fly-up 480ms var(--cc-out) both;
+}
+:root[data-lens="calling-card"] .cc-arcana {
+  position: absolute;
+  left: 2.4vw;
+  top: 5rem;
+  width: clamp(8rem, 12vw, 11rem);
+  aspect-ratio: 5 / 8;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  padding: 0.6rem;
+  background: var(--cc-paper);
+  color: var(--cc-black);
+  border: 4px solid var(--cc-black);
+  outline: 3px solid var(--cc-white);
+  box-shadow: 10px 10px 0 var(--cc-black);
+  transform: rotate(-9deg);
+  animation: calling-card-slam 460ms var(--cc-out) both 160ms;
+}
+:root[data-lens="calling-card"] .cc-arcana__num {
+  font-family: var(--cc-didone);
+  font-weight: 900;
+  font-size: 2rem;
+  line-height: 1;
+}
+:root[data-lens="calling-card"] .cc-arcana__art {
+  width: 86%;
+  align-self: center;
+}
+:root[data-lens="calling-card"] .cc-arcana__name {
+  width: 100%;
+  padding: 0.1rem 0;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-confidant__rank {
+  position: absolute;
+  left: 3vw;
+  top: calc(5rem + clamp(8rem, 12vw, 11rem) * 1.6 + 1.4rem);
+  display: grid;
+  justify-items: start;
+  gap: 0.2rem;
+  margin: 0;
+  transform: rotate(-5deg);
+}
+:root[data-lens="calling-card"] .cc-confidant__rank-label {
+  padding: 0 0.5rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-confidant__rank-value {
+  font-family: var(--cc-display);
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--cc-white);
+  text-shadow: var(--cc-outline);
+}
+:root[data-lens="calling-card"] .cc-confidant__pips {
+  display: flex;
+  gap: 0.2rem;
+}
+:root[data-lens="calling-card"] .cc-confidant__pips span {
+  width: 0.9rem;
+  height: 0.9rem;
+  background: var(--cc-white);
+  border: 2px solid var(--cc-black);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+:root[data-lens="calling-card"] .cc-confidant__file {
+  position: absolute;
+  z-index: 3;
+  top: 4.2rem;
+  right: 0;
+  bottom: 3.2rem;
+  width: 58vw;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 1.1rem;
+  padding: 1.4rem 3vw 3rem 1rem;
+}
+:root[data-lens="calling-card"] .cc-confidant__file > * {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-confidant__file > * {
+  animation: calling-card-fly-right 360ms var(--cc-out) both 80ms;
+}
+:root[data-lens="calling-card"] .cc-social {
+  display: grid;
+  grid-template-columns: 15rem 1fr;
+  align-items: center;
+  gap: 1rem;
+  max-width: 40rem;
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-social__chart {
+  width: 100%;
+  overflow: visible;
+}
+:root[data-lens="calling-card"] .cc-social__ring {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.9);
+  stroke-width: 2;
+}
+:root[data-lens="calling-card"] .cc-social__ring--in {
+  stroke: rgb(255 255 255 / 0.3);
+  stroke-width: 1;
+}
+:root[data-lens="calling-card"] .cc-social__fill {
+  fill: rgb(229 25 28 / 0.75);
+  stroke: var(--cc-white);
+  stroke-width: 4;
+  stroke-linejoin: miter;
+  transform-origin: 100px 100px;
+  animation: calling-card-grow 700ms var(--cc-snap) both 300ms;
+}
+@keyframes calling-card-grow {
+  from { transform: scale(0.1) rotate(-40deg); }
+}
+:root[data-lens="calling-card"] .cc-social__star {
+  fill: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-social__chart text {
+  fill: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+}
+:root[data-lens="calling-card"] .cc-social figcaption {
+  font-size: 0.9rem;
+  color: var(--cc-grey);
+}
+:root[data-lens="calling-card"] .cc-social figcaption b {
+  display: block;
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1.4rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-social__wink {
+  display: block;
+  font-style: italic;
+}
+:root[data-lens="calling-card"] .cc-social__list {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-social__stat {
+  display: grid;
+  grid-template-columns: 6.6rem minmax(0, 1fr);
+  grid-template-areas: "name rank" "note note";
+  align-items: center;
+  column-gap: 0.6rem;
+}
+:root[data-lens="calling-card"] .cc-social__name {
+  grid-area: name;
+  padding: 0.02rem 0.5rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: right;
+  transform: skewX(-14deg);
+}
+:root[data-lens="calling-card"] .cc-social__rank {
+  grid-area: rank;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--cc-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-social__pips {
+  display: inline-flex;
+  gap: 0.18rem;
+}
+:root[data-lens="calling-card"] .cc-social__pips i {
+  width: 0.5rem;
+  height: 0.8rem;
+  border: 1.5px solid var(--cc-white);
+  transform: skewX(-14deg);
+}
+:root[data-lens="calling-card"] .cc-social__pips i[data-on] {
+  background: var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-social__note {
+  grid-area: note;
+  margin-top: 0.1rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--cc-grey);
+}
+:root[data-lens="calling-card"] .cc-talk {
+  display: grid;
+  gap: 1.1rem;
+  max-width: 42rem;
+}
+:root[data-lens="calling-card"] .cc-talk .cc-say:nth-child(odd) {
+  transform: rotate(-0.6deg);
+}
+:root[data-lens="calling-card"] .cc-talk .cc-say:nth-child(even) {
+  transform: rotate(0.5deg) translateX(0.6rem);
+}
+:root[data-lens="calling-card"] .cc-rankup {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.8rem 0 0;
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1.7rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  transform: rotate(-3deg);
+}
+:root[data-lens="calling-card"] .cc-rankup > span:last-child {
+  padding: 0.1rem 0.8rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  transform: skewX(-10deg);
+  box-shadow: 5px 5px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-rankup__tag {
+  padding: 0.25rem 0.55rem;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  font-size: 0.85rem;
+  letter-spacing: 0.16em;
+  transform: rotate(-8deg);
+}
+
+/* =====================================================================
+   STATUS: resume
+   ===================================================================== */
+:root[data-lens="calling-card"] .cc-status .cc-screen__bg {
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-status__red {
+  inset: 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1.7px, transparent 2.3px) 0 0 / 10px 10px,
+    linear-gradient(170deg, var(--cc-red), var(--cc-red-deep));
+  clip-path: polygon(0 0, 36% 0, 28% 100%, 0 100%);
+}
+:root[data-lens="calling-card"] .cc-status__rays {
+  inset: 0;
+  background: repeating-conic-gradient(from 0deg at 100% 100%, rgb(255 255 255 / 0.06) 0 3deg, transparent 3deg 8deg);
+}
+:root[data-lens="calling-card"] .cc-status__head {
+  position: absolute;
+  z-index: 3;
+  left: 1.5rem;
+  top: 1rem;
+  bottom: 3rem;
+  width: min(26rem, 32vw);
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 1.2rem;
+}
+:root[data-lens="calling-card"] .cc-status__logo {
+  margin: 0.6rem 0 0;
+  font-size: clamp(3.6rem, 7vw, 6rem);
+  line-height: 0.9;
+  color: var(--cc-white);
+  text-shadow: var(--cc-outline);
+  transform: rotate(-8deg);
+}
+:root[data-lens="calling-card"] .cc-status__card {
+  position: relative;
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.2rem 1.3rem 1.3rem;
+  background: var(--cc-black);
+  border: 3px solid var(--cc-white);
+  box-shadow: 10px 10px 0 var(--cc-black);
+  transform: rotate(-2deg);
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-status__card {
+  animation: calling-card-fly-left 380ms var(--cc-out) both 120ms;
+}
+:root[data-lens="calling-card"] .cc-status__card > * {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-status__lv {
+  position: absolute;
+  top: -1.1rem;
+  right: 1rem;
+  padding: 0 0.6rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 1.3rem;
+  transform: rotate(6deg);
+}
+:root[data-lens="calling-card"] .cc-status__name {
+  font-size: clamp(2.2rem, 3.6vw, 3.2rem);
+  line-height: 1;
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-status__intro {
+  font-family: var(--cc-didone);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+:root[data-lens="calling-card"] .cc-status__contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-status__contacts a {
+  display: inline-grid;
+  place-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.8rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transform: skewX(-10deg);
+  transition: transform 120ms var(--cc-snap), background 80ms;
+}
+:root[data-lens="calling-card"] .cc-status__contacts a:hover {
+  background: var(--cc-red);
+  color: var(--cc-white);
+  transform: skewX(-10deg) translateY(-3px);
+}
+:root[data-lens="calling-card"] .cc-status__body {
+  position: absolute;
+  z-index: 2;
+  top: 4.2rem;
+  right: 0;
+  bottom: 3.2rem;
+  left: min(30rem, 36vw);
+  display: grid;
+  align-content: start;
+  gap: 2.2rem;
+  padding: 1.6rem 3vw 3rem 1.5rem;
+}
+:root[data-lens="calling-card"] .cc-status__panel {
+  display: grid;
+  gap: 0.9rem;
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-status__panel {
+  animation: calling-card-fly-right 380ms var(--cc-out) both;
+  animation-delay: calc(80ms + var(--i) * 60ms);
+}
+:root[data-lens="calling-card"] .cc-status__section {
+  justify-self: start;
+  margin: 0;
+  padding: 0.1rem 1rem 0.05rem 0.8rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1.8rem;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transform: rotate(-2deg) skewX(-12deg);
+  box-shadow: 6px 6px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-roster {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-member {
+  position: relative;
+  display: grid;
+  /* Wide enough for the longest data-derived tag ("Project work"). */
+  grid-template-columns: 7.4rem minmax(0, 1fr) auto;
+  grid-template-areas: "tag head date" ". body body";
+  align-items: center;
+  column-gap: 0.9rem;
+  row-gap: 0.4rem;
+  padding: 0.55rem 1.1rem 0.8rem 0.4rem;
+  background: rgb(20 20 20 / 0.92);
+  border-left: 5px solid var(--cc-red);
+  clip-path: polygon(0 0, 100% 2%, 99.4% 100%, 0.4% 97%);
+}
+:root[data-lens="calling-card"] .cc-member__tag {
+  grid-area: tag;
+  justify-self: start;
+  padding: 0.1rem 0.5rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  border: 2px solid var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  transform: rotate(-6deg) skewX(-10deg);
+}
+/* Only an open-ended role is marked out, and only because its data says so. */
+:root[data-lens="calling-card"] .cc-member[data-current] .cc-member__tag {
+  background: var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-member__head {
+  grid-area: head;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.6rem;
+  margin: 0;
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-size: 1.35rem;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-member__org {
+  padding: 0 0.45rem;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  font-size: 1rem;
+  transform: skewX(-10deg);
+}
+:root[data-lens="calling-card"] .cc-member__date {
+  grid-area: date;
+  margin: 0;
+  font-family: var(--cc-didone);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--cc-grey);
+  text-align: right;
+}
+:root[data-lens="calling-card"] .cc-member__body {
+  grid-area: body;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+:root[data-lens="calling-card"] .cc-member__body > * {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-member__body ul {
+  display: grid;
+  gap: 0.3rem;
+  padding-left: 1.2rem;
+}
+:root[data-lens="calling-card"] .cc-member__body li::marker {
+  content: "★ ";
+  color: var(--cc-red-text);
+}
+:root[data-lens="calling-card"] .cc-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-skills li {
+  padding: 0.25rem 0.8rem;
+  background: var(--cc-black);
+  border: 2px solid var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transform: skewX(-10deg) rotate(calc((mod(var(--i), 3) - 1) * 1.5deg));
+}
+:root[data-lens="calling-card"] .cc-skills li span {
+  color: var(--cc-red-text);
+}
+:root[data-lens="calling-card"] .cc-status__lead {
+  font-size: 1rem;
+}
+:root[data-lens="calling-card"] .cc-status__lead > * {
+  margin: 0;
+}
+
+/* =====================================================================
+   DOCUMENT: anything else
+   ===================================================================== */
+:root[data-lens="calling-card"] .cc-doc .cc-screen__bg {
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-doc__red {
+  inset: 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1.7px, transparent 2.3px) 0 0 / 10px 10px,
+    var(--cc-red);
+  clip-path: polygon(0 0, 24% 0, 12% 100%, 0 100%);
+}
+:root[data-lens="calling-card"] .cc-doc__star {
+  right: -10vmax;
+  bottom: -12vmax;
+  width: 40vmax;
+  aspect-ratio: 1;
+}
+:root[data-lens="calling-card"] .cc-doc__head {
+  position: absolute;
+  z-index: 3;
+  left: 1.5rem;
+  top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+:root[data-lens="calling-card"] .cc-doc__stamp {
+  margin: 0;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--cc-white);
+  text-shadow: var(--cc-outline);
+  transform: rotate(-6deg);
+}
+:root[data-lens="calling-card"] .cc-doc__label {
+  margin: 0;
+  max-width: 22rem;
+  font-size: 0.9rem;
+  color: var(--cc-grey);
+}
+:root[data-lens="calling-card"] .cc-doc__label span {
+  font-family: var(--cc-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cc-red-text);
+}
+:root[data-lens="calling-card"] .cc-doc__sheet {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 5.2rem;
+  bottom: 3.4rem;
+  width: min(68rem, 92vw);
+  padding: 1.5rem 0 3rem;
+  background: var(--color-page, #f6efe4);
+  color: var(--color-text, #2a1f1b);
+  border: 4px solid var(--cc-white);
+  outline: 3px solid var(--cc-black);
+  box-shadow: 16px 16px 0 var(--cc-red);
+  transform: translateX(-50%) rotate(-0.8deg);
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-doc__sheet {
+  animation: calling-card-fly-up 420ms var(--cc-out) both 60ms;
+}
+:root[data-lens="calling-card"] .cc-doc__page h1:focus {
+  outline: none;
+}
+
+/* Mid widths: the document label would run under the section tabs; the
+   sheet's own heading already says it. */
+@media (max-width: 1180px) {
+  :root[data-lens="calling-card"] .cc-doc__label {
+    display: none;
+  }
+}
+
+/* =====================================================================
+   Small screens: every inner screen becomes one scrolling column
+   ===================================================================== */
+@media (max-width: 760px), (max-aspect-ratio: 5/6) {
+  :root[data-lens="calling-card"] .cc-screen:not(.cc-home) .cc-main {
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: grid;
+    align-content: start;
+    gap: 1.2rem;
+    padding: 4.4rem 1rem 5.5rem;
+  }
+  :root[data-lens="calling-card"] .cc-screen:not(.cc-home) .cc-prompts {
+    display: none;
+  }
+  :root[data-lens="calling-card"] .cc-tabs {
+    top: 0.6rem;
+    left: 0.6rem;
+    right: 0.6rem;
+    justify-content: space-between;
+    transform: none;
+  }
+  :root[data-lens="calling-card"] .cc-tabs ul {
+    flex: 1;
+    justify-content: space-between;
+  }
+  :root[data-lens="calling-card"] .cc-tabs__tab {
+    padding: 0 0.55rem;
+    font-size: 0.85rem;
+  }
+  :root[data-lens="calling-card"] .cc-tabs__shoulder {
+    display: none;
+  }
+  :root[data-lens="calling-card"] .cc-equip__col,
+  :root[data-lens="calling-card"] .cc-equip__head,
+  :root[data-lens="calling-card"] .cc-requests__head,
+  :root[data-lens="calling-card"] .cc-equip__intro,
+  :root[data-lens="calling-card"] .cc-requests__intro,
+  :root[data-lens="calling-card"] .cc-equip__list,
+  :root[data-lens="calling-card"] .cc-requests__board,
+  :root[data-lens="calling-card"] .cc-item__visual,
+  :root[data-lens="calling-card"] .cc-item__file,
+  :root[data-lens="calling-card"] .cc-confidant__side,
+  :root[data-lens="calling-card"] .cc-confidant__file,
+  :root[data-lens="calling-card"] .cc-status__head,
+  :root[data-lens="calling-card"] .cc-status__body,
+  :root[data-lens="calling-card"] .cc-doc__head,
+  :root[data-lens="calling-card"] .cc-doc__sheet,
+  :root[data-lens="calling-card"] .cc-brief__paper {
+    position: relative;
+    inset: auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: auto;
+    overflow: visible;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  :root[data-lens="calling-card"] .cc-title {
+    font-size: 3.6rem;
+  }
+  :root[data-lens="calling-card"] .cc-item__file,
+  :root[data-lens="calling-card"] .cc-confidant__file,
+  :root[data-lens="calling-card"] .cc-status__body {
+    mask-image: none;
+  }
+  :root[data-lens="calling-card"] .cc-equip__intro,
+  :root[data-lens="calling-card"] .cc-requests__intro {
+    margin-top: 0.4rem;
+  }
+  :root[data-lens="calling-card"] .cc-equip__red {
+    clip-path: polygon(0 30%, 100% 18%, 100% 100%, 0 100%);
+  }
+  :root[data-lens="calling-card"] .cc-equip__list {
+    padding: 0;
+  }
+  :root[data-lens="calling-card"] .cc-equip__list ol {
+    gap: 1rem;
+  }
+  :root[data-lens="calling-card"] .cc-slot,
+  :root[data-lens="calling-card"] .cc-slot[data-state="selected"] {
+    grid-template-columns: 6.5rem 1fr;
+    grid-template-areas: "thumb cat" "thumb name" "sum sum";
+    align-items: start;
+    gap: 0.35rem 0.8rem;
+    padding: 0.8rem 0.9rem 0.9rem;
+    transform: rotate(calc((mod(var(--i), 2) - 0.5) * 2deg));
+  }
+  /* No cover, no thumbnail: the words take the whole slot. */
+  :root[data-lens="calling-card"] .cc-slot[data-bare] {
+    grid-template-areas: "cat cat" "name name" "sum sum";
+  }
+  :root[data-lens="calling-card"] .cc-slot__shard {
+    inset: 0;
+    clip-path: polygon(0 2%, 100% 0, 99% 100%, 1% 98%);
+  }
+  :root[data-lens="calling-card"] .cc-slot[data-state="selected"]::before {
+    display: none;
+  }
+  :root[data-lens="calling-card"] .cc-slot__thumb {
+    grid-area: thumb;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border: 3px solid var(--cc-white);
+    transform: rotate(-3deg);
+  }
+  :root[data-lens="calling-card"] .cc-slot__cat {
+    grid-area: cat;
+    justify-self: start;
+  }
+  :root[data-lens="calling-card"] .cc-slot__name {
+    grid-area: name;
+    white-space: normal;
+    font-size: 1.5rem;
+  }
+  :root[data-lens="calling-card"] .cc-slot__sum {
+    grid-area: sum;
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+  :root[data-lens="calling-card"] .cc-equip__detail {
+    display: none;
+  }
+  :root[data-lens="calling-card"] .cc-item__red {
+    clip-path: polygon(0 0, 100% 0, 100% 22%, 0 34%);
+  }
+  /* The column scrolls over a fixed ground: the star would sit under text. */
+  :root[data-lens="calling-card"] .cc-item__star {
+    display: none;
+  }
+  :root[data-lens="calling-card"] .cc-item__visual {
+    display: grid;
+    gap: 1rem;
+  }
+  :root[data-lens="calling-card"] .cc-item__cover img {
+    max-height: none;
+    width: 100%;
+    border-width: 5px;
+    box-shadow: 10px 10px 0 var(--cc-black);
+    transform: rotate(-3deg);
+  }
+  :root[data-lens="calling-card"] .cc-item__media {
+    width: 70vw;
+  }
+  :root[data-lens="calling-card"] .cc-item__file,
+  :root[data-lens="calling-card"] .cc-confidant__file {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  :root[data-lens="calling-card"] .cc-item__pager {
+    flex-direction: column;
+  }
+  :root[data-lens="calling-card"] .cc-say.cc-requests__intro {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: auto;
+    margin-top: 0.8rem;
+    padding: 1.35rem 1.2rem 1.1rem;
+  }
+  :root[data-lens="calling-card"] .cc-requests__curtain {
+    clip-path: polygon(0 24%, 100% 14%, 100% 100%, 0 100%);
+  }
+  :root[data-lens="calling-card"] .cc-requests__board {
+    display: grid;
+    gap: 2rem;
+    padding: 0.5rem 0.6rem 0;
+  }
+  :root[data-lens="calling-card"] .cc-request,
+  :root[data-lens="calling-card"] .cc-request[data-state="selected"] {
+    transform: rotate(calc(-1.5deg + var(--i) * 3deg));
+  }
+  :root[data-lens="calling-card"] .cc-brief__paper {
+    max-height: none;
+    transform: rotate(-0.8deg);
+    padding: 1.2rem 1.1rem 1.8rem;
+  }
+  :root[data-lens="calling-card"] .cc-confidant__rays {
+    clip-path: polygon(0 0, 100% 0, 100% 20%, 0 36%);
+  }
+  :root[data-lens="calling-card"] .cc-confidant__red {
+    clip-path: polygon(0 8%, 100% 0, 100% 26%, 0 40%);
+  }
+  :root[data-lens="calling-card"] .cc-confidant__side {
+    height: clamp(22rem, 58vw, 30rem);
+  }
+  /* Capped so a tall tablet doesn't push the face under the tabs and the
+     chest over the title. */
+  :root[data-lens="calling-card"] .cc-confidant__portrait {
+    left: auto;
+    right: max(-12vw, calc(50% - 26rem));
+    bottom: 0;
+    width: min(78vw, 28rem);
+    /* The cut-out's torso runs past its box; end it at the box so it
+       doesn't sit under the title and intro. */
+    clip-path: polygon(-20% -20%, 120% -20%, 120% 92%, -20% 100%);
+  }
+  :root[data-lens="calling-card"] .cc-arcana {
+    left: 0.4rem;
+    top: 0.6rem;
+    width: 8rem;
+  }
+  :root[data-lens="calling-card"] .cc-confidant__rank {
+    left: 0.8rem;
+    top: 15.6rem;
+  }
+  :root[data-lens="calling-card"] .cc-social {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  :root[data-lens="calling-card"] .cc-social__chart {
+    max-width: 18rem;
+  }
+  :root[data-lens="calling-card"] .cc-status__red {
+    clip-path: polygon(0 0, 100% 0, 100% 16%, 0 30%);
+  }
+  :root[data-lens="calling-card"] .cc-status__logo {
+    font-size: 4rem;
+  }
+  :root[data-lens="calling-card"] .cc-member {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "tag date" "head head" "body body";
+    padding-left: 0.8rem;
+  }
+  :root[data-lens="calling-card"] .cc-doc__head {
+    flex-wrap: wrap;
+  }
+  :root[data-lens="calling-card"] .cc-doc__sheet {
+    transform: rotate(-0.6deg);
+    padding: 1rem 0.4rem 2rem;
+    overflow-x: hidden;
+  }
+}

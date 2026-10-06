@@ -12,49 +12,60 @@
  * A press is always a click: the hit area never moves. ball-life.ts gives
  * the painted face and label their life (lean, jelly, jostle, poke, squash
  * and bounce); the links work the same without it. */
+import type { SiteData } from "../../content.config";
 import Link from "../primitives/Link.astro";
 interface Props {
-  nav: { label: string; href: string; external?: boolean }[];
-  email: string;
+  site: Pick<SiteData, "nav" | "email" | "header">;
   currentPath?: string;
   form?: "row" | "cluster";
   label?: string;
 }
 const {
-  nav,
-  email,
+  site,
   currentPath = Astro.url.pathname,
   form = "row",
-  label = "Main navigation",
+  label = site.header.label,
 } = Astro.props;
 
 // Cluster geometry (centre x/y and radius in a 300 x 336 box), grown from
-// v1's four-ball cluster to hold all six. Each ball is big enough for its
-// label on one line, and the external balls' rim satellites (top right, 45
-// degrees) never overlap a neighbour, so no click can land on the wrong
+// v1's four-ball cluster to hold all six. Keyed by destination, not by
+// label, so the words stay in content. Each ball is big enough for its
+// label on one line, and an external ball's rim satellite (top right, 45
+// degrees) never overlaps a neighbour, so no click can land on the wrong
 // ball.
 const BOX = { width: 300, height: 336 };
+const HELLO = "hello";
 const geometry: Record<string, { cx: number; cy: number; r: number }> = {
-  Home: { cx: 78, cy: 62, r: 58 },
-  Lab: { cx: 184, cy: 46, r: 42 },
-  Writing: { cx: 252, cy: 104, r: 48 },
-  About: { cx: 54, cy: 176, r: 50 },
-  Projects: { cx: 168, cy: 172, r: 66 },
-  "Say hello": { cx: 84, cy: 280, r: 54 },
+  "/": { cx: 78, cy: 62, r: 58 },
+  "/lab": { cx: 184, cy: 46, r: 42 },
+  "/writing": { cx: 252, cy: 104, r: 48 },
+  "/about": { cx: 54, cy: 176, r: 50 },
+  "/projects": { cx: 168, cy: 172, r: 66 },
+  [HELLO]: { cx: 84, cy: 280, r: 54 },
 };
+// The header's choice of destinations (site.header, from content): Home,
+// the chosen nav items in order, then Say hello by email. A ball is
+// outbound when its href leaves the site; the Link primitive gives it the
+// rim satellite.
 const items = [
-  { label: "Home", href: "/", external: false },
-  ...["Projects", "Lab", "About", "Writing"].flatMap((name) =>
-    nav.filter((item) => item.label === name),
+  { key: "/", label: site.header.home, href: "/" },
+  ...site.header.items.flatMap((name) =>
+    site.nav
+      .filter((item) => item.label === name)
+      .map((item) => ({ key: item.href, ...item })),
   ),
-  { label: "Say hello", href: `mailto:${email}`, external: true },
+  { key: HELLO, label: site.header.hello, href: `mailto:${site.email}` },
 ];
 const current = (href: string) =>
   href === "/"
     ? currentPath === "/"
     : currentPath === href || currentPath.startsWith(href + "/");
-const place = (name: string, index: number) => {
-  const { cx, cy, r } = geometry[name];
+const place = (key: string, index: number) => {
+  const spot = geometry[key];
+  // A destination with no cluster spot still works as a ball in the row
+  // and honeycomb; the cluster just has nowhere to hang it.
+  if (!spot) return `--i:${index}`;
+  const { cx, cy, r } = spot;
   return [
     `--x:${(((cx - r) / BOX.width) * 100).toFixed(3)}%`,
     `--y:${(((cy - r) / BOX.height) * 100).toFixed(3)}%`,
@@ -67,12 +78,11 @@ const place = (name: string, index: number) => {
 <nav class="ball-nav" aria-label={label} data-ball-nav data-form={form}>
   <ul>
     {items.map((item, index) => (
-      <li style={place(item.label, index)}>
+      <li style={place(item.key, index)}>
         <Link
           href={item.href}
           treatment="ball"
           current={current(item.href)}
-          arrow={item.external}
           data-ball
           data-tone={current(item.href) ? "wine" : "peach"}
           draggable="false"

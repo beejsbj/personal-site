@@ -3,6 +3,7 @@ import { readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import test from "node:test";
+import { isServerRoute } from "./lib/server-routes.mjs";
 
 // Run after `pnpm build`: these assertions inspect what will actually ship.
 const outputDir = fileURLToPath(new URL("../../dist/client/", import.meta.url));
@@ -123,10 +124,10 @@ test("the ball nav is the one navigation, its homepage form a real labelled list
       "Projects",
       "Lab",
       "About",
-      "Writing (external site)",
+      "Writing",
       "Say hello (email)",
     ],
-    "Six balls in order; external ones say where they go",
+    "Six balls in order; Writing is on the site now, and the outbound ball says where it goes",
   );
   for (const link of links) {
     assert.ok(link.href, "Every ball is a real link");
@@ -226,13 +227,14 @@ test("local links, stylesheets, icons, and image sources resolve in built output
       join(outputDir, pathname, "index.html"),
     ];
     assert.ok(
-      candidates.some((path) => {
-        try {
-          return statSync(path).isFile();
-        } catch {
-          return false;
-        }
-      }),
+      isServerRoute(pathname) ||
+        candidates.some((path) => {
+          try {
+            return statSync(path).isFile();
+          } catch {
+            return false;
+          }
+        }),
       `Local reference does not resolve in dist/client: ${reference}`,
     );
   }

@@ -1,25 +1,27 @@
 ---
 import Note from "../primitives/Note.astro";
 import Heading from "../primitives/Heading.astro";
+import Inline from "../primitives/Inline.astro";
 import Link from "../primitives/Link.astro";
+import { part } from "../../prism/parts";
 interface Props {
+  note: { title: string; body: string; link: { label: string; href: string } };
   id?: string;
   variant?: "paper" | "plain";
 }
-const { id = "home-currently", variant = "paper" } = Astro.props;
+const { note, id = "home-currently", variant = "paper" } = Astro.props;
+// Only the home page's own note is the home.currently part.
+const mark = id === "home-currently" ? part("home.currently") : {};
 ---
 
 <section aria-labelledby={id}>
   <Note variant={variant}>
-    <div class="current-copy">
-      <Heading id={id}>Currently</Heading>
-      <p>
-        I’m maintaining <strong>bjslab</strong>, my home-lab environment for the
-        tools and services I use.
-      </p>
+    <div class="current-copy" {...mark}>
+      <Heading id={id}>{note.title}</Heading>
+      <p><Inline text={note.body} /></p>
       <div class="more">
-        <Link href="/about" treatment="pill" arrow>
-          More about me
+        <Link href={note.link.href} treatment="pill" arrow>
+          {note.link.label}
         </Link>
       </div>
     </div>

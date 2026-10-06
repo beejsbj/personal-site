@@ -1,0 +1,400 @@
+/* Writings: a marbled composition book, the black-and-white kind essays are
+   written in at school. A marbled board cover with black cloth tape down
+   the spine and a white label; inside, white paper, wide ruled in blue with
+   one red margin, sewn at the fold. The essays are in blue biro, their dates
+   in red in the margin. The marble is SVG noise thresholded into black and
+   white, drawn once as a tile. */
+
+:root[data-lens="back-page"] [data-theme="composition"] {
+  --bp-paper: #fbfaf5;
+  --bp-blue: #1c3a96;
+  --bp-red: #c3262e;
+  --bp-pencil: #3d3b38;
+  --bp-fine: #5b5752;
+  --bp-letter: #1d2f7a;
+  --bp-pencil-a: #3d5292;
+  --bp-pencil-b: #a83a40;
+  --bp-tape: #ece6d6;
+  --bp-kraft: #161616;
+  --bp-label: #fdfcf8;
+  --bp-label-ink: #161616;
+  --bp-title-a: #1c3a96;
+  --bp-title-b: #c3262e;
+  --bp-grid: rgba(78, 138, 206, 0.5);
+  --bp-margin: rgba(220, 70, 80, 0.66);
+  --bp-edge-1: #f8f7f2;
+  --bp-edge-2: #d8d5cb;
+  --bp-ear-1: #e2dfd5;
+  --bp-ear-2: #f2f0e9;
+  --bp-glow: rgba(255, 255, 252, 0.55);
+  --bp-circle-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M64 5 C 100 3, 117 13, 115 26 C 113 41, 82 47, 56 46 C 26 45, 5 38, 6 24 C 7 11, 33 4, 76 7' fill='none' stroke='%23c3262e' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --bp-marble: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Crect width='360' height='360' fill='%23141414'/%3E%3Cfilter id='a' filterUnits='userSpaceOnUse' x='0' y='0' width='360' height='360'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035 0.05' numOctaves='6' seed='6' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.3 0 0 0 -0.15'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 1 1 0 0 0 1 0 0 0'/%3E%3C/feComponentTransfer%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.92 0 0 0 0 0.89 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23a)'/%3E%3Cfilter id='b' filterUnits='userSpaceOnUse' x='0' y='0' width='360' height='360'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.12' numOctaves='2' seed='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.3 0 0 0 -0.15'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 0 0 0 1 0 0'/%3E%3C/feComponentTransfer%3E%3CfeColorMatrix values='0 0 0 0 0.95 0 0 0 0 0.95 0 0 0 0 0.93 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23b)'/%3E%3C/svg%3E");
+  /* black bookcloth: a fine weave, a sheen down its middle */
+  --bp-cloth:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.09) 45%, rgba(255, 255, 255, 0.02)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0 1px, transparent 1px 3px),
+    #0d0d0d;
+}
+
+/* ---- the cover ------------------------------------------------------------------- */
+:root[data-lens="back-page"] .bp-page[data-kind="cover"][data-book="writing"] {
+  background:
+    radial-gradient(ellipse at 30% 18%, rgba(255, 255, 255, 0.1), transparent 55%),
+    var(--bp-marble) 0 0 / 360px 360px,
+    #141414;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+/* the tape down the spine, wrapping round from the back */
+:root[data-lens="back-page"] .bp-page[data-kind="cover"][data-book="writing"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 13%;
+  background: var(--bp-cloth);
+  box-shadow:
+    1px 0 0 rgba(255, 255, 255, 0.08),
+    3px 0 5px rgba(0, 0, 0, 0.55);
+}
+:root[data-lens="back-page"] .bp-page[data-kind="cover"][data-book="writing"] .bp-flow {
+  left: calc(13% + 1.4em);
+}
+/* the label: printed black on white, a ruled frame, the name written in */
+:root[data-lens="back-page"] [data-book="writing"] .bp-label {
+  width: min(100%, 19em);
+  border-radius: 3px;
+  padding: 0.9em 1.1em 0.8em;
+  box-shadow:
+    inset 0 0 0 4px var(--bp-label),
+    inset 0 0 0 6px var(--bp-label-ink),
+    inset 0 0 0 8px var(--bp-label),
+    inset 0 0 0 9px var(--bp-label-ink),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+  transform: none;
+}
+:root[data-lens="back-page"] [data-book="writing"] .bp-label__school {
+  font: 700 0.95em/1.6 var(--bp-type);
+  letter-spacing: 0.2em;
+  color: var(--bp-label-ink);
+}
+:root[data-lens="back-page"] [data-book="writing"] .bp-label__field {
+  border-bottom-color: rgba(22, 22, 22, 0.55);
+}
+:root[data-lens="back-page"] [data-book="writing"] .bp-cover-doodle {
+  display: none;
+}
+/* the maker's small print, at the foot of the cover */
+:root[data-lens="back-page"] .bp-cover-print {
+  margin: auto 0 0 !important;
+  align-self: flex-end;
+  padding: 0.25em 0.7em;
+  font: 0.62em/1.4 var(--bp-type);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f4f2ec;
+  background: #0d0d0d;
+}
+
+/* ---- the boards round the open book ---------------------------------------------------- */
+:root[data-lens="back-page"] .bp-desk[data-theme="composition"] .bp-board {
+  /* the board's edge, in the lamp's shadow: the marble dimmed */
+  background:
+    linear-gradient(rgba(10, 10, 10, 0.55), rgba(10, 10, 10, 0.55)),
+    var(--bp-marble) 0 0 / 360px 360px,
+    #141414;
+}
+/* the tape, showing at the head and foot of the spine */
+:root[data-lens="back-page"] .bp-desk[data-theme="composition"] .bp-board::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 1.6em);
+  width: 3.2em;
+  background: var(--bp-cloth);
+}
+:root[data-lens="back-page"] .bp-desk[data-theme="composition"] .bp-book[data-mode="single"] .bp-board::before,
+:root[data-lens="back-page"] .bp-desk[data-theme="composition"] .bp-book[data-mode="single"] .bp-board::after,
+:root[data-lens="back-page"] .bp-desk[data-theme="composition"] .bp-book[data-closed] .bp-board::after {
+  left: 0;
+  width: 1.6em;
+  border: 0;
+  top: 0;
+  bottom: 0;
+}
+:root[data-lens="back-page"] .bp-desk[data-theme="composition"] .bp-book[data-mode="single"] .bp-board::before {
+  content: none;
+}
+
+/* ---- the paper: wide ruled, one red margin, sewn at the fold ------------------------------ */
+:root[data-lens="back-page"] [data-theme="composition"] .bp-page:not([data-paper^="kraft"]) {
+  --stitch: 0;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 0.9em, rgba(70, 66, 60, 0.5) 0.9em 1.75em, transparent 1.75em 2.4em) var(--stitch) 0 / 2px 100% no-repeat,
+    radial-gradient(ellipse 90% 70% at 38% 28%, var(--bp-glow), transparent 72%),
+    linear-gradient(var(--bp-paper), var(--bp-paper)) 0 0 / 100% calc(var(--lh) * 2.1) no-repeat,
+    linear-gradient(transparent calc(var(--lh) - 1.3px), var(--bp-grid) calc(var(--lh) - 1.3px)) 0 calc(var(--lh) * 0.34) / 100% var(--lh),
+    var(--bp-paper);
+}
+:root[data-lens="back-page"] [data-theme="composition"] .bp-page[data-side="left"] {
+  --stitch: 100%;
+}
+:root[data-lens="back-page"] [data-theme="composition"] .bp-page[data-paper="kraft-in"] {
+  background:
+    radial-gradient(ellipse at 70% 30%, rgba(255, 255, 255, 0.3), transparent 60%),
+    repeating-linear-gradient(88deg, rgba(0, 0, 0, 0.025) 0 1px, transparent 1px 5px),
+    #e6e4de;
+}
+:root[data-lens="back-page"] [data-theme="composition"] .bp-page[data-kind="inside-cover"] .bp-flow {
+  bottom: calc(var(--lh) * 2.2);
+}
+:root[data-lens="back-page"] .bp-page[data-paper="ruled"] .bp-flow {
+  color: var(--bp-letter);
+}
+
+:root[data-lens="back-page"] [data-theme="composition"] .bp-page[data-kind="inside-cover"] .bp-belongs {
+  align-self: center;
+}
+/* the printed matter inside the front cover: a times table and a few
+   conversions, in black on the grey board, the squares picked out */
+:root[data-lens="back-page"] .bp-printed {
+  width: 100%;
+  max-width: 30em;
+  margin: 1.1em auto 0;
+  font: 0.68em/1 var(--bp-type);
+  color: #191919;
+}
+:root[data-lens="back-page"] .bp-times {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  border: 2px solid #191919;
+  font-variant-numeric: tabular-nums;
+}
+:root[data-lens="back-page"] .bp-times caption {
+  padding-bottom: 0.55em;
+  font: 700 1.2em/1 var(--bp-type);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+:root[data-lens="back-page"] .bp-times :is(th, td) {
+  padding: 0.3em 0;
+  text-align: center;
+  border: 1px solid rgba(25, 25, 25, 0.3);
+}
+:root[data-lens="back-page"] .bp-times th {
+  background: #191919;
+  color: #e6e4de;
+  border-color: rgba(230, 228, 222, 0.25);
+}
+:root[data-lens="back-page"] .bp-times .bp-times__sq {
+  background: rgba(25, 25, 25, 0.12);
+  font-weight: 700;
+}
+:root[data-lens="back-page"] .bp-convs {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: space-between;
+  gap: 0.4em 1.2em;
+  margin-top: 1.1em;
+  padding-top: 0.7em;
+  border-top: 2px solid #191919;
+}
+:root[data-lens="back-page"] .bp-flow .bp-convs__title {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+:root[data-lens="back-page"] .bp-convs dl {
+  margin: 0;
+  line-height: 1.5;
+}
+:root[data-lens="back-page"] .bp-convs dt {
+  font-weight: 700;
+}
+:root[data-lens="back-page"] .bp-convs dd {
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ---- the contents: an entry for each essay --------------------------------------------- */
+:root[data-lens="back-page"] .bp-essayhead {
+  position: relative;
+  margin-bottom: var(--lh);
+}
+:root[data-lens="back-page"] .bp-essayhead .bp-ntab {
+  margin-bottom: calc(var(--lh) * 0.25) !important;
+}
+:root[data-lens="back-page"] .bp-essaytitle {
+  font-size: 2.3em;
+  line-height: calc(var(--lh) * 2);
+  text-align: center;
+  transform: rotate(-0.6deg);
+  transform-origin: 50% 50%;
+  text-wrap: balance;
+}
+:root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-essaytitle,
+:root[data-lens="back-page"] .bp-stage[data-mode="single"] .bp-essaytitle {
+  font-size: 1.9em;
+  line-height: calc(var(--lh) * 1.5);
+}
+:root[data-lens="back-page"] .bp-essaytitle .bp-underline {
+  margin: -0.35em auto 0.2em;
+  width: min(70%, 11em);
+}
+:root[data-lens="back-page"] .bp-essayhead .bp-lead {
+  margin: 0;
+}
+:root[data-lens="back-page"] .bp-flow ol.bp-essays {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+:root[data-lens="back-page"] .bp-essay {
+  position: relative;
+  margin-bottom: var(--lh) !important;
+}
+/* the year, written across the line where it turns */
+:root[data-lens="back-page"] .bp-flow .bp-essay__year {
+  margin: 0;
+  font: 400 1.35em/var(--lh) var(--bp-brush);
+  color: var(--bp-red);
+  letter-spacing: 0.04em;
+}
+:root[data-lens="back-page"] .bp-essay .bp-mnote,
+:root[data-lens="back-page"] .bp-essayhead .bp-mnote {
+  top: 0;
+  line-height: calc(var(--lh) * 0.5);
+  padding-top: calc(var(--lh) * 0.18);
+  white-space: normal;
+  word-spacing: 100vw;
+  font-size: 1em;
+}
+:root[data-lens="back-page"] .bp-essay[data-year] .bp-mnote {
+  top: var(--lh);
+}
+:root[data-lens="back-page"] .bp-essayhead .bp-mnote {
+  top: calc(var(--lh) * 0.5);
+}
+:root[data-lens="back-page"] .bp-flow .bp-essay__title {
+  margin: 0;
+  font: 700 1.42em/var(--lh) var(--bp-hand);
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-flow .bp-essay__title a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25em;
+  text-decoration: none;
+}
+:root[data-lens="back-page"] .bp-essay__name {
+  flex: 0 1 auto;
+}
+/* the page it starts on, at the end of a dotted leader */
+:root[data-lens="back-page"] .bp-essay__no {
+  flex: 1 0 2.2em;
+  font-size: 0.8em;
+  color: var(--bp-red);
+  text-align: right;
+  background: radial-gradient(circle, var(--bp-fine) 0.05em, transparent 0.07em) 0 72% / 0.42em 0.42em repeat-x;
+}
+:root[data-lens="back-page"] .bp-flow .bp-essay__opening {
+  margin: 0;
+}
+:root[data-lens="back-page"] .bp-flow .bp-essay__opening a {
+  margin-left: 0.3em;
+  font: 700 1.1em/1 var(--bp-hand);
+  color: var(--bp-red);
+  text-decoration: none;
+  white-space: nowrap;
+}
+:root[data-lens="back-page"] .bp-flow .bp-essay__opening a:hover {
+  text-decoration: underline;
+}
+
+/* code copied out line for line, each on its ruled line */
+:root[data-lens="back-page"] .bp-page[data-paper="ruled"] .bp-flow pre {
+  font-family: var(--bp-type);
+  font-size: 0.78em;
+  line-height: var(--lh);
+}
+:root[data-lens="back-page"] .bp-page[data-paper="ruled"] .bp-flow pre code {
+  font-size: 1em;
+  line-height: inherit;
+}
+
+/* ---- an essay ------------------------------------------------------------------------------ */
+:root[data-lens="back-page"] .bp-flow .bp-essay__sub {
+  margin: 0;
+  font: 400 1.32em/var(--lh) var(--bp-hand);
+  color: var(--bp-pencil);
+  text-align: center;
+}
+:root[data-lens="back-page"] .bp-essayhead .bp-essay__title {
+  text-align: center;
+}
+:root[data-lens="back-page"] .bp-flow .bp-essay__origin {
+  margin: 0;
+  font: 0.68em/var(--lh) var(--bp-type);
+  letter-spacing: 0.04em;
+  color: var(--bp-fine);
+  text-align: center;
+}
+:root[data-lens="back-page"] .bp-flow .bp-essay__origin a {
+  color: inherit;
+}
+/* the P.S., squeezed in under the last line */
+:root[data-lens="back-page"] .bp-flow .bp-ps {
+  margin: var(--lh) 0 calc(var(--lh) * 0.5);
+  font: 400 1.25em/var(--lh) var(--bp-hand);
+  color: var(--bp-letter);
+  transform: rotate(-1.2deg);
+  transform-origin: 0 0;
+}
+:root[data-lens="back-page"] .bp-flow .bp-ps p {
+  margin: 0;
+}
+:root[data-lens="back-page"] .bp-ps__head b {
+  color: var(--bp-red);
+}
+:root[data-lens="back-page"] .bp-flow .bp-ps .bp-arrows {
+  margin: 0;
+  font-size: 0.92em;
+}
+:root[data-lens="back-page"] .bp-flow .bp-pencilled {
+  font: 400 1.25em/var(--lh) var(--bp-hand);
+  color: var(--bp-fine);
+  transform: rotate(-1deg);
+}
+
+/* ---- on the pile ----------------------------------------------------------------------------- */
+:root[data-lens="back-page"] .bp-shelf [data-theme="composition"] .bp-shelf__book:not([data-state="open"]) {
+  background:
+    linear-gradient(90deg, transparent 0 13%, rgba(255, 255, 255, 0.1) 13% 14%, transparent 14%),
+    linear-gradient(90deg, #0b0b0b 0 13%, transparent 13%),
+    var(--bp-marble) 0 0 / 180px 180px,
+    #141414;
+}
+:root[data-lens="back-page"] .bp-shelf [data-theme="composition"] .bp-shelf__label {
+  left: 20%;
+  right: 7%;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 0 2px var(--bp-label),
+    inset 0 0 0 3px var(--bp-label-ink),
+    0 1px 3px rgba(0, 0, 0, 0.6);
+}
+:root[data-lens="back-page"] .bp-shelf [data-theme="composition"] .bp-shelf__paper {
+  background:
+    linear-gradient(90deg, transparent 18%, var(--bp-margin) 18% 20%, transparent 20%),
+    linear-gradient(transparent 6px, var(--bp-grid) 6px) 0 0 / 100% 7px,
+    var(--bp-paper);
+}
+:root[data-lens="back-page"] .bp-desk[data-mode="single"] .bp-shelf [data-theme="composition"] .bp-shelf__label {
+  left: 18px;
+  right: 6px;
+}

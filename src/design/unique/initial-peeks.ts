@@ -296,6 +296,15 @@ export function installInitialPeeks() {
     const attempt = (forced: boolean) => {
       timer = undefined;
       if (!motion.matches || active) return;
+      // Only Daylight peeks: never over another lens, a prism face or the
+      // open prism.
+      const root = document.documentElement;
+      if (
+        root.hasAttribute("data-lens-shell") ||
+        root.hasAttribute("data-prism-face") ||
+        root.hasAttribute("data-prism-idle")
+      )
+        return retry();
       const now = Date.now();
       const busy =
         document.hidden ||

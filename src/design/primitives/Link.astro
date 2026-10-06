@@ -26,6 +26,8 @@ interface Props extends Omit<HTMLAttributes<"a">, "href"> {
   arrow?: boolean;
   disabled?: boolean;
   newTab?: boolean;
+  /** Prism part markers (see src/prism/parts.ts). */
+  [data: `data-${string}`]: string | undefined;
 }
 const {
   href,

@@ -4,7 +4,9 @@ import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
 import MediaFrame from "../design/primitives/MediaFrame.astro";
 import TagList from "../design/primitives/TagList.astro";
+import { part } from "../prism/parts";
 interface Props {
+  /** Already in the shared project order (src/lib/rules.ts). */
   projects: CollectionEntry<"projects">[];
 }
 const { projects } = Astro.props;
@@ -24,21 +26,20 @@ const years = [...new Set(projects.map((project) => project.data.year))].sort(
       <ol class="timeline-year__projects">
         {projects
           .filter((project) => project.data.year === year)
-          .sort((a, b) => a.data.order - b.data.order)
           .map((project) => (
             <li class="timeline-entry">
               <article class="timeline-entry__body">
                 <div class="timeline-entry__copy">
-                  <p class="timeline-entry__meta">
+                  <p class="timeline-entry__meta" {...part("project.meta", project.slug)}>
                     {project.data.dateLabel} <span aria-hidden="true">/</span>{" "}
                     {project.data.kind}
                   </p>
-                  <Heading level={3} scale="card">
+                  <Heading level={3} scale="card" {...part("project.title", project.slug)}>
                     <Link href={`/projects/${project.slug}`} arrow>
                       {project.data.title}
                     </Link>
                   </Heading>
-                  <p>{project.data.summary}</p>
+                  <p {...part("project.summary", project.slug)}>{project.data.summary}</p>
                   <TagList
                     items={project.data.tools.slice(0, 3)}
                     label={`${project.data.title} tools`}

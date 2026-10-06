@@ -2,25 +2,32 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
+import { getTextPage } from "../lib/portfolio";
+import { part } from "../prism/parts";
+
+const page = await getTextPage("not-found");
+const { header } = page;
 ---
 
 <BaseLayout
-  title="Not Found"
-  description="This page does not exist."
+  title={page.title}
+  description={page.description}
   pageClass="page-copy"
 >
   <section class="shell page-section page-section--copy">
-    <p class="section-intro__eyebrow">404</p>
-    <Heading level={1} scale="page">
-      That page wandered off.
+    <p class="section-intro__eyebrow" {...part("page.eyebrow", "not-found")}>{header.eyebrow}</p>
+    <Heading level={1} scale="page" {...part("page.title", "not-found")}>
+      {header.title}
     </Heading>
-    <p class="section-intro__intro">
-      Try the homepage, or follow one of the links above.
+    <p class="section-intro__intro" {...part("page.intro", "not-found")}>
+      {header.intro}
     </p>
-    <div>
-      <Link treatment="pill" tone="wine" href="/">
-        Return home
-      </Link>
+    <div {...part("page.actions", "not-found")}>
+      {header.actions.map((action) => (
+        <Link treatment="pill" tone="wine" href={action.href}>
+          {action.label}
+        </Link>
+      ))}
     </div>
   </section>
 </BaseLayout>

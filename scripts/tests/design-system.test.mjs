@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
+import { isServerRoute } from "./lib/server-routes.mjs";
 
 const walk = (path) =>
   readdirSync(path, { withFileTypes: true }).flatMap((entry) =>
@@ -23,8 +24,9 @@ const definitions = new Set(
 );
 
 test("one visual-value authority, with no raw colors or geometry in consumers", () => {
+  // Each prism lens is the visual-value authority for its own refraction.
   for (const path of sources.filter(
-    (path) => path !== "src/design/tokens.css",
+    (path) => path !== "src/design/tokens.css" && !path.startsWith("src/prism/"),
   )) {
     // Native media conditions cannot use var(). Structural 100vh and percentages
     // are layout constraints, not design values. SVG/image attributes are art/data.
@@ -155,7 +157,7 @@ test("one ball navigation on every page, with native links and correct section m
       'href="/projects"',
       'href="/lab"',
       'href="/about"',
-      'href="https://buroojs.substack.com"',
+      'href="/writing"',
       'href="mailto:',
     ])
       assert.ok(
@@ -341,17 +343,19 @@ test("all generated pages have shared chrome and resolving local links and media
       );
       if (url.origin !== root.origin) continue;
       const target = join(output, decodeURIComponent(url.pathname));
-      const found = [
-        target,
-        join(target, "index.html"),
-        target.replace(/\/$/, "") + ".html",
-      ].some((candidate) => {
-        try {
-          return statSync(candidate).isFile();
-        } catch {
-          return false;
-        }
-      });
+      const found =
+        isServerRoute(url.pathname) ||
+        [
+          target,
+          join(target, "index.html"),
+          target.replace(/\/$/, "") + ".html",
+        ].some((candidate) => {
+          try {
+            return statSync(candidate).isFile();
+          } catch {
+            return false;
+          }
+        });
       assert.ok(found, `${path}: broken local reference ${value}`);
     }
   }

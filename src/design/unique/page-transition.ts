@@ -126,6 +126,9 @@ export function installPageTransition() {
         ? source.closest<HTMLAnchorElement>("a[href]")
         : null;
     if (!motion.matches || !link || event.navigationType === "traverse") return;
+    // Daylight's cover only: another lens's shell animates its own route
+    // changes, and prism faces and the open prism hold still.
+    if (offstage(root)) return;
     const rect = link.getBoundingClientRect();
     if (!rect.width) return;
     const clamp = (value: number, max: number) =>
@@ -304,4 +307,14 @@ function buildCover(label: string) {
   sheet.append(title);
   cover.append(ball, sheet);
   return cover;
+}
+
+/** Daylight is not the page on show: another lens's shell has replaced it,
+ * it is a prism face, or the prism is open over it. */
+function offstage(root: HTMLElement) {
+  return (
+    root.hasAttribute("data-lens-shell") ||
+    root.hasAttribute("data-prism-face") ||
+    root.hasAttribute("data-prism-idle")
+  );
 }

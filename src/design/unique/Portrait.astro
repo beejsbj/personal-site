@@ -3,20 +3,28 @@
 // Arrival: the photo settles in and its ring breathes twice. A nearby fine
 // pointer may tilt it through --tilt-x/--tilt-y (set by the homepage scene).
 import Link from "../primitives/Link.astro";
+interface Props {
+  src: string;
+  alt: string;
+  caption: string;
+  href: string;
+  [data: `data-${string}`]: string | undefined;
+}
+const { src, alt, caption, href, ...data } = Astro.props;
 ---
 
-<figure>
+<figure {...data}>
   <img
-    src="/images/burooj4.jpg"
-    alt="Burooj Rashid wearing round sunglasses"
+    src={src}
+    alt={alt}
     width="1080"
     height="1920"
     decoding="async"
     fetchpriority="high"
   />
   <figcaption>
-    <Link href="/about" treatment="pill" arrow>
-      That's me
+    <Link href={href} treatment="pill" arrow>
+      {caption}
     </Link>
   </figcaption>
 </figure>

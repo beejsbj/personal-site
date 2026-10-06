@@ -28,7 +28,7 @@ test("project history includes applications and the learning arcade in dated ord
   );
   for (const slug of ["e4p", "garden"]) {
     const detail = read(`dist/client/projects/${slug}/index.html`);
-    assert.match(detail, />Arcade</);
+    assert.match(detail, />\s*Arcade\s*</);
     assert.match(detail, /archived arcade project/);
   }
 });
