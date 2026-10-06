@@ -25,7 +25,7 @@ import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
-import { weaveType } from "./woven";
+import { weaveCovers, weaveType } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { compose } from "./weave";
 import "./shell.css";
@@ -132,7 +132,9 @@ function show(route: Route, first: boolean) {
     loom.start();
     cloth.start();
     life?.start();
-    weaveType(page, { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric });
+    const weaving = { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric };
+    weaveType(page, weaving);
+    weaveCovers(page, weaving);
     page.dataset.state = "here";
   });
   // Keyboard travel ahead of the drawing brings the drawing with it.

@@ -599,7 +599,7 @@
   display: inline-block;
 }
 
-:root[data-lens="hion"] [data-woven-state] {
+:root[data-lens="hion"] [data-woven][data-woven-state] {
   color: transparent;
   background: none;
   -webkit-text-fill-color: transparent;
@@ -696,6 +696,53 @@
   transition:
     filter 0.5s ease,
     mix-blend-mode 0.5s;
+}
+
+/* A woven cover (woven.ts): the picture's light woven into the page's
+   fabric on black paper; reach for it and the picture comes back. */
+:root[data-lens="hion"] .hion-woven-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+
+@keyframes hion-woven-in {
+  from {
+    opacity: 0;
+  }
+}
+
+:root[data-lens="hion"] .hion-woven-cover {
+  animation: hion-woven-in 0.6s ease;
+}
+
+/* Black paper until it is woven (or found unweavable, and shown plain). */
+:root[data-lens="hion"] [data-woven-cover] .hion-picture__frame:not([data-woven-state="plain"]) {
+  background: var(--hion-black);
+}
+
+:root[data-lens="hion"] [data-woven-cover] .hion-picture__frame:not([data-woven-state="plain"]) img {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+:root[data-lens="hion"] .hion-work:is(:hover, :focus-within) [data-woven-cover] .hion-picture__frame {
+  background: var(--hion-c);
+}
+
+:root[data-lens="hion"] .hion-work:is(:hover, :focus-within) [data-woven-cover][data-hue="m"] .hion-picture__frame {
+  background: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-work:is(:hover, :focus-within) [data-woven-cover] .hion-picture__frame img {
+  opacity: 1;
+}
+
+:root[data-lens="hion"] .hion-work:is(:hover, :focus-within) .hion-woven-cover {
+  opacity: 0;
 }
 
 /* A film keeps its own colours and its controls. */
@@ -1661,38 +1708,19 @@
   }
 
   /* Rows of charms slide along their cord. */
+  /* One under another, each hung from the one above: a phone reads down,
+     not across. */
   :root[data-lens="hion"] .hion-row--works,
   :root[data-lens="hion"] .hion-row--lab,
   :root[data-lens="hion"] .hion-loop--year[data-count="1"] .hion-row--works {
-    display: flex;
-    gap: 22px;
-    /* Slides between the strands, and out of sight behind them. */
-    margin-inline: calc(-1 * var(--hion-loop-pad) + 9px);
-    padding: 0 calc(var(--hion-loop-pad) - 9px) 10px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--hion-loop-pad);
-    scrollbar-width: none;
-  }
-
-  :root[data-lens="hion"] .hion-row--works > *,
-  :root[data-lens="hion"] .hion-row--lab > * {
-    flex: 0 0 84%;
-    scroll-snap-align: start;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 56px;
   }
 
   :root[data-lens="hion"] .hion-row--forks {
     grid-template-columns: 1fr;
     gap: 0;
-  }
-
-  :root[data-lens="hion"] .hion-row--works:has(> :only-child) > * {
-    flex-basis: 100%;
-  }
-
-  :root[data-lens="hion"] .hion-row--works::-webkit-scrollbar,
-  :root[data-lens="hion"] .hion-row--lab::-webkit-scrollbar {
-    display: none;
   }
 
   :root[data-lens="hion"] .hion-year {

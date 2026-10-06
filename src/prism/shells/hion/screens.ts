@@ -228,7 +228,7 @@ function workCharm(copy: Copy, project: Project, level: "h2" | "h3", i: number) 
               tabindex: "-1",
               "aria-hidden": "true",
             },
-            picture(image(project.cover), i % 2 ? "m" : "c", {}, null, false),
+            picture(image(project.cover), i % 2 ? "m" : "c", { "data-woven-cover": "" }, null, false),
           )
         : null,
       h(
