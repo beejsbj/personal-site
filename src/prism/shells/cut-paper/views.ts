@@ -229,9 +229,15 @@ function pad(env: Env, item: LabEntry, index: number, big = false) {
   const label = fill(env.copy.lab.hear, { name: item.title });
   const hit = h(
     "button",
-    { type: "button", class: big ? "cp-pad__hit cp-pad__hit--big" : "cp-pad__hit", "aria-label": label, title: label, disabled: env.face },
-    roll(sketchNotes(item.slug)),
-    h("span", { class: "cp-clip__run", "aria-hidden": "true" }),
+    { type: "button", class: big ? "cp-pad__hit cp-pad__hit--big" : "cp-pad__hit", "aria-label": label, title: label, disabled: env.face, "data-art": item.cover ? "" : null },
+    // with a thumbnail, the sketch fills the pad and its motif rides a band
+    // along the bottom; without one, the motif fills the pad
+    item.cover
+      ? [
+          h("img", { class: "cp-pad__art", src: item.cover, alt: "", loading: "lazy", decoding: "async" }),
+          h("span", { class: "cp-pad__band" }, roll(sketchNotes(item.slug)), h("span", { class: "cp-clip__run", "aria-hidden": "true" })),
+        ]
+      : [roll(sketchNotes(item.slug)), h("span", { class: "cp-clip__run", "aria-hidden": "true" })],
   );
   hit.addEventListener("click", () => hearSketch(env, item.slug, hit), { signal: env.signal });
   let timer = 0;

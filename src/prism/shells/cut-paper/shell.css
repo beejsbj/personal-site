@@ -2356,6 +2356,44 @@
   filter: brightness(1.08);
 }
 
+/* a pad with the sketch's thumbnail: the picture on top, the motif on a
+   band of the pad's colour underneath */
+:root[data-lens="cut-paper"] .cp-pad__art {
+  position: absolute;
+  inset: 6px 6px 30%;
+  width: calc(100% - 12px);
+  height: calc(70% - 6px);
+  border-radius: 4px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(10, 9, 8, 0.25);
+  transition: transform var(--cp-dur-tap) var(--cp-ease-stab);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__band {
+  position: absolute;
+  right: 6px;
+  bottom: 10px;
+  left: 6px;
+  height: calc(30% - 18px);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__band .cp-roll {
+  top: 2px;
+  right: 6%;
+  bottom: 2px;
+  left: 6%;
+  width: 88%;
+  height: calc(100% - 4px);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit[data-hearing] .cp-pad__art {
+  transform: translateY(2px);
+}
+
+:root[data-lens="cut-paper"] [data-hearing] .cp-pad__band > .cp-clip__run {
+  animation: cut-paper-hear var(--hear, 1.5s) linear forwards;
+}
+
 :root[data-lens="cut-paper"] .cp-pad__hit:active,
 :root[data-lens="cut-paper"] .cp-pad__hit[data-hearing] {
   transform: scale(0.97);
@@ -3274,6 +3312,7 @@
   }
 
   :root[data-lens="cut-paper"] [data-hearing] > .cp-clip__run,
+  :root[data-lens="cut-paper"] [data-hearing] .cp-pad__band > .cp-clip__run,
   :root[data-lens="cut-paper"] [data-hearing] .cp-tcard__roll .cp-clip__run,
   :root[data-lens="cut-paper"] .cp-sound[data-nudge][data-state="off"] {
     animation: none;
