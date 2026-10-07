@@ -695,6 +695,18 @@
     margin-top: 0;
   }
 
+  /* Not much room either side: drawn in closer to the middle. */
+  @media (max-width: 1099px) {
+    :root[data-lens="hion"] .hion-head {
+      --hion-lane: clamp(42%, var(--hion-drop-x, 50%), 58%);
+      --hion-lane-w: 120px;
+    }
+
+    :root[data-lens="hion"] .hion-head .hion-intro {
+      font-size: 1.08rem;
+    }
+  }
+
   /* Without an intro, the rest hangs straight under the title. */
   :root[data-lens="hion"] .hion-head:not(:has(.hion-intro)) .hion-head__more {
     margin-top: 2rem;
@@ -1343,7 +1355,7 @@
   }
 
   :root[data-lens="hion"] .hion-knots--writing {
-    --hion-knot-ride: 3.4rem;
+    --hion-knot-ride: 1.6rem;
   }
 
   :root[data-lens="hion"] .hion-knots--forks {
