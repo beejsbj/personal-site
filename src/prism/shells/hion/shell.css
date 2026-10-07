@@ -551,7 +551,8 @@
   --hion-drop: 40px;
   position: relative;
   display: inline-block;
-  max-width: 14em;
+  max-width: min(14em, 100%);
+  overflow-wrap: break-word;
   margin: 0;
   padding: 0.12em 0.3em 0.05em;
   font: 800 clamp(2.6rem, 5.4vw, 4.6rem)/1.04 var(--hion-serif);
@@ -574,23 +575,130 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Inner heroes keep clear of the cord dropping from the line. */
-:root[data-lens="hion"] .hion-head,
-:root[data-lens="hion"] .hion-entry-head,
-:root[data-lens="hion"] .hion-about-head {
+/* Openings: the head of a screen hung on the hions' way down (screens.ts
+   opening). A phone reads it down one column; wide screens lay it across
+   their way (below). */
+:root[data-lens="hion"] .hion-head {
   padding-inline: var(--hion-gutter);
 }
 
-:root[data-lens="hion"] .hion-page[data-drop="left"] :is(.hion-head, .hion-entry-head, .hion-about-head) {
-  padding-left: max(var(--hion-gutter), calc(var(--hion-drop-x) + 80px));
+:root[data-lens="hion"] .hion-head .hion-intro {
+  margin: 1.6rem 0 0;
 }
 
-:root[data-lens="hion"] .hion-page[data-drop="right"] :is(.hion-head, .hion-entry-head, .hion-about-head) {
-  padding-right: max(var(--hion-gutter), calc(100% - var(--hion-drop-x) + 80px));
+/* The knot where the intro is tied on: a station of the hions' way, the
+   height of the intro's first line. */
+:root[data-lens="hion"] .hion-knot {
+  display: block;
+  width: 2px;
+  height: 2px;
+  pointer-events: none;
 }
 
-:root[data-lens="hion"] .hion-page[data-drop="center"] :is(.hion-head, .hion-entry-head) {
-  padding-right: calc(50% + 60px);
+:root[data-lens="hion"] .hion-head__knot,
+:root[data-lens="hion"] .hion-head__via {
+  display: none;
+}
+
+:root[data-lens="hion"] .hion-head__more > .hion-pullcord:first-child,
+:root[data-lens="hion"] .hion-head__more > .hion-row:first-child {
+  margin-top: 30px;
+}
+
+@media (min-width: 720px) {
+  /* They come down from the place you are in the line (drawn in toward the
+     middle, so there is room either side): the title hangs from a branch
+     thrown out from them on the side with more room, the intro is tied on
+     at a knot further down, on their other side, and the rest of the head
+     (pull-cords, tags, tools) hangs under the title. */
+  :root[data-lens="hion"] .hion-head {
+    --hion-lane: clamp(36%, var(--hion-drop-x, 50%), 64%);
+    --hion-lane-w: 170px;
+    display: grid;
+    grid-template-columns:
+      var(--hion-gutter)
+      minmax(0, calc(var(--hion-lane) - var(--hion-lane-w) / 2 - var(--hion-gutter)))
+      var(--hion-lane-w)
+      minmax(0, 1fr)
+      var(--hion-gutter);
+    grid-template-areas:
+      ". sign  .    .     ."
+      ". more  knot intro ."
+      ". more  via  .     .";
+    grid-template-rows: auto auto 1fr;
+    align-items: start;
+    padding-inline: 0;
+  }
+
+  :root[data-lens="hion"] .hion-page[data-drop="left"] .hion-head {
+    grid-template-areas:
+      ". .     .    sign ."
+      ". intro knot more ."
+      ". .     via  more .";
+  }
+
+  :root[data-lens="hion"] .hion-head__sign {
+    grid-area: sign;
+    min-width: 0;
+    max-width: 100%;
+    justify-self: end;
+    text-align: right;
+  }
+
+  :root[data-lens="hion"] .hion-page[data-drop="left"] .hion-head__sign {
+    justify-self: start;
+    text-align: left;
+  }
+
+  :root[data-lens="hion"] .hion-head__knot {
+    display: block;
+    grid-area: knot;
+    justify-self: center;
+    height: calc(1.2rem * 1.65);
+    margin-top: 2.2rem;
+  }
+
+  :root[data-lens="hion"] .hion-head__via {
+    display: block;
+    grid-area: via;
+    align-self: end;
+    justify-self: center;
+    width: 2px;
+    height: 2px;
+  }
+
+  :root[data-lens="hion"] .hion-head .hion-intro {
+    grid-area: intro;
+    justify-self: start;
+    max-width: 27em;
+    margin-top: 2.2rem;
+  }
+
+  :root[data-lens="hion"] .hion-page[data-drop="left"] .hion-head .hion-intro {
+    justify-self: end;
+  }
+
+  /* Under the title, below where the intro is tied on. */
+  :root[data-lens="hion"] .hion-head__more {
+    grid-area: more;
+    justify-self: end;
+    max-width: 34rem;
+    margin-top: 5.4rem;
+  }
+
+  :root[data-lens="hion"] .hion-page[data-drop="left"] .hion-head__more {
+    justify-self: start;
+  }
+
+  :root[data-lens="hion"] .hion-head__more > .hion-pullcord:first-child,
+  :root[data-lens="hion"] .hion-head__more > .hion-row:first-child {
+    margin-top: 0;
+  }
+
+  /* Without an intro, the rest hangs straight under the title. */
+  :root[data-lens="hion"] .hion-head:not(:has(.hion-intro)) .hion-head__more {
+    margin-top: 2rem;
+  }
 }
 
 /* ---------- Home: the hero ---------- */
@@ -858,12 +966,6 @@
   width: min(820px, calc(100% - 2 * var(--hion-gutter)));
 }
 
-:root[data-lens="hion"] .hion-loop--note {
-  width: min(640px, calc(100% - 2 * var(--hion-gutter)));
-  padding-top: 100px;
-  padding-bottom: 110px;
-}
-
 /* Strung headings: the weft runs into them from both sides. */
 :root[data-lens="hion"] .hion-strung {
   position: relative;
@@ -1086,25 +1188,209 @@
   padding-left: 0.2em;
 }
 
-/* The writing archive is a reading thread: one post after another, with
-   the same hung marks and scroll reveal as the rest of the loom. */
-:root[data-lens="hion"] .hion-row--writing {
+/* ---------- Strands: lists on the hions' way down ---------- */
+
+/* Off the loops the two run down together, knotted at each entry; the
+   entries are tied on beside the knots, by turns either side of them, the
+   date level with the knot and the title under it (screens.ts knotted).
+   A phone keeps them in one column beside the hions, stepping in and out a
+   little. */
+:root[data-lens="hion"] .hion-strand {
+  width: min(1120px, calc(100% - 2 * var(--hion-gutter)));
+  margin: 0 auto 170px;
+}
+
+:root[data-lens="hion"] .hion-knots {
+  --hion-knot-gap: 2.4rem;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 64px;
-  max-width: 66ch;
-  margin: 20px auto 0;
+  gap: var(--hion-knot-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-:root[data-lens="hion"] .hion-work--writing,
-:root[data-lens="hion"] .hion-work--writing:nth-child(2n) {
-  --hion-drop: 40px;
+:root[data-lens="hion"] .hion-tied {
+  /* The first line of what is tied on (the date): the knot sits level
+     with its middle. */
+  --hion-knot-h: calc(1.15rem * 1.3);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  grid-template-areas: "tied knot";
+  align-items: start;
 }
 
-:root[data-lens="hion"] .hion-work--writing .hion-work__title {
-  margin: 0.25em 0 0.4em;
-  font-size: clamp(1.55rem, 2.4vw, 2rem);
+:root[data-lens="hion"] .hion-tied > .hion-knot {
+  grid-area: knot;
+  justify-self: center;
+  height: var(--hion-knot-h);
+}
+
+:root[data-lens="hion"] .hion-tied__block {
+  grid-area: tied;
+  min-width: 0;
+}
+
+:root[data-lens="hion"] .hion-tied__date {
+  margin: 0 0 0.15em;
+  font-size: 1.15rem;
+  line-height: 1.3;
+}
+
+/* Stepping in and out, a little. */
+:root[data-lens="hion"] .hion-tied[data-side="l"] > .hion-tied__block {
+  padding-left: 1.4rem;
+}
+
+:root[data-lens="hion"] .hion-tied__title {
+  margin: 0;
+  font: 700 1.3rem/1.3 var(--hion-serif);
+  color: var(--hion-cl);
   overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+:root[data-lens="hion"] .hion-tied__title a {
+  text-decoration: none;
+}
+
+:root[data-lens="hion"] .hion-tied__title a:hover {
+  color: var(--hion-c);
+}
+
+:root[data-lens="hion"] .hion-tied[data-hue="m"] .hion-tied__title a:hover {
+  color: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-tied__summary {
+  margin: 0.4em 0 0;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--hion-text);
+}
+
+:root[data-lens="hion"] .hion-tied__title + .hion-meta {
+  margin-top: 0.15em;
+  font-size: 1.1rem;
+}
+
+/* A writing post's title is set larger: it is the whole entry. */
+:root[data-lens="hion"] .hion-knots--writing .hion-tied__title {
+  font-size: clamp(1.45rem, 2.2vw, 1.8rem);
+  line-height: 1.2;
+}
+
+:root[data-lens="hion"] .hion-knots--writing {
+  --hion-knot-gap: 3.2rem;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-tied {
+    grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+    grid-template-areas: ". knot tied";
+  }
+
+  :root[data-lens="hion"] .hion-tied[data-side="l"] {
+    grid-template-areas: "tied knot .";
+  }
+
+  :root[data-lens="hion"] .hion-tied__block {
+    max-width: 30rem;
+  }
+
+  :root[data-lens="hion"] .hion-tied[data-side="l"] > .hion-tied__block {
+    justify-self: end;
+    padding-left: 0;
+    text-align: right;
+  }
+
+  /* Not a column of rows: each entry rides up beside the one before it,
+     on the hions' other side. */
+  :root[data-lens="hion"] .hion-knots {
+    --hion-knot-ride: 1.7rem;
+  }
+
+  :root[data-lens="hion"] .hion-knots--writing {
+    --hion-knot-ride: 3.4rem;
+  }
+
+  :root[data-lens="hion"] .hion-knots--forks {
+    --hion-knot-ride: -1rem;
+  }
+
+  :root[data-lens="hion"] .hion-knots > * + * {
+    margin-top: calc(-1 * (var(--hion-knot-gap) + var(--hion-knot-ride)));
+  }
+
+  /* Only the words take the pointer, not the empty side of an entry that
+     rides up over the one before. */
+  :root[data-lens="hion"] .hion-knots > * {
+    pointer-events: none;
+  }
+
+  :root[data-lens="hion"] .hion-knots .hion-tied__block {
+    pointer-events: auto;
+  }
+}
+
+/* Forks: the last two things tied on before the hions let go; their
+   titles are their first lines. */
+:root[data-lens="hion"] .hion-fork {
+  --hion-knot-h: calc(1.8rem * 1.1);
+}
+
+:root[data-lens="hion"] .hion-fork__title {
+  margin: 0 0 0.2em;
+  font: 800 1.8rem/1.1 var(--hion-serif);
+  color: var(--hion-c);
+}
+
+/* The heading of a strand: strung out to one side of the hions, its words
+   tied on at a knot on the other. */
+:root[data-lens="hion"] .hion-strand__head {
+  margin-bottom: 3.4rem;
+}
+
+:root[data-lens="hion"] .hion-strand__head .hion-strung {
+  text-align: left;
+}
+
+:root[data-lens="hion"] .hion-strand__knot {
+  display: none;
+}
+
+:root[data-lens="hion"] .hion-strand__head .hion-aside {
+  margin: 0;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-strand__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+    grid-template-areas:
+      "head . ."
+      ". knot aside";
+    align-items: start;
+  }
+
+  :root[data-lens="hion"] .hion-strand__head .hion-strung {
+    grid-area: head;
+    justify-self: end;
+    margin: 0;
+    text-align: right;
+  }
+
+  :root[data-lens="hion"] .hion-strand__knot {
+    display: block;
+    grid-area: knot;
+    justify-self: center;
+    height: calc(1.0625rem * 1.78);
+    margin-top: 1.4rem;
+  }
+
+  :root[data-lens="hion"] .hion-strand__head .hion-aside {
+    grid-area: aside;
+    margin-top: 1.4rem;
+  }
 }
 
 :root[data-lens="hion"] .hion-writing__origin {
@@ -1271,62 +1557,6 @@
   --hion-drop: 50px;
 }
 
-/* Ties: updates knotted to the strand. */
-:root[data-lens="hion"] .hion-ties {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-:root[data-lens="hion"] .hion-tie {
-  display: flex;
-  flex-direction: column-reverse;
-  margin: 0 0 1.5em;
-}
-
-:root[data-lens="hion"] .hion-tie__title {
-  margin: 0;
-  font: 600 1.15rem/1.45 var(--hion-serif);
-  color: var(--hion-cl);
-}
-
-:root[data-lens="hion"] .hion-tie__title a {
-  text-decoration: none;
-}
-
-:root[data-lens="hion"] .hion-tie__title a:hover {
-  color: var(--hion-c);
-}
-
-:root[data-lens="hion"] .hion-tie .hion-meta {
-  font-size: 1.1rem;
-}
-
-/* Forks: the two loose ends of the home cord. */
-:root[data-lens="hion"] .hion-loop--forks {
-  padding-top: 90px;
-}
-
-:root[data-lens="hion"] .hion-row--forks {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 48px;
-}
-
-:root[data-lens="hion"] .hion-fork {
-  --hion-drop: 40px;
-}
-
-:root[data-lens="hion"] .hion-fork:nth-child(2) {
-  --hion-drop: 70px;
-}
-
-:root[data-lens="hion"] .hion-fork__title {
-  margin: 0 0 0.2em;
-  font: 800 1.8rem/1.1 var(--hion-serif);
-  color: var(--hion-c);
-}
-
 :root[data-lens="hion"] .hion-fork[data-hue="m"] .hion-fork__title {
   color: var(--hion-m);
 }
@@ -1347,34 +1577,64 @@
 
 /* ---------- Entry heads, gallery, onward ---------- */
 
-:root[data-lens="hion"] .hion-entry-head,
-:root[data-lens="hion"] .hion-about-head {
-  margin-bottom: 150px;
-}
-
 :root[data-lens="hion"] .hion-entry-head .hion-beads {
   margin-top: 36px;
 }
 
-:root[data-lens="hion"] .hion-about-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0 60px;
-  align-items: start;
-}
-
-:root[data-lens="hion"] .hion-about-head .hion-head {
-  padding: 0;
-}
-
-:root[data-lens="hion"] .hion-about-head .hion-pullcord {
-  grid-column: 1;
-}
-
 :root[data-lens="hion"] .hion-about-head .hion-hero__art {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  width: 240px;
+  width: min(70%, 240px);
+  margin: 64px auto 0;
+}
+
+/* About: the words hang either side of the portrait, not in a column. The
+   hions come down beside it (cyan circling it), the title hung on its far
+   side and the intro tied on at a knot on its near one. */
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-page .hion-about-head {
+    grid-template-columns:
+      var(--hion-gutter)
+      minmax(0, 1fr)
+      clamp(200px, 20vw, 260px)
+      120px
+      minmax(0, 1fr)
+      var(--hion-gutter);
+    grid-template-areas:
+      ". sign art .    .     ."
+      ". more art knot intro ."
+      ". more art via  .     .";
+    column-gap: 0;
+  }
+
+  :root[data-lens="hion"] .hion-about-head .hion-head__sign {
+    justify-self: end;
+    padding-right: 48px;
+    text-align: right;
+  }
+
+  :root[data-lens="hion"] .hion-about-head .hion-head__more {
+    display: contents;
+  }
+
+  :root[data-lens="hion"] .hion-about-head .hion-head__more > .hion-pullcord {
+    grid-area: more;
+    justify-self: end;
+    margin: 2.4rem 48px 0 0;
+  }
+
+  :root[data-lens="hion"] .hion-about-head .hion-hero__art {
+    grid-area: art;
+    width: 100%;
+    margin: 40px 0 0;
+  }
+
+  :root[data-lens="hion"] .hion-about-head .hion-intro {
+    justify-self: start;
+    margin-top: 1.2rem;
+  }
+
+  :root[data-lens="hion"] .hion-about-head .hion-head__knot {
+    margin-top: 1.2rem;
+  }
 }
 
 :root[data-lens="hion"] .hion-row--gallery {
@@ -1427,11 +1687,6 @@
 
 :root[data-lens="hion"] .hion-end__link:hover {
   color: var(--hion-c);
-}
-
-:root[data-lens="hion"] .hion-lost {
-  padding: 60px var(--hion-gutter) 140px;
-  padding-left: max(var(--hion-gutter), calc(var(--hion-drop-x, 0px) + 80px));
 }
 
 /* ---------- Prose: the rendered articles ---------- */
@@ -1844,38 +2099,27 @@
     gap: 56px;
   }
 
-  :root[data-lens="hion"] .hion-row--forks {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
   :root[data-lens="hion"] .hion-year {
     font-size: 2.1rem;
   }
 
-  :root[data-lens="hion"] .hion-head,
-  :root[data-lens="hion"] .hion-entry-head,
-  :root[data-lens="hion"] .hion-about-head,
-  :root[data-lens="hion"] .hion-page[data-drop] :is(.hion-head, .hion-entry-head, .hion-about-head) {
+  /* The cord comes down the right-hand edge; the head reads down beside
+     it, the intro and the rest stepped in a little from the title. */
+  :root[data-lens="hion"] .hion-head {
     padding-inline: var(--hion-gutter) 64px;
+  }
+
+  :root[data-lens="hion"] .hion-head .hion-intro,
+  :root[data-lens="hion"] .hion-head__more {
+    margin-left: 1.1rem;
+  }
+
+  :root[data-lens="hion"] .hion-screen > .hion-head {
+    margin-bottom: 110px;
   }
 
   :root[data-lens="hion"] .hion-title {
     font-size: clamp(2.2rem, 10vw, 3rem);
-  }
-
-  :root[data-lens="hion"] .hion-about-head {
-    display: block;
-  }
-
-  :root[data-lens="hion"] .hion-about-head .hion-hero__art {
-    width: 70%;
-    margin: 64px auto 0;
-  }
-
-  :root[data-lens="hion"] .hion-entry-head,
-  :root[data-lens="hion"] .hion-about-head {
-    margin-bottom: 110px;
   }
 
   :root[data-lens="hion"] .hion-loop--gallery[data-count="2"] .hion-row--gallery {
@@ -1935,13 +2179,13 @@
   }
 }
 
-:root[data-lens="hion"] :is(.hion-tag, .hion-pullcord, .hion-fork, .hion-work--lab, .hion-end)[data-lit]:hover,
+:root[data-lens="hion"] :is(.hion-tag, .hion-pullcord, .hion-work--lab, .hion-end)[data-lit]:hover,
 :root[data-lens="hion"] .hion-charm:hover {
   animation: hion-swing 1.5s ease-in-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root[data-lens="hion"] :is(.hion-tag, .hion-pullcord, .hion-fork, .hion-work--lab, .hion-end)[data-lit]:hover,
+  :root[data-lens="hion"] :is(.hion-tag, .hion-pullcord, .hion-work--lab, .hion-end)[data-lit]:hover,
   :root[data-lens="hion"] .hion-charm:hover {
     animation: none;
   }
@@ -2030,7 +2274,6 @@
   :root[data-lens="hion"] .hion-charm,
   :root[data-lens="hion"] .hion-tag,
   :root[data-lens="hion"] .hion-pullcord[data-hang],
-  :root[data-lens="hion"] .hion-fork,
   :root[data-lens="hion"] .hion-work--lab,
   :root[data-lens="hion"] .hion-end,
   :root[data-lens="hion"] .hion-title,
