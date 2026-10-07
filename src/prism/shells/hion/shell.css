@@ -966,6 +966,39 @@
   width: min(820px, calc(100% - 2 * var(--hion-gutter)));
 }
 
+/* Long reading: a calm column of about sixty characters, held off centre
+   between the two strands, its headings hanging out past the cyan one
+   into the open side. */
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-loop--story {
+    --hion-measure: calc(60ch + 2 * var(--hion-loop-pad));
+    font-size: 1.08rem;
+    width: min(var(--hion-measure), calc(100% - 2 * var(--hion-gutter)));
+    margin-left: clamp(
+      var(--hion-gutter),
+      calc(50% - var(--hion-measure) / 2 + min(8vw, 130px)),
+      calc(100% - var(--hion-gutter) - var(--hion-measure))
+    );
+  }
+
+  :root[data-lens="hion"] .hion-loop--story .hion-prose > .hion-strung {
+    margin-left: calc(-1 * (var(--hion-loop-pad) + min(10vw, 9rem)));
+    text-align: left;
+  }
+
+  /* A knotted heading's knot sits on the strand it hangs from. */
+  :root[data-lens="hion"] .hion-loop--story .hion-prose h3.hion-knotted {
+    margin-left: calc(-1 * var(--hion-loop-pad) - 0.4em);
+    padding-left: calc(var(--hion-loop-pad) + 0.4em);
+  }
+}
+
+:root[data-lens="hion"] .hion-loop--note {
+  width: min(640px, calc(100% - 2 * var(--hion-gutter)));
+  padding-top: 100px;
+  padding-bottom: 110px;
+}
+
 /* Strung headings: the weft runs into them from both sides. */
 :root[data-lens="hion"] .hion-strung {
   position: relative;
