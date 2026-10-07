@@ -1,10 +1,14 @@
 /** Every screen, as thread.
  *
  * No boxes, cards or panels: each screen is laid out as stations along the
- * two hions' way down the page. Titles hang from branches tied to them.
- * Sections are loops, where the two part to run down either side of the
- * words and meet again beneath them. Headings are strung on wefts woven
- * across a loop; lists hang from wefts like charms; pictures hang on two
+ * two hions' way down the page. A screen's opening hangs across their way
+ * as they come down from the line: the title from a branch thrown out from
+ * them, the intro tied on at a knot on their other side. Sections are
+ * loops, where the two part to run down either side of the words and meet
+ * again beneath them. Lists of dated things are strands: the two run down
+ * together, knotted at each entry, and the entries are tied on by turns
+ * either side. Headings are strung on wefts woven across a loop (or thrown
+ * out from the hions beside them); charms hang from wefts; pictures hang on two
  * threads, wound round their corners; links are pull-cords and knots;
  * `data-orbit` marks something one hion goes out of its way to circle. The
  * markup only says what is what (see weave.ts for the attributes); the
@@ -114,41 +118,90 @@ function screen(kind: string, labelledBy: string, ...children: Child[]) {
   );
 }
 
-/** A title hung like a sign on two threads, from a branch tied to the main
- * cord; the eyebrow sits on the branch above it. `marks` says which parts
- * the title, eyebrow and intro are. */
-function hungTitle(
+/** Where the two hions are tied together on their way down: a station
+ * (weave.ts) they meet at and part from again. Something tied on beside it
+ * (`data-tie`) is tied to the knot by a short thread. */
+const knotPoint = (cls = "") =>
+  h("span", { class: `hion-knot ${cls}`.trim(), "data-spine": "knot", "aria-hidden": "true" });
+
+/** Which side of the hions an entry on them is tied on, by turns. */
+const side = (i: number): Attrs => ({ "data-side": i % 2 ? "l" : "r", "data-hue": i % 2 ? "m" : "c" });
+
+/** An entry knotted on the hions' way down (laid out by `.hion-tied`,
+ * on its `side`): the knot, and the entry tied on beside it, its date (if
+ * it has one) written level with the knot, the title under it. */
+function knotted(date: Child, attrs: Attrs, ...tied: Child[]): Child[] {
+  return [
+    knotPoint(),
+    h(
+      "div",
+      { ...attrs, class: "hion-tie hion-tied__block", "data-tie": "" },
+      date ? h("p", { class: "hion-tied__date hion-meta" }, date) : null,
+      tied,
+    ),
+  ];
+}
+
+type Marks = { title?: PartAttrs; eyebrow?: PartAttrs; intro?: PartAttrs };
+
+/** A screen's opening, hung on the hions where they come down from the
+ * line: the title hung like a sign from a branch thrown out from them where
+ * they arrive (the eyebrow on the branch above it), the intro tied on
+ * further down, at a knot, on their other side, and whatever else the head
+ * has (actions as pull-cords, tags, tools) hanging below the title. Wide
+ * screens lay it across the hions' way down (shell.css); phones read it down
+ * one column. `marks` says which parts the title, eyebrow and intro are. */
+function opening(
   id: string,
   title: string,
-  eyebrow?: string,
-  intro?: string,
-  marks: { title?: PartAttrs; eyebrow?: PartAttrs; intro?: PartAttrs } = {},
+  eyebrow: string | undefined,
+  intro: string | undefined,
+  marks: Marks = {},
+  attrs: Attrs = {},
+  ...more: Child[]
 ) {
+  const rest = more.filter(Boolean);
   return h(
     "header",
-    { class: "hion-head", "data-cord": "branch" },
-    eyebrow
-      ? h("p", { ...marks.eyebrow, class: "hion-eyebrow", "data-reveal": "" }, eyebrow)
-      : null,
-    hung(
-      "h1",
-      "sign",
-      { ...marks.title, class: "hion-title", id, "data-hang": "" },
-      h("span", { class: "hion-title__text", "data-woven": "m" }, title),
+    { ...attrs, class: `hion-head ${attrs.class ?? ""}`.trim() },
+    h(
+      "div",
+      { class: "hion-head__sign", "data-cord": "branch" },
+      eyebrow
+        ? h("p", { ...marks.eyebrow, class: "hion-eyebrow", "data-reveal": "" }, eyebrow)
+        : null,
+      hung(
+        "h1",
+        "sign",
+        { ...marks.title, class: "hion-title", id, "data-hang": "" },
+        h("span", { class: "hion-title__text", "data-woven": "m" }, title),
+      ),
     ),
+    intro ? knotPoint("hion-head__knot") : null,
     intro
-      ? h("p", { ...marks.intro, class: "hion-intro", "data-reveal": "" }, intro)
+      ? h("p", { ...marks.intro, class: "hion-intro", "data-tie": "", "data-reveal": "" }, intro)
       : null,
+    rest.length ? h("div", { class: "hion-head__more" }, rest) : null,
+    // They keep to their way down past the rest of the head, clear of it.
+    h("span", { class: "hion-head__via", "data-spine": "via", "aria-hidden": "true" }),
   );
 }
 
 /** A page's own opening, from its header copy, marked as that page's. */
-function pageTitle(header: Header, ref: string) {
-  return hungTitle("hion-page-title", header.title, header.eyebrow, header.intro, {
-    title: part("page.title", ref),
-    eyebrow: part("page.eyebrow", ref),
-    intro: part("page.intro", ref),
-  });
+function pageTitle(header: Header, ref: string, attrs: Attrs = {}, ...more: Child[]) {
+  return opening(
+    "hion-page-title",
+    header.title,
+    header.eyebrow,
+    header.intro,
+    {
+      title: part("page.title", ref),
+      eyebrow: part("page.eyebrow", ref),
+      intro: part("page.intro", ref),
+    },
+    attrs,
+    ...more,
+  );
 }
 
 /** A page header's actions: one pull-cord, or a row of them. */
@@ -356,52 +409,53 @@ function home(content: SiteContent) {
     pullLink(page.currently.link.href, page.currently.link.label, "m"),
   );
 
-  const signals = loop(
-    { class: "hion-loop--updates", "aria-labelledby": "hion-home-updates" },
-    strung("h2", "hion-home-updates", page.updates.title),
-    h("p", { class: "hion-aside", "data-reveal": "" }, page.updates.intro),
+  // Off the loops: the hions run down together here, knotted at each
+  // update, and the updates are tied on either side of them.
+  const signals = h(
+    "section",
+    { class: "hion-strand hion-strand--updates", "aria-labelledby": "hion-home-updates" },
+    h(
+      "div",
+      { class: "hion-strand__head" },
+      strung("h2", "hion-home-updates", page.updates.title),
+      knotPoint("hion-strand__knot"),
+      h("p", { class: "hion-aside", "data-tie": "", "data-reveal": "" }, page.updates.intro),
+    ),
     h(
       "ol",
-      { class: "hion-ties", "aria-label": page.updates.listLabel },
+      { class: "hion-knots hion-knots--updates", "aria-label": page.updates.listLabel },
       updates.map((update, i) =>
         h(
           "li",
-          {
-            ...part("update.item", update.id),
-            class: "hion-tie",
-            "data-tie": "",
-            "data-reveal": "",
-            "data-hue": i % 2 ? "m" : "c",
-          },
-          h(
-            "p",
-            { class: "hion-meta" },
-            `${update.sourceLabel} · ${update.kindLabel} · `,
+          { ...part("update.item", update.id), class: "hion-tied", "data-reveal": "", ...side(i) },
+          knotted(
             h("time", { datetime: update.date }, update.dateLabel),
+            {},
+            h("p", { class: "hion-tied__title" }, link(update.href, {}, update.title)),
+            h("p", { class: "hion-meta" }, `${update.sourceLabel} · ${update.kindLabel}`),
           ),
-          h("p", { class: "hion-tie__title" }, link(update.href, {}, update.title)),
         ),
       ),
     ),
   );
 
-  const elsewhere = loop(
-    { class: "hion-loop--forks", "aria-label": page.elsewhere.label },
+  // The last two things tied on before the hions let go.
+  const elsewhere = h(
+    "section",
+    { class: "hion-strand hion-strand--forks", "aria-label": page.elsewhere.label },
     h(
       "div",
-      { class: "hion-row hion-row--forks", "data-cord": "" },
+      { class: "hion-knots hion-knots--forks" },
       page.elsewhere.items.map((item, i) =>
-        hung(
+        h(
           "div",
-          "drop",
-          {
-            ...part("home.elsewhere", i),
-            class: "hion-fork",
-            "data-hang": "",
-            "data-hue": i % 2 ? "m" : "c",
-          },
-          h("h2", { class: "hion-fork__title" }, link(item.href, {}, item.title)),
-          h("p", {}, item.blurb),
+          { ...part("home.elsewhere", i), class: "hion-tied hion-fork", "data-reveal": "", ...side(i) },
+          knotted(
+            null,
+            {},
+            h("h2", { class: "hion-fork__title" }, link(item.href, {}, item.title)),
+            h("p", {}, item.blurb),
+          ),
         ),
       ),
     ),
@@ -562,14 +616,14 @@ function project(content: SiteContent, data: Project) {
   return screen(
     "project",
     "hion-page-title",
-    h(
-      "div",
+    opening(
+      "hion-page-title",
+      data.title,
+      `${data.kind} · ${data.year}`,
+      data.summary,
+      { title: part("project.title", ref), intro: part("project.summary", ref) },
       // The same lace as its charm on the list, seen close.
       { class: "hion-entry-head", "data-frame": data.slug },
-      hungTitle("hion-page-title", data.title, `${data.kind} · ${data.year}`, data.summary, {
-        title: part("project.title", ref),
-        intro: part("project.summary", ref),
-      }),
       tagsRow(
         [
           [labels.role, data.role],
@@ -603,13 +657,13 @@ function labEntry(content: SiteContent, data: SiteContent["lab"][number]) {
   return screen(
     "lab-entry",
     "hion-page-title",
-    h(
-      "div",
+    opening(
+      "hion-page-title",
+      data.title,
+      detail.eyebrow,
+      data.summary,
+      { title: part("lab.title", ref), intro: part("lab.summary", ref) },
       { class: "hion-entry-head", "data-frame": data.slug },
-      hungTitle("hion-page-title", data.title, detail.eyebrow, data.summary, {
-        title: part("lab.title", ref),
-        intro: part("lab.summary", ref),
-      }),
       tagsRow(
         [
           [detail.labels.type, data.type],
@@ -697,10 +751,11 @@ function about(content: SiteContent) {
   return screen(
     "about",
     "hion-page-title",
-    h(
-      "div",
+    // The words hang either side of the portrait's cloth, not in a column.
+    pageTitle(
+      page.header,
+      "about",
       { class: "hion-about-head" },
-      pageTitle(page.header, "about"),
       actions(content.lenses.hion, page.header, "about"),
       h(
         "div",
@@ -725,10 +780,10 @@ function resume(content: SiteContent) {
   return screen(
     "resume",
     "hion-page-title",
-    h(
-      "div",
+    pageTitle(
+      page.header,
+      "resume",
       { class: "hion-entry-head" },
-      pageTitle(page.header, "resume"),
       actions(content.lenses.hion, page.header, "resume"),
     ),
     body,
@@ -748,46 +803,28 @@ function writing(content: SiteContent) {
     posts.length && status === "available"
       ? h(
           "ol",
-          { class: "hion-row hion-row--writing", "data-cord": "" },
+          { class: "hion-knots hion-knots--writing" },
           posts.map((post, i) => {
             const id = `hion-writing-${post.slug}`;
-            return hung(
+            return h(
               "li",
-              "pair",
-              {
-                class: "hion-work hion-work--writing",
-                "data-hang": "",
-                "data-hue": i % 2 ? "m" : "c",
-                "data-frame": post.slug,
-              },
+              { "data-reveal": "" },
               h(
                 "article",
-                { "aria-labelledby": id },
-                h(
-                  "time",
-                  {
-                    class: "hion-meta",
-                    datetime: post.date,
-                    ...part("writing.meta", post.slug),
-                  },
-                  post.dateLabel,
-                ),
-                h(
-                  "h2",
-                  {
-                    class: "hion-work__title",
-                    id,
-                    ...part("writing.title", post.slug),
-                  },
-                  link(post.href, {}, post.title),
-                ),
-                h(
-                  "p",
-                  {
-                    class: "hion-work__summary",
-                    ...part("writing.summary", post.slug),
-                  },
-                  post.subtitle || post.description,
+                { class: "hion-tied", "aria-labelledby": id, ...side(i) },
+                knotted(
+                  h("time", { datetime: post.date, ...part("writing.meta", post.slug) }, post.dateLabel),
+                  { "data-frame": post.slug },
+                  h(
+                    "h2",
+                    { class: "hion-tied__title", id, ...part("writing.title", post.slug) },
+                    link(post.href, {}, post.title),
+                  ),
+                  h(
+                    "p",
+                    { class: "hion-tied__summary", ...part("writing.summary", post.slug) },
+                    post.subtitle || post.description,
+                  ),
                 ),
               ),
             );
@@ -808,13 +845,13 @@ function writing(content: SiteContent) {
   return screen(
     "writing",
     "hion-page-title",
-    h(
-      "div",
+    pageTitle(
+      page.header,
+      "writing",
       { class: "hion-entry-head" },
-      pageTitle(page.header, "writing"),
       actions(content.lenses.hion, page.header, "writing"),
     ),
-    loop({ class: "hion-loop--writing", "aria-label": copy.listLabel }, list),
+    h("section", { class: "hion-strand hion-strand--writing", "aria-label": copy.listLabel }, list),
   );
 }
 
@@ -834,7 +871,7 @@ function writingEntry(content: SiteContent, route: Route) {
     return screen(
       "writing-entry",
       "hion-page-title",
-      h("div", { class: "hion-entry-head" }, pageTitle(page.header, "writing")),
+      pageTitle(page.header, "writing", { class: "hion-entry-head" }),
       loop(
         { class: "hion-loop--story", "aria-label": page.title },
         h(
@@ -865,20 +902,17 @@ function writingEntry(content: SiteContent, route: Route) {
   return screen(
     "writing-entry",
     "hion-page-title",
-    h(
-      "div",
+    opening(
+      "hion-page-title",
+      post.title,
+      page.header.eyebrow,
+      post.subtitle,
+      {
+        title: part("writing.title", post.slug),
+        intro: part("writing.subtitle", post.slug),
+      },
       // The same tape as its charm on the list, seen close.
       { class: "hion-entry-head", "data-frame": post.slug },
-      hungTitle(
-        "hion-page-title",
-        post.title,
-        page.header.eyebrow,
-        post.subtitle,
-        {
-          title: part("writing.title", post.slug),
-          intro: part("writing.subtitle", post.slug),
-        },
-      ),
       hung(
         "p",
         "drop",
@@ -933,14 +967,15 @@ function lost(content: SiteContent) {
   return screen(
     "other",
     "hion-page-title",
-    hungTitle(
+    opening(
       "hion-page-title",
       content.pages.notFound.header.title,
       copy.eyebrow,
       copy.intro,
       { title: part("page.title", "not-found") },
+      { class: "hion-head--lost" },
+      pullLink("/", copy.home, "m"),
     ),
-    h("div", { class: "hion-lost" }, pullLink("/", copy.home, "m")),
   );
 }
 
@@ -966,7 +1001,7 @@ function other(content: SiteContent, route: Route) {
   return screen(
     "other",
     "hion-page-title",
-    hungTitle("hion-page-title", title, eyebrow || undefined, intro || undefined),
+    opening("hion-page-title", title, eyebrow || undefined, intro || undefined),
     hasContent ? loop({ class: "hion-loop--other", "aria-label": title }, rest) : null,
   );
 }

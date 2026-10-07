@@ -458,6 +458,17 @@ Derived "content": page numbers are hard-coded (`ch:45-48,276-281`, labs `15+i`,
 
 No new copy, no new reads of `content.json`, no `route.main`: the cloth's only inputs are layout and slugs.
 
+**Text on the thread (`hion/text-on-thread`).** Where the words sit changed; what they read did not (the same parts, the same fields).
+
+| Part | Where it hangs now | Built by |
+|---|---|---|
+| Page opening (eyebrow, h1, intro, actions; project/lab/post meta, links, tools) | Across the hions' way down from the current destination (drawn in toward the middle): the title hangs from a branch on the side with room, the intro is tied on at a `knot` station on the other side, pull-cords and tags hang under the title. Phones: one column, stepped a little | `S:opening`, `S:pageTitle` |
+| About opening | Title and action-cord on the far side of the portrait, intro tied on at a knot on the near side; cyan circles the portrait | `S:about` |
+| H9 updates, writing list, H11 Elsewhere | Strands, not loops: the hions run down together, knotted at each entry; the entry is tied on beside its knot by turns either side, date level with the knot, title beneath. Wide screens: each rides up beside the one before. Phones: one column, knots on the right | `S:knotted`, `S:home`, `S:writing` |
+| Long reading (About, project, lab and post bodies, resume) | A ~60ch column held right of centre; h2s hang out past the cyan strand, the resume's h3 knots sit on it | `S:story`, `shell.css` |
+
+The new marks are layout only: `data-spine="knot"` (the two meet and are tied there), `data-tie` outside a loop (a short thread to the hions at the element's first line) and wefts thrown from the hions to a heading beside them (`weave.ts`).
+
 Line numbers are from the current tree and are still moving. `S` = `HI/screens.ts`.
 
 **content.json reads**

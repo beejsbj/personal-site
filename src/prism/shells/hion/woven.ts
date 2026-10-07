@@ -64,13 +64,20 @@ function letters(el: HTMLElement, pitch: number) {
     for (const match of text.matchAll(/\S+/g)) {
       range.setStart(node, match.index);
       range.setEnd(node, match.index + match[0].length);
-      const rect = range.getClientRects()[0];
-      if (!rect) continue;
-      const metrics = ctx.measureText(match[0]);
-      const x = rect.left - own.left + ROOM;
-      const y = rect.top - own.top + ROOM + metrics.fontBoundingBoxAscent;
-      ctx.fillText(match[0], x, y);
-      ctx.strokeText(match[0], x, y);
+      if (!range.getClientRects()[0]) continue;
+      // A word broken over two lines (at a hyphen) is drawn a line at a time.
+      for (const [start, end] of lineRuns(range, node, match.index, match.index + match[0].length)) {
+        range.setStart(node, start);
+        range.setEnd(node, end);
+        const rect = range.getClientRects()[0];
+        if (!rect) continue;
+        const piece = text.slice(start, end);
+        const metrics = ctx.measureText(piece);
+        const x = rect.left - own.left + ROOM;
+        const y = rect.top - own.top + ROOM + metrics.fontBoundingBoxAscent;
+        ctx.fillText(piece, x, y);
+        ctx.strokeText(piece, x, y);
+      }
     }
   }
   range.detach();
@@ -93,6 +100,29 @@ function letters(el: HTMLElement, pitch: number) {
     }
   }
   return { mask, cols, rows, w, h };
+}
+
+/** The stretches of [from, to) in a text node that sit on one line each. */
+function lineRuns(range: Range, node: Node, from: number, to: number): [number, number][] {
+  range.setStart(node, from);
+  range.setEnd(node, to);
+  if (range.getClientRects().length < 2) return [[from, to]];
+  const runs: [number, number][] = [];
+  let start = from;
+  let top: number | undefined;
+  for (let i = from; i < to; i++) {
+    range.setStart(node, i);
+    range.setEnd(node, i + 1);
+    const rect = range.getClientRects()[0];
+    if (!rect) continue;
+    if (top !== undefined && Math.abs(rect.top - top) > rect.height / 2) {
+      runs.push([start, i]);
+      start = i;
+    }
+    top = rect.top;
+  }
+  runs.push([start, to]);
+  return runs;
 }
 
 /** Below this size a woven letter is too few crossings to read: the
