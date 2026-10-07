@@ -83,8 +83,8 @@ function show(route: Route, first: boolean) {
   stage.replaceChildren(page);
   // Its fabric pulled down from the line like a blind (not on arrival: the
   // line and the page come together then).
-  if (!first && !still()) pullDown(page, fabric);
   nav.setCurrent(route.path);
+  if (!first && !still()) pullDown(page, fabric);
   // Which side the threads drop on, so the screen's head keeps clear of them.
   const drop = nav.origin();
   if (drop) {
@@ -151,25 +151,63 @@ function show(route: Route, first: boolean) {
   if (!first && !ctx.face) main.focus({ preventScroll: true });
 }
 
-/** Pull a new screen down from the line: its first screenful drops into
- * view like cloth let down, a woven hem of its own fabric at the leading
- * edge, landing with a little bounce; then the hem rolls away. */
+/** Pull a new screen down out of the swatch of its own cloth hanging
+ * from the line: a ribbon of the page drops from the swatch to the foot of
+ * the screen, a woven hem at its leading edge, then spreads sideways until
+ * it is the whole page. Nothing slides under the line; it all comes out of
+ * the thing you pulled. */
 function pullDown(page: HTMLElement, fabric: Fabric) {
-  const fold = innerHeight;
-  page.style.setProperty("--hion-fold", `${fold}px`);
+  const pageBox = page.getBoundingClientRect();
   const width = page.clientWidth || innerWidth;
-  const band = clothCanvas(fabric, Math.ceil(width / 5), 5, 5, 41);
+  const height = page.scrollHeight;
+  const fold = innerHeight - pageBox.top;
+  // Where it comes from: the swatch, or (no swatch shown) where the
+  // threads drop from.
+  const drop = nav.origin();
+  const from = nav.swatch() ?? {
+    left: (drop?.[0] ?? width / 2) - 22,
+    right: (drop?.[0] ?? width / 2) + 22,
+    top: 60,
+    bottom: 70,
+  };
+  const l = from.left - pageBox.left;
+  const r = width - (from.right - pageBox.left);
+  const t = from.top - pageBox.top;
+  const below = (y: number) => Math.max(0, height - y);
+  const clip = (top: number, right: number, bottom: number, left: number) =>
+    `inset(${top}px ${right}px ${bottom}px ${left}px)`;
+  const drop1 = 0.5;
+  page.animate(
+    [
+      { clipPath: clip(t, r, below(t + 20), l), easing: "cubic-bezier(0.55, 0, 0.75, 0.35)" },
+      { clipPath: clip(t, r, below(fold), l), offset: drop1, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" },
+      { clipPath: clip(0, 0, below(fold), 0) },
+    ],
+    { duration: 1000 },
+  );
+  // The hem: a band of its cloth riding the leading edge, then widening
+  // with it, and rolled away.
+  const band = clothCanvas(fabric, Math.ceil(width / 5), 4, 5, 41);
   band.className = "hion-hem__cloth";
   const hem = h("div", { class: "hion-hem", "aria-hidden": "true" }, band);
   page.append(hem);
-  page.dataset.unroll = "";
-  const done = (event: AnimationEvent) => {
-    if (event.target !== page) return;
-    delete page.dataset.unroll;
-    page.removeEventListener("animationend", done);
-  };
-  page.addEventListener("animationend", done);
-  hem.addEventListener("animationend", () => hem.remove(), { once: true });
+  const at = (top: number, left: number, w: number) => ({
+    top: `${top}px`,
+    left: `${left}px`,
+    width: `${w}px`,
+  });
+  const w0 = width - l - r;
+  hem
+    .animate(
+      [
+        { ...at(t, l, w0), easing: "cubic-bezier(0.55, 0, 0.75, 0.35)" },
+        { ...at(fold - 20, l, w0), offset: drop1, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" },
+        at(fold - 20, 0, width),
+      ],
+      { duration: 1000, fill: "forwards" },
+    )
+    .finished.then(() => hem.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" }).finished)
+    .then(() => hem.remove(), () => hem.remove());
 }
 
 /** A single thing seen close: a project, a lab entry, a post. */

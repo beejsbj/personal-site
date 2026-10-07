@@ -298,59 +298,23 @@
     transform 0.38s var(--hion-ease-out);
 }
 
-/* A new page is its fabric pulled down from the line (index.ts pullDown):
-   its first screenful drops into view like a blind let down, a woven hem
-   of its own cloth at the leading edge, and lands with a little give. */
-:root[data-lens="hion"] .hion-page[data-unroll] {
-  animation: hion-pull 0.95s cubic-bezier(0.32, 1.28, 0.5, 1);
-}
-
-/* It comes out from behind the line at the top (clipped above it), so
-   nothing of it shows until it has passed under the names hanging from
-   it. */
-@keyframes hion-pull {
-  from {
-    translate: 0 calc(-1 * var(--hion-fold));
-    clip-path: inset(calc(var(--hion-fold) + 150px) 0 calc(100% - var(--hion-fold)) 0);
-  }
-
-  to {
-    translate: 0 0;
-    clip-path: inset(150px 0 calc(100% - var(--hion-fold)) 0);
-  }
-}
-
+/* A new page comes out of its swatch on the line (index.ts pullDown);
+   this is the woven hem riding its leading edge. */
 :root[data-lens="hion"] .hion-hem {
   position: absolute;
-  top: calc(var(--hion-fold) - 25px);
-  left: 0;
   z-index: 3;
-  width: 100%;
-  height: 25px;
+  height: 20px;
+  overflow: hidden;
   pointer-events: none;
-  transform-origin: 50% 0;
-  animation: hion-hem 1.5s ease-in both;
 }
 
 :root[data-lens="hion"] .hion-hem__cloth {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  object-position: left top;
   filter: drop-shadow(0 6px 10px rgb(6 4 8 / 0.9));
-}
-
-/* Hangs there while it falls, then is rolled up out of the way. */
-@keyframes hion-hem {
-  0%,
-  62% {
-    opacity: 1;
-    scale: 1 1;
-  }
-
-  100% {
-    opacity: 0;
-    scale: 1 0;
-  }
 }
 
 :root[data-lens="hion"] .hion-page > main,

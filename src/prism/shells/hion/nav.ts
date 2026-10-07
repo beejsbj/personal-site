@@ -34,6 +34,9 @@ export interface Nav {
   /** The line's height at page x, at rest. */
   cordY(x: number): number;
   setCurrent(path: string): void;
+  /** The swatch of cloth under the current destination's name, on screen
+   * (null when it is not shown, as on a phone). */
+  swatch(): DOMRect | null;
   close(): void;
 }
 
@@ -290,6 +293,11 @@ export function createNav(
       }
       if (el.dataset.state === "dropped") setState(scrollY < 150 ? "rest" : "stowed");
       hangCharms();
+    },
+    swatch() {
+      const current = nav.querySelector<HTMLElement>(".hion-charm[data-current] .hion-swatch");
+      const box = current?.getBoundingClientRect();
+      return box && box.width > 0 && box.height > 0 ? box : null;
     },
     close() {
       if (el.dataset.state === "dropped") setState("rest");
