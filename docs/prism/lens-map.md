@@ -419,6 +419,31 @@ Derived "content": page numbers are hard-coded (`ch:45-48,276-281`, labs `15+i`,
 
 ### 3.4 Hion (`HI`, provisional)
 
+**The living weave (exploration, `prism/hion-living-weave`).** Under the two dancing hions every screen now has a cloth (`HI/cloth.ts`): a coarse grid of thread crossings running two-species Game of Life (Immigration, `HI/immigration.ts`), drawn as pastel thread between neighbouring live crossings, with a faint woven ground wherever life has been (`HI/stitch.ts`). It reads no content of its own; it reads the screen's layout:
+
+| What the screen has | What the cloth does with it | Read from |
+|---|---|---|
+| Any text, `img`, `video`, `svg`, `a`, `button` in `main`/`footer` | Holds those crossings empty, so words always sit on black paper | text-node line boxes and element boxes, measured with transforms off (`.hion-measuring`) |
+| Columns clear of content down the page edges (wide screens) | Selvages: living strips, cyan-leaning left, magenta-leaning right, sown band by band as the hions reach them | the held map |
+| Six or more clear rows between sections | A soup across the gap, so life runs between sections (phones get their cloth here) | the held map |
+| Where the cyan and magenta hions cross | A glider, a burst (R-pentomino, pi) or a blinker, sown when the drawing reaches it | `loom.journeys()` |
+| `[data-frame]` (project charms, lab charms, the portrait, a project's or lab entry's head) | Woven tape at two corners with a still knot at each; the pattern comes from the attribute's value (the slug), so a project's tape on the list and on its page match | `HI/screens.ts` |
+| `[data-weft]` headings | Tape along the weft, out from the words both ways, tied off in a knot | `HI/screens.ts` |
+| Project and lab-entry routes | The same cloth at twice the scale; each thread shows two twisting plies. Following a project link out of a list magnifies the old cloth round the link | `route.kind`, the clicked link |
+
+No new copy, no new reads of `content.json`, no `route.main`: the cloth's only inputs are layout and slugs.
+
+**Text on the thread (`hion/text-on-thread`).** Where the words sit changed; what they read did not (the same parts, the same fields).
+
+| Part | Where it hangs now | Built by |
+|---|---|---|
+| Page opening (eyebrow, h1, intro, actions; project/lab/post meta, links, tools) | Across the hions' way down from the current destination (drawn in toward the middle): the title hangs from a branch on the side with room, the intro is tied on at a `knot` station on the other side, pull-cords and tags hang under the title. Phones: one column, stepped a little | `S:opening`, `S:pageTitle` |
+| About opening | Title and action-cord on the far side of the portrait, intro tied on at a knot on the near side; cyan circles the portrait | `S:about` |
+| H9 updates, writing list, H11 Elsewhere | Strands, not loops: the hions run down together, knotted at each entry; the entry is tied on beside its knot by turns either side, date level with the knot, title beneath. Wide screens: each rides up beside the one before. Phones: one column, knots on the right | `S:knotted`, `S:home`, `S:writing` |
+| Long reading (About, project, lab and post bodies, resume) | A ~60ch column held right of centre; h2s hang out past the cyan strand, the resume's h3 knots sit on it | `S:story`, `shell.css` |
+
+The new marks are layout only: `data-spine="knot"` (the two meet and are tied there), `data-tie` outside a loop (a short thread to the hions at the element's first line) and wefts thrown from the hions to a heading beside them (`weave.ts`).
+
 Line numbers are from the current tree and are still moving. `S` = `HI/screens.ts`.
 
 **content.json reads**

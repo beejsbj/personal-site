@@ -19,10 +19,14 @@
 import type { LensShell, Route, ShellContext } from "../types";
 import { h, setNewTabNote, wait } from "./dom";
 import { ink } from "./ink";
+import { createCloth } from "./cloth";
+import { type Fabric, fabricOf } from "./fabric";
 import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
+import { clothCanvas } from "./stitch";
+import { weaveCovers, weaveType } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { compose } from "./weave";
 import "./shell.css";
@@ -31,6 +35,7 @@ interface Live {
   path: string;
   page: HTMLElement;
   loom: ReturnType<typeof createLoom>;
+  cloth: ReturnType<typeof createCloth>;
   life: ReturnType<typeof createLife> | undefined;
   controller: AbortController;
 }
@@ -63,14 +68,23 @@ function show(route: Route, first: boolean) {
   const controller = new AbortController();
   ctx.signal.addEventListener("abort", () => controller.abort(), { once: true });
   const main = buildScreen(ctx.content, route);
+  const fabric = fabricOf(route.kind);
   const page = h(
     "div",
-    { class: "hion-page", "data-kind": route.kind, "data-state": first ? "arriving" : "entering" },
+    {
+      class: "hion-page",
+      "data-kind": route.kind,
+      "data-fabric": fabric,
+      "data-state": first ? "arriving" : "entering",
+    },
     main,
     footer(ctx.content),
   );
   stage.replaceChildren(page);
+  // Its fabric pulled down from the line like a blind (not on arrival: the
+  // line and the page come together then).
   nav.setCurrent(route.path);
+  if (!first && !still()) pullDown(page, fabric);
   // Which side the threads drop on, so the screen's head keeps clear of them.
   const drop = nav.origin();
   if (drop) {
@@ -92,6 +106,17 @@ function show(route: Route, first: boolean) {
       return composition;
     },
   });
+  // The living cloth under it all; a single thing is seen close up.
+  const cloth = createCloth({
+    page,
+    loom,
+    signal: controller.signal,
+    instant: still(),
+    scale: close(route) ? 2 : 1,
+    fabric,
+    isIdle: ctx.isIdle,
+    onIdleChange: ctx.onIdleChange,
+  });
   // What moves over the drawing, for a visitor who can see it move.
   const life = still()
     ? undefined
@@ -103,10 +128,14 @@ function show(route: Route, first: boolean) {
         isIdle: ctx.isIdle,
         onIdleChange: ctx.onIdleChange,
       });
-  live = { path: route.path, page, loom, life, controller };
+  live = { path: route.path, page, loom, cloth, life, controller };
   requestAnimationFrame(() => {
     loom.start();
+    cloth.start();
     life?.start();
+    const weaving = { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric };
+    weaveType(page, weaving);
+    weaveCovers(page, weaving);
     page.dataset.state = "here";
   });
   // Keyboard travel ahead of the drawing brings the drawing with it.
@@ -120,6 +149,84 @@ function show(route: Route, first: boolean) {
     { signal: controller.signal },
   );
   if (!first && !ctx.face) main.focus({ preventScroll: true });
+}
+
+/** Pull a new screen down out of the swatch of its own cloth hanging
+ * from the line: a ribbon of the page drops from the swatch to the foot of
+ * the screen, a woven hem at its leading edge, then spreads sideways until
+ * it is the whole page. Nothing slides under the line; it all comes out of
+ * the thing you pulled. */
+function pullDown(page: HTMLElement, fabric: Fabric) {
+  const pageBox = page.getBoundingClientRect();
+  const width = page.clientWidth || innerWidth;
+  const height = page.scrollHeight;
+  const fold = innerHeight - pageBox.top;
+  // Where it comes from: the swatch, or (no swatch shown) where the
+  // threads drop from.
+  const drop = nav.origin();
+  const from = nav.swatch() ?? {
+    left: (drop?.[0] ?? width / 2) - 22,
+    right: (drop?.[0] ?? width / 2) + 22,
+    top: 60,
+    bottom: 70,
+  };
+  const l = from.left - pageBox.left;
+  const r = width - (from.right - pageBox.left);
+  const t = from.top - pageBox.top;
+  const below = (y: number) => Math.max(0, height - y);
+  const clip = (top: number, right: number, bottom: number, left: number) =>
+    `inset(${top}px ${right}px ${bottom}px ${left}px)`;
+  const drop1 = 0.5;
+  page.animate(
+    [
+      { clipPath: clip(t, r, below(t + 20), l), easing: "cubic-bezier(0.55, 0, 0.75, 0.35)" },
+      { clipPath: clip(t, r, below(fold), l), offset: drop1, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" },
+      { clipPath: clip(0, 0, below(fold), 0) },
+    ],
+    { duration: 1000 },
+  );
+  // The hem: a band of its cloth riding the leading edge, then widening
+  // with it, and rolled away.
+  const band = clothCanvas(fabric, Math.ceil(width / 5), 4, 5, 41);
+  band.className = "hion-hem__cloth";
+  const hem = h("div", { class: "hion-hem", "aria-hidden": "true" }, band);
+  page.append(hem);
+  const at = (top: number, left: number, w: number) => ({
+    top: `${top}px`,
+    left: `${left}px`,
+    width: `${w}px`,
+  });
+  const w0 = width - l - r;
+  hem
+    .animate(
+      [
+        { ...at(t, l, w0), easing: "cubic-bezier(0.55, 0, 0.75, 0.35)" },
+        { ...at(fold - 20, l, w0), offset: drop1, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" },
+        at(fold - 20, 0, width),
+      ],
+      { duration: 1000, fill: "forwards" },
+    )
+    .finished.then(() => hem.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" }).finished)
+    .then(() => hem.remove(), () => hem.remove());
+}
+
+/** A single thing seen close: a project, a lab entry, a post. */
+const close = (route: Route) =>
+  route.kind === "project" || route.kind === "lab-entry" || route.kind === "writing-entry";
+
+/** The link you followed, when it opens one thing out of a cloth of many
+ * (a project or a post from a list): the cloth magnifies round it on the way. */
+let followed: { el: HTMLAnchorElement; at: number } | undefined;
+
+function closer(page: HTMLElement, route: Route): [number, number] | undefined {
+  if (!close(route)) return undefined;
+  if (!followed || performance.now() - followed.at > 2000 || !page.contains(followed.el)) return undefined;
+  if (new URL(followed.el.href, location.href).pathname.replace(/\/$/, "") !== route.path.replace(/\/$/, "")) {
+    return undefined;
+  }
+  const p = page.getBoundingClientRect();
+  const r = followed.el.getBoundingClientRect();
+  return [(r.left + r.right) / 2 - p.left, (r.top + r.bottom) / 2 - p.top];
 }
 
 const shell: LensShell = {
@@ -153,6 +260,14 @@ const shell: LensShell = {
     for (const [key, url] of Object.entries(urls)) {
       world.style.setProperty(`--hion-tooth-${key}`, `url("${url}")`);
     }
+    world.addEventListener(
+      "click",
+      (event) => {
+        const el = (event.target as Element).closest?.("a");
+        if (el) followed = { el, at: performance.now() };
+      },
+      { capture: true, signal },
+    );
     root.replaceChildren(world);
     // Let the faces arrive before measuring words to hang them.
     await Promise.race([document.fonts?.ready, wait(600)]);
@@ -169,6 +284,7 @@ const shell: LensShell = {
       leaving.page.dataset.state = "leaving";
       leaving.page.setAttribute("inert", "");
       leaving.loom.release();
+      leaving.cloth.release(closer(leaving.page, route));
       leaving.life?.release();
       await wait(430);
       if (mine !== token) return;

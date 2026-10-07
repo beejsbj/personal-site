@@ -175,7 +175,6 @@ interface Pluck {
   hue: Hue;
   s: number;
   age: number;
-  amp: number;
 }
 
 interface Runner {
@@ -494,7 +493,7 @@ export function createLife(options: LifeOptions) {
       if (hit && (!best || hit.d < best.d)) best = { hue, s: hit.s, d: hit.d, x: strand!.xs[hit.i], y: strand!.ys[hit.i] };
     }
     if (!best) return false;
-    plucks.push({ hue: best.hue, s: best.s, age: 0, amp: best.hue === "c" ? 10 : 13 });
+    plucks.push({ hue: best.hue, s: best.s, age: 0 });
     dust(best.x, best.y, best.hue, 12, 1.4);
     return true;
   }
@@ -797,30 +796,33 @@ export function createLife(options: LifeOptions) {
       if (!strand) continue;
       const half = 84;
       const decay = Math.exp(-p.age / 300);
-      const swing = Math.sin(p.age / 52) * p.amp * decay;
-      ctx.beginPath();
-      for (let u = -1; u <= 1.0001; u += 0.08) {
-        const [x, y, nx, ny] = strand.at(p.s + u * half);
-        const d = swing * Math.cos((u * Math.PI) / 2);
-        const px = x + nx * d;
-        const py = y + ny * d;
-        if (u === -1) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
+      // It rings where it lies: a standing wave of light along the string
+      // itself, its bright bellies breathing in and out. Nothing moves off
+      // the thread, so no second copy of it shows.
+      const breath = Math.abs(Math.sin(p.age / 52)) * decay;
+      const core = `rgb(${RGB[p.hue === "c" ? "cl" : "ml"].join(" ")})`;
+      const light = `rgb(${RGB[p.hue].join(" ")})`;
       ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.globalAlpha = 0.22 * decay;
-      ctx.lineWidth = 14;
-      ctx.strokeStyle = `rgb(${RGB[p.hue].join(" ")})`;
-      ctx.stroke();
-      ctx.globalAlpha = 0.7 * decay;
-      ctx.lineWidth = 5;
-      ctx.strokeStyle = pats[p.hue];
-      ctx.stroke();
-      ctx.globalAlpha = 0.95 * decay;
-      ctx.lineWidth = 1.6;
-      ctx.strokeStyle = `rgb(${RGB[p.hue === "c" ? "cl" : "ml"].join(" ")})`;
-      ctx.stroke();
+      const step = 0.05;
+      for (let u = -1; u < 1; u += step) {
+        // Two bellies either side of the pluck, fading toward the ends.
+        const belly = Math.abs(Math.sin((u + 1) * Math.PI)) * Math.cos((u * Math.PI) / 2);
+        const a = breath * belly;
+        if (a < 0.03) continue;
+        const [x0, y0] = strand.at(p.s + u * half);
+        const [x1, y1] = strand.at(p.s + (u + step) * half);
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        ctx.globalAlpha = 0.2 * a;
+        ctx.lineWidth = 12;
+        ctx.strokeStyle = light;
+        ctx.stroke();
+        ctx.globalAlpha = 0.85 * a;
+        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = core;
+        ctx.stroke();
+      }
       ctx.globalAlpha = 1;
     }
 
