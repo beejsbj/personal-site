@@ -275,17 +275,19 @@ test("ball labels never wrap, and external balls wear a named satellite on the r
   }
 });
 
-test("one arrow language: every arrow is the satellite, one inked glyph turned for outbound", () => {
-  // Round 7: balls, pills and text links had three different arrows. Now
-  // each is a small burgundy ball carrying the same hand-inked path;
-  // leaving the site only turns it.
+test("arrow iff outbound: the satellite marks leaving the site, never an in-site link", () => {
+  // Round 7 gave balls, pills and text links one arrow (the satellite).
+  // Round 8: the horizontal in-site arrows were noise; an in-site link's
+  // affordance is its peach (stretch, pill, swell) and the cover. Only links
+  // that leave the site carry the arrow, turned to point out of the page.
   const link = read("src/design/primitives/Link.astro");
   assert.equal(
     (link.match(/<path\b/g) || []).length,
     1,
     "one arrow glyph in the family",
   );
-  assert.match(link, /\.link-sat--out \{[^}]*--sat-turn: -45deg/);
+  assert.match(link, /\.link-sat \{[^}]*--sat-turn: -45deg/);
+  assert.doesNotMatch(link, /link-sat--out/, "no second, in-site arrow");
   assert.match(
     link,
     /prefers-reduced-motion: no-preference\) \{[\s\S]*?\.link-sat \{\s*translate/,
@@ -293,10 +295,12 @@ test("one arrow language: every arrow is the satellite, one inked glyph turned f
   );
   assert.match(link, /forced-colors: active\) \{\s*\.link-sat \{\s*border/);
   const paths = new Set();
+  let outboundSeen = 0;
   for (const page of [
     "index.html",
     "about/index.html",
     "projects/index.html",
+    "style-guide/index.html",
   ]) {
     const html = read(`dist/client/${page}`);
     assert.doesNotMatch(
@@ -308,17 +312,38 @@ test("one arrow language: every arrow is the satellite, one inked glyph turned f
       /<a\b([^>]*ds-link--(?:pill|text|ball)[^>]*)>([\s\S]*?)<\/a>/g,
     )) {
       const sat = body.match(
-        /<span class="link-sat( link-sat--out)?"[^>]*aria-hidden="true"[^>]*>[\s\S]*?<path d="([^"]+)"/,
+        /<span class="link-sat"[^>]*aria-hidden="true"[^>]*>[\s\S]*?<path d="([^"]+)"/,
       );
-      if (!sat) continue;
-      paths.add(sat[2]);
       const outbound = /href="(?:https?:|mailto:)/.test(attrs);
-      assert.equal(Boolean(sat[1]), outbound, `${page}: turned iff outbound`);
-      if (outbound)
-        assert.match(body, /ds-link__note[^>]*>\(/, `${page}: says where`);
+      if (!outbound) {
+        assert.doesNotMatch(body, /link-sat/, `${page}: in-site link with an arrow`);
+        continue;
+      }
+      if (!sat) continue;
+      outboundSeen++;
+      paths.add(sat[1]);
+      assert.match(body, /ds-link__note[^>]*>\(/, `${page}: says where`);
     }
   }
+  assert.ok(outboundSeen > 0, "some outbound link carries the arrow");
   assert.equal(paths.size, 1, "every satellite carries the same glyph");
+  // The style guide shows both sides of the rule, for pills and text links.
+  const guide = read("dist/client/style-guide/index.html");
+  for (const kind of ["pill", "text"]) {
+    const links = [
+      ...guide.matchAll(
+        new RegExp(`<a\\b([^>]*ds-link--${kind}\\b[^>]*)>([\\s\\S]*?)</a>`, "g"),
+      ),
+    ];
+    assert.ok(
+      links.some(([, a, b]) => /href="\//.test(a) && !/link-sat/.test(b)),
+      `style guide: an in-site ${kind} without an arrow`,
+    );
+    assert.ok(
+      links.some(([, a, b]) => /href="https?:/.test(a) && /link-sat/.test(b)),
+      `style guide: an outbound ${kind} with the arrow`,
+    );
+  }
 });
 
 test("all generated pages have shared chrome and resolving local links and media", () => {
