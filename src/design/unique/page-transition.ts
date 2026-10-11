@@ -253,9 +253,9 @@ export function installPageTransition() {
   });
 }
 
-/** The seed wears the clicked link's type, words and arrow (a text link's
- * arrow rides just outside its pill), so the moment the cover takes the
- * pointer nothing appears to change. */
+/** The seed wears the clicked link's type, words and arrow if it has one
+ * (only outbound links do; a text link's rides just outside its pill), so
+ * the moment the cover takes the pointer nothing appears to change. */
 function dressSeed(seed: HTMLElement, link: Element, kind: "pill" | "text") {
   const style = getComputedStyle(link);
   for (const property of [

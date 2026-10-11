@@ -9,8 +9,8 @@ interface Props {
   intro?: string;
   level?: 1 | 2;
   scale?: "page" | "post";
-  /** Action links under the intro: pills with an arrow; a mail link stays
-   * plain text. */
+  /** Action links under the intro: pills (outbound ones carry the arrow);
+   * a mail link stays plain text. */
   actions?: { label: string; href: string }[];
   /** The page id, when this header is a page's own: marks page.* parts. */
   page?: string;

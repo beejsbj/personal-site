@@ -8,14 +8,16 @@
  * behind the label's first letters and stretches into a pill on hover.
  * Both paint their shape on a layer that ignores the pointer, so hover lift
  * and press squish never move the hit area: a press is always a click.
- * One arrow for the whole family, the satellite: a small burgundy ball
- * carrying one hand-inked arrow. Inside the site it points along the line;
- * leaving the site, the same arrow turns to point out of the page. It sits
- * after a pill's or text link's words, and on a ball's rim. On hover the
- * peach reaches it (the pill's stretch, the text link's pill, the ball's
- * swell) and kicks it a little way along its arrow.
- * Outbound arrows (and a ball's satellite) also add a hidden "(external
- * site)", "(opens in a new tab)" or "(email)" to the link's name.
+ * An arrow means leaving the site, and only that. Inside the site a link
+ * has no arrow: the peach is its affordance (the pill's stretch, the text
+ * link's pill, the ball's swell) and the cover swelling from it on click.
+ * Leaving the site, the link wears the satellite: a small burgundy ball
+ * carrying one hand-inked arrow turned to point out of the page, after a
+ * pill's or text link's words (when `arrow` asks for it) and always on an
+ * outbound ball's rim. On hover the peach reaches it and kicks it a little
+ * way along its arrow.
+ * The satellite also adds a hidden "(external site)", "(opens in a new
+ * tab)" or "(email)" to the link's name.
  */
 import type { HTMLAttributes } from "astro/types";
 interface Props extends Omit<HTMLAttributes<"a">, "href"> {
@@ -54,10 +56,12 @@ const note =
     : undefined;
 // One hand-inked arrow (artwork): the shaft is a little throw, rising from
 // low left and landing on the line, with a head of uneven arms set to the
-// arc's landing angle. Outbound turns it; it is never a second glyph.
+// arc's landing angle. The satellite turns it to point out of the page.
 const ARROW =
   "M2.5 9.4C5.3 7.5 9 7.4 13 8.2M9.5 4.6c1.3 1.2 2.4 2.3 3.5 3.6-1.4.9-2.6 2-3.6 3.5";
-const satellite = ball ? outbound : arrow;
+// Arrow iff outbound: `arrow` on an in-site link draws nothing (callers
+// with data-driven hrefs may pass it either way).
+const satellite = outbound && (ball || arrow);
 ---
 
 <Tag
@@ -77,10 +81,7 @@ const satellite = ball ? outbound : arrow;
     {note && <span class="ds-link__note">{note}</span>}
   </span>
   {satellite && (
-    <span
-      class:list={["link-sat", { "link-sat--out": outbound }]}
-      aria-hidden="true"
-    >
+    <span class="link-sat" aria-hidden="true">
       <svg
         viewBox="0 0 16 16"
         fill="none"
@@ -106,7 +107,8 @@ const satellite = ball ? outbound : arrow;
   }
   /* Text links rest on a pencil rule painted on the label. Their hover
      belongs to the ball family: the rule gives way to a peach pill that
-     grows behind the words from the left, toward the satellite. */
+     grows behind the words from the left (toward the satellite, when the
+     link leaves the site). */
   .ds-link--text .link-label {
     padding-bottom: var(--underline-pad);
     background-repeat: no-repeat;
@@ -144,14 +146,14 @@ const satellite = ball ? outbound : arrow;
       transition: background-size var(--duration-hover) var(--ease-settle);
     }
   }
-  /* The satellite: the family's one arrow. A small burgundy ball with a
-     cream, hand-inked arrow; outbound, the same arrow turns to point out of
-     the page. On hover the peach reaches it and kicks it along its arrow,
-     with the ink leading a touch further than the ball. */
+  /* The satellite: the family's one arrow, for leaving the site. A small
+     burgundy ball with a cream, hand-inked arrow turned to point out of the
+     page. On hover the peach reaches it and kicks it along its arrow, with
+     the ink leading a touch further than the ball. */
   .link-sat {
-    --sat-turn: 0deg;
-    --sat-dx: var(--link-sat-kick);
-    --sat-dy: 0;
+    --sat-turn: -45deg;
+    --sat-dx: var(--link-sat-kick-diagonal);
+    --sat-dy: calc(-1 * var(--link-sat-kick-diagonal));
     display: inline-grid;
     place-items: center;
     box-sizing: border-box;
@@ -163,11 +165,6 @@ const satellite = ball ? outbound : arrow;
     color: var(--ball-ink-current);
     vertical-align: middle;
     pointer-events: none;
-  }
-  .link-sat--out {
-    --sat-turn: -45deg;
-    --sat-dx: var(--link-sat-kick-diagonal);
-    --sat-dy: calc(-1 * var(--link-sat-kick-diagonal));
   }
   .link-sat svg {
     width: var(--link-sat-glyph);
@@ -369,7 +366,8 @@ const satellite = ball ? outbound : arrow;
     white-space: nowrap;
   }
   /* Pill (v2's .button), the family's action link: a peach ball rests
-     behind the label's first letters and stretches into a pill on hover.
+     behind the label's first letters and stretches into a pill on hover
+     (and, clicked, swells into the page transition's cover).
      Wine: the pill is already full and burgundy (a primary action). */
   .ds-link--pill {
     position: relative;
@@ -400,9 +398,13 @@ const satellite = ball ? outbound : arrow;
   .ds-link--pill:is(:hover, :focus-visible) {
     text-decoration: none;
   }
+  /* In the site a pill has no arrow: the stretch is the whole affordance.
+     The peach runs out under the label (the label never moves) and lifts
+     off the page like a hovered ball. */
   .ds-link--pill:is(:hover, :focus-visible)::before {
     width: 100%;
     background: var(--ball-fill-hover);
+    box-shadow: var(--shadow-ball-raised);
   }
   .ds-link--pill.ds-link--wine {
     padding-inline: var(--space-m);
@@ -423,6 +425,7 @@ const satellite = ball ? outbound : arrow;
       transition:
         width var(--duration-hover) var(--ease-pop),
         background-color var(--duration-hover) var(--ease-feedback),
+        box-shadow var(--duration-hover) var(--ease-settle),
         scale var(--duration-fast) var(--ease-feedback);
     }
   }

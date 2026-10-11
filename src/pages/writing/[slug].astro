@@ -100,7 +100,7 @@ const { subtitle, date, canonical, cover } = entry?.data ?? {};
       </aside>
 
       <div class="entry-page__links" {...part("writing.links", entry.slug)}>
-        <Link href="/writing" treatment="pill" arrow>
+        <Link href="/writing" treatment="pill">
           {copy.backLabel}
         </Link>
       </div>
@@ -116,7 +116,7 @@ const { subtitle, date, canonical, cover } = entry?.data ?? {};
         }
       />
       <div class="entry-page__links">
-        <Link href="/writing" treatment="pill" arrow>
+        <Link href="/writing" treatment="pill">
           {copy.backLabel}
         </Link>
         <Link href={site.writingUrl} treatment="pill" newTab arrow>

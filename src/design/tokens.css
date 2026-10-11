@@ -157,11 +157,10 @@
   --shadow-ball-raised: -0.5rem 0.75rem 1.5rem #30232040;
   --welcome-copy-width: 32ch;
   --feature-media-width: 45%;
-  /* The satellite: the family's one arrow (a small ball, hand-inked). */
+  /* The satellite: the one arrow, for leaving the site (a small ball, hand-inked). */
   --link-sat-size: min(1.125em, 1.5rem);
   --link-sat-glyph: 68%;
   --link-sat-gap: 0.3em;
-  --link-sat-kick: 0.1875rem;
   --link-sat-kick-diagonal: 0.135rem;
   --link-sat-lead: 0.5;
   --ease-feedback: ease;
