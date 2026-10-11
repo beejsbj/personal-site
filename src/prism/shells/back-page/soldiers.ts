@@ -303,7 +303,8 @@ class Troupe {
     for (const page of pages) {
       if (this.lives.has(page)) continue;
       const kind = page.dataset.kind ?? "";
-      if (["cover", "inside-cover", "back"].includes(kind) || "oversize" in page.dataset) continue;
+      // covers are left alone, unless one has been lived on (the composition book's times table)
+      if ((["cover", "inside-cover", "back"].includes(kind) && !page.dataset.life) || "oversize" in page.dataset) continue;
       this.settle(page, 0);
     }
   }
@@ -368,7 +369,27 @@ class Troupe {
     }
     found.sort((a, b) => b.score - a.score);
     const want = spare ? 6 : page.dataset.side === "single" ? 2 : 3;
-    const chosen: typeof found = [];
+    const chosen: ((typeof found)[number] & { side?: Side })[] = [];
+    const apart = (c: (typeof found)[number]) =>
+      !chosen.some((o) => Math.hypot(o.x - c.x, o.y - c.y) < (o.R + c.R) * 2.2 + 14);
+    // a page may say where a side is dug in (a `data-dug-in` point by a cell, a
+    // corner): that side camps in the clear paper nearest it, if any is close
+    const P = page.getBoundingClientRect();
+    for (const spot of page.querySelectorAll<HTMLElement>("[data-dug-in]")) {
+      const r = spot.getBoundingClientRect();
+      const sx = r.left + r.width / 2 - P.left;
+      const sy = r.top + r.height / 2 - P.top;
+      let near: (typeof found)[number] | null = null;
+      let nearD = fs * 4;
+      for (const c of found) {
+        const d = Math.hypot(c.x - sx, c.y - sy) - (c.R === big ? fs * 0.3 : 0);
+        if (d < nearD && apart(c)) {
+          near = c;
+          nearD = d;
+        }
+      }
+      if (near) chosen.push({ ...near, side: spot.dataset.dugIn === "red" ? "red" : "blue" });
+    }
     if (spare) {
       // an empty page: spread the camps over it, each as far from the rest as it can be
       const pool = found.filter((c) => c.R === big);
@@ -389,8 +410,7 @@ class Troupe {
     } else
       for (const c of found) {
         if (chosen.length >= want) break;
-        if (chosen.some((o) => Math.hypot(o.x - c.x, o.y - c.y) < (o.R + c.R) * 2.2 + 14)) continue;
-        chosen.push(c);
+        if (apart(c)) chosen.push(c);
       }
     if (!chosen.length) return null;
 
@@ -400,7 +420,7 @@ class Troupe {
     page.append(top);
     const life: PageLife = {
       page,
-      kind: spare ? "spare" : (page.dataset.kind ?? ""),
+      kind: spare ? "spare" : (page.dataset.life ?? page.dataset.kind ?? ""),
       space,
       ink,
       top,
@@ -415,8 +435,8 @@ class Troupe {
     // there before; elsewhere they take turns, so every page has both if it can
     const first: Side = side === "right" ? "red" : "blue";
     const byY = [...chosen].sort((p, q) => p.y - q.y);
-    const sides = chosen.map((c, i): Side =>
-      spare ? (byY.indexOf(c) < Math.floor(chosen.length / 2) ? "red" : "blue") : i % 2 ? foe(first) : first,
+    const sides = chosen.map(
+      (c, i): Side => c.side ?? (spare ? (byY.indexOf(c) < Math.floor(chosen.length / 2) ? "red" : "blue") : i % 2 ? foe(first) : first),
     );
     const reveal = this.alive;
     chosen.forEach((c, i) => {
@@ -697,9 +717,11 @@ class Troupe {
     const page = this.talk.page[m.life.kind];
     const theme = m.life.page.closest<HTMLElement>("[data-theme]")?.dataset.theme as ThemeId | undefined;
     const paper = theme ? this.talk.paper[theme] : undefined;
+    // a page with a life of its own (the times table) is talked about more
+    const own = m.life.page.dataset.life ? 0.32 : 0;
     let line: Line;
-    if (roll < 0.4 && mates.length) line = pick(this.talk.chats);
-    else if (roll < 0.58 && page) line = pick(page);
+    if (roll < 0.4 - own && mates.length) line = pick(this.talk.chats);
+    else if (roll < 0.58 + own / 2 && page) line = pick(page);
     else if (roll < 0.7 && paper) line = pick(paper);
     else if (roll < 0.78) line = pick(this.talk.say.banter);
     else line = pick(this.talk.idle);
@@ -841,7 +863,9 @@ class Troupe {
             .sort((p, q) => Math.abs(p.y - from.y) - Math.abs(q.y - from.y))[0];
           if (!shooter) break outer;
           const across = Math.abs(to.x - from.x);
-          best = { m: shooter, from, to, score: across * 1.2 + Math.abs(to.y - from.y) * 0.2 + Math.random() * 80 + (B.c === prefer ? 400 : 0) };
+          // a page with a war of its own (the times table) mostly keeps it at home
+          const home = A.l === B.l && A.l.page.dataset.life ? 260 : 0;
+          best = { m: shooter, from, to, score: across * 1.2 + Math.abs(to.y - from.y) * 0.2 + Math.random() * 80 + home + (B.c === prefer ? 400 : 0) };
           break outer;
         }
       }
