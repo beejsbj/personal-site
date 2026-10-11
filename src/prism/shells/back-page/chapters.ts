@@ -15,13 +15,20 @@ import { h, handDate, link, shortDate, svg } from "./dom";
 import {
   BLUE,
   RED,
+  arrow,
   camp,
   doodle,
+  face,
+  fallen,
   flick,
   miniWar,
+  ring,
   seed,
+  shading,
+  strike,
   tally,
   tapeClip,
+  tick,
   underline,
 } from "./ink";
 import { paginate, type Blank } from "./paginate";
@@ -393,26 +400,82 @@ function insideCover(b: Build) {
   return page;
 }
 
+/** What a bored hand did to the printed times table, by [row, column]: the
+ * sevens half shaded in while he learnt them, and marked hard; seven eights
+ * guessed wrong, crossed out and put right in the margin, the printed answer
+ * ringed in red; nine nines ringed;
+ * ticks by the tables he knew; a hundred's noughts made eyes; and one
+ * of Dawood's men crossed out by the 144 corner, from a war fought here
+ * before. The two camps' places are where the war is now: Blue by the last
+ * row, Red dug in behind 144, so their shots rule along its lines. */
+const USED = {
+  shade: { row: 7, cells: 6.5 },
+  guess: { row: 7, col: 8, wrote: 54 },
+  ringed: [9, 9],
+  known: [1, 2, 5, 10],
+  face: [10, 10],
+  fallen: [12, 11],
+  camps: { blue: 12, red: [12, 12] },
+} as const;
+
 /** The composition book's inside cover, printed as the bought ones are: a
  * times table and a few conversions in black on the grey board, and the
- * owner's name written in above them. The printed matter is furniture, so
- * it's kept from screen readers; the name isn't. */
+ * owner's name written in above them. It's been used: there are scribbles
+ * on the table (`USED`) and the war in the margins is camped round it. The
+ * printed matter and the scribbles are furniture, so they're kept from
+ * screen readers; the name isn't. */
 function compositionInsideCover(b: Build) {
   const { page, flow } = blankPage(b.copy, "inside-cover", "kraft-in");
+  // the soldiers live on this inside cover (soldiers.ts reads its own lines for it)
+  page.dataset.life = "times";
   const { insideCover: ic } = b.copy.writing;
+  const rng = seed("composition-times");
   const n = Array.from({ length: 12 }, (_, i) => i + 1);
+  const at = (cell: readonly number[], i: number, j: number) => cell[0] === i && cell[1] === j;
+  const ink = (markup: string) => svg(markup);
+
+  const rowHead = (i: number) => {
+    const kids: Node[] = [document.createTextNode(String(i))];
+    if ((USED.known as readonly number[]).includes(i)) kids.push(ink(tick(RED, rng)));
+    if (i === USED.shade.row)
+      kids.push(h("span", { class: "bp-times__note" }, ic.hard, ink(arrow(BLUE, rng))));
+    if (i === USED.camps.blue) kids.push(h("i", { class: "bp-dugin", "data-dug-in": "blue" }));
+    return h("th", { class: kids.length > 1 ? "bp-inked" : null }, kids);
+  };
+
+  const cell = (i: number, j: number) => {
+    const kids: (Node | string)[] = [String(i * j)];
+    const { shade, guess } = USED;
+    if (i === shade.row && j === 1) {
+      const s = ink(shading(shade.cells, rng));
+      s.style.setProperty("--cells", String(shade.cells));
+      kids.push(s);
+    }
+    // the slip: ringed in red where it's printed, put right in the margin
+    if (i === guess.row && j === guess.col) kids.push(ink(ring(RED, rng)));
+    if (i === guess.row && j === n.length)
+      kids.push(
+        h(
+          "span",
+          { class: "bp-times__guess" },
+          h("span", { class: "bp-times__wrong" }, String(guess.wrote), ink(strike(BLUE, rng))),
+          ` ${guess.row * guess.col}`,
+        ),
+      );
+    if (at(USED.ringed, i, j)) kids.push(ink(ring(BLUE, rng)));
+    if (at(USED.face, i, j)) kids.push(ink(face(BLUE, rng)));
+    if (at(USED.fallen, i, j)) kids.push(ink(fallen(RED, BLUE, rng)));
+    if (at(USED.camps.red, i, j)) kids.push(h("i", { class: "bp-dugin", "data-dug-in": "red" }));
+    const cls = [i === j ? "bp-times__sq" : "", kids.length > 1 ? "bp-inked" : ""].join(" ").trim();
+    return h("td", { class: cls || null }, kids);
+  };
+
   const table = h(
     "table",
-    { class: "bp-times" },
+    { class: "bp-times", "data-rules": "" },
     h("caption", null, ic.tables),
     h("thead", null, h("tr", null, h("th", null, "×"), ...n.map((j) => h("th", null, String(j))))),
-    h(
-      "tbody",
-      null,
-      ...n.map((i) =>
-        h("tr", null, h("th", null, String(i)), ...n.map((j) => h("td", { class: i === j ? "bp-times__sq" : null }, String(i * j)))),
-      ),
-    ),
+    h("tbody", null, ...n.map((i) => h("tr", null, rowHead(i), ...n.map((j) => cell(i, j))))),
   );
   const conversions: [string, string[]][] = [
     [ic.length, ["1 in = 2.54 cm", "1 ft = 0.305 m", "1 mi = 1.61 km"]],
@@ -424,6 +487,8 @@ function compositionInsideCover(b: Build) {
     { class: "bp-convs" },
     h("p", { class: "bp-convs__title" }, ic.conversionHeader),
     ...conversions.map(([name, rows]) => h("dl", null, h("dt", null, name), ...rows.map((r) => h("dd", null, r)))),
+    // and Dawood signed it, in his red
+    h("span", { class: "bp-times__was" }, ic.was),
   );
   flow.append(
     h("p", { class: "bp-belongs" }, `${b.copy.cover.belongs} `, h("b", null, b.content.site.name)),

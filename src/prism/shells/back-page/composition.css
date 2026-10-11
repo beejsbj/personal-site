@@ -193,6 +193,114 @@
   background: rgba(25, 25, 25, 0.12);
   font-weight: 700;
 }
+
+/* ---- a used book: the scribbles on the printed table (ink.ts, `USED` in
+   chapters.ts). Each is stretched over what it marks, so it stays on its
+   cell at any size. The table is a little narrower than the board, to leave
+   the war its margins, and the board lets a note run past its edge. */
+:root[data-lens="back-page"] .bp-page[data-life="times"] .bp-flow {
+  overflow: visible;
+}
+:root[data-lens="back-page"] .bp-page[data-life="times"] .bp-printed {
+  max-width: 27em;
+}
+:root[data-lens="back-page"] .bp-times .bp-inked {
+  position: relative;
+}
+:root[data-lens="back-page"] .bp-scrawl {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+/* the sevens, shaded over in pencil as far as he got */
+:root[data-lens="back-page"] .bp-scrawl--shade {
+  left: 0;
+  top: 0;
+  width: calc(var(--cells, 1) * 100%);
+  height: 100%;
+  opacity: 0.34;
+  mix-blend-mode: multiply;
+}
+:root[data-lens="back-page"] .bp-scrawl--ring {
+  inset: 4% 6%;
+}
+:root[data-lens="back-page"] .bp-scrawl--face {
+  inset: -36% -18% -44%;
+}
+/* where a side is dug in: a point off the table's edge (soldiers.ts camps there) */
+:root[data-lens="back-page"] .bp-dugin {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+:root[data-lens="back-page"] th .bp-dugin {
+  right: calc(100% + 1.7em);
+}
+:root[data-lens="back-page"] td .bp-dugin {
+  left: calc(100% + 1.7em);
+}
+:root[data-lens="back-page"] .bp-scrawl--fallen {
+  right: -0.6em;
+  bottom: -0.75em;
+  width: 1.7em;
+  height: 1.7em;
+}
+:root[data-lens="back-page"] .bp-scrawl--tick {
+  right: calc(100% + 0.45em);
+  top: 50%;
+  width: 1.3em;
+  height: 1.05em;
+  translate: 0 -55%;
+}
+/* the student's own hand: a wrong guess, a note, Dawood's name */
+:root[data-lens="back-page"] .bp-times__guess {
+  position: absolute;
+  left: calc(100% + 0.4em);
+  top: 50%;
+  font: 700 1.5em/1 var(--bp-hand);
+  color: var(--bp-blue);
+  white-space: nowrap;
+  translate: 0 -55%;
+  rotate: -5deg;
+}
+:root[data-lens="back-page"] .bp-times__wrong {
+  position: relative;
+}
+:root[data-lens="back-page"] .bp-scrawl--strike {
+  inset: 5% -10%;
+}
+:root[data-lens="back-page"] .bp-times__note {
+  position: absolute;
+  right: calc(100% + 0.25em);
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 0.05em;
+  font: 700 1.55em/1 var(--bp-hand);
+  color: var(--bp-blue);
+  white-space: nowrap;
+  translate: 0 -62%;
+  rotate: -7deg;
+}
+:root[data-lens="back-page"] .bp-times__note .bp-scrawl {
+  position: static;
+  width: 1.1em;
+  height: 0.7em;
+  margin-top: 0.3em;
+}
+:root[data-lens="back-page"] .bp-convs {
+  position: relative;
+}
+:root[data-lens="back-page"] .bp-times__was {
+  position: absolute;
+  right: -0.4em;
+  bottom: -2.1em;
+  font: 700 1.6em/1 var(--bp-hand);
+  color: var(--bp-red);
+  rotate: -4deg;
+  opacity: 0.9;
+}
 :root[data-lens="back-page"] .bp-convs {
   display: grid;
   grid-template-columns: repeat(3, auto);
