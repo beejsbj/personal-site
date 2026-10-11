@@ -224,6 +224,20 @@
 :root[data-lens="back-page"] .bp-scrawl--ring {
   inset: 4% 6%;
 }
+:root[data-lens="back-page"] .bp-eye {
+  position: relative;
+}
+:root[data-lens="back-page"] .bp-eye::after {
+  content: "";
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  width: 0.24em;
+  height: 0.26em;
+  border-radius: 50%;
+  background: var(--bp-blue);
+  translate: -50% -50%;
+}
 :root[data-lens="back-page"] .bp-scrawl--face {
   inset: -36% -18% -44%;
 }

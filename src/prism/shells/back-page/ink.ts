@@ -293,15 +293,15 @@ export function arrow(ink: string, rng: Rng) {
   );
 }
 
-/** A face drawn round a hundred: its noughts are the eyes, given pupils. */
+/** A face drawn round a hundred: its noughts are the eyes. The pupils are
+ * inked on the noughts themselves (.bp-eye), so they stay put whatever the
+ * cell's width or the font. */
 export function face(ink: string, rng: Rng) {
   const j = () => between(rng, -1.5, 1.5);
   return scrawl(
     "face",
     "-50 -50 100 100",
     `<path d="${handCircle(6, 4, 47, rng)}" stroke="${ink}" stroke-width="1.3" ${NS}/>` +
-      dot(1.5, -1, 3, rng, ink) +
-      dot(21.5, -1, 3, rng, ink) +
       `<path d="M-4 ${f(24 + j())}Q12 ${f(38 + j())} 30 ${f(22 + j())}" stroke="${ink}" stroke-width="1.6" ${NS}/>` +
       // and a tuft of hair
       `<path d="M4 -40q0 -12 6 -16M13 -41q5 -10 11 -11" stroke="${ink}" stroke-width="1.3" ${NS}/>`,

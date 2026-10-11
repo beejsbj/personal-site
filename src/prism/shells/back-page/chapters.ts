@@ -444,7 +444,11 @@ function compositionInsideCover(b: Build) {
   };
 
   const cell = (i: number, j: number) => {
-    const kids: (Node | string)[] = [String(i * j)];
+    const printed = String(i * j);
+    // the face's eyes are the hundred's noughts, so each gets its own pupil
+    const kids: (Node | string)[] = at(USED.face, i, j)
+      ? [printed.replace(/0/g, ""), ...[...printed.matchAll(/0/g)].map(() => h("span", { class: "bp-eye" }, "0"))]
+      : [printed];
     const { shade, guess } = USED;
     if (i === shade.row && j === 1) {
       const s = ink(shading(shade.cells, rng));
