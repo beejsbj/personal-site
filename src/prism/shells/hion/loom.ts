@@ -16,7 +16,9 @@
  * up with you. */
 import { type Hue, Kind, type Mark, paint, paintGlow, patterns, type Patterns, type Pt } from "./pastel";
 
-const TILE = 1024;
+/** Tile height: a frame that draws re-sends only the tiles it touched,
+ * so shorter tiles cost less each frame. */
+const TILE = 512;
 const GLOW = 0.25;
 
 interface Tile {
