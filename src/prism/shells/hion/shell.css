@@ -10,8 +10,32 @@
   --hion-cl: rgb(214 251 255);
   --hion-ml: rgb(255 216 241);
   --hion-text: rgb(205 240 245);
-  --hion-serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", Georgia, serif;
-  --hion-hand: "Caveat", "Patrick Hand", cursive;
+  /* One broad-nib family (Alegreya) writes every word: the hand that
+     draws the threads also writes. Display: the woven and hung titles, a
+     semibold so counters stay open when life weaves the letters. Text:
+     long reading on black, a touch over regular so it does not thin out.
+     Hand: the spoken lines, in the true italic. Label: charms, dates,
+     tags, in real small caps. Every weight here is in a loaded file. */
+  --hion-serif: "Alegreya Variable", "Alegreya", Georgia, serif;
+  --hion-display: var(--hion-serif);
+  --hion-display-weight: 660;
+  --hion-display-vary: normal;
+  --hion-display-track: -0.01em;
+  --hion-display-leading: 0.92;
+  --hion-text-size: 1.125rem;
+  --hion-read-size: 1.2rem;
+  --hion-text-weight: 450;
+  --hion-strong-weight: 700;
+  --hion-hand: var(--hion-serif);
+  --hion-hand-style: italic;
+  --hion-hand-weight: 500;
+  --hion-hand-scale: 0.8;
+  --hion-label: "Alegreya SC", var(--hion-serif);
+  --hion-label-style: normal;
+  --hion-label-weight: 500;
+  --hion-label-scale: 0.74;
+  --hion-label-caps: normal;
+  --hion-label-track: 0.05em;
   --hion-gutter: clamp(20px, 6vw, 96px);
   --hion-loop-pad: clamp(40px, 5vw, 72px);
   --hion-ease-swing: cubic-bezier(0.2, 1.55, 0.4, 1);
@@ -20,7 +44,7 @@
   min-height: 100vh;
   color: var(--hion-text);
   background: var(--hion-black);
-  font: 500 1.0625rem/1.78 var(--hion-serif);
+  font: var(--hion-text-weight) var(--hion-text-size)/1.7 var(--hion-serif);
   font-kerning: normal;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -57,7 +81,9 @@
   left: 12px;
   z-index: 60;
   padding: 0.4em 0.9em;
-  font: 600 1.4rem/1 var(--hion-hand);
+  font: var(--hion-label-style) var(--hion-label-weight) calc(1.4rem * var(--hion-label-scale))/1 var(--hion-label);
+  font-variant-caps: var(--hion-label-caps);
+  letter-spacing: var(--hion-label-track);
   color: var(--hion-black);
   background: var(--hion-c);
   border-radius: 2px;
@@ -163,7 +189,9 @@
   margin-top: var(--hion-top, 40px);
   padding: 9px 0.25em 0.05em;
   color: var(--hion-c);
-  font: 600 1.6rem/1 var(--hion-hand);
+  font: var(--hion-label-style) var(--hion-label-weight) calc(1.6rem * var(--hion-label-scale))/1 var(--hion-label);
+  font-variant-caps: var(--hion-label-caps);
+  letter-spacing: var(--hion-label-track);
   text-decoration: none;
   white-space: nowrap;
   pointer-events: auto;
@@ -229,7 +257,8 @@
   position: absolute;
   left: 50%;
   translate: -50% 0;
-  font: 800 1.15rem/1 var(--hion-serif);
+  font: var(--hion-display-weight) 1.15rem/1 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
   letter-spacing: 0.02em;
   color: var(--hion-m);
 }
@@ -252,7 +281,9 @@
   border: 0;
   background: none;
   color: var(--hion-c);
-  font: 600 1.35rem/1 var(--hion-hand);
+  font: var(--hion-label-style) var(--hion-label-weight) calc(1.35rem * var(--hion-label-scale))/1 var(--hion-label);
+  font-variant-caps: var(--hion-label-caps);
+  letter-spacing: var(--hion-label-track);
   cursor: pointer;
   pointer-events: auto;
   transform-origin: 50% 0;
@@ -461,25 +492,33 @@
 
 /* ---------- Shared words ---------- */
 
-:root[data-lens="hion"] .hion-eyebrow,
 :root[data-lens="hion"] .hion-hello,
-:root[data-lens="hion"] .hion-meta,
-:root[data-lens="hion"] .hion-role,
-:root[data-lens="hion"] .hion-year {
+:root[data-lens="hion"] .hion-role {
   font-family: var(--hion-hand);
-  font-weight: 600;
+  font-style: var(--hion-hand-style);
+  font-weight: var(--hion-hand-weight);
+}
+
+:root[data-lens="hion"] .hion-eyebrow,
+:root[data-lens="hion"] .hion-meta,
+:root[data-lens="hion"] .hion-year {
+  font-family: var(--hion-label);
+  font-style: var(--hion-label-style);
+  font-weight: var(--hion-label-weight);
+  font-variant-caps: var(--hion-label-caps);
+  letter-spacing: var(--hion-label-track);
 }
 
 :root[data-lens="hion"] .hion-eyebrow {
   margin: 0 0 0.2em;
-  font-size: 1.6rem;
+  font-size: calc(1.6rem * var(--hion-label-scale));
   line-height: 1.1;
   color: var(--hion-c);
 }
 
 :root[data-lens="hion"] .hion-meta {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: calc(1.2rem * var(--hion-label-scale));
   line-height: 1.2;
   color: var(--hion-m);
 }
@@ -519,8 +558,9 @@
   overflow-wrap: break-word;
   margin: 0;
   padding: 0.12em 0.3em 0.05em;
-  font: 800 clamp(2.6rem, 5.4vw, 4.6rem)/1.04 var(--hion-serif);
-  letter-spacing: -0.01em;
+  font: var(--hion-display-weight) clamp(2.6rem, 5.4vw, 4.6rem)/1.04 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
+  letter-spacing: var(--hion-display-track);
   text-wrap: balance;
 }
 
@@ -703,7 +743,7 @@
 
 :root[data-lens="hion"] .hion-hello {
   margin: 0 0 0.1em 1.4em;
-  font-size: 2rem;
+  font-size: calc(2rem * var(--hion-hand-scale));
   line-height: 1;
   color: var(--hion-c);
 }
@@ -733,8 +773,9 @@
 
 :root[data-lens="hion"] .hion-display {
   margin: 0;
-  font: 800 clamp(4.2rem, 9.4vw, 8.4rem)/0.9 var(--hion-serif);
-  letter-spacing: -0.02em;
+  font: var(--hion-display-weight) clamp(4.2rem, 9.4vw, 8.4rem)/var(--hion-display-leading) var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
+  letter-spacing: var(--hion-display-track);
 }
 
 :root[data-lens="hion"] .hion-display__word {
@@ -773,7 +814,7 @@
 
 :root[data-lens="hion"] .hion-role {
   margin: 0.6em 0 0;
-  font-size: 1.7rem;
+  font-size: calc(1.7rem * var(--hion-hand-scale));
   line-height: 1.1;
   color: var(--hion-m);
 }
@@ -912,7 +953,7 @@
 
 :root[data-lens="hion"] .hion-picture__caption {
   margin-top: 0.4em;
-  font: 600 1.5rem/1.1 var(--hion-hand);
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.5rem * var(--hion-hand-scale))/1.1 var(--hion-hand);
   color: var(--hion-m);
   text-align: right;
 }
@@ -948,7 +989,7 @@
 @media (min-width: 720px) {
   :root[data-lens="hion"] .hion-loop--story {
     --hion-measure: calc(60ch + 2 * var(--hion-loop-pad));
-    font-size: 1.08rem;
+    font-size: var(--hion-read-size);
     width: min(var(--hion-measure), calc(100% - 2 * var(--hion-gutter)));
     margin-left: clamp(
       var(--hion-gutter),
@@ -979,7 +1020,8 @@
 :root[data-lens="hion"] .hion-strung {
   position: relative;
   margin: 0 0 1em;
-  font: 800 clamp(1.9rem, 3.4vw, 2.6rem)/1.15 var(--hion-serif);
+  font: var(--hion-display-weight) clamp(1.9rem, 3.4vw, 2.6rem)/1.15 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
   text-align: center;
   text-wrap: balance;
 }
@@ -1007,7 +1049,7 @@
   top: -0.62em;
   left: calc(50% + 22px);
   margin: 0;
-  font-size: 2.6rem;
+  font-size: calc(2.6rem * var(--hion-label-scale));
   line-height: 1;
   color: var(--hion-c);
 }
@@ -1075,7 +1117,8 @@
 
 :root[data-lens="hion"] .hion-work__title {
   margin: 0;
-  font: 800 1.55rem/1.2 var(--hion-serif);
+  font: var(--hion-display-weight) 1.55rem/1.2 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
   color: var(--hion-cl);
 }
 
@@ -1097,7 +1140,7 @@
 
 :root[data-lens="hion"] .hion-work__summary {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.06rem;
   line-height: 1.65;
 }
 
@@ -1161,7 +1204,7 @@
   /* The label: when, like a tag tied on; the name woven large. */
   :root[data-lens="hion"] .hion-row--works .hion-meta {
     margin-top: 1.4em;
-    font-size: 1.45rem;
+    font-size: calc(1.45rem * var(--hion-label-scale));
     rotate: -3deg;
     transform-origin: 0 50%;
   }
@@ -1175,7 +1218,7 @@
     margin: 0.05em 0 0.25em;
     font-size: clamp(2.4rem, 4.6vw, 3.7rem);
     line-height: 1;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--hion-display-track);
   }
 
   :root[data-lens="hion"] .hion-row--works .hion-work__title a[data-woven] {
@@ -1184,7 +1227,7 @@
 
   :root[data-lens="hion"] .hion-row--works .hion-work__summary {
     max-width: 24em;
-    font-size: 1.02rem;
+    font-size: 1.06rem;
   }
 
   :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) .hion-work__summary {
@@ -1241,7 +1284,7 @@
 
 :root[data-lens="hion"] .hion-tied__date {
   margin: 0 0 0.15em;
-  font-size: 1.15rem;
+  font-size: calc(1.15rem * var(--hion-label-scale));
   line-height: 1.3;
 }
 
@@ -1252,7 +1295,8 @@
 
 :root[data-lens="hion"] .hion-tied__title {
   margin: 0;
-  font: 700 1.3rem/1.3 var(--hion-serif);
+  font: var(--hion-display-weight) 1.3rem/1.3 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
   color: var(--hion-cl);
   overflow-wrap: anywhere;
   text-wrap: balance;
@@ -1272,14 +1316,14 @@
 
 :root[data-lens="hion"] .hion-tied__summary {
   margin: 0.4em 0 0;
-  font-size: 1.02rem;
+  font-size: 1.06rem;
   line-height: 1.6;
   color: var(--hion-text);
 }
 
 :root[data-lens="hion"] .hion-tied__title + .hion-meta {
   margin-top: 0.15em;
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--hion-label-scale));
 }
 
 /* A writing post's title is set larger: it is the whole entry. */
@@ -1349,7 +1393,8 @@
 
 :root[data-lens="hion"] .hion-fork__title {
   margin: 0 0 0.2em;
-  font: 800 1.8rem/1.1 var(--hion-serif);
+  font: var(--hion-display-weight) 1.8rem/1.1 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
   color: var(--hion-c);
 }
 
@@ -1409,7 +1454,7 @@
   gap: 12px 24px;
   max-width: 64ch;
   margin-top: 32px;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 :root[data-lens="hion"] .hion-writing__origin a {
@@ -1431,7 +1476,7 @@
 :root[data-lens="hion"] .hion-loop--writing-story figcaption {
   margin-top: 12px;
   color: var(--hion-ml);
-  font: 600 1.1rem/1.5 var(--hion-hand);
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.1rem * var(--hion-hand-scale))/1.5 var(--hion-hand);
 }
 
 :root[data-lens="hion"] .hion-loop--writing-end > .hion-row--pulls {
@@ -1453,7 +1498,9 @@
   margin: 0.5em 0 0;
   padding: 0;
   list-style: none;
-  font: 600 1.2rem/1.3 var(--hion-hand);
+  font: var(--hion-label-style) var(--hion-label-weight) calc(1.2rem * var(--hion-label-scale))/1.3 var(--hion-label);
+  font-variant-caps: var(--hion-label-caps);
+  letter-spacing: var(--hion-label-track);
   color: var(--hion-c);
 }
 
@@ -1484,7 +1531,9 @@
 :root[data-lens="hion"] .hion-tag {
   --hion-drop: 26px;
   padding-top: 8px;
-  font: 600 1.45rem/1.1 var(--hion-hand);
+  font: var(--hion-label-style) var(--hion-label-weight) calc(1.45rem * var(--hion-label-scale))/1.1 var(--hion-label);
+  font-variant-caps: var(--hion-label-caps);
+  letter-spacing: var(--hion-label-track);
   color: var(--hion-c);
 }
 
@@ -1509,7 +1558,9 @@
 }
 
 :root[data-lens="hion"] .hion-tag--meta dt {
-  font: 600 1.15rem/1.1 var(--hion-hand);
+  font: var(--hion-label-style) var(--hion-label-weight) calc(1.15rem * var(--hion-label-scale))/1.1 var(--hion-label);
+  font-variant-caps: var(--hion-label-caps);
+  letter-spacing: var(--hion-label-track);
   color: var(--hion-m);
 }
 
@@ -1519,7 +1570,7 @@
 
 :root[data-lens="hion"] .hion-tag--meta dd {
   margin: 0;
-  font: 500 1.02rem/1.4 var(--hion-serif);
+  font: var(--hion-text-weight) 1.02rem/1.4 var(--hion-serif);
   color: var(--hion-cl);
 }
 
@@ -1528,7 +1579,7 @@
   --hion-drop: 34px;
   margin-bottom: 0;
   padding-left: 22px;
-  font: 600 1.55rem/1.2 var(--hion-hand);
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.55rem * var(--hion-hand-scale))/1.2 var(--hion-hand);
   color: var(--hion-c);
 }
 
@@ -1689,7 +1740,8 @@
 }
 
 :root[data-lens="hion"] .hion-end__link {
-  font: 800 1.3rem/1.25 var(--hion-serif);
+  font: var(--hion-display-weight) 1.3rem/1.25 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
   color: var(--hion-cl);
   text-decoration: none;
 }
@@ -1701,8 +1753,8 @@
 /* ---------- Prose: the rendered articles ---------- */
 
 :root[data-lens="hion"] .hion-prose {
-  font-size: 1.08rem;
-  line-height: 1.85;
+  font-size: var(--hion-read-size);
+  line-height: 1.72;
 }
 
 :root[data-lens="hion"] .hion-prose p {
@@ -1711,7 +1763,8 @@
 
 :root[data-lens="hion"] .hion-prose h3 {
   margin: 1.9em 0 0.3em;
-  font: 800 1.3rem/1.35 var(--hion-serif);
+  font: var(--hion-display-weight) 1.3rem/1.35 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
   color: var(--hion-cl);
 }
 
@@ -1737,16 +1790,13 @@
 
 :root[data-lens="hion"] .hion-prose h3 + p > em:only-child,
 :root[data-lens="hion"] .hion-prose em {
-  font-style: normal;
-  font-family: var(--hion-hand);
-  font-weight: 600;
-  font-size: 1.22em;
+  font-style: italic;
   color: var(--hion-m);
 }
 
 :root[data-lens="hion"] .hion-prose strong {
   color: var(--hion-cl);
-  font-weight: 800;
+  font-weight: var(--hion-strong-weight);
 }
 
 :root[data-lens="hion"] .hion-prose ul,
@@ -1801,7 +1851,8 @@
 /* Whatever else the markdown makes: smaller headings, tables, code blocks. */
 :root[data-lens="hion"] .hion-prose :is(h4, h5, h6) {
   margin: 1.6em 0 0.3em;
-  font: 800 1.1rem/1.4 var(--hion-serif);
+  font: var(--hion-display-weight) 1.1rem/1.4 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
   color: var(--hion-cl);
 }
 
@@ -1820,7 +1871,9 @@
 }
 
 :root[data-lens="hion"] .hion-prose th {
-  font: 600 1.2em/1.3 var(--hion-hand);
+  font: var(--hion-label-style) var(--hion-label-weight) calc(1.2em * var(--hion-label-scale))/1.3 var(--hion-label);
+  font-variant-caps: var(--hion-label-caps);
+  letter-spacing: var(--hion-label-track);
   color: var(--hion-m);
 }
 
@@ -1846,15 +1899,19 @@
 }
 
 :root[data-lens="hion"] .hion-prose--other :is(h1, h2, h3, h4) {
-  font-family: var(--hion-serif);
-  font-weight: 800;
+  font-family: var(--hion-display);
+  font-weight: var(--hion-display-weight);
+  font-variation-settings: var(--hion-display-vary);
   color: var(--hion-cl);
   line-height: 1.2;
 }
 
 :root[data-lens="hion"] .hion-prose--other :is(.ds-link, .ds-tags li, .meta, .event-origin, .page-header__eyebrow) {
-  font-family: var(--hion-hand);
-  font-weight: 600;
+  font-family: var(--hion-label);
+  font-style: var(--hion-label-style);
+  font-weight: var(--hion-label-weight);
+  font-variant-caps: var(--hion-label-caps);
+  letter-spacing: var(--hion-label-track);
   color: var(--hion-m);
 }
 
@@ -1898,13 +1955,14 @@
 
 :root[data-lens="hion"] .hion-foot__call {
   margin: 0;
-  font: 600 2.2rem/1.1 var(--hion-hand);
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(2.2rem * var(--hion-hand-scale))/1.1 var(--hion-hand);
   color: var(--hion-m);
 }
 
 :root[data-lens="hion"] .hion-foot__mail {
   margin: 0.3em 0 0;
-  font: 800 clamp(1.3rem, 3vw, 1.9rem)/1.2 var(--hion-serif);
+  font: var(--hion-display-weight) clamp(1.3rem, 3vw, 1.9rem)/1.2 var(--hion-display);
+  font-variation-settings: var(--hion-display-vary);
 }
 
 :root[data-lens="hion"] .hion-foot__mail a {
@@ -1979,7 +2037,9 @@
   :root[data-lens="hion"] .hion {
     --hion-gutter: 20px;
     --hion-loop-pad: 26px;
-    font-size: 1rem;
+    --hion-text-size: 1.0625rem;
+    --hion-read-size: 1.125rem;
+    font-size: var(--hion-text-size);
   }
 
   :root[data-lens="hion"] .hion-nav {
@@ -2046,7 +2106,7 @@
   }
 
   :root[data-lens="hion"] .hion-top[data-state="dropped"] .hion-nav__list .hion-charm {
-    font-size: 2.1rem;
+    font-size: calc(2.1rem * var(--hion-label-scale));
   }
 
   :root[data-lens="hion"] .hion-page {
@@ -2067,7 +2127,7 @@
   }
 
   :root[data-lens="hion"] .hion-hello {
-    font-size: 1.7rem;
+    font-size: calc(1.7rem * var(--hion-hand-scale));
   }
 
   :root[data-lens="hion"] .hion-display {
@@ -2109,7 +2169,7 @@
   }
 
   :root[data-lens="hion"] .hion-year {
-    font-size: 2.1rem;
+    font-size: calc(2.1rem * var(--hion-label-scale));
   }
 
   /* The cord comes down the right-hand edge; the head reads down beside
