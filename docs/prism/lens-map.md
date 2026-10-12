@@ -458,6 +458,10 @@ Derived "content": page numbers are hard-coded (`ch:45-48,276-281`, labs `15+i`,
 
 No new copy, no new reads of `content.json`, no `route.main`: the cloth's only inputs are layout and slugs.
 
+The cloth is ground, not subject: laid at half strength (`STRENGTH`), sown sparser at the selvages and gaps (`DENSITY`), with no glow of its own, at one device pixel, stepping about two generations a second (scrolling adds a little). Its tiles, and the loom's, are 512px tall, so a frame re-sends only what it touched. The scroll sway is set on each swinging thing on screen, not on the world (which restyled the whole page every frame).
+
+**Moving between screens.** Clicking a destination answers in the frame you clicked (`astro:before-preparation`): the old screen starts reeling up, the destination's charm drops, and the ribbon of its cloth starts down from its swatch while the router fetches the page. The new screen is clipped to that ribbon (timed from the click, 640ms, falling for the first 42% and then spreading), over the old screen as it finishes reeling up, and its threads come down briskly. The cloth, the woven words (one at a time) and the woven covers (a few rows a slice) are laid in idle time after the ribbon has fallen. While Hion is mounted the router's native view transition is skipped: its snapshot froze the page for hundreds of milliseconds, for a crossfade `prism.css` already turns off.
+
 **Text on the thread (`hion/text-on-thread`).** Where the words sit changed; what they read did not (the same parts, the same fields).
 
 | Part | Where it hangs now | Built by |

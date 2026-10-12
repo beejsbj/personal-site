@@ -38,7 +38,7 @@ import { Immigration, orient, PATTERNS, type Pattern, type PatternName, size as 
 import type { createLoom } from "./loom";
 import { rng, type Pt } from "./pastel";
 import type { Fabric } from "./fabric";
-import { drape, type Drape, GLOW, paintGround, paintRegion, repaintGround, stitches, type Stitches } from "./stitch";
+import { drape, type Drape, paintGround, paintRegion, repaintGround, stitches, type Stitches } from "./stitch";
 
 type Loom = ReturnType<typeof createLoom>;
 
@@ -61,8 +61,6 @@ interface Tile {
   el: HTMLElement;
   /** The live threads, repainted in chunks as they change. */
   ctx: CanvasRenderingContext2D;
-  /** Their light, at quarter resolution. */
-  gctx: CanvasRenderingContext2D;
   /** The woven ground, only ever added to. */
   wctx: CanvasRenderingContext2D;
   /** The next row of crossings whose ground is still to be laid on this
@@ -78,9 +76,16 @@ interface Sow {
 
 /** Chunks of crossings repainted together. */
 const CHUNK = 8;
-/** Generations a second while you read, and once only blinkers are left. */
-const PACE = 4;
-const RESTING = 1.4;
+/** Generations a second while you read, and once only blinkers are left:
+ * slow, because the cloth is the ground, not the subject (and every
+ * generation repaints canvases). */
+const PACE = 2;
+const RESTING = 0.6;
+/** How strongly the cloth is laid: faint enough that words and the two
+ * hions lead, strong enough to read as thread close to. */
+const STRENGTH = 0.5;
+/** How thick life is sown at the selvages and between sections. */
+const DENSITY = 0.2;
 /** Still knots a frame is made of. */
 const KNOTS: PatternName[] = ["beehive", "block", "loaf", "boat", "tub", "ship", "pond"];
 
@@ -257,7 +262,7 @@ export function createCloth(options: ClothOptions) {
         run() {
           for (let y = y0; y <= y1; y++) {
             for (let x = x0; x <= x1; x++) {
-              if (rand() < 0.28) life.set(x, y, rand() < 0.72 ? lean : lean === 1 ? 2 : 1);
+              if (rand() < DENSITY) life.set(x, y, rand() < 0.72 ? lean : lean === 1 ? 2 : 1);
             }
           }
         },
@@ -282,8 +287,8 @@ export function createCloth(options: ClothOptions) {
         let r = 0;
         while (r < life.w / 3 && clear(life.w - 1 - r)) r++;
         // Keep a crossing of black paper between a strip and the words.
-        if (l >= 7) out.push(soup(Math.max(0, l - 19), l - 2, y0, y1 - 1, 1, band * 131 + 1));
-        if (r >= 7) out.push(soup(life.w - r + 1, Math.min(life.w - 1, life.w - r + 18), y0, y1 - 1, 2, band * 131 + 7908));
+        if (l >= 7) out.push(soup(Math.max(0, l - 13), l - 2, y0, y1 - 1, 1, band * 131 + 1));
+        if (r >= 7) out.push(soup(life.w - r + 1, Math.min(life.w - 1, life.w - r + 12), y0, y1 - 1, 2, band * 131 + 7908));
         for (let y = y0; y < y0 + BAND && y < life.h; y++) {
           left[y] = l >= 7 ? l : 0;
           right[y] = r >= 7 ? r : 0;
@@ -434,14 +439,16 @@ export function createCloth(options: ClothOptions) {
     height = page.scrollHeight;
     pageTop = page.getBoundingClientRect().top + scrollY;
     S = Math.round((width < 720 ? 13 : 16) * (options.scale ?? 1));
-    // Soft pastel needs no more than this, and phones pay for every pixel.
-    dpr = Math.min(devicePixelRatio || 1, 1.5);
-    st = stitches(S, dpr);
+    // Soft pastel ground needs no more than this, and phones pay for every
+    // pixel (each generation re-sends the canvases it touched).
+    dpr = Math.min(devicePixelRatio || 1, 1);
+    st = stitches(S, dpr, false, STRENGTH);
     life = new Immigration(Math.ceil(width / S), Math.ceil(height / S));
     hang = drape(life.w, life.h, S, 11);
     across = Math.ceil(life.w / CHUNK);
     const chunkPx = CHUNK * S;
-    tileH = chunkPx * Math.max(1, Math.round(1024 / chunkPx));
+    // Short tiles: a generation re-sends only the tiles it touched.
+    tileH = chunkPx * Math.max(1, Math.round(512 / chunkPx));
     tileRows = Math.ceil(height / tileH);
     layer.style.height = `${height}px`;
     dirty.clear();
@@ -483,11 +490,11 @@ export function createCloth(options: ClothOptions) {
       ctx.setTransform(scale, 0, 0, scale, 0, -index * tileH * scale);
       return { c, ctx };
     };
-    const glow = canvas(GLOW);
     // The ground is faint texture: it needs less resolution than thread.
-    const ground = canvas(Math.min(dpr, 1.25));
+    // No light of its own: the glow is the hions'.
+    const ground = canvas(Math.min(dpr, 0.75));
     const live = canvas(dpr);
-    el.append(glow.c, ground.c, live.c);
+    el.append(ground.c, live.c);
     layer.append(el);
     // Its threads are laid a chunk at a time, nearest the reader first.
     const rows = tileH / S / CHUNK;
@@ -495,7 +502,7 @@ export function createCloth(options: ClothOptions) {
       for (let cx = 0; cx < across; cx++) dirty.add(cx + cy * across);
     }
     const first = Math.max(0, (index * tileH) / S - 2);
-    return { index, el, ctx: live.ctx, gctx: glow.ctx, wctx: ground.ctx, groundRow: first };
+    return { index, el, ctx: live.ctx, wctx: ground.ctx, groundRow: first };
   }
 
   /** Lay the ground of a newly woven crossing on the tiles it shows on. */
@@ -516,8 +523,8 @@ export function createCloth(options: ClothOptions) {
   /** Keep tiles near the viewport; drop far ones. */
   function cull() {
     const top = scrollY - pageTop;
-    const from = Math.max(0, Math.floor((top - innerHeight * 0.5) / tileH));
-    const to = Math.min(tileRows - 1, Math.floor((top + innerHeight * 1.6) / tileH));
+    const from = Math.max(0, Math.floor((top - innerHeight * 0.3) / tileH));
+    const to = Math.min(tileRows - 1, Math.floor((top + innerHeight * 1.3) / tileH));
     for (const [index, tile] of tiles) {
       if (index < from - 1 || index > to + 1) {
         tile.el.remove();
@@ -582,7 +589,7 @@ export function createCloth(options: ClothOptions) {
       if (!tile) continue;
       paintRegion(
         tile.ctx,
-        tile.gctx,
+        null,
         life,
         st,
         cx * CHUNK,
@@ -632,9 +639,9 @@ export function createCloth(options: ClothOptions) {
     last = now;
     sowAndTouch(loom.reach());
     weaveSome(8);
-    budget = Math.min(4, budget + (dt / 1000) * (life.settled ? RESTING : PACE));
+    budget = Math.min(2, budget + (dt / 1000) * (life.settled ? RESTING : PACE));
     let steps = 0;
-    while (budget >= 1 && steps < 2) {
+    while (budget >= 1 && steps < 1) {
       life.step();
       touchChanged();
       for (let k = 0; k < life.freshes; k++) {
@@ -673,7 +680,7 @@ export function createCloth(options: ClothOptions) {
     // Reading moves the cloth along.
     const dy = Math.abs(scrollY - lastScroll);
     lastScroll = scrollY;
-    budget = Math.min(4, budget + dy / (S * 5));
+    budget = Math.min(2, budget + dy / (S * 30));
     wake();
   }
 
@@ -849,8 +856,11 @@ export function createCloth(options: ClothOptions) {
         weaveSome(Infinity);
         settle(400);
       } else {
+        // Laid a few milliseconds a frame (the loop goes on while it is
+        // behind), fading up as it comes, so it never stalls the screen.
         cull();
-        paint(Infinity);
+        paint(performance.now() + 6);
+        layer.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: "ease" });
         wake();
       }
     },

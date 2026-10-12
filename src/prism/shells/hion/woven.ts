@@ -32,8 +32,24 @@ const SPIN = 1500;
 const ROOM = 18;
 
 export function weaveType(root: ParentNode, options: WovenOptions) {
-  for (const el of root.querySelectorAll<HTMLElement>("[data-woven]")) weaveWord(el, options);
+  const words = [...root.querySelectorAll<HTMLElement>("[data-woven]")];
+  if (options.instant) {
+    for (const el of words) weaveWord(el, options);
+    return;
+  }
+  // A word at a time, when the page has room: each is measured and set up
+  // on its own cloth, and a screen of them at once is a long stall.
+  const next = () => {
+    const el = words.shift();
+    if (!el || options.signal.aborted) return;
+    weaveWord(el, options);
+    if (words.length) soon(next);
+  };
+  soon(next);
 }
+
+const soon = (run: () => void) =>
+  "requestIdleCallback" in window ? requestIdleCallback(run, { timeout: 300 }) : setTimeout(run, 16);
 
 function hueOf(el: HTMLElement): Species {
   const hue = el.closest<HTMLElement>("[data-hue]")?.dataset.hue ?? el.dataset.woven;
@@ -240,8 +256,8 @@ function weaveWord(el: HTMLElement, options: WovenOptions) {
         finish();
         return;
       }
-      // About thirty generations a second.
-      if (now - last > 32) {
+      // About fifteen generations a second (each one repaints the word).
+      if (now - last > 64) {
         last = now;
         life.step();
         // Drawn toward the word: born in the letters, dying outside them.
@@ -304,13 +320,18 @@ export function weaveCovers(root: ParentNode, options: WovenOptions) {
   if (!figures.length) return;
   const queue: HTMLElement[] = [];
   let frame = 0;
+  let weaving = false;
   const next = () => {
     frame = 0;
     const figure = queue.shift();
     if (!figure || options.signal.aborted) return;
-    weaveCover(figure, options);
-    // One a frame, so a list of them never stalls the page.
-    if (queue.length) frame = requestAnimationFrame(next);
+    // One at a time, a few rows a slice, so a list of them never stalls
+    // the page.
+    weaving = true;
+    weaveCover(figure, options, () => {
+      weaving = false;
+      if (queue.length) frame = requestAnimationFrame(next);
+    });
   };
   const near = new IntersectionObserver(
     (entries) => {
@@ -320,10 +341,15 @@ export function weaveCovers(root: ParentNode, options: WovenOptions) {
         const figure = entry.target as HTMLElement;
         const img = figure.querySelector("img");
         if (!img) continue;
-        const ready = () => {
-          queue.push(figure);
-          if (!frame) frame = requestAnimationFrame(next);
-        };
+        // Decoded off the main thread before it is read.
+        const ready = () =>
+          img.decode().then(
+            () => {
+              queue.push(figure);
+              if (!frame && !weaving) frame = requestAnimationFrame(next);
+            },
+            () => {},
+          );
         if (img.complete && img.naturalWidth) ready();
         else img.addEventListener("load", ready, { once: true, signal: options.signal });
       }
@@ -337,15 +363,15 @@ export function weaveCovers(root: ParentNode, options: WovenOptions) {
   });
 }
 
-function weaveCover(figure: HTMLElement, options: WovenOptions) {
+function weaveCover(figure: HTMLElement, options: WovenOptions, done: () => void) {
   const frameEl = figure.querySelector<HTMLElement>(".hion-picture__frame");
   const img = figure.querySelector("img");
-  if (!frameEl || !img) return;
+  if (!frameEl || !img) return done();
   const w = frameEl.clientWidth;
   const h = frameEl.clientHeight;
   if (w < 20 || h < 20) {
     frameEl.dataset.wovenState = "plain";
-    return;
+    return done();
   }
   const pitch = w < 260 ? 3 : 4;
   const cols = Math.ceil(w / pitch);
@@ -365,7 +391,7 @@ function weaveCover(figure: HTMLElement, options: WovenOptions) {
   } catch {
     // A picture from elsewhere cannot be read: it stays a picture.
     frameEl.dataset.wovenState = "plain";
-    return;
+    return done();
   }
   const hue: 1 | 2 = figure.dataset.hue === "m" ? 2 : 1;
   const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -378,15 +404,26 @@ function weaveCover(figure: HTMLElement, options: WovenOptions) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const st = stitches(pitch, dpr, true);
   const hang = drape(cols, rows, pitch, 31);
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      const i = (y * cols + x) * 4;
-      const light = (data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11) / 255;
-      const b = BAYER[(y & 3) * 4 + (x & 3)];
-      const bits = light > 0.55 + b * 0.45 ? 3 : light > b * 0.6 ? hue : 0;
-      paintCrossing(ctx, st, x, y, bits, hang, options.fabric);
+  let y = 0;
+  const slice = () => {
+    if (options.signal.aborted) return;
+    const end = performance.now() + 8;
+    for (; y < rows && performance.now() < end; y++) {
+      for (let x = 0; x < cols; x++) {
+        const i = (y * cols + x) * 4;
+        const light = (data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11) / 255;
+        const b = BAYER[(y & 3) * 4 + (x & 3)];
+        const bits = light > 0.55 + b * 0.45 ? 3 : light > b * 0.6 ? hue : 0;
+        paintCrossing(ctx, st, x, y, bits, hang, options.fabric);
+      }
     }
-  }
-  frameEl.append(canvas);
-  frameEl.dataset.wovenState = "done";
+    if (y < rows) {
+      soon(slice);
+      return;
+    }
+    frameEl.append(canvas);
+    frameEl.dataset.wovenState = "done";
+    done();
+  };
+  slice();
 }

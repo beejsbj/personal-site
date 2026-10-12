@@ -42,6 +42,8 @@ export interface Stitches {
    * magenta one along the weft. */
   ground: HTMLCanvasElement[][];
   dpr: number;
+  /** How strongly it is laid (0 to 1): a cloth that is only ground is faint. */
+  strength: number;
 }
 
 const HUES: Hue[] = ["c", "m"];
@@ -75,8 +77,20 @@ function float(a: Pt, b: Pt, rand: () => number, over: number): number[] {
 }
 
 /** Sprites for a cloth of crossings `size` apart. `heavy` lays thicker
- * thread for a fine cloth that has to read (woven type). */
-export function stitches(size: number, dpr: number, heavy = false): Stitches {
+ * thread for a fine cloth that has to read (woven type); `strength` lays
+ * all of it fainter. */
+export function stitches(size: number, dpr: number, heavy = false, strength = 1): Stitches {
+  // Drawn once for each kind of cloth: dozens of pastel marks each, and
+  // only ever read after.
+  const key = `${size}:${dpr}:${heavy}:${strength}`;
+  let made = sewn.get(key);
+  if (!made) sewn.set(key, (made = sew(size, dpr, heavy, strength)));
+  return made;
+}
+
+const sewn = new Map<string, Stitches>();
+
+function sew(size: number, dpr: number, heavy: boolean, strength: number): Stitches {
   const pad = Math.ceil(size * 0.7 + 6);
   const ply = size >= 17 ? 2 : 1;
   const weight = heavy
@@ -150,7 +164,7 @@ export function stitches(size: number, dpr: number, heavy = false): Stitches {
       return canvas;
     }),
   );
-  return { size, pad, threads, knots, ground, dpr };
+  return { size, pad, threads, knots, ground, dpr, strength };
 }
 
 /** How the cloth hangs: a smooth offset for every crossing, so its rows
@@ -200,7 +214,9 @@ export function paintCrossing(
   const py = y * S + S / 2 - st.pad + drape.dy[di];
   const bit = bits === 3 ? topAt(fabric, x, y) : bits;
   const g = st.ground[bit - 1][variant(x, y, 5) % VARIANTS];
+  ctx.globalAlpha = st.strength;
   ctx.drawImage(g, px, py, g.width / st.dpr, g.height / st.dpr);
+  ctx.globalAlpha = 1;
 }
 
 /** Lay the woven ground of one crossing of a living cloth. */
@@ -269,6 +285,7 @@ export function paintRegion(
   ctx.rect(rx, ry, rw, rh);
   ctx.clip();
   ctx.clearRect(rx, ry, rw, rh);
+  ctx.globalAlpha = st.strength;
   // Threads from crossings up to two away can reach into the rectangle.
   const m = 2;
   const ax = Math.max(0, x0 - m);

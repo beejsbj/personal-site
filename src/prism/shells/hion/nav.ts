@@ -121,6 +121,13 @@ export function createNav(
     width = nav.clientWidth;
     const dropped = el.dataset.state === "dropped";
     const charms = [home, ...list.querySelectorAll<HTMLElement>(".hion-charm")];
+    // Where each hangs along the line, read all at once before anything
+    // moves (a read between writes lays the page out again each time).
+    const navLeft = nav.getBoundingClientRect().left;
+    const xs = charms.map((charm) => {
+      const box = charm.getBoundingClientRect();
+      return box.left - navLeft + box.width / 2;
+    });
     charms.forEach((charm, i) => {
       const isCurrent = charm.hasAttribute("data-current");
       let hang: number;
@@ -134,19 +141,22 @@ export function createNav(
       }
       charm.style.setProperty("--hion-hang", `${hang}px`);
       // Positioned from the top of the line, so the thread meets the line.
-      const box = charm.getBoundingClientRect();
-      const navBox = nav.getBoundingClientRect();
-      const x = box.left - navBox.left + box.width / 2;
-      charm.style.setProperty("--hion-top", `${(cordY(x) + hang).toFixed(1)}px`);
+      charm.style.setProperty("--hion-top", `${(cordY(xs[i]) + hang).toFixed(1)}px`);
     });
     drawCord();
     ink(el);
   }
 
+  /** The line as last drawn (it changes only with the width). */
+  let drawn = "";
+
   function drawCord() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
     const w = nav.clientWidth;
     const hgt = cordTop() + sagOf() + 40;
+    const key = `${w}:${hgt}:${dpr}`;
+    if (key === drawn) return;
+    drawn = key;
     cord.width = Math.ceil(w * dpr);
     cord.height = Math.ceil(hgt * dpr);
     cord.style.width = `${w}px`;

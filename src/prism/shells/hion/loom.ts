@@ -16,7 +16,9 @@
  * up with you. */
 import { type Hue, Kind, type Mark, paint, paintGlow, patterns, type Patterns, type Pt } from "./pastel";
 
-const TILE = 1024;
+/** Tile height: a frame that draws re-sends only the tiles it touched,
+ * so shorter tiles cost less each frame. */
+const TILE = 512;
 const GLOW = 0.25;
 
 interface Tile {
@@ -49,6 +51,10 @@ interface LoomOptions {
   /** How far beyond the viewport to keep tiles, in viewports (a still
    * face never scrolls, so it keeps none). */
   lookahead?: number;
+  /** A screen you travelled to: its first drawing comes down briskly, so
+   * what you came for is lit while the ribbon is still unfurling (the
+   * screen you arrive on is drawn slowly enough to watch). */
+  brisk?: boolean;
   isIdle(): boolean;
   onIdleChange(listener: (idle: boolean) => void): void;
   compose(): Composition;
@@ -250,7 +256,11 @@ export function createLoom(options: LoomOptions) {
       gap = target - reach;
     }
     if (gap > 0.5) {
-      const speed = intro ? 0.26 + gap / 800 : 0.45 + gap / 450; // px per ms
+      const speed = intro
+        ? options.brisk
+          ? 1.4 + gap / 220
+          : 0.26 + gap / 800
+        : 0.45 + gap / 450; // px per ms
       advance(Math.min(target, reach + speed * dt));
     } else {
       last = 0;
