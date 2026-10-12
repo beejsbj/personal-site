@@ -2277,6 +2277,14 @@
   }
 }
 
+/* The swing is set on each swinging thing (life.ts), and goes no further:
+   changing it must not restyle what is inside. */
+@property --hion-sway {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 /* Sway: scrolling swings everything hung from a thread. Light things swing
    most; pictures stay still (they would repaint every frame). */
 @media (prefers-reduced-motion: no-preference) {

@@ -40,6 +40,10 @@ interface LifeOptions {
   onIdleChange(listener: (idle: boolean) => void): void;
 }
 
+/** What hangs and swings with a scroll (shell.css reads --hion-sway). */
+const SWINGS =
+  ".hion-charm, .hion-tag, .hion-pullcord[data-hang], .hion-work--lab, .hion-end, .hion-title, .hion-display__word, .hion-pull";
+
 /* ---------- A drawn thread, searchable ---------- */
 
 const CELL = 64;
@@ -258,6 +262,32 @@ export function createLife(options: LifeOptions) {
   let last = 0;
   let canvasDirty = false;
   const rand = rng(Date.now() % 10007);
+
+  /** The things that swing, given the angle each frame. Set on each of them
+   * rather than once on the world: a custom property changed on the world
+   * restyles the whole page every frame of a scroll. */
+  let swung: HTMLElement[] = [];
+  let swungAt = 0;
+  let swungAngle = "";
+  function swing(angle: string) {
+    if (angle === swungAngle) return;
+    const now = performance.now();
+    // Only what is on screen (looked for again as you scroll on).
+    if (angle && (!swung.length || now - swungAt > 400)) {
+      for (const el of swung) el.style.removeProperty("--hion-sway");
+      swungAt = now;
+      swung = [...world.querySelectorAll<HTMLElement>(SWINGS)].filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.bottom > -80 && r.top < innerHeight + 80 && r.width > 0;
+      });
+    }
+    swungAngle = angle;
+    for (const el of swung) {
+      if (angle) el.style.setProperty("--hion-sway", angle);
+      else el.style.removeProperty("--hion-sway");
+    }
+    if (!angle) swung = [];
+  }
 
   function measure() {
     const box = page.getBoundingClientRect();
@@ -591,7 +621,8 @@ export function createLife(options: LifeOptions) {
         sway = 0;
         swayV = 0;
       }
-      world.style.setProperty("--hion-sway", `${Math.max(-5, Math.min(5, sway)).toFixed(2)}deg`);
+      // In tenths of a degree: finer is not seen, and each change restyles.
+      swing(sway ? `${Math.max(-5, Math.min(5, sway)).toFixed(1)}deg` : "");
     }
 
     /* Glints ride the circles. */
@@ -1032,7 +1063,7 @@ export function createLife(options: LifeOptions) {
         cancelAnimationFrame(frame);
         frame = 0;
         layer.remove();
-        world.style.removeProperty("--hion-sway");
+        swing("");
       });
       wake();
     },
