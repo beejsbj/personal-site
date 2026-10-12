@@ -19,7 +19,7 @@ const SOLID = [
   "img",
   "video",
   "iframe",
-  "svg:not(.bp-life svg, .bp-life, .bp-life-ink, .bp-underline, .bp-scribble)",
+  "svg:not(.bp-life svg, .bp-life, .bp-life-ink, .bp-underline, .bp-scribble, .bp-scrawl)",
   ".bp-taped",
   ".bp-note",
   ".bp-slip",
@@ -32,7 +32,7 @@ const SOLID = [
   ".bp-fields",
   ".bp-circled li",
   "pre",
-  "table",
+  "table:not([data-rules])",
   "hr",
   ".bp-return",
   ".bp-label",
@@ -152,6 +152,22 @@ export function measurePage(page: HTMLElement, others: Element[], skip: Element[
       if (r.width < 1 || r.height < 1) continue;
       const b = local(r);
       space.block(b, 6, b);
+    }
+  }
+  // old scribbles on the print: no room to camp or write there, but a shot
+  // may run over them
+  for (const el of page.querySelectorAll(".bp-scrawl")) {
+    if (skipped(el)) continue;
+    for (const r of el.getClientRects()) if (r.width >= 1 && r.height >= 1) space.block(local(r), 4, null);
+  }
+  // a ruled table (`data-rules`): solid to camp or write on, but a shot may
+  // rule along its lines, between the cells and never through one
+  for (const table of page.querySelectorAll("table[data-rules]")) {
+    if (skipped(table)) continue;
+    space.block(local(table.getBoundingClientRect()), 6, null);
+    for (const cell of table.querySelectorAll("th, td")) {
+      const b = local(cell.getBoundingClientRect());
+      space.block({ x0: b.x0 + 3, y0: b.y0 + 4, x1: b.x1 - 3, y1: b.y1 - 4 }, 0, { x0: b.x0 + 3, y0: b.y0 + 4, x1: b.x1 - 3, y1: b.y1 - 4 });
     }
   }
   for (const el of others) {
