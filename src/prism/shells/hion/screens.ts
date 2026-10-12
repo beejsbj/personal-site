@@ -15,7 +15,7 @@
  * loom and the ink draw it. */
 import { part, type PartAttrs } from "../../parts";
 import { fallbackBody, featured, fill, inline, rich, type LinkMaker } from "../rich";
-import type { Header, Media, Route, SiteContent } from "../types";
+import type { Header, Media, ResumeEntry, Route, SiteContent } from "../types";
 import { h, link, scrub, text } from "./dom";
 
 type Project = SiteContent["projects"][number];
@@ -771,12 +771,110 @@ function about(content: SiteContent) {
   );
 }
 
+/* The resume is a timeline the hions draw: built from the structured
+ * resume (content.resume), never from its rendered prose. A group's
+ * heading is thrown out from a knot on their way down; each role is a loop
+ * of its own, its years written on the thread where the two part (and
+ * circled by one of them), its title strung across the loop's head, its
+ * record inside. Courses are knotted on the strand; tools hang as charms
+ * from the weft of their heading; the page's own words close it. */
+
+/** The years a role spans, as they are written on the thread: "2024",
+ * "2022–2024", "2026–Present". Empty when it has no dates. */
+function span(entry: ResumeEntry, ongoing: string) {
+  const year = (date?: string) => date?.slice(0, 4) ?? "";
+  const from = year(entry.start);
+  const to = entry.current ? ongoing : year(entry.end);
+  if (!from) return to;
+  return !to || to === from ? from : `${from}–${to}`;
+}
+
+/** An entry's name and the line under it: the title with the organisation
+ * beneath; an entry with no title is named by its organisation. */
+function named(entry: ResumeEntry): { name: string; org?: string } {
+  const name = entry.title ?? entry.org ?? entry.heading;
+  return { name, org: entry.title ? entry.org : undefined };
+}
+
+/** What an entry says: where, its date line, its summary and bullets. */
+function record(entry: ResumeEntry, org: string | undefined, hue: "c" | "m") {
+  const where = [org, entry.location].filter(Boolean).join(" · ");
+  return [
+    where
+      ? h(
+          "p",
+          { class: "hion-resume__org", "data-hue": hue, "data-reveal": "" },
+          entry.url ? link(entry.url, {}, where) : where,
+        )
+      : null,
+    entry.dateLine
+      ? h("p", { class: "hion-resume__date hion-meta", "data-reveal": "" }, entry.dateLine)
+      : null,
+    entry.summary || entry.bullets.length
+      ? h(
+          "div",
+          { class: "hion-prose hion-resume__record", "data-reveal": "" },
+          entry.summary ? h("p", {}, inline(entry.summary, hionLink)) : null,
+          entry.bullets.length
+            ? h("ul", {}, entry.bullets.map((bullet) => h("li", {}, inline(bullet, hionLink))))
+            : null,
+        )
+      : null,
+  ];
+}
+
+/** A group's heading, thrown out from a knot the hions are tied at. */
+function groupHead(id: string, title: string) {
+  return h(
+    "div",
+    { class: "hion-resume__group" },
+    strung("h2", id, title),
+    knotPoint("hion-resume__group-knot"),
+  );
+}
+
 function resume(content: SiteContent) {
   const page = content.pages.resume;
-  // The structured resume and its free body, as Daylight renders them; the
-  // parts are marked in the markup.
-  const body = story(content.resume.html, page.title, "hion-loop--resume");
-  body?.querySelectorAll("h3").forEach((h3) => h3.classList.add("hion-knotted"));
+  const { experience, education, tools, ongoing } = content.resume;
+
+  const roles = experience.roles.map((entry, i) => {
+    const hue = i % 2 ? "m" : "c";
+    const { name, org } = named(entry);
+    const years = span(entry, ongoing);
+    return loop(
+      {
+        ...part("resume.role", entry.id),
+        class: `hion-loop--role ${i % 2 ? "hion-loop--right" : "hion-loop--left"}`,
+        "aria-labelledby": `hion-role-${entry.id}`,
+        "data-hue": hue,
+      },
+      years
+        ? h(
+            "p",
+            { class: "hion-resume__when", "aria-hidden": "true", "data-reveal": "", "data-orbit": hue },
+            years,
+          )
+        : null,
+      strung("h3", `hion-role-${entry.id}`, name),
+      record(entry, org, hue),
+    );
+  });
+
+  const courses = education.entries.map((entry, i) => {
+    const { name, org } = named(entry);
+    const years = span(entry, ongoing);
+    return h(
+      "li",
+      { ...part("resume.education", entry.id), class: "hion-tied", "data-reveal": "", ...side(i) },
+      knotted(
+        years ? h("span", { "aria-hidden": "true" }, years) : null,
+        {},
+        h("h3", { class: "hion-tied__title" }, name),
+        ...record(entry, org, i % 2 ? "m" : "c"),
+      ),
+    );
+  });
+
   return screen(
     "resume",
     "hion-page-title",
@@ -786,7 +884,36 @@ function resume(content: SiteContent) {
       { class: "hion-entry-head" },
       actions(content.lenses.hion, page.header, "resume"),
     ),
-    body,
+    roles.length
+      ? h(
+          "section",
+          { class: "hion-resume hion-resume--roles", "aria-labelledby": "hion-resume-roles" },
+          groupHead("hion-resume-roles", experience.title),
+          roles,
+        )
+      : null,
+    courses.length
+      ? h(
+          "section",
+          { class: "hion-strand hion-resume--courses", "aria-labelledby": "hion-resume-courses" },
+          groupHead("hion-resume-courses", education.title),
+          h("ol", { class: "hion-knots hion-knots--courses" }, courses),
+        )
+      : null,
+    tools.items.length
+      ? loop(
+          { class: "hion-loop--note hion-loop--tools", "aria-labelledby": "hion-resume-tools" },
+          strung("h2", "hion-resume-tools", tools.title),
+          h(
+            "ul",
+            { ...part("resume.tools"), class: "hion-row hion-row--tags hion-row--charms", "data-cord": "" },
+            tools.items.map((item, i) =>
+              hung("li", "drop", { class: "hion-tag", "data-hang": "", "data-hue": i % 2 ? "m" : "c" }, item),
+            ),
+          ),
+        )
+      : null,
+    story(page.html, page.title, "hion-loop--resume", part("page.body", "resume")),
   );
 }
 

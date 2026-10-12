@@ -2494,3 +2494,193 @@
     transform: scale(1);
   }
 }
+
+/* ==========================================================================
+   Resume: the timeline the hions draw (screens.ts resume)
+   Each role is a loop of its own, down the page by turns left and right;
+   its years are written on the thread where the two part above it, circled
+   by one of them; its title is strung across the loop's head with the
+   organisation and date line beneath, its record inside. Group headings
+   are thrown out from a knot; courses are knotted on the strand; tools
+   hang as charms from their heading's weft.
+   ========================================================================== */
+
+:root[data-lens="hion"] .hion-resume--roles {
+  margin-bottom: 40px;
+}
+
+/* A group's heading, beside the knot it is thrown out from. */
+:root[data-lens="hion"] .hion-resume__group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: center;
+  width: calc(100% - 2 * var(--hion-gutter));
+  margin: 0 auto 150px;
+}
+
+:root[data-lens="hion"] .hion-resume__group .hion-strung {
+  margin: 0;
+  text-align: left;
+}
+
+:root[data-lens="hion"] .hion-resume__group-knot {
+  justify-self: center;
+  width: 2px;
+  height: 2.6rem;
+}
+
+:root[data-lens="hion"] .hion-resume--courses .hion-resume__group {
+  width: 100%;
+  margin-bottom: 3.4rem;
+}
+
+/* The years a role spans, written on the thread where the two part. */
+:root[data-lens="hion"] .hion-resume__when {
+  position: absolute;
+  top: -0.6em;
+  left: calc(50% + 26px);
+  margin: 0;
+  font: 600 2.1rem/1 var(--hion-hand);
+  color: var(--hion-c);
+  white-space: nowrap;
+}
+
+:root[data-lens="hion"] .hion-loop--role[data-hue="m"] .hion-resume__when {
+  color: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-loop--role {
+  width: min(760px, calc(100% - 2 * var(--hion-gutter)));
+  margin-bottom: 120px;
+  padding-top: 110px;
+  padding-bottom: 120px;
+}
+
+:root[data-lens="hion"] .hion-loop--role > .hion-strung {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.6vw, 2.05rem);
+  /* Room between wrapped lines, so a line's box never bites the
+     descenders of the one above. */
+  line-height: 1.34;
+}
+
+:root[data-lens="hion"] .hion-resume__org {
+  margin: 0.35em 0 0;
+  font: 600 1.55rem/1.15 var(--hion-hand);
+  color: var(--hion-c);
+  text-align: center;
+}
+
+:root[data-lens="hion"] .hion-resume__org[data-hue="m"] {
+  color: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-resume__org a {
+  text-decoration: none;
+}
+
+:root[data-lens="hion"] .hion-loop--role .hion-resume__date {
+  margin-top: 0.3em;
+  font-size: 1.15rem;
+  text-align: center;
+}
+
+:root[data-lens="hion"] .hion-resume__record {
+  max-width: 34rem;
+  margin: 1.6rem auto 0;
+}
+
+:root[data-lens="hion"] .hion-resume__record > :first-child {
+  margin-top: 0;
+}
+
+:root[data-lens="hion"] .hion-resume__record > :last-child {
+  margin-bottom: 0;
+}
+
+/* Courses: knotted on the strand; the record sits under the name. */
+:root[data-lens="hion"] .hion-resume--courses {
+  width: min(1040px, calc(100% - 2 * var(--hion-gutter)));
+  margin-bottom: 150px;
+}
+
+:root[data-lens="hion"] .hion-knots--courses .hion-resume__org,
+:root[data-lens="hion"] .hion-knots--courses .hion-resume__date {
+  text-align: inherit;
+}
+
+:root[data-lens="hion"] .hion-knots--courses .hion-resume__org {
+  font-size: 1.35rem;
+}
+
+:root[data-lens="hion"] .hion-knots--courses .hion-resume__date {
+  margin-top: 0.25em;
+  font-size: 1.05rem;
+}
+
+:root[data-lens="hion"] .hion-knots--courses .hion-resume__record {
+  margin: 0.7rem 0 0;
+  font-size: 1rem;
+}
+
+/* Tools: charms hung from the weft of their heading, row by row. */
+:root[data-lens="hion"] .hion-row--charms {
+  justify-content: center;
+  gap: 0 28px;
+  margin-top: 1.4rem;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-resume__group {
+    grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+    width: min(1120px, calc(100% - 2 * var(--hion-gutter)));
+  }
+
+  :root[data-lens="hion"] .hion-resume__group .hion-strung {
+    justify-self: end;
+    text-align: right;
+  }
+
+  :root[data-lens="hion"] .hion-resume--courses .hion-resume__group {
+    width: 100%;
+  }
+
+  :root[data-lens="hion"] .hion-knots--courses .hion-tied[data-side="l"] .hion-resume__record {
+    margin-left: auto;
+  }
+
+  :root[data-lens="hion"] .hion-loop--tools {
+    width: min(720px, calc(100% - 2 * var(--hion-gutter)));
+  }
+}
+
+@media (max-width: 719px) {
+  :root[data-lens="hion"] .hion-resume__group {
+    width: calc(100% - 24px);
+    margin-bottom: 110px;
+  }
+
+  :root[data-lens="hion"] .hion-loop--role,
+  :root[data-lens="hion"] .hion-loop--tools {
+    width: calc(100% - 2 * 12px);
+    margin: 0 12px 100px;
+    padding: 84px var(--hion-loop-pad) 92px;
+  }
+
+  :root[data-lens="hion"] .hion-resume__when {
+    left: calc(50% + 18px);
+    font-size: 1.75rem;
+  }
+
+  :root[data-lens="hion"] .hion-loop--role > .hion-strung {
+    font-size: 1.45rem;
+  }
+
+  :root[data-lens="hion"] .hion-resume__org {
+    font-size: 1.35rem;
+  }
+
+  :root[data-lens="hion"] .hion-row--charms {
+    gap: 0 16px;
+  }
+}
