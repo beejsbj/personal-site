@@ -1924,7 +1924,7 @@
 
 :root[data-lens="hion"] [data-reveal] {
   transition:
-    opacity 0.7s ease,
+    opacity 0.45s ease,
     transform 0.9s var(--hion-ease-out),
     clip-path 0.8s var(--hion-ease-out);
 }
