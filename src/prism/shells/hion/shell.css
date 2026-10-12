@@ -10,24 +10,32 @@
   --hion-cl: rgb(214 251 255);
   --hion-ml: rgb(255 216 241);
   --hion-text: rgb(205 240 245);
-  --hion-serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", Georgia, serif;
-  --hion-hand: "Caveat", "Patrick Hand", cursive;
+  /* One broad-nib family (Alegreya) writes every word: the hand that
+     draws the threads also writes. Display: the woven and hung titles, a
+     semibold so counters stay open when life weaves the letters. Text:
+     long reading on black, a touch over regular so it does not thin out.
+     Hand: the spoken lines, in the true italic. Label: charms, dates,
+     tags, in real small caps. Every weight here is in a loaded file. */
+  --hion-serif: "Alegreya Variable", "Alegreya", Georgia, serif;
   --hion-display: var(--hion-serif);
-  --hion-display-weight: 800;
+  --hion-display-weight: 660;
   --hion-display-vary: normal;
-  --hion-display-track: -0.015em;
-  --hion-display-leading: 0.9;
-  --hion-text-weight: 500;
-  --hion-strong-weight: 800;
-  --hion-hand-style: normal;
-  --hion-hand-weight: 600;
-  --hion-hand-scale: 1;
-  --hion-label: var(--hion-hand);
+  --hion-display-track: -0.01em;
+  --hion-display-leading: 0.92;
+  --hion-text-size: 1.125rem;
+  --hion-read-size: 1.2rem;
+  --hion-text-weight: 450;
+  --hion-strong-weight: 700;
+  --hion-hand: var(--hion-serif);
+  --hion-hand-style: italic;
+  --hion-hand-weight: 500;
+  --hion-hand-scale: 0.8;
+  --hion-label: "Alegreya SC", var(--hion-serif);
   --hion-label-style: normal;
-  --hion-label-weight: 600;
-  --hion-label-scale: 1;
+  --hion-label-weight: 500;
+  --hion-label-scale: 0.74;
   --hion-label-caps: normal;
-  --hion-label-track: normal;
+  --hion-label-track: 0.05em;
   --hion-gutter: clamp(20px, 6vw, 96px);
   --hion-loop-pad: clamp(40px, 5vw, 72px);
   --hion-ease-swing: cubic-bezier(0.2, 1.55, 0.4, 1);
@@ -36,7 +44,7 @@
   min-height: 100vh;
   color: var(--hion-text);
   background: var(--hion-black);
-  font: var(--hion-text-weight) 1.0625rem/1.78 var(--hion-serif);
+  font: var(--hion-text-weight) var(--hion-text-size)/1.7 var(--hion-serif);
   font-kerning: normal;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -981,7 +989,7 @@
 @media (min-width: 720px) {
   :root[data-lens="hion"] .hion-loop--story {
     --hion-measure: calc(60ch + 2 * var(--hion-loop-pad));
-    font-size: 1.08rem;
+    font-size: var(--hion-read-size);
     width: min(var(--hion-measure), calc(100% - 2 * var(--hion-gutter)));
     margin-left: clamp(
       var(--hion-gutter),
@@ -1132,7 +1140,7 @@
 
 :root[data-lens="hion"] .hion-work__summary {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.06rem;
   line-height: 1.65;
 }
 
@@ -1219,7 +1227,7 @@
 
   :root[data-lens="hion"] .hion-row--works .hion-work__summary {
     max-width: 24em;
-    font-size: 1.02rem;
+    font-size: 1.06rem;
   }
 
   :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) .hion-work__summary {
@@ -1308,7 +1316,7 @@
 
 :root[data-lens="hion"] .hion-tied__summary {
   margin: 0.4em 0 0;
-  font-size: 1.02rem;
+  font-size: 1.06rem;
   line-height: 1.6;
   color: var(--hion-text);
 }
@@ -1446,7 +1454,7 @@
   gap: 12px 24px;
   max-width: 64ch;
   margin-top: 32px;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 :root[data-lens="hion"] .hion-writing__origin a {
@@ -1745,8 +1753,8 @@
 /* ---------- Prose: the rendered articles ---------- */
 
 :root[data-lens="hion"] .hion-prose {
-  font-size: 1.08rem;
-  line-height: 1.85;
+  font-size: var(--hion-read-size);
+  line-height: 1.72;
 }
 
 :root[data-lens="hion"] .hion-prose p {
@@ -2029,7 +2037,9 @@
   :root[data-lens="hion"] .hion {
     --hion-gutter: 20px;
     --hion-loop-pad: 26px;
-    font-size: 1rem;
+    --hion-text-size: 1.0625rem;
+    --hion-read-size: 1.125rem;
+    font-size: var(--hion-text-size);
   }
 
   :root[data-lens="hion"] .hion-nav {
