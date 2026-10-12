@@ -2600,7 +2600,8 @@
   top: -0.6em;
   left: calc(50% + 26px);
   margin: 0;
-  font: 600 2.1rem/1 var(--hion-hand);
+  font: var(--hion-label-weight) calc(2.1rem * var(--hion-label-scale))/1 var(--hion-label);
+  letter-spacing: var(--hion-label-track);
   color: var(--hion-c);
   white-space: nowrap;
 }
@@ -2626,7 +2627,7 @@
 
 :root[data-lens="hion"] .hion-resume__org {
   margin: 0.35em 0 0;
-  font: 600 1.55rem/1.15 var(--hion-hand);
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.55rem * var(--hion-hand-scale))/1.15 var(--hion-hand);
   color: var(--hion-c);
   text-align: center;
 }
