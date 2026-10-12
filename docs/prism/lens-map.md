@@ -465,7 +465,19 @@ No new copy, no new reads of `content.json`, no `route.main`: the cloth's only i
 | Page opening (eyebrow, h1, intro, actions; project/lab/post meta, links, tools) | Across the hions' way down from the current destination (drawn in toward the middle): the title hangs from a branch on the side with room, the intro is tied on at a `knot` station on the other side, pull-cords and tags hang under the title. Phones: one column, stepped a little | `S:opening`, `S:pageTitle` |
 | About opening | Title and action-cord on the far side of the portrait, intro tied on at a knot on the near side; cyan circles the portrait | `S:about` |
 | H9 updates, writing list, H11 Elsewhere | Strands, not loops: the hions run down together, knotted at each entry; the entry is tied on beside its knot by turns either side, date level with the knot, title beneath. Wide screens: each rides up beside the one before. Phones: one column, knots on the right | `S:knotted`, `S:home`, `S:writing` |
-| Long reading (About, project, lab and post bodies, resume) | A ~60ch column held right of centre; h2s hang out past the cyan strand, the resume's h3 knots sit on it | `S:story`, `shell.css` |
+| Long reading (About, project, lab and post bodies, the resume's own body) | A ~60ch column held right of centre; h2s hang out past the cyan strand | `S:story`, `shell.css` |
+
+**The resume as a timeline (`hion/resume-timeline`).** The resume is built from `content.resume`, no longer from `resume.html`; the hions are its time axis.
+
+| Part | How it is drawn | Built by |
+|---|---|---|
+| Experience / Education headings | Strung on a weft thrown out from a knot (`data-spine="knot"`) on the hions' way down; on phones the knot sits at the right | `S:groupHead`, `.hion-resume__group` |
+| Each role (`resume.role`) | Its own loop (by turns left and right on wide screens): the years it spans (`start`/`end`, or `start`–`ongoing` when current) written on the thread where the two part and circled by one hion (`data-orbit`, aria-hidden: the date line carries the same fact); the title strung on the loop's weft (`h3`), organisation (and `location`, linked by `url` when given) in hand beneath, then `dateLine`, then summary and bullets | `S:resume`, `S:record`, `S:span` |
+| Each course (`resume.education`) | Knotted on the strand like updates: years level with the knot, name, organisation, date line, summary | `S:resume`, `S:knotted` |
+| Tools (`resume.tools`) | Charms (`.hion-tag` drops) hung on cords woven across a loop under the strung heading; rows close together share one cord, so the lower row hangs on longer threads | `S:resume`, `.hion-row--charms` |
+| Page body (`page.body`, "See the work") | The story loop | `S:story` |
+
+No new weave kind: role loops are ordinary `loop` stations, years are `data-orbit` (as `/projects` years). `tools.sentence` is not shown: it is the same items written as a sentence. No new lens copy; no parity gaps.
 
 The new marks are layout only: `data-spine="knot"` (the two meet and are tied there), `data-tie` outside a loop (a short thread to the hions at the element's first line) and wefts thrown from the hions to a heading beside them (`weave.ts`).
 
@@ -482,6 +494,7 @@ Line numbers are from the current tree and are still moving. `S` = `HI/screens.t
 | `projects[]`: slug, href, title, summary, kind, year, dateLabel, tools, featured, cover, links | `S:workCharm`, `S:projects`, `S:project`, `S:onward` |
 | `lab[]`: slug, href, detail, title, summary, type, sourceEra, links | `S:lab`, `S:labEntry` |
 | `updates[]`: source, kind, date, dateLabel, href, title (`slice(0,6)`) | `S:home` |
+| `resume.experience/education` (title; entries' id, title, org, start, end, current, dateLine, location, url, summary, bullets), `resume.tools` (title, items), `resume.ongoing`, `pages.resume.header/html` | `S:resume` |
 
 Never read: `pages.*.body`, `eyebrow`, `availability`; `projects[].role/location/status/tags/media` (media and meta come from `route.main` instead); `lab[].cover`, list-page `links`; `updates[].summary/linkLabel/relatedProject`.
 
@@ -501,7 +514,6 @@ Never read: `pages.*.body`, `eyebrow`, `availability`; `projects[].role/location
 | `article.prose` | `S:508,536,622,633` | `<article class="prose">` |
 | `.lab-aside` | `S:559` | `lab/index.astro` |
 | `.page-header__actions a` (first) | `S:604,632` | actions slot |
-| `h3` | `S:634` | resume entries |
 | `.page-header, header.page-header`, `.section-intro__*` removed; `:scope > * > *`; `/404/` regex on the eyebrow text | `S:652-684` | 404 detection depends on the "404" eyebrow |
 
 **Hard-coded strings**
