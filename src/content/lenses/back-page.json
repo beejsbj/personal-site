@@ -94,7 +94,9 @@
       "conversionHeader": "Useful Conversions",
       "length": "Length",
       "weight": "Weight",
-      "volume": "Volume"
+      "volume": "Volume",
+      "hard": "≈ hard",
+      "was": "Burooj was here"
     }
   },
   "lab": {
@@ -280,6 +282,20 @@
         "don't skip ahead",
         { "t": "is there a test?", "reply": "there's a P.S." },
         { "t": "are we in it?", "reply": "we're the margin" }
+      ],
+      "times": [
+        { "t": "seven eights?", "reply": "fifty-six. it's ringed" },
+        { "t": "what's nine nines?", "reply": "81. easy" },
+        { "t": "twelve twelves?", "reply": "144. that's the trench" },
+        { "t": "who shaded the sevens?", "reply": "Burooj. in maths" },
+        { "t": "is 54 right?", "reply": "it's crossed out" },
+        { "t": "say your sevens", "reply": "7, 14, 21… pass" },
+        "learn your sevens",
+        "mind the sevens, they're hard",
+        "keep down behind 144",
+        "the lines are straight here",
+        "rule a line, rule a row",
+        "who gave 100 a face"
       ],
       "spare": [
         "a quick war!",
