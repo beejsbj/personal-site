@@ -169,6 +169,12 @@ export function createCloth(options: ClothOptions) {
       }
     }
     range.detach();
+    // A stretch left to something that draws its own (the resume's timeline
+    // when it runs across: track.ts), whole.
+    for (const el of page.querySelectorAll("[data-cloth-hold]")) {
+      const b = box(el);
+      holdPx(0, b.t, width, b.b, 0, 0);
+    }
     // The line at the top, and what hangs from it.
     holdPx(0, 0, width, 150, 0, 0);
   }
