@@ -382,7 +382,8 @@
 
 
 /* The living cloth (cloth.ts): under the hions, page-tall, drawn only
-   near the viewport. Its light is a quarter-resolution canvas, scaled up. */
+   near the viewport: a ground canvas a tile, and the moving heads on
+   strips over it. */
 :root[data-lens="hion"] .hion-cloth {
   position: absolute;
   inset: 0 0 auto;
@@ -391,8 +392,8 @@
   transition: opacity 0.6s ease;
 }
 
-/* Living out of sight until it has settled (reduced motion, a still face,
-   a new layout). */
+/* Woven out of sight before it is shown (on arrival, a new layout, and
+   for reduced motion or a still face). */
 :root[data-lens="hion"] .hion-cloth[data-state="settling"] {
   opacity: 0;
   transition: none;
