@@ -232,35 +232,6 @@ export function paintGround(
   paintCrossing(ctx, st, x, y, life.woven[x + y * life.w], drape, fabric);
 }
 
-/** A crossing's ground changed after it was laid (the ground canvas is
- * never cleared): clear its square and lay it, and the floats of its
- * neighbours that reach into it, again. */
-export function repaintGround(
-  ctx: CanvasRenderingContext2D,
-  life: Immigration,
-  st: Stitches,
-  x: number,
-  y: number,
-  drape: Drape,
-  fabric: Fabric,
-) {
-  const S = st.size;
-  const di = x + y * drape.w;
-  const cx = x * S + drape.dx[di];
-  const cy = y * S + drape.dy[di];
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(cx, cy, S, S);
-  ctx.clip();
-  ctx.clearRect(cx, cy, S, S);
-  for (let yy = Math.max(0, y - 1); yy <= Math.min(life.h - 1, y + 1); yy++) {
-    for (let xx = Math.max(0, x - 1); xx <= Math.min(life.w - 1, x + 1); xx++) {
-      paintGround(ctx, life, st, xx, yy, drape, fabric);
-    }
-  }
-  ctx.restore();
-}
-
 /** Repaint the live threads in one rectangle of crossings [x0, x1) ×
  * [y0, y1) on a tile: clear it, then lay every thread that touches it,
  * under ones first, and their light. */
