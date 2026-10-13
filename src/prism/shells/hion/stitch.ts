@@ -1,4 +1,5 @@
-/** Stitch: how a living cloth is drawn, so it reads as thread, not pixels.
+/** Stitch: how a cloth of crossings (woven words and covers, swatches) is
+ * drawn, so it reads as thread, not pixels.
  *
  * A live crossing is not painted as a square. Thread runs between
  * neighbouring live crossings of the same colour: across, down, or on the
@@ -42,8 +43,6 @@ export interface Stitches {
    * magenta one along the weft. */
   ground: HTMLCanvasElement[][];
   dpr: number;
-  /** How strongly it is laid (0 to 1): a cloth that is only ground is faint. */
-  strength: number;
 }
 
 const HUES: Hue[] = ["c", "m"];
@@ -77,20 +76,19 @@ function float(a: Pt, b: Pt, rand: () => number, over: number): number[] {
 }
 
 /** Sprites for a cloth of crossings `size` apart. `heavy` lays thicker
- * thread for a fine cloth that has to read (woven type); `strength` lays
- * all of it fainter. */
-export function stitches(size: number, dpr: number, heavy = false, strength = 1): Stitches {
+ * thread for a fine cloth that has to read (woven type). */
+export function stitches(size: number, dpr: number, heavy = false): Stitches {
   // Drawn once for each kind of cloth: dozens of pastel marks each, and
   // only ever read after.
-  const key = `${size}:${dpr}:${heavy}:${strength}`;
+  const key = `${size}:${dpr}:${heavy}`;
   let made = sewn.get(key);
-  if (!made) sewn.set(key, (made = sew(size, dpr, heavy, strength)));
+  if (!made) sewn.set(key, (made = sew(size, dpr, heavy)));
   return made;
 }
 
 const sewn = new Map<string, Stitches>();
 
-function sew(size: number, dpr: number, heavy: boolean, strength: number): Stitches {
+function sew(size: number, dpr: number, heavy: boolean): Stitches {
   const pad = Math.ceil(size * 0.7 + 6);
   const ply = size >= 17 ? 2 : 1;
   const weight = heavy
@@ -164,7 +162,7 @@ function sew(size: number, dpr: number, heavy: boolean, strength: number): Stitc
       return canvas;
     }),
   );
-  return { size, pad, threads, knots, ground, dpr, strength };
+  return { size, pad, threads, knots, ground, dpr };
 }
 
 /** How the cloth hangs: a smooth offset for every crossing, so its rows
@@ -214,9 +212,7 @@ export function paintCrossing(
   const py = y * S + S / 2 - st.pad + drape.dy[di];
   const bit = bits === 3 ? topAt(fabric, x, y) : bits;
   const g = st.ground[bit - 1][variant(x, y, 5) % VARIANTS];
-  ctx.globalAlpha = st.strength;
   ctx.drawImage(g, px, py, g.width / st.dpr, g.height / st.dpr);
-  ctx.globalAlpha = 1;
 }
 
 /** Lay the woven ground of one crossing of a living cloth. */
@@ -230,35 +226,6 @@ export function paintGround(
   fabric: Fabric,
 ) {
   paintCrossing(ctx, st, x, y, life.woven[x + y * life.w], drape, fabric);
-}
-
-/** A crossing's ground changed after it was laid (the ground canvas is
- * never cleared): clear its square and lay it, and the floats of its
- * neighbours that reach into it, again. */
-export function repaintGround(
-  ctx: CanvasRenderingContext2D,
-  life: Immigration,
-  st: Stitches,
-  x: number,
-  y: number,
-  drape: Drape,
-  fabric: Fabric,
-) {
-  const S = st.size;
-  const di = x + y * drape.w;
-  const cx = x * S + drape.dx[di];
-  const cy = y * S + drape.dy[di];
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(cx, cy, S, S);
-  ctx.clip();
-  ctx.clearRect(cx, cy, S, S);
-  for (let yy = Math.max(0, y - 1); yy <= Math.min(life.h - 1, y + 1); yy++) {
-    for (let xx = Math.max(0, x - 1); xx <= Math.min(life.w - 1, x + 1); xx++) {
-      paintGround(ctx, life, st, xx, yy, drape, fabric);
-    }
-  }
-  ctx.restore();
 }
 
 /** Repaint the live threads in one rectangle of crossings [x0, x1) ×
@@ -285,7 +252,6 @@ export function paintRegion(
   ctx.rect(rx, ry, rw, rh);
   ctx.clip();
   ctx.clearRect(rx, ry, rw, rh);
-  ctx.globalAlpha = st.strength;
   // Threads from crossings up to two away can reach into the rectangle.
   const m = 2;
   const ax = Math.max(0, x0 - m);
