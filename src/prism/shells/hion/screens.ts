@@ -776,7 +776,9 @@ function about(content: SiteContent) {
  * heading is thrown out from a knot on their way down; each role is a loop
  * of its own, its years written on the thread where the two part (and
  * circled by one of them), its title strung across the loop's head, its
- * record inside. Courses are knotted on the strand; tools hang as charms
+ * record inside. On a wide screen the roles run across instead, on a
+ * pinned track the page's scrolling slides (track.ts), in the same order:
+ * newest first. Courses are knotted on the strand; tools hang as charms
  * from the weft of their heading; the page's own words close it. */
 
 /** The years a role spans, as they are written on the thread: "2024",
@@ -884,12 +886,27 @@ function resume(content: SiteContent) {
       { class: "hion-entry-head" },
       actions(content.lenses.hion, page.header, "resume"),
     ),
+    // Down the page, or (wide screens) across it: the pin and the track
+    // are boxes only when it runs across (track.ts).
     roles.length
       ? h(
           "section",
-          { class: "hion-resume hion-resume--roles", "aria-labelledby": "hion-resume-roles" },
-          groupHead("hion-resume-roles", experience.title),
-          roles,
+          {
+            class: "hion-resume hion-resume--roles hion-timeline",
+            "aria-labelledby": "hion-resume-roles",
+            "data-timeline": "",
+          },
+          h(
+            "div",
+            { class: "hion-timeline__pin" },
+            h(
+              "div",
+              { class: "hion-timeline__track" },
+              groupHead("hion-resume-roles", experience.title),
+              roles,
+              h("span", { class: "hion-timeline__out", "data-spine": "via", "aria-hidden": "true" }),
+            ),
+          ),
         )
       : null,
     courses.length

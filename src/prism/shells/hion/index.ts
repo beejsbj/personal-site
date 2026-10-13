@@ -29,6 +29,7 @@ import { tooth } from "./pastel";
 import { clothCanvas } from "./stitch";
 import { weaveCovers, weaveType } from "./woven";
 import { buildScreen, footer } from "./screens";
+import { ACROSS, createTrack } from "./track";
 import { compose } from "./weave";
 import "./shell.css";
 
@@ -38,6 +39,8 @@ interface Live {
   loom: ReturnType<typeof createLoom>;
   cloth: ReturnType<typeof createCloth>;
   life: ReturnType<typeof createLife> | undefined;
+  /** The resume's timeline, when it runs across. */
+  track: ReturnType<typeof createTrack> | undefined;
   controller: AbortController;
   /** When it began to leave (performance.now()), once it has. */
   left?: number;
@@ -128,6 +131,30 @@ function show(route: Route, first: boolean) {
     page.dataset.drop =
       drop[0] < width * 0.4 ? "left" : drop[0] > width * 0.6 ? "right" : "center";
   }
+  // The resume's timeline runs across a wide screen, on a track that draws
+  // its own threads; laid again if the window crosses over.
+  const timeline = page.querySelector<HTMLElement>("[data-timeline]");
+  const across = timeline ? matchMedia(ACROSS) : undefined;
+  const track =
+    timeline && across?.matches
+      ? createTrack({
+          section: timeline,
+          signal: controller.signal,
+          instant: still(),
+          face: ctx.face,
+          isIdle: ctx.isIdle,
+          onIdleChange: ctx.onIdleChange,
+        })
+      : undefined;
+  across?.addEventListener(
+    "change",
+    () => {
+      if (live?.page !== page || live.left !== undefined) return;
+      controller.abort();
+      show(route, true);
+    },
+    { signal: controller.signal },
+  );
   const loom = createLoom({
     host: page,
     signal: controller.signal,
@@ -164,11 +191,12 @@ function show(route: Route, first: boolean) {
         isIdle: ctx.isIdle,
         onIdleChange: ctx.onIdleChange,
       });
-  live = { path: route.path, page, loom, cloth, life, controller };
+  live = { path: route.path, page, loom, cloth, life, track, controller };
   requestAnimationFrame(() => {
     if (controller.signal.aborted) return;
     // The threads first: they are what you follow onto the screen.
     loom.start();
+    track?.start();
     life?.start();
     page.dataset.state = "here";
     // Then the ground and the woven things, once the ribbon has fallen and
@@ -209,6 +237,7 @@ function leave(path: string) {
   // What has to be measured first, then what moves: one layout, not one
   // per step, in the frame you clicked.
   leaving.loom.release();
+  leaving.track?.release();
   leaving.cloth.release(closer(leaving.page, path));
   leaving.life?.release();
   nav.setCurrent(path);
