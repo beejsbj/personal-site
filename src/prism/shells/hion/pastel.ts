@@ -117,7 +117,8 @@ export interface Mark {
   pts: number[];
   seed: number;
   core: boolean;
-  /** Bounding box, padded for dust and glow. */
+  /** Extent along the way the drawing reads (page y; x across a track),
+   * padded for dust and glow. */
   y0: number;
   y1: number;
 }
@@ -157,6 +158,31 @@ export function mark(
     core,
     ...box,
   };
+}
+
+/** A mark composed with x and y swapped (a drawing that reads across a
+ * track is composed as if it read down, then turned): its points are
+ * swapped back; its key and extent, already along x, are kept. */
+export function turned(m: Mark): Mark {
+  const pts = new Array<number>(m.pts.length);
+  for (let i = 0; i < m.pts.length; i += 2) {
+    pts[i] = m.pts[i + 1];
+    pts[i + 1] = m.pts[i];
+  }
+  return { ...m, pts };
+}
+
+/** A mark laid as it is on a drawing that reads across: its extent is
+ * measured along x. */
+export function acrossX(m: Mark): Mark {
+  const pad = m.kind === Kind.Glow ? m.w * 2 + 24 : m.w + 18;
+  let x0 = Infinity;
+  let x1 = -Infinity;
+  for (let i = 0; i < m.pts.length; i += 2) {
+    if (m.pts[i] < x0) x0 = m.pts[i];
+    if (m.pts[i] > x1) x1 = m.pts[i];
+  }
+  return { ...m, y0: x0 - pad, y1: x1 + pad };
 }
 
 function normals(pts: number[]) {

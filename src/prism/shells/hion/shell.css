@@ -2753,3 +2753,91 @@
     gap: 0 16px;
   }
 }
+
+/* --------------------------------------------------------------------------
+   The timeline across (track.ts): on a wide screen the roles lie along a
+   track pinned to the window while you pass through the section, slid left
+   as you scroll. Down the page (phones, narrow or short windows) the pin
+   and the track are not boxes at all, and the roles run down as above.
+   -------------------------------------------------------------------------- */
+
+:root[data-lens="hion"] .hion-timeline__pin,
+:root[data-lens="hion"] .hion-timeline__track {
+  display: contents;
+}
+
+:root[data-lens="hion"] .hion-timeline__out {
+  display: none;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="across"] {
+  /* Where the hions come down into it: the knot, this far across. */
+  --hion-timeline-in: clamp(300px, 30vw, 480px);
+  position: relative;
+  margin-bottom: 90px;
+}
+
+/* Clipped, not scrolled: focus can't slide it behind track.ts's back. */
+:root[data-lens="hion"] .hion-timeline[data-timeline="across"] .hion-timeline__pin {
+  display: block;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: clip;
+  background: var(--hion-black);
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="across"] .hion-timeline__track {
+  display: flex;
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+  width: max-content;
+  height: 100%;
+  /* Room for the line at the top; and at the end, room for the last role
+     to stand clear while the hions turn down out of it. */
+  padding: 96px 30vw 32px 0;
+  will-change: transform;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="across"] .hion-resume__group {
+  flex: none;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  width: calc(var(--hion-timeline-in) + 75px);
+  margin: 0;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="across"] .hion-loop--role {
+  flex: none;
+  width: clamp(520px, 42vw, 680px);
+  margin: 0 0 0 250px;
+  /* The strands run along the top and the foot, and part and meet at the
+     ends: the sides keep clear of their turns. */
+  padding: 64px 112px;
+}
+
+/* The years, on the thread just before the two part round the role. */
+:root[data-lens="hion"] .hion-timeline[data-timeline="across"] .hion-resume__when {
+  top: auto;
+  right: calc(100% + 30px);
+  bottom: calc(50% + 22px);
+  left: auto;
+}
+
+/* Where the hions leave the track, turning down to the page below. */
+:root[data-lens="hion"] .hion-timeline[data-timeline="across"] .hion-timeline__out {
+  display: block;
+  flex: none;
+  align-self: flex-end;
+  width: 2px;
+  height: 2px;
+  margin: 0 0 -32px 140px;
+}
+
+:root[data-lens="hion"] .hion-loom--across .hion-loom__tile {
+  width: auto;
+}
+
+:root[data-lens="hion"] .hion-loom--across {
+  right: auto;
+}

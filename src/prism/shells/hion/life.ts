@@ -47,6 +47,8 @@ const SWINGS =
 /* ---------- A drawn thread, searchable ---------- */
 
 const CELL = 64;
+/** Points further apart than this are either side of a gap in a thread. */
+const GAP = 400;
 
 class Strand {
   xs: Float64Array;
@@ -65,7 +67,10 @@ class Strand {
     for (let i = 0; i < n; i++) {
       this.xs[i] = points[i][0];
       this.ys[i] = points[i][1];
-      this.ls[i] = i ? this.ls[i - 1] + Math.hypot(this.xs[i] - this.xs[i - 1], this.ys[i] - this.ys[i - 1]) : 0;
+      // A thread that leaves the page for a track (weave.ts `gap`) comes
+      // back further down: nothing runs across the stretch between.
+      const step = i ? Math.hypot(this.xs[i] - this.xs[i - 1], this.ys[i] - this.ys[i - 1]) : 0;
+      this.ls[i] = i ? this.ls[i - 1] + (step > GAP ? 0 : step) : 0;
       const cell = this.cell(this.xs[i], this.ys[i]);
       const bucket = this.grid.get(cell);
       if (bucket) bucket.push(i);
@@ -842,6 +847,7 @@ export function createLife(options: LifeOptions) {
         if (a < 0.03) continue;
         const [x0, y0] = strand.at(p.s + u * half);
         const [x1, y1] = strand.at(p.s + (u + step) * half);
+        if (Math.abs(y1 - y0) + Math.abs(x1 - x0) > 60) continue;
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(x1, y1);
@@ -871,6 +877,7 @@ export function createLife(options: LifeOptions) {
         if (!strand.drawnAt(s0, reach)) continue;
         const [x0, y0] = strand.at(s0);
         const [x1, y1] = strand.at(s1);
+        if (Math.abs(y1 - y0) + Math.abs(x1 - x0) > 60) continue;
         ctx.globalAlpha = 0.85 * (1 - k / 6);
         ctx.strokeStyle = `rgb(${rgb})`;
         ctx.beginPath();
