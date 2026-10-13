@@ -20,13 +20,13 @@ import { kindOf } from "../../routes";
 import type { LensShell, Route, ShellContext } from "../types";
 import { h, setNewTabNote, wait } from "./dom";
 import { ink } from "./ink";
-import { createCloth } from "./cloth";
 import { type Fabric, fabricAt, fabricOf } from "./fabric";
 import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
 import { clothCanvas } from "./stitch";
+import { createThreads, seedOf } from "./threads";
 import { weaveCovers, weaveType } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { compose } from "./weave";
@@ -36,7 +36,7 @@ interface Live {
   path: string;
   page: HTMLElement;
   loom: ReturnType<typeof createLoom>;
-  cloth: ReturnType<typeof createCloth>;
+  threads: ReturnType<typeof createThreads>;
   life: ReturnType<typeof createLife> | undefined;
   controller: AbortController;
   /** When it began to leave (performance.now()), once it has. */
@@ -65,7 +65,7 @@ let ribbon: Ribbon | undefined;
  * to the foot of the screen (then it spreads to the whole page). */
 const PULL = 640;
 const DROP = 0.42;
-/** How long a leaving screen takes to reel up (loom.ts, cloth.ts). */
+/** How long a leaving screen takes to reel up (loom.ts, threads.ts). */
 const LEAVE = 440;
 
 const still = () => ctx.reducedMotion || ctx.face;
@@ -142,14 +142,15 @@ function show(route: Route, first: boolean) {
       return composition;
     },
   });
-  // The living cloth under it all; a single thing is seen close up.
-  const cloth = createCloth({
+  // Threads of intent under it all; a single thing is seen close up.
+  const threads = createThreads({
     page,
     loom,
     signal: controller.signal,
     instant: still(),
     scale: close(route.path) ? 2 : 1,
-    fabric,
+    origin: () => nav.origin(),
+    seed: seedOf(route.path),
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
   });
@@ -164,7 +165,7 @@ function show(route: Route, first: boolean) {
         isIdle: ctx.isIdle,
         onIdleChange: ctx.onIdleChange,
       });
-  live = { path: route.path, page, loom, cloth, life, controller };
+  live = { path: route.path, page, loom, threads, life, controller };
   requestAnimationFrame(() => {
     if (controller.signal.aborted) return;
     // The threads first: they are what you follow onto the screen.
@@ -176,7 +177,7 @@ function show(route: Route, first: boolean) {
     const ground = () => {
       // Not for a screen already let go (pulled away before it settled).
       if (live?.page !== page || live.left !== undefined) return;
-      cloth.start();
+      threads.start();
       const weaving = { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric };
       weaveType(page, weaving);
       weaveCovers(page, weaving);
@@ -198,7 +199,7 @@ function show(route: Route, first: boolean) {
 }
 
 /** The screen you are on lets go: its drawing reels back up toward the
- * line, its cloth goes, and the place you pulled drops and starts its
+ * line, its threads go, and the place you pulled drops and starts its
  * ribbon down. Begun at the click; the next screen need not be here yet. */
 function leave(path: string) {
   const leaving = live;
@@ -209,7 +210,7 @@ function leave(path: string) {
   // What has to be measured first, then what moves: one layout, not one
   // per step, in the frame you clicked.
   leaving.loom.release();
-  leaving.cloth.release(closer(leaving.page, path));
+  leaving.threads.release(closer(leaving.page, path));
   leaving.life?.release();
   nav.setCurrent(path);
   ribbon = unfurl(path);
@@ -331,7 +332,7 @@ const close = (path: string) => {
 };
 
 /** The link you followed, when it opens one thing out of a cloth of many
- * (a project or a post from a list): the cloth magnifies round it on the way. */
+ * (a project or a post from a list): the threads magnify round it on the way. */
 let followed: { el: HTMLAnchorElement; at: number } | undefined;
 
 function closer(page: HTMLElement, path: string): [number, number] | undefined {
