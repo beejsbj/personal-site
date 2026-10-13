@@ -1,0 +1,44 @@
+{
+  "newTab": "(opens in a new tab)",
+  "nav": {
+    "label": "Site",
+    "menu": "Menu"
+  },
+  "home": {
+    "links": "Elsewhere",
+    "work": "Follow the line to every project"
+  },
+  "work": {
+    "tools": "{title} tools"
+  },
+  "entry": {
+    "links": "Links",
+    "tools": "Tools",
+    "pictures": "Pictures",
+    "story": "{title}, the story",
+    "backTo": "Back to"
+  },
+  "project": {
+    "onward": "More projects",
+    "newer": "Newer along the line",
+    "older": "Older along the line",
+    "all": "Every project"
+  },
+  "labEntry": {
+    "live": "Open the live experiment",
+    "onward": "More from the lab",
+    "all": "The whole lab"
+  },
+  "about": {
+    "story": "About Burooj"
+  },
+  "notFound": {
+    "eyebrow": "A loose end",
+    "intro": "This thread doesn’t lead anywhere. Try the homepage, or follow one of the lines above.",
+    "home": "Follow the threads home"
+  },
+  "footer": {
+    "call": "Send a line my way",
+    "links": "Elsewhere"
+  }
+}

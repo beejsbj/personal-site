@@ -1,0 +1,70 @@
+---
+import { getEntry } from "astro:content";
+import { getWritingPage } from "../../lib/portfolio";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import PostList from "../../components/PostList.astro";
+import Link from "../../design/primitives/Link.astro";
+import { getPosts, writingHeaders } from "../../lib/writing";
+
+const site = (await getEntry("site", "config"))?.data;
+if (!site) throw new Error("Missing site config entry.");
+export const prerender = false;
+const page = await getWritingPage();
+const copy = page.copy;
+let posts: Awaited<ReturnType<typeof getPosts>> = [];
+let unavailable = false;
+try {
+  posts = await getPosts();
+  for (const [name, value] of Object.entries(writingHeaders))
+    Astro.response.headers.set(name, value);
+} catch {
+  unavailable = true;
+  Astro.response.status = 503;
+  Astro.response.headers.set("Cache-Control", "no-store");
+  Astro.response.headers.set("Retry-After", "60");
+}
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  pageClass="page-writing"
+>
+  <section class="shell page-section page-section--header">
+    <PageHeader
+      page="writing"
+      eyebrow={page.header.eyebrow}
+      title={page.header.title}
+      intro={page.header.intro}
+    >
+      <Fragment slot="actions">
+        {page.header.actions.map((action, i) => (
+          <Link
+            treatment="action"
+            tone={i === 0 ? "wine" : "paper"}
+            href={action.href}
+            newTab
+            arrow
+          >
+            {action.label}
+          </Link>
+        ))}
+      </Fragment>
+    </PageHeader>
+  </section>
+  <section class="shell page-section" aria-label={copy.listLabel}>
+    {unavailable ? (
+      <p>
+        {copy.unavailableMessage}{" "}
+        <Link href={site.writingUrl} newTab>
+          {copy.sourceLabel}
+        </Link>
+      </p>
+    ) : posts.length ? (
+      <PostList posts={posts} />
+    ) : (
+      <p>{copy.emptyMessage}</p>
+    )}
+  </section>
+</BaseLayout>

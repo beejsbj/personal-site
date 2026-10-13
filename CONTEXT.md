@@ -37,12 +37,16 @@ Movement outside the prism from one legible face to another, with each face acti
 _Avoid_: free roam, fly mode, open navigation
 
 **Prism Face**:
-One of the six complete skins that surround the normal portfolio within the prism. Each face is a real visual treatment of the same portfolio, not a separate story world or content mode.
+One of the five complete skins that surround the normal portfolio within the pentagonal prism. Each face is a real visual treatment of the same portfolio, not a separate story world or content mode. The faces are Daylight, Calling Card, Cut Paper, Back Page and Hion.
 _Avoid_: demo side, filler theme, optional face
 
 **Lens**:
 A visual skin for the same normal portfolio structure. A lens can change theme, typography, color, layout feel, motion, filters, and mood, but it does not create a separate portfolio or content model.
 _Avoid_: content mode, separate site, alternate portfolio
+
+**Refraction**:
+The idea behind the prism: one body of work goes in as white light and comes out as five colours. Every lens is the same portfolio bent differently, never a different portfolio.
+_Avoid_: variant, alternate site
 
 **Lens Name**:
 An internal handle for building and discussing a lens. Lens names may appear softly in the experience, but they are not presented as a theme-picker taxonomy.
@@ -57,5 +61,5 @@ Later movement through known prism faces after the first journey has made the st
 _Avoid_: replay, theme picker, level select
 
 **Default Lens**:
-The first lens: the default portfolio skin that reads as normal before the prism reveals itself.
+The first lens, Daylight: the default portfolio skin that reads as normal before the prism reveals itself.
 _Avoid_: Plainface, boring mode, control page

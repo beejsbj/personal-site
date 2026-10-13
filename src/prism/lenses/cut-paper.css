@@ -1,0 +1,26 @@
+/* Lens: cut-paper — EmotiTone, "cut-paper jazz, lit by a synth".
+   This lens has its own shell (src/prism/shells/cut-paper): the portfolio
+   as an instrument. Only what must exist before the shell's JS arrives
+   lives here: the ink stage (no flash) and the two faces, preloaded. */
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+
+@font-face {
+  font-family: "Lets Jazz";
+  src: url("../fonts/lets-jazz-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  /* the face draws caps at ~1.46em; normalise so caps are ~1em tall and
+     the line box hugs them (caps ascend ~1.02em, barely descend) */
+  size-adjust: 70%;
+  ascent-override: 148.5%;
+  descent-override: 8.5%;
+  line-gap-override: 0%;
+}
+
+:root[data-lens="cut-paper"],
+:root[data-lens="cut-paper"] body {
+  background: #0a0908;
+  color: #f4efe6;
+  color-scheme: dark;
+}

@@ -4,6 +4,7 @@ summary: "Drawing a lotus one line at a time. An SVG path study using GSAP, stro
 type: "SVG + motion"
 sourceEra: "CodePen"
 href: "https://codepen.io/beejsbj/pen/abXZWLQ"
+cover: "/images/lab/motion-path-graph.svg"
 order: 1
 ---
 

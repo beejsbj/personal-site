@@ -61,6 +61,11 @@
 .prose > * + * {
   margin-top: var(--space-m);
 }
+/* Grouping wrappers (a resume entry, a page body) keep the prose rhythm, at
+   the same specificity as the rule above so headings still win. */
+.prose :where(.resume-entry, .resume-body) > * + * {
+  margin-top: var(--space-m);
+}
 .prose h2,
 .prose h3 {
   margin-top: var(--space-xl);

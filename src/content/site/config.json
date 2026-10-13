@@ -4,6 +4,11 @@
   "siteDescription": "A lean portfolio and lab for Burooj Rashid, focused on expressive frontend work, motion, and thoughtful web design.",
   "email": "burooj.bj@gmail.com",
   "writingUrl": "https://buroojs.substack.com",
+  "mark": {
+    "text": "burooj.",
+    "label": "Burooj — home"
+  },
+  "skipLink": "Skip to content",
   "nav": [
     {
       "label": "Projects",
@@ -15,8 +20,7 @@
     },
     {
       "label": "Writing",
-      "href": "https://buroojs.substack.com",
-      "external": true
+      "href": "/writing"
     },
     {
       "label": "About",
@@ -27,6 +31,19 @@
       "href": "/resume"
     }
   ],
+  "header": {
+    "label": "Main navigation",
+    "home": "Home",
+    "hello": "Say hello",
+    "items": ["Projects", "Lab", "About", "Writing"]
+  },
+  "footer": {
+    "links": [
+      { "label": "Resume", "href": "/resume" },
+      { "label": "Style guide", "href": "/style-guide" }
+    ],
+    "signoff": "Thanks for stopping by."
+  },
   "social": [
     {
       "label": "GitHub",
@@ -44,5 +61,23 @@
       "label": "Email",
       "href": "mailto:burooj.bj@gmail.com"
     }
-  ]
+  ],
+  "updateKinds": {
+    "project": "Project",
+    "pull-request": "Pull request",
+    "repository": "Repository",
+    "writing": "Writing",
+    "lab": "Experiment",
+    "milestone": "Made",
+    "status": "Checking in",
+    "location": "Somewhere",
+    "agents": "Agents"
+  },
+  "updateSources": {
+    "site": "This site",
+    "github": "GitHub",
+    "substack": "Substack",
+    "bjslab": "bjslab",
+    "manual": "A note"
+  }
 }

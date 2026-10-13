@@ -86,7 +86,9 @@ test("ephemeral event contract requires expiry and acknowledges build-time limit
   const stream = read("src/design/compounds/ActivityStream.astro");
   assert.match(stream, /deployed HTML does not self-expire/);
   assert.match(stream, /selectActivitySnapshot\(Astro\.props\.updates\)/);
-  assert.match(stream, /A quiet moment/);
+  // The empty-state copy lives with the rest of the home copy.
+  assert.match(read("src/content/pages/home.md"), /A quiet moment/);
+  assert.match(stream, /copy\.empty/);
 });
 
 test("snapshot filters future/expired signals, handles empty input, and preserves inputs", () => {
@@ -120,10 +122,13 @@ test("snapshot filters future/expired signals, handles empty input, and preserve
 
 test("display limit follows eligibility so newer hidden signals cannot crowd out valid updates", () => {
   const stream = read("src/design/compounds/ActivityStream.astro");
+  // The display limit is content (home.md `updates.limit`), applied after
+  // eligibility.
   assert.match(
     stream,
-    /selectActivitySnapshot\(Astro\.props\.updates\)\.slice\(0, 8\)/,
+    /selectActivitySnapshot\(Astro\.props\.updates\)\.slice\(0, copy\.limit\)/,
   );
+  assert.match(read("src/content/pages/home.md"), /^  limit: 8$/m);
   const page = read("src/pages/index.astro");
   assert.match(
     page,

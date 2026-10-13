@@ -3,7 +3,7 @@ const pageRedirects: Record<string, string> = {
   about: "/about",
   resume: "/resume",
   projects: "/projects",
-  blog: "https://buroojs.substack.com",
+  blog: "/writing",
   garden: "/projects/garden",
   "layout-detail": "/projects/garden",
   e4p: "/projects/e4p",

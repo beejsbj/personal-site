@@ -2,37 +2,43 @@
 import Heading from "../primitives/Heading.astro";
 import Link from "../primitives/Link.astro";
 import Portrait from "../unique/Portrait.astro";
+import { part } from "../../prism/parts";
 /** Composition: approved A introduction. The guide imports this same region. */
 interface Props {
-  social: { label: string; href: string }[];
+  hero: {
+    greeting: string;
+    headline: string;
+    occupation: string;
+    welcome: string;
+    portrait: { src: string; alt: string; caption: string; href: string };
+    links: { label: string; href: string }[];
+  };
   level?: 1 | 2;
   id?: string;
 }
-const { social, level = 1, id = "home-title" } = Astro.props;
+const { hero, level = 1, id = "home-title" } = Astro.props;
+// Only the page's own hero carries the home page's parts.
+const mark = (name: Parameters<typeof part>[0]) =>
+  level === 1 ? part(name, name === "page.title" ? "home" : undefined) : {};
 ---
 
 <section class="hello" aria-labelledby={id}>
-  <Portrait />
+  <Portrait {...hero.portrait} {...mark("home.portrait")} />
   <div class="copy">
-    <p class="greeting">Hey there!</p>
+    <p class="greeting" {...mark("home.greeting")}>{hero.greeting}</p>
     <div class="title">
-      <Heading level={level} scale="display" id={id}>
-        Burooj here!
+      <Heading level={level} scale="display" id={id} {...mark("page.title")}>
+        {hero.headline}
       </Heading>
     </div>
-    <p class="occupation">Frontend developer &amp; designer</p>
-    <p class="welcome">I make places on the web. Feel free to look around!</p>
-    <div class="socials">
-      {social
-        .filter((link) => ["GitHub", "LinkedIn", "Email"].includes(link.label))
-        .map((link) => (
-          <Link href={link.href} arrow>
-            {link.label}
-          </Link>
-        ))}
-      <Link href="/resume" arrow>
-        Resume
-      </Link>
+    <p class="occupation" {...mark("home.occupation")}>{hero.occupation}</p>
+    <p class="welcome" {...mark("home.welcome")}>{hero.welcome}</p>
+    <div class="socials" {...mark("home.links")}>
+      {hero.links.map((link) => (
+        <Link href={link.href} arrow>
+          {link.label}
+        </Link>
+      ))}
     </div>
   </div>
 </section>

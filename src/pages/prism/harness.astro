@@ -1,0 +1,15 @@
+---
+/** The fuzz harness: mounts one lens shell on fixture content at a pretend
+ * route. /prism/harness?lens=cut-paper&fixture=long-title&route=/projects
+ * The parity test drives it; see src/prism/fixtures.ts for the fixtures. */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Prism harness" pageClass="page-copy" tool>
+  <section class="shell page-section">
+    <p>Mounting a lens on fixture content…</p>
+  </section>
+</BaseLayout>
+<script>
+  import "../../prism/harness";
+</script>

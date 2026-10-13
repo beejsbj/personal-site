@@ -1,35 +1,30 @@
 ---
-import { getCollection } from "astro:content";
-import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import LabCard from "../../components/LabCard.astro";
+import Inline from "../../design/primitives/Inline.astro";
 import Link from "../../design/primitives/Link.astro";
-const entries: CollectionEntry<"lab">[] = (await getCollection("lab"))
-  .filter((entry: CollectionEntry<"lab">) => !entry.data.hidden)
-  .sort(
-    (a: CollectionEntry<"lab">, b: CollectionEntry<"lab">) =>
-      a.data.order - b.data.order,
-  );
+import { getLab, getLabPage, labDetail } from "../../lib/portfolio";
+import { part } from "../../prism/parts";
+
+const page = await getLabPage();
+const entries = await getLab();
 ---
 
 <BaseLayout
-  title="Lab"
-  description="Little experiments in SVG, motion, sound, and interaction by Burooj Rashid."
+  title={page.title}
+  description={page.description}
   pageClass="page-lab"
 >
   <section class="shell page-section page-section--header">
-    <PageHeader
-      eyebrow="Lab"
-      title="Small things. Room to play."
-      intro="A line that draws itself. Shapes that keep a beat. Little experiments in how the web can look, move, and feel."
-    />
+    <PageHeader {...page.header} page="lab" />
   </section>
-  <section class="shell page-section" aria-label="Selected experiments">
+  <section class="shell page-section" aria-label={page.listLabel}>
     <div class="lab-grid lab-grid--dense">
       {entries.map((entry) => (
         <LabCard
-          href={entry.data.href || `/lab/${entry.slug}`}
+          slug={entry.slug}
+          href={labDetail(entry)}
           title={entry.data.title}
           summary={entry.data.summary}
           type={entry.data.type}
@@ -38,16 +33,12 @@ const entries: CollectionEntry<"lab">[] = (await getCollection("lab"))
         />
       ))}
     </div>
-    <p class="lab-more">
-      <Link href="https://codepen.io/beejsbj" arrow>
-        More sketches on CodePen
+    <p class="lab-more" {...part("lab.more")}>
+      <Link href={page.more.href} arrow>
+        {page.more.label}
       </Link>
     </p>
-    <p class="lab-aside">
-      Looking for the bigger pieces? The learning arcade and applications live
-      in <Link href="/projects">Projects</Link>. This site's visual foundations
-      have their own <Link href="/style-guide">Style Guide</Link>.
-    </p>
+    <p class="lab-aside" {...part("lab.aside")}><Inline text={page.aside} /></p>
   </section>
 </BaseLayout>
 <style>

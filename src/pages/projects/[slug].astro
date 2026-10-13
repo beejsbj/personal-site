@@ -1,17 +1,15 @@
 ---
-import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import MediaRail from "../../components/MediaRail.astro";
 import Link from "../../design/primitives/Link.astro";
 import TagList from "../../design/primitives/TagList.astro";
+import { getProjects, getProjectsPage } from "../../lib/portfolio";
+import { part } from "../../prism/parts";
 
 export async function getStaticPaths() {
-  const entries = (await getCollection("projects")).filter(
-    (entry: CollectionEntry<"projects">) => !entry.data.hidden,
-  );
-  return entries.map((entry: CollectionEntry<"projects">) => ({
+  return (await getProjects()).map((entry: CollectionEntry<"projects">) => ({
     params: { slug: entry.slug },
     props: { entry },
   }));
@@ -19,40 +17,46 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const projectEntry = entry as CollectionEntry<"projects">;
+const { slug, data } = projectEntry;
 const { Content } = await projectEntry.render();
+const { detail } = await getProjectsPage();
 ---
 
 <BaseLayout
-  title={projectEntry.data.title}
-  description={projectEntry.data.summary}
-  image={projectEntry.data.cover}
+  title={data.title}
+  description={data.summary}
+  image={data.cover}
   pageClass="page-entry"
 >
   <section class="shell entry-page">
     <PageHeader
-      eyebrow={projectEntry.data.kind}
-      title={projectEntry.data.title}
-      intro={projectEntry.data.summary}
+      eyebrow={data.kind}
+      title={data.title}
+      intro={data.summary}
+      marks={{
+        title: part("project.title", slug),
+        intro: part("project.summary", slug),
+      }}
     />
 
-    <div class="entry-page__meta">
+    <div class="entry-page__meta" {...part("project.meta", slug)}>
       <div>
-        <span class="entry-page__label">Role</span>
-        <p>{projectEntry.data.role}</p>
+        <span class="entry-page__label">{detail.labels.role}</span>
+        <p>{data.role}</p>
       </div>
       <div>
-        <span class="entry-page__label">Where</span>
-        <p>{projectEntry.data.location}</p>
+        <span class="entry-page__label">{detail.labels.location}</span>
+        <p>{data.location}</p>
       </div>
       <div>
-        <span class="entry-page__label">When</span>
-        <p>{projectEntry.data.dateLabel}</p>
+        <span class="entry-page__label">{detail.labels.date}</span>
+        <p>{data.dateLabel}</p>
       </div>
     </div>
 
-    {projectEntry.data.links.length > 0 && (
-      <div class="entry-page__links">
-        {projectEntry.data.links.map((link: { label: string; url: string }) => (
+    {data.links.length > 0 && (
+      <div class="entry-page__links" {...part("project.links", slug)}>
+        {data.links.map((link: { label: string; url: string }) => (
           <Link treatment="action" href={link.url} newTab>
             {link.label}
           </Link>
@@ -60,19 +64,16 @@ const { Content } = await projectEntry.render();
       </div>
     )}
 
-    <TagList
-      items={projectEntry.data.tools}
-      label={`${projectEntry.data.title} tools`}
-    />
+    <TagList items={data.tools} label={`${data.title} tools`} {...part("project.tools", slug)} />
 
-    <MediaRail media={projectEntry.data.media} />
+    <MediaRail media={data.media} {...part("project.media", slug)} />
 
-    <article class="prose">
+    <article class="prose" {...part("project.body", slug)}>
       <Content />
     </article>
     <div class="entry-page__links">
-      <Link href="/projects" arrow>
-        Back to all projects
+      <Link href={detail.back.href} arrow>
+        {detail.back.label}
       </Link>
     </div>
   </section>

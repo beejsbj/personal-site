@@ -3,6 +3,7 @@ import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
 import MediaFrame from "../design/primitives/MediaFrame.astro";
 import TagList from "../design/primitives/TagList.astro";
+import { part } from "../prism/parts";
 /** Compound: cover + metadata + linked heading + summary + tools.
  * layout=row|stack|feature is the only axis. Children own interaction/typography.
  * Do not paste this assembly into another screen; import it.
@@ -15,6 +16,8 @@ interface Props {
   role: string;
   tools: string[];
   cover: string;
+  /** The project's slug, marking its parts. */
+  slug?: string;
   layout?: "row" | "stack" | "feature";
 }
 const {
@@ -25,22 +28,29 @@ const {
   role,
   tools,
   cover,
+  slug,
   layout = "row",
 } = Astro.props;
+const mark = (name: Parameters<typeof part>[0]) =>
+  slug === undefined ? {} : part(name, slug);
 ---
 
 <article class:list={["project-row", `project-row--${layout}`]}>
   <MediaFrame src={cover} alt="" href={href} />
   <div class="project-copy">
-    <p class="meta">
+    <p class="meta" {...mark("project.meta")}>
       {dateLabel} · {role}
     </p>
-    <Heading level={3} scale={layout === "feature" ? "section" : "card"}>
+    <Heading
+      level={3}
+      scale={layout === "feature" ? "section" : "card"}
+      {...mark("project.title")}
+    >
       <Link href={href} arrow>
         {title}
       </Link>
     </Heading>
-    <p class="summary">{summary}</p>
+    <p class="summary" {...mark("project.summary")}>{summary}</p>
     <TagList items={tools.slice(0, 3)} label={`${title} tools`} />
   </div>
 </article>

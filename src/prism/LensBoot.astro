@@ -1,0 +1,87 @@
+---
+/** Applies the visitor's lens before first paint and after every client-side
+ * swap. `?lens=` previews a lens and keeps it; `?prism-face=` renders a
+ * non-persistent face for the prism stage. */
+import { LENSES } from "./lenses";
+const ids = LENSES.map((lens) => lens.id);
+const shells = ids.slice(1);
+---
+
+<script is:inline define:vars={{ ids, shells }}>
+  (() => {
+    const key = "prism:lens";
+    const apply = () => {
+      const root = document.documentElement;
+      // Lenses with their own shell hide Daylight before paint, not after.
+      const settle = () =>
+        root.toggleAttribute("data-lens-shell", shells.includes(root.dataset.lens));
+      const params = new URLSearchParams(location.search);
+      const face = params.get("prism-face");
+      if (ids.includes(face)) {
+        root.dataset.lens = face;
+        root.setAttribute("data-prism-face", "");
+        settle();
+        return;
+      }
+      let lens = params.get("lens");
+      try {
+        if (ids.includes(lens)) localStorage.setItem(key, lens);
+        else lens = localStorage.getItem(key);
+      } catch {}
+      root.dataset.lens = ids.includes(lens) ? lens : ids[0];
+      settle();
+    };
+    apply();
+    document.addEventListener("astro:after-swap", apply);
+
+    // Carry the lens onto the incoming page before the router swaps <html>
+    // attributes, so lens CSS never stops matching mid-navigation.
+    const lensAttributes = [
+      "data-lens",
+      "data-lens-shell",
+      "data-prism-face",
+      "data-shell-ready",
+    ];
+    // Lens shells load their CSS at runtime. The router drops any head
+    // stylesheet the incoming page doesn't list, so pin those across swaps.
+    const persist = "data-astro-transition-persist";
+    const runtimeStyles = new Set();
+    let loaded = false;
+    let count = 0;
+    addEventListener("DOMContentLoaded", () => (loaded = true));
+    new MutationObserver((records) => {
+      if (!loaded) return;
+      for (const record of records)
+        for (const node of record.addedNodes)
+          if (
+            node.matches?.("style, link[rel=stylesheet]") &&
+            !node.hasAttribute("data-prism-page")
+          )
+            runtimeStyles.add(node);
+    }).observe(document.head, { childList: true });
+    document.addEventListener("astro:before-swap", (event) => {
+      const next = event.newDocument;
+      const root = document.documentElement;
+      for (const name of lensAttributes) {
+        const value = root.getAttribute(name);
+        if (value === null) next.documentElement.removeAttribute(name);
+        else next.documentElement.setAttribute(name, value);
+      }
+      for (const sheet of next.head.querySelectorAll(
+        "style, link[rel=stylesheet]",
+      ))
+        sheet.setAttribute("data-prism-page", "");
+      for (const sheet of runtimeStyles) {
+        if (!sheet.isConnected) {
+          runtimeStyles.delete(sheet);
+          continue;
+        }
+        const id = sheet.getAttribute(persist) || `prism-style-${++count}`;
+        sheet.setAttribute(persist, id);
+        const placeholder = next.createElement("style");
+        placeholder.setAttribute(persist, id);
+        next.head.append(placeholder);
+      }
+    });
+  })();
+</script>

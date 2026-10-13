@@ -4,30 +4,41 @@ import { selectActivitySnapshot } from "../../lib/activity.mjs";
 import UpdateEntry from "./UpdateEntry.astro";
 
 interface Props {
-  updates: UpdateData[];
+  updates: (UpdateData & { id?: string })[];
+  copy: {
+    intro: string;
+    listLabel: string;
+    empty: string;
+    caption: string;
+    limit: number;
+  };
+  labels: { kinds: Record<string, string>; sources: Record<string, string> };
 }
+const { copy, labels } = Astro.props;
 // Curated build-time snapshot, not a connected presence service. Expiry is
 // evaluated only when rendering/building; deployed HTML does not self-expire.
 // Publish no live signals until a runtime or scheduled-refresh layer exists.
-const updates = selectActivitySnapshot(Astro.props.updates).slice(0, 8);
+const updates = selectActivitySnapshot(Astro.props.updates).slice(0, copy.limit);
 ---
 
 <div class="activity-stream">
-  <p class="stream-intro">Little signals from around my internet.</p>
+  <p class="stream-intro">{copy.intro}</p>
   {updates.length ? (
-    <ol aria-label="Recent activity, newest first" class="stream-events">
+    <ol aria-label={copy.listLabel} class="stream-events">
       {updates.map((update, index) => (
         <li>
-          <UpdateEntry {...update} connected={index < updates.length - 1} />
+          <UpdateEntry
+            {...update}
+            labels={labels}
+            connected={index < updates.length - 1}
+          />
         </li>
       ))}
     </ol>
   ) : (
-    <p class="stream-empty">
-      A quiet moment. More when there's something to share.
-    </p>
+    <p class="stream-empty">{copy.empty}</p>
   )}
-  <p class="stream-caption">A few things worth sharing, collected by hand.</p>
+  <p class="stream-caption">{copy.caption}</p>
 </div>
 <style>
   .stream-intro,

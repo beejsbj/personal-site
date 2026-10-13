@@ -1,0 +1,177 @@
+{
+  "speaker": "Burooj",
+  "sections": {
+    "home": "Command",
+    "projects": "Projects",
+    "project": "Projects",
+    "lab": "Lab",
+    "lab-entry": "Request",
+    "about": "About",
+    "resume": "Status",
+    "writing": "Writing",
+    "writing-entry": "Writing",
+    "other": "Mementos"
+  },
+  "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+  "chrome": {
+    "tabs": "Sections",
+    "previous": "Previous section: {label}",
+    "next": "Next section: {label}",
+    "back": "Back",
+    "backTo": "to {label}",
+    "tapAgain": "Tap again",
+    "prompts": {
+      "select": "Select",
+      "confirm": "Confirm",
+      "browse": "Browse",
+      "open": "Open",
+      "accept": "Accept",
+      "item": "Item",
+      "section": "Section",
+      "back": "Back"
+    },
+    "verbs": {
+      "code": "Code",
+      "pen": "Pen",
+      "read": "Read",
+      "watch": "Watch",
+      "write": "Write",
+      "visit": "Visit"
+    }
+  },
+  "home": {
+    "menu": "Command menu",
+    "logo": "Command",
+    "select": "Command select",
+    "commands": {
+      "projects": { "label": "Projects", "help": "Equip · things I've made, along the way" },
+      "lab": { "label": "Lab", "help": "Requests · small experiments, room to play" },
+      "about": { "label": "About", "help": "Confidant · who's behind the mask" },
+      "status": { "label": "Status", "help": "Resume · experience, education, tools" },
+      "phone": { "label": "Phone", "help": "Updates · {n} new message{s}" },
+      "writing": {
+        "label": "Writing",
+        "help": "Essays · notes from building things"
+      },
+      "card": { "label": "Calling Card", "help": "Contact · send a calling card" }
+    },
+    "portrait": "{alt}, as a red and black cut-out",
+    "calendar": {
+      "label": "Last updated {date}",
+      "time": "Daytime",
+      "latest": "Last update"
+    },
+    "phone": "New message",
+    "money": {
+      "label": "{projects} projects and {lab} experiments",
+      "works": "Works",
+      "lab": "Lab"
+    }
+  },
+  "projects": {
+    "eyebrow": "Equip",
+    "list": "Projects, newest first",
+    "kinds": {
+      "featured": "Selected",
+      "Project": "Project",
+      "Arcade": "Arcade"
+    },
+    "tap": "Tap again to open",
+    "open": "Open file",
+    "tools": "{title} tools",
+    "links": "Links",
+    "more": "More projects",
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "lab": {
+    "eyebrow": "Requests",
+    "speaker": "The Lab",
+    "board": "Experiments",
+    "number": "No.{n}",
+    "status": "Open",
+    "client": "Client",
+    "accept": {
+      "external": "Accept · open experiment",
+      "page": "Accept · read the brief",
+      "tap": "Tap again to accept",
+      "verb": "Accept"
+    },
+    "brief": "Request {number}",
+    "experiment": "Open the experiment",
+    "links": "Links"
+  },
+  "about": {
+    "arcana": { "number": "0", "name": "The Fool" },
+    "eyebrow": { "label": "Confidant", "arcana": "The Fool · Arcana 0" },
+    "rank": { "label": "Confidant rank", "value": "MAX" },
+    "rankUp": "Rank {n}",
+    "next": "Next",
+    "social": {
+      "title": "Social stats",
+      "caption": "Nothing maxed yet. Plenty of game left.",
+      "rank": "rank {rank} of {max}:",
+      "maxRank": 5,
+      "stats": [
+        {
+          "stat": "Knowledge",
+          "rank": 4,
+          "rankName": "Endlessly Curious",
+          "note": "People, stories, interfaces: how folks think, and why they tap where they tap."
+        },
+        {
+          "stat": "Guts",
+          "rank": 2,
+          "rankName": "Bold (at the Start)",
+          "note": "Starts side projects fearlessly. Finishing them is the next rank."
+        },
+        {
+          "stat": "Proficiency",
+          "rank": 3,
+          "rankName": "Skilled",
+          "note": "Makes places on the web that work. Guessing how long that takes: still training."
+        },
+        {
+          "stat": "Kindness",
+          "rank": 4,
+          "rankName": "Empathetic",
+          "note": "Builds for whoever has to find their way around afterwards."
+        },
+        {
+          "stat": "Charm",
+          "rank": 3,
+          "rankName": "Suave-ish",
+          "note": "Coding is gaming that pays, he'll tell you. You're standing in a game menu."
+        }
+      ]
+    }
+  },
+  "resume": {
+    "leader": "Leader",
+    "contacts": "Contact",
+    "tags": {
+      "current": "Current",
+      "education": "Education",
+      "internship": "Internship",
+      "client": "Client",
+      "contract": "Contract",
+      "projectWork": "Project work",
+      "employment": "Employment"
+    }
+  },
+  "other": {
+    "document": "Document"
+  },
+  "phone": {
+    "title": "Messages",
+    "with": "{name} · {n} update{s}"
+  },
+  "card": {
+    "to": "To whoever has a project in mind,",
+    "headline": "Take your heart",
+    "body": "You've been keeping a good idea to yourself. I'm going to take it and make it a place on the web: one people can find their way around, with the small details that make it feel alive.",
+    "ask": "Tell me about it.",
+    "elsewhere": "Elsewhere",
+    "writing": "Writing"
+  }
+}

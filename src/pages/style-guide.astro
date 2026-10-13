@@ -21,7 +21,10 @@ import LabCard from "../components/LabCard.astro";
 import PageHeader from "../components/PageHeader.astro";
 import SectionIntro from "../components/SectionIntro.astro";
 import MediaRail from "../components/MediaRail.astro";
+import { getHome } from "../lib/portfolio";
 const site = (await getEntry("site", "config"))!.data;
+const home = await getHome();
+const labels = { kinds: site.updateKinds, sources: site.updateSources };
 const project = (await getCollection("projects")).find(
   (entry: CollectionEntry<"projects">) =>
     entry.data.featured && !entry.data.hidden,
@@ -151,7 +154,7 @@ const anatomy = [
         href="/"
         linkLabel="Actual homepage"
       />
-      <WelcomeHero social={site.social} level={2} id="guide-welcome" />
+      <WelcomeHero hero={home.hero} level={2} id="guide-welcome" />
       <CurvedArrow />
       <p class="annotation">
         Composition → WelcomeHero imports Heading, Link, and the singular
@@ -211,12 +214,7 @@ const anatomy = [
 
     <section class="specimen" aria-labelledby="controls">
       <SectionHeading id="controls" title="Links and wayfinding" />
-      <SiteNav
-        nav={site.nav}
-        currentPath="/"
-        email={site.email}
-        label="Navigation specimen"
-      />
+      <SiteNav site={site} currentPath="/" label="Navigation specimen" />
       <p class="annotation">
         A regular menu uses the same typography and link language as the rest of
         the site. The current destination has a burgundy underline and stronger
@@ -262,11 +260,11 @@ const anatomy = [
           />
         </div>
         <div>
-          <CurrentNote id="guide-currently" variant="plain" />
+          <CurrentNote note={home.currently} id="guide-currently" variant="plain" />
           <div class="spaced">
-            <UpdateEntry {...update.data} detailed />
+            <UpdateEntry {...update.data} labels={labels} detailed />
           </div>
-          <ActivityStream updates={updates} />
+          <ActivityStream updates={updates} copy={home.updates} labels={labels} />
           <Note>
             <p>
               A note can hold arbitrary content without inventing a new card

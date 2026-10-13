@@ -1,18 +1,18 @@
 ---
+import type { SiteData } from "../content.config";
 import SiteNav from "./SiteNav.astro";
 interface Props {
-  nav: { label: string; href: string; external?: boolean }[];
+  site: SiteData;
   currentPath: string;
-  email: string;
 }
-const { nav, currentPath, email } = Astro.props;
+const { site, currentPath } = Astro.props;
 ---
 
 <header class="site-header shell">
-  <a class="home-link" href="/" aria-label="Burooj — home">
-    burooj.
+  <a class="home-link" href="/" aria-label={site.mark.label}>
+    {site.mark.text}
   </a>
-  <SiteNav nav={nav} currentPath={currentPath} email={email} />
+  <SiteNav site={site} currentPath={currentPath} />
 </header>
 <style>
   .site-header {

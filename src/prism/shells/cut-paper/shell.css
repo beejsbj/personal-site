@@ -1,0 +1,3949 @@
+/* Cut Paper shell — EmotiTone, "cut-paper jazz, lit by a synth", as a DAW
+   whose heart is the arrangement. Chrome is ink and ivory; brass belongs to
+   the playhead and the playing transport only. Note colours (do…ti, the
+   seven degrees of F major) mark what is musical: keys, clips, notes. Brand
+   paper (tomato, plum, mustard, bone) is decoration: scraps, the logo, the
+   Currently note. Every selector is lens-scoped. */
+
+:root[data-lens="cut-paper"] {
+  --cp-ink: #0a0908;
+  --cp-ink-2: #141210;
+  --cp-ink-3: #1b1815;
+  --cp-ink-4: #25211d;
+  --cp-ink-5: #3a352f;
+  --cp-ivory: #f4efe6;
+  --cp-ivory-2: #c9c2b5;
+  --cp-ivory-3: #9a9285;
+  --cp-ivory-4: #514b42;
+  --cp-hairline: rgba(255, 255, 255, 0.1);
+  --cp-hairline-2: rgba(255, 255, 255, 0.05);
+  --cp-ring: inset 0 0 0 1px var(--cp-hairline);
+
+  --cp-brass: #e0a93a;
+  --cp-brass-hi: #f5d278;
+  --cp-brass-edge: #2a1c08;
+  --cp-brass-fill: linear-gradient(160deg, #d6a03e 0%, #e0aa42 22%, #efbf50 42%, #f5d278 50%, #ebb947 60%, #d6a03e 82%, #e3ac42 100%);
+  --cp-glow-brass: 0 0 14px rgba(224, 169, 58, 0.45);
+
+  --cp-tomato: #d8362a;
+  --cp-plum: #6b3fa0;
+  --cp-bone: #efe6d0;
+  --cp-mustard: #f0b137;
+  --cp-pine: #1f4d3f;
+
+  /* the seven degrees of F major; ink text holds >= 6:1 on each */
+  --cp-do: #ee6f38;
+  --cp-re: #a7dc2c;
+  --cp-mi: #30c35d;
+  --cp-fa: #25c5bf;
+  --cp-sol: #9884eb;
+  --cp-la: #e674cf;
+  --cp-ti: #f2625d;
+
+  --cp-eighth: 250ms;
+  --cp-sixteenth: 125ms;
+  --cp-ease-stab: cubic-bezier(0.2, 0.9, 0.3, 1);
+  --cp-ease-brush: cubic-bezier(0.4, 0, 0.2, 1);
+  --cp-ease-paper: cubic-bezier(0.7, 0, 0.2, 1);
+  --cp-ease-swing: cubic-bezier(0.7, -0.2, 0.3, 1.2);
+  --cp-dur-tap: 90ms;
+  --cp-dur-ui: 200ms;
+
+  --cp-display: "Lets Jazz", "Anton", "Oswald", system-ui, sans-serif;
+  --cp-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --cp-torn: polygon(0% 10%, 4% 0%, 13% 7%, 24% 1%, 36% 6%, 49% 0%, 61% 7%, 74% 1%, 86% 6%, 97% 0%, 100% 14%, 98.5% 50%, 100% 86%, 96% 100%, 84% 93%, 71% 100%, 58% 94%, 45% 100%, 31% 93%, 18% 100%, 6% 94%, 0% 100%, 1.5% 50%);
+  --cp-torn-v: polygon(0 0, 100% 0, 84% 6%, 100% 13%, 80% 21%, 100% 30%, 86% 38%, 100% 47%, 78% 55%, 100% 63%, 84% 72%, 100% 80%, 82% 89%, 100% 96%, 90% 100%, 0 100%);
+  --cp-cut-tab: polygon(3% 0%, 99% 5%, 100% 88%, 97% 100%, 1% 95%, 0% 9%);
+  /* faint cut-paper litter, for the poster wall */
+  --cp-confetti: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'><g fill='%23f4efe6' fill-opacity='0.05'><path d='M20 30 44 18 38 46z'/><circle cx='120' cy='40' r='6'/><rect x='190' y='22' width='26' height='7' transform='rotate(-24 203 25)'/><path d='M60 120l14-22 10 26z'/><circle cx='220' cy='130' r='11'/><rect x='130' y='150' width='8' height='30' transform='rotate(18 134 165)'/><path d='M30 210h30l-6 14H36z'/><circle cx='98' cy='238' r='4'/><path d='M180 210l30 6-22 20z'/><rect x='240' y='60' width='6' height='6'/></g></svg>");
+
+  --cp-bar-h: 56px;
+  --cp-ov-h: 30px;
+  --cp-browser-w: 168px;
+  --cp-pad: 28px;
+}
+
+/* ── the window ────────────────────────────────────────────── */
+
+:root[data-lens="cut-paper"] #lens-shell {
+  display: block;
+}
+
+:root[data-lens="cut-paper"] .cp-app {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: var(--cp-browser-w) minmax(0, 1fr);
+  grid-template-rows: var(--cp-bar-h) var(--cp-ov-h) minmax(0, 1fr);
+  grid-template-areas: "bar bar" "ov ov" "browser view";
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+  font: 400 14px/1.55 var(--cp-mono);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root[data-lens="cut-paper"] .cp-app *,
+:root[data-lens="cut-paper"] .cp-app *::before,
+:root[data-lens="cut-paper"] .cp-app *::after {
+  box-sizing: border-box;
+}
+
+:root[data-lens="cut-paper"] .cp-app :focus-visible {
+  outline: 2px solid var(--cp-ivory);
+  outline-offset: 2px;
+}
+
+:root[data-lens="cut-paper"] .cp-app button {
+  font: inherit;
+}
+
+:root[data-lens="cut-paper"] .cp-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:root[data-lens="cut-paper"] .cp-out {
+  display: inline-block;
+  margin-left: 0.3em;
+  font: 400 0.8em/1 var(--cp-mono);
+  opacity: 0.7;
+}
+
+/* ── transport bar ─────────────────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-bar {
+  grid-area: bar;
+  position: relative;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--cp-hairline);
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-logo {
+  flex: none;
+  color: var(--cp-ivory);
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-logo .cp-out,
+:root[data-lens="cut-paper"] .cp-key .cp-sr + .cp-out {
+  display: none;
+}
+
+:root[data-lens="cut-paper"] .cp-logo__paper {
+  display: block;
+  padding: 5px 13px 3px;
+  background: var(--cp-tomato);
+  clip-path: var(--cp-torn);
+  font: 400 27px/1 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  transform: rotate(-2.5deg);
+}
+
+:root[data-lens="cut-paper"] .cp-file {
+  margin: 0;
+  color: var(--cp-ivory-3);
+  font: 600 12px/1 var(--cp-mono);
+  white-space: nowrap;
+}
+
+:root[data-lens="cut-paper"] .cp-deck {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  margin-left: auto;
+  padding: 4px 14px 4px 4px;
+  border-radius: 4px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+}
+
+:root[data-lens="cut-paper"] .cp-tp {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--cp-ink-3);
+  box-shadow: var(--cp-ring);
+  color: var(--cp-ivory);
+  cursor: pointer;
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), transform var(--cp-dur-tap) var(--cp-ease-stab);
+}
+
+:root[data-lens="cut-paper"] .cp-tp:hover {
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-tp:active,
+:root[data-lens="cut-paper"] .cp-play:active {
+  transform: scale(0.94);
+}
+
+:root[data-lens="cut-paper"] .cp-tp svg,
+:root[data-lens="cut-paper"] .cp-play svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+
+:root[data-lens="cut-paper"] .cp-tp__pause,
+:root[data-lens="cut-paper"] [aria-pressed="true"] > svg .cp-tp__play {
+  display: none;
+}
+
+:root[data-lens="cut-paper"] [aria-pressed="true"] > svg .cp-tp__pause {
+  display: block;
+}
+
+/* brass: the transport while it plays */
+:root[data-lens="cut-paper"] .cp-tp--play[aria-pressed="true"],
+:root[data-lens="cut-paper"] .cp-play[aria-pressed="true"] {
+  background: var(--cp-brass-fill);
+  box-shadow: var(--cp-glow-brass);
+  color: var(--cp-brass-edge);
+}
+
+:root[data-lens="cut-paper"] .cp-pos {
+  display: grid;
+  min-width: 104px;
+  margin: 0 0 0 10px;
+  line-height: 1;
+}
+
+:root[data-lens="cut-paper"] .cp-pos__num {
+  font: 400 25px/1 var(--cp-display);
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+:root[data-lens="cut-paper"] .cp-pos__month,
+:root[data-lens="cut-paper"] .cp-meter small,
+:root[data-lens="cut-paper"] .cp-np__label {
+  margin-top: 3px;
+  color: var(--cp-ivory-3);
+  font: 500 10px/1 var(--cp-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-meter {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding-left: 14px;
+  border-left: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-meter span {
+  display: grid;
+  line-height: 1;
+}
+
+:root[data-lens="cut-paper"] .cp-meter b {
+  font: 400 19px/1 var(--cp-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-meter__now {
+  min-width: 58px;
+}
+
+:root[data-lens="cut-paper"] .cp-app[data-playing] .cp-meter__chord {
+  color: var(--cp-brass-hi);
+}
+
+:root[data-lens="cut-paper"] .cp-np {
+  display: grid;
+  flex: 0 1 190px;
+  min-width: 0;
+  margin: 0 auto 0 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--cp-ink-5);
+  line-height: 1;
+}
+
+:root[data-lens="cut-paper"] .cp-app[data-playing] .cp-np {
+  border-left-color: var(--cp-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-np__title {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  font: 400 19px/1 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+:root[data-lens="cut-paper"] .cp-sound {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  color: var(--cp-ivory-2);
+  font: 400 15px/1 var(--cp-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-sound:hover {
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-sound svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+:root[data-lens="cut-paper"] .cp-sound svg path:first-child {
+  fill: currentColor;
+  stroke: none;
+}
+
+:root[data-lens="cut-paper"] .cp-sound[data-state="off"] .cp-sound__wave,
+:root[data-lens="cut-paper"] .cp-sound[data-state="on"] .cp-sound__mute {
+  display: none;
+}
+
+:root[data-lens="cut-paper"] .cp-sound[data-state="on"] {
+  color: var(--cp-ivory);
+  box-shadow: inset 0 0 0 1px var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-sound__state {
+  min-width: 2.2em;
+  color: var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-sound[data-state="on"] .cp-sound__state {
+  color: var(--cp-ivory);
+}
+
+/* playing with sound off: the switch says so, once */
+:root[data-lens="cut-paper"] .cp-sound[data-nudge][data-state="off"] {
+  animation: cut-paper-nudge 1.2s var(--cp-ease-brush) 2;
+}
+
+@keyframes cut-paper-nudge {
+  0%, 100% { box-shadow: var(--cp-ring); }
+  40% { box-shadow: inset 0 0 0 2px var(--cp-brass), var(--cp-glow-brass); }
+}
+
+/* ── overview: the whole career ────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-ov {
+  grid-area: ov;
+  position: relative;
+  z-index: 20;
+  padding: 0 14px 0 var(--cp-browser-w);
+  border-bottom: 1px solid var(--cp-hairline);
+  background: var(--cp-ink-2);
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+:root[data-lens="cut-paper"] .cp-ov:focus-visible {
+  outline-offset: -2px;
+}
+
+:root[data-lens="cut-paper"] .cp-ov__track {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+
+:root[data-lens="cut-paper"] .cp-ov__year {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--at) * 100%);
+  border-left: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-ov__year b {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  color: var(--cp-ivory-3);
+  font: 500 9px/1 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-ov__clip {
+  position: absolute;
+  left: calc(var(--at) * 100%);
+  width: max(3px, calc(var(--len) * 100%));
+  border-radius: 1px;
+  background: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-ov__clip--project {
+  top: 13px;
+  height: 7px;
+  opacity: 0.8;
+}
+
+:root[data-lens="cut-paper"] .cp-ov__clip--role {
+  bottom: 3px;
+  height: 3px;
+  background: var(--cp-ivory-4);
+}
+
+:root[data-lens="cut-paper"] .cp-ov__clip--update {
+  top: 3px;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  background: var(--cp-ivory-3);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-ov__clip[data-live] {
+  opacity: 1;
+  filter: brightness(1.25);
+}
+
+:root[data-lens="cut-paper"] .cp-ov__clip--role[data-live] {
+  background: var(--cp-ivory-2);
+}
+
+:root[data-lens="cut-paper"] .cp-future {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: calc(var(--at) * 100%);
+  border-left: 1px dashed var(--cp-ivory-4);
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.045) 0 2px, transparent 2px 7px);
+  pointer-events: none;
+}
+
+:root[data-lens="cut-paper"] .cp-future__label {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  color: var(--cp-ivory-3);
+  font: 500 9px/1 var(--cp-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* the playhead: a lane-wide run whose right edge is the line, so moving it
+   is one transform */
+:root[data-lens="cut-paper"] .cp-run {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  transform: translateX(calc((var(--at, 1) - 1) * 100%));
+}
+
+:root[data-lens="cut-paper"] .cp-run__head {
+  position: absolute;
+  top: 0;
+  right: -1px;
+  bottom: 0;
+  width: 2px;
+  background: var(--cp-brass);
+  box-shadow: var(--cp-glow-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-ov .cp-run__head::before,
+:root[data-lens="cut-paper"] .cp-arr__over .cp-run__head::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -5px;
+  border: 6px solid transparent;
+  border-top-color: var(--cp-brass);
+  border-bottom: 0;
+}
+
+/* ── browser: the keyboard that is the navigation ──────────── */
+
+:root[data-lens="cut-paper"] .cp-browser {
+  grid-area: browser;
+  min-height: 0;
+  padding: 12px 10px;
+  overflow: auto;
+  border-right: 1px solid var(--cp-hairline);
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-browser ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-key {
+  position: relative;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: 10px;
+  min-height: 54px;
+  padding: 6px 10px 6px 0;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  color: var(--cp-ivory);
+  text-decoration: none;
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), transform var(--cp-dur-tap) var(--cp-ease-stab);
+}
+
+:root[data-lens="cut-paper"] .cp-key__note {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  margin: -6px 0;
+  background: var(--note);
+  color: var(--cp-ink);
+  font: 400 22px/1 var(--cp-display);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+:root[data-lens="cut-paper"] .cp-key__label {
+  align-self: end;
+  font: 400 20px/1 var(--cp-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-key__view {
+  color: var(--cp-ivory-3);
+  font: 500 10px/1.3 var(--cp-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-key .cp-out {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  margin: 0;
+  color: var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-key:hover {
+  background: var(--cp-ink-3);
+  box-shadow: var(--cp-ring), inset -3px 0 0 var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-key:active {
+  transform: translateX(3px) scale(0.98);
+}
+
+:root[data-lens="cut-paper"] .cp-key[aria-current="page"] {
+  background: var(--note);
+  box-shadow: none;
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-key[aria-current="page"] .cp-key__note {
+  background: rgba(10, 9, 8, 0.14);
+  box-shadow: none;
+}
+
+:root[data-lens="cut-paper"] .cp-key[aria-current="page"] .cp-key__view {
+  color: rgba(10, 9, 8, 0.7);
+}
+
+/* ── the view ──────────────────────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-view {
+  grid-area: view;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:root[data-lens="cut-paper"] .cp-scroll {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: start;
+  overflow: auto;
+  overscroll-behavior: contain;
+  outline: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 78% 112%, rgba(238, 111, 56, 0.08), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 0% 0%, rgba(152, 132, 235, 0.05), transparent 70%),
+    var(--cp-ink);
+  scrollbar-color: var(--cp-ink-5) transparent;
+  scrollbar-width: thin;
+}
+
+:root[data-lens="cut-paper"] .cp-screen {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+:root[data-lens="cut-paper"] .cp-page {
+  position: relative;
+  padding: var(--cp-pad) var(--cp-pad) 72px;
+}
+
+/* the playhead sweep between views, in the key's colour */
+:root[data-lens="cut-paper"] .cp-wipe {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  visibility: hidden;
+}
+
+:root[data-lens="cut-paper"] .cp-wipe[data-state="cutting"] {
+  visibility: visible;
+}
+
+:root[data-lens="cut-paper"] .cp-wipe::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  background: var(--note, var(--cp-ivory));
+  clip-path: var(--cp-torn-v);
+  box-shadow: inset -2px 0 0 var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+:root[data-lens="cut-paper"] .cp-confetti__bit {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--paper);
+  will-change: transform;
+}
+
+:root[data-lens="cut-paper"] .cp-confetti__bit--tri {
+  clip-path: polygon(0 100%, 46% 0, 100% 88%);
+}
+
+:root[data-lens="cut-paper"] .cp-confetti__bit--dot {
+  border-radius: 50%;
+}
+
+:root[data-lens="cut-paper"] .cp-confetti__bit--bar {
+  width: 22px;
+  height: 6px;
+}
+
+:root[data-lens="cut-paper"] .cp-confetti__bit--tab {
+  width: 16px;
+  height: 10px;
+  clip-path: var(--cp-cut-tab);
+}
+
+/* views enter on successive sixteenths */
+:root[data-lens="cut-paper"] .cp-screen[data-state="entering"] [data-beat] {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+:root[data-lens="cut-paper"] .cp-screen[data-state="live"] [data-beat] {
+  transition: opacity 260ms var(--cp-ease-brush), transform 360ms var(--cp-ease-swing);
+  transition-delay: calc(var(--i, 0) * var(--cp-sixteenth));
+}
+
+/* ── shared pieces ─────────────────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-tag {
+  display: inline-block;
+  margin: 0;
+  padding: 5px 9px 3px;
+  background: var(--cp-ivory);
+  clip-path: var(--cp-cut-tab);
+  color: var(--cp-ink);
+  font: 400 15px/1 var(--cp-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-label {
+  margin: 0 0 10px;
+  color: var(--cp-ivory-3);
+  font: 400 16px/1 var(--cp-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-label small {
+  font: inherit;
+  color: var(--cp-ivory-4);
+}
+
+:root[data-lens="cut-paper"] .cp-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  align-items: end;
+  gap: 8px 40px;
+  margin-bottom: 22px;
+}
+
+:root[data-lens="cut-paper"] .cp-head__kicker {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  color: var(--cp-ivory-3);
+  font: 600 11px/1.2 var(--cp-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-head__kicker a {
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-head__title,
+:root[data-lens="cut-paper"] .cp-clipview__title {
+  margin: 0;
+  font: 400 clamp(46px, 6vw, 84px) / 0.88 var(--cp-display);
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  outline: none;
+}
+
+:root[data-lens="cut-paper"] .cp-head__intro {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--cp-ivory-2);
+  font-size: 14px;
+}
+
+:root[data-lens="cut-paper"] .cp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 11px 16px 9px;
+  border: 0;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--cp-ivory-4);
+  clip-path: var(--cp-cut-tab);
+  color: var(--cp-ivory);
+  font: 400 17px/1 var(--cp-display);
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), transform var(--cp-dur-tap) var(--cp-ease-stab);
+}
+
+:root[data-lens="cut-paper"] .cp-btn:hover {
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-btn--lit {
+  background: var(--cp-ivory);
+  box-shadow: none;
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-btn--lit:hover {
+  background: var(--cp-ivory-2);
+}
+
+:root[data-lens="cut-paper"] .cp-btn small {
+  font: 600 11px/1 var(--cp-mono);
+  opacity: 0.7;
+}
+
+:root[data-lens="cut-paper"] .cp-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 11px;
+  border-radius: 4px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  color: var(--cp-ivory);
+  font: 600 11.5px/1 var(--cp-mono);
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] a.cp-chip:hover {
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-chip--flat {
+  color: var(--cp-ivory-2);
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* the play button that sits with a view (bound to the same transport) */
+:root[data-lens="cut-paper"] .cp-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 16px 8px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--cp-ivory);
+  color: var(--cp-ink);
+  font: 400 18px/1 var(--cp-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform var(--cp-dur-tap) var(--cp-ease-stab);
+}
+
+:root[data-lens="cut-paper"] .cp-play:disabled {
+  cursor: default;
+}
+
+:root[data-lens="cut-paper"] .cp-prose {
+  max-width: 66ch;
+  color: var(--cp-ivory-2);
+  font: 400 14.5px/1.75 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-prose > * {
+  margin: 0 0 1.1em;
+}
+
+:root[data-lens="cut-paper"] .cp-prose h2,
+:root[data-lens="cut-paper"] .cp-prose h3,
+:root[data-lens="cut-paper"] .cp-prose h4 {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 1.5em 0 0.55em;
+  color: var(--cp-ivory);
+  font: 400 30px/1 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-prose h2::before {
+  content: "";
+  flex: none;
+  width: 12px;
+  height: 12px;
+  background: var(--note, var(--cp-ivory));
+  transform: translateY(-4px);
+}
+
+:root[data-lens="cut-paper"] .cp-prose h3,
+:root[data-lens="cut-paper"] .cp-prose h4 {
+  font-size: 22px;
+}
+
+:root[data-lens="cut-paper"] .cp-prose strong,
+:root[data-lens="cut-paper"] .cp-prose em {
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-prose a,
+:root[data-lens="cut-paper"] .cp-role a,
+:root[data-lens="cut-paper"] .cp-lab__aside a {
+  color: var(--cp-ivory);
+  text-decoration: underline;
+  text-decoration-color: var(--note, var(--cp-ivory-3));
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-prose ul,
+:root[data-lens="cut-paper"] .cp-prose ol {
+  padding-left: 1.4em;
+}
+
+:root[data-lens="cut-paper"] .cp-prose li {
+  margin-bottom: 0.4em;
+}
+
+:root[data-lens="cut-paper"] .cp-prose img,
+:root[data-lens="cut-paper"] .cp-prose video {
+  max-width: 100%;
+  height: auto;
+}
+
+:root[data-lens="cut-paper"] .cp-prose table {
+  border-collapse: collapse;
+}
+
+:root[data-lens="cut-paper"] .cp-prose th,
+:root[data-lens="cut-paper"] .cp-prose td {
+  padding: 4px 12px 4px 0;
+  border-bottom: 1px solid var(--cp-hairline);
+  text-align: left;
+}
+
+:root[data-lens="cut-paper"] .cp-prose pre {
+  overflow: auto;
+  padding: 12px;
+  background: var(--cp-ink-2);
+}
+
+:root[data-lens="cut-paper"] .cp-prose blockquote {
+  padding-left: 14px;
+  border-left: 3px solid var(--note, var(--cp-ivory-3));
+}
+
+:root[data-lens="cut-paper"] .cp-back {
+  display: inline-flex;
+  margin-top: 22px;
+  color: var(--cp-ivory);
+  font: 400 18px/1 var(--cp-display);
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-scrap {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  background: var(--paper);
+  pointer-events: none;
+  transform: rotate(var(--tilt, 0deg));
+}
+
+:root[data-lens="cut-paper"] .cp-scrap--torn {
+  clip-path: var(--cp-torn);
+}
+
+:root[data-lens="cut-paper"] .cp-scrap--tri {
+  clip-path: polygon(0 100%, 46% 0, 100% 88%);
+}
+
+:root[data-lens="cut-paper"] .cp-scrap--stairs {
+  clip-path: polygon(0 100%, 0 70%, 18% 70%, 18% 48%, 38% 48%, 38% 30%, 58% 30%, 58% 12%, 80% 12%, 80% 0, 100% 0, 100% 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-scrap--dot {
+  border-radius: 50%;
+}
+
+:root[data-lens="cut-paper"] .cp-scrap--strip {
+  opacity: 0.85;
+  clip-path: polygon(2% 0, 100% 6%, 98% 100%, 0 92%);
+}
+
+/* the clip's own little playhead while it is auditioned */
+:root[data-lens="cut-paper"] .cp-clip__run {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--cp-ivory);
+  opacity: 0;
+  pointer-events: none;
+}
+
+:root[data-lens="cut-paper"] [data-hearing] > .cp-clip__run,
+:root[data-lens="cut-paper"] [data-hearing] .cp-tcard__roll .cp-clip__run {
+  animation: cut-paper-hear var(--hear, 1.5s) linear forwards;
+}
+
+@keyframes cut-paper-hear {
+  0% { opacity: 1; left: 0; }
+  96% { opacity: 1; }
+  100% { opacity: 0; left: 100%; }
+}
+
+/* ── the arrangement ───────────────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-arr {
+  --head: 300px;
+  position: relative;
+  border-radius: 6px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  overflow: hidden;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--session {
+  --head: 196px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--zoom {
+  --head: 168px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row {
+  display: grid;
+  grid-template-columns: var(--head) minmax(0, 1fr);
+  min-height: 34px;
+  border-bottom: 1px solid var(--cp-hairline-2);
+}
+
+:root[data-lens="cut-paper"] .cp-arr__tracks,
+:root[data-lens="cut-paper"] .cp-roles__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__head {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 10px;
+  border-right: 1px solid var(--cp-hairline);
+  background: var(--cp-ink-2);
+}
+
+:root[data-lens="cut-paper"] .cp-arr__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font: 400 16px/1 var(--cp-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__name small,
+:root[data-lens="cut-paper"] .cp-ruler__corner small {
+  margin-left: 8px;
+  color: var(--cp-ivory-3);
+  font: 500 10px/1 var(--cp-mono);
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
+:root[data-lens="cut-paper"] .cp-lane {
+  position: relative;
+  min-width: 0;
+  min-height: 34px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row[data-silent] .cp-lane,
+:root[data-lens="cut-paper"] .cp-arr__row[data-silent] .cp-arr__name,
+:root[data-lens="cut-paper"] .cp-arr__row[data-silent] .cp-track__copy {
+  opacity: 0.35;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__over {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: var(--head);
+  z-index: 3;
+  pointer-events: none;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--at) * 100%);
+  border-left: 1px solid var(--cp-hairline-2);
+}
+
+/* ruler */
+:root[data-lens="cut-paper"] .cp-arr__row--ruler {
+  min-height: 30px;
+  border-bottom: 1px solid var(--cp-hairline);
+  background: var(--cp-ink-3);
+}
+
+:root[data-lens="cut-paper"] .cp-ruler__corner {
+  background: var(--cp-ink-3);
+  color: var(--cp-ivory-3);
+  font: 400 15px/1 var(--cp-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-ruler__lane {
+  position: relative;
+  cursor: text;
+  touch-action: none;
+  user-select: none;
+}
+
+:root[data-lens="cut-paper"] .cp-ruler__year {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--at) * 100%);
+  width: calc(var(--len) * 100%);
+  border-left: 1px solid var(--cp-ivory-4);
+  background: repeating-linear-gradient(90deg, var(--cp-hairline) 0 1px, transparent 1px calc(100% / var(--months, 12))) bottom / 100% 6px no-repeat;
+}
+
+:root[data-lens="cut-paper"] .cp-ruler__year b {
+  position: absolute;
+  top: 6px;
+  left: 5px;
+  color: var(--cp-ivory-2);
+  font: 400 15px/1 var(--cp-display);
+  letter-spacing: 0.06em;
+}
+
+:root[data-lens="cut-paper"] .cp-ruler__month {
+  position: absolute;
+  bottom: 8px;
+  left: calc(var(--at) * 100%);
+  padding-left: 3px;
+  color: var(--cp-ivory-3);
+  font: 500 9px/1 var(--cp-mono);
+  font-style: normal;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--zoom .cp-ruler__year b {
+  top: 3px;
+}
+
+/* changes */
+:root[data-lens="cut-paper"] .cp-chord {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: calc(var(--at) * 100%);
+  width: calc(var(--len) * 100% - 2px);
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--cp-ivory) calc(5% + var(--tint) * 3%), transparent);
+  color: var(--cp-ivory-3);
+  font: 600 10px/1 var(--cp-mono);
+  white-space: nowrap;
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), color var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-chord[data-live] {
+  background: color-mix(in srgb, var(--cp-brass) 22%, transparent);
+  color: var(--cp-brass-hi);
+}
+
+/* roles: the bass */
+:root[data-lens="cut-paper"] .cp-rclip {
+  position: absolute;
+  top: calc(5px + var(--row, 0) * 13px);
+  left: calc(var(--at) * 100%);
+  width: max(6px, calc(var(--len) * 100% - 2px));
+  height: 12px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--cp-sol) 45%, var(--cp-ink-3));
+  color: var(--cp-ivory);
+  font: 600 9px/12px var(--cp-mono);
+  white-space: nowrap;
+  text-decoration: none;
+  pointer-events: auto;
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-rclip span {
+  padding: 0 5px;
+}
+
+:root[data-lens="cut-paper"] .cp-rclip[data-live] {
+  background: var(--cp-sol);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-lane--roles {
+  min-height: 34px;
+}
+
+/* project tracks */
+:root[data-lens="cut-paper"] .cp-track__head {
+  align-items: flex-start;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+:root[data-lens="cut-paper"] .cp-track__no {
+  flex: none;
+  width: 22px;
+  color: var(--note);
+  font: 400 18px/1 var(--cp-display);
+}
+
+:root[data-lens="cut-paper"] .cp-track__copy {
+  flex: 1;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-track__title {
+  margin: 0;
+  overflow: hidden;
+  font: 400 19px/1 var(--cp-display);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+:root[data-lens="cut-paper"] .cp-track__title a {
+  color: var(--cp-ivory);
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-track__title a:hover {
+  color: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-track__meta,
+:root[data-lens="cut-paper"] .cp-track__tools {
+  margin: 3px 0 0;
+  color: var(--cp-ivory-3);
+  font: 500 10.5px/1.35 var(--cp-mono);
+  letter-spacing: 0.04em;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--session .cp-track__voice {
+  display: none;
+}
+
+:root[data-lens="cut-paper"] .cp-track__sum {
+  display: -webkit-box;
+  margin: 5px 0 0;
+  overflow: hidden;
+  color: var(--cp-ivory-2);
+  font: 400 12px/1.45 var(--cp-mono);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+:root[data-lens="cut-paper"] .cp-ms-group {
+  display: flex;
+  flex: none;
+  gap: 3px;
+}
+
+:root[data-lens="cut-paper"] .cp-ms,
+:root[data-lens="cut-paper"] .cp-hear {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--cp-ink-4);
+  color: var(--cp-ivory-2);
+  font: 700 10px/1 var(--cp-mono);
+  cursor: pointer;
+}
+
+:root[data-lens="cut-paper"] .cp-ms:hover,
+:root[data-lens="cut-paper"] .cp-hear:hover {
+  background: var(--cp-ink-5);
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-hear svg {
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+}
+
+:root[data-lens="cut-paper"] .cp-ms--mute[aria-pressed="true"] {
+  background: var(--cp-mustard);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-ms--solo[aria-pressed="true"] {
+  background: var(--cp-fa);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-lane--track {
+  min-height: 52px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--full .cp-lane--track {
+  min-height: 74px;
+}
+
+:root[data-lens="cut-paper"] .cp-clip {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: calc(var(--at) * 100%);
+  width: max(18px, calc(var(--len) * 100% - 2px));
+  overflow: hidden;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--note) 82%, var(--cp-ink));
+  color: var(--cp-ink);
+  text-decoration: none;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22);
+  pointer-events: auto;
+  transition: filter var(--cp-dur-ui) var(--cp-ease-brush), box-shadow var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-clip__name {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  right: 2px;
+  overflow: hidden;
+  font: 400 11px/1 var(--cp-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+:root[data-lens="cut-paper"] .cp-roll {
+  position: absolute;
+  top: 14px;
+  right: 2px;
+  bottom: 4px;
+  left: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 18px);
+  fill: rgba(10, 9, 8, 0.62);
+}
+
+:root[data-lens="cut-paper"] .cp-clip:hover,
+:root[data-lens="cut-paper"] .cp-clip[data-hearing] {
+  filter: brightness(1.12);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22), 0 0 0 2px var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-clip[data-live] {
+  background: var(--note);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22), 0 0 18px color-mix(in srgb, var(--note) 60%, transparent);
+}
+
+/* markers */
+:root[data-lens="cut-paper"] .cp-lane--markers {
+  min-height: 40px;
+}
+
+:root[data-lens="cut-paper"] .cp-flag {
+  position: absolute;
+  top: calc(5px + var(--row) * 10px);
+  left: calc(var(--at) * 100%);
+  width: 14px;
+  height: 14px;
+  margin-left: -1px;
+  pointer-events: auto;
+}
+
+:root[data-lens="cut-paper"] .cp-flag__pin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 9px;
+  border-left: 2px solid var(--cp-ivory-3);
+  background: var(--cp-ivory-3);
+  clip-path: polygon(0 0, 100% 0, 70% 50%, 100% 100%, 0 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-flag:hover .cp-flag__pin,
+:root[data-lens="cut-paper"] .cp-flag[data-live] .cp-flag__pin,
+:root[data-lens="cut-paper"] .cp-flag[data-hearing] .cp-flag__pin {
+  background: var(--cp-brass-hi);
+}
+
+/* ── home: set info, the turntable, the crate ──────────────── */
+
+:root[data-lens="cut-paper"] .cp-home {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(250px, 0.9fr);
+  grid-template-areas: "hero tt crate" "loc loc loc";
+  align-items: center;
+  gap: 34px 40px;
+  padding: var(--cp-pad) var(--cp-pad) 72px;
+}
+
+:root[data-lens="cut-paper"] .cp-home__hero {
+  grid-area: hero;
+  position: relative;
+  z-index: 1;
+  padding: 18px 0 8px;
+}
+
+:root[data-lens="cut-paper"] .cp-home__hero > :not(.cp-scrap) {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-lens="cut-paper"] .cp-home__scrap-a {
+  top: 4px;
+  left: 96px;
+  width: 58px;
+  height: 36px;
+  --tilt: -8deg;
+}
+
+:root[data-lens="cut-paper"] .cp-home__scrap-b {
+  bottom: -58px;
+  left: calc(var(--cp-pad) * -1);
+  width: 96px;
+  height: 72px;
+  opacity: 0.9;
+}
+
+:root[data-lens="cut-paper"] .cp-home__scrap-c {
+  top: 46%;
+  right: -22px;
+  width: 64px;
+  height: 70px;
+  --tilt: 14deg;
+}
+
+/* the polaroid floats beside the name, so the name wraps round it and
+   never covers its caption */
+:root[data-lens="cut-paper"] .cp-polaroid {
+  float: right;
+  width: 118px;
+  margin: -4px 4px 12px 16px;
+  padding: 6px 6px 5px;
+  background: var(--cp-bone);
+  box-shadow: 6px 6px 0 var(--cp-plum);
+  transform: rotate(4deg);
+}
+
+:root[data-lens="cut-paper"] .cp-polaroid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: 50% 30%;
+  filter: grayscale(0.15) contrast(1.05);
+}
+
+:root[data-lens="cut-paper"] .cp-polaroid figcaption {
+  margin-top: 4px;
+  font: 600 10px/1.2 var(--cp-mono);
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-polaroid figcaption a {
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-home__greeting {
+  display: inline-flex;
+  margin: 0;
+  padding: 7px 14px 6px 12px;
+  background: var(--cp-ink);
+  box-shadow: inset 0 0 0 1px var(--cp-ivory-4);
+  color: var(--cp-ivory);
+  clip-path: var(--cp-cut-tab);
+  font: 600 12px/1 var(--cp-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+:root[data-lens="cut-paper"] .cp-home__greeting::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  margin: 1px 9px 0 0;
+  background: var(--cp-tomato);
+}
+
+:root[data-lens="cut-paper"] .cp-home__title {
+  margin: 10px 0 0;
+  color: var(--cp-ivory);
+  font: 400 clamp(68px, min(7.4vw, 14vh), 136px) / 0.9 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-shadow: 6px 6px 0 var(--cp-plum);
+  text-transform: uppercase;
+  outline: none;
+}
+
+:root[data-lens="cut-paper"] .cp-home__role {
+  clear: both;
+  margin: 14px 0 0;
+  color: var(--cp-mustard);
+  font: 400 clamp(22px, 2.2vw, 30px) / 1 var(--cp-display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-home__welcome {
+  max-width: 38ch;
+  margin: 12px 0 0;
+  color: var(--cp-ivory-2);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* the turntable: the record on the platter is a project's clip */
+:root[data-lens="cut-paper"] .cp-tt {
+  grid-area: tt;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__state {
+  transition: color var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__deck {
+  position: relative;
+  width: 100%;
+  max-width: min(320px, 42vh);
+  aspect-ratio: 1.06;
+  border-radius: 14px;
+  background: linear-gradient(160deg, var(--cp-ink-3), var(--cp-ink-2));
+  box-shadow: var(--cp-ring), 0 8px 24px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__mat {
+  position: absolute;
+  top: 8%;
+  left: 5%;
+  width: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #050404;
+  box-shadow: 0 0 0 5px var(--cp-ink-4), 0 0 0 6px var(--cp-hairline), 0 14px 30px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__platter {
+  position: absolute;
+  top: 8%;
+  left: 5%;
+  width: 78%;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__platter:disabled {
+  cursor: default;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__platter:focus-visible {
+  outline-offset: 6px;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__record {
+  position: absolute;
+  inset: 3%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 31%, rgba(255, 255, 255, 0.05) 31.5% 32.5%, transparent 33%),
+    repeating-radial-gradient(circle, #0c0b0a 0 1.4px, #181614 1.6px 2.8px);
+  animation: cut-paper-spin 1.8s linear infinite paused;
+  transition: opacity 160ms var(--cp-ease-brush), transform 220ms var(--cp-ease-swing);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__deck[data-spin] .cp-tt__record {
+  animation-play-state: running;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__platter:hover .cp-tt__record {
+  filter: brightness(1.15);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__deck[data-swap] .cp-tt__record {
+  opacity: 0.3;
+  transform: translateX(-5%) scale(0.96);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__label {
+  position: absolute;
+  inset: 33%;
+  border-radius: 50%;
+  background: var(--cover) center / cover no-repeat, var(--cp-ink-4);
+  box-shadow: 0 0 0 4px var(--note, var(--cp-ivory-3)), 0 0 18px -2px var(--note, transparent);
+  transition: box-shadow var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 20deg, transparent 0 8%, rgba(255, 255, 255, 0.09) 13%, transparent 19% 58%, rgba(255, 255, 255, 0.07) 63%, transparent 69%);
+  pointer-events: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__spindle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--cp-ivory-2);
+  box-shadow: 0 0 0 2px var(--cp-ink);
+}
+
+@keyframes cut-paper-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* the arm rests off the record, and drops onto it while the record plays */
+:root[data-lens="cut-paper"] .cp-tt__arm {
+  position: absolute;
+  top: 3%;
+  right: 2%;
+  width: 52%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--cp-ivory-2);
+  stroke-width: 2.6;
+  pointer-events: none;
+  transform: rotate(-16deg);
+  transform-origin: 86% 14%;
+  transition: transform 420ms var(--cp-ease-swing);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__deck[data-spin] .cp-tt__arm {
+  transform: rotate(0deg);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__deck[data-swap] .cp-tt__arm {
+  transform: rotate(-22deg);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__pivot {
+  fill: var(--cp-ink-4);
+  stroke: var(--cp-ivory-3);
+  stroke-width: 1.5;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__head {
+  fill: var(--cp-ivory-2);
+  stroke: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__speed {
+  position: absolute;
+  right: 7%;
+  bottom: 7%;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--cp-ivory-3);
+  font: 400 15px/1 var(--cp-display);
+  letter-spacing: 0.1em;
+}
+
+/* the lamp lights while the platter turns */
+:root[data-lens="cut-paper"] .cp-tt__speed::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cp-ink-5);
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), box-shadow var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__deck[data-spin] .cp-tt__speed::before {
+  background: var(--cp-brass-fill);
+  box-shadow: var(--cp-glow-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__meta {
+  max-width: 340px;
+  margin-top: 16px;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__when {
+  margin: 0;
+  color: var(--cp-ivory-3);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__title {
+  margin: 4px 0 6px;
+  font: 400 40px/1 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__link {
+  color: var(--cp-ivory);
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__link:hover {
+  color: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__sum {
+  display: -webkit-box;
+  margin: 0 0 12px;
+  overflow: hidden;
+  color: var(--cp-ivory-2);
+  font-size: 13px;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* the clip's own notes, exactly what the record plays */
+:root[data-lens="cut-paper"] .cp-tt__roll {
+  position: relative;
+  height: 34px;
+  border-radius: 4px;
+  background: var(--note);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__roll .cp-roll {
+  top: 4px;
+  bottom: 4px;
+  left: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 8px);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__roll .cp-clip__run {
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__voice {
+  margin: 6px 0 14px;
+  color: var(--cp-ivory-3);
+  font: 600 10.5px/1.3 var(--cp-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__follow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  max-width: 400px;
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-tt__follow .cp-play {
+  padding: 8px 12px 6px 10px;
+  font-size: 15px;
+}
+
+:root[data-lens="cut-paper"] .cp-tt__follow p {
+  margin: 0;
+  color: var(--cp-ivory-3);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+/* the crate */
+:root[data-lens="cut-paper"] .cp-crate {
+  grid-area: crate;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__rec {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 5px 12px 5px 14px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: var(--cp-ink-3);
+  box-shadow: var(--cp-ring);
+  color: var(--cp-ivory);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), transform var(--cp-dur-ui) var(--cp-ease-swing);
+}
+
+:root[data-lens="cut-paper"] .cp-crate__rec::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-crate__rec:hover {
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-crate__rec:disabled {
+  cursor: default;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__rec[data-on] {
+  background: var(--cp-ink-4);
+  box-shadow: inset 0 0 0 1px var(--cp-ivory-4);
+  transform: translateX(-6px);
+}
+
+:root[data-lens="cut-paper"] .cp-crate__art {
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+  background: var(--cp-ink-5);
+  object-fit: cover;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__copy {
+  display: grid;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__title {
+  overflow: hidden;
+  font: 400 21px/1.15 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__meta {
+  overflow: hidden;
+  color: var(--cp-ivory-3);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__side {
+  color: var(--cp-ivory-4);
+  font: 400 17px/1 var(--cp-display);
+  letter-spacing: 0.06em;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__rec[data-on] .cp-crate__side {
+  color: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-crate__all {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 0;
+  color: var(--cp-ivory);
+  font: 400 18px/1 var(--cp-display);
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__all::after {
+  content: "→";
+  font-family: var(--cp-mono);
+  font-size: 14px;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__count {
+  padding: 3px 6px 2px;
+  background: var(--cp-ink-4);
+  color: var(--cp-ivory-2);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+:root[data-lens="cut-paper"] .cp-crate__all:hover {
+  color: var(--cp-brass-hi);
+}
+
+/* Currently, a bone note taped under the crate */
+:root[data-lens="cut-paper"] .cp-note {
+  position: relative;
+  margin-top: 22px;
+  padding: 16px 16px 22px;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  clip-path: polygon(0 0, 100% 1%, 99% 92%, 94% 100%, 83% 95%, 70% 100%, 57% 94%, 44% 100%, 30% 95%, 16% 100%, 4% 95%, 0 100%);
+  transform: rotate(-1.4deg);
+}
+
+:root[data-lens="cut-paper"] .cp-note__tape {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 70px;
+  height: 18px;
+  background: color-mix(in srgb, var(--cp-plum) 80%, transparent);
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+:root[data-lens="cut-paper"] .cp-note h2 {
+  margin: 0 0 6px;
+  font: 400 28px/1 var(--cp-display);
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-note p {
+  margin: 0 0 10px;
+  font: 400 13px/1.6 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-note a {
+  color: var(--cp-ink);
+  font: 700 12px/1.3 var(--cp-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-underline-offset: 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-note :focus-visible {
+  outline-color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-locators {
+  grid-area: loc;
+  min-width: 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-session__head,
+:root[data-lens="cut-paper"] .cp-session__bar,
+:root[data-lens="cut-paper"] .cp-editor__head,
+:root[data-lens="cut-paper"] .cp-roles__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
+:root[data-lens="cut-paper"] .cp-session__bar {
+  margin-bottom: 14px;
+}
+
+:root[data-lens="cut-paper"] .cp-session__legend {
+  flex-basis: 100%;
+  max-width: 76ch;
+  margin: 0;
+  color: var(--cp-ivory-2);
+  font-size: 12.5px;
+}
+
+:root[data-lens="cut-paper"] .cp-session__bar .cp-session__legend,
+:root[data-lens="cut-paper"] .cp-roles__head .cp-session__legend {
+  flex: 1 1 320px;
+}
+
+:root[data-lens="cut-paper"] .cp-locators__intro,
+:root[data-lens="cut-paper"] .cp-locators__caption,
+:root[data-lens="cut-paper"] .cp-locators__empty {
+  margin: 0 0 8px;
+  color: var(--cp-ivory-3);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-locators__list {
+  margin: 0 0 8px;
+  padding: 0;
+  border-top: 1px solid var(--cp-hairline);
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-loc {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--cp-hairline-2);
+}
+
+:root[data-lens="cut-paper"] .cp-loc__when {
+  justify-self: start;
+  padding: 4px 8px 3px;
+  border: 0;
+  border-left: 3px solid var(--cp-ivory-4);
+  background: var(--cp-ink-3);
+  color: var(--cp-ivory-2);
+  font: 600 11px/1.2 var(--cp-mono);
+  cursor: pointer;
+}
+
+:root[data-lens="cut-paper"] .cp-loc__when:hover,
+:root[data-lens="cut-paper"] .cp-loc[data-live] .cp-loc__when {
+  border-left-color: var(--cp-brass);
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-loc__title {
+  overflow: hidden;
+  color: var(--cp-ivory);
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+:root[data-lens="cut-paper"] .cp-loc__title:hover {
+  text-decoration: underline;
+}
+
+:root[data-lens="cut-paper"] .cp-loc small {
+  color: var(--cp-ivory-3);
+  font-size: 11px;
+}
+
+/* ── projects ──────────────────────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-narrow {
+  display: none;
+}
+
+/* ── a project: the clip view ──────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-clipview {
+  display: grid;
+  grid-template-columns: minmax(260px, 330px) minmax(0, 1fr);
+  align-items: start;
+  gap: 32px;
+  padding: var(--cp-pad) var(--cp-pad) 72px;
+}
+
+:root[data-lens="cut-paper"] .cp-clipview__side {
+  display: grid;
+  gap: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-clipview__side .cp-head__kicker {
+  margin-top: 6px;
+}
+
+:root[data-lens="cut-paper"] .cp-clipview__title {
+  font-size: clamp(42px, 4.6vw, 70px);
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-clipview__lede {
+  margin: 0;
+  color: var(--cp-ivory-2);
+}
+
+:root[data-lens="cut-paper"] .cp-cover {
+  margin: 0;
+  padding: 6px;
+  background: var(--note);
+  transform: rotate(-1.5deg);
+}
+
+:root[data-lens="cut-paper"] .cp-cover img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+}
+
+:root[data-lens="cut-paper"] .cp-props {
+  display: grid;
+  gap: 0;
+  margin: 4px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-props > div {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-props dt {
+  color: var(--cp-ivory-3);
+  font: 400 15px/1.2 var(--cp-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-props dd {
+  margin: 0;
+  font-size: 13px;
+}
+
+:root[data-lens="cut-paper"] .cp-props--tools .cp-chips {
+  margin-top: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+:root[data-lens="cut-paper"] .cp-pager__link {
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  border-radius: 4px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  color: var(--cp-ivory);
+  font: 400 16px/1 var(--cp-display);
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-pager__link--next {
+  text-align: right;
+}
+
+:root[data-lens="cut-paper"] .cp-pager__link small {
+  color: var(--cp-ivory-3);
+  font: 500 9.5px/1 var(--cp-mono);
+  letter-spacing: 0.1em;
+}
+
+:root[data-lens="cut-paper"] .cp-pager__link[data-off] {
+  opacity: 0.4;
+}
+
+:root[data-lens="cut-paper"] a.cp-pager__link:hover {
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-clipview__main {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-editor {
+  display: grid;
+  gap: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-editor__hint {
+  margin: 0;
+  color: var(--cp-ivory-3);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row--piano {
+  --row-h: 13px;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__keys {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 26px;
+  align-items: start;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__keys .cp-arr__name {
+  align-self: center;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__names {
+  display: grid;
+  grid-template-rows: repeat(var(--rows), var(--row-h));
+  margin: 0 -10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__names li {
+  padding-right: 4px;
+  border-bottom: 1px solid var(--cp-hairline-2);
+  color: var(--cp-ivory-3);
+  font: 600 9px/var(--row-h) var(--cp-mono);
+  text-align: right;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__names li[data-root] {
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-lane--piano {
+  height: calc(var(--rows) * var(--row-h) + 12px);
+  margin: 6px 0;
+  background: repeating-linear-gradient(180deg, transparent 0 calc(var(--row-h) - 1px), var(--cp-hairline-2) calc(var(--row-h) - 1px) var(--row-h));
+}
+
+:root[data-lens="cut-paper"] .cp-piano__clip {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  left: calc(var(--at) * 100%);
+  width: calc(var(--len) * 100%);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--note) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--note) 50%, transparent);
+}
+
+:root[data-lens="cut-paper"] .cp-piano__note {
+  position: absolute;
+  top: calc(var(--row) * var(--row-h) + 1px);
+  left: calc(var(--at) * 100%);
+  width: calc(var(--len) * 100% - 2px);
+  height: calc(var(--row-h) - 2px);
+  border-radius: 2px;
+  background: var(--note);
+  transition: filter var(--cp-dur-ui) var(--cp-ease-brush), box-shadow var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-piano__note[data-live] {
+  filter: brightness(1.3);
+  box-shadow: 0 0 12px var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-inserts {
+  display: grid;
+  gap: 16px;
+}
+
+:root[data-lens="cut-paper"] .cp-insert {
+  margin: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-insert img,
+:root[data-lens="cut-paper"] .cp-insert video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-insert figcaption {
+  margin-top: 6px;
+  color: var(--cp-ivory-3);
+  font-size: 12px;
+}
+
+/* ── the lab: the rack ─────────────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-rack {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 22px;
+  margin: 18px 0 26px;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__slot {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: var(--note);
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: transform var(--cp-dur-tap) var(--cp-ease-stab), filter var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit .cp-roll {
+  top: 22%;
+  right: 12%;
+  bottom: 22%;
+  left: 12%;
+  width: 76%;
+  height: 56%;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit:hover {
+  filter: brightness(1.08);
+}
+
+/* a pad with the sketch's thumbnail: the picture on top, the motif on a
+   band of the pad's colour underneath */
+:root[data-lens="cut-paper"] .cp-pad__art {
+  position: absolute;
+  inset: 6px 6px 30%;
+  width: calc(100% - 12px);
+  height: calc(70% - 6px);
+  border-radius: 4px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(10, 9, 8, 0.25);
+  transition: transform var(--cp-dur-tap) var(--cp-ease-stab);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__band {
+  position: absolute;
+  right: 6px;
+  bottom: 10px;
+  left: 6px;
+  height: calc(30% - 18px);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__band .cp-roll {
+  top: 2px;
+  right: 6%;
+  bottom: 2px;
+  left: 6%;
+  width: 88%;
+  height: calc(100% - 4px);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit[data-hearing] .cp-pad__art {
+  transform: translateY(2px);
+}
+
+:root[data-lens="cut-paper"] [data-hearing] .cp-pad__band > .cp-clip__run {
+  animation: cut-paper-hear var(--hear, 1.5s) linear forwards;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit:active,
+:root[data-lens="cut-paper"] .cp-pad__hit[data-hearing] {
+  transform: scale(0.97);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit .cp-clip__run {
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-rack__meta {
+  margin: 4px 0 0;
+  color: var(--cp-ivory-3);
+  font: 600 10.5px/1.2 var(--cp-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__title {
+  margin: 0;
+  font: 400 26px/1 var(--cp-display);
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__title a {
+  color: var(--cp-ivory);
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__title a:hover {
+  color: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-rack__sum {
+  margin: 0;
+  color: var(--cp-ivory-2);
+  font-size: 13px;
+}
+
+:root[data-lens="cut-paper"] .cp-lab__more {
+  display: grid;
+  gap: 10px;
+  max-width: 66ch;
+}
+
+:root[data-lens="cut-paper"] .cp-lab__more p {
+  margin: 0;
+  color: var(--cp-ivory-2);
+}
+
+/* ── about: the set notes, a torn jazz poster ──────────────── */
+
+:root[data-lens="cut-paper"] .cp-about {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 100%;
+}
+
+:root[data-lens="cut-paper"] .cp-poster {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: max(calc(100dvh - var(--cp-bar-h) - var(--cp-ov-h)), 560px);
+  padding: 48px 40px 40px;
+  overflow: hidden;
+  background: var(--cp-confetti), var(--cp-ink);
+  border-right: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-poster > :not(.cp-scrap) {
+  position: relative;
+  z-index: 2;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__a {
+  top: -20px;
+  left: -30px;
+  width: 64%;
+  height: 40%;
+  --tilt: -5deg;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__b {
+  right: -2%;
+  bottom: 0;
+  width: 44%;
+  height: 34%;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__c {
+  top: 5%;
+  left: 8%;
+  width: 90px;
+  height: 100px;
+  --tilt: -14deg;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__d {
+  z-index: 3;
+  top: 9%;
+  right: 16%;
+  width: 120px;
+  height: 26px;
+  --tilt: -24deg;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__e {
+  top: 44%;
+  right: 8%;
+  width: 70px;
+  height: 70px;
+}
+
+:root[data-lens="cut-paper"] .cp-poster > .cp-poster__portrait {
+  position: absolute;
+  top: 7%;
+  right: 12%;
+  z-index: 2;
+  width: 38%;
+  max-width: 250px;
+  margin: 0;
+  aspect-ratio: 3 / 4;
+  filter: drop-shadow(10px 10px 0 var(--cp-ink));
+  transform: rotate(3deg);
+}
+
+:root[data-lens="cut-paper"] .cp-poster__portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 25%;
+  clip-path: polygon(0 3%, 96% 0, 100% 62%, 97% 100%, 4% 97%, 2% 60%);
+}
+
+:root[data-lens="cut-paper"] .cp-poster__kicker {
+  margin-bottom: 10px;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__title {
+  margin: 0;
+  color: var(--cp-ivory);
+  font: 400 clamp(72px, 7.6vw, 140px) / 0.94 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-shadow: 7px 7px 0 var(--cp-plum);
+  text-transform: uppercase;
+  outline: none;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__intro {
+  max-width: 34ch;
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  background: var(--cp-ink);
+  box-shadow: var(--cp-ring);
+  color: var(--cp-ivory);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+:root[data-lens="cut-paper"] .cp-poster__tag {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.4em;
+  margin: 18px 0 0;
+  color: var(--cp-mustard);
+  font: 400 26px/1 var(--cp-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-about__body {
+  --note: var(--cp-fa);
+  position: relative;
+  z-index: 1;
+  padding: 40px 44px 72px;
+}
+
+:root[data-lens="cut-paper"] .cp-about__body .cp-prose > :first-child {
+  color: var(--cp-ivory);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+/* ── the resume: the Roles track drawn out ─────────────────── */
+
+:root[data-lens="cut-paper"] .cp-roles__head {
+  margin-bottom: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--roles {
+  --head: 56%;
+}
+
+:root[data-lens="cut-paper"] .cp-roles__group {
+  margin: 0;
+  padding: 14px 14px 8px;
+  border-bottom: 1px solid var(--cp-hairline);
+  font: 400 26px/1 var(--cp-display);
+  text-transform: uppercase;
+  width: var(--head);
+  background: var(--cp-ink-2);
+  position: relative;
+  z-index: 5;
+  border-right: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-role__copy {
+  align-items: flex-start;
+  padding: 12px 14px;
+}
+
+:root[data-lens="cut-paper"] .cp-role__title {
+  margin: 0;
+  font: 400 21px/1.05 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-role__org {
+  color: var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-role__when {
+  margin: 4px 0 0;
+  color: var(--cp-ivory-3);
+  font: 600 11px/1.3 var(--cp-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-role__sum {
+  margin: 6px 0 0;
+  color: var(--cp-ivory-2);
+  font-size: 13px;
+}
+
+:root[data-lens="cut-paper"] .cp-role__bullets {
+  margin: 8px 0 0;
+  padding-left: 1.2em;
+  color: var(--cp-ivory-2);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+:root[data-lens="cut-paper"] .cp-lane--role .cp-rclip {
+  top: 14px;
+  height: 20px;
+  background: color-mix(in srgb, var(--note) 55%, var(--cp-ink-3));
+  font: 400 12px/20px var(--cp-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-lane--role .cp-rclip[data-live],
+:root[data-lens="cut-paper"] .cp-lane--role .cp-rclip[data-hearing] {
+  background: var(--note);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-rclip--undated {
+  left: 10px;
+  width: auto;
+  background: none !important;
+  color: var(--cp-ivory-3);
+  font: 600 10px/20px var(--cp-mono) !important;
+}
+
+:root[data-lens="cut-paper"] .cp-cv__tools {
+  margin: 26px 0;
+}
+
+/* ── writing: the Send ─────────────────────────────────────── */
+
+/* the send lane: the session's ruler and a flag per post at its date */
+:root[data-lens="cut-paper"] .cp-arr--sends {
+  --head: 196px;
+  margin: 14px 0 34px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row--sends {
+  border-bottom: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row--sends .cp-arr__name {
+  color: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-lane--sends {
+  min-height: 52px;
+}
+
+:root[data-lens="cut-paper"] .cp-send {
+  position: absolute;
+  top: calc(8px + var(--row) * 12px);
+  left: calc(var(--at) * 100%);
+  width: 18px;
+  height: 22px;
+  margin-left: -1px;
+  pointer-events: auto;
+}
+
+/* a paper dart on a stem: sent, at this date */
+:root[data-lens="cut-paper"] .cp-send__pin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 12px;
+  border-left: 2px solid var(--cp-ivory-3);
+  background: var(--cp-ivory-3);
+  clip-path: polygon(0 0, 100% 50%, 0 100%, 30% 50%);
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), transform var(--cp-dur-tap) var(--cp-ease-stab);
+}
+
+:root[data-lens="cut-paper"] .cp-send::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: -30px;
+  left: 0;
+  border-left: 2px solid var(--cp-ivory-4);
+}
+
+:root[data-lens="cut-paper"] .cp-send:hover .cp-send__pin,
+:root[data-lens="cut-paper"] .cp-send[data-live] .cp-send__pin {
+  background: var(--note);
+  transform: translateX(3px);
+}
+
+:root[data-lens="cut-paper"] .cp-send[data-live]::after {
+  border-color: var(--cp-brass-hi);
+}
+
+/* the bounces: a wall of bone sheets, one per post */
+:root[data-lens="cut-paper"] .cp-bounces__label small {
+  letter-spacing: 0.08em;
+}
+
+:root[data-lens="cut-paper"] .cp-bounces {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px 26px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 24px 20px 30px;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  clip-path: polygon(0 0, 100% 1%, 99% 93%, 93% 100%, 81% 95%, 68% 100%, 55% 94%, 42% 100%, 29% 95%, 16% 100%, 4% 95%, 0 100%);
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 360ms var(--cp-ease-swing), background var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce:hover,
+:root[data-lens="cut-paper"] .cp-bounce:focus-within {
+  transform: rotate(0deg) translateY(-3px);
+}
+
+/* the playhead on its date: the sheet straightens and lights */
+:root[data-lens="cut-paper"] .cp-bounce[data-live] {
+  background: var(--cp-ivory);
+  transform: rotate(0deg) translateY(-6px);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__tape {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 74px;
+  height: 14px;
+  background: color-mix(in srgb, var(--note) 78%, transparent);
+  transform: translateX(-50%) rotate(-2deg);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce[data-live] .cp-bounce__tape {
+  background: var(--cp-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 0;
+  color: rgba(10, 9, 8, 0.7);
+  font: 600 10.5px/1.2 var(--cp-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__no {
+  padding: 3px 6px 2px;
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+  font: 400 14px/1 var(--cp-display);
+  letter-spacing: 0.1em;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__chord {
+  margin-left: auto;
+}
+
+/* the motif strip: a button that plays the bounce */
+:root[data-lens="cut-paper"] .cp-bounce__hit {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 58px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 4px;
+  background: var(--cp-ink);
+  cursor: pointer;
+  transition: transform var(--cp-dur-tap) var(--cp-ease-stab), filter var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit .cp-roll {
+  top: 10px;
+  right: 5%;
+  bottom: 10px;
+  left: 5%;
+  width: 90%;
+  height: calc(100% - 20px);
+  fill: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit:hover {
+  filter: brightness(1.25);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit:active,
+:root[data-lens="cut-paper"] .cp-bounce__hit[data-hearing] {
+  transform: scale(0.98);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit:disabled {
+  cursor: default;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit--big {
+  height: 132px;
+  border-radius: 8px;
+  background: var(--note);
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.25);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit--big .cp-roll {
+  top: 22px;
+  bottom: 26px;
+  height: calc(100% - 48px);
+  fill: rgba(10, 9, 8, 0.7);
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__hit--big .cp-clip__run {
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-bounces .cp-bounce__title {
+  margin: 4px 0 0;
+  color: var(--cp-ink);
+  font: 400 32px/0.95 var(--cp-display);
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* the whole sheet opens the post; the strip stays its own button */
+:root[data-lens="cut-paper"] .cp-bounce__title a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__title a:hover,
+:root[data-lens="cut-paper"] .cp-bounce__title a:focus-visible {
+  text-decoration: underline;
+  text-decoration-color: var(--note);
+  text-decoration-thickness: 4px;
+  text-underline-offset: 4px;
+  outline: none;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce:has(.cp-bounce__title a:focus-visible) {
+  outline: 3px solid var(--note);
+  outline-offset: -3px;
+}
+
+:root[data-lens="cut-paper"] .cp-bounce__sum {
+  margin: 0;
+  color: #3a352f;
+  font: 400 13px/1.6 var(--cp-mono);
+}
+
+/* a slip of bone for the quiet states: unavailable, empty, missing */
+:root[data-lens="cut-paper"] .cp-slip {
+  position: relative;
+  max-width: 560px;
+  margin-top: 8px;
+  padding: 30px 24px 28px;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  clip-path: polygon(0 0, 100% 1%, 99% 92%, 94% 100%, 83% 95%, 70% 100%, 57% 94%, 44% 100%, 30% 95%, 16% 100%, 4% 95%, 0 100%);
+  transform: rotate(-1deg);
+}
+
+:root[data-lens="cut-paper"] .cp-slip__tape {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 70px;
+  height: 14px;
+  background: color-mix(in srgb, var(--note) 78%, transparent);
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-slip .cp-slip__tag {
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-slip__msg {
+  margin: 14px 0 0;
+  font: 400 14px/1.6 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-slip__go {
+  margin: 16px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-btn--ink {
+  box-shadow: inset 0 0 0 1.5px var(--cp-ink);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-btn--ink:hover {
+  background: rgba(10, 9, 8, 0.08);
+}
+
+:root[data-lens="cut-paper"] .cp-slip :focus-visible {
+  outline-color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-sends__missing {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+}
+
+/* the sheet takes the column's width, however wide its code runs */
+:root[data-lens="cut-paper"] .cp-liner__view .cp-clipview__main {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* a post: the bounce beside its liner notes, and in view while they
+   scroll by */
+@media (min-width: 981px) {
+  :root[data-lens="cut-paper"] .cp-liner__view {
+    grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-liner__side {
+    position: sticky;
+    top: var(--cp-pad);
+  }
+}
+
+:root[data-lens="cut-paper"] .cp-liner__bounce {
+  display: grid;
+  gap: 8px;
+  border-radius: 9px;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__bounce .cp-bounce__meta {
+  color: var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-liner__bounce .cp-bounce__no {
+  background: var(--note);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-liner__bounce[data-live] {
+  outline: 2px solid var(--cp-brass);
+  outline-offset: 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__side .cp-buttons {
+  margin: 10px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__back {
+  margin: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__back .cp-back {
+  margin-top: 6px;
+}
+
+:root[data-lens="cut-paper"] .cp-liner {
+  position: relative;
+  max-width: 860px;
+  padding: 46px 56px 48px;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  /* torn across the top in pixels, so a long post tears like a short one */
+  clip-path: polygon(0 12px, 5% 3px, 13% 10px, 24% 1px, 36% 9px, 49% 2px, 61% 11px, 74% 2px, 86% 9px, 95% 0, 100% 7px, 100% 100%, 0 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-liner__tape {
+  position: absolute;
+  top: 18px;
+  left: 42px;
+  width: 92px;
+  height: 18px;
+  background: color-mix(in srgb, var(--note) 78%, transparent);
+  transform: rotate(-4deg);
+}
+
+:root[data-lens="cut-paper"] .cp-liner__scrap {
+  top: 22px;
+  right: 26px;
+  width: 38px;
+  height: 38px;
+  --tilt: 14deg;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin: 18px 52px 30px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--cp-ink);
+  font: 400 22px/1 var(--cp-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-liner__head span + span {
+  font: 600 11px/22px var(--cp-mono);
+  letter-spacing: 0.14em;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose {
+  max-width: 68ch;
+  color: #2b2723;
+  font-size: 15px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-liner .cp-prose :is(h1, h2, h3, h4),
+:root[data-lens="cut-paper"] .cp-liner .cp-prose :is(strong, em, a) {
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose pre {
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose code {
+  font-family: var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose :not(pre) > code {
+  padding: 1px 5px;
+  background: rgba(10, 9, 8, 0.08);
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose figure {
+  margin-inline: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose img {
+  display: block;
+  padding: 6px;
+  background: var(--cp-ink);
+  transform: rotate(-0.6deg);
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose figcaption {
+  margin-top: 8px;
+  color: rgba(10, 9, 8, 0.65);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-prose hr {
+  border: 0;
+  border-top: 2px dashed rgba(10, 9, 8, 0.25);
+}
+
+:root[data-lens="cut-paper"] .cp-liner :focus-visible {
+  outline-color: var(--cp-ink);
+}
+
+/* the return: where the send comes back, an ink slip pasted at the end */
+:root[data-lens="cut-paper"] .cp-return {
+  position: relative;
+  max-width: 600px;
+  margin-top: 44px;
+  padding: 28px 26px 22px;
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+  clip-path: var(--cp-cut-tab);
+  transform: rotate(-0.8deg);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-return .cp-return__tag {
+  background: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-liner .cp-return__title {
+  margin: 14px 0 8px;
+  color: var(--cp-ivory);
+  font: 400 40px/0.95 var(--cp-display);
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-return__body {
+  margin: 0;
+  color: var(--cp-ivory-2);
+  font: 400 13.5px/1.65 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-return .cp-buttons {
+  margin: 18px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-liner .cp-return :focus-visible {
+  outline-color: var(--cp-ivory);
+}
+
+/* ── the text view ─────────────────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-sheet .cp-head__kicker {
+  margin-bottom: 14px;
+}
+
+:root[data-lens="cut-paper"] .cp-sheet__paper {
+  max-width: 900px;
+  padding: 28px;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  clip-path: polygon(0 0, 100% 0.5%, 99.4% 99%, 0.5% 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-sheet__paper h1 {
+  font-family: var(--cp-display);
+  text-transform: uppercase;
+  outline: none;
+}
+
+:root[data-lens="cut-paper"] .cp-sheet__paper a {
+  color: var(--cp-ink);
+}
+
+/* ── the tape (phones) ─────────────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-tape__hint {
+  margin: 0 0 12px;
+  color: var(--cp-ivory-3);
+  font-size: 11.5px;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__body {
+  position: relative;
+  padding-left: 28px;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__roles {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 24px;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__role {
+  position: absolute;
+  left: calc(var(--row) * 12px);
+  width: 10px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--cp-sol) 40%, var(--cp-ink-3));
+  overflow: hidden;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__role b {
+  display: block;
+  padding-top: 3px;
+  color: var(--cp-ivory);
+  font: 600 8px/10px var(--cp-mono);
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__role[data-live] {
+  background: var(--cp-sol);
+}
+
+:root[data-lens="cut-paper"] .cp-tape__role[data-live] b {
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-tape__list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__year {
+  margin: 16px 0 6px;
+  padding-top: 4px;
+  border-top: 2px solid var(--cp-ivory-4);
+  color: var(--cp-ivory-2);
+  font: 400 24px/1 var(--cp-display);
+  letter-spacing: 0.06em;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: start;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__when {
+  padding-top: 6px;
+  color: var(--cp-ivory-3);
+  font: 600 10px/1 var(--cp-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__bell {
+  display: block;
+  width: 10px;
+  height: 9px;
+  margin-top: -2px;
+  border-left: 2px solid var(--cp-ivory-3);
+  background: var(--cp-ivory-3);
+  clip-path: polygon(0 0, 100% 0, 70% 50%, 100% 100%, 0 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-tcard {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 4px 10px;
+  padding: 10px 40px 10px 10px;
+  border-left: 4px solid var(--note);
+  border-radius: 6px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  transition: box-shadow var(--cp-dur-ui) var(--cp-ease-brush), background var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-tcard[data-live] {
+  background: color-mix(in srgb, var(--note) 14%, var(--cp-ink-2));
+  box-shadow: inset 0 0 0 1px var(--note), 0 0 18px color-mix(in srgb, var(--note) 35%, transparent);
+}
+
+:root[data-lens="cut-paper"] .cp-tcard__art {
+  display: block;
+  width: 52px;
+  height: 52px;
+  border-radius: 4px;
+  background: var(--cp-ink-4);
+  object-fit: cover;
+}
+
+:root[data-lens="cut-paper"] .cp-tcard__title {
+  margin: 0;
+  font: 400 22px/1 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-tcard__title a {
+  color: var(--cp-ivory);
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tcard__meta,
+:root[data-lens="cut-paper"] .cp-tcard__tools {
+  margin: 3px 0 0;
+  color: var(--cp-ivory-3);
+  font: 500 10.5px/1.3 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-tcard__sum {
+  margin: 6px 0 0;
+  color: var(--cp-ivory-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+:root[data-lens="cut-paper"] .cp-tcard__roll {
+  position: relative;
+  grid-column: 1 / -1;
+  height: 30px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--note) 75%, var(--cp-ink));
+}
+
+:root[data-lens="cut-paper"] .cp-tcard__roll .cp-roll {
+  top: 3px;
+  bottom: 3px;
+  height: calc(100% - 6px);
+}
+
+:root[data-lens="cut-paper"] .cp-tcard .cp-hear {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--note);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-tcard .cp-hear svg {
+  width: 12px;
+  height: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-tmark {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 4px 0 4px 8px;
+  border-left: 2px solid var(--cp-ink-5);
+}
+
+:root[data-lens="cut-paper"] .cp-tmark[data-live] {
+  border-left-color: var(--cp-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-tmark__title {
+  color: var(--cp-ivory);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tmark small {
+  color: var(--cp-ivory-3);
+  font-size: 10.5px;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__today {
+  margin: 14px 0 4px;
+  border-top: 1px dashed var(--cp-brass);
+  color: var(--cp-brass);
+  font: 600 10px/1 var(--cp-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-tape__today span {
+  display: inline-block;
+  padding: 4px 6px;
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-tape__end {
+  height: 40vh;
+  border-top: 2px solid var(--cp-ivory-4);
+}
+
+:root[data-lens="cut-paper"] .cp-tape__end span {
+  display: none;
+}
+
+/* the fixed playhead line over the tape */
+:root[data-lens="cut-paper"] .cp-tline {
+  position: absolute;
+  top: 40%;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--cp-brass);
+  box-shadow: var(--cp-glow-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-tline[hidden] {
+  display: none;
+}
+
+:root[data-lens="cut-paper"] .cp-tline__label {
+  position: absolute;
+  right: 10px;
+  bottom: 4px;
+  padding: 3px 6px 2px;
+  border-radius: 3px;
+  background: var(--cp-brass);
+  color: var(--cp-brass-edge);
+  font: 700 10px/1.2 var(--cp-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── narrower windows ──────────────────────────────────────── */
+
+@media (max-width: 1180px) {
+  :root[data-lens="cut-paper"] .cp-file,
+  :root[data-lens="cut-paper"] .cp-np {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr {
+    --head: 250px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--session {
+    --head: 150px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-home {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "hero hero" "tt crate" "loc loc";
+    align-items: start;
+  }
+
+  :root[data-lens="cut-paper"] .cp-home__hero {
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 980px) {
+  :root[data-lens="cut-paper"] .cp-clipview,
+  :root[data-lens="cut-paper"] .cp-about {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-poster {
+    position: relative;
+    height: auto;
+    min-height: 600px;
+    border-right: 0;
+    border-bottom: 1px solid var(--cp-hairline);
+  }
+}
+
+/* phones: time runs down the page */
+@media (max-width: 760px) {
+  :root[data-lens="cut-paper"] {
+    --cp-bar-h: 52px;
+    --cp-ov-h: 26px;
+    --cp-pad: 16px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: var(--cp-bar-h) var(--cp-ov-h) minmax(0, 1fr) auto;
+    grid-template-areas: "bar" "ov" "view" "browser";
+  }
+
+  :root[data-lens="cut-paper"] .cp-bar {
+    gap: 8px;
+    padding: 0 8px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-logo__paper {
+    padding: 4px 9px 2px;
+    font-size: 21px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-deck {
+    height: 40px;
+    padding: 3px 8px 3px 3px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tp {
+    width: 36px;
+    height: 34px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-pos {
+    min-width: 0;
+    margin-left: 4px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-pos__num {
+    font-size: 19px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-meter {
+    gap: 0;
+    padding-left: 8px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-meter > span:first-child {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-meter__now {
+    min-width: 44px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-meter b {
+    font-size: 16px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-sound {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  :root[data-lens="cut-paper"] .cp-sound__label,
+  :root[data-lens="cut-paper"] .cp-sound__state {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-ov {
+    padding: 0 8px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-browser {
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    overflow: visible;
+    border-top: 1px solid var(--cp-hairline);
+    border-right: 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-browser ul {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-key {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 26px auto;
+    justify-items: center;
+    min-height: 0;
+    padding: 0 0 5px;
+    row-gap: 3px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-key__note {
+    grid-row: 1;
+    width: 100%;
+    margin: 0;
+    font-size: 17px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-key__label {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 11.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :root[data-lens="cut-paper"] .cp-key__view,
+  :root[data-lens="cut-paper"] .cp-key .cp-out {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-key:hover {
+    box-shadow: var(--cp-ring);
+  }
+
+  :root[data-lens="cut-paper"] .cp-wide {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-narrow {
+    display: block;
+  }
+
+  :root[data-lens="cut-paper"] .cp-home {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "hero" "tt" "crate" "loc";
+    gap: 34px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-home__scrap-b {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-polaroid {
+    width: 96px;
+    margin: 0 0 8px 10px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-home__title {
+    font-size: clamp(60px, 19vw, 96px);
+    text-shadow: 5px 5px 0 var(--cp-plum);
+  }
+
+  :root[data-lens="cut-paper"] .cp-home__role {
+    font-size: 22px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-home__welcome {
+    font-size: 14px;
+  }
+
+  /* the deck sits beside what it plays */
+  :root[data-lens="cut-paper"] .cp-tt {
+    display: grid;
+    grid-template-columns: 46% minmax(0, 1fr);
+    align-items: start;
+    column-gap: 16px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tt__state,
+  :root[data-lens="cut-paper"] .cp-tt__follow {
+    grid-column: 1 / -1;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tt__meta {
+    margin: 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tt__title {
+    font-size: 30px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tt__sum {
+    font-size: 12px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tt__voice {
+    margin-bottom: 10px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tt__meta .cp-btn {
+    padding: 9px 12px 7px;
+    font-size: 15px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-loc {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-loc small {
+    grid-column: 2;
+  }
+
+  :root[data-lens="cut-paper"] .cp-head__title,
+  :root[data-lens="cut-paper"] .cp-clipview__title {
+    font-size: 46px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--zoom {
+    --head: 92px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--zoom .cp-ms-group {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--zoom .cp-arr__name small {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--zoom .cp-arr__name {
+    font-size: 13px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-piano__keys {
+    grid-template-columns: minmax(0, 1fr) 22px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--zoom .cp-ruler__month {
+    font-size: 8px;
+    padding-left: 1px;
+  }
+
+  /* the resume: each role reads first, its span below */
+  :root[data-lens="cut-paper"] .cp-arr--roles {
+    --head: 0px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--roles .cp-arr__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--roles .cp-arr__row--ruler {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--roles .cp-ruler__corner {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--roles .cp-ruler__year b {
+    font-size: 11px;
+    left: 2px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-roles__group {
+    width: auto;
+    border-right: 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-role__copy {
+    border-right: 0;
+    padding-bottom: 4px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-lane--role {
+    min-height: 30px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-lane--role .cp-rclip {
+    top: 6px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 16px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--roles .cp-arr__over {
+    top: 30px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-poster {
+    min-height: 620px;
+    padding: 30px var(--cp-pad);
+  }
+
+  :root[data-lens="cut-paper"] .cp-poster > .cp-poster__portrait {
+    top: 5%;
+    right: 8%;
+    width: 46%;
+  }
+
+  :root[data-lens="cut-paper"] .cp-poster__title {
+    font-size: clamp(60px, 19vw, 92px);
+    text-shadow: 5px 5px 0 var(--cp-plum);
+  }
+
+  :root[data-lens="cut-paper"] .cp-poster__intro {
+    font-size: 14px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-about__body {
+    padding: 28px var(--cp-pad) 56px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-rack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-rack__title {
+    font-size: 21px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-clipview__side .cp-pad {
+    max-width: 220px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-sheet__paper {
+    padding: 18px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--sends {
+    --head: 84px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--sends .cp-arr__name small,
+  :root[data-lens="cut-paper"] .cp-arr--sends .cp-ruler__corner small {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--sends .cp-ruler__year b {
+    font-size: 12px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-bounces {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-liner {
+    padding: 34px 18px 28px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-liner__head {
+    margin-right: 44px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-liner__scrap {
+    right: 14px;
+  }
+}
+
+/* ── reduced motion and faces ──────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-lens="cut-paper"] .cp-screen[data-state] [data-beat] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  :root[data-lens="cut-paper"] [data-hearing] > .cp-clip__run,
+  :root[data-lens="cut-paper"] [data-hearing] .cp-pad__band > .cp-clip__run,
+  :root[data-lens="cut-paper"] [data-hearing] .cp-tcard__roll .cp-clip__run,
+  :root[data-lens="cut-paper"] .cp-sound[data-nudge][data-state="off"] {
+    animation: none;
+  }
+
+  :root[data-lens="cut-paper"] [data-hearing] {
+    outline: 2px solid var(--cp-ivory);
+  }
+
+  /* the record never turns; the lamp and the arm still say it plays */
+  :root[data-lens="cut-paper"] .cp-tt__record {
+    animation: none;
+    transition: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-tt__arm,
+  :root[data-lens="cut-paper"] .cp-crate__rec {
+    transition: none;
+  }
+
+  /* the sheets stay pasted where they are; the playhead still lights them */
+  :root[data-lens="cut-paper"] .cp-bounce,
+  :root[data-lens="cut-paper"] .cp-send__pin,
+  :root[data-lens="cut-paper"] .cp-bounce__hit {
+    transition: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-bounce:hover,
+  :root[data-lens="cut-paper"] .cp-bounce:focus-within,
+  :root[data-lens="cut-paper"] .cp-bounce[data-live] {
+    transform: rotate(var(--tilt, 0deg));
+  }
+
+  :root[data-lens="cut-paper"] .cp-send .cp-send__pin,
+  :root[data-lens="cut-paper"] .cp-bounce__hit[data-hearing] {
+    transform: none;
+  }
+}
+
+:root[data-lens="cut-paper"] .cp-app[data-face] .cp-tape__hint {
+  display: none;
+}
+
+/* ── fixes after the first look ────────────────────────────── */
+
+/* Daylight's heading colours stay out of the session */
+:root[data-lens="cut-paper"] .cp-app :is(h1, h2, h3, h4) {
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-note h2,
+:root[data-lens="cut-paper"] .cp-sheet__paper :is(h1, h2, h3, h4) {
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-label {
+  color: var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-prose > :first-child {
+  margin-top: 0;
+}
+
+/* the session view keeps project tracks to name and hear; mute and solo
+   for each project live on the full arrangement */
+:root[data-lens="cut-paper"] .cp-arr--session .cp-track .cp-ms {
+  display: none;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--session .cp-track__meta {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--full .cp-clip {
+  top: 12px;
+  bottom: auto;
+  height: 58px;
+}
+
+:root[data-lens="cut-paper"] .cp-ruler__corner .cp-arr__name {
+  color: var(--cp-ivory-2);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-tag {
+  color: var(--cp-ink);
+}
+
+/* the clip editor's own track head: name, controls, then the pitch names */
+:root[data-lens="cut-paper"] .cp-piano__keys {
+  grid-template-columns: minmax(0, 1fr) 26px;
+  grid-template-rows: auto auto 1fr;
+  gap: 6px 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__keys .cp-arr__name {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  margin-top: 4px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__keys .cp-arr__name small {
+  display: block;
+  margin: 3px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__keys .cp-ms-group {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+:root[data-lens="cut-paper"] .cp-piano__names {
+  grid-column: 2;
+  grid-row: 1 / 4;
+  margin-top: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-run[data-out] {
+  visibility: hidden;
+}
