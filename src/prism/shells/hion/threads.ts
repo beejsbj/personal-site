@@ -94,7 +94,8 @@ const BATCH = 8;
 /** The ground's strength, the bright head being 1: the paper's tooth takes
  * about half again, so it lies at a quarter or so. */
 const GROUND = 0.6;
-/** Heads growing at once, near the reader. */
+/** Heads growing at once, near the reader (fewer on a screen seen close,
+ * where each is twice the size and its page otherwise very still). */
 const LIVE = 3;
 /** The beat: heads grow and their runs are repainted this often (ms). A
  * hand drawing in short strokes, and a frame the page must commit only a
@@ -151,6 +152,9 @@ export function createThreads(options: ThreadsOptions) {
   let began = 0;
   let trickles = 0;
   const lineW = 1.25 * (scale > 1 ? 1.6 : 1);
+  const live = scale > 1 ? LIVE - 1 : LIVE;
+  // A single thing seen close arrives still: its threads wait for the reader.
+  const arrive = scale > 1 ? 0 : ARRIVE;
 
   /* ---------- Reading the screen ---------- */
 
@@ -364,7 +368,9 @@ export function createThreads(options: ThreadsOptions) {
   function makeHead(s: Strand): Head {
     const el = document.createElement("canvas");
     el.className = "hion-threads__head";
-    el.width = el.height = Math.ceil(HEAD * dpr);
+    // A bright run is soft anyway: one pixel per css pixel is enough, and it
+    // is repainted every beat.
+    el.width = el.height = HEAD;
     el.style.width = el.style.height = `${HEAD}px`;
     layer.append(el);
     const ctx = el.getContext("2d")!;
@@ -402,7 +408,7 @@ export function createThreads(options: ThreadsOptions) {
     const { ctx } = head;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, head.el.width, head.el.height);
-    ctx.setTransform(dpr, 0, 0, dpr, -head.x * dpr, -head.y * dpr);
+    ctx.setTransform(1, 0, 0, 1, -head.x, -head.y);
     ctx.lineCap = "round";
     // As few strokes as will do: the cooled part in one, the bright part in
     // a few bands, and its light in one.
@@ -546,7 +552,7 @@ export function createThreads(options: ThreadsOptions) {
   /** Someone is reading: they arrived a moment ago or did something lately.
    * Left alone, the threads hold where they are (their beads dim) and the
    * loop sleeps until the reader moves again. */
-  const present = (now: number) => now - lastInput < ATTEND || now - began < ARRIVE;
+  const present = (now: number) => now - lastInput < ATTEND || now - began < arrive;
 
   function tick(now: number) {
     frame = 0;
@@ -565,17 +571,17 @@ export function createThreads(options: ThreadsOptions) {
     const reach = loom.reach();
     // Born as the drawing reaches them, a moment apart.
     // Only heads near the reader count: the rest hurry out of sight.
-    let live = growing().filter((s) => inView(s)).length;
-    while (sown < seeds.length && seeds[sown].key <= reach && live < LIVE && now - lastBirth > 350) {
+    let growingNear = growing().filter((s) => inView(s)).length;
+    while (sown < seeds.length && seeds[sown].key <= reach && growingNear < live && now - lastBirth > 350) {
       born(seeds[sown++]);
       lastBirth = now;
-      live++;
+      growingNear++;
     }
-    if (sown >= seeds.length && live < 3) trickle(now);
+    if (sown >= seeds.length && growingNear < live) trickle(now);
     for (const s of strands) {
       if (s.t.done) continue;
       const pace = inView(s) ? 1 : 6;
-      s.owed = Math.min(6 * pace, s.owed + (SPEED * scale * pace * dt) / 1000 / STEP);
+      s.owed = Math.min(6 * pace, s.owed + (SPEED * pace * dt) / 1000 / STEP);
       while (s.owed >= 1 && !s.t.done) {
         fate.step(s.t);
         s.owed--;
@@ -631,7 +637,7 @@ export function createThreads(options: ThreadsOptions) {
     const x = event.clientX;
     const y = event.clientY + scrollY - pageTop;
     if (y < 0 || y > height || ground.clear(x, y) < 12) return;
-    if (growing().length >= LIVE + 4) return;
+    if (growing().length >= live + 4) return;
     const rand = rng(Math.floor(x * 31 + y * 17));
     const a = (rand() - 0.5) * Math.PI * 2;
     (["c", "m"] as Hue[]).forEach((hue, i) => {
@@ -709,11 +715,11 @@ export function createThreads(options: ThreadsOptions) {
    * ground is there at once and a few heads are at work in it. */
   function pregrow() {
     const fold = Math.max(0, scrollY - pageTop) + innerHeight;
-    let live = 0;
+    let started = 0;
     while (sown < seeds.length && seeds[sown].key <= fold) {
       const s = born(seeds[sown++]);
-      const stop = live < LIVE ? s.t.len * (0.3 + s.t.rand() * 0.25) : Infinity;
-      if (stop < Infinity) live++;
+      const stop = started < live ? s.t.len * (0.3 + s.t.rand() * 0.25) : Infinity;
+      if (stop < Infinity) started++;
       while ((s.t.xs.length - 1) * STEP < stop && fate.step(s.t));
       if (s.t.done) {
         s.laid = s.t.xs.length - 1;
