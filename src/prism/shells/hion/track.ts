@@ -8,10 +8,10 @@
  * section. So everything that scrolls the page moves the timeline: the
  * wheel, a trackpad, the scrollbar, the keyboard (arrows, Page Down,
  * Space), find-in-page, a finger panning the page. Nothing is taken from
- * the wheel; a sideways swipe over the track is passed on as scrolling
- * down it, and the left and right arrows step along it while it is
- * pinned. Focus moving to something still off to the side brings the page
- * to where it is in sight.
+ * the wheel; a sideways swipe over the track (a trackpad's, or a finger's
+ * on a touch screen) is passed on as scrolling down it, and the left and
+ * right arrows step along it while it is pinned. Focus moving to something
+ * still off to the side brings the page to where it is in sight.
  *
  * The track draws its own threads (a loom that reads across, keyed to how
  * far along it you are); the page's own threads go into the section at
@@ -43,6 +43,8 @@ interface TrackOptions {
 
 /** How tall a role may stand in the pin, as a share of its height. */
 const STAND = 0.8;
+/** A finger has to move this far before it says which way it is going. */
+const SLOP = 10;
 
 export function createTrack(options: TrackOptions) {
   const { section, signal, instant } = options;
@@ -176,6 +178,69 @@ export function createTrack(options: TrackOptions) {
         },
         { passive: true, signal },
       );
+      // A finger moving sideways over the track moves along it, as it
+      // would a strip of film: the page keeps its own upright panning
+      // (touch-action: pan-y, shell.css), and a gesture that sets off
+      // sideways is handed on as scrolling, gliding on a little when it
+      // lets go with speed. One that sets off upright is the browser's.
+      let touch: { x: number; y: number; t: number; v: number; sideways?: boolean } | null = null;
+      let glide = 0;
+      const stopGlide = () => {
+        cancelAnimationFrame(glide);
+        glide = 0;
+      };
+      pin.addEventListener(
+        "touchstart",
+        (event) => {
+          stopGlide();
+          const [finger] = event.touches;
+          touch = event.touches.length === 1 && pinned()
+            ? { x: finger.clientX, y: finger.clientY, t: event.timeStamp, v: 0 }
+            : null;
+        },
+        { passive: true, signal },
+      );
+      pin.addEventListener(
+        "touchmove",
+        (event) => {
+          if (!touch || event.touches.length !== 1) return;
+          const [finger] = event.touches;
+          const dx = finger.clientX - touch.x;
+          const dy = finger.clientY - touch.y;
+          if (touch.sideways === undefined) {
+            if (Math.hypot(dx, dy) < SLOP) return;
+            touch.sideways = Math.abs(dx) > Math.abs(dy) * 1.2;
+          }
+          if (!touch.sideways) return;
+          const dt = Math.max(1, event.timeStamp - touch.t);
+          touch.v = 0.7 * (-dx / dt) + 0.3 * touch.v;
+          Object.assign(touch, { x: finger.clientX, y: finger.clientY, t: event.timeStamp });
+          scrollBy({ top: -dx, behavior: "instant" });
+        },
+        { passive: true, signal },
+      );
+      const lift = (event: TouchEvent) => {
+        const flung = touch?.sideways && !instant && event.timeStamp - touch.t < 90 ? touch.v : 0;
+        touch = null;
+        if (Math.abs(flung) < 0.25) return;
+        let v = flung;
+        let last = performance.now();
+        const coast = (now: number) => {
+          const dt = Math.min(32, now - last);
+          last = now;
+          v *= Math.pow(0.994, dt);
+          const before = scrollY;
+          scrollBy({ top: v * dt, behavior: "instant" });
+          glide = Math.abs(v) > 0.03 && scrollY !== before ? requestAnimationFrame(coast) : 0;
+        };
+        glide = requestAnimationFrame(coast);
+      };
+      pin.addEventListener("touchend", lift, { passive: true, signal });
+      pin.addEventListener("touchcancel", () => (touch = null), { passive: true, signal });
+      // Anything else that moves the page takes over from a glide.
+      addEventListener("wheel", stopGlide, { passive: true, signal });
+      addEventListener("keydown", stopGlide, { passive: true, signal });
+      signal.addEventListener("abort", stopGlide);
       // Left and right step along it while it is pinned.
       addEventListener(
         "keydown",

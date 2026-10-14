@@ -2788,6 +2788,8 @@
   height: 100svh;
   overflow: clip;
   background: var(--hion-black);
+  /* The page still pans up and down here; sideways is track.ts's. */
+  touch-action: pan-y pinch-zoom;
 }
 
 :root[data-lens="hion"] .hion-timeline[data-timeline="across"] .hion-timeline__track {
@@ -2846,6 +2848,27 @@
 
 :root[data-lens="hion"] .hion-timeline[data-timeline="across"] .hion-resume__record li {
   break-inside: avoid;
+}
+
+/* A screen's very edges stay the browser's, for its swipe back and
+   forward: over the pin's sides, two thin strips (one box, clipped to its
+   edges) where the page pans as anywhere else. */
+@media (hover: none) and (pointer: coarse) {
+  :root[data-lens="hion"] .hion-timeline[data-timeline="across"]::before {
+    content: "";
+    position: sticky;
+    z-index: 5;
+    top: 0;
+    display: block;
+    height: 100vh;
+    height: 100svh;
+    margin-bottom: -100vh;
+    margin-bottom: -100svh;
+    clip-path: polygon(
+      0 0, 20px 0, 20px 100%, calc(100% - 20px) 100%,
+      calc(100% - 20px) 0, 100% 0, 100% 100%, 0 100%
+    );
+  }
 }
 
 /* A short window has no room for the menu's name over the timeline: as
