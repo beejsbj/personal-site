@@ -1,5 +1,5 @@
-/** The timeline across: on a wide screen the resume's roles lie along a
- * track, and the two hions run across it, left to right.
+/** The timeline across: the resume's roles lie along a track, and the two
+ * hions run across it, left to right, on a phone as on a wide screen.
  *
  * The page's height becomes the track's travel. The section is as tall as
  * the track is long (less one screen's width, plus one screen's height);
@@ -7,10 +7,11 @@
  * the track slides left by exactly as far as you have scrolled into the
  * section. So everything that scrolls the page moves the timeline: the
  * wheel, a trackpad, the scrollbar, the keyboard (arrows, Page Down,
- * Space), find-in-page. Nothing is taken from the wheel; a sideways swipe
- * over the track is passed on as scrolling down it, and the left and right
- * arrows step along it while it is pinned. Focus moving to something still
- * off to the side brings the page to where it is in sight.
+ * Space), find-in-page, a finger panning the page. Nothing is taken from
+ * the wheel; a sideways swipe over the track (a trackpad's, or a finger's
+ * on a touch screen) is passed on as scrolling down it, and the left and
+ * right arrows step along it while it is pinned. Focus moving to something
+ * still off to the side brings the page to where it is in sight.
  *
  * The track draws its own threads (a loom that reads across, keyed to how
  * far along it you are); the page's own threads go into the section at
@@ -19,14 +20,15 @@
  * one pair of threads turning to run along time and turning back down.
  *
  * Reading order is the content's: newest first, so time runs right to
- * left, from now back. Phones and short or narrow windows keep the
+ * left, from now back. Only a window too short to hold a role keeps the
  * timeline running down the page (screens.ts lays out both; this only runs
  * when `ACROSS` matches, and the screen is laid again when that changes). */
 import { createLoom, type View } from "./loom";
 import { compose } from "./weave";
 
-/** When the timeline runs across. */
-export const ACROSS = "(min-width: 900px) and (min-height: 600px)";
+/** When the timeline runs across: any window tall enough to hold a role
+ * (a phone on its side, with its bars showing, is about 320px). */
+export const ACROSS = "(min-height: 280px)";
 
 interface TrackOptions {
   /** The timeline section ([data-timeline]): its pin and track inside. */
@@ -41,6 +43,8 @@ interface TrackOptions {
 
 /** How tall a role may stand in the pin, as a share of its height. */
 const STAND = 0.8;
+/** A finger has to move this far before it says which way it is going. */
+const SLOP = 10;
 
 export function createTrack(options: TrackOptions) {
   const { section, signal, instant } = options;
@@ -70,13 +74,18 @@ export function createTrack(options: TrackOptions) {
   }
   const middle = (el: HTMLElement) => lies(el) + el.offsetWidth / 2;
 
-  /** Each role as narrow as it can be while standing in the pin. */
+  /** Each role as narrow as it can be while standing in the pin (and in
+   * the room the track leaves it: a short window has little). Widened, its
+   * record runs on in columns (shell.css). */
   function fit() {
-    const tall = pin.clientHeight * STAND;
+    const style = getComputedStyle(track);
+    const room = pin.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    const tall = Math.min(pin.clientHeight * STAND, room);
+    const widest = Math.max(1100, pin.clientWidth * 1.6);
     for (const role of track.querySelectorAll<HTMLElement>(".hion-loop--role")) {
       role.style.removeProperty("width");
       let width = role.offsetWidth;
-      while (role.offsetHeight > tall && width < 1100) {
+      while (role.offsetHeight > tall && width < widest) {
         width += 60;
         role.style.width = `${width}px`;
       }
@@ -169,6 +178,69 @@ export function createTrack(options: TrackOptions) {
         },
         { passive: true, signal },
       );
+      // A finger moving sideways over the track moves along it, as it
+      // would a strip of film: the page keeps its own upright panning
+      // (touch-action: pan-y, shell.css), and a gesture that sets off
+      // sideways is handed on as scrolling, gliding on a little when it
+      // lets go with speed. One that sets off upright is the browser's.
+      let touch: { x: number; y: number; t: number; v: number; sideways?: boolean } | null = null;
+      let glide = 0;
+      const stopGlide = () => {
+        cancelAnimationFrame(glide);
+        glide = 0;
+      };
+      pin.addEventListener(
+        "touchstart",
+        (event) => {
+          stopGlide();
+          const [finger] = event.touches;
+          touch = event.touches.length === 1 && pinned()
+            ? { x: finger.clientX, y: finger.clientY, t: event.timeStamp, v: 0 }
+            : null;
+        },
+        { passive: true, signal },
+      );
+      pin.addEventListener(
+        "touchmove",
+        (event) => {
+          if (!touch || event.touches.length !== 1) return;
+          const [finger] = event.touches;
+          const dx = finger.clientX - touch.x;
+          const dy = finger.clientY - touch.y;
+          if (touch.sideways === undefined) {
+            if (Math.hypot(dx, dy) < SLOP) return;
+            touch.sideways = Math.abs(dx) > Math.abs(dy) * 1.2;
+          }
+          if (!touch.sideways) return;
+          const dt = Math.max(1, event.timeStamp - touch.t);
+          touch.v = 0.7 * (-dx / dt) + 0.3 * touch.v;
+          Object.assign(touch, { x: finger.clientX, y: finger.clientY, t: event.timeStamp });
+          scrollBy({ top: -dx, behavior: "instant" });
+        },
+        { passive: true, signal },
+      );
+      const lift = (event: TouchEvent) => {
+        const flung = touch?.sideways && !instant && event.timeStamp - touch.t < 90 ? touch.v : 0;
+        touch = null;
+        if (Math.abs(flung) < 0.25) return;
+        let v = flung;
+        let last = performance.now();
+        const coast = (now: number) => {
+          const dt = Math.min(32, now - last);
+          last = now;
+          v *= Math.pow(0.994, dt);
+          const before = scrollY;
+          scrollBy({ top: v * dt, behavior: "instant" });
+          glide = Math.abs(v) > 0.03 && scrollY !== before ? requestAnimationFrame(coast) : 0;
+        };
+        glide = requestAnimationFrame(coast);
+      };
+      pin.addEventListener("touchend", lift, { passive: true, signal });
+      pin.addEventListener("touchcancel", () => (touch = null), { passive: true, signal });
+      // Anything else that moves the page takes over from a glide.
+      addEventListener("wheel", stopGlide, { passive: true, signal });
+      addEventListener("keydown", stopGlide, { passive: true, signal });
+      signal.addEventListener("abort", stopGlide);
       // Left and right step along it while it is pinned.
       addEventListener(
         "keydown",
@@ -192,11 +264,16 @@ export function createTrack(options: TrackOptions) {
         (event) => {
           const el = event.target as HTMLElement;
           requestAnimationFrame(() => {
-            const x = lies(el);
+            // All of it: a link wrapped onto a second line starts further
+            // left on that line than on its first.
+            const box = el.getBoundingClientRect();
+            const x = box.left - track.getBoundingClientRect().left;
             const width = pin.clientWidth;
-            const inSight = pinned() && x >= along + 24 && x + el.offsetWidth <= along + width - 24;
+            const inSight = pinned() && x >= along + 24 && x + box.width <= along + width - 24;
             if (inSight) return;
-            const to = Math.min(travel, Math.max(0, x - width * 0.3));
+            // A little of what comes before it in sight too, if there is room.
+            const lead = Math.min(width * 0.3, Math.max(24, (width - box.width) / 2));
+            const to = Math.min(travel, Math.max(0, x - lead));
             scrollTo({ top: Math.round(top + to), behavior: "instant" });
             loom.catchUp(to + width * 1.05);
           });
