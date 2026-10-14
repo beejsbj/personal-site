@@ -43,6 +43,9 @@ interface TrackOptions {
 
 /** How tall a role may stand in the pin, as a share of its height. */
 const STAND = 0.8;
+/** How far a role may drift above or below the middle, as a share of the
+ * pin's height. */
+const DRIFT = 0.075;
 /** A finger has to move this far before it says which way it is going. */
 const SLOP = 10;
 
@@ -76,20 +79,35 @@ export function createTrack(options: TrackOptions) {
 
   /** Each role as narrow as it can be while standing in the pin (and in
    * the room the track leaves it: a short window has little). Widened, its
-   * record runs on in columns (shell.css). */
+   * record runs on in columns (shell.css).
+   *
+   * Then each drifts off the middle, by turns above and below it, so the
+   * thread between two roles rises or falls to the next one. No role
+   * drifts out of the room the track leaves it, so each is whole in the
+   * window while you read it: a role with a fuller record has less room,
+   * and drifts less. A wide, tall window keeps a little room for the
+   * drift (a long role stands a little wider); a phone gives up no width
+   * for it, so its roles drift only as far as they already have room to,
+   * and on its side hardly at all. Layout, not motion: the track still
+   * slides only sideways. */
   function fit() {
     const style = getComputedStyle(track);
     const room = pin.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
-    const tall = Math.min(pin.clientHeight * STAND, room);
+    const drift = pin.clientHeight * DRIFT;
+    const spare = pin.clientWidth >= 720 && pin.clientHeight >= 600 ? drift : 0;
+    const tall = Math.min(pin.clientHeight * STAND, room - spare);
     const widest = Math.max(1100, pin.clientWidth * 1.6);
-    for (const role of track.querySelectorAll<HTMLElement>(".hion-loop--role")) {
+    track.querySelectorAll<HTMLElement>(".hion-loop--role").forEach((role, i) => {
       role.style.removeProperty("width");
+      role.style.removeProperty("top");
       let width = role.offsetWidth;
       while (role.offsetHeight > tall && width < widest) {
         width += 60;
         role.style.width = `${width}px`;
       }
-    }
+      const shift = Math.min(drift, Math.max(0, room - role.offsetHeight) / 2);
+      if (shift >= 4) role.style.top = `${Math.round(i % 2 ? shift : -shift)}px`;
+    });
   }
 
   function measure() {
