@@ -10,32 +10,36 @@
   --hion-cl: rgb(214 251 255);
   --hion-ml: rgb(255 216 241);
   --hion-text: rgb(205 240 245);
-  /* One broad-nib family (Alegreya) writes every word: the hand that
-     draws the threads also writes. Display: the woven and hung titles, a
-     semibold so counters stay open when life weaves the letters. Text:
-     long reading on black, a touch over regular so it does not thin out.
-     Hand: the spoken lines, in the true italic. Label: charms, dates,
-     tags, in real small caps. Every weight here is in a loaded file. */
-  --hion-serif: "Alegreya Variable", "Alegreya", Georgia, serif;
-  --hion-display: var(--hion-serif);
-  --hion-display-weight: 600;
-  --hion-display-vary: normal;
-  --hion-display-track: 0;
-  --hion-display-leading: 0.92;
+  /* Fate, not warmth: one inscribed voice in two faces. Display: the
+     woven and hung titles in Aboreto, thin wide capitals cut like a stele;
+     thin, open strokes weave cleanly, and their one weight is the only
+     one. Its capitals are for large words only: under about 28px they
+     shout, so small titles (head) are set in the reading face. Text:
+     Spectral, wide and calm on black. Hand: the spoken lines, in
+     Spectral's light italic. Label: charms, dates, tags, in Aboreto's
+     capitals, tracked open. Every weight here is in a loaded file, and
+     nothing is synthesised. */
+  --hion-serif: "Spectral", Georgia, serif;
+  --hion-display: "Aboreto", Georgia, serif;
+  --hion-display-weight: 400;
+  --hion-display-track: 0.02em;
+  --hion-display-leading: 1;
+  --hion-head: var(--hion-serif);
+  --hion-head-weight: 600;
   --hion-text-size: 1.125rem;
   --hion-read-size: 1.2rem;
-  --hion-text-weight: 450;
-  --hion-strong-weight: 700;
+  --hion-text-weight: 400;
+  --hion-strong-weight: 600;
   --hion-hand: var(--hion-serif);
   --hion-hand-style: italic;
-  --hion-hand-weight: 500;
-  --hion-hand-scale: 0.8;
-  --hion-label: "Alegreya SC", var(--hion-serif);
+  --hion-hand-weight: 300;
+  --hion-hand-scale: 0.82;
+  --hion-label: "Aboreto", Georgia, serif;
   --hion-label-style: normal;
-  --hion-label-weight: 500;
-  --hion-label-scale: 0.74;
+  --hion-label-weight: 400;
+  --hion-label-scale: 0.72;
   --hion-label-caps: normal;
-  --hion-label-track: 0.05em;
+  --hion-label-track: 0.12em;
   --hion-gutter: clamp(20px, 6vw, 96px);
   --hion-loop-pad: clamp(40px, 5vw, 72px);
   --hion-ease-swing: cubic-bezier(0.2, 1.55, 0.4, 1);
@@ -46,6 +50,7 @@
   background: var(--hion-black);
   font: var(--hion-text-weight) var(--hion-text-size)/1.7 var(--hion-serif);
   font-kerning: normal;
+  font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
@@ -257,9 +262,8 @@
   position: absolute;
   left: 50%;
   translate: -50% 0;
-  font: var(--hion-display-weight) 1.15rem/1 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
-  letter-spacing: 0.02em;
+  font: var(--hion-label-weight) 1.15rem/1 var(--hion-label);
+  letter-spacing: 0.08em;
   color: var(--hion-m);
 }
 
@@ -557,8 +561,7 @@
   overflow-wrap: break-word;
   margin: 0;
   padding: 0.12em 0.3em 0.05em;
-  font: var(--hion-display-weight) clamp(3rem, 6.2vw, 5.3rem)/1.04 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-display-weight) clamp(2.8rem, 5.4vw, 4.6rem)/1.04 var(--hion-display);
   letter-spacing: var(--hion-display-track);
   text-wrap: balance;
 }
@@ -772,8 +775,7 @@
 
 :root[data-lens="hion"] .hion-display {
   margin: 0;
-  font: var(--hion-display-weight) clamp(4.8rem, 10.8vw, 9.6rem)/var(--hion-display-leading) var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-display-weight) clamp(4.4rem, 8.6vw, 7.6rem)/var(--hion-display-leading) var(--hion-display);
   letter-spacing: var(--hion-display-track);
 }
 
@@ -1019,8 +1021,8 @@
 :root[data-lens="hion"] .hion-strung {
   position: relative;
   margin: 0 0 1em;
-  font: var(--hion-display-weight) clamp(1.9rem, 3.4vw, 2.6rem)/1.15 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-display-weight) clamp(1.8rem, 3vw, 2.3rem)/1.15 var(--hion-display);
+  letter-spacing: var(--hion-display-track);
   text-align: center;
   text-wrap: balance;
 }
@@ -1116,8 +1118,7 @@
 
 :root[data-lens="hion"] .hion-work__title {
   margin: 0;
-  font: var(--hion-display-weight) 1.55rem/1.2 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-head-weight) 1.55rem/1.2 var(--hion-head);
   color: var(--hion-cl);
 }
 
@@ -1213,10 +1214,10 @@
     transform-origin: 100% 50%;
   }
 
+  /* Large enough to be woven: in the inscribed capitals. */
   :root[data-lens="hion"] .hion-row--works .hion-work__title {
     margin: 0.05em 0 0.25em;
-    font-size: clamp(2.4rem, 4.6vw, 3.7rem);
-    line-height: 1;
+    font: var(--hion-display-weight) clamp(2.4rem, 4.6vw, 3.7rem)/1 var(--hion-display);
     letter-spacing: var(--hion-display-track);
   }
 
@@ -1283,7 +1284,7 @@
 
 :root[data-lens="hion"] .hion-tied__date {
   margin: 0 0 0.15em;
-  font-size: calc(1.15rem * var(--hion-label-scale));
+  font-size: calc(1.2rem * var(--hion-label-scale));
   line-height: 1.3;
 }
 
@@ -1294,8 +1295,7 @@
 
 :root[data-lens="hion"] .hion-tied__title {
   margin: 0;
-  font: var(--hion-display-weight) 1.3rem/1.3 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-head-weight) 1.3rem/1.3 var(--hion-head);
   color: var(--hion-cl);
   overflow-wrap: anywhere;
   text-wrap: balance;
@@ -1322,7 +1322,7 @@
 
 :root[data-lens="hion"] .hion-tied__title + .hion-meta {
   margin-top: 0.15em;
-  font-size: calc(1.1rem * var(--hion-label-scale));
+  font-size: calc(1.2rem * var(--hion-label-scale));
 }
 
 /* A writing post's title is set larger: it is the whole entry. */
@@ -1392,8 +1392,7 @@
 
 :root[data-lens="hion"] .hion-fork__title {
   margin: 0 0 0.2em;
-  font: var(--hion-display-weight) 1.8rem/1.1 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-head-weight) 1.8rem/1.1 var(--hion-head);
   color: var(--hion-c);
 }
 
@@ -1557,7 +1556,7 @@
 }
 
 :root[data-lens="hion"] .hion-tag--meta dt {
-  font: var(--hion-label-style) var(--hion-label-weight) calc(1.15rem * var(--hion-label-scale))/1.1 var(--hion-label);
+  font: var(--hion-label-style) var(--hion-label-weight) calc(1.2rem * var(--hion-label-scale))/1.1 var(--hion-label);
   font-variant-caps: var(--hion-label-caps);
   letter-spacing: var(--hion-label-track);
   color: var(--hion-m);
@@ -1570,6 +1569,7 @@
 :root[data-lens="hion"] .hion-tag--meta dd {
   margin: 0;
   font: var(--hion-text-weight) 1.02rem/1.4 var(--hion-serif);
+  letter-spacing: 0;
   color: var(--hion-cl);
 }
 
@@ -1739,8 +1739,7 @@
 }
 
 :root[data-lens="hion"] .hion-end__link {
-  font: var(--hion-display-weight) 1.3rem/1.25 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-head-weight) 1.3rem/1.25 var(--hion-head);
   color: var(--hion-cl);
   text-decoration: none;
 }
@@ -1762,8 +1761,7 @@
 
 :root[data-lens="hion"] .hion-prose h3 {
   margin: 1.9em 0 0.3em;
-  font: var(--hion-display-weight) 1.3rem/1.35 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-head-weight) 1.3rem/1.35 var(--hion-head);
   color: var(--hion-cl);
 }
 
@@ -1850,8 +1848,7 @@
 /* Whatever else the markdown makes: smaller headings, tables, code blocks. */
 :root[data-lens="hion"] .hion-prose :is(h4, h5, h6) {
   margin: 1.6em 0 0.3em;
-  font: var(--hion-display-weight) 1.1rem/1.4 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-head-weight) 1.1rem/1.4 var(--hion-head);
   color: var(--hion-cl);
 }
 
@@ -1898,9 +1895,8 @@
 }
 
 :root[data-lens="hion"] .hion-prose--other :is(h1, h2, h3, h4) {
-  font-family: var(--hion-display);
-  font-weight: var(--hion-display-weight);
-  font-variation-settings: var(--hion-display-vary);
+  font-family: var(--hion-head);
+  font-weight: var(--hion-head-weight);
   color: var(--hion-cl);
   line-height: 1.2;
 }
@@ -1960,8 +1956,7 @@
 
 :root[data-lens="hion"] .hion-foot__mail {
   margin: 0.3em 0 0;
-  font: var(--hion-display-weight) clamp(1.3rem, 3vw, 1.9rem)/1.2 var(--hion-display);
-  font-variation-settings: var(--hion-display-vary);
+  font: var(--hion-head-weight) clamp(1.3rem, 3vw, 1.9rem)/1.2 var(--hion-head);
 }
 
 :root[data-lens="hion"] .hion-foot__mail a {
@@ -2038,6 +2033,8 @@
     --hion-loop-pad: 26px;
     --hion-text-size: 1.0625rem;
     --hion-read-size: 1.125rem;
+    /* Wide capitals on a narrow screen: a little less air between them. */
+    --hion-label-track: 0.08em;
     font-size: var(--hion-text-size);
   }
 
@@ -2130,7 +2127,7 @@
   }
 
   :root[data-lens="hion"] .hion-display {
-    font-size: clamp(3.4rem, 18vw, 5rem);
+    font-size: clamp(3.2rem, 16.5vw, 4.6rem);
   }
 
   :root[data-lens="hion"] .hion-lane {
@@ -2211,12 +2208,19 @@
     text-align: left;
   }
 
+  /* Small on a phone: the capitals would shout, so the reading face. */
   :root[data-lens="hion"] .hion-strung {
-    font-size: 1.7rem;
+    font: var(--hion-head-weight) 1.7rem/1.15 var(--hion-head);
+    letter-spacing: 0;
   }
 
+  /* A row of charms (links, the footer's ways out) stays one row. */
   :root[data-lens="hion"] .hion-row--tags {
     gap: 0 16px;
+  }
+
+  :root[data-lens="hion"] .hion-tag {
+    font-size: calc(1.2rem * var(--hion-label-scale));
   }
 }
 
@@ -2649,8 +2653,10 @@
 
 :root[data-lens="hion"] .hion-loop--role .hion-resume__date {
   margin-top: 0.3em;
-  font-size: 1.15rem;
+  font-size: calc(1.45rem * var(--hion-label-scale));
   text-align: center;
+  /* Wide capitals: a long date breaks in the middle, not at the thread. */
+  text-wrap: balance;
 }
 
 :root[data-lens="hion"] .hion-resume__record {
@@ -2683,7 +2689,8 @@
 
 :root[data-lens="hion"] .hion-knots--courses .hion-resume__date {
   margin-top: 0.25em;
-  font-size: 1.05rem;
+  font-size: calc(1.3rem * var(--hion-label-scale));
+  text-wrap: balance;
 }
 
 :root[data-lens="hion"] .hion-knots--courses .hion-resume__record {
@@ -2742,6 +2749,10 @@
 
   :root[data-lens="hion"] .hion-loop--role > .hion-strung {
     font-size: 1.45rem;
+  }
+
+  :root[data-lens="hion"] .hion-loop--role .hion-resume__date {
+    font-size: calc(1.25rem * var(--hion-label-scale));
   }
 
   :root[data-lens="hion"] .hion-resume__org {
