@@ -24,12 +24,15 @@ export function prewarmShell(lens: string) {
 
 const contentLoader = createContentLoader();
 let fixtureContent: SiteContent | undefined;
-const loadContent = (route?: Route) =>
+/** `stale`: a page change within a mounted shell need not wait on the
+ * network; content refreshes behind it. Writing always asks fresh. */
+const loadContent = (route?: Route, stale = false) =>
   fixtureContent
     ? Promise.resolve(fixtureContent)
     : contentLoader.load(
         route?.kind === "writing-entry" ? route.slug : undefined,
         route?.kind === "writing" || route?.kind === "writing-entry",
+        stale,
       );
 
 /** The test harness mounts shells on fixture content at a pretend route. */
@@ -106,7 +109,7 @@ async function mount(lens: string) {
   const route = currentRoute();
   if (active?.lens === lens) {
     try {
-      const data = await loadContent(route);
+      const data = await loadContent(route, true);
       if (
         currentRoute().path !== route.path ||
         document.documentElement.dataset.lens !== lens

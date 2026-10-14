@@ -2,7 +2,9 @@ import type { SiteContent } from "./shells/types";
 
 /** Shared API loader. Article bodies are requested lazily, keyed by slug,
  * and never reused as the body of another route. Rejected requests are evicted
- * so a transient failure does not freeze every lens for the rest of a visit. */
+ * so a transient failure does not freeze every lens for the rest of a visit.
+ * A `stale` load answers from an expired cache at once and refreshes behind,
+ * so moving between pages never waits on a cold content function. */
 export function createContentLoader(
   fetcher: typeof fetch = fetch,
   now = Date.now,
@@ -10,11 +12,15 @@ export function createContentLoader(
   const cached = new Map<string, { at: number; value: SiteContent }>();
   const pending = new Map<string, Promise<SiteContent>>();
   return {
-    async load(slug?: string, fresh = false): Promise<SiteContent> {
+    async load(slug?: string, fresh = false, stale = false): Promise<SiteContent> {
       const key = slug ?? "";
       const previous = cached.get(key);
       if (!fresh && previous && now() - previous.at < 60_000)
         return previous.value;
+      if (!fresh && stale && previous) {
+        if (!pending.has(key)) this.load(slug, true).catch(() => {});
+        return previous.value;
+      }
       if (pending.has(key)) return pending.get(key)!;
       const request = (async () => {
         const query =
