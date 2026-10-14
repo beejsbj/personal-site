@@ -381,30 +381,28 @@
 
 
 
-/* Threads of intent (threads.ts): under the hions, page-tall, painted
-   only near the viewport; each growing head has a small canvas of its own. */
-:root[data-lens="hion"] .hion-threads {
+/* The skein (skein.ts): every thread but the hions' bodies. The ground
+   lies under the hions, page-tall, painted only near the viewport; what
+   moves is one canvas over the hions and under the words, a band of the
+   page about one and a half screens tall, moved as you scroll on. */
+:root[data-lens="hion"] .hion-skein {
   position: absolute;
   inset: 0 0 auto;
   z-index: 0;
+  overflow: clip;
   pointer-events: none;
   transition: opacity 0.6s ease;
 }
 
 /* Growing out of sight until settled (reduced motion, a still face, a new
    layout). */
-:root[data-lens="hion"] .hion-threads[data-state="settling"] {
+:root[data-lens="hion"] .hion-skein[data-state="settling"] {
   opacity: 0;
   transition: none;
 }
 
-:root[data-lens="hion"] .hion-threads__tile {
-  position: absolute;
-  left: 0;
-  width: 100%;
-}
-
-:root[data-lens="hion"] .hion-threads__head {
+:root[data-lens="hion"] .hion-skein__pane,
+:root[data-lens="hion"] .hion-skein__band {
   position: absolute;
   top: 0;
   left: 0;

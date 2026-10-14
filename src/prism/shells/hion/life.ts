@@ -1,16 +1,13 @@
 /** Life: how the two hions answer the visitor.
  *
+ * (Threads from the pointer are strands like any other: skein.ts.)
+ *
  * The loom lays the drawing down once and leaves it. This layer is what
  * moves on top of it: one viewport-sized canvas (cleared and redrawn only
  * while something is alive) and a few light spans, driven by one frame
  * loop that sleeps the moment nothing moves and never runs while the page
  * is idle.
  *
- *   intents   the pointer is a source: as it moves, or rests a moment,
- *             loose threads of intent issue from it, creep (taut, turning
- *             in drawn curves) to the nearest thing on the page (a
- *             heading, a picture, a charm, the hions' own way) and weave
- *             loosely round it, then fade. A tap does the same on touch.
  *   loops     hover something hung, strung or linked and cyan runs over and
  *             ties a loop round it; leave and it unties, from the end back.
  *             Magenta drifts under it to look.
@@ -145,33 +142,6 @@ class Strand {
 
 /* ---------- Things alive on the page ---------- */
 
-interface Box {
-  l: number;
-  t: number;
-  r: number;
-  b: number;
-}
-
-/** A thread of intent from the pointer: it creeps to a thing, weaves
- * round it, and fades. Points are page space, x, y pairs. */
-interface Intent {
-  hue: Hue;
-  pts: number[];
-  a: number;
-  /** What it means to reach: a thing's box, or a point on a hion. */
-  box: Box | null;
-  on: { hue: Hue; s: number } | null;
-  /** The way round it, once it has arrived, and how far along. */
-  round: Pt[] | null;
-  at: number;
-  /** Steps owed (fractional), and how far it has crept. */
-  owed: number;
-  crept: number;
-  /** 1 while it lives, fading to 0. */
-  alpha: number;
-  rand: () => number;
-}
-
 interface Loop {
   el: Element | null;
   path: Path;
@@ -231,15 +201,6 @@ interface Row {
   last: number;
 }
 
-/** What threads of intent go to, on the page. */
-const AIMS = "main h1, main h2, main h3, [data-weft], main img, .hion-woven-cover, .hion-tag, .hion-pullcord, .hion-charm";
-/** Intents at once, how far one looks for a thing, how fast it creeps
- * (px a second), and how far it may creep before it gives up. */
-const INTENTS = 5;
-const SEEK = 360;
-const CREEP = 240;
-const REACH = 520;
-
 const HOVER = "[data-ink]:not(.hion-pull), .hion-strung, .hion-tie, .hion-prose a, .hion-foot__mail a";
 
 export function createLife(options: LifeOptions) {
@@ -261,15 +222,6 @@ export function createLife(options: LifeOptions) {
   let version = -1;
   let glints: OrbitGlint[] = [];
   let rows: Row[] = [];
-  let intents: Intent[] = [];
-  let aims: Box[] = [];
-  let travelled = 0;
-  let lastIntent = 0;
-  let rests = 0;
-  let intentHue: Hue = "c";
-  /** What was drawn last frame (canvas css px), when it was only intents:
-   * the next frame clears just that. */
-  let drawnBox: Box | null = null;
   let loops: Loop[] = [];
   let motes: Mote[] = [];
   let plucks: Pluck[] = [];
@@ -373,8 +325,6 @@ export function createLife(options: LifeOptions) {
         shown: false,
       };
     });
-    intents = [];
-    measureAims();
     loops = [];
     rows = [];
     for (const holder of page.querySelectorAll<HTMLElement>("[data-cord]")) {
@@ -606,219 +556,6 @@ export function createLife(options: LifeOptions) {
     return true;
   }
 
-  /* ---------- Intents: threads from the pointer ---------- */
-
-  /** Where the things are that intents go to (page px). */
-  function measureAims() {
-    const p = page.getBoundingClientRect();
-    aims = [];
-    for (const el of page.querySelectorAll(AIMS)) {
-      const r = el.getBoundingClientRect();
-      // Too small to go round, or so big the way round would be a frame.
-      if (r.width < 4 || r.height < 4 || r.width > 640 || r.height > 420) continue;
-      aims.push({ l: r.left - p.left, t: r.top - p.top, r: r.right - p.left, b: r.bottom - p.top });
-      if (aims.length >= 240) break;
-    }
-  }
-
-  const gap = (b: Box, x: number, y: number) =>
-    Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - y, 0, y - b.b));
-
-  /** Send a thread of intent out from (x, y) to the nearest thing it can
-   * find that no other is already going to. */
-  function issue(x: number, y: number, now: number) {
-    if (intents.length >= INTENTS) return;
-    let box: Box | null = null;
-    let best = SEEK;
-    for (const b of aims) {
-      const d = gap(b, x, y);
-      if (d < 18 || d >= best) continue;
-      if (intents.some((it) => it.box === b)) continue;
-      best = d;
-      box = b;
-    }
-    let on: Intent["on"] = null;
-    let target: Pt | null = null;
-    if (box) target = [Math.max(box.l, Math.min(box.r, x)), Math.max(box.t, Math.min(box.b, y))];
-    else {
-      // Nothing near: the hions' own way, if it is.
-      const reach = loom.reach();
-      for (const hue of ["c", "m"] as Hue[]) {
-        const hit = strands[hue]?.nearest(x, y, best, reach);
-        if (hit && hit.d > 24 && hit.d < best) {
-          best = hit.d;
-          on = { hue, s: hit.s };
-          target = [strands[hue]!.xs[hit.i], strands[hue]!.ys[hit.i]];
-        }
-      }
-    }
-    if (!target) return;
-    const rand = rng(Math.floor(now * 7 + x * 13 + y));
-    intentHue = intentHue === "c" ? "m" : "c";
-    // Out at a slant, so it comes round in a drawn curve, not a beeline.
-    const a = Math.atan2(target[1] - y, target[0] - x) + (rand() < 0.5 ? -1 : 1) * (0.35 + rand() * 0.4);
-    intents.push({ hue: intentHue, pts: [x, y], a, box, on, round: null, at: 0, owed: 0, crept: 0, alpha: 1, rand });
-    lastIntent = now;
-    wake();
-  }
-
-  /** The way round a thing: a loose band at a little distance, its corners
-   * cut (no right angles), from where the thread arrives, part way round
-   * in the sense it was going. */
-  function roundBox(b: Box, x: number, y: number, a: number, rand: () => number): Pt[] {
-    const pad = 10 + rand() * 6;
-    const l = b.l - pad;
-    const t = b.t - pad;
-    const r = b.r + pad;
-    const btm = b.b + pad;
-    const c = Math.min(26, (r - l) / 3, (btm - t) / 3);
-    const ring: Pt[] = [
-      [l + c, t], [r - c, t], [r, t + c], [r, btm - c], [r - c, btm], [l + c, btm], [l, btm - c], [l, t + c],
-    ];
-    // Where on the ring it arrives, and which way it goes on.
-    let start = 0;
-    let bd = Infinity;
-    ring.forEach(([px, py], i) => {
-      const d = Math.hypot(px - x, py - y);
-      if (d < bd) {
-        bd = d;
-        start = i;
-      }
-    });
-    const [nx, ny] = ring[(start + 1) % 8];
-    const forward = (nx - x) * Math.cos(a) + (ny - y) * Math.sin(a) >= 0 ? 1 : -1;
-    const corners: Pt[] = [];
-    const count = 3 + Math.floor(rand() * 4);
-    for (let k = 0; k <= count; k++) {
-      const [px, py] = ring[(((start + k * forward) % 8) + 8) % 8];
-      corners.push([px + (rand() - 0.5) * 6, py + (rand() - 0.5) * 6]);
-    }
-    // Each side bows out a little, loose, never ruled.
-    const cx = (b.l + b.r) / 2;
-    const cy = (b.t + b.b) / 2;
-    const out: Pt[] = [corners[0]];
-    for (let k = 1; k < corners.length; k++) {
-      const [ax, ay] = corners[k - 1];
-      const [bx, by] = corners[k];
-      const mx = (ax + bx) / 2;
-      const my = (ay + by) / 2;
-      const d = Math.hypot(mx - cx, my - cy) || 1;
-      const bow = 3 + rand() * 5;
-      out.push([mx + ((mx - cx) / d) * bow, my + ((my - cy) / d) * bow], [bx, by]);
-    }
-    return out;
-  }
-
-  /** The way along a hion: crossing it back and forth, over and under, in
-   * taut stitches. */
-  function roundStrand(on: { hue: Hue; s: number }, rand: () => number): Pt[] {
-    const strand = strands[on.hue];
-    if (!strand) return [];
-    const dir = rand() < 0.5 ? -1 : 1;
-    const span = 80 + rand() * 80;
-    const out: Pt[] = [];
-    for (let k = 0, u = 0; u <= span; k++, u += 22) {
-      const [x, y, nx, ny] = strand.at(on.s + dir * u);
-      const side = k % 2 ? 5 : -5;
-      out.push([x + nx * side, y + ny * side]);
-    }
-    return out;
-  }
-
-  /** One frame of an intent: creep toward its thing, then weave round it,
-   * then fade. */
-  function grow(it: Intent, dt: number) {
-    if (it.round && it.at >= it.round.length) {
-      it.alpha = Math.max(0, it.alpha - dt / 900);
-      return;
-    }
-    it.owed = Math.min(12, it.owed + (CREEP * dt) / 1000 / 4);
-    while (it.owed >= 1) {
-      it.owed--;
-      const n = it.pts.length;
-      const x = it.pts[n - 2];
-      const y = it.pts[n - 1];
-      if (it.round) {
-        // Along the way round, a stitch at a time.
-        const [tx, ty] = it.round[it.at];
-        const d = Math.hypot(tx - x, ty - y);
-        if (d <= 4) {
-          it.pts.push(tx, ty);
-          it.at++;
-          if (it.at >= it.round.length) return;
-        } else it.pts.push(x + ((tx - x) / d) * 4, y + ((ty - y) / d) * 4);
-        continue;
-      }
-      // Creeping: toward its target, turning no faster than a drawn curve,
-      // with a little looseness.
-      const target: Pt = it.box
-        ? [Math.max(it.box.l - 12, Math.min(it.box.r + 12, x)), Math.max(it.box.t - 12, Math.min(it.box.b + 12, y))]
-        : (strands[it.on!.hue]?.at(it.on!.s).slice(0, 2) as Pt) ?? [x, y];
-      const dx = target[0] - x;
-      const dy = target[1] - y;
-      if (Math.hypot(dx, dy) < 6) {
-        it.round = it.box ? roundBox(it.box, x, y, it.a, it.rand) : roundStrand(it.on!, it.rand);
-        it.at = 0;
-        continue;
-      }
-      let turn = Math.atan2(dy, dx) - it.a;
-      turn = Math.atan2(Math.sin(turn), Math.cos(turn));
-      const max = 0.12;
-      it.a += Math.max(-max, Math.min(max, turn)) + (it.rand() - 0.5) * 0.06;
-      it.pts.push(x + Math.cos(it.a) * 4, y + Math.sin(it.a) * 4);
-      it.crept += 4;
-      if (it.crept > REACH) {
-        // Never got there: let it go.
-        it.round = [];
-        it.at = 0;
-        return;
-      }
-    }
-  }
-
-  /** The box (canvas css px) all intents lie in, padded. */
-  function intentsBox(): Box | null {
-    let l = Infinity;
-    let t = Infinity;
-    let r = -Infinity;
-    let b = -Infinity;
-    for (const it of intents) {
-      for (let i = 0; i < it.pts.length; i += 2) {
-        l = Math.min(l, it.pts[i]);
-        r = Math.max(r, it.pts[i]);
-        t = Math.min(t, it.pts[i + 1]);
-        b = Math.max(b, it.pts[i + 1]);
-      }
-    }
-    if (l === Infinity) return null;
-    return { l: l + pageLeft - 14, t: t + pageTop - 14, r: r + pageLeft + 14, b: b + pageTop + 14 };
-  }
-
-  function paintIntent(it: Intent) {
-    if (!pats) return;
-    const { pts } = it;
-    const n = pts.length / 2;
-    if (n < 2) return;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = pats[it.hue];
-    ctx.lineWidth = 1.9;
-    // Loose: its oldest part already faint, the newest bright.
-    const bands = 6;
-    for (let k = 0; k < bands; k++) {
-      const i0 = Math.floor(((n - 1) * k) / bands);
-      const i1 = Math.floor(((n - 1) * (k + 1)) / bands);
-      if (i1 <= i0) continue;
-      ctx.globalAlpha = it.alpha * (0.45 + (0.55 * (k + 1)) / bands);
-      ctx.beginPath();
-      ctx.moveTo(pts[i0 * 2], pts[i0 * 2 + 1]);
-      for (let i = i0 + 1; i <= i1; i++) ctx.lineTo(pts[i * 2], pts[i * 2 + 1]);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-    if (!it.round || it.at < it.round.length) spark(pts[(n - 1) * 2], pts[(n - 1) * 2 + 1], it.hue, 0.85 * it.alpha, 7);
-  }
-
   /* ---------- The loop ---------- */
 
   function alive() {
@@ -827,8 +564,6 @@ export function createLife(options: LifeOptions) {
       plucks.length > 0 ||
       runners.length > 0 ||
       loops.length > 0 ||
-      intents.length > 0 ||
-      (pointer.here && rests < 2) ||
       Math.abs(sway) > 0.02 ||
       Math.abs(swayV) > 0.002 ||
       glints.some((g) => g.shown)
@@ -876,17 +611,6 @@ export function createLife(options: LifeOptions) {
       g.el.style.transform = `translate(${(x + pageLeft).toFixed(1)}px, ${(y + pageTop).toFixed(1)}px)`;
     }
 
-    /* Intents creep, weave and fade; a pointer at rest sends one or two. */
-    if (fine && pointer.here && now - pointer.at > 700 && rests < 2 && now - lastIntent > 1100) {
-      rests++;
-      issue(pointer.x, pointer.y, now);
-    }
-    if (intents.length) {
-      draw = true;
-      for (const it of intents) grow(it, dt);
-      intents = intents.filter((it) => it.alpha > 0);
-    }
-
     /* Loops tie and untie. */
     for (const loop of loops) {
       if (loop.state === "tying") {
@@ -932,14 +656,9 @@ export function createLife(options: LifeOptions) {
       runners = runners.filter((r) => (r.v > 0 ? r.s < r.to : r.s > r.to));
     }
 
-    /* Draw: only near the pointer when only intents are out. */
     if (draw) {
-      const near = !loops.length && !motes.length && !plucks.length && !runners.length ? intentsBox() : null;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (near && (drawnBox || !canvasDirty)) {
-        for (const b of [drawnBox, near]) if (b) ctx.clearRect(b.l, b.t, b.r - b.l, b.b - b.t);
-      } else ctx.clearRect(0, 0, cw, ch);
-      drawnBox = near;
+      ctx.clearRect(0, 0, cw, ch);
       ctx.setTransform(dpr, 0, 0, dpr, pageLeft * dpr, pageTop * dpr);
       paintAll();
       canvasDirty = true;
@@ -947,7 +666,6 @@ export function createLife(options: LifeOptions) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       canvasDirty = false;
-      drawnBox = null;
     }
 
     if (alive()) frame = requestAnimationFrame(tick);
@@ -957,8 +675,6 @@ export function createLife(options: LifeOptions) {
   function paintAll() {
     if (!pats) return;
     const reach = loom.reach();
-
-    for (const it of intents) paintIntent(it);
 
     for (const loop of loops) {
       const hue = loop.marks[0]?.hue ?? "c";
@@ -1103,18 +819,11 @@ export function createLife(options: LifeOptions) {
       pointer.vy = (y - pointer.y) / dt;
       pointer.speed = Math.hypot(pointer.vx, pointer.vy);
     }
-    if (pointer.here) travelled += Math.hypot(x - pointer.x, y - pointer.y);
     pointer.x = x;
     pointer.y = y;
     pointer.at = now;
     pointer.here = true;
-    rests = 0;
     sync();
-    // Moving sends threads of intent out, every so far; too quick, none.
-    if (fine && travelled > 150 && now - lastIntent > 240 && pointer.speed < 2.4) {
-      travelled = 0;
-      issue(x, y, now);
-    }
     const reach = loom.reach();
     // A finger along the thread sends light running down it.
     for (const hue of ["c", "m"] as Hue[]) {
@@ -1171,11 +880,6 @@ export function createLife(options: LifeOptions) {
       return;
     }
     if (target.closest("a, button, input, textarea, select")) return;
-    // On touch, a tap is the source: a pair of intents from there.
-    if (event.pointerType === "touch") {
-      issue(x, y, performance.now());
-      issue(x, y, performance.now() + 1);
-    }
     if (pluckAt(x, y)) wake();
   }
 
@@ -1218,7 +922,7 @@ export function createLife(options: LifeOptions) {
       world.addEventListener("pointerout", onOut, { signal });
       document.addEventListener("pointerleave", onLeave, { signal });
       addEventListener("scroll", onScroll, { passive: true, signal });
-      addEventListener("resize", () => { size(); measureAims(); wake(); }, { signal });
+      addEventListener("resize", () => { size(); wake(); }, { signal });
       if (fine) {
         world.addEventListener(
           "pointerenter",

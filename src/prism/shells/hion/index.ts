@@ -26,7 +26,8 @@ import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
 import { clothCanvas } from "./stitch";
-import { createThreads, seedOf } from "./threads";
+import { createPulse } from "./pulse";
+import { createSkein, seedOf } from "./skein";
 import { weaveCovers, weaveType } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { ACROSS, createTrack } from "./track";
@@ -37,7 +38,7 @@ interface Live {
   path: string;
   page: HTMLElement;
   loom: ReturnType<typeof createLoom>;
-  threads: ReturnType<typeof createThreads>;
+  skein: ReturnType<typeof createSkein>;
   life: ReturnType<typeof createLife> | undefined;
   /** The resume's timeline, when it runs across. */
   track: ReturnType<typeof createTrack> | undefined;
@@ -169,17 +170,20 @@ function show(route: Route, first: boolean) {
       return composition;
     },
   });
-  // Threads of intent under it all; a single thing is seen close up.
-  const threads = createThreads({
+  // One frame loop for everything that moves on this screen.
+  const pulse = createPulse({ signal: controller.signal, isIdle: ctx.isIdle, onIdleChange: ctx.onIdleChange });
+  // Every other thread, one system: the ground under the hions and the
+  // threads from the pointer; a single thing is seen close up.
+  const skein = createSkein({
     page,
     loom,
+    pulse,
     signal: controller.signal,
     instant: still(),
     scale: close(route.path) ? 2 : 1,
     origin: () => nav.origin(),
     seed: seedOf(route.path),
     isIdle: ctx.isIdle,
-    onIdleChange: ctx.onIdleChange,
   });
   // What moves over the drawing, for a visitor who can see it move.
   const life = still()
@@ -192,7 +196,9 @@ function show(route: Route, first: boolean) {
         isIdle: ctx.isIdle,
         onIdleChange: ctx.onIdleChange,
       });
-  live = { path: route.path, page, loom, threads, life, track, controller };
+  live = { path: route.path, page, loom, skein, life, track, controller };
+  // For a look from the console while developing.
+  if (import.meta.env.DEV) Object.assign(window, { __hion: live });
   requestAnimationFrame(() => {
     if (controller.signal.aborted) return;
     // The threads first: they are what you follow onto the screen.
@@ -205,7 +211,7 @@ function show(route: Route, first: boolean) {
     const ground = () => {
       // Not for a screen already let go (pulled away before it settled).
       if (live?.page !== page || live.left !== undefined) return;
-      threads.start();
+      skein.start();
       const weaving = { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric };
       weaveType(page, weaving);
       weaveCovers(page, weaving);
@@ -239,7 +245,7 @@ function leave(path: string) {
   // per step, in the frame you clicked.
   leaving.loom.release();
   leaving.track?.release();
-  leaving.threads.release(closer(leaving.page, path));
+  leaving.skein.release(closer(leaving.page, path));
   leaving.life?.release();
   nav.setCurrent(path);
   ribbon = unfurl(path);
