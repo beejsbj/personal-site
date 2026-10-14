@@ -18,9 +18,9 @@
      tags, in real small caps. Every weight here is in a loaded file. */
   --hion-serif: "Alegreya Variable", "Alegreya", Georgia, serif;
   --hion-display: var(--hion-serif);
-  --hion-display-weight: 660;
+  --hion-display-weight: 600;
   --hion-display-vary: normal;
-  --hion-display-track: -0.01em;
+  --hion-display-track: 0;
   --hion-display-leading: 0.92;
   --hion-text-size: 1.125rem;
   --hion-read-size: 1.2rem;
@@ -557,7 +557,7 @@
   overflow-wrap: break-word;
   margin: 0;
   padding: 0.12em 0.3em 0.05em;
-  font: var(--hion-display-weight) clamp(2.6rem, 5.4vw, 4.6rem)/1.04 var(--hion-display);
+  font: var(--hion-display-weight) clamp(3rem, 6.2vw, 5.3rem)/1.04 var(--hion-display);
   font-variation-settings: var(--hion-display-vary);
   letter-spacing: var(--hion-display-track);
   text-wrap: balance;
@@ -772,7 +772,7 @@
 
 :root[data-lens="hion"] .hion-display {
   margin: 0;
-  font: var(--hion-display-weight) clamp(4.2rem, 9.4vw, 8.4rem)/var(--hion-display-leading) var(--hion-display);
+  font: var(--hion-display-weight) clamp(4.8rem, 10.8vw, 9.6rem)/var(--hion-display-leading) var(--hion-display);
   font-variation-settings: var(--hion-display-vary);
   letter-spacing: var(--hion-display-track);
 }
