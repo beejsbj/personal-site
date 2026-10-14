@@ -3,11 +3,13 @@
  * (Threads from the pointer, and the loops tied round what you hover, are
  * strands like any other: skein.ts.)
  *
- * The loom lays the drawing down once and leaves it. This layer is what
- * moves on top of it: one viewport-sized canvas (cleared and redrawn only
- * while something is alive) and a few light spans, driven by one frame
- * loop that sleeps the moment nothing moves and never runs while the page
- * is idle.
+ * The loom lays the drawing down once and leaves it. What moves on it is
+ * painted on the skein's live canvas (the one layer every moving thread
+ * is on: plucks, runners and dust are an effect there, repainted only
+ * where they are), and on the screen's one frame loop (pulse.ts), which
+ * sleeps the moment nothing moves and never runs while the page is idle.
+ * The glints riding the hions' circles are the compositor's (CSS
+ * offset-path), not a frame loop's.
  *
  *   runners   touch a thread and a bead of light runs away along it both
  *             ways; a glint rides slowly round each circle the hions drew.
@@ -21,8 +23,9 @@
  *   eggs      left alone, the threads now and then tie a small knot of
  *             their own (a loop on the skein), or chase each other down
  *             the page. */
-import { type Hue, patterns, type Patterns, Path, type Pt, RGB, rng } from "./pastel";
+import { type Hue, Path, type Pt, RGB, rng } from "./pastel";
 import type { createLoom } from "./loom";
+import type { Pulse } from "./pulse";
 import type { createSkein } from "./skein";
 
 type Loom = ReturnType<typeof createLoom>;
@@ -35,6 +38,7 @@ interface LifeOptions {
   loom: Loom;
   /** Every other thread: a knot of their own is a loop on it. */
   skein: ReturnType<typeof createSkein>;
+  pulse: Pulse;
   signal: AbortSignal;
   isIdle(): boolean;
   onIdleChange(listener: (idle: boolean) => void): void;
@@ -172,14 +176,8 @@ interface Runner {
 }
 
 interface OrbitGlint {
-  hue: Hue;
-  path: Path;
   key: number;
-  top: number;
-  bottom: number;
   el: HTMLElement;
-  s: number;
-  v: number;
   shown: boolean;
 }
 
@@ -195,17 +193,10 @@ interface Row {
 export function createLife(options: LifeOptions) {
   const { world, page, loom, skein, signal } = options;
   const fine = matchMedia("(pointer: fine)").matches;
+  // The glints, on the page (they ride with it).
   const layer = document.createElement("div");
-  layer.className = "hion-life";
+  layer.className = "hion-glints";
   layer.setAttribute("aria-hidden", "true");
-  const canvas = document.createElement("canvas");
-  layer.append(canvas);
-  world.append(layer);
-  const ctx = canvas.getContext("2d")!;
-  let pats: Patterns | undefined;
-  let dpr = 1;
-  let cw = 0;
-  let ch = 0;
 
   let strands: Partial<Record<Hue, Strand>> = {};
   let version = -1;
@@ -225,9 +216,6 @@ export function createLife(options: LifeOptions) {
   let lastScroll = scrollY;
   let lastInput = performance.now();
   let lastEgg = performance.now();
-  let frame = 0;
-  let last = 0;
-  let canvasDirty = false;
   const rand = rng(Date.now() % 10007);
 
   /** The things that swing, given the angle each frame. Set on each of them
@@ -275,17 +263,6 @@ export function createLife(options: LifeOptions) {
     return [x, y];
   }
 
-  function size() {
-    dpr = Math.min(devicePixelRatio || 1, 1.5);
-    cw = innerWidth;
-    ch = innerHeight;
-    canvas.width = Math.ceil(cw * dpr);
-    canvas.height = Math.ceil(ch * dpr);
-    canvas.style.width = `${cw}px`;
-    canvas.style.height = `${ch}px`;
-    pats = patterns(ctx, dpr);
-  }
-
   /** Pick up the drawing again whenever the loom recomposed it. */
   function sync() {
     if (loom.version() === version) return;
@@ -294,22 +271,18 @@ export function createLife(options: LifeOptions) {
     for (const tip of loom.journeys()) strands[tip.hue] = new Strand(tip.points, tip.keys);
     for (const g of glints) g.el.remove();
     glints = loom.orbits().map((orbit) => {
+      // Round the circle on the compositor: a path to ride and how long
+      // once round takes.
       const el = document.createElement("span");
       el.className = "hion-glint";
       el.dataset.hue = orbit.hue;
+      const path = new Path(orbit.points, 4);
+      let d = "";
+      for (let i = 0; i < path.count; i += 2) d += `${i ? "L" : "M"}${path.xs[i].toFixed(1)} ${path.ys[i].toFixed(1)}`;
+      el.style.offsetPath = `path("${d}")`;
+      el.style.animationDuration = `${(path.length / (orbit.hue === "c" ? 0.075 : 0.05) / 1000).toFixed(1)}s`;
       layer.append(el);
-      const ys = orbit.points.map((p) => p[1]);
-      return {
-        hue: orbit.hue,
-        path: new Path(orbit.points, 4),
-        key: orbit.key,
-        top: Math.min(...ys),
-        bottom: Math.max(...ys),
-        el,
-        s: 0,
-        v: orbit.hue === "c" ? 0.075 : 0.05,
-        shown: false,
-      };
+      return { key: orbit.key, el, shown: false };
     });
     rows = [];
     for (const holder of page.querySelectorAll<HTMLElement>("[data-cord]")) {
@@ -467,29 +440,33 @@ export function createLife(options: LifeOptions) {
   /* ---------- The loop ---------- */
 
   function alive() {
-    return (
-      motes.length > 0 ||
-      plucks.length > 0 ||
-      runners.length > 0 ||
-      Math.abs(sway) > 0.02 ||
-      Math.abs(swayV) > 0.002 ||
-      glints.some((g) => g.shown)
-    );
+    return Math.abs(sway) > 0.02 || Math.abs(swayV) > 0.002;
   }
+
+  const task = options.pulse.add(tick);
 
   function wake() {
-    if (!frame && !options.isIdle()) frame = requestAnimationFrame(tick);
+    task.wake();
+    skein.wake();
   }
 
-  function tick(now: number) {
-    frame = 0;
-    if (options.isIdle()) return;
-    const dt = Math.min(48, now - (last || now));
-    last = now;
+  /** The glints show once their circle is drawn. */
+  function lightGlints() {
+    const reach = loom.reach();
+    for (const g of glints) {
+      const show = g.key <= reach;
+      if (show === g.shown) continue;
+      g.shown = show;
+      g.el.dataset.state = show ? "on" : "";
+    }
+  }
+
+  function tick(_now: number, dt: number) {
+    if (options.isIdle()) return false;
+    dt = Math.min(48, dt);
     measure();
     sync();
-    const reach = loom.reach();
-    let draw = false;
+    lightGlints();
 
     /* Sway: everything hung swings with the scroll, and settles. */
     if (Math.abs(sway) > 0.001 || Math.abs(swayV) > 0.0005) {
@@ -502,25 +479,14 @@ export function createLife(options: LifeOptions) {
       // In tenths of a degree: finer is not seen, and each change restyles.
       swing(sway ? `${Math.max(-5, Math.min(5, sway)).toFixed(1)}deg` : "");
     }
+    return alive();
+  }
 
-    /* Glints ride the circles. */
-    const viewTop = -pageTop;
-    const viewBottom = viewTop + innerHeight;
-    for (const g of glints) {
-      const show = g.key <= reach && g.bottom > viewTop && g.top < viewBottom && !document.hidden;
-      if (show !== g.shown) {
-        g.shown = show;
-        g.el.dataset.state = show ? "on" : "";
-      }
-      if (!show) continue;
-      g.s = (g.s + g.v * dt) % g.path.length;
-      const [x, y] = g.path.at(g.s);
-      g.el.style.transform = `translate(${(x + pageLeft).toFixed(1)}px, ${(y + pageTop).toFixed(1)}px)`;
-    }
+  /* ---------- On the live canvas: plucks, runners, dust ---------- */
 
-    /* Motes fall. */
-    if (motes.length) {
-      draw = true;
+  skein.effect({
+    step(_now, dt) {
+      dt = Math.min(48, dt);
       for (const m of motes) {
         m.age += dt;
         m.vy += 0.00011 * dt;
@@ -529,46 +495,57 @@ export function createLife(options: LifeOptions) {
         m.y += m.vy * dt;
       }
       motes = motes.filter((m) => m.age < m.life);
-    }
-
-    /* Plucks ring down. */
-    if (plucks.length) {
-      draw = true;
       for (const p of plucks) p.age += dt;
       plucks = plucks.filter((p) => p.age < 950);
-    }
-
-    /* Runners run. */
-    if (runners.length) {
-      draw = true;
       for (const r of runners) {
         r.age += dt;
-        if (r.age < 0) continue;
-        r.s += r.v * dt;
+        if (r.age >= 0) r.s += r.v * dt;
       }
       runners = runners.filter((r) => (r.v > 0 ? r.s < r.to : r.s > r.to));
-    }
+      return motes.length + plucks.length + runners.length > 0;
+    },
+    boxes() {
+      const out: { l: number; t: number; r: number; b: number }[] = [];
+      const along = (hue: Hue, s0: number, s1: number, pad: number) => {
+        const strand = strands[hue];
+        if (!strand) return;
+        let l = Infinity;
+        let t = Infinity;
+        let r = -Infinity;
+        let b = -Infinity;
+        for (let s = Math.min(s0, s1); s <= Math.max(s0, s1) + 6; s += 6) {
+          const [x, y] = strand.at(s);
+          l = Math.min(l, x);
+          r = Math.max(r, x);
+          t = Math.min(t, y);
+          b = Math.max(b, y);
+        }
+        if (l < Infinity) out.push({ l: l - pad, t: t - pad, r: r + pad, b: b + pad });
+      };
+      for (const p of plucks) along(p.hue, p.s - 90, p.s + 90, 10);
+      for (const r of runners) if (r.age >= 0) along(r.hue, r.s - 64 * Math.sign(r.v), r.s, 13);
+      if (motes.length) {
+        let l = Infinity;
+        let t = Infinity;
+        let r = -Infinity;
+        let b = -Infinity;
+        for (const m of motes) {
+          l = Math.min(l, m.x);
+          r = Math.max(r, m.x + m.size);
+          t = Math.min(t, m.y);
+          b = Math.max(b, m.y + m.size);
+        }
+        out.push({ l: l - 2, t: t - 2, r: r + 2, b: b + 2 });
+      }
+      return out;
+    },
+    paint(ctx) {
+      paintAll(ctx);
+    },
+  });
 
-    if (draw) {
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, cw, ch);
-      ctx.setTransform(dpr, 0, 0, dpr, pageLeft * dpr, pageTop * dpr);
-      paintAll();
-      canvasDirty = true;
-    } else if (canvasDirty) {
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      canvasDirty = false;
-    }
-
-    if (alive()) frame = requestAnimationFrame(tick);
-    else last = 0;
-  }
-
-  function paintAll() {
-    if (!pats) return;
+  function paintAll(ctx: CanvasRenderingContext2D) {
     const reach = loom.reach();
-
     for (const p of plucks) {
       const strand = strands[p.hue];
       if (!strand) continue;
@@ -628,7 +605,7 @@ export function createLife(options: LifeOptions) {
         ctx.stroke();
       }
       const [x, y] = strand.at(r.s);
-      spark(x, y, r.hue, 1, 11);
+      spark(ctx, x, y, r.hue, 1, 11);
       ctx.globalAlpha = 1;
     }
 
@@ -642,7 +619,7 @@ export function createLife(options: LifeOptions) {
   }
 
   /** A point of light: the bright heart of a thread. */
-  function spark(x: number, y: number, hue: Hue, alpha: number, r: number) {
+  function spark(ctx: CanvasRenderingContext2D, x: number, y: number, hue: Hue, alpha: number, r: number) {
     const halo = ctx.createRadialGradient(x, y, 0, x, y, r);
     const [cr, cg, cb] = RGB[hue];
     const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
@@ -730,10 +707,6 @@ export function createLife(options: LifeOptions) {
     wake();
   }
 
-  options.onIdleChange((idle) => {
-    if (!idle) wake();
-  });
-
   // Left alone, the threads amuse themselves. Rarely.
   const eggs = window.setInterval(() => {
     const now = performance.now();
@@ -744,14 +717,14 @@ export function createLife(options: LifeOptions) {
 
   return {
     start() {
-      size();
+      page.insertBefore(layer, page.querySelector(":scope > main"));
       measure();
       sync();
       addEventListener("pointermove", onMove, { passive: true, signal });
       addEventListener("pointerdown", onDown, { passive: true, signal });
       document.addEventListener("pointerleave", onLeave, { signal });
       addEventListener("scroll", onScroll, { passive: true, signal });
-      addEventListener("resize", () => { size(); wake(); }, { signal });
+      addEventListener("resize", () => wake(), { signal });
       if (fine) {
         world.addEventListener(
           "pointerenter",
@@ -764,13 +737,13 @@ export function createLife(options: LifeOptions) {
       }
       signal.addEventListener("abort", () => {
         clearInterval(eggs);
-        cancelAnimationFrame(frame);
-        frame = 0;
         layer.remove();
         swing("");
       });
       wake();
     },
+    /** The loom drew on: a circle may be drawn now. */
+    wake,
     /** The page is leaving: everything alive lets go. */
     release() {
       layer.dataset.state = "leaving";

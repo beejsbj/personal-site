@@ -9,6 +9,11 @@
  * themselves just ahead of you, and stay drawn. A bead of light rides the
  * tip of each hion, so there is always something to follow.
  *
+ * On a page the beads are the skein's (skein.ts): the hions' heads are
+ * strands like every other thread, moving each frame with a warm run
+ * behind them, and the loom only says how far it has drawn. A track keeps
+ * beads of its own.
+ *
  * Cheap on purpose: tiles exist only near the viewport (others are dropped
  * and redrawn identically when you come back), each mark is drawn once and
  * within a per-frame budget, blooms live on quarter-resolution canvases,
@@ -22,6 +27,7 @@
  * same: the marks only need composing with their keys and extents along x
  * (weave.ts composes such a drawing turned, as if it read down). */
 import { type Hue, Kind, type Mark, paint, paintGlow, patterns, type Patterns, type Pt } from "./pastel";
+import { createPulse, type Pulse } from "./pulse";
 
 /** Tile length: a frame that draws re-sends only the tiles it touched,
  * so shorter tiles cost less each frame. */
@@ -77,6 +83,13 @@ interface LoomOptions {
   isIdle(): boolean;
   onIdleChange(listener: (idle: boolean) => void): void;
   compose(): Composition;
+  /** The screen's frame loop (a track without one makes its own). */
+  pulse?: Pulse;
+  /** Beads of light at the hions' tips (default). Off where the skein
+   * draws their heads. */
+  beads?: boolean;
+  /** Told each frame the drawing moves on. */
+  onDraw?(): void;
 }
 
 export function createLoom(options: LoomOptions) {
@@ -89,7 +102,7 @@ export function createLoom(options: LoomOptions) {
   layer.className = across ? "hion-loom hion-loom--across" : "hion-loom";
   layer.setAttribute("aria-hidden", "true");
   // One bead of light at the tip of each hion, riding its own thread.
-  const beads = (["c", "m"] as Hue[]).map((hue) => {
+  const beads = (options.beads === false ? [] : (["c", "m"] as Hue[])).map((hue) => {
     const el = document.createElement("span");
     el.className = "hion-bead";
     el.dataset.hue = hue;
@@ -114,8 +127,6 @@ export function createLoom(options: LoomOptions) {
   let dpr = 1;
   const tiles = new Map<number, Tile>();
   let reveals: { el: HTMLElement; at: number }[] = [];
-  let frame = 0;
-  let last = 0;
   let built = false;
   /** The first drawing of a screen is slow enough to watch; after that, it
    * keeps up with the reader. */
@@ -286,12 +297,9 @@ export function createLoom(options: LoomOptions) {
       : Math.max(target, Math.min(length + 1, top + size * (intro ? 0.94 : 1.05)));
   }
 
-  function tick(now: number) {
-    frame = 0;
-    if (options.isIdle()) return;
+  function tick(_now: number, dt: number) {
+    if (options.isIdle() || !built) return false;
     const deadline = performance.now() + 7;
-    const dt = Math.min(64, now - (last || now));
-    last = now;
     // The hand draws at a pace you can watch, and hurries when you scroll
     // far ahead of it.
     let gap = target - reach;
@@ -309,17 +317,16 @@ export function createLoom(options: LoomOptions) {
           : 0.26 + gap / 800
         : 0.45 + gap / 450; // px per ms
       advance(Math.min(target, reach + speed * dt));
-    } else {
-      last = 0;
-      advance(target);
-    }
+      options.onDraw?.();
+    } else advance(target);
     const behind = fill(deadline);
-    if (gap > 0.5 || behind) frame = requestAnimationFrame(tick);
-    else last = 0;
+    return gap > 0.5 || behind;
   }
 
+  const task = (options.pulse ?? createPulse({ signal, isIdle: options.isIdle, onIdleChange: options.onIdleChange })).add(tick);
+
   function wake() {
-    if (!frame && !options.isIdle()) frame = requestAnimationFrame(tick);
+    task.wake();
   }
 
   function onScroll() {
@@ -351,10 +358,6 @@ export function createLoom(options: LoomOptions) {
     }, 140);
   });
 
-  options.onIdleChange((idle) => {
-    if (!idle) wake();
-  });
-
   return {
     start() {
       observedWidth = measureBreadth();
@@ -372,7 +375,6 @@ export function createLoom(options: LoomOptions) {
       observer.observe(host);
       signal.addEventListener("abort", () => {
         observer.disconnect();
-        cancelAnimationFrame(frame);
         clearTimeout(resizeTimer);
       });
     },
@@ -389,8 +391,7 @@ export function createLoom(options: LoomOptions) {
         [{ clipPath: `inset(0 0 ${bottom}px 0)` }, { clipPath: `inset(0 0 ${gone}px 0)` }],
         { duration: 420, easing: "cubic-bezier(0.55, 0, 0.8, 0.2)", fill: "forwards" },
       );
-      cancelAnimationFrame(frame);
-      frame = 0;
+      built = false;
     },
     /** Light everything now (e.g. focus jumped far ahead), to this far
      * along the axis the drawing reads. */
@@ -402,6 +403,13 @@ export function createLoom(options: LoomOptions) {
     journeys: () => tips,
     orbits: () => orbits,
     reach: () => reach,
+    /** The hions' heads are drawn elsewhere now (skein.ts): no beads. */
+    yieldHeads() {
+      for (const bead of beads) bead.remove();
+      beads.length = 0;
+    },
+    /** Whether the hand is still drawing toward where you are. */
+    drawing: () => target - reach > 0.5,
     version: () => version,
   };
 }

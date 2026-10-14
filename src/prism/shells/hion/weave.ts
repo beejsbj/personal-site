@@ -31,6 +31,9 @@
  *   that draws its own (track.ts). They go in at its top and come out at
  *   its foot; nothing of theirs is drawn between.
  *
+ * With `heads` (a page whose hions' heads the skein draws), each mark of
+ * a hion is keyed by where it ends, so none lies ahead of its head.
+ *
  * Only what belongs to the host is read: the nearest `[data-loom]` round
  * it is the host (a track inside the page is not the page's).
  *
@@ -81,7 +84,7 @@ const GAP = 400;
 export function compose(
   host: HTMLElement,
   origin: () => Pt | null,
-  { axis = "y" }: { axis?: "x" | "y" } = {},
+  { axis = "y", heads = false }: { axis?: "x" | "y"; heads?: boolean } = {},
 ): Composition {
   const hostBox = host.getBoundingClientRect();
   const across = axis === "x";
@@ -291,6 +294,8 @@ export function compose(
           w: TEMPER[hue].weight * (narrow ? 0.85 : 1),
           seed: seed++,
           key: (s) => keys.keyAt(s + offset),
+          // Their heads (skein.ts) draw what is in front of the last mark.
+          keyEnd: heads,
           glow: 0.22,
         }),
       );

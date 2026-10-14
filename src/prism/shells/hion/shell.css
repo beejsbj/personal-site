@@ -2259,31 +2259,25 @@
 
 /* ---------- Life: what moves over the drawing ---------- */
 
-/* The layer the threads answer on: over the page, under the line. */
-:root[data-lens="hion"] .hion-life {
-  position: fixed;
+/* The glints, on the page with the drawing (life.ts). */
+:root[data-lens="hion"] .hion-glints {
+  position: absolute;
   inset: 0;
-  z-index: 30;
+  z-index: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
-:root[data-lens="hion"] .hion-life[data-state="leaving"] {
+:root[data-lens="hion"] .hion-glints[data-state="leaving"] {
   opacity: 0;
-}
-
-:root[data-lens="hion"] .hion-life > canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 
 /* A glint riding slowly round each circle the hions drew. */
 :root[data-lens="hion"] .hion-glint {
   --hion-bead: var(--hion-c);
   position: absolute;
-  top: -7px;
-  left: -7px;
+  top: 0;
+  left: 0;
   width: 14px;
   height: 14px;
   opacity: 0;
@@ -2295,8 +2289,23 @@
     color-mix(in srgb, var(--hion-bead) 20%, transparent) 55%,
     transparent 72%
   );
+  /* Round its circle on the compositor (life.ts sets the path and how
+     long once round takes). */
+  offset-rotate: 0deg;
+  offset-anchor: center;
+  animation: hion-orbit 20s linear infinite;
+  animation-play-state: paused;
   transition: opacity 0.8s ease;
-  will-change: transform;
+}
+
+:root[data-lens="hion"] .hion-glint[data-state="on"] {
+  animation-play-state: running;
+}
+
+@keyframes hion-orbit {
+  to {
+    offset-distance: 100%;
+  }
 }
 
 :root[data-lens="hion"] .hion-glint[data-hue="m"] {

@@ -4,6 +4,11 @@
  * hue, a width, some slack, a brightness and a lifetime. The kinds differ
  * only in those numbers (NATURE) and in what steers them:
  *
+ *   hion     the two hions: persistent and brightest. Their bodies are
+ *            composed from the screen's stations (weave.ts) and laid in
+ *            pastel by the loom as the reader scrolls; here are their
+ *            heads, chasing how far the loom has drawn along each way
+ *            down, with a warm run over the last of it.
  *   ground   born where the hions come down from the line and in from the
  *            page edges as the drawing reaches them; steered by fate.ts
  *            (taut, bowed, turning at decisions, falling in alongside
@@ -63,7 +68,17 @@ import { type Box, encircle as encircle_, ring, stitches, weave, wordBoxes } fro
 
 type Loom = ReturnType<typeof createLoom>;
 
-export type Kind = "ground" | "pointer" | "loop";
+/** Something else that moves on the live canvas (life.ts: plucks,
+ * runners, dust), stepped and painted with the strands, in page px. */
+export interface Effect {
+  /** Move on by dt (ms); false once nothing of it is left. */
+  step(now: number, dt: number): boolean;
+  /** Where it is now. */
+  boxes(): Box[];
+  paint(ctx: CanvasRenderingContext2D): void;
+}
+
+export type Kind = "hion" | "ground" | "pointer" | "loop";
 
 interface Nature {
   /** Line width (css px). */
@@ -88,6 +103,7 @@ interface Nature {
 const GROUND = 0.6;
 
 const NATURE: Record<Kind, Nature> = {
+  hion: { w: 2.4, speed: 700, tail: 130, slack: 0, bead: 11, bright: 1, body: 0, hold: Infinity },
   ground: { w: 1.25, speed: 120, tail: 110, slack: 1.07, bead: 8, bright: 1, body: GROUND, hold: 40000 },
   pointer: { w: 1.5, speed: 340, tail: 80, slack: 1.12, bead: 6, bright: 0.9, body: 0.55, hold: 11000 },
   loop: { w: 2.1, speed: 1100, tail: 70, slack: 1.05, bead: 6, bright: 1, body: 1, hold: Infinity },
@@ -144,7 +160,8 @@ type Drive =
   | { by: "fate" }
   | { by: "seek"; aim: Aim | null; on: { hue: Hue; s: number } | null; crept: number; letGo: boolean }
   | { by: "wind"; way: Pt[]; at: number; letGo: boolean }
-  | { by: "loop"; el: Element | null; state: "tying" | "held" | "untying"; until: number };
+  | { by: "loop"; el: Element | null; state: "tying" | "held" | "untying"; until: number }
+  | { by: "hion"; keys: Float64Array };
 
 interface Strand {
   kind: Kind;
@@ -287,6 +304,7 @@ export function createSkein(options: SkeinOptions) {
   let skipPaint = false;
   /** Boxes of things gone from the live canvas, to clear. */
   let cleared: Box[] = [];
+  const effects: { e: Effect; last: Box[] }[] = [];
   // The pointer, in page space.
   const pointer = { x: -1e4, y: -1e4, at: 0, here: false, travelled: 0, lastIssue: 0, rests: 0, hue: "c" as Hue };
 
@@ -360,6 +378,69 @@ export function createSkein(options: SkeinOptions) {
       hions.push({ hue: tip.hue, xs, ys, ls, keys: tip.keys });
       fate.fix(tip.hue, tip.points);
     }
+    // Their heads (the loom's own beads give way to them).
+    strands = strands.filter((st) => {
+      if (st.kind !== "hion") return true;
+      if (st.box) cleared.push(st.box);
+      return false;
+    });
+    if (instant) return;
+    for (const tip of loom.journeys()) {
+      if (tip.points.length < 2) continue;
+      const n = nature("hion");
+      const st = make("hion", { ...n, w: n.w * (tip.hue === "m" ? 1.15 : 0.9) }, fate.bare(tip.hue, tip.points), { by: "hion", keys: tip.keys });
+      measureBody(st);
+      st.s = hionTarget(st);
+      strands.unshift(st);
+      loom.yieldHeads();
+    }
+  }
+
+  /** How far along its way a hion's drawing has got. */
+  function hionTarget(st: Strand) {
+    const keys = (st.drive as Extract<Drive, { by: "hion" }>).keys;
+    const reach = loom.reach();
+    if (keys[0] > reach) return 0;
+    let lo = 0;
+    let hi = keys.length - 1;
+    if (keys[hi] <= reach) return st.ls[hi];
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1;
+      if (keys[mid] <= reach) lo = mid;
+      else hi = mid;
+    }
+    const span = keys[lo + 1] - keys[lo];
+    const u = span > 0 ? Math.min(1, (reach - keys[lo]) / span) : 0;
+    return st.ls[lo] + (st.ls[lo + 1] - st.ls[lo]) * u;
+  }
+
+  /** A hion's head chases its drawing: quick, never a jump unless the
+   * drawing jumped far (a fling), a little dimmer once it has caught up. */
+  function chase(st: Strand, dt: number) {
+    const before = st.s;
+    const target = hionTarget(st);
+    const total = measureBody(st);
+    const gap = target - st.s;
+    if (Math.abs(gap) > 900) st.s = target - Math.sign(gap) * 240;
+    else if (gap) {
+      const speed = Math.max(st.n.speed, Math.abs(gap) * 7);
+      st.s += Math.sign(gap) * Math.min(Math.abs(gap), (speed * dt) / 1000);
+    }
+    const going = st.s !== before || loom.drawing();
+    st.resting = !going;
+    st.laid = Math.max(0, indexAt(st, st.s - st.n.tail) - 1);
+    st.motion += ((going ? 1 : 0) - st.motion) * Math.min(1, dt / 220);
+    // At the end of its way (or not yet begun) it gives no light.
+    const lit = st.s > 2 && st.s < total - 2;
+    const heat = st.heat;
+    st.heat = lit ? Math.min(1, st.heat + dt / 300) : Math.max(0, st.heat - dt / 600);
+    if (!seen(headY(st), 0.2)) {
+      if (st.box) st.dirty = true;
+      return false;
+    }
+    const moving = st.s !== before || st.heat !== heat || st.motion > 0.01;
+    if (moving || st.box === null) st.dirty = true;
+    return moving;
   }
 
   function build() {
@@ -375,6 +456,7 @@ export function createSkein(options: SkeinOptions) {
     page.classList.remove("hion-measuring");
     ground.finish();
     fate = new Fate(ground);
+    strands = [];
     hionVersion = -1;
     readHions();
     const origin = options.origin();
@@ -389,7 +471,6 @@ export function createSkein(options: SkeinOptions) {
     all = planned.gathers;
     seeds = planned.seeds;
     sown = 0;
-    strands = [];
     trickles = 0;
     cleared = [];
     bandFresh = true;
@@ -402,7 +483,9 @@ export function createSkein(options: SkeinOptions) {
     const { xs, ys } = st.t;
     const ls = st.ls;
     for (let i = ls.length; i < xs.length; i++) {
-      ls.push(i ? ls[i - 1] + Math.hypot(xs[i] - xs[i - 1], ys[i] - ys[i - 1]) : 0);
+      const d = i ? Math.hypot(xs[i] - xs[i - 1], ys[i] - ys[i - 1]) : 0;
+      // A stretch a hion leaves the page for (a track) is no length.
+      ls.push(i ? ls[i - 1] + (d > 400 ? 0 : d) : 0);
     }
     return ls[ls.length - 1] ?? 0;
   }
@@ -456,8 +539,8 @@ export function createSkein(options: SkeinOptions) {
       fate.step(t);
       return;
     }
-    // A loop is laid whole when it is tied.
-    if (d.by === "loop") return;
+    // A loop is laid whole when it is tied; a hion, by the loom.
+    if (d.by === "loop" || d.by === "hion") return;
     const n = t.xs.length - 1;
     const x = t.xs[n];
     const y = t.ys[n];
@@ -857,7 +940,7 @@ export function createSkein(options: SkeinOptions) {
     const settled = st.s - span;
     // Settled: exactly as the ground will have it.
     const i1 = indexAt(st, settled);
-    if (i1 > st.laid || settled > st.ls[st.laid]) {
+    if (st.n.body > 0 && (i1 > st.laid || settled > st.ls[st.laid])) {
       const [tx, ty] = at(st, settled);
       lay(ctx, pats, st, st.laid, i1, [tx, ty]);
     }
@@ -873,6 +956,14 @@ export function createSkein(options: SkeinOptions) {
         pts.push(x, y);
       }
     }
+    // Not across a stretch a hion leaves the page for.
+    for (let i = pts.length - 4; i >= 0; i -= 2) {
+      if (Math.abs(pts[i + 2] - pts[i]) + Math.abs(pts[i + 3] - pts[i + 1]) > 120) {
+        pts.splice(0, i + 2);
+        break;
+      }
+    }
+    if (pts.length < 4) return;
     const count = pts.length / 2;
     const heat = st.heat * st.alpha;
     const base = st.n.body * st.alpha;
@@ -963,28 +1054,28 @@ export function createSkein(options: SkeinOptions) {
       ctx.clip();
       ctx.clearRect(r.l, r.t, r.r - r.l, r.b - r.t);
       for (const st of strands) if (st.box && meets(st.box, r)) paintStrand(ctx, bpats, st);
+      for (const fx of effects) if (fx.last.some((b) => meets(b, r))) fx.e.paint(ctx);
       ctx.restore();
     }
   }
 
   /* ---------- Growing ---------- */
 
-  function spawn(kind: Kind, seed: Seed, drive: Drive): Strand {
-    const t = fate.add(seed);
-    const st: Strand = {
+  function make(kind: Kind, n: Nature, t: Thread, drive: Drive): Strand {
+    return {
       kind,
-      n: nature(kind),
+      n,
       t,
       ls: [0],
       s: 0,
       drive,
-      rand: rng(seed.seed * 3 + 1),
+      rand: rng(t.id * 31 + t.xs[0] * 7 + 1),
       rope: null,
       laid: 0,
       fadeAt: Infinity,
       alpha: 1,
-      top: seed.y,
-      bottom: seed.y,
+      top: t.ys[0],
+      bottom: t.ys[0],
       motion: 1,
       heat: 1,
       resting: false,
@@ -992,6 +1083,11 @@ export function createSkein(options: SkeinOptions) {
       dirty: true,
       cold: false,
     };
+  }
+
+  function spawn(kind: Kind, seed: Seed, drive: Drive): Strand {
+    const st = make(kind, nature(kind), fate.add(seed), drive);
+    st.rand = rng(seed.seed * 3 + 1);
     strands.push(st);
     return st;
   }
@@ -1085,6 +1181,7 @@ export function createSkein(options: SkeinOptions) {
   function move(st: Strand, now: number, dt: number, here: boolean) {
     const before = st.s;
     if (st.drive.by === "loop") return tie(st, st.drive, now, Math.min(dt, 64), before);
+    if (st.drive.by === "hion") return chase(st, Math.min(dt, 64));
     const near = seen(headY(st), 0.2);
     st.resting = st.kind === "ground" && !here;
     if (!st.resting) {
@@ -1141,6 +1238,7 @@ export function createSkein(options: SkeinOptions) {
     lastTick = now;
     const here = present(performance.now());
     anchor();
+    readHions();
     if (here) {
       // Born as the drawing reaches them, a moment apart; only heads near
       // the reader count (the rest hurry out of sight).
@@ -1162,10 +1260,18 @@ export function createSkein(options: SkeinOptions) {
     }
     let moving = false;
     let offscreen = false;
+    for (const fx of effects) {
+      const alive = fx.e.step(now, Math.min(dt, 64));
+      const boxes = alive ? fx.e.boxes() : [];
+      if (alive || fx.last.length) cleared.push(...fx.last, ...boxes);
+      fx.last = boxes;
+      if (alive) moving = true;
+    }
     let untied = false;
     for (const st of strands) {
       if (st.cold) continue;
       if (move(st, now, dt, here)) moving = true;
+      if (st.drive.by === "hion") continue;
       if (st.drive.by === "loop") {
         if (st.drive.state === "untying" && st.s <= 0) {
           if (st.box) cleared.push(st.box);
@@ -1300,27 +1406,7 @@ export function createSkein(options: SkeinOptions) {
   }
 
   function loop(el: Element | null, hue: Hue, way: Pt[], until: number) {
-    const st: Strand = {
-      kind: "loop",
-      n: nature("loop"),
-      t: fate.bare(hue, way),
-      ls: [0],
-      s: 0,
-      drive: { by: "loop", el, state: "tying", until },
-      rand: rng(way.length * 31 + 7),
-      rope: null,
-      laid: 0,
-      fadeAt: Infinity,
-      alpha: 1,
-      top: way[0][1],
-      bottom: way[0][1],
-      motion: 1,
-      heat: 1,
-      resting: false,
-      box: null,
-      dirty: true,
-      cold: false,
-    };
+    const st = make("loop", nature("loop"), fate.bare(hue, way), { by: "loop", el, state: "tying", until });
     measureBody(st);
     strands.push(st);
     task.wake();
@@ -1568,6 +1654,12 @@ export function createSkein(options: SkeinOptions) {
       loop(null, hue, way, performance.now() + hold);
       return true;
     },
+    /** Something else to move and paint on the live canvas. */
+    effect(e: Effect) {
+      effects.push({ e, last: [] });
+    },
+    /** The loom drew on: the hions' heads follow. */
+    wake: () => task.wake(),
     /** For a check: the threads themselves. */
     fate: () => fate,
     strands: () => strands,

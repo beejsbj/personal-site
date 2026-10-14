@@ -156,6 +156,9 @@ function show(route: Route, first: boolean) {
     },
     { signal: controller.signal },
   );
+  // One frame loop for everything that moves on this screen.
+  const pulse = createPulse({ signal: controller.signal, isIdle: ctx.isIdle, onIdleChange: ctx.onIdleChange });
+  let drew = () => {};
   const loom = createLoom({
     host: page,
     signal: controller.signal,
@@ -164,16 +167,18 @@ function show(route: Route, first: boolean) {
     brisk: !first,
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
+    pulse,
+    onDraw: () => drew(),
     compose: () => {
-      const composition = compose(page, () => nav.origin());
+      // The hions' heads are the skein's: each mark keyed by where it ends.
+      const composition = compose(page, () => nav.origin(), { heads: true });
       ink(page);
       return composition;
     },
   });
-  // One frame loop for everything that moves on this screen.
-  const pulse = createPulse({ signal: controller.signal, isIdle: ctx.isIdle, onIdleChange: ctx.onIdleChange });
-  // Every other thread, one system: the ground under the hions and the
-  // threads from the pointer; a single thing is seen close up.
+  // Every thread as one system (skein.ts): the hions' heads, the ground
+  // under them, threads from the pointer, loops round what you hover. A
+  // single thing is seen close up.
   const skein = createSkein({
     page,
     loom,
@@ -185,6 +190,7 @@ function show(route: Route, first: boolean) {
     seed: seedOf(route.path),
     isIdle: ctx.isIdle,
   });
+
   // What moves over the drawing, for a visitor who can see it move.
   const life = still()
     ? undefined
@@ -193,10 +199,12 @@ function show(route: Route, first: boolean) {
         page,
         loom,
         skein,
+        pulse,
         signal: controller.signal,
         isIdle: ctx.isIdle,
         onIdleChange: ctx.onIdleChange,
       });
+  drew = () => (life ? life.wake() : skein.wake());
   live = { path: route.path, page, loom, skein, life, track, controller };
   // For a look from the console while developing.
   if (import.meta.env.DEV) Object.assign(window, { __hion: live });
