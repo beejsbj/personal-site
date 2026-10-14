@@ -70,8 +70,9 @@ function letters(el: HTMLElement, pitch: number) {
   ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
   if ("letterSpacing" in ctx) (ctx as { letterSpacing: string }).letterSpacing = style.letterSpacing;
   ctx.fillStyle = ctx.strokeStyle = "#000";
-  // Thicken the hairlines, so they still cross a crossing or two.
-  ctx.lineWidth = pitch * 0.7;
+  // Thicken the hairlines a little, so they still cross a crossing, but
+  // not so much that the small gaps close (see PITCH).
+  ctx.lineWidth = pitch * 0.4;
   ctx.lineJoin = "round";
   const range = document.createRange();
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -145,11 +146,18 @@ function lineRuns(range: Range, node: Node, from: number, to: number): [number, 
  * word keeps its chalk. */
 const SMALLEST = 52;
 
+/** Font size per crossing. Fine enough, with the thickening above, that the
+ * smallest gaps in a woven letter (the break in an "!", the tail of a "J",
+ * the space before a "." or ",") stay more than a crossing wide, so they
+ * read at every woven size; thin capitals have little else to tell them
+ * apart. */
+const PITCH = 22;
+
 function weaveWord(el: HTMLElement, options: WovenOptions) {
   const { signal } = options;
   const size = parseFloat(getComputedStyle(el).fontSize) || 48;
   if (size < SMALLEST) return;
-  const pitch = Math.max(3, Math.min(6, Math.round(size / 18)));
+  const pitch = Math.max(3, Math.min(6, Math.round(size / PITCH)));
   const dpr = Math.min(devicePixelRatio || 1, 2);
   const canvas = document.createElement("canvas");
   canvas.className = "hion-woven";
