@@ -87,7 +87,7 @@ test("dedicated style guide imports production assemblies and keeps design-syste
     "CurrentNote",
     "UpdateEntry",
     "ActivityStream",
-    "SiteNav",
+    "BallNav",
     "MediaRail",
   ]) {
     assert.match(guide, new RegExp(`import ${component} from`));
@@ -101,7 +101,7 @@ test("dedicated style guide imports production assemblies and keeps design-syste
   assert.match(
     built,
     /aria-label="Navigation specimen"/,
-    "Guide must demonstrate the real text navigation",
+    "Guide must demonstrate the real ball navigation",
   );
   assert.doesNotMatch(
     built,
@@ -112,33 +112,237 @@ test("dedicated style guide imports production assemblies and keeps design-syste
   assert.match(built, /Burooj here!/);
   assert.doesNotMatch(read("dist/client/sitemap-0.xml"), /\/design-system\//);
   assert.doesNotMatch(built, /Pause motion/);
-  assert.doesNotMatch(built, /data-blob-nav|blob-nav__cluster/);
+  assert.match(
+    built,
+    /<nav\b[^>]*aria-label="Ball navigation specimen"[^>]*data-ball-nav/,
+    "Guide must demonstrate the real ball links",
+  );
   assert.match(
     read("dist/client/design-system/index.html"),
     /http-equiv="refresh"/,
   );
 });
 
-test("text navigation retains native links and correct section markers", () => {
-  for (const [path, current] of [
-    ["index.html", "/"],
-    ["about/index.html", "/about"],
-    ["projects/index.html", "/projects"],
-    ["projects/conduit-market/index.html", "/projects"],
-    ["lab/index.html", "/lab"],
+test("one ball navigation on every page, with native links and correct section markers", () => {
+  // Burooj, round 4: no point in two navs. The balls are the site nav
+  // everywhere; the old six-link text menu must not come back beside them.
+  for (const [path, current, form] of [
+    ["index.html", "/", "cluster"],
+    ["about/index.html", "/about", "row"],
+    ["projects/index.html", "/projects", "row"],
+    ["projects/conduit-market/index.html", "/projects", "row"],
+    ["lab/index.html", "/lab", "row"],
+    ["resume/index.html", null, "row"],
   ]) {
     const html = read(`dist/client/${path}`);
-    const nav = html.match(
-      /<nav\b[^>]*aria-label="Main navigation"[^>]*>([\s\S]*?)<\/nav>/,
-    )?.[1];
-    assert.ok(nav, `${path}: missing semantic navigation`);
-    const anchors = [...nav.matchAll(/<a\b[^>]*>/g)].map(([tag]) => tag);
-    assert.equal(anchors.length, 6);
+    const navs = [...html.matchAll(/<nav\b([^>]*)>([\s\S]*?)<\/nav>/g)];
+    assert.equal(navs.length, 1, `${path}: exactly one nav`);
+    const [, attrs, body] = navs[0];
+    assert.match(attrs, /aria-label="Main navigation"/, `${path}: named`);
+    assert.match(attrs, /data-ball-nav/, `${path}: the nav is the balls`);
+    assert.match(attrs, new RegExp(`data-form="${form}"`), `${path}: form`);
+    assert.match(
+      html.slice(0, navs[0].index),
+      /<header\b[^>]*site-header/,
+      `${path}: the nav lives in the shared header`,
+    );
+    const anchors = [...body.matchAll(/<a\b[^>]*>/g)].map(([tag]) => tag);
+    assert.equal(anchors.length, 6, `${path}: all six destinations`);
+    for (const tag of anchors) {
+      assert.match(tag, /\bds-link--ball\b/, `${path}: shared ball link`);
+      assert.match(tag, /draggable="false"/, `${path}: a press never drags`);
+    }
+    for (const href of [
+      'href="/"',
+      'href="/projects"',
+      'href="/lab"',
+      'href="/about"',
+      'href="/writing"',
+      'href="mailto:',
+    ])
+      assert.ok(
+        anchors.some((tag) => tag.includes(href)),
+        `${path}: ${href}`,
+      );
     const marked = anchors.filter((tag) => tag.includes('aria-current="page"'));
-    assert.equal(marked.length, 1);
-    assert.ok(marked[0].includes(`href="${current}"`));
-    assert.doesNotMatch(html, /data-blob-nav|blob-nav__cluster/);
+    if (current === null) {
+      assert.equal(marked.length, 0, `${path}: no false marker`);
+    } else {
+      assert.equal(marked.length, 1, `${path}: one current ball`);
+      assert.ok(marked[0].includes(`href="${current}"`));
+      assert.match(marked[0], /data-tone="wine"/, "current ball is burgundy");
+    }
     assert.match(html, /data-magnetic-edge/);
+  }
+});
+
+test("one link family: no drag physics, no rectangular actions, shared ball tokens", () => {
+  assert.equal(
+    existsSync("src/design/unique/ball-nav.ts"),
+    false,
+    "Ball drag/throw physics were removed on purpose",
+  );
+  assert.equal(existsSync("src/components/SiteNav.astro"), false);
+  // The flavour came back on the paint only (round 5): the runtime has no
+  // drag, the face and label never take the pointer, and the sunrise
+  // animates them rather than the link.
+  assert.doesNotMatch(
+    read("src/design/unique/ball-life.ts"),
+    /setPointerCapture|dragstart|preventDefault/,
+  );
+  const link = read("src/design/primitives/Link.astro");
+  for (const layer of [
+    /\.ds-link--ball > \.ds-link__body \{[^}]*pointer-events: none/,
+    /\.ball-face \{[^}]*pointer-events: none/,
+  ])
+    assert.match(link, layer, "painted layers ignore the pointer");
+  const ballNav = read("src/design/unique/BallNav.astro");
+  for (const [, selector, body] of ballNav.matchAll(
+    /([^{}]+)\{([^{}]*animation:[^{}]*)\}/g,
+  ))
+    assert.match(
+      selector,
+      /ds-link--ball( \.ball-face| > \.ds-link__body)/,
+      `only painted layers animate: ${selector.trim()}`,
+    );
+  for (const token of [
+    "--ball-fill",
+    "--ball-fill-hover",
+    "--ball-fill-current",
+    "--ball-ink",
+  ]) {
+    assert.match(link, new RegExp(`var\\(${token}\\)`), `Link uses ${token}`);
+  }
+  assert.doesNotMatch(link, /ds-link--action|ds-link--nav/);
+  for (const path of sources.filter((path) => path.endsWith(".astro"))) {
+    assert.doesNotMatch(
+      read(path),
+      /treatment="(?:action|nav)"/,
+      `${path}: retired link treatment`,
+    );
+  }
+  // Standalone actions are pills from the same family.
+  const home = read("dist/client/index.html");
+  for (const label of [
+    "GitHub",
+    "LinkedIn",
+    "Email",
+    "Resume",
+    "That's me",
+    "All projects",
+  ]) {
+    const escaped = label.replace("'", "(?:'|&#39;)");
+    assert.match(
+      home,
+      new RegExp(
+        `<a\\b[^>]*ds-link--pill[^>]*>(?:(?!</a>)[\\s\\S])*${escaped}`,
+      ),
+      `${label} is a pill`,
+    );
+  }
+});
+
+test("ball labels never wrap, and external balls wear a named satellite on the rim", () => {
+  // Round 6: "Say / hello ↗" on three lines looked unpolished. Each ball is
+  // sized to its one-line label; external links get a rim badge and say
+  // where they go in words.
+  const link = read("src/design/primitives/Link.astro");
+  assert.match(link, /\.ds-link--ball \{[^}]*white-space: nowrap/);
+  assert.doesNotMatch(link, /text-wrap: balance/);
+  for (const path of ["index.html", "about/index.html"]) {
+    const html = read(`dist/client/${path}`);
+    const nav = html.match(
+      /<nav\b[^>]*data-ball-nav[^>]*>([\s\S]*?)<\/nav>/,
+    )[1];
+    const anchors = [...nav.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)];
+    for (const [, attrs, body] of anchors) {
+      const external = /href="(?:https?:|mailto:)/.test(attrs);
+      assert.equal(
+        /class="link-sat\b/.test(body),
+        external,
+        `${path}: satellite iff external`,
+      );
+      const note = body.match(/ds-link__note[^>]*>([^<]*)</)?.[1];
+      if (external)
+        assert.match(
+          note ?? "",
+          /^\((external site|email)\)$/,
+          `${path}: named`,
+        );
+      else assert.equal(note, undefined);
+      assert.match(body, /class="ball-face[^"]*"[^>]*aria-hidden="true"/);
+    }
+  }
+});
+
+test("arrow iff outbound: the satellite marks leaving the site, never an in-site link", () => {
+  // Round 7 gave balls, pills and text links one arrow (the satellite).
+  // Round 8: the horizontal in-site arrows were noise; an in-site link's
+  // affordance is its peach (stretch, pill, swell) and the cover. Only links
+  // that leave the site carry the arrow, turned to point out of the page.
+  const link = read("src/design/primitives/Link.astro");
+  assert.equal(
+    (link.match(/<path\b/g) || []).length,
+    1,
+    "one arrow glyph in the family",
+  );
+  assert.match(link, /\.link-sat \{[^}]*--sat-turn: -45deg/);
+  assert.doesNotMatch(link, /link-sat--out/, "no second, in-site arrow");
+  assert.match(
+    link,
+    /prefers-reduced-motion: no-preference\) \{[\s\S]*?\.link-sat \{\s*translate/,
+    "the kick only plays when motion is welcome",
+  );
+  assert.match(link, /forced-colors: active\) \{\s*\.link-sat \{\s*border/);
+  const paths = new Set();
+  let outboundSeen = 0;
+  for (const page of [
+    "index.html",
+    "about/index.html",
+    "projects/index.html",
+    "style-guide/index.html",
+  ]) {
+    const html = read(`dist/client/${page}`);
+    assert.doesNotMatch(
+      html,
+      /link-arrow|ball-badge/,
+      `${page}: retired arrows`,
+    );
+    for (const [, attrs, body] of html.matchAll(
+      /<a\b([^>]*ds-link--(?:pill|text|ball)[^>]*)>([\s\S]*?)<\/a>/g,
+    )) {
+      const sat = body.match(
+        /<span class="link-sat"[^>]*aria-hidden="true"[^>]*>[\s\S]*?<path d="([^"]+)"/,
+      );
+      const outbound = /href="(?:https?:|mailto:)/.test(attrs);
+      if (!outbound) {
+        assert.doesNotMatch(body, /link-sat/, `${page}: in-site link with an arrow`);
+        continue;
+      }
+      if (!sat) continue;
+      outboundSeen++;
+      paths.add(sat[1]);
+      assert.match(body, /ds-link__note[^>]*>\(/, `${page}: says where`);
+    }
+  }
+  assert.ok(outboundSeen > 0, "some outbound link carries the arrow");
+  assert.equal(paths.size, 1, "every satellite carries the same glyph");
+  // The style guide shows both sides of the rule, for pills and text links.
+  const guide = read("dist/client/style-guide/index.html");
+  for (const kind of ["pill", "text"]) {
+    const links = [
+      ...guide.matchAll(
+        new RegExp(`<a\\b([^>]*ds-link--${kind}\\b[^>]*)>([\\s\\S]*?)</a>`, "g"),
+      ),
+    ];
+    assert.ok(
+      links.some(([, a, b]) => /href="\//.test(a) && !/link-sat/.test(b)),
+      `style guide: an in-site ${kind} without an arrow`,
+    );
+    assert.ok(
+      links.some(([, a, b]) => /href="https?:/.test(a) && /link-sat/.test(b)),
+      `style guide: an outbound ${kind} with the arrow`,
+    );
   }
 });
 

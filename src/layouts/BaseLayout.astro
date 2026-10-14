@@ -4,6 +4,8 @@ import { ClientRouter } from "astro:transitions";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import EdgeBlob from "../design/unique/EdgeBlob.astro";
+import PageTransition from "../design/unique/PageTransition.astro";
+import PeekingInitials from "../design/unique/PeekingInitials.astro";
 import LensBoot from "../prism/LensBoot.astro";
 import LensDecor from "../prism/LensDecor.astro";
 import Prism from "../prism/Prism.astro";
@@ -80,6 +82,8 @@ const socialImage = new URL(image, siteBaseUrl).toString();
       </main>
       <SiteFooter site={site} />
     </div>
+    {clientRouting && <PageTransition />}
+    {!tool && <PeekingInitials />}
     {!tool && <Prism />}
   </body>
 </html>

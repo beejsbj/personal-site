@@ -1,5 +1,6 @@
 /** Optional pointer attraction for the cropped corner artwork only.
  * Stable hit geometry, interruptible spring, no dependencies or idle loop.
+ * While it moves, the surface squashes and stretches along its travel.
  */
 export function installEdgeMagnet() {
   const motion = window.matchMedia(
@@ -35,6 +36,7 @@ export function installEdgeMagnet() {
         lastTime = 0;
         x = y = vx = vy = targetX = targetY = 0;
         surface.style.removeProperty("transform");
+        delete root.dataset.aim;
       };
       resetters.push(reset);
       const refresh = () => {
@@ -52,7 +54,14 @@ export function installEdgeMagnet() {
         vy += ((targetY - y) * 210 - vy * 22) * dt;
         x += vx * dt;
         y += vy * dt;
-        surface.style.transform = `translate3d(${x.toFixed(3)}px, ${y.toFixed(3)}px, 0)`;
+        // Jelly: the big ball stretches along its travel, as the small ones do.
+        const speed = Math.hypot(vx, vy);
+        const s = Math.min(0.06, speed * 0.0004);
+        const ux = speed ? vx / speed : 0;
+        const uy = speed ? vy / speed : 0;
+        const sx = 1 + s * (ux * ux - uy * uy * 0.5);
+        const sy = 1 + s * (uy * uy - ux * ux * 0.5);
+        surface.style.transform = `translate3d(${x.toFixed(3)}px, ${y.toFixed(3)}px, 0) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
         if (
           Math.abs(targetX - x) +
             Math.abs(targetY - y) +
@@ -91,6 +100,10 @@ export function installEdgeMagnet() {
             (event.clientX - rect.left - rect.width / 2) / (rect.width / 2);
           const ny =
             (event.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+          // Over the visible circle, on bare page: it can be clicked.
+          const aim = nx * nx + ny * ny <= 1 && !interactive(event.target);
+          if (aim) root.dataset.aim = "";
+          else delete root.dataset.aim;
           if (nx * nx + ny * ny > 1.2) {
             leave();
             return;
@@ -103,6 +116,38 @@ export function installEdgeMagnet() {
         { signal, passive: true },
       );
       document.addEventListener("pointerleave", leave, { signal });
+      // Clear the pointer cursor when the page scrolls (e.g., via blob click),
+      // since there's no pointer movement to trigger a cursor update.
+      const clearAim = () => {
+        delete root.dataset.aim;
+      };
+      document.addEventListener("scroll", clearAim, { signal, passive: true });
+      // v1/v2's Easter egg: clicking the big circle rolls you to the bottom
+      // of the page, or back to the top once you are past halfway. The
+      // artwork sits under the page, so the click is read from the document:
+      // only a click on bare page inside the visible circle counts.
+      document.addEventListener(
+        "click",
+        (event) => {
+          if (!motion.matches || event.defaultPrevented || event.button) return;
+          if (interactive(event.target)) return;
+          if (window.getSelection?.()?.toString()) return;
+          const rect = hit.getBoundingClientRect();
+          if (!rect.width || !rect.height) return;
+          const nx =
+            (event.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+          const ny =
+            (event.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+          if (nx * nx + ny * ny > 1) return;
+          const end =
+            document.documentElement.scrollHeight - window.innerHeight;
+          window.scrollTo({
+            top: window.scrollY > end / 2 ? 0 : end,
+            behavior: "smooth",
+          });
+        },
+        { signal },
+      );
       refresh();
     }
 
@@ -118,4 +163,12 @@ export function installEdgeMagnet() {
   mount();
   document.addEventListener("astro:before-swap", () => cleanup?.());
   document.addEventListener("astro:page-load", mount);
+}
+
+/** Content under the pointer that should keep its own click. */
+function interactive(target: EventTarget | null) {
+  const element = target as Element | null;
+  return Boolean(
+    element?.closest?.("a, button, input, select, textarea, label, summary"),
+  );
 }

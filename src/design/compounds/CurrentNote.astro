@@ -20,7 +20,7 @@ const mark = id === "home-currently" ? part("home.currently") : {};
       <Heading id={id}>{note.title}</Heading>
       <p><Inline text={note.body} /></p>
       <div class="more">
-        <Link href={note.link.href} arrow>
+        <Link href={note.link.href} treatment="pill" arrow>
           {note.link.label}
         </Link>
       </div>
