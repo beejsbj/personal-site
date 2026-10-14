@@ -15,6 +15,13 @@
  *            a heading's words, a loose band round a picture, stitches
  *            across a hion), and then either lets go into fate and runs on
  *            to join the ground's flow, or ends there.
+ *   loop     born where you hover something hung, strung or linked: it
+ *            weaves through its words (a title, a link) or ties a loop
+ *            round it (a picture, a card), quick, holds while you stay, and
+ *            unties from its end back when you leave. Threads from the
+ *            pointer still on their way somewhere near turn to it too.
+ *            Left alone a while, the hions now and then tie a small one of
+ *            their own (life.ts).
  *
  * Every strand is in one index (fate's): the hions are fixed company, so
  * ground threads fall in alongside them; ground threads fall in alongside
@@ -52,11 +59,11 @@ import { Fate, goalsFor, Ground, plan, type Gather, type Seed, STEP, type Thread
 import type { createLoom } from "./loom";
 import type { Pulse } from "./pulse";
 import { type Hue, patterns, type Patterns, type Pt, RGB, rng } from "./pastel";
-import { type Box, ring, stitches, weave, wordBoxes } from "./wind";
+import { type Box, encircle as encircle_, ring, stitches, weave, wordBoxes } from "./wind";
 
 type Loom = ReturnType<typeof createLoom>;
 
-export type Kind = "ground" | "pointer";
+export type Kind = "ground" | "pointer" | "loop";
 
 interface Nature {
   /** Line width (css px). */
@@ -83,6 +90,7 @@ const GROUND = 0.6;
 const NATURE: Record<Kind, Nature> = {
   ground: { w: 1.25, speed: 120, tail: 110, slack: 1.07, bead: 8, bright: 1, body: GROUND, hold: 40000 },
   pointer: { w: 1.5, speed: 340, tail: 80, slack: 1.12, bead: 6, bright: 0.9, body: 0.55, hold: 11000 },
+  loop: { w: 2.1, speed: 1100, tail: 70, slack: 1.05, bead: 6, bright: 1, body: 1, hold: Infinity },
 };
 
 interface SkeinOptions {
@@ -135,7 +143,8 @@ interface Aim {
 type Drive =
   | { by: "fate" }
   | { by: "seek"; aim: Aim | null; on: { hue: Hue; s: number } | null; crept: number; letGo: boolean }
-  | { by: "wind"; way: Pt[]; at: number; letGo: boolean };
+  | { by: "wind"; way: Pt[]; at: number; letGo: boolean }
+  | { by: "loop"; el: Element | null; state: "tying" | "held" | "untying"; until: number };
 
 interface Strand {
   kind: Kind;
@@ -205,6 +214,8 @@ const AIMS = "main h1, main h2, main h3, [data-weft], main img, .hion-woven-cove
 const INTENTS = 3;
 const SEEK = 360;
 const REACH = 520;
+/** What a loop is tied round when you hover it. */
+const HOVER = "[data-ink]:not(.hion-pull), .hion-strung, .hion-tie, .hion-prose a, .hion-foot__mail a";
 
 const hash = (text: string) => {
   let h = 2166136261;
@@ -445,6 +456,8 @@ export function createSkein(options: SkeinOptions) {
       fate.step(t);
       return;
     }
+    // A loop is laid whole when it is tied.
+    if (d.by === "loop") return;
     const n = t.xs.length - 1;
     const x = t.xs[n];
     const y = t.ys[n];
@@ -1071,6 +1084,7 @@ export function createSkein(options: SkeinOptions) {
    * whether it is still visibly moving. */
   function move(st: Strand, now: number, dt: number, here: boolean) {
     const before = st.s;
+    if (st.drive.by === "loop") return tie(st, st.drive, now, Math.min(dt, 64), before);
     const near = seen(headY(st), 0.2);
     st.resting = st.kind === "ground" && !here;
     if (!st.resting) {
@@ -1095,6 +1109,28 @@ export function createSkein(options: SkeinOptions) {
     }
     swing(st, Math.min(dt, 40), now);
     const moving = st.s !== before || (st.rope?.energy ?? 0) > 0.04 || (ended && st.heat > 0) || st.motion > 0.01;
+    if (moving) st.dirty = true;
+    return moving;
+  }
+
+  /** A loop: tied quickly round, held, untied from its end back. */
+  function tie(st: Strand, d: Extract<Drive, { by: "loop" }>, now: number, dt: number, before: number) {
+    const total = measureBody(st);
+    if (d.state === "tying") {
+      st.s = Math.min(total, st.s + (st.n.speed * dt) / 1000);
+      if (st.s >= total) d.state = "held";
+    } else if (d.state === "held") {
+      if (now >= d.until) d.state = "untying";
+    } else st.s = Math.max(0, st.s - (st.n.speed * 1.5 * dt) / 1000);
+    const going = d.state !== "held";
+    st.motion += ((going ? 1 : 0) - st.motion) * Math.min(1, dt / 220);
+    st.heat = going ? Math.min(1, st.heat + dt / 200) : Math.max(0, st.heat - dt / 500);
+    if (!seen(headY(st), 0.2)) {
+      st.rope = null;
+      return going;
+    }
+    swing(st, Math.min(dt, 40), now);
+    const moving = st.s !== before || (st.rope?.energy ?? 0) > 0.04 || (st.heat > 0 && !going) || st.motion > 0.01 || (going && st.heat < 1);
     if (moving) st.dirty = true;
     return moving;
   }
@@ -1126,9 +1162,18 @@ export function createSkein(options: SkeinOptions) {
     }
     let moving = false;
     let offscreen = false;
+    let untied = false;
     for (const st of strands) {
       if (st.cold) continue;
       if (move(st, now, dt, here)) moving = true;
+      if (st.drive.by === "loop") {
+        if (st.drive.state === "untying" && st.s <= 0) {
+          if (st.box) cleared.push(st.box);
+          st.box = null;
+          st.t.gone = untied = true;
+        } else if (st.drive.state === "held" && st.drive.until < Infinity) offscreen = true;
+        continue;
+      }
       // Lay what has cooled behind the head, a batch at a time.
       const settled = st.s - Math.min(st.n.tail, st.s);
       const to = indexAt(st, settled);
@@ -1136,6 +1181,7 @@ export function createSkein(options: SkeinOptions) {
       if (st.t.done && st.heat <= 0 && (!st.rope || st.rope.energy < 0.04)) finish(st, now);
       else if (!st.cold && !st.resting && !seen(headY(st), 0.2)) offscreen = true;
     }
+    if (untied) strands = strands.filter((st) => !st.t.gone);
     for (const [t, i] of fate.breaks) breakAt(t, i);
     fate.breaks.length = 0;
     fade(now);
@@ -1217,6 +1263,96 @@ export function createSkein(options: SkeinOptions) {
       if (h) return hionAt(h, d.on.s).slice(0, 2) as Pt;
     }
     return null;
+  }
+
+  /** A loop for something you hover: through its words if it has any to
+   * speak of, otherwise round it. Threads from the pointer on their way
+   * somewhere near turn to it too. */
+  function encircle(el: Element, from: Pt) {
+    untie(null);
+    const p = page.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const box: Box = { l: r.left - p.left, t: r.top - p.top, r: r.right - p.left, b: r.bottom - p.top };
+    const seed = Math.floor(performance.now() * 3 + box.l * 7 + box.t);
+    const rand = rng(seed);
+    const pictured = el.querySelector("img, video, canvas.hion-woven-cover, .hion-woven-cover");
+    const text = (el.textContent ?? "").trim();
+    let way: Pt[] = [];
+    if (!pictured && text.length > 0 && text.length < 90) way = weave(wordBoxes(el, p), from, rand);
+    if (way.length < 2) way = encircle_(box, from, padFor(el), seed);
+    if (way.length < 2) return;
+    loop(el, "c", way, Infinity);
+    // Those still on their way somewhere near come to it instead.
+    const aim: Aim = { box, el, words: !pictured && text.length < 90 };
+    for (const st of strands) {
+      const d = st.drive;
+      if (d.by !== "seek" || d.on) continue;
+      const [hx, hy] = at(st, st.s);
+      if (gapTo(box, hx, hy) < 320) d.aim = aim;
+    }
+  }
+
+  function padFor(el: Element) {
+    if (el.matches(".hion-prose a, .hion-foot__mail a")) return 7;
+    if (el.matches(".hion-strung, .hion-tie")) return 12;
+    if (el.matches(".hion-picture, .hion-work")) return 20;
+    return 14;
+  }
+
+  function loop(el: Element | null, hue: Hue, way: Pt[], until: number) {
+    const st: Strand = {
+      kind: "loop",
+      n: nature("loop"),
+      t: fate.bare(hue, way),
+      ls: [0],
+      s: 0,
+      drive: { by: "loop", el, state: "tying", until },
+      rand: rng(way.length * 31 + 7),
+      rope: null,
+      laid: 0,
+      fadeAt: Infinity,
+      alpha: 1,
+      top: way[0][1],
+      bottom: way[0][1],
+      motion: 1,
+      heat: 1,
+      resting: false,
+      box: null,
+      dirty: true,
+      cold: false,
+    };
+    measureBody(st);
+    strands.push(st);
+    task.wake();
+    return st;
+  }
+
+  /** Untie the loop round el (null: whatever is hovered). */
+  function untie(el: Element | null) {
+    for (const st of strands) {
+      const d = st.drive;
+      if (d.by === "loop" && d.until === Infinity && (el === null || d.el === el) && d.state !== "untying") d.state = "untying";
+    }
+    task.wake();
+  }
+
+  let hovered: Element | null = null;
+  function onOver(event: PointerEvent) {
+    if (!fine || !built || busy) return;
+    const target = (event.target as Element).closest(HOVER);
+    if (!target || !page.contains(target) || target === hovered) return;
+    if (target.hasAttribute("data-reveal") && !target.hasAttribute("data-lit")) return;
+    hovered = target;
+    encircle(target, [event.clientX, event.clientY + scrollY - pageTop]);
+  }
+
+  function onOut(event: PointerEvent) {
+    if (!hovered) return;
+    const to = event.relatedTarget as Node | null;
+    if (to && hovered.contains(to)) return;
+    if ((event.target as Element).closest(HOVER) !== hovered) return;
+    hovered = null;
+    untie(null);
   }
 
   function onMove(event: PointerEvent) {
@@ -1385,7 +1521,17 @@ export function createSkein(options: SkeinOptions) {
         page.addEventListener("pointerdown", onDown, { passive: true, signal });
         addEventListener("pointermove", onMove, { passive: true, signal });
         addEventListener("keydown", () => ((lastInput = performance.now()), task.wake()), { passive: true, signal });
-        document.addEventListener("pointerleave", () => (pointer.here = false), { signal });
+        document.addEventListener(
+          "pointerleave",
+          () => {
+            pointer.here = false;
+            hovered = null;
+            untie(null);
+          },
+          { signal },
+        );
+        page.addEventListener("pointerover", onOver, { signal });
+        page.addEventListener("pointerout", onOut, { signal });
       }
       signal.addEventListener("abort", () => {
         observer.disconnect();
@@ -1413,6 +1559,14 @@ export function createSkein(options: SkeinOptions) {
           ]
         : [{ opacity: 1 }, { opacity: 0 }];
       for (const l of [layer, liveLayer]) l.animate(keyframes, { duration: 420, easing: "cubic-bezier(0.5, 0, 0.75, 0)", fill: "forwards" });
+    },
+    /** A small loop of a hion's own, tied round a point and let go after
+     * a while (life.ts: left alone, they amuse themselves). */
+    knot(hue: Hue, x: number, y: number, r: number, hold: number) {
+      if (!built || busy) return false;
+      const way = encircle_({ l: x - r, t: y - r, r: x + r, b: y + r }, [x, y - r], 4, Math.floor(x + y));
+      loop(null, hue, way, performance.now() + hold);
+      return true;
     },
     /** For a check: the threads themselves. */
     fate: () => fate,

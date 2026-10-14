@@ -128,9 +128,14 @@ export function weave(lines: Box[][], from: Pt, rand: () => number, words = Infi
       } else pts.push([mid, y + (rand() - 0.5) * 2]);
       const next = line[wi + 1];
       if (next && left > 1) {
-        // Through the gap, at the waist.
+        // Down (or up) through the gap between the words, upright, so it
+        // passes between letters rather than across them.
         const gx = rightward ? (w.r + next.l) / 2 : (w.l + next.r) / 2;
-        pts.push([gx, (w.t + w.b) / 2 + (rand() - 0.5) * h * 0.12]);
+        const top = Math.min(w.t, next.t) + h * 0.22;
+        const bottom = Math.max(w.b, next.b) - h * 0.22;
+        const jitter = (rand() - 0.5) * 1.5;
+        if (over) pts.push([gx + jitter, top], [gx - jitter, bottom]);
+        else pts.push([gx + jitter, bottom], [gx - jitter, top]);
       }
       over = !over;
     }

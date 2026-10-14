@@ -1,6 +1,7 @@
 /** Life: how the two hions answer the visitor.
  *
- * (Threads from the pointer are strands like any other: skein.ts.)
+ * (Threads from the pointer, and the loops tied round what you hover, are
+ * strands like any other: skein.ts.)
  *
  * The loom lays the drawing down once and leaves it. This layer is what
  * moves on top of it: one viewport-sized canvas (cleared and redrawn only
@@ -8,9 +9,6 @@
  * loop that sleeps the moment nothing moves and never runs while the page
  * is idle.
  *
- *   loops     hover something hung, strung or linked and cyan runs over and
- *             ties a loop round it; leave and it unties, from the end back.
- *             Magenta drifts under it to look.
  *   runners   touch a thread and a bead of light runs away along it both
  *             ways; a glint rides slowly round each circle the hions drew.
  *   plucks    a click or tap plucks the nearest thread like a string, and
@@ -21,9 +19,11 @@
  *             property on the world; brushing the cord a row hangs from
  *             sends a ripple down it; the destinations chime on hover.
  *   eggs      left alone, the threads now and then tie a small knot of
- *             their own, or chase each other down the page. */
-import { type Hue, Kind, type Mark, paint, patterns, type Patterns, Path, type Pt, RGB, rng, thread } from "./pastel";
+ *             their own (a loop on the skein), or chase each other down
+ *             the page. */
+import { type Hue, patterns, type Patterns, Path, type Pt, RGB, rng } from "./pastel";
 import type { createLoom } from "./loom";
+import type { createSkein } from "./skein";
 
 type Loom = ReturnType<typeof createLoom>;
 
@@ -33,6 +33,8 @@ interface LifeOptions {
   /** The screen: the loom's host, whose space the drawing is in. */
   page: HTMLElement;
   loom: Loom;
+  /** Every other thread: a knot of their own is a loop on it. */
+  skein: ReturnType<typeof createSkein>;
   signal: AbortSignal;
   isIdle(): boolean;
   onIdleChange(listener: (idle: boolean) => void): void;
@@ -142,17 +144,6 @@ class Strand {
 
 /* ---------- Things alive on the page ---------- */
 
-interface Loop {
-  el: Element | null;
-  path: Path;
-  marks: Mark[];
-  total: number;
-  progress: number;
-  state: "tying" | "held" | "untying";
-  holdUntil: number;
-  head: Pt;
-}
-
 interface Mote {
   x: number;
   y: number;
@@ -201,10 +192,8 @@ interface Row {
   last: number;
 }
 
-const HOVER = "[data-ink]:not(.hion-pull), .hion-strung, .hion-tie, .hion-prose a, .hion-foot__mail a";
-
 export function createLife(options: LifeOptions) {
-  const { world, page, loom, signal } = options;
+  const { world, page, loom, skein, signal } = options;
   const fine = matchMedia("(pointer: fine)").matches;
   const layer = document.createElement("div");
   layer.className = "hion-life";
@@ -222,12 +211,9 @@ export function createLife(options: LifeOptions) {
   let version = -1;
   let glints: OrbitGlint[] = [];
   let rows: Row[] = [];
-  let loops: Loop[] = [];
   let motes: Mote[] = [];
   let plucks: Pluck[] = [];
   let runners: Runner[] = [];
-  let hovered: Element | null = null;
-  let hoverBox: { l: number; t: number; r: number; b: number } | null = null;
   const touched: Record<Hue, number> = { c: 0, m: 0 };
 
   // The pointer, in page space.
@@ -325,7 +311,6 @@ export function createLife(options: LifeOptions) {
         shown: false,
       };
     });
-    loops = [];
     rows = [];
     for (const holder of page.querySelectorAll<HTMLElement>("[data-cord]")) {
       const items = [...holder.querySelectorAll<HTMLElement>("[data-hang]")].filter(
@@ -367,80 +352,6 @@ export function createLife(options: LifeOptions) {
         size: 1 + rand() * 1.3,
       });
     }
-  }
-
-  /* ---------- Loops: cyan ties a loop round something ---------- */
-
-  function loopPath(box: { l: number; t: number; r: number; b: number }, from: Pt, pad: number, seed: number): Pt[] {
-    const cx = (box.l + box.r) / 2;
-    const cy = (box.t + box.b) / 2;
-    const rx = (box.r - box.l) / 2 + pad;
-    const ry = (box.b - box.t) / 2 + pad;
-    // Long low things get a rounded-oblong loop rather than a vast ellipse.
-    const n = rx / ry > 2.2 || ry / rx > 2.2 ? 3.2 : 2;
-    const r = rng(seed);
-    const start = Math.atan2((from[1] - cy) / ry, (from[0] - cx) / rx);
-    const turns = 1.05 + r() * 0.08;
-    const out: Pt[] = [];
-    const steps = Math.max(40, Math.round((rx + ry) / 4));
-    for (let k = 0; k <= steps; k++) {
-      const u = k / steps;
-      const a = start + u * turns * Math.PI * 2;
-      const c = Math.cos(a);
-      const s = Math.sin(a);
-      const wob = 1 + Math.sin(u * Math.PI * 4 + seed) * 0.03 + (u - 0.5) * 0.05;
-      out.push([
-        cx + Math.sign(c) * Math.pow(Math.abs(c), 2 / n) * rx * wob,
-        cy + Math.sign(s) * Math.pow(Math.abs(s), 2 / n) * ry * wob,
-      ]);
-    }
-    return out;
-  }
-
-  function tie(el: Element | null, box: { l: number; t: number; r: number; b: number }, from: Pt, pad: number) {
-    const pts = loopPath(box, from, pad, Math.floor(rand() * 1000));
-    const path = new Path(pts, 3);
-    const total = path.length;
-    const marks = thread(path, {
-      hue: "c",
-      w: 2.3,
-      seed: 300 + Math.floor(rand() * 500),
-      glow: 0,
-      wobble: 0.5,
-      key: [0, total],
-    });
-    const loop: Loop = { el, path, marks, total, progress: 0, state: "tying", holdUntil: Infinity, head: pts[0] };
-    loops.push(loop);
-    return loop;
-  }
-
-  function untie(el: Element | null) {
-    for (const loop of loops) if (loop.el === el && loop.state !== "untying") loop.state = "untying";
-  }
-
-  function hoverPad(el: Element) {
-    if (el.matches(".hion-prose a, .hion-foot__mail a")) return 7;
-    if (el.matches(".hion-strung, .hion-tie")) return 12;
-    if (el.matches(".hion-picture, .hion-work")) return 20;
-    return 14;
-  }
-
-  function enter(el: Element) {
-    if (hovered === el) return;
-    if (hovered) untie(hovered);
-    hovered = el;
-    const r = el.getBoundingClientRect();
-    hoverBox = { l: r.left - pageLeft, t: r.top - pageTop, r: r.right - pageLeft, b: r.bottom - pageTop };
-    tie(el, hoverBox, [pointer.x, pointer.y], hoverPad(el));
-    wake();
-  }
-
-  function leave() {
-    if (!hovered) return;
-    untie(hovered);
-    hovered = null;
-    hoverBox = null;
-    wake();
   }
 
   /* ---------- Rows: brushing a cord ---------- */
@@ -545,10 +456,7 @@ export function createLife(options: LifeOptions) {
         if (!strand || !span) return;
         const s = span[0] + (0.2 + rand() * 0.6) * (span[1] - span[0]);
         const [x, y] = strand.at(s);
-        const loop = tie(null, { l: x - 9, t: y - 9, r: x + 9, b: y + 9 }, [x, y], 6 + i * 3);
-        loop.holdUntil = now + 1500 + i * 500;
-        for (const mark of loop.marks) mark.hue = hue;
-        any = true;
+        if (skein.knot(hue, x, y, 9 + i * 3, 1500 + i * 500)) any = true;
       });
       if (!any) return false;
     }
@@ -563,7 +471,6 @@ export function createLife(options: LifeOptions) {
       motes.length > 0 ||
       plucks.length > 0 ||
       runners.length > 0 ||
-      loops.length > 0 ||
       Math.abs(sway) > 0.02 ||
       Math.abs(swayV) > 0.002 ||
       glints.some((g) => g.shown)
@@ -610,20 +517,6 @@ export function createLife(options: LifeOptions) {
       const [x, y] = g.path.at(g.s);
       g.el.style.transform = `translate(${(x + pageLeft).toFixed(1)}px, ${(y + pageTop).toFixed(1)}px)`;
     }
-
-    /* Loops tie and untie. */
-    for (const loop of loops) {
-      if (loop.state === "tying") {
-        loop.progress = Math.min(loop.total, loop.progress + 2.2 * dt);
-        if (loop.progress >= loop.total) loop.state = "held";
-      } else if (loop.state === "held") {
-        if (now >= loop.holdUntil) loop.state = "untying";
-      } else {
-        loop.progress -= 3.2 * dt;
-      }
-    }
-    loops = loops.filter((loop) => loop.progress > 0);
-    if (loops.length) draw = true;
 
     /* Motes fall. */
     if (motes.length) {
@@ -675,27 +568,6 @@ export function createLife(options: LifeOptions) {
   function paintAll() {
     if (!pats) return;
     const reach = loom.reach();
-
-    for (const loop of loops) {
-      const hue = loop.marks[0]?.hue ?? "c";
-      halo(loop.path, 0, Math.min(loop.progress, loop.total), hue, 0.8);
-      for (const m of loop.marks) {
-        if (m.key > loop.progress) break;
-        paint(ctx, m, pats);
-      }
-      // The hand, where the loop is being tied or untied.
-      if (loop.state !== "held") {
-        let head: Pt | null = null;
-        for (const m of loop.marks) {
-          if (m.key > loop.progress) break;
-          if (m.kind === Kind.Stroke) head = [m.pts[m.pts.length - 2], m.pts[m.pts.length - 1]];
-        }
-        if (head) {
-          loop.head = head;
-          spark(head[0], head[1], loop.marks[0]?.hue ?? "c", 0.8, 6);
-        }
-      }
-    }
 
     for (const p of plucks) {
       const strand = strands[p.hue];
@@ -769,29 +641,6 @@ export function createLife(options: LifeOptions) {
     ctx.globalAlpha = 1;
   }
 
-  /** The soft light a thread gives off: two wide faint passes under it. */
-  function halo(path: Path, from: number, to: number, hue: Hue, alpha: number) {
-    if (to - from < 4) return;
-    ctx.beginPath();
-    for (let s = from; s <= to; s += 6) {
-      const [x, y] = path.at(s);
-      if (s === from) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    const [ex, ey] = path.at(to);
-    ctx.lineTo(ex, ey);
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = `rgb(${RGB[hue].join(" ")})`;
-    ctx.globalAlpha = 0.11 * alpha;
-    ctx.lineWidth = 16;
-    ctx.stroke();
-    ctx.globalAlpha = 0.18 * alpha;
-    ctx.lineWidth = 7;
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-  }
-
   /** A point of light: the bright heart of a thread. */
   function spark(x: number, y: number, hue: Hue, alpha: number, r: number) {
     const halo = ctx.createRadialGradient(x, y, 0, x, y, r);
@@ -844,22 +693,6 @@ export function createLife(options: LifeOptions) {
     wake();
   }
 
-  function onOver(event: PointerEvent) {
-    if (!fine) return;
-    const target = (event.target as Element).closest(HOVER);
-    if (!target || !page.contains(target)) return;
-    if (target.hasAttribute("data-reveal") && !target.hasAttribute("data-lit")) return;
-    enter(target);
-  }
-
-  function onOut(event: PointerEvent) {
-    if (!hovered) return;
-    const to = event.relatedTarget as Node | null;
-    if (to && hovered.contains(to)) return;
-    if ((event.target as Element).closest(HOVER) !== hovered) return;
-    leave();
-  }
-
   function onDown(event: PointerEvent) {
     lastInput = performance.now();
     measure();
@@ -889,13 +722,11 @@ export function createLife(options: LifeOptions) {
     const dy = scrollY - lastScroll;
     lastScroll = scrollY;
     swayV += Math.max(-0.22, Math.min(0.22, dy * 0.0007));
-    if (hovered) leave();
     wake();
   }
 
   function onLeave() {
     pointer.here = false;
-    leave();
     wake();
   }
 
@@ -918,8 +749,6 @@ export function createLife(options: LifeOptions) {
       sync();
       addEventListener("pointermove", onMove, { passive: true, signal });
       addEventListener("pointerdown", onDown, { passive: true, signal });
-      world.addEventListener("pointerover", onOver, { signal });
-      world.addEventListener("pointerout", onOut, { signal });
       document.addEventListener("pointerleave", onLeave, { signal });
       addEventListener("scroll", onScroll, { passive: true, signal });
       addEventListener("resize", () => { size(); wake(); }, { signal });
@@ -945,7 +774,6 @@ export function createLife(options: LifeOptions) {
     /** The page is leaving: everything alive lets go. */
     release() {
       layer.dataset.state = "leaving";
-      leave();
     },
   };
 }

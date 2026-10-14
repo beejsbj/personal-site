@@ -254,6 +254,22 @@ export class Fate {
     return t;
   }
 
+  /** A thread that is no one's company: drawn whole and soon taken back
+   * (a loop tied round something while it is hovered). Not indexed. */
+  bare(hue: Hue, points: Pt[]): Thread {
+    const t = this.add({ x: points[0][0], y: points[0][1], a: 0, hue, len: 0, goals: [], seed: 7, key: 0 });
+    this.threads.pop();
+    this.byId.delete(t.id);
+    const k = this.key(t.xs[0], t.ys[0]);
+    this.grid.get(k)?.pop();
+    for (let i = 1; i < points.length; i++) {
+      t.xs.push(points[i][0]);
+      t.ys.push(points[i][1]);
+    }
+    t.done = true;
+    return t;
+  }
+
   /** Grow a thread by a point something else chose (its head is steered
    * from outside: the pointer's, winding round a heading). It still goes
    * over and under what it crosses, and is company. */

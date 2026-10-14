@@ -192,6 +192,7 @@ function show(route: Route, first: boolean) {
         world,
         page,
         loom,
+        skein,
         signal: controller.signal,
         isIdle: ctx.isIdle,
         onIdleChange: ctx.onIdleChange,
