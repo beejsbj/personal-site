@@ -178,6 +178,7 @@ interface Runner {
 interface OrbitGlint {
   key: number;
   el: HTMLElement;
+  ride: Animation;
   shown: boolean;
 }
 
@@ -271,18 +272,26 @@ export function createLife(options: LifeOptions) {
     for (const tip of loom.journeys()) strands[tip.hue] = new Strand(tip.points, tip.keys);
     for (const g of glints) g.el.remove();
     glints = loom.orbits().map((orbit) => {
-      // Round the circle on the compositor: a path to ride and how long
-      // once round takes.
+      // Round the circle on the compositor: a transform through points
+      // along it (an offset-path would be animated on the main thread).
       const el = document.createElement("span");
       el.className = "hion-glint";
       el.dataset.hue = orbit.hue;
-      const path = new Path(orbit.points, 4);
-      let d = "";
-      for (let i = 0; i < path.count; i += 2) d += `${i ? "L" : "M"}${path.xs[i].toFixed(1)} ${path.ys[i].toFixed(1)}`;
-      el.style.offsetPath = `path("${d}")`;
-      el.style.animationDuration = `${(path.length / (orbit.hue === "c" ? 0.075 : 0.05) / 1000).toFixed(1)}s`;
       layer.append(el);
-      return { key: orbit.key, el, shown: false };
+      const path = new Path(orbit.points, 4);
+      const step = Math.max(6, path.length / 90);
+      const frames: Keyframe[] = [];
+      for (let s = 0; s <= path.length; s += step) {
+        const [x, y] = path.at(s);
+        frames.push({ transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)` });
+      }
+      const ride = el.animate(frames, {
+        duration: path.length / (orbit.hue === "c" ? 0.075 : 0.05),
+        iterations: Infinity,
+        easing: "linear",
+      });
+      ride.pause();
+      return { key: orbit.key, el, ride, shown: false };
     });
     rows = [];
     for (const holder of page.querySelectorAll<HTMLElement>("[data-cord]")) {
@@ -458,6 +467,8 @@ export function createLife(options: LifeOptions) {
       if (show === g.shown) continue;
       g.shown = show;
       g.el.dataset.state = show ? "on" : "";
+      if (show && !options.isIdle()) g.ride.play();
+      else g.ride.pause();
     }
   }
 
@@ -706,6 +717,16 @@ export function createLife(options: LifeOptions) {
     pointer.here = false;
     wake();
   }
+
+  // The glints hold still while the prism holds the page (prism.css stops
+  // CSS animations; these are the shell's own).
+  options.onIdleChange((idle) => {
+    for (const g of glints) {
+      if (idle || !g.shown) g.ride.pause();
+      else g.ride.play();
+    }
+    if (!idle) wake();
+  });
 
   // Left alone, the threads amuse themselves. Rarely.
   const eggs = window.setInterval(() => {
