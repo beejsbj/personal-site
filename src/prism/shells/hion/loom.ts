@@ -27,6 +27,7 @@
  * same: the marks only need composing with their keys and extents along x
  * (weave.ts composes such a drawing turned, as if it read down). */
 import { type Hue, Kind, type Mark, paint, paintGlow, patterns, type Patterns, type Pt } from "./pastel";
+import { still } from "./dom";
 import { createPulse, type Pulse } from "./pulse";
 
 /** Tile length: a frame that draws re-sends only the tiles it touched,
@@ -37,6 +38,8 @@ const GLOW = 0.25;
 interface Tile {
   index: number;
   el: HTMLElement;
+  canvas: HTMLCanvasElement;
+  glow: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   gctx: CanvasRenderingContext2D;
   pats: Patterns;
@@ -205,7 +208,7 @@ export function createLoom(options: LoomOptions) {
     ctx.setTransform(dpr, 0, 0, dpr, across ? shift * dpr : 0, across ? 0 : shift * dpr);
     const gctx = glow.getContext("2d")!;
     gctx.setTransform(GLOW, 0, 0, GLOW, across ? shift * GLOW : 0, across ? 0 : shift * GLOW);
-    return { index, el, ctx, gctx, pats: patterns(ctx, dpr), cursor: 0 };
+    return { index, el, canvas, glow, ctx, gctx, pats: patterns(ctx, dpr), cursor: 0 };
   }
 
   function lay(tile: Tile, m: Mark) {
@@ -231,14 +234,27 @@ export function createLoom(options: LoomOptions) {
         Math.abs((b.index + 0.5) * TILE - middle),
     );
     let behind = false;
+    // Each tile drawn on is shown as a still again (dom.ts), once.
+    const drawn = new Set<Tile>();
+    const show = () => {
+      for (const tile of drawn) {
+        still(tile.canvas);
+        still(tile.glow);
+      }
+    };
     for (const tile of order) {
       const bucket = buckets[tile.index] ?? [];
       while (tile.cursor < bucket.length && bucket[tile.cursor] < upto) {
-        if (performance.now() > deadline) return true;
+        if (performance.now() > deadline) {
+          show();
+          return true;
+        }
         lay(tile, marks[bucket[tile.cursor++]]);
+        drawn.add(tile);
       }
       if (tile.cursor < bucket.length && bucket[tile.cursor] < upto) behind = true;
     }
+    show();
     return behind;
   }
 

@@ -88,3 +88,69 @@ export function textExtent(el: HTMLElement): [number, number] | null {
   range.detach();
   return l < r ? [l, r] : null;
 }
+
+/* ---------- Still pictures ---------- */
+
+/** A 2D canvas on the page costs every frame the page commits, changed or
+ * not (about a tenth of a millisecond each, measured on a software-
+ * rendered machine; a Hion screen has fifty or so). A bitmap shown in a
+ * `bitmaprenderer` canvas costs nothing until it changes. So a canvas
+ * drawn now and then is drawn out of sight and shown as a still: `still`
+ * swaps a twin into its place the first time and updates the twin after
+ * that (coalesced, once per task); the 2D canvas stays the thing drawn on.
+ * Where the browser has no bitmap renderer, the canvas stays itself. */
+const twins = new WeakMap<HTMLCanvasElement, HTMLCanvasElement>();
+const sources = new WeakMap<Element, HTMLCanvasElement>();
+const shots = new WeakMap<HTMLCanvasElement, number>();
+const due = new Set<HTMLCanvasElement>();
+let flushing = false;
+const stills =
+  typeof window !== "undefined" && typeof createImageBitmap === "function" && "ImageBitmapRenderingContext" in window;
+
+export function still(canvas: HTMLCanvasElement) {
+  if (!stills) return;
+  due.add(canvas);
+  if (flushing) return;
+  flushing = true;
+  queueMicrotask(() => {
+    flushing = false;
+    const list = [...due];
+    due.clear();
+    for (const source of list) {
+      const shown = twins.get(source) ?? source;
+      if (!shown.isConnected || !source.width || !source.height) continue;
+      const shot = (shots.get(source) ?? 0) + 1;
+      shots.set(source, shot);
+      createImageBitmap(source).then(
+        (bitmap) => {
+          let twin = twins.get(source);
+          // Gone, or a later picture is on its way.
+          if (shots.get(source) !== shot || !(twin ?? source).isConnected) {
+            bitmap.close();
+            return;
+          }
+          if (!twin) {
+            twin = document.createElement("canvas");
+            twins.set(source, twin);
+            sources.set(twin, source);
+            source.replaceWith(twin);
+          }
+          twin.className = source.className;
+          twin.style.cssText = source.style.cssText;
+          if (source.hasAttribute("aria-hidden")) twin.setAttribute("aria-hidden", "true");
+          twin.getContext("bitmaprenderer")?.transferFromImageBitmap(bitmap);
+        },
+        () => {},
+      );
+    }
+  });
+}
+
+/** The canvas drawn on behind what is shown (itself, if not a still). */
+export const drawnOn = <T extends Element | null>(el: T): T => ((el && sources.get(el)) ?? el) as T;
+
+/** Take a canvas off the page, whether it is shown as itself or a still. */
+export function unshow(canvas: HTMLCanvasElement) {
+  shots.set(canvas, (shots.get(canvas) ?? 0) + 1);
+  (twins.get(canvas) ?? canvas).remove();
+}

@@ -62,6 +62,7 @@
  * thread is busiest). */
 import { Fate, goalsFor, Ground, plan, type Gather, type Seed, STEP, type Thread } from "./fate";
 import type { createLoom } from "./loom";
+import { still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
 import { type Hue, patterns, type Patterns, type Pt, RGB, rng } from "./pastel";
 import { type Box, encircle as encircle_, ring, stitches, weave, wordBoxes } from "./wind";
@@ -714,6 +715,7 @@ export function createSkein(options: SkeinOptions) {
       for (const st of strands) {
         if (st.laid && st.bottom >= t0 - 4 && st.top <= t0 + TILE + 4) lay(ctx, pane.pats, st, 0, st.laid);
       }
+      still(pane.el);
     }
   }
 
@@ -744,7 +746,7 @@ export function createSkein(options: SkeinOptions) {
     const to = Math.min(tileRows - 1, Math.floor((top + innerHeight * 1.3) / TILE));
     for (const [index, tile] of tiles) {
       if (index < from - 1 || index > to + 1) {
-        for (const pane of tile.panes) pane.el.remove();
+        for (const pane of tile.panes) unshow(pane.el);
         tiles.delete(index);
       }
     }
@@ -770,7 +772,11 @@ export function createSkein(options: SkeinOptions) {
     const [a, b] = tileRange(top, bottom);
     for (let k = a; k <= b; k++) {
       const tile = tiles.get(k);
-      if (tile) for (const pane of panesIn(tile, left, right)) lay(pane.ctx, pane.pats, st, st.laid, to);
+      if (!tile) continue;
+      for (const pane of panesIn(tile, left, right)) {
+        lay(pane.ctx, pane.pats, st, st.laid, to);
+        still(pane.el);
+      }
     }
     st.laid = to;
   }
@@ -788,7 +794,8 @@ export function createSkein(options: SkeinOptions) {
     for (let k = a; k <= b; k++) {
       const tile = tiles.get(k);
       if (!tile) continue;
-      for (const { ctx } of panesIn(tile, Math.min(x0, x1), Math.max(x0, x1))) {
+      for (const { ctx, el } of panesIn(tile, Math.min(x0, x1), Math.max(x0, x1))) {
+        still(el);
         ctx.save();
         ctx.globalCompositeOperation = "destination-out";
         ctx.lineWidth = st.n.w + 2.5;
@@ -1542,7 +1549,7 @@ export function createSkein(options: SkeinOptions) {
         }
         st.fadeAt = instant ? Infinity : now + st.n.hold * (0.4 + st.rand());
       }
-      for (const tile of tiles.values()) for (const pane of tile.panes) pane.el.remove();
+      for (const tile of tiles.values()) for (const pane of tile.panes) unshow(pane.el);
       tiles.clear();
       cull();
       bandFresh = true;

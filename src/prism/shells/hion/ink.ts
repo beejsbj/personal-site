@@ -15,7 +15,7 @@
  *
  * The hang length is `--hion-hang` on the element (px). */
 import { pendant } from "./dance";
-import { textExtent } from "./dom";
+import { drawnOn, still, textExtent } from "./dom";
 import { Kind, type Mark, Path, knot, paint, paintGlows, patterns, rng, thread, wraps, type Hue } from "./pastel";
 
 const PAD = 26;
@@ -95,7 +95,7 @@ function inkOne(el: HTMLElement) {
   const signature = `${w}x${h}:${drop}:${getComputedStyle(el).getPropertyValue("--hion-tassel-x")}`;
   if (drawn.get(el) === signature) return;
   drawn.set(el, signature);
-  let canvas = el.querySelector<HTMLCanvasElement>(":scope > canvas.hion-ink");
+  let canvas = drawnOn(el.querySelector<HTMLCanvasElement>(":scope > canvas.hion-ink"));
   if (!canvas) {
     canvas = document.createElement("canvas");
     canvas.className = "hion-ink";
@@ -118,6 +118,7 @@ function inkOne(el: HTMLElement) {
   // Blooms first, faintly, under the threads.
   paintGlows(ctx, marks, cw, ch, 0.6);
   for (const m of marks) if (m.kind !== Kind.Glow) paint(ctx, m, pats);
+  still(canvas);
 }
 
 /** Ink every hung thing under root (cheap when nothing changed). */

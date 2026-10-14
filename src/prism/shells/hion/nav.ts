@@ -12,7 +12,7 @@
  * the destinations fall in a cascade, each on a longer thread than the
  * last, like a wind chime. */
 import type { SiteContent } from "../types";
-import { h, newTab } from "./dom";
+import { h, newTab, still } from "./dom";
 import { ink } from "./ink";
 import { type Fabric, fabricAt } from "./fabric";
 import { Kind, Path, paint, paintGlows, patterns, thread, type Pt } from "./pastel";
@@ -179,6 +179,7 @@ export function createNav(
     const pats = patterns(ctx, dpr);
     paintGlows(ctx, marks, w, hgt, 0.7);
     for (const m of marks) if (m.kind !== Kind.Glow) paint(ctx, m, pats);
+    still(cord);
   }
 
   function setState(state: "rest" | "stowed" | "dropped") {

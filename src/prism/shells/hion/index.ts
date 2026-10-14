@@ -18,7 +18,7 @@
  * threads come down from the new place. */
 import { kindOf } from "../../routes";
 import type { LensShell, Route, ShellContext } from "../types";
-import { h, setNewTabNote, wait } from "./dom";
+import { h, setNewTabNote, still as showStill, wait } from "./dom";
 import { ink } from "./ink";
 import { type Fabric, fabricAt, fabricOf } from "./fabric";
 import { createLife } from "./life";
@@ -455,6 +455,8 @@ const shell: LensShell = {
       signal.addEventListener("abort", () => Reflect.deleteProperty(document, "startViewTransition"), { once: true });
     }
     root.replaceChildren(world);
+    // The line and its swatches are drawn once: shown as stills (dom.ts).
+    for (const canvas of world.querySelectorAll<HTMLCanvasElement>(".hion-nav canvas")) showStill(canvas);
     // Let the faces arrive before measuring words to hang them.
     await Promise.race([document.fonts?.ready, wait(600)]);
     show(context.route, true);
