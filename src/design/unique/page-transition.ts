@@ -31,6 +31,19 @@ export function linkKind(link: Element): From | undefined {
   return undefined;
 }
 
+/** The nav ball on screen that goes where this link goes, if any. */
+export function ballFor(link: HTMLAnchorElement): HTMLAnchorElement | undefined {
+  const path = new URL(link.href, location.href).pathname;
+  for (const ball of document.querySelectorAll<HTMLAnchorElement>(
+    "a[data-ball][href]",
+  )) {
+    if (new URL(ball.href, location.href).pathname !== path) continue;
+    const r = ball.getBoundingClientRect();
+    if (r.width && r.bottom > 0 && r.top < window.innerHeight) return ball;
+  }
+  return undefined;
+}
+
 /** The painted shape a pill or text link shows under the pointer: a pill's
  * stretched paint (full width, its own height, centred), or the line of a
  * text link's words that holds the click (else its first line). */
@@ -121,14 +134,20 @@ export function installPageTransition() {
   document.addEventListener("astro:before-preparation", (event) => {
     drop();
     const source = event.sourceElement;
-    const link =
+    const clickedLink =
       source instanceof Element
         ? source.closest<HTMLAnchorElement>("a[href]")
         : null;
-    if (!motion.matches || !link || event.navigationType === "traverse") return;
+    if (!motion.matches || !clickedLink || event.navigationType === "traverse")
+      return;
     // Daylight's cover only: another lens's shell animates its own route
     // changes, and prism faces and the open prism hold still.
     if (offstage(root)) return;
+    // A plain link (the wordmark, say) has no shape of its own to swell
+    // from; if a nav ball on screen goes to the same place, that ball does.
+    const link = linkKind(clickedLink)
+      ? clickedLink
+      : (ballFor(clickedLink) ?? clickedLink);
     const rect = link.getBoundingClientRect();
     if (!rect.width) return;
     const clamp = (value: number, max: number) =>
