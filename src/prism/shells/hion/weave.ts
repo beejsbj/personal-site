@@ -59,14 +59,14 @@ import {
 import type { Composition } from "./loom";
 import { textExtent } from "./dom";
 
-interface Box {
+export interface Box {
   l: number;
   t: number;
   r: number;
   b: number;
 }
 
-interface Loop extends Box {
+export interface Loop extends Box {
   el: HTMLElement;
   entry: Pt;
   exit: Pt;
@@ -484,7 +484,7 @@ export function compose(
 
 /** The way one hion goes round a loop: from where they meet at its top,
  * out to its side, down, and back in to meet beneath it. */
-function strandPoints(loop: Loop, hue: Hue, seed: number): Pt[] {
+export function strandPoints(loop: Loop, hue: Hue, seed: number): Pt[] {
   const { l, t, r, b, entry, exit, flare } = loop;
   const x = hue === "c" ? l : r;
   const pts: Pt[] = [
@@ -503,7 +503,7 @@ function strandPoints(loop: Loop, hue: Hue, seed: number): Pt[] {
 }
 
 /** A single loose loop hung from a point, coming back through it. */
-function looseLoop(p: Pt, dir: 1 | -1, r: number, seed: number): Pt[] {
+export function looseLoop(p: Pt, dir: 1 | -1, r: number, seed: number): Pt[] {
   const rand = rng(seed);
   const c: Pt = [p[0] + dir * r * 0.75, p[1] + r * 0.7];
   const start = Math.atan2(p[1] - c[1], p[0] - c[0]);
@@ -519,7 +519,7 @@ function looseLoop(p: Pt, dir: 1 | -1, r: number, seed: number): Pt[] {
 
 /** A finer fibre beside each side of a loop: the hion loosened where it
  * holds a section open. */
-function looseFibres(loop: Loop, seed: number): Mark[] {
+export function looseFibres(loop: Loop, seed: number): Mark[] {
   const out: Mark[] = [];
   for (const hue of ["c", "m"] as Hue[]) {
     const dir = hue === "c" ? -1 : 1;
@@ -539,7 +539,7 @@ function looseFibres(loop: Loop, seed: number): Mark[] {
  * one strand and under the other, alternating. Elsewhere its ends are
  * knotted. `from` (when given) is where it is thrown from, so it draws
  * outward from the main cord. */
-function weft(
+export function weft(
   from: number,
   to: number,
   y: number,

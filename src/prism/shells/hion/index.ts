@@ -30,6 +30,7 @@ import { createThreads, seedOf } from "./threads";
 import { weaveCovers, weaveType } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { ACROSS, createTrack } from "./track";
+import { createFree, FREE } from "./free";
 import { compose } from "./weave";
 import "./shell.css";
 
@@ -40,7 +41,7 @@ interface Live {
   threads: ReturnType<typeof createThreads>;
   life: ReturnType<typeof createLife> | undefined;
   /** The resume's timeline, when it runs across. */
-  track: ReturnType<typeof createTrack> | undefined;
+  track: { start(): void; release(): void } | undefined;
   controller: AbortController;
   /** When it began to leave (performance.now()), once it has. */
   left?: number;
@@ -134,27 +135,36 @@ function show(route: Route, first: boolean) {
   // The resume's timeline runs across, on a track that draws its own
   // threads; laid again if the window crosses over (too short for it).
   const timeline = page.querySelector<HTMLElement>("[data-timeline]");
+  // (Experiment: on a screen with room for it, laid free across a table
+  // the camera follows, free.ts.)
   const across = timeline ? matchMedia(ACROSS) : undefined;
-  const track =
-    timeline && across?.matches
-      ? createTrack({
-          section: timeline,
-          signal: controller.signal,
-          instant: still(),
-          face: ctx.face,
-          isIdle: ctx.isIdle,
-          onIdleChange: ctx.onIdleChange,
-        })
-      : undefined;
-  across?.addEventListener(
-    "change",
-    () => {
-      if (live?.page !== page || live.left !== undefined) return;
-      controller.abort();
-      show(route, true);
-    },
-    { signal: controller.signal },
-  );
+  const free = timeline ? matchMedia(FREE) : undefined;
+  const trackOptions = timeline && {
+    section: timeline,
+    signal: controller.signal,
+    instant: still(),
+    face: ctx.face,
+    isIdle: ctx.isIdle,
+    onIdleChange: ctx.onIdleChange,
+  };
+  const track = trackOptions
+    ? free?.matches
+      ? createFree(trackOptions)
+      : across?.matches
+        ? createTrack(trackOptions)
+        : undefined
+    : undefined;
+  for (const query of [across, free]) {
+    query?.addEventListener(
+      "change",
+      () => {
+        if (live?.page !== page || live.left !== undefined) return;
+        controller.abort();
+        show(route, true);
+      },
+      { signal: controller.signal },
+    );
+  }
   const loom = createLoom({
     host: page,
     signal: controller.signal,

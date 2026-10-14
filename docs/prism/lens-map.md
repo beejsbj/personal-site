@@ -499,6 +499,17 @@ The new marks are layout only: `data-spine="knot"` (the two meet and are tied th
 
 Courses and tools stay below the track, down the page: courses are not all dated, and tools are not time-tied.
 
+**The timeline laid free (`hion/resume-free`, experiment).** On a screen with room for it (`FREE` in `HI/free.ts`: at least 720px wide and 520px tall) the roles are neither down nor across: they lie where a thread dropped across a table carries them, and the window follows the thread as you scroll. Phones and short windows keep the track across. Same parts, same fields, same DOM order (newest first); only where the roles lie changes.
+
+| What | How | Where |
+|---|---|---|
+| The path | From the group's knot the way sets off east; at each role it turns by 52 to 82 degrees, read from how much text the role holds, two turns one way then two the other, each held within 60 degrees of the way it leaves the last role. A role is travelled along the one of east, south, west, north nearest its heading (never straight back), so its text stays upright and the hions part round it as round any loop. Each is placed as near as it can be along its heading (from 250px, in 40px steps) without coming within 80px of anything already placed; the legs between are cubic curves leaving and arriving square to the roles | `free.ts:layOut` |
+| The camera | The section is as tall as the way is long plus a window. One pixel of scroll is one pixel along the way; the camera keeps that point (the way smoothed over up to 220px either side, less at the ends) in the middle of the window by translating the table. Nothing is eased in time | `free.ts:cameraAt`, `look` |
+| Drawing | Composed in `free.ts` from weave.ts's pieces (`strandPoints`, `looseLoop`, `looseFibres`, `weft`, now exported), each role's strands and the years' orbit composed in the role's own frame and turned to its way; keyed by distance along the way. Laid on a sheet of 512px square tiles kept round the camera, with the loom's pacing, beads and reveals | `free.ts:composeFree`, sheet |
+| Input | Scrolling of every kind moves along the way; a sideways trackpad swipe and Left/Right as on the track; focus on something out of the window scrolls to where the camera looks most squarely at it | `free.ts:start` |
+| Joining the page | A `gap` station as the track: the page's threads go in at the top of the window over the knot (centred at the start) and come out at its foot under where the way ends (centred at the end) | `free.ts:measure` |
+| Still (reduced motion, face) | The camera still moves with your scrolling, the drawing is laid at once | `free.ts` |
+
 Line numbers are from the current tree and are still moving. `S` = `HI/screens.ts`.
 
 **content.json reads**

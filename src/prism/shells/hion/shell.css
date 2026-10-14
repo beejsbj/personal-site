@@ -2964,3 +2964,90 @@
 :root[data-lens="hion"] .hion-loom--across {
   right: auto;
 }
+
+/* --------------------------------------------------------------------------
+   The timeline laid free (free.ts, an experiment): on a screen with room
+   for it, the roles lie where a thread dropped across a table carries
+   them, each placed by free.ts, and the window follows the thread as you
+   scroll. Each role's padding keeps clear of the strands for the way it is
+   travelled: along its top and foot when crossed, down its sides when
+   descended.
+   -------------------------------------------------------------------------- */
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] {
+  position: relative;
+  margin-bottom: 90px;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] .hion-timeline__pin {
+  display: block;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: clip;
+  background: var(--hion-black);
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] .hion-timeline__track {
+  display: block;
+  position: relative;
+  will-change: transform;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] .hion-timeline__out {
+  display: none;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] .hion-resume__group {
+  position: absolute;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  width: calc(clamp(300px, 30vw, 480px) + 75px);
+  margin: 0;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] .hion-loop--role {
+  position: absolute;
+  width: clamp(520px, 42vw, 640px);
+  margin: 0;
+  padding: 64px 112px;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] .hion-loop--role:is([data-travel="s"], [data-travel="n"]) {
+  width: clamp(480px, 38vw, 600px);
+  padding: 104px var(--hion-loop-pad) 112px;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] .hion-resume__record {
+  max-width: none;
+  columns: 17rem;
+  column-gap: 2.6rem;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] .hion-resume__record li {
+  break-inside: avoid;
+}
+
+/* The years, on the thread just before the two part round the role. */
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] [data-travel="e"] .hion-resume__when {
+  top: auto;
+  right: calc(100% + 30px);
+  bottom: calc(50% + 22px);
+  left: auto;
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] [data-travel="w"] .hion-resume__when {
+  top: auto;
+  right: auto;
+  bottom: calc(50% + 22px);
+  left: calc(100% + 30px);
+}
+
+:root[data-lens="hion"] .hion-timeline[data-timeline="free"] [data-travel="n"] .hion-resume__when {
+  top: auto;
+  bottom: -0.6em;
+}
+
+:root[data-lens="hion"] .hion-loom--free {
+  right: auto;
+}
