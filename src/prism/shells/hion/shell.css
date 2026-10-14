@@ -381,9 +381,9 @@
 
 
 
-/* The living cloth (cloth.ts): under the hions, page-tall, drawn only
-   near the viewport. Its light is a quarter-resolution canvas, scaled up. */
-:root[data-lens="hion"] .hion-cloth {
+/* Threads of intent (threads.ts): under the hions, page-tall, painted
+   only near the viewport; each growing head has a small canvas of its own. */
+:root[data-lens="hion"] .hion-threads {
   position: absolute;
   inset: 0 0 auto;
   z-index: 0;
@@ -391,24 +391,23 @@
   transition: opacity 0.6s ease;
 }
 
-/* Living out of sight until it has settled (reduced motion, a still face,
-   a new layout). */
-:root[data-lens="hion"] .hion-cloth[data-state="settling"] {
+/* Growing out of sight until settled (reduced motion, a still face, a new
+   layout). */
+:root[data-lens="hion"] .hion-threads[data-state="settling"] {
   opacity: 0;
   transition: none;
 }
 
-:root[data-lens="hion"] .hion-cloth__tile {
+:root[data-lens="hion"] .hion-threads__tile {
   position: absolute;
   left: 0;
   width: 100%;
 }
 
-:root[data-lens="hion"] .hion-cloth__tile canvas {
+:root[data-lens="hion"] .hion-threads__head {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
 }
 
 /* Measuring where things rest: everything still for one read. */
