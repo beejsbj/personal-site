@@ -421,6 +421,63 @@ Derived "content": page numbers are hard-coded (`ch:45-48,276-281`, labs `15+i`,
 
 ### 3.4 Hion (`HI`, provisional)
 
+**Type: Stele (`hion/type-fate`).** Fate, not warmth: one inscribed voice in two faces, set by the variables at the top of `HI/shell.css` and imported (Latin only) in `lenses/hion.css`. Aboreto (thin, wide capitals cut like a stele, one weight) writes the large titles, the ones woven or hung: the home words, page and project titles, strung section headings, the resume's role titles on wide screens. It also writes the labels (charms, dates, tags, the menu), tracked open, at least ~13.5px. Under about 28px its capitals shout, so small titles (update and writing titles, the "In the lab" / "Writing" forks, the loose ends, prose h3 to h6, the footer address) and, on phones, strung headings and role titles use `--hion-head`: Spectral 600. Reading is Spectral 400; the spoken lines (Hey there!, the role line, captions) are Spectral light italic. Only the shipped weights are ever asked for (`font-synthesis: none`). The DOM text keeps its own case (Aboreto draws lowercase as capitals), so screen readers and copy are unaffected. Woven titles sit about a fifth smaller than the Alegreya ones did, as the capitals are wide. Their weave is finer for thin capitals (`HI/woven.ts`: a crossing every `size / 22` px, 3 to 6, and the letter mask thickened by 0.4 of a crossing, was 18 and 0.7), so the break in a "!", the tail of a "J" and a "." or "," stay open at every woven size, 1x screens included.
+
+**Threads of intent (exploration, `hion/threads-of-intent`, on `prism/hion-living-weave`).** Under the two dancing hions every screen has a ground of long threads (`HI/threads.ts`, steering in `HI/fate.ts`). It replaced the Immigration cloth, whose grid read as a warping net however it was mapped. Each thread grows only from its head: a bead of light with a bright run behind it that cools into a quiet ground (`GROUND`, about a quarter of the head's strength once the paper's tooth takes its share). A head holds a heading with a slight bow and turns only at a decision (run spent, words ahead, a goal reached, another thread met at a slant), choosing from a fan of headings at most 48 degrees off its own (more only to get round content), and draws the turn as a quick curve. Its turning over the last ~550px is capped, so it never loops. Where two cross, one goes under. It reads no content of its own; it reads the screen's layout:
+
+| What the screen has | What the threads do with it | Read from |
+|---|---|---|
+| Any text, `img`, `video`, `svg`, `a`, `button` in `main`/`footer` | Held clear (with a margin): heads turn at it and never cross it, and prefer headings that keep some paper between them and the words | text-node line boxes and element boxes, measured with transforms off (`.hion-measuring`) |
+| The most open place in each ~820px stretch of the page (leaning to the middle) | A gather: most threads below a stretch's top pass through its lanes, so they converge into a bundle and part again; a few are lone and run off into the distance | the held map |
+| Where the hions come down from the line | A fan of threads, born first, spreading either side of the hions' own way down | `nav.origin()` |
+| The page edges | Threads in from the left (mostly cyan) and right (mostly magenta) down the page, each born when the hions' drawing reaches it | `loom.reach()` |
+| Project, lab-entry and post routes | Fewer, thicker threads, at most two heads; the screen arrives still and its threads wait for the reader | `route.kind` |
+
+The same page grows the same way (seeded by its path). The first screen arrives part grown (its ground already there, a few heads still at work). Heads near the reader grow at about 40px a second, at most three at once, on a 200ms beat (each beat a small canvas repaint, not a frame of animation); heads out of sight hurry. They grow while someone is there: for 6s after arriving and after any scroll, pointer move, tap or key; left alone, they hold where they are (beads dimmed) and the loop sleeps. A finished thread lies for about a minute and then fades; new ones come in from the edges near the reader, so the page never fills. A tap on the paper sends a cyan and a magenta thread out from there. Ground is painted onto 320x512px page-space panes near the viewport, a batch of segments at a time. Reduced motion and face mode grow everything out of sight and show it settled, with no heads and no fading.
+
+**The pointer is a source (`HI/life.ts`, intents).** Near the pointer the hions no longer reach toward it. Instead, as a fine pointer moves (every ~150px) or rests (twice, then nothing), a loose thread of intent issues from it, creeps in a drawn curve to the nearest thing nobody else is going to (a heading, a `[data-weft]`, a picture or `[data-frame]`, a tag, pull-cord or charm; otherwise the hions' own way), weaves loosely round it (a band with cut corners part way round, or taut stitches back and forth across a hion), and fades. There are at most five at once, painted only in the box they occupy on the life canvas. On touch a tap sends a pair. None of it runs in reduced motion, face mode or while the prism holds the page idle.
+
+**Moving between screens.** Clicking a destination answers in the frame you clicked (`astro:before-preparation`): the old screen starts reeling up, the destination's charm drops, and the ribbon of its cloth starts down from its swatch while the router fetches the page. The new screen is clipped to that ribbon (timed from the click, 640ms, falling for the first 42% and then spreading), over the old screen as it finishes reeling up, and its threads come down briskly. The threads, the woven words (one at a time) and the woven covers (a few rows a slice) are laid in idle time after the ribbon has fallen. While Hion is mounted the router's native view transition is skipped: its snapshot froze the page for hundreds of milliseconds, for a crossfade `prism.css` already turns off.
+
+**Text on the thread (`hion/text-on-thread`).** Where the words sit changed; what they read did not (the same parts, the same fields).
+
+| Part | Where it hangs now | Built by |
+|---|---|---|
+| Page opening (eyebrow, h1, intro, actions; project/lab/post meta, links, tools) | Across the hions' way down from the current destination (drawn in toward the middle): the title hangs from a branch on the side with room, the intro is tied on at a `knot` station on the other side, pull-cords and tags hang under the title. Phones: one column, stepped a little | `S:opening`, `S:pageTitle` |
+| About opening | Title and action-cord on the far side of the portrait, intro tied on at a knot on the near side; cyan circles the portrait | `S:about` |
+| H9 updates, writing list, H11 Elsewhere | Strands, not loops: the hions run down together, knotted at each entry; the entry is tied on beside its knot by turns either side, date level with the knot, title beneath. Wide screens: each rides up beside the one before. Phones: one column, knots on the right | `S:knotted`, `S:home`, `S:writing` |
+| Long reading (About, project, lab and post bodies, the resume's own body) | A ~60ch column held right of centre; h2s hang out past the cyan strand | `S:story`, `shell.css` |
+
+**The resume as a timeline (`hion/resume-timeline`).** The resume is built from `content.resume`, no longer from `resume.html`; the hions are its time axis.
+
+| Part | How it is drawn | Built by |
+|---|---|---|
+| Experience / Education headings | Strung on a weft thrown out from a knot (`data-spine="knot"`) on the hions' way down; on phones the knot sits at the right | `S:groupHead`, `.hion-resume__group` |
+| Each role (`resume.role`) | Its own loop (by turns left and right on wide screens): the years it spans (`start`/`end`, or `start`–`ongoing` when current) written on the thread where the two part and circled by one hion (`data-orbit`, aria-hidden: the date line carries the same fact); the title strung on the loop's weft (`h3`), organisation (and `location`, linked by `url` when given) in hand beneath, then `dateLine`, then summary and bullets | `S:resume`, `S:record`, `S:span` |
+| Each course (`resume.education`) | Knotted on the strand like updates: years level with the knot, name, organisation, date line, summary | `S:resume`, `S:knotted` |
+| Tools (`resume.tools`) | Charms (`.hion-tag` drops) hung on cords woven across a loop under the strung heading; rows close together share one cord, so the lower row hangs on longer threads | `S:resume`, `.hion-row--charms` |
+| Page body (`page.body`, "See the work") | The story loop | `S:story` |
+
+No new weave kind: role loops are ordinary `loop` stations, years are `data-orbit` (as `/projects` years). `tools.sentence` is not shown: it is the same items written as a sentence. No new lens copy; no parity gaps.
+
+The new marks are layout only: `data-spine="knot"` (the two meet and are tied there), `data-tie` outside a loop (a short thread to the hions at the element's first line) and wefts thrown from the hions to a heading beside them (`weave.ts`).
+
+**The timeline across (`hion/resume-horizontal`, `hion/resume-phone`).** On any window tall enough to hold a role (`ACROSS` in `HI/track.ts`: at least 280px tall), phones included, the roles run across instead of down. Same parts, same fields, same order; only a window shorter than that keeps the vertical timeline above.
+
+| What | How | Where |
+|---|---|---|
+| Scrolling | The section is as tall as the track is long (less a screen's width, plus a screen's height); its pin is sticky and clipped, and the track slides left by exactly how far you have scrolled into it. Wheel, trackpad, scrollbar, Page Down, Space and find-in-page all scroll the page as usual. Additions: a sideways swipe over the pin (passive listener) scrolls the page; on a touch screen the pin keeps the page's upright panning (`touch-action: pan-y pinch-zoom`) and a finger that sets off sideways (decided after 10px) is handed on as scrolling, with a short glide on a fling (none when still); 20px strips at the screen's edges (`::before`, clipped to its sides, coarse pointers only) are left to the browser's back and forward swipe; Left/Right step 45% of a screen while pinned, stopping at the ends; focus landing on something off to the side scrolls the page until all of it (a wrapped link's whole box) is in sight | `HI/track.ts` |
+| Direction of time | Newest first, the content's own order: time runs right to left, from now back. Reading order, focus order and the vertical layout all agree | `S:resume` |
+| Roles | Each loop turned on its side: the hions part at its left (years written just before, circled), run along its top (cyan) and foot (magenta), and meet at its right. Each role is widened until it stands within 80% of the pin's height and the room the track's padding leaves; widened, its record runs on in columns (`columns: 17rem`). Then each role drifts off the middle, by turns above and below (`top`, 7.5% of the pin's height at most, never past the room the track leaves it, so a fuller role drifts less): the thread rises or falls from one role to the next, leaving and arriving square to each (the loom's `hang` between stations). A wide, tall window keeps one drift's room when fitting; a phone gives up no width for it (upright it drifts about 40 to 60px; on its side about 15 to 25px). The track still slides only sideways: every role is whole in the window, so a vertical follow would add movement without showing anything more. On a phone held upright a role is about a screen wide (`100vw - 48px`); on a short window (under 600px tall: a phone on its side) the padding, title and record are smaller, and the menu's name hides once stowed so the track's top is clear | `.hion-timeline[data-timeline="across"]`, `track.ts:fit` |
+| Threads | The track has its own loom reading across (`createLoom({ axis: "x", view })`: column tiles, reach along x, keyed to how far along the track is). `compose(track, ..., { axis: "x" })` reads the stations turned (x and y swapped), so the dance, loops and orbits are the vertical ones, then turns the marks back (`pastel.ts:turned`); headings across are strung on wefts level with their words (`acrossX`). Cords and ties are not read across | `HI/loom.ts`, `HI/weave.ts` |
+| Joining the page | The section is a `data-spine="gap"` station on the page: the page's hions go in at its top over the track's knot and come out at its foot under where the track's turn down (`data-entry`/`data-exit`, set by `track.ts`), so they read as one pair turning to run along time and back down. Each loom keeps to its own: the nearest `[data-loom]` round a thing is the drawing it belongs to | `weave.ts`, `loom.ts` |
+| Ground | The pin is black paper: the living cloth holds the whole section empty (`data-cloth-hold`), and life (tendrils, plucks) answers only the page's threads; hovering a strung title still ties a loop round it | `cloth.ts`, `life.ts` |
+| Still (reduced motion, face) | The track still slides with your scrolling (that is your movement), the drawing is settled, and stepping and focus jumps are instant | `track.ts`, `loom.ts` |
+| Window height | The pin is `100svh` (fallback `100vh`): the window with the browser's bars showing, so a URL bar sliding away leaves black paper under the pin rather than resizing the track | `.hion-timeline__pin` |
+| Crossing the breakpoint | The screen is laid again when the window crosses `ACROSS` | `HI/index.ts:show` |
+
+Courses and tools stay below the track, down the page: courses are not all dated, and tools are not time-tied.
+
 Line numbers are from the current tree and are still moving. `S` = `HI/screens.ts`.
 
 **content.json reads**
@@ -434,6 +491,7 @@ Line numbers are from the current tree and are still moving. `S` = `HI/screens.t
 | `projects[]`: slug, href, title, summary, kind, year, dateLabel, tools, featured, cover, links | `S:workCharm`, `S:projects`, `S:project`, `S:onward` |
 | `lab[]`: slug, href, detail, title, summary, type, sourceEra, links | `S:lab`, `S:labEntry` |
 | `updates[]`: source, kind, date, dateLabel, href, title (`slice(0,6)`) | `S:home` |
+| `resume.experience/education` (title; entries' id, title, org, start, end, current, dateLine, location, url, summary, bullets), `resume.tools` (title, items), `resume.ongoing`, `pages.resume.header/html` | `S:resume` |
 
 Never read: `pages.*.body`, `eyebrow`, `availability`; `projects[].role/location/status/tags/media` (media and meta come from `route.main` instead); `lab[].cover`, list-page `links`; `updates[].summary/linkLabel/relatedProject`.
 
@@ -453,7 +511,6 @@ Never read: `pages.*.body`, `eyebrow`, `availability`; `projects[].role/location
 | `article.prose` | `S:508,536,622,633` | `<article class="prose">` |
 | `.lab-aside` | `S:559` | `lab/index.astro` |
 | `.page-header__actions a` (first) | `S:604,632` | actions slot |
-| `h3` | `S:634` | resume entries |
 | `.page-header, header.page-header`, `.section-intro__*` removed; `:scope > * > *`; `/404/` regex on the eyebrow text | `S:652-684` | 404 detection depends on the "404" eyebrow |
 
 **Hard-coded strings**

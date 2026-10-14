@@ -6,14 +6,19 @@
  *
  * - `[data-spine]` are stations on the hions' way down, in document order:
  *   `loop` (a section: the two part to run down either side of it, and
- *   meet again beneath, one tying a loose loop round the other), `via` (they
- *   pass through here) and `end` (they let go of each other in two curls).
- *   They set out from the knot of the destination you are on, in the line
- *   at the top. Between stations they dance (dance.ts).
+ *   meet again beneath, one tying a loose loop round the other), `knot`
+ *   (they are tied together here: they meet at it and part again after,
+ *   keeping close company either side of it), `via` (they pass through
+ *   here) and `end` (they let go of each other in two curls). They set out
+ *   from the knot of the destination you are on, in the line at the top.
+ *   Between stations they dance (dance.ts).
  * - `[data-orbit="c|m"]` is something that hion circles on its way past.
  * - `[data-weft]` headings are strung on a weft: a thread through the waist
  *   of their first line, woven over one side of the loop and under the
- *   other.
+ *   other (and out past the loop, if the heading hangs out of it). Off the
+ *   loops, a heading beside the hions has its weft thrown out from them.
+ * - `[data-tie]` things are tied on by a short thread to the hions beside
+ *   them, level with their first line (inside a loop, to its left strand).
  * - `[data-cord]` holds `[data-hang]` things. Each row of them hangs from a
  *   cord across its top: `branch` cords are tied to the nearest hion and run
  *   out to one side (the heads of screens hang from these), `heading` rows
@@ -21,7 +26,20 @@
  *   cord of their own (woven into the loop when inside one). Things with
  *   `data-hang-from="prev"` hang from the thing above them instead.
  *   Spacing is layout (`--hion-drop`); the thread length (`--hion-hang`) is
- *   measured here, so every thread reaches its cord exactly. */
+ *   measured here, so every thread reaches its cord exactly.
+ * - `gap` is a stretch the hions leave the page for: a track inside it
+ *   that draws its own (track.ts). They go in at its top and come out at
+ *   its foot; nothing of theirs is drawn between.
+ *
+ * Only what belongs to the host is read: the nearest `[data-loom]` round
+ * it is the host (a track inside the page is not the page's).
+ *
+ * A drawing that reads across (`axis: "x"`, the wide resume's timeline) is
+ * composed turned: its stations are read with x and y swapped, so the same
+ * dance, loops and orbits run left to right, and the marks are turned back
+ * (pastel.ts `turned`), their keys running along x. Its headings are strung
+ * on wefts laid as they are, level with their words. Cords and ties are not
+ * read across (a track has none). */
 import { curl, dancer, journeyKeys, orbit, TEMPER } from "./dance";
 import {
   cubic,
@@ -35,6 +53,8 @@ import {
   type Pt,
   rng,
   thread,
+  turned,
+  acrossX,
 } from "./pastel";
 import type { Composition } from "./loom";
 import { textExtent } from "./dom";
@@ -55,9 +75,21 @@ interface Loop extends Box {
 
 const visible = (el: HTMLElement) => el.offsetParent !== null || el.getClientRects().length > 0;
 
-export function compose(host: HTMLElement, origin: () => Pt | null): Composition {
+/** Consecutive points further apart than this are a gap in a thread. */
+const GAP = 400;
+
+export function compose(
+  host: HTMLElement,
+  origin: () => Pt | null,
+  { axis = "y" }: { axis?: "x" | "y" } = {},
+): Composition {
   const hostBox = host.getBoundingClientRect();
-  const narrow = host.clientWidth < 720;
+  const across = axis === "x";
+  const narrow = !across && host.clientWidth < 720;
+  /** The host's own things (not those of a track inside it), on show. */
+  const mine = (el: HTMLElement) => el.parentElement?.closest("[data-loom]") === host;
+  const own = (selector: string, shown = true) =>
+    [...host.querySelectorAll<HTMLElement>(selector)].filter((el) => mine(el) && (!shown || visible(el)));
   // Layout boxes, not painted ones: things still swinging into place (or
   // waiting to) must not move the threads they hang from.
   const box = (el: Element): Box => {
@@ -79,6 +111,11 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
       r: r.right - hostBox.left,
       b: r.bottom - hostBox.top,
     };
+  };
+  /** A box as the spine reads it: turned, for a drawing that reads across. */
+  const sbox = (el: Element): Box => {
+    const b = box(el);
+    return across ? { l: b.t, t: b.l, r: b.b, b: b.r } : b;
   };
   /** The box a hung thing's threads attach to: for a sign, the words
    * themselves (a wrapped heading's box is wider than its lines). */
@@ -103,12 +140,30 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
   let seed = 1;
 
   /* ---- Stations along the main cord ---- */
-  const stations = [...host.querySelectorAll<HTMLElement>("[data-spine]")].filter(visible);
+  const stations = own("[data-spine]");
   const loops = new Map<HTMLElement, Loop>();
-  const route: Pt[][] = [];
+  /** Runs of the route between stations: the loop each one arrives at,
+   * and whether it leaves from or arrives at a knot (where the two are
+   * tied together, so they keep close company either side of it). */
+  const route: { points: Pt[]; loop?: Loop; from?: string; to?: string }[] = [];
   let run: Pt[] = [];
-  const start = origin();
-  if (start) {
+  let runFrom: string | undefined;
+  const close = (to: string, loop?: Loop) => {
+    route.push({ points: run, loop, from: runFrom, to });
+    runFrom = to;
+  };
+  const given = origin();
+  const start: Pt | null = given && across ? [given[1], given[0]] : given;
+  if (start && across) {
+    // Into a track from above: down to the height of its first station
+    // (and away along it, if that is further on).
+    run.push(start);
+    const first = stations[0];
+    if (first) {
+      const b = sbox(first);
+      if (b.t - start[1] > 200) run.push([(b.l + b.r) / 2, start[1] + 90]);
+    }
+  } else if (start) {
     run.push(start);
     // A cord hangs straight down from where it is tied, clear of the head
     // of the screen, before it swings across to its first station.
@@ -122,7 +177,7 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
 
   for (const el of stations) {
     const kind = el.dataset.spine;
-    const b = box(el);
+    const b = sbox(el);
     if (kind === "loop") {
       const entryX = b.l + (b.r - b.l) * parseFloat(el.dataset.entry ?? "0.5");
       const exitX = b.l + (b.r - b.l) * parseFloat(el.dataset.exit ?? "0.5");
@@ -131,24 +186,40 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
       loops.set(el, loop);
       if (!run.length) run.push([entryX, Math.max(0, b.t - 160)]);
       run.push(loop.entry);
-      route.push(run);
+      close("loop", loop);
       run = [loop.exit];
     } else if (kind === "end") {
       const p: Pt = [(b.l + b.r) / 2, b.t + (b.b - b.t) * 0.2];
       if (!run.length) run.push([p[0], p[1] - 120]);
       run.push(p);
       endAt = p;
-      route.push(run);
+      close("end");
       run = [];
       break;
+    } else if (kind === "gap" && !across) {
+      // Left for a track that draws its own: in at its top, out at its foot.
+      const at = (f: string | undefined) => b.l + (b.r - b.l) * parseFloat(f ?? "0.5");
+      const into: Pt = [at(el.dataset.entry), b.t];
+      if (!run.length) run.push([into[0], Math.max(0, b.t - 160)]);
+      run.push(into);
+      close("gap");
+      run = [[at(el.dataset.exit), b.b]];
+    } else if (kind === "knot") {
+      // The two are tied together here: they meet at the knot, and part
+      // again after it. Things on the page are tied on beside it.
+      const p: Pt = [(b.l + b.r) / 2, (b.t + b.b) / 2];
+      if (!run.length) run.push([p[0], Math.max(0, p[1] - 160)]);
+      run.push(p);
+      marks.push(...knot(p[0], p[1], narrow ? 7 : 9, seed++, p[1] - 30));
+      close("knot");
+      run = [p];
     } else {
       const p: Pt = [(b.l + b.r) / 2, (b.t + b.b) / 2];
       if (!run.length) run.push([p[0], Math.max(0, p[1] - 160)]);
       run.push(p);
-      if (kind === "knot") marks.push(...knot(p[0], p[1], narrow ? 7 : 9, seed++));
     }
   }
-  if (run.length > 1) route.push(run);
+  if (run.length > 1) route.push({ points: run, from: runFrom });
 
   // The two hions dance down each run between stations, part to go round
   // each loop (cyan down its left, magenta down its right), and come back
@@ -157,20 +228,21 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
   const journey: Record<Hue, Pt[]> = { c: [], m: [] };
   const detours: Record<Hue, { from: number; to: number }[]> = { c: [], m: [] };
   const runs: { top: number; bottom: number }[] = [];
-  const orbiting = [...host.querySelectorAll<HTMLElement>("[data-orbit]")].filter(
-    (el) => visible(el) && !(narrow && el.hasAttribute("data-orbit-wide")),
-  );
-  route.forEach((points, i) => {
+  const orbiting = own("[data-orbit]").filter((el) => !(narrow && el.hasAttribute("data-orbit-wide")));
+  route.forEach(({ points, loop, from, to }, i) => {
     const centre = new Path(hang(points, 0.55), 3);
     if (centre.length < 6) return;
     runs.push({ top: Math.min(...centre.ys), bottom: Math.max(...centre.ys) });
-    // Under the head of a screen there's less room to dance.
-    const room = (narrow ? 0.42 : 1) * (i === 0 && start ? 0.6 : 1);
+    // Under the head of a screen there's less room to dance; tied
+    // together, they keep close (closest between two knots).
+    const knots = (from === "knot" ? 1 : 0) + (to === "knot" ? 1 : 0);
+    const room =
+      (narrow ? 0.42 : 1) * (i === 0 && start ? 0.6 : 1) * (knots === 2 ? 0.32 : knots ? 0.5 : 1);
     for (const hue of ["c", "m"] as Hue[]) {
       let pts = dancer(centre, hue, { scale: room, seed: i * 13 + seed });
       for (const el of orbiting) {
         if (el.dataset.orbit !== hue) continue;
-        const b = box(el);
+        const b = sbox(el);
         const cy = (b.t + b.b) / 2;
         if (cy < centre.ys[0] || cy > centre.ys[centre.ys.length - 1]) continue;
         const pad = (el.dataset.orbitPad ?? "34,30").split(",").map(Number) as [number, number];
@@ -180,7 +252,6 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
         pts = found.points;
       }
       journey[hue].push(...pts);
-      const loop = loopList[i];
       if (loop) {
         // Where they meet, one ties a loose loop round the other before
         // they part: cyan going in, magenta coming out.
@@ -208,16 +279,43 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
     for (const { from, to } of detours[hue]) {
       orbits.push({ hue, points: pts.slice(from, to), key: keys.keys[to - 1] });
     }
-    marks.push(
-      ...thread(new Path(pts, 3), {
-        hue,
-        w: TEMPER[hue].weight * (narrow ? 0.85 : 1),
-        seed: seed++,
-        key: (s) => keys.keyAt(s),
-        glow: 0.22,
-      }),
-    );
+    // One thread, unless it leaves the page for a track (a gap): then one
+    // for each stretch drawn, keyed by where it is along the whole.
+    let from = 0;
+    for (let i = 1; i <= pts.length; i++) {
+      if (i < pts.length && Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]) < GAP) continue;
+      const offset = keys.lens[from];
+      marks.push(
+        ...thread(new Path(pts.slice(from, i), 3), {
+          hue,
+          w: TEMPER[hue].weight * (narrow ? 0.85 : 1),
+          seed: seed++,
+          key: (s) => keys.keyAt(s + offset),
+          glow: 0.22,
+        }),
+      );
+      from = i;
+    }
     tips.push({ hue, points: pts, keys: keys.keys });
+  }
+  if (across) {
+    // Turned back: the spine was composed as if the track read down.
+    const turn = (pts: Pt[]) => pts.map(([x, y]) => [y, x] as Pt);
+    marks.splice(0, marks.length, ...marks.map(turned));
+    for (const tip of tips) tip.points = turn(tip.points);
+    for (const o of orbits) o.points = turn(o.points);
+    // Headings across a track: strung on a weft level with their words,
+    // thrown as the reach (along x) gets to them.
+    let wi = 0;
+    for (const el of own("[data-weft]")) {
+      const y = firstLineMiddle(el);
+      const b = box(el.querySelector(".hion-strung__box") ?? el);
+      const hue: Hue = wi++ % 2 ? "c" : "m";
+      marks.push(
+        ...weft(b.l - 36, b.r + 36, y, hue, seed++, undefined, { knotL: true, knotR: true, key: b.l - 60 }).map(acrossX),
+      );
+    }
+    return { marks, tips, orbits, end: endAt ? endAt[1] + 120 : null };
   }
   /** Where a hion crosses height y nearest to x (for things to tie on). */
   const threadAt = (y: number, x: number) => {
@@ -244,23 +342,35 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
   const weftY = new Map<HTMLElement, number>();
 
   /* ---- Headings strung on wefts ---- */
-  for (const el of host.querySelectorAll<HTMLElement>("[data-weft]")) {
-    if (!visible(el)) continue;
+  for (const el of own("[data-weft]")) {
     const y = firstLineMiddle(el);
     weftY.set(el, y);
     const loop = loopOf(el);
-    const b = box(el);
-    const from = loop ? loop.l - 22 : b.l - 36;
-    const to = loop ? loop.r + 22 : b.r + 36;
-    marks.push(...weft(from, to, y, wi++ % 2 ? "c" : "m", seed++, loop));
+    // The words, not the heading's whole line.
+    const b = box(el.querySelector(".hion-strung__box") ?? el);
+    const hue: Hue = wi++ % 2 ? "c" : "m";
+    if (loop) {
+      // Across the loop, and out past it where the heading hangs out.
+      marks.push(...weft(Math.min(loop.l - 22, b.l - 30), Math.max(loop.r + 22, b.r + 30), y, hue, seed++, loop));
+      continue;
+    }
+    // Off the loops, a heading beside the hions is strung from them: the
+    // weft is thrown out from where they pass, through the words.
+    const x = threadAt(y, (b.l + b.r) / 2);
+    if (x !== null && (x < b.l - 20 || x > b.r + 20)) {
+      const toLeft = x > b.r;
+      const [a, c] = toLeft ? [b.l - 36, x] : [x, b.r + 36];
+      marks.push(...weft(a, c, y, hue, seed++, undefined, { knotL: true, knotR: true, from: x }));
+    } else {
+      marks.push(...weft(b.l - 36, b.r + 36, y, hue, seed++, undefined));
+    }
   }
 
   /* ---- Things that hang ---- */
   const setHang = (el: HTMLElement, length: number) =>
     el.style.setProperty("--hion-hang", `${Math.max(0, length).toFixed(1)}px`);
 
-  for (const holder of host.querySelectorAll<HTMLElement>("[data-cord]")) {
-    if (!visible(holder)) continue;
+  for (const holder of own("[data-cord]")) {
     const items = [...holder.querySelectorAll<HTMLElement>("[data-hang]")].filter(
       (item) =>
         item.closest("[data-cord]") === holder &&
@@ -327,20 +437,36 @@ export function compose(host: HTMLElement, origin: () => Pt | null): Composition
   }
 
   // Chains: things hung from the thing above them.
-  for (const item of host.querySelectorAll<HTMLElement>("[data-hang-from='prev']")) {
+  for (const item of own("[data-hang-from='prev']", false)) {
     let prev = item.previousElementSibling as HTMLElement | null;
     while (prev && !prev.hasAttribute("data-ink")) prev = prev.previousElementSibling as HTMLElement | null;
     if (prev) setHang(item, box(item).t - box(prev).b);
   }
 
-  /* ---- Ties: items knotted to their loop's left strand ---- */
-  for (const el of host.querySelectorAll<HTMLElement>("[data-tie]")) {
-    if (!visible(el)) continue;
+  /* ---- Ties: things tied on to the hions beside them (or, inside a
+     loop, to its left strand) ---- */
+  for (const el of own("[data-tie]")) {
     const loop = loopOf(el);
-    if (!loop) continue;
     const y = firstLineMiddle(el);
     const b = box(el);
-    const hue: Hue = el.dataset.hue === "m" ? "m" : "c";
+    const hue: Hue = (el.closest<HTMLElement>("[data-hue]")?.dataset.hue ?? "c") === "m" ? "m" : "c";
+    if (!loop) {
+      const x = threadAt(y, (b.l + b.r) / 2);
+      if (x === null || (x > b.l - 8 && x < b.r + 8)) continue;
+      const right = x < b.l;
+      const end = right ? b.l - 10 : b.r + 10;
+      if (Math.abs(end - x) > 260) continue;
+      const pts: Pt[] = [
+        [x, y],
+        [(x + end) / 2, y + 4],
+        [end, y],
+      ];
+      marks.push(
+        ...thread(new Path(pts, 3), { hue, w: 2.2, seed: seed++, key: [y - 40, y - 10], glow: 0.16 }),
+        ...knot(end, y, 3.5, seed++, y - 10),
+      );
+      continue;
+    }
     const pts: Pt[] = [
       [loop.l, y - 4],
       [(loop.l + b.l) / 2, y + 3],
@@ -420,7 +546,7 @@ function weft(
   hue: Hue,
   seed: number,
   loop: Loop | undefined,
-  ends: { knotL?: boolean; knotR?: boolean; from?: number } = {},
+  ends: { knotL?: boolean; knotR?: boolean; from?: number; key?: number } = {},
 ): Mark[] {
   const out: Mark[] = [];
   const rand = rng(seed);
@@ -436,7 +562,7 @@ function weft(
   }
   const reversed = ends.from !== undefined && Math.abs(ends.from - to) < Math.abs(ends.from - from);
   const path = new Path(reversed ? pts.slice().reverse() : pts, 3);
-  const key = y - 40;
+  const key = ends.key ?? y - 40;
   // Thrown across as the reach passes them.
   const keys: [number, number] = [key, key + 60];
   if (loop) {

@@ -14,7 +14,17 @@
 import type { SiteContent } from "../types";
 import { h, newTab } from "./dom";
 import { ink } from "./ink";
+import { type Fabric, fabricAt } from "./fabric";
 import { Kind, Path, paint, paintGlows, patterns, thread, type Pt } from "./pastel";
+import { clothCanvas } from "./stitch";
+
+/** A swatch of a page's cloth, hanging under its name. Drawn long; CSS
+ * shows as much of it as is pulled down. */
+function swatch(fabric: Fabric) {
+  const canvas = clothCanvas(fabric, 11, 26, 4);
+  canvas.classList.add("hion-swatch__cloth");
+  return h("span", { class: "hion-swatch", "aria-hidden": "true", "data-fabric": fabric }, canvas);
+}
 
 export interface Nav {
   el: HTMLElement;
@@ -24,6 +34,9 @@ export interface Nav {
   /** The line's height at page x, at rest. */
   cordY(x: number): number;
   setCurrent(path: string): void;
+  /** The swatch of cloth under the current destination's name, on screen
+   * (null when it is not shown, as on a phone). */
+  swatch(): DOMRect | null;
   close(): void;
 }
 
@@ -47,6 +60,7 @@ export function createNav(
       "data-hue": "m",
     },
     h("span", { class: "hion-charm__label" }, content.site.name),
+    face ? null : swatch(fabricAt("/")),
   );
   const list = h("ul", { class: "hion-nav__list", id: "hion-nav-list" });
   content.site.nav.forEach((item, i) => {
@@ -66,6 +80,7 @@ export function createNav(
             ...(item.external ? { target: "_blank", rel: "noreferrer" } : {}),
           },
           h("span", { class: "hion-charm__label" }, item.label),
+          item.external || face ? null : swatch(fabricAt(item.href)),
           item.external ? newTab() : null,
         ),
       ),
@@ -106,6 +121,13 @@ export function createNav(
     width = nav.clientWidth;
     const dropped = el.dataset.state === "dropped";
     const charms = [home, ...list.querySelectorAll<HTMLElement>(".hion-charm")];
+    // Where each hangs along the line, read all at once before anything
+    // moves (a read between writes lays the page out again each time).
+    const navLeft = nav.getBoundingClientRect().left;
+    const xs = charms.map((charm) => {
+      const box = charm.getBoundingClientRect();
+      return box.left - navLeft + box.width / 2;
+    });
     charms.forEach((charm, i) => {
       const isCurrent = charm.hasAttribute("data-current");
       let hang: number;
@@ -119,19 +141,22 @@ export function createNav(
       }
       charm.style.setProperty("--hion-hang", `${hang}px`);
       // Positioned from the top of the line, so the thread meets the line.
-      const box = charm.getBoundingClientRect();
-      const navBox = nav.getBoundingClientRect();
-      const x = box.left - navBox.left + box.width / 2;
-      charm.style.setProperty("--hion-top", `${(cordY(x) + hang).toFixed(1)}px`);
+      charm.style.setProperty("--hion-top", `${(cordY(xs[i]) + hang).toFixed(1)}px`);
     });
     drawCord();
     ink(el);
   }
 
+  /** The line as last drawn (it changes only with the width). */
+  let drawn = "";
+
   function drawCord() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
     const w = nav.clientWidth;
     const hgt = cordTop() + sagOf() + 40;
+    const key = `${w}:${hgt}:${dpr}`;
+    if (key === drawn) return;
+    drawn = key;
     cord.width = Math.ceil(w * dpr);
     cord.height = Math.ceil(hgt * dpr);
     cord.style.width = `${w}px`;
@@ -278,6 +303,11 @@ export function createNav(
       }
       if (el.dataset.state === "dropped") setState(scrollY < 150 ? "rest" : "stowed");
       hangCharms();
+    },
+    swatch() {
+      const current = nav.querySelector<HTMLElement>(".hion-charm[data-current] .hion-swatch");
+      const box = current?.getBoundingClientRect();
+      return box && box.width > 0 && box.height > 0 ? box : null;
     },
     close() {
       if (el.dataset.state === "dropped") setState("rest");

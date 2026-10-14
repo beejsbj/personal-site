@@ -37,6 +37,31 @@ test("lens content cache expires and writing requests force refresh", async () =
   assert.equal(requests, 3);
 });
 
+test("a stale load answers at once from the cache and refreshes behind", async () => {
+  let now = 0;
+  let requests = 0;
+  let release;
+  const loader = createContentLoader(
+    async () => {
+      requests += 1;
+      if (requests > 1) await new Promise((resolve) => (release = resolve));
+      return Response.json({ ...payload(), site: { n: requests } });
+    },
+    () => now,
+  );
+  await loader.load();
+  now = 60_001;
+  // Expired: answered from the cache without waiting on the network.
+  const quick = await loader.load(undefined, false, true);
+  assert.equal(quick.site.n, 1);
+  assert.equal(requests, 2);
+  release();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  // The refresh landed; nothing more was asked for.
+  assert.equal((await loader.load()).site.n, 2);
+  assert.equal(requests, 2);
+});
+
 test("concurrent content requests deduplicate and rejected requests can recover", async () => {
   let requests = 0;
   let broken = true;

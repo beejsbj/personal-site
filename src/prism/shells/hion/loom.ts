@@ -13,10 +13,19 @@
  * and redrawn identically when you come back), each mark is drawn once and
  * within a per-frame budget, blooms live on quarter-resolution canvases,
  * and nothing runs while the page is idle or once the drawing has caught
- * up with you. */
+ * up with you.
+ *
+ * A drawing can also read across (`axis: "x"`): the timeline on a wide
+ * resume, a track slid sideways as the page scrolls (track.ts). Then the
+ * tiles are columns, the reach runs left to right, and what is in sight is
+ * the stretch of the track its `view()` reports. Everything else is the
+ * same: the marks only need composing with their keys and extents along x
+ * (weave.ts composes such a drawing turned, as if it read down). */
 import { type Hue, Kind, type Mark, paint, paintGlow, patterns, type Patterns, type Pt } from "./pastel";
 
-const TILE = 1024;
+/** Tile length: a frame that draws re-sends only the tiles it touched,
+ * so shorter tiles cost less each frame. */
+const TILE = 512;
 const GLOW = 0.25;
 
 interface Tile {
@@ -37,8 +46,16 @@ export interface Composition {
   /** The detours round things a hion circles, once drawn (key is the
    * reveal key of their last point), for a glint to ride. */
   orbits: { hue: Hue; points: Pt[]; key: number }[];
-  /** Where the threads end (page y), if they do. */
+  /** Where the threads end (along the axis the drawing reads), if they do. */
   end: number | null;
+}
+
+/** The stretch of a drawing in sight: where it starts along the axis the
+ * drawing reads, how long it is, and whether any of it is on screen. */
+export interface View {
+  start: number;
+  size: number;
+  shown: boolean;
 }
 
 interface LoomOptions {
@@ -49,6 +66,14 @@ interface LoomOptions {
   /** How far beyond the viewport to keep tiles, in viewports (a still
    * face never scrolls, so it keeps none). */
   lookahead?: number;
+  /** A screen you travelled to: its first drawing comes down briskly, so
+   * what you came for is lit while the ribbon is still unfurling (the
+   * screen you arrive on is drawn slowly enough to watch). */
+  brisk?: boolean;
+  /** Which way the drawing reads: down the page (default), or across. */
+  axis?: "x" | "y";
+  /** Reading across: what of the track is in sight. */
+  view?: () => View;
   isIdle(): boolean;
   onIdleChange(listener: (idle: boolean) => void): void;
   compose(): Composition;
@@ -56,8 +81,12 @@ interface LoomOptions {
 
 export function createLoom(options: LoomOptions) {
   const { host, signal, instant } = options;
+  const across = options.axis === "x";
+  // Whose drawing a thing on the page belongs to: a track inside the page
+  // draws its own (weave.ts and the reveals here keep to their host's).
+  host.dataset.loom = across ? "x" : "y";
   const layer = document.createElement("div");
-  layer.className = "hion-loom";
+  layer.className = across ? "hion-loom hion-loom--across" : "hion-loom";
   layer.setAttribute("aria-hidden", "true");
   // One bead of light at the tip of each hion, riding its own thread.
   const beads = (["c", "m"] as Hue[]).map((hue) => {
@@ -79,8 +108,9 @@ export function createLoom(options: LoomOptions) {
   let buckets: number[][] = []; // per tile, the marks that touch it
   let reach = 0;
   let target = 0;
-  let width = 0;
-  let height = 0;
+  /** Length along the axis the drawing reads, and breadth across it. */
+  let length = 0;
+  let breadth = 0;
   let dpr = 1;
   const tiles = new Map<number, Tile>();
   let reveals: { el: HTMLElement; at: number }[] = [];
@@ -95,14 +125,26 @@ export function createLoom(options: LoomOptions) {
     return host.getBoundingClientRect().top + scrollY;
   }
 
+  /** What of the drawing is in sight. */
+  function sight(): View {
+    if (across && options.view) return options.view();
+    return { start: scrollY - hostTop(), size: innerHeight, shown: true };
+  }
+
+  const measureLength = () => (across ? host.scrollWidth : host.scrollHeight);
+  const measureBreadth = () => (across ? host.clientHeight : host.clientWidth);
+
   function build() {
-    width = host.clientWidth;
-    height = host.scrollHeight;
-    dpr = Math.min(devicePixelRatio || 1, width > 800 ? 1.5 : 2);
-    layer.style.height = `${height}px`;
+    length = measureLength();
+    breadth = measureBreadth();
+    dpr = Math.min(devicePixelRatio || 1, across || breadth > 800 ? 1.5 : 2);
+    if (across) {
+      layer.style.width = `${length}px`;
+      layer.style.height = `${breadth}px`;
+    } else layer.style.height = `${length}px`;
     const composed = options.compose();
     marks = composed.marks.sort((a, b) => a.key - b.key);
-    buckets = Array.from({ length: Math.ceil(height / TILE) }, () => []);
+    buckets = Array.from({ length: Math.ceil(length / TILE) }, () => []);
     marks.forEach((m, i) => {
       const from = Math.max(0, Math.floor(m.y0 / TILE));
       const to = Math.min(buckets.length - 1, Math.floor(m.y1 / TILE));
@@ -115,12 +157,13 @@ export function createLoom(options: LoomOptions) {
     for (const tile of tiles.values()) tile.el.remove();
     tiles.clear();
     upto = 0;
-    const top = hostTop();
+    const hostBox = host.getBoundingClientRect();
     reveals = [...host.querySelectorAll<HTMLElement>("[data-reveal]")]
-      .map((el) => ({
-        el,
-        at: el.getBoundingClientRect().top + scrollY - top + 24,
-      }))
+      .filter((el) => el.parentElement?.closest("[data-loom]") === host)
+      .map((el) => {
+        const r = el.getBoundingClientRect();
+        return { el, at: (across ? r.left - hostBox.left : r.top - hostBox.top) + 24 };
+      })
       .sort((a, b) => a.at - b.at);
     built = true;
   }
@@ -128,22 +171,29 @@ export function createLoom(options: LoomOptions) {
   function makeTile(index: number): Tile {
     const el = document.createElement("div");
     el.className = "hion-loom__tile";
-    const tileHeight = Math.min(TILE, height - index * TILE);
-    el.style.top = `${index * TILE}px`;
-    el.style.height = `${tileHeight}px`;
+    const tileLength = Math.min(TILE, length - index * TILE);
+    // Rows down the page; columns across a track.
+    const [w, h] = across ? [tileLength, breadth] : [breadth, tileLength];
+    if (across) {
+      Object.assign(el.style, { left: `${index * TILE}px`, top: "0", width: `${w}px`, height: `${h}px` });
+    } else {
+      el.style.top = `${index * TILE}px`;
+      el.style.height = `${h}px`;
+    }
     const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(width * dpr);
-    canvas.height = Math.ceil(tileHeight * dpr);
+    canvas.width = Math.ceil(w * dpr);
+    canvas.height = Math.ceil(h * dpr);
     const glow = document.createElement("canvas");
     glow.className = "hion-loom__glow";
-    glow.width = Math.ceil(width * GLOW);
-    glow.height = Math.ceil(tileHeight * GLOW);
+    glow.width = Math.ceil(w * GLOW);
+    glow.height = Math.ceil(h * GLOW);
     el.append(glow, canvas);
     layer.append(el);
+    const shift = -index * TILE;
     const ctx = canvas.getContext("2d")!;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, -index * TILE * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, across ? shift * dpr : 0, across ? 0 : shift * dpr);
     const gctx = glow.getContext("2d")!;
-    gctx.setTransform(GLOW, 0, 0, GLOW, 0, -index * TILE * GLOW);
+    gctx.setTransform(GLOW, 0, 0, GLOW, across ? shift * GLOW : 0, across ? 0 : shift * GLOW);
     return { index, el, ctx, gctx, pats: patterns(ctx, dpr), cursor: 0 };
   }
 
@@ -156,13 +206,13 @@ export function createLoom(options: LoomOptions) {
    * budget, so a new tile never stalls a frame: tiles are made well ahead
    * of the viewport and fill in over a few frames. */
   function fill(deadline: number, inView = false) {
-    const top = scrollY - hostTop();
-    const middle = top + innerHeight / 2;
+    const { start: top, size } = sight();
+    const middle = top + size / 2;
     const order = [...tiles.values()]
       .filter(
         (tile) =>
           !inView ||
-          ((tile.index + 1) * TILE > top && tile.index * TILE < top + innerHeight),
+          ((tile.index + 1) * TILE > top && tile.index * TILE < top + size),
       )
       .sort(
       (a, b) =>
@@ -183,12 +233,12 @@ export function createLoom(options: LoomOptions) {
 
   /** Keep tiles near the viewport; drop far ones. */
   function cull() {
-    const top = scrollY - hostTop();
+    const { start: top, size } = sight();
     const ahead = options.lookahead ?? 0.6;
-    const from = Math.max(0, Math.floor((top - innerHeight * Math.min(0.5, ahead)) / TILE));
+    const from = Math.max(0, Math.floor((top - size * Math.min(0.5, ahead)) / TILE));
     const to = Math.min(
-      Math.ceil(height / TILE) - 1,
-      Math.floor((top + innerHeight * (1 + ahead)) / TILE),
+      Math.ceil(length / TILE) - 1,
+      Math.floor((top + size * (1 + ahead)) / TILE),
     );
     for (const [index, tile] of tiles) {
       if (index < from - 1 || index > to + 1 || (ahead === 0 && (index < from || index > to))) {
@@ -228,10 +278,12 @@ export function createLoom(options: LoomOptions) {
   }
 
   function aim() {
-    const top = scrollY - hostTop();
+    const { start: top, size, shown } = sight();
+    // A track not yet in sight waits to be drawn until you get to it.
+    if (!instant && !shown) return;
     target = instant
-      ? height + 1
-      : Math.max(target, Math.min(height + 1, top + innerHeight * (intro ? 0.94 : 1.05)));
+      ? length + 1
+      : Math.max(target, Math.min(length + 1, top + size * (intro ? 0.94 : 1.05)));
   }
 
   function tick(now: number) {
@@ -245,12 +297,17 @@ export function createLoom(options: LoomOptions) {
     let gap = target - reach;
     // Far behind (a jump, a fling): lay what you have passed at once, and
     // draw only the last stretch in front of you.
-    if (gap > innerHeight * 1.4) {
-      advance(target - innerHeight * 0.9);
+    const size = across ? sight().size : innerHeight;
+    if (gap > size * 1.4) {
+      advance(target - size * 0.9);
       gap = target - reach;
     }
     if (gap > 0.5) {
-      const speed = intro ? 0.26 + gap / 800 : 0.45 + gap / 450; // px per ms
+      const speed = intro
+        ? options.brisk
+          ? 1.4 + gap / 220
+          : 0.26 + gap / 800
+        : 0.45 + gap / 450; // px per ms
       advance(Math.min(target, reach + speed * dt));
     } else {
       last = 0;
@@ -267,7 +324,7 @@ export function createLoom(options: LoomOptions) {
 
   function onScroll() {
     if (!built) return;
-    if (scrollY > 0) intro = false;
+    if (across ? sight().start > 0 : scrollY > 0) intro = false;
     cull();
     aim();
     if (instant) advance(target);
@@ -278,15 +335,11 @@ export function createLoom(options: LoomOptions) {
   let observedWidth = 0;
   let observedHeight = 0;
   const observer = new ResizeObserver(() => {
-    if (
-      host.clientWidth === observedWidth &&
-      host.scrollHeight === observedHeight
-    )
-      return;
+    if (measureBreadth() === observedWidth && measureLength() === observedHeight) return;
     clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
-      observedWidth = host.clientWidth;
-      observedHeight = host.scrollHeight;
+      observedWidth = measureBreadth();
+      observedHeight = measureLength();
       const kept = reach;
       build();
       cull();
@@ -304,8 +357,8 @@ export function createLoom(options: LoomOptions) {
 
   return {
     start() {
-      observedWidth = host.clientWidth;
-      observedHeight = host.scrollHeight;
+      observedWidth = measureBreadth();
+      observedHeight = measureLength();
       build();
       cull();
       aim();
@@ -327,10 +380,11 @@ export function createLoom(options: LoomOptions) {
     release() {
       layer.dataset.state = "leaving";
       // Reeled back in: the drawing withdraws up the screen, toward the
-      // line at the top it came from.
-      const top = scrollY - hostTop();
-      const bottom = Math.max(0, height - (top + innerHeight));
-      const gone = Math.max(0, height - Math.max(0, top));
+      // line at the top it came from (a track is in sight top to bottom).
+      const top = across ? 0 : scrollY - hostTop();
+      const tall = across ? breadth : length;
+      const bottom = across ? 0 : Math.max(0, tall - (top + innerHeight));
+      const gone = Math.max(0, tall - Math.max(0, top));
       layer.animate(
         [{ clipPath: `inset(0 0 ${bottom}px 0)` }, { clipPath: `inset(0 0 ${gone}px 0)` }],
         { duration: 420, easing: "cubic-bezier(0.55, 0, 0.8, 0.2)", fill: "forwards" },
@@ -338,9 +392,10 @@ export function createLoom(options: LoomOptions) {
       cancelAnimationFrame(frame);
       frame = 0;
     },
-    /** Light everything now (e.g. focus jumped far ahead). */
-    catchUp(y: number) {
-      target = Math.max(target, Math.min(height + 1, y));
+    /** Light everything now (e.g. focus jumped far ahead), to this far
+     * along the axis the drawing reads. */
+    catchUp(to: number) {
+      target = Math.max(target, Math.min(length + 1, to));
       wake();
     },
     /* What is drawn, for life.ts: the threads answer the visitor on it. */

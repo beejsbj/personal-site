@@ -26,6 +26,9 @@ importers:
       '@fontsource-variable/tourney':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource/aboreto':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource/anton':
         specifier: ^5.3.0
         version: 5.3.0
@@ -41,10 +44,10 @@ importers:
       '@fontsource/patrick-hand':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/shippori-mincho':
+      '@fontsource/special-elite':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/special-elite':
+      '@fontsource/spectral':
         specifier: ^5.3.0
         version: 5.3.0
       '@vercel/functions':
@@ -560,6 +563,9 @@ packages:
   '@fontsource-variable/tourney@5.3.0':
     resolution: {integrity: sha512-EH5xhAm6Dykk8yyFIex7AoBU9LXceQSPdyemxqv9FPvIaFgHVLVRJq5rCTFd1+rBv+MMfeXf0UctZJH72D1vsQ==}
 
+  '@fontsource/aboreto@5.3.0':
+    resolution: {integrity: sha512-/vwaZbwMV8gLO0YCnm6YMQRnuN1Hx/+5MsxkSfpjjYz8HR99yNpOhn6rhusICx7WGonuRhyKnOzQ3H7YbtW2Pg==}
+
   '@fontsource/anton@5.3.0':
     resolution: {integrity: sha512-OR1D5n124n2XRs66SbX7IjcOSptljEJE8FcDNnlni2y1/M6KpTx7cU2PIWzTSsBj4WFkHPw24On8qw3qkQZuTw==}
 
@@ -575,11 +581,11 @@ packages:
   '@fontsource/patrick-hand@5.3.0':
     resolution: {integrity: sha512-V8C38IlIFfdWg0Xtri3F7sLCVpm069rUwn6w4n+oyn38gt7H4arOJmuReg3tAw1Q6jHqZp89wTnAAJagq4Atxw==}
 
-  '@fontsource/shippori-mincho@5.3.0':
-    resolution: {integrity: sha512-S41kRxQuubAaYss+LeXu0IOc02RQwsPaJbR1cWZx4VV15hXaYZViH3WAve9HpDVFqKYd/BVk86Bg7lp9ytV3KQ==}
-
   '@fontsource/special-elite@5.3.0':
     resolution: {integrity: sha512-fOQ9XU8m4KnqzcLibAXCxTsKzbxePNDjPqVss5GSMcPVCY1TuCv+Wq8gm1ebqIR6XS1rhMbQ7ECP9ocKVEEpTA==}
+
+  '@fontsource/spectral@5.3.0':
+    resolution: {integrity: sha512-2TL5WWGOZj4SIsBmPFEzKeA60tXXd1Qp1OqaaVEWkJL8IfSGLk6YmiusmC441iFkdJDIuFelu1r8lhCmQUU3mw==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -2848,6 +2854,8 @@ snapshots:
 
   '@fontsource-variable/tourney@5.3.0': {}
 
+  '@fontsource/aboreto@5.3.0': {}
+
   '@fontsource/anton@5.3.0': {}
 
   '@fontsource/caveat-brush@5.3.0': {}
@@ -2858,9 +2866,9 @@ snapshots:
 
   '@fontsource/patrick-hand@5.3.0': {}
 
-  '@fontsource/shippori-mincho@5.3.0': {}
-
   '@fontsource/special-elite@5.3.0': {}
+
+  '@fontsource/spectral@5.3.0': {}
 
   '@img/colour@1.1.0':
     optional: true

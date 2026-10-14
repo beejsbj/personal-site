@@ -2,10 +2,17 @@
    magenta, in chalk pastel on black paper. This file only holds what must
    exist before the shell's JS arrives: the black paper itself, so there is
    no flash, and the faces the shell writes in. Everything else lives in
-   shells/hion/shell.css. */
-@import "@fontsource/shippori-mincho/latin-500.css";
-@import "@fontsource/shippori-mincho/latin-800.css";
-@import "@fontsource/caveat/latin-600.css";
+   shells/hion/shell.css.
+
+   Two faces, one inscribed voice. Aboreto, thin capitals cut like a stele,
+   for the large titles and the labels; Spectral for reading, its light
+   italic for the spoken lines. Latin only, and only the weights the shell
+   asks for: Spectral 400, 600 (strong words and small titles) and light
+   italic; Aboreto has one weight. */
+@import "@fontsource/aboreto/latin-400.css";
+@import "@fontsource/spectral/latin-400.css";
+@import "@fontsource/spectral/latin-600.css";
+@import "@fontsource/spectral/latin-300-italic.css";
 
 :root[data-lens="hion"],
 :root[data-lens="hion"] body {
