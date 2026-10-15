@@ -776,9 +776,9 @@ function about(content: SiteContent) {
  * heading is thrown out from a knot on their way down; each role is a loop
  * of its own, its years written on the thread where the two part (and
  * circled by one of them), its title strung across the loop's head, its
- * record inside. On a wide screen the roles run across instead, on a
- * pinned track the page's scrolling slides (track.ts), in the same order:
- * newest first. Courses are knotted on the strand; tools hang as charms
+ * record inside. Wherever there is height for it (phones too) the roles
+ * run across instead, on a pinned track the page's scrolling slides
+ * (track.ts), in the same order: newest first. Courses are knotted on the strand; tools hang as charms
  * from the weft of their heading; the page's own words close it. */
 
 /** The years a role spans, as they are written on the thread: "2024",
@@ -886,8 +886,8 @@ function resume(content: SiteContent) {
       { class: "hion-entry-head" },
       actions(content.lenses.hion, page.header, "resume"),
     ),
-    // Down the page, or (wide screens) across it: the pin and the track
-    // are boxes only when it runs across (track.ts).
+    // Across, or (a window too short for it) down the page: the pin and
+    // the track are boxes only when it runs across (track.ts).
     roles.length
       ? h(
           "section",

@@ -132,8 +132,8 @@ function show(route: Route, first: boolean) {
     page.dataset.drop =
       drop[0] < width * 0.4 ? "left" : drop[0] > width * 0.6 ? "right" : "center";
   }
-  // The resume's timeline runs across a wide screen, on a track that draws
-  // its own threads; laid again if the window crosses over.
+  // The resume's timeline runs across, on a track that draws its own
+  // threads; laid again if the window crosses over (too short for it).
   const timeline = page.querySelector<HTMLElement>("[data-timeline]");
   const across = timeline ? matchMedia(ACROSS) : undefined;
   const track =
