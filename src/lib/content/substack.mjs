@@ -1,4 +1,4 @@
-import { sanitizeSubstackHtml } from "./substack-html.mjs";
+import { articleHash, sanitizeSubstackHtml } from "./substack-html.mjs";
 
 export class ContentUnavailable extends Error {}
 class SourceError extends Error {
@@ -304,7 +304,7 @@ export function createSubstackSource({
               const url = new URL(href, base);
               const target = url.pathname.match(/^\/p\/([\w-]+)\/?$/)?.[1];
               return url.origin === base && allowed.has(target)
-                ? `/writing/${target}${url.hash}`
+                ? `/writing/${target}${articleHash(url.hash)}`
                 : href;
             } catch {
               return href;

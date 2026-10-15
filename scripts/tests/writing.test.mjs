@@ -151,7 +151,7 @@ test("body is fetched lazily and sanitised into the shared entry contract", asyn
   assert.equal(full.id, "hello");
   assert.equal(full.data.canonical, `${origin}/p/hello`);
   assert.match(full.body, /<h2>Heading<\/h2>/);
-  assert.match(full.body, /href="\/writing\/other#part"/);
+  assert.match(full.body, /href="\/writing\/other#ss-part"/);
   assert.match(full.body, /href="https:\/\/buroojs\.substack\.com\/p\/absent"/);
   assert.doesNotMatch(full.body, /script|onerror|utm_source/);
 });
@@ -365,6 +365,39 @@ b</code></pre>
     "top-level code keeps its blank line",
   );
   assert.doesNotMatch(html.replace(/<pre[\s\S]*?<\/pre>/, ""), /\n\s*\n\s*\n/);
+});
+
+test("fragment links keep namespaced targets, even on unwrapped wrappers", () => {
+  const { html } = sanitizeSubstackHtml(
+    `<p><a href="#toc">Contents</a> <a href="#note-1">1</a> <a class="footnote-anchor" data-component-name="FootnoteAnchorToDOM" id="footnote-anchor-1" href="#footnote-1" target="_self">2</a></p>
+    <h2 id="toc" class="header-anchor-post" style="x">Contents</h2>
+    <p id="note-1" onclick="bad()">A footnote</p>
+    <div class="footnote" data-component-name="FootnoteToDOM"><a id="footnote-1" href="#footnote-anchor-1" class="footnote-number" contenteditable="false" target="_self">2</a><div id="wrapped" class="footnote-content"><p>Second note</p></div></div>
+    <span id="loose">Loose text</span><a href="#loose">back</a><a href="#wrapped">wrapped</a>
+    <p id="note-1">A duplicate id</p><p id="bad&quot; onmouseover=&quot;x()">Hostile id</p><a href="#%C2%A7caf%C3%A9">encoded</a><p id="§café">Unicode id</p><p id="">Empty</p>`,
+  );
+  const ids = [...html.matchAll(/\sid="([^"]*)"/g)].map((m) => m[1]);
+  assert.equal(new Set(ids).size, ids.length, "ids are unique");
+  for (const id of ids)
+    assert.match(id, /^ss-[A-Za-z0-9_-]+$/, "ids are namespaced and inert");
+  for (const [, href] of html.matchAll(/href="#([^"]*)"/g))
+    assert.ok(ids.includes(href), `#${href} has a destination`);
+  assert.match(html, /<a href="#ss-note-1">1<\/a>/);
+  assert.match(html, /<p id="ss-note-1">A footnote<\/p>/);
+  assert.match(html, /<h2 id="ss-toc">Contents<\/h2>/);
+  assert.match(
+    html,
+    /<a id="ss-footnote-anchor-1" href="#ss-footnote-1">2<\/a>/,
+  );
+  assert.match(html, /<a id="ss-footnote-1" href="#ss-footnote-anchor-1">/);
+  assert.match(html, /id="ss-wrapped">Second note/);
+  assert.match(html, /id="ss-loose"/);
+  assert.match(html, /A duplicate id/);
+  assert.match(html, /Hostile id/);
+  assert.doesNotMatch(
+    html,
+    /\s(on\w+|style|class|target|contenteditable|data-[\w-]+)=/,
+  );
 });
 
 test("RSS absence does not turn a healthy older article into a false 404", async () => {

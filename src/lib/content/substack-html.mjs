@@ -95,6 +95,32 @@ const TRACKING_PARAM =
 const TRACKING_SRC =
   /(^|[./])(email|click|links?|track(ing)?|pixel|beacon|open)\.[\w.-]+\/|\/(pixel|beacon|track(ing)?|open)(\.\w+)?(\/|\?|$)|[?&]open=/i;
 
+// In-article destinations (footnotes, TOC targets) keep their ids, rewritten
+// into this namespace so they cannot collide with, or clobber, site chrome.
+const ID_PREFIX = "ss-";
+
+/** A source fragment or id as an inert, namespaced id; undefined if unusable. */
+export function articleId(raw) {
+  let value = raw ?? "";
+  try {
+    value = decodeURIComponent(value);
+  } catch {
+    /* keep the raw text */
+  }
+  const id = value
+    .normalize("NFKD")
+    .replace(/[^A-Za-z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+  return id ? `${ID_PREFIX}${id}` : undefined;
+}
+
+/** A URL hash (`#part`) pointing into a sanitised article, namespaced to match. */
+export function articleHash(hash) {
+  const id = articleId(hash.replace(/^#/, ""));
+  return id ? `#${id}` : "";
+}
+
 const attr = (el, name) =>
   el.attrs?.find((a) => a.name === name)?.value ?? undefined;
 const isEl = (n) => typeof n.tagName === "string";
@@ -114,9 +140,11 @@ function safeUrl(value, { allowMailto = true } = {}) {
   return undefined;
 }
 
-function cleanHref(value, rewriteHref) {
+function cleanHref(value, ctx) {
   let href = safeUrl(value);
   if (!href) return undefined;
+  // A bare fragment stays inside the article, aimed at its namespaced target.
+  if (href.startsWith("#")) return href === "#" ? href : articleHash(href);
   if (/^https?:/.test(href)) {
     // Only touch the URL when there is tracking to remove; otherwise keep the
     // author's link byte for byte.
@@ -129,7 +157,7 @@ function cleanHref(value, rewriteHref) {
       href = url.toString();
     }
   }
-  return rewriteHref ? rewriteHref(href) : href;
+  return ctx.rewriteHref ? ctx.rewriteHref(href) : href;
 }
 
 function cleanSrcset(value) {
@@ -204,7 +232,7 @@ function component(node, ctx) {
     /(^|\s)(digest-post-embed|embedded-post-wrap)(\s|$)/.test(cls)
   ) {
     const data = dataAttrs(node);
-    const href = cleanHref(data.canonical_url ?? data.url, ctx.rewriteHref);
+    const href = cleanHref(data.canonical_url ?? data.url, ctx);
     if (!href || !data.title) return [];
     return [
       el("aside", { class: "embed-card" }, [
@@ -234,9 +262,56 @@ function isTrackingImage(node) {
   return TRACKING_SRC.test(src);
 }
 
+const ANCHOR_HOST = new Set([
+  "blockquote",
+  "figcaption",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "li",
+  "p",
+  "td",
+  "th",
+]);
+
+// Each source id is claimed once, by its first element, as a namespaced id.
+function claimId(node, ctx) {
+  const raw =
+    attr(node, "id") ?? (node.tagName === "a" ? attr(node, "name") : undefined);
+  const id = raw && articleId(raw);
+  if (!id || ctx.ids.has(id)) return undefined;
+  ctx.ids.add(id);
+  return id;
+}
+
 function walk(node, ctx) {
   if (isText(node)) return [text(node.value)];
   if (!isEl(node)) return []; // comments, doctype
+  if (node.tagName === "iframe" || DROP.has(node.tagName))
+    return build(node, ctx);
+  const id = claimId(node, ctx);
+  const out = build(node, ctx);
+  if (!id) return out;
+  // A kept element carries its own id. An unwrapped wrapper hands it to its
+  // first output element, or leaves an empty anchor so the target survives.
+  const first = out[0];
+  if (first?.tag !== undefined && !first.attrs.id) {
+    first.attrs = { id, ...first.attrs };
+    return out;
+  }
+  if (!out.length && component(node, ctx)) return out; // dropped chrome
+  const anchor = el("a", { id });
+  // Inside the first block when it may hold an inline anchor, so a wrapper's
+  // target does not add an empty paragraph.
+  if (ANCHOR_HOST.has(first?.tag)) first.children.unshift(anchor);
+  else out.unshift(anchor);
+  return out;
+}
+
+function build(node, ctx) {
   const tag = node.tagName;
 
   if (tag === "iframe") return iframeFallback(attr(node, "src"));
@@ -278,7 +353,7 @@ function walk(node, ctx) {
   }
   if (tag === "a") {
     const cls = attr(node, "class") ?? "";
-    const href = cleanHref(attr(node, "href"), ctx.rewriteHref);
+    const href = cleanHref(attr(node, "href"), ctx);
     // Substack wraps every image in a "view full size" link; the image is enough.
     if (/(^|\s)image-link(\s|$)/.test(cls) || !href) return children();
     return [el("a", { href }, children())];
@@ -377,6 +452,7 @@ const hasMedia = (node) =>
 
 function isEmpty(node) {
   if (node.text !== undefined) return node.text.trim() === "";
+  if (node.attrs?.id) return false; // a fragment target, even when blank
   if (VOID.has(node.tag)) return node.tag === "br";
   if (node.tag === "hr" || node.tag === "td" || node.tag === "th") return false;
   if (hasMedia(node)) return false;
@@ -499,12 +575,15 @@ function markdownSafe(html, topLevelPre) {
 
 /**
  * @param {string} html Substack `body_html` (or RSS `content:encoded`).
+ * Bare `#fragment` links and element ids are namespaced together (see
+ * `articleId`).
  * @param {{ rewriteHref?: (href: string) => string, imageSizes?: string }} [options]
  * @returns {{ html: string, text: string, stats: { images: number, code: number } }}
  */
 export function sanitizeSubstackHtml(html, options = {}) {
   const ctx = {
     rewriteHref: options.rewriteHref,
+    ids: new Set(),
     imageSizes: options.imageSizes ?? "(min-width: 800px) 720px, 100vw",
     stats: { images: 0, code: 0 },
   };
