@@ -16,7 +16,7 @@ hero:
     - href: "social:LinkedIn"
     - href: "social:Email"
     - label: Resume
-      href: /resume
+      href: /about/resume
 work:
   title: Some things I've built
   link:

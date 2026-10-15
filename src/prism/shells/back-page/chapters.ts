@@ -34,6 +34,7 @@ import {
 import { paginate, type Blank } from "./paginate";
 import { studyNotes } from "./studynotes";
 import { BOOKS, type BookKey } from "./themes";
+import { RESUME_PATH } from "../../routes";
 
 type Project = SiteContent["projects"][number];
 type LabItem = SiteContent["lab"][number];
@@ -95,7 +96,7 @@ export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
   add("about", "/about", names.about, 1);
   // the resume is stapled into the about book, after the notes (its first
   // page is counted from the notes when it's written: see `resume`)
-  add("about", "/resume", names.resume, 1);
+  add("about", RESUME_PATH, names.resume, 1);
   page = 1;
   add("lab", "/lab", names.lab, ALLOWANCE.labHead);
   content.lab

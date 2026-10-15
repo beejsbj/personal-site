@@ -130,3 +130,28 @@ test("duplicated legacy path aliases remain declared for app and Vercel ingress"
     assert.match(astroConfig, new RegExp(`"${source}": "${destination}"`));
   }
 });
+
+test("the resume moved under About, and its old path keeps the query string", () => {
+  assert.ok(
+    vercelConfig.redirects.some(
+      (rule) =>
+        rule.source === "/resume" &&
+        rule.destination === "/about/resume" &&
+        rule.permanent &&
+        !rule.has,
+    ),
+    "Missing permanent Vercel redirect: /resume",
+  );
+  for (const [from, to] of [
+    ["/resume", "/about/resume"],
+    ["/resume/", "/about/resume"],
+    ["/resume?lens=cut-paper", "/about/resume?lens=cut-paper"],
+    ["/resume?lens=hion&x=1", "/about/resume?lens=hion&x=1"],
+  ])
+    assert.equal(getLegacyRedirect(new URL(from, "https://burooj.dev")), to, from);
+  assert.equal(getLegacyRedirect(new URL("https://burooj.dev/about/resume?lens=back-page")), undefined);
+  assert.match(
+    readFileSync("src/pages/resume.astro", "utf8"),
+    /getLegacyRedirect\(Astro\.url\)[\s\S]*301/,
+  );
+});

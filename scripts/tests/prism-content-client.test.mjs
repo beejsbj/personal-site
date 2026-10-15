@@ -129,3 +129,12 @@ test("writing route classification rejects surplus segments and malformed slugs"
   ])
     assert.equal(kindOf(path).kind, "other", path);
 });
+
+test("the resume is classified under About, and nowhere else", () => {
+  assert.equal(kindOf("/about").kind, "about");
+  assert.equal(kindOf("/about/").kind, "about");
+  assert.equal(kindOf("/about/resume").kind, "resume");
+  assert.equal(kindOf("/about/resume/").kind, "resume");
+  assert.equal(kindOf("/about/elsewhere").kind, "other");
+  assert.equal(kindOf("/resume").kind, "other");
+});

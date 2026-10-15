@@ -1,5 +1,9 @@
 import type { RouteKind } from "./shells/types";
 
+/** Where the resume lives: a page of About's. Lenses link to it through
+ * this, so the address is decided once (the old /resume redirects here). */
+export const RESUME_PATH = "/about/resume";
+
 /** Classify real site routes. Writing must be an exact index/detail path:
  * an extra segment cannot put a real article over the native 404 page. */
 export function kindOf(path: string): { kind: RouteKind; slug?: string } {
@@ -15,8 +19,8 @@ export function kindOf(path: string): { kind: RouteKind; slug?: string } {
   const kinds: Record<string, RouteKind> = {
     projects: slug ? "project" : "projects",
     lab: slug ? "lab-entry" : "lab",
-    about: "about",
-    resume: "resume",
+    // the resume is a page of About's; nothing else is
+    about: !slug ? "about" : slug === "resume" ? "resume" : "other",
   };
   return { kind: path === "/" ? "home" : (kinds[first] ?? "other"), slug };
 }

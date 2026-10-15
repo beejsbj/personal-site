@@ -9,6 +9,7 @@ import { h, link } from "./dom";
 import { hoverAudition, noteVar, roll, spell, trackControls, type Env } from "./bits";
 import { place, type Range } from "./transport";
 import { MONTH, type Clip } from "./score";
+import { RESUME_PATH } from "../../routes";
 
 /** Where something sits on a lane: left and width as shares of the range. */
 export const span = (start: number, end: number, range: Range) =>
@@ -104,7 +105,7 @@ export function rolesLane(env: Env, range: Range) {
       .map((clip, i) => {
         const entry = entries.find((e) => e.id === clip.ref);
         const name = entry?.org ?? entry?.title ?? "";
-        const el = link("/resume", { class: "cp-rclip", style: `${span(clip.start, clip.end, range)}; --row:${i % 2}`, tabindex: "-1", title: entry?.heading }, h("span", null, name));
+        const el = link(RESUME_PATH, { class: "cp-rclip", style: `${span(clip.start, clip.end, range)}; --row:${i % 2}`, tabindex: "-1", title: entry?.heading }, h("span", null, name));
         transport.watch(el, clip.start, clip.end, signal, "roles");
         hoverAudition(env, el, clip);
         return el;

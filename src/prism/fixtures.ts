@@ -310,7 +310,7 @@ export const FIXTURES: Record<string, Fixture> = {
       next.resume.html = resumeHtml(next);
       return settle(next);
     },
-    routes: () => [{ kind: "resume", path: "/resume" }],
+    routes: () => [{ kind: "resume", path: "/about/resume" }],
   },
   "lab-no-cover": {
     name: "lab-no-cover",

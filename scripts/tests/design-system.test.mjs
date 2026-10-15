@@ -132,7 +132,7 @@ test("one ball navigation on every page, with native links and correct section m
     ["projects/index.html", "/projects", "row"],
     ["projects/conduit-market/index.html", "/projects", "row"],
     ["lab/index.html", "/lab", "row"],
-    ["resume/index.html", null, "row"],
+    ["about/resume/index.html", "/about", "row"],
   ]) {
     const html = read(`dist/client/${path}`);
     const navs = [...html.matchAll(/<nav\b([^>]*)>([\s\S]*?)<\/nav>/g)];
