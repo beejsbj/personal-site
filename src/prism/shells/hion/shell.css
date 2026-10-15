@@ -385,10 +385,11 @@
 
 
 
-/* The skein (skein.ts): every thread but the hions' bodies. The ground
-   lies under the hions, page-tall, painted only near the viewport; what
-   moves is one canvas over the hions and under the words, a band of the
-   page about one and a half screens tall, moved as you scroll on. */
+/* The skein (skein.ts): every thread, the hions included. The ground
+   lies under the loom (what hangs from the hions), page-tall, painted
+   only near the viewport; what moves is one canvas over it and under the
+   words, a band of the page about one and a half screens tall, moved as
+   you scroll on. */
 :root[data-lens="hion"] .hion-skein {
   position: absolute;
   inset: 0 0 auto;

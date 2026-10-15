@@ -9,10 +9,11 @@
  * themselves just ahead of you, and stay drawn. A bead of light rides the
  * tip of each hion, so there is always something to follow.
  *
- * On a page the beads are the skein's (skein.ts): the hions' heads are
- * strands like every other thread, moving each frame with a warm run
- * behind them, and the loom only says how far it has drawn. A track keeps
- * beads of its own.
+ * On a page the hions themselves are the skein's (skein.ts): strands like
+ * every other thread, grown along their composed ways as far as the loom
+ * has drawn; the loom lays only what hangs from them (wefts, knots, ties,
+ * cords) and says how far it has drawn. A track lays its hions in pastel
+ * and keeps beads of its own.
  *
  * Cheap on purpose: tiles exist only near the viewport (others are dropped
  * and redrawn identically when you come back), each mark is drawn once and
@@ -419,11 +420,6 @@ export function createLoom(options: LoomOptions) {
     journeys: () => tips,
     orbits: () => orbits,
     reach: () => reach,
-    /** The hions' heads are drawn elsewhere now (skein.ts): no beads. */
-    yieldHeads() {
-      for (const bead of beads) bead.remove();
-      beads.length = 0;
-    },
     /** Whether the hand is still drawing toward where you are. */
     drawing: () => target - reach > 0.5,
     version: () => version,

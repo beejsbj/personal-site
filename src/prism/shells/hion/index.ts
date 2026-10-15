@@ -168,17 +168,18 @@ function show(route: Route, first: boolean) {
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
     pulse,
+    // The hions are the skein's: bodies and heads.
+    beads: false,
     onDraw: () => drew(),
     compose: () => {
-      // The hions' heads are the skein's: each mark keyed by where it ends.
       const composition = compose(page, () => nav.origin(), { heads: true });
       ink(page);
       return composition;
     },
   });
-  // Every thread as one system (skein.ts): the hions' heads, the ground
-  // under them, threads from the pointer, loops round what you hover. A
-  // single thing is seen close up.
+  // Every thread as one system (skein.ts): the hions, the ground under
+  // them, threads from a click or a touched thread, loops round what you
+  // hover. A single thing is seen close up; home is the busiest.
   const skein = createSkein({
     page,
     loom,
@@ -186,6 +187,7 @@ function show(route: Route, first: boolean) {
     signal: controller.signal,
     instant: still(),
     scale: close(route.path) ? 2 : 1,
+    lively: route.kind === "home",
     origin: () => nav.origin(),
     seed: seedOf(route.path),
     isIdle: ctx.isIdle,

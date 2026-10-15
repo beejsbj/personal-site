@@ -31,8 +31,10 @@
  *   that draws its own (track.ts). They go in at its top and come out at
  *   its foot; nothing of theirs is drawn between.
  *
- * With `heads` (a page whose hions' heads the skein draws), each mark of
- * a hion is keyed by where it ends, so none lies ahead of its head.
+ * With `heads` (a page), the hions themselves are the skein's (skein.ts):
+ * their bodies and heads are strands there, so no marks are composed for
+ * them here, only their ways down (`tips`) for the skein to grow along.
+ * Without it (a track), they are laid here in pastel.
  *
  * Only what belongs to the host is read: the nearest `[data-loom]` round
  * it is the host (a track inside the page is not the page's).
@@ -285,7 +287,7 @@ export function compose(
     // One thread, unless it leaves the page for a track (a gap): then one
     // for each stretch drawn, keyed by where it is along the whole.
     let from = 0;
-    for (let i = 1; i <= pts.length; i++) {
+    for (let i = 1; i <= pts.length && !heads; i++) {
       if (i < pts.length && Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]) < GAP) continue;
       const offset = keys.lens[from];
       marks.push(
@@ -294,8 +296,6 @@ export function compose(
           w: TEMPER[hue].weight * (narrow ? 0.85 : 1),
           seed: seed++,
           key: (s) => keys.keyAt(s + offset),
-          // Their heads (skein.ts) draw what is in front of the last mark.
-          keyEnd: heads,
           glow: 0.22,
         }),
       );

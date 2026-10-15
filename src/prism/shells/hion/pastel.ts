@@ -489,10 +489,6 @@ interface ThreadOptions {
    * spread along the thread from `from` to `to`, or a function of the
    * distance along the thread. */
   key?: number | [number, number] | ((s: number, y: number) => number);
-  /** Key each mark by where it ends, not where it starts: it is laid once
-   * the hand has passed it (a head with a warm run of its own draws the
-   * stretch in front, skein.ts). */
-  keyEnd?: boolean;
   core?: boolean;
 }
 
@@ -533,7 +529,7 @@ export function thread(path: Path, opts: ThreadOptions): Mark[] {
         (opts.alpha ?? 1) * (0.75 + rand() * 0.25),
         pts,
         opts.seed * 131 + index++,
-        opts.keyEnd ? keyFor(opts, s + len, total, path.at(s + len)[1]) : keyFor(opts, s, total, y0),
+        keyFor(opts, s, total, y0),
         opts.core ?? true,
       ),
     );
@@ -549,7 +545,7 @@ function bloom(
   hue: Hue,
   w: number,
   alpha: number,
-  opts: { key?: ThreadOptions["key"]; keyEnd?: boolean },
+  opts: { key?: ThreadOptions["key"] },
 ): Mark[] {
   const out: Mark[] = [];
   const total = path.length;
@@ -561,11 +557,10 @@ function bloom(
       const [x, y] = path.at(t);
       pts.push(x, y);
     }
-    const [ex, ey] = path.at(end);
-    pts.push(ex, ey);
+    pts.push(...path.at(end).slice(0, 2));
     const [, y0] = path.at(s);
     out.push(
-      mark(Kind.Glow, hue, w, alpha, pts, 0, opts.keyEnd ? keyFor(opts, end, total, ey) : keyFor(opts, s, total, y0)),
+      mark(Kind.Glow, hue, w, alpha, pts, 0, keyFor(opts, s, total, y0)),
     );
   }
   return out;

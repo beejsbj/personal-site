@@ -183,13 +183,14 @@ export interface Thread {
   fixed: boolean;
 }
 
-interface Near {
+export interface Near {
   d: number;
   x: number;
   y: number;
   dx: number;
   dy: number;
   id: number;
+  hue: Hue;
   fixed: boolean;
 }
 
@@ -324,8 +325,9 @@ export class Fate {
     else this.grid.set(k, [v]);
   }
 
-  /** The nearest point of another thread within r, and its direction. */
-  private near(t: Thread, x: number, y: number, r: number): Near | null {
+  /** The nearest drawn point of any thread (but the one with id `self`)
+   * within r of (x, y), and the way it runs there. */
+  nearest(x: number, y: number, r: number, self = -1): Near | null {
     let best = r * r;
     let hit: Near | null = null;
     const c0 = Math.floor((x - r) / CELL);
@@ -338,7 +340,7 @@ export class Fate {
         if (!b) continue;
         for (const v of b) {
           const id = Math.floor(v / 65536);
-          if (id === t.id) continue;
+          if (id === self) continue;
           const o = this.byId.get(id);
           if (!o || o.gone) continue;
           const i = v % 65536;
@@ -352,7 +354,7 @@ export class Fate {
           const ex = o.xs[j] - o.xs[k];
           const ey = o.ys[j] - o.ys[k];
           const el = Math.hypot(ex, ey) || 1;
-          hit = { d: Math.sqrt(d), x: o.xs[i], y: o.ys[i], dx: ex / el, dy: ey / el, id, fixed: o.fixed };
+          hit = { d: Math.sqrt(d), x: o.xs[i], y: o.ys[i], dx: ex / el, dy: ey / el, id, hue: o.hue, fixed: o.fixed };
         }
       }
     }
@@ -394,7 +396,7 @@ export class Fate {
     if (b !== null && t.turnTo === null && t.runLeft < 100 && Math.abs(wrap(b - t.a)) > 50 * DEG) decide = true;
     let n: Near | null = null;
     if (!t.lone && (t.xs.length - 1) * STEP > t.free) {
-      n = this.near(t, x, y, 70);
+      n = this.nearest(x, y, 70, t.id);
       if (n && n.id !== t.joined && t.turnTo === null) {
         const s = Math.abs(n.dx * Math.cos(t.a) + n.dy * Math.sin(t.a));
         // Meeting another at a slant: fall in beside it.
@@ -510,8 +512,7 @@ export class Fate {
       if (id === t.id) continue;
       const o = this.byId.get(id);
       const i = v % 65536;
-      // A hion lies over every thread anyway (the loom is above the ground).
-      if (!o || o.gone || o.fixed || i + 1 >= o.xs.length) continue;
+      if (!o || o.gone || i + 1 >= o.xs.length) continue;
       const cx = o.xs[i];
       const cy = o.ys[i];
       const dx = o.xs[i + 1];
@@ -522,7 +523,8 @@ export class Fate {
       const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / den;
       if (s < 0 || s > 1 || u < 0 || u > 1) continue;
       const n = t.xs.length - 1;
-      if (((t.id * 7 + id * 13 + i) & 1) === 0) {
+      // A hion lies over every thread; otherwise it is a coin toss.
+      if (o.fixed || ((t.id * 7 + id * 13 + i) & 1) === 0) {
         t.under.add(n - 1).add(n).add(n + 1);
       } else {
         for (const k of [i - 1, i, i + 1]) {
@@ -547,6 +549,8 @@ interface PlanOptions {
   seed: number;
   /** A screen seen close: fewer threads. */
   close: boolean;
+  /** A screen that should be busy (home): more, sooner. */
+  lively?: boolean;
 }
 
 /** The gathers of a page: the most open place in each stretch of it,
@@ -619,7 +623,15 @@ export function plan(ground: Ground, o: PlanOptions) {
   const narrow = W < 720;
   const seeds: Seed[] = [];
   // Clear of the way the hions themselves come down (straight below).
-  const fan = o.close ? [-48, -26, 28, 50] : narrow ? [-40, -22, 22, 40] : [-66, -50, -34, -22, 24, 36, 52, 68];
+  const fan = o.close
+    ? [-48, -26, 28, 50]
+    : narrow
+      ? o.lively
+        ? [-44, -30, -16, 18, 30, 44]
+        : [-40, -22, 22, 40]
+      : o.lively
+        ? [-72, -58, -46, -34, -22, -12, 14, 24, 36, 48, 60, 72]
+        : [-66, -50, -34, -22, 24, 36, 52, 68];
   const down = Math.PI / 2;
   fan.forEach((d, i) => {
     const s = o.seed * 977 + i;
@@ -640,10 +652,10 @@ export function plan(ground: Ground, o: PlanOptions) {
     });
   });
   let k = 0;
-  const gap = (narrow ? 520 : 380) * (o.close ? 1.4 : 1);
+  const gap = (narrow ? 520 : 380) * (o.close ? 1.4 : o.lively ? 0.6 : 1);
   for (let y = o.top + 180; y < H - 120; y += gap) {
     for (const side of [0, 1]) {
-      if (rand() < 0.3) continue;
+      if (rand() < (o.lively ? 0.15 : 0.3)) continue;
       const tilt = (14 + rand() * 40) * DEG;
       const hue: Hue = side ? (rand() < 0.72 ? "m" : "c") : rand() < 0.72 ? "c" : "m";
       const yy = y + rand() * 160;
