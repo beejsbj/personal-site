@@ -367,6 +367,16 @@ b</code></pre>
   assert.doesNotMatch(html.replace(/<pre[\s\S]*?<\/pre>/, ""), /\n\s*\n\s*\n/);
 });
 
+test("dropped chrome does not take an id from the real target", () => {
+  const { html } = sanitizeSubstackHtml(
+    `<div id="note" class="subscription-widget-wrap"><p>Subscribe!</p></div>
+    <a href="#note">see note</a><p id="note">The real note</p>`,
+  );
+  assert.doesNotMatch(html, /Subscribe!/);
+  assert.match(html, /<p id="ss-note">The real note<\/p>/);
+  assert.match(html, /href="#ss-note"/);
+});
+
 test("fragment links keep namespaced targets, even on unwrapped wrappers", () => {
   const { html } = sanitizeSubstackHtml(
     `<p><a href="#toc">Contents</a> <a href="#note-1">1</a> <a class="footnote-anchor" data-component-name="FootnoteAnchorToDOM" id="footnote-anchor-1" href="#footnote-1" target="_self">2</a></p>

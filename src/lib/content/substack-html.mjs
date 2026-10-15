@@ -305,7 +305,11 @@ function walk(node, ctx) {
     first.attrs = { id, ...first.attrs };
     return out;
   }
-  if (!out.length && component(node, ctx)) return out; // dropped chrome
+  if (!out.length && component(node, ctx)) {
+    // dropped chrome: give its id back, so a real target can still take it
+    ctx.ids.delete(id);
+    return out;
+  }
   const anchor = el("a", { id });
   // Inside the first block when it may hold an inline anchor, so a wrapper's
   // target does not add an empty paragraph.
