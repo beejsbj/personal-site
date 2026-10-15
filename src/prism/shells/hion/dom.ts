@@ -135,9 +135,11 @@ export function still(canvas: HTMLCanvasElement) {
             sources.set(twin, source);
             source.replaceWith(twin);
           }
-          twin.className = source.className;
-          twin.style.cssText = source.style.cssText;
-          if (source.hasAttribute("aria-hidden")) twin.setAttribute("aria-hidden", "true");
+          // Only when changed: setting these invalidates style, and a pane
+          // drawn on often would dirty layout for every frame's reads.
+          if (twin.className !== source.className) twin.className = source.className;
+          if (twin.style.cssText !== source.style.cssText) twin.style.cssText = source.style.cssText;
+          if (source.hasAttribute("aria-hidden") && !twin.hasAttribute("aria-hidden")) twin.setAttribute("aria-hidden", "true");
           twin.getContext("bitmaprenderer")?.transferFromImageBitmap(bitmap);
         },
         () => {},

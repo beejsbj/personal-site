@@ -61,8 +61,11 @@
  * of the page about one and a half screens tall, so scrolling carries it
  * and only moving it on repaints it), repainted only where something
  * changed (each thing's old and new box); what has cooled is baked onto
- * page-space panes near the viewport, a batch at a time, and never
- * repainted until it fades; at most three ground heads grow near the
+ * page-space panes near the viewport, a batch at a time on a beat (each
+ * bake re-stills a pane), and never repainted until it has faded (a fade
+ * is a few steps on one beat, taken off the paper in place along its own
+ * fibres, and one repaint at the end; threads fade in waves); at most
+ * three ground heads grow near the
  * reader (six on home; heads out of sight hurry, unpainted, a beat at a
  * time); when a frame's painting runs long the live canvas is painted
  * every other frame. Ground heads grow while someone is there (6s after
@@ -124,8 +127,8 @@ interface Nature {
  * firmly the body lies and how long. */
 const NATURE: Record<Kind, Nature> = {
   hion: { w: 3.6, speed: 700, tail: 130, slack: 1.04, glow: 0.16, body: 1, hold: Infinity },
-  ground: { w: 2.5, speed: 150, tail: 110, slack: 1.07, glow: 0.1, body: 0.5, hold: 40000 },
-  pointer: { w: 2.8, speed: 360, tail: 90, slack: 1.1, glow: 0.12, body: 0.62, hold: 12000 },
+  ground: { w: 2.5, speed: 150, tail: 110, slack: 1.07, glow: 0, body: 0.5, hold: 55000 },
+  pointer: { w: 2.8, speed: 360, tail: 90, slack: 1.1, glow: 0, body: 0.62, hold: 12000 },
   loop: { w: 3.1, speed: 1100, tail: 80, slack: 1.05, glow: 0.14, body: 0.95, hold: Infinity },
 };
 
@@ -202,8 +205,13 @@ interface Strand {
   fadeAt: number;
   /** How much of it is left (1, fading to 0). */
   alpha: number;
+  /** The extent of what is baked (page px). */
   top: number;
   bottom: number;
+  left: number;
+  right: number;
+  /** When it was last baked (performance.now()). */
+  bakedAt: number;
   /** How much its head is moving (eases to 0 when it stops). */
   motion: number;
   /** The head's light: 1 while it grows, cooling to 0 once it has ended. */
@@ -242,8 +250,10 @@ interface Hion {
 
 const TILE = 512;
 const PANE = 320;
-/** Segments laid onto the ground at once. */
+/** Segments laid onto the ground at once, and the least time between
+ * two bakes of one strand (ms). */
 const BATCH = 8;
+const BEAT = 320;
 /** Rope nodes. */
 const KNOTS = 12;
 /** Ground heads growing at once near the reader (fewer on a screen seen
@@ -253,8 +263,13 @@ const LIVE = 3;
  * and after the screen arrives (ms). */
 const ATTEND = 6000;
 const ARRIVE = 6000;
+/** A fade: this long, in this many steps. Every step repaints whole panes
+ * (every strand on them, and a new bitmap each), so steps are few, and
+ * finished strands are grouped to fade together, to GROUP ms, so a pane
+ * fades its threads in waves with rest between. */
 const FADE = 3000;
-const FADES = 6;
+const FADES = 4;
+const GROUP = 16000;
 /** The live canvas, in screens tall. */
 const BAND = 1.6;
 /** When a frame's painting takes longer than this (ms, averaged), paint
@@ -746,6 +761,7 @@ export function createSkein(options: SkeinOptions) {
     heat: number[] | null,
     dust: boolean,
     seed: number,
+    erase?: number,
   ) {
     const n = pts.length / 2;
     if (n < 2 || base <= 0) return;
@@ -767,21 +783,39 @@ export function createSkein(options: SkeinOptions) {
     const bands = heat ? 4 : 1;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+    // The bundle wavers a little together, as a hand lays it (once per
+    // point); each fibre winds slowly about the line on top of that.
+    const waver = new Float32Array(n);
+    for (let k = 0; k < n; k++) waver[k] = 0.5 * Math.sin(arc[k] * 0.21 + ph * 3);
     const path = (k0: number, k1: number, f: number) => {
       ctx.beginPath();
+      const bf = f < 0 ? 0 : (f / (F - 1) - 0.5) * w * 0.85;
       for (let k = k0; k <= k1; k++) {
-        const s = arc[k];
-        // Each fibre winds slowly about the line; the bundle wavers a
-        // little together, as a hand lays it.
-        const o =
-          (f < 0 ? 0 : (f / (F - 1) - 0.5) * w * 0.85 * (0.7 + 0.3 * Math.sin(s * 0.05 + ph + f * 2.4))) +
-          (f < 0 ? 0 : 0.5 * Math.sin(s * 0.21 + ph * 3));
+        const o = f < 0 ? 0 : bf * (0.7 + 0.3 * Math.sin(arc[k] * 0.05 + ph + f * 2.4)) + waver[k];
         const x = pts[k * 2] + nx[k] * o;
         const y = pts[k * 2 + 1] + ny[k] * o;
         if (k === k0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
     };
+    if (erase !== undefined) {
+      // Taking this fraction of the run off the paper, along its own
+      // fibres (a fade step that repaints nothing else).
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.strokeStyle = "#000";
+      ctx.globalAlpha = erase;
+      ctx.lineWidth = Math.max(0.9, (w / F) * 1.25) + 1;
+      for (let f = 0; f < F; f++) {
+        path(0, n - 1, f);
+        ctx.stroke();
+      }
+      ctx.lineWidth = Math.max(0.8, w * 0.28) + 1;
+      path(0, n - 1, -1);
+      ctx.stroke();
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 1;
+      return;
+    }
     for (let b = 0; b < bands; b++) {
       const k0 = Math.floor(((n - 1) * b) / bands);
       const k1 = Math.floor(((n - 1) * (b + 1)) / bands);
@@ -828,28 +862,38 @@ export function createSkein(options: SkeinOptions) {
     ctx.globalAlpha = 1;
   }
 
-  /** Lay segments [i0, i1) of a strand's body on a context, settled. */
-  function lay(ctx: CanvasRenderingContext2D, pats: Patterns, st: Strand, i0: number, i1: number, tip?: Pt) {
+  /** Lay segments [i0, i1) of a strand's body on a context, settled.
+   * With `clip` (a pane's box), segments wholly outside it are skipped:
+   * a hion's body is thousands of segments, and a pane sees a few. */
+  function lay(ctx: CanvasRenderingContext2D, pats: Patterns, st: Strand, i0: number, i1: number, tip?: Pt, clip?: Box, erase?: number) {
     const { xs, ys, under, hue, id } = st.t;
     const { ls } = st;
     const base = st.n.body;
+    const pad = st.n.w * 3 + 14;
+    const outside = (i: number) =>
+      !!clip &&
+      (Math.max(xs[i], xs[i + 1]) < clip.l - pad ||
+        Math.min(xs[i], xs[i + 1]) > clip.r + pad ||
+        Math.max(ys[i], ys[i + 1]) < clip.t - pad ||
+        Math.min(ys[i], ys[i + 1]) > clip.b + pad);
     let pts: number[] = [];
     let arc: number[] = [];
     const flush = (alpha: number) => {
-      if (pts.length >= 4) strokeRun(ctx, pats, hue, st.n.w, st.n.glow, pts, arc, base * alpha, null, true, id);
+      if (pts.length >= 4) strokeRun(ctx, pats, hue, st.n.w, st.n.glow, pts, arc, base * alpha, null, true, id, erase);
       pts = [];
       arc = [];
     };
     for (let i = i0; i < i1; i++) {
       const a = taper(st, i);
-      // Under another thread, or across a stretch it leaves the page for.
-      if (under.has(i) || a <= 0 || ls[i + 1] - ls[i] <= 0) {
+      // Under another thread, across a stretch it leaves the page for, or
+      // out of this pane's sight.
+      if (under.has(i) || a <= 0 || ls[i + 1] - ls[i] <= 0 || outside(i)) {
         flush(st.alpha);
         continue;
       }
       if (a < st.alpha) {
         flush(st.alpha);
-        strokeRun(ctx, pats, hue, st.n.w, st.n.glow, [xs[i], ys[i], xs[i + 1], ys[i + 1]], [ls[i], ls[i + 1]], base * a, null, true, id);
+        strokeRun(ctx, pats, hue, st.n.w, st.n.glow, [xs[i], ys[i], xs[i + 1], ys[i + 1]], [ls[i], ls[i + 1]], base * a, null, true, id, erase);
         continue;
       }
       if (!pts.length) {
@@ -887,7 +931,9 @@ export function createSkein(options: SkeinOptions) {
       ctx.clearRect(0, 0, pane.el.width, pane.el.height);
       ctx.restore();
       for (const st of strands) {
-        if (st.laid && st.bottom >= t0 - 4 && st.top <= t0 + TILE + 4) lay(ctx, pane.pats, st, 0, st.laid);
+        if (!st.laid || st.bottom < t0 - 4 || st.top > t0 + TILE + 4) continue;
+        if (st.right < pane.x0 - 16 || st.left > pane.x1 + 16) continue;
+        lay(ctx, pane.pats, st, 0, st.laid, undefined, { l: pane.x0, t: t0, r: pane.x1, b: t0 + TILE });
       }
       still(pane.el);
     }
@@ -927,6 +973,17 @@ export function createSkein(options: SkeinOptions) {
     for (let i = from; i <= to; i++) if (!tiles.has(i)) tiles.set(i, makeTile(i));
   }
 
+  /** The extent of a strand's baked body (points [0, laid]). */
+  function extent(st: Strand) {
+    const { xs, ys } = st.t;
+    for (let i = 0; i <= st.laid; i++) {
+      if (ys[i] < st.top) st.top = ys[i];
+      if (ys[i] > st.bottom) st.bottom = ys[i];
+      if (xs[i] < st.left) st.left = xs[i];
+      if (xs[i] > st.right) st.right = xs[i];
+    }
+  }
+
   /** Lay segments [laid, to) of a strand onto the ground. */
   function bake(st: Strand, to: number) {
     if (to <= st.laid) return;
@@ -943,12 +1000,15 @@ export function createSkein(options: SkeinOptions) {
     }
     st.top = Math.min(st.top, top);
     st.bottom = Math.max(st.bottom, bottom);
+    st.left = Math.min(st.left, left);
+    st.right = Math.max(st.right, right);
+    st.bakedAt = performance.now();
     const [a, b] = tileRange(top, bottom);
     for (let k = a; k <= b; k++) {
       const tile = tiles.get(k);
       if (!tile) continue;
       for (const pane of panesIn(tile, left, right)) {
-        lay(pane.ctx, pane.pats, st, st.laid, to);
+        lay(pane.ctx, pane.pats, st, st.laid, to, undefined, { l: pane.x0, t: k * TILE, r: pane.x1, b: (k + 1) * TILE });
         still(pane.el);
       }
     }
@@ -1302,6 +1362,9 @@ export function createSkein(options: SkeinOptions) {
       alpha: 1,
       top: t.ys[0],
       bottom: t.ys[0],
+      left: t.xs[0],
+      right: t.xs[0],
+      bakedAt: 0,
       motion: 1,
       heat: 1,
       resting: false,
@@ -1338,7 +1401,7 @@ export function createSkein(options: SkeinOptions) {
     st.box = null;
     st.rope = null;
     st.cold = true;
-    st.fadeAt = now + st.n.hold * (0.7 + st.rand() * 0.8);
+    st.fadeAt = fadeFrom(now, st, 0.7 + st.rand() * 0.8);
     // Too short to read as a thread: let it go now.
     if (st.t.xs.length < 14) st.fadeAt = now;
   }
@@ -1362,21 +1425,31 @@ export function createSkein(options: SkeinOptions) {
     born({ x, y, a, hue, len: 700 + rand() * 1400, seed: options.seed * 13 + trickles * 71, key: y, lone, goals: goalsFor(all, x, y, a, lone, rand) });
   }
 
-  /** Fade what has lain long enough, a step at a time. */
+  /** Fade what has lain long enough, a step at a time. Every step falls
+   * on one shared beat (so however many are fading, a tile is repainted
+   * at most FADES times in FADE ms), and strands finish in groups. */
   function fade(now: number) {
     let swept = false;
     const touched = new Set<number>();
+    const beat = FADE / FADES;
+    const tick = Math.floor(now / beat) * beat;
     for (const st of strands) {
-      if (now < st.fadeAt) continue;
-      const left = Math.max(0, 1 - Math.ceil(((now - st.fadeAt) / FADE) * FADES) / FADES);
+      if (tick < st.fadeAt) continue;
+      const left = Math.max(0, 1 - Math.ceil(((tick - st.fadeAt) / FADE) * FADES) / FADES);
       if (left === st.alpha) continue;
+      const before = st.alpha;
       st.alpha = left;
+      if (left > 0) {
+        // A step: this much of it taken off the paper, in place. (Where
+        // another thread crosses it a little of that goes too, put back
+        // by the repaint at the end.)
+        dim(st, 1 - left / before);
+        continue;
+      }
       const [a, b] = tileRange(st.top, st.bottom);
       for (let k = a; k <= b; k++) touched.add(k);
-      if (!left) {
-        st.t.gone = true;
-        swept = true;
-      }
+      st.t.gone = true;
+      swept = true;
     }
     if (swept) {
       strands = strands.filter((st) => !st.t.gone);
@@ -1388,14 +1461,34 @@ export function createSkein(options: SkeinOptions) {
     }
   }
 
+  /** Take a fraction of a strand's baked body off the panes it lies on. */
+  function dim(st: Strand, fraction: number) {
+    if (!st.laid) return;
+    const [a, b] = tileRange(st.top, st.bottom);
+    for (let k = a; k <= b; k++) {
+      const tile = tiles.get(k);
+      if (!tile) continue;
+      for (const pane of panesIn(tile, st.left, st.right)) {
+        lay(pane.ctx, pane.pats, st, 0, st.laid, undefined, { l: pane.x0, t: k * TILE, r: pane.x1, b: (k + 1) * TILE }, fraction);
+        still(pane.el);
+      }
+    }
+  }
+
   function nextFade(now: number) {
     let next = Infinity;
+    const beat = FADE / FADES;
     for (const st of strands) {
       if (st.fadeAt === Infinity) continue;
-      next = Math.min(next, st.fadeAt <= now ? now + FADE / FADES : st.fadeAt);
+      next = Math.min(next, st.fadeAt <= now ? Math.floor(now / beat) * beat + beat : st.fadeAt);
     }
     return next;
   }
+
+  /** When a strand finishing now should start to fade: its own hold,
+   * rounded to a GROUP so neighbours fade together (fewer repaints). */
+  const fadeFrom = (now: number, st: Strand, spread: number) =>
+    Math.ceil((now + st.n.hold * spread) / GROUP) * GROUP;
 
   const asleep = () => options.isIdle() || document.hidden;
   /** Someone is reading: they arrived a moment ago or did something lately.
@@ -1506,9 +1599,12 @@ export function createSkein(options: SkeinOptions) {
         continue;
       }
       // Lay what has cooled behind the head, a batch at a time.
+      // Lay what has cooled behind the head, a batch at a time, and not
+      // more often than a few times a second: every bake re-stills a pane
+      // (a new bitmap), and a quick head would do that every frame.
       const settled = st.s - Math.min(st.n.tail, st.s);
       const to = indexAt(st, settled);
-      if (to - st.laid >= BATCH) bake(st, to);
+      if (to - st.laid >= BATCH && now - st.bakedAt > BEAT) bake(st, to);
       // A hion is never finished: its way is drawn as far as the loom has.
       if (st.kind === "hion") continue;
       if (st.t.done && st.heat <= 0 && (!st.rope || st.rope.energy < 0.04)) finish(st, now);
@@ -1799,13 +1895,9 @@ export function createSkein(options: SkeinOptions) {
           st.laid = st.t.xs.length - 1;
           st.cold = true;
           st.heat = 0;
-          st.fadeAt = instant ? Infinity : now + st.n.hold * (0.4 + st.rand());
+          st.fadeAt = instant ? Infinity : fadeFrom(now, st, 0.4 + st.rand());
         }
-        for (let i = 0; i <= st.laid; i++) {
-          const y = st.t.ys[i];
-          if (y < st.top) st.top = y;
-          if (y > st.bottom) st.bottom = y;
-        }
+        extent(st);
       }
       for (const tile of tiles.values()) for (const pane of tile.panes) unshow(pane.el);
       tiles.clear();
@@ -1833,12 +1925,9 @@ export function createSkein(options: SkeinOptions) {
         st.laid = st.t.xs.length - 1;
         st.cold = true;
         st.heat = 0;
-        st.fadeAt = now + st.n.hold * (0.5 + st.t.rand());
+        st.fadeAt = fadeFrom(now, st, 0.5 + st.t.rand());
       } else st.laid = Math.max(0, indexAt(st, st.s - st.n.tail) - 1);
-      for (let i = 0; i <= st.laid; i++) {
-        st.top = Math.min(st.top, st.t.ys[i]);
-        st.bottom = Math.max(st.bottom, st.t.ys[i]);
-      }
+      extent(st);
     }
     fate.breaks.length = 0;
     lastBirth = now;
