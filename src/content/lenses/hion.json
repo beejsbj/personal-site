@@ -32,6 +32,9 @@
   "about": {
     "story": "About Burooj"
   },
+  "resume": {
+    "onward": "Back up the thread"
+  },
   "notFound": {
     "eyebrow": "A loose end",
     "intro": "This thread doesn’t lead anywhere. Try the homepage, or follow one of the lines above.",

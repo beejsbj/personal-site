@@ -709,6 +709,7 @@ function about(content: SiteContent) {
 
 function resume(content: SiteContent) {
   const page = content.pages.resume;
+  const copy = content.lenses.hion;
   // The structured resume and its free body, as Daylight renders them; the
   // parts are marked in the markup.
   const body = story(content.resume.html, page.title, "hion-loop--resume");
@@ -723,6 +724,16 @@ function resume(content: SiteContent) {
       actions(content.lenses.hion, page.header, "resume"),
     ),
     body,
+    // the resume hangs from About's knot: its thread leads back up there
+    h(
+      "nav",
+      { class: "hion-onward", "aria-label": copy.resume.onward },
+      h(
+        "ul",
+        { class: "hion-row hion-row--ends", "data-cord": "branch" },
+        end("hion-end--all", copy.entry.backTo, "/about", copy.about.story, "m"),
+      ),
+    ),
   );
 }
 

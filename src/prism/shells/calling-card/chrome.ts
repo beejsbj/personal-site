@@ -34,12 +34,13 @@ export interface Screen {
 
 export type ScreenFactory = (route: Route, env: Env) => Screen;
 
-/** The sections the L1/R1 tabs cycle through, in order. */
+/** The sections the L1/R1 tabs cycle through, in order. Status (the
+ * resume) is a sub-screen of About, as a party's status sits under its
+ * leader: no tab of its own, and About stays lit while it is open. */
 export const TABS = [
   { id: "projects", kind: "projects", href: "/projects" },
   { id: "lab", kind: "lab", href: "/lab" },
   { id: "about", kind: "about", href: "/about" },
-  { id: "resume", kind: "resume", href: "/resume" },
   { id: "writing", kind: "writing", href: "/writing" },
 ] as const;
 
@@ -47,7 +48,7 @@ export function tabFor(kind: Route["kind"]) {
   if (kind === "project" || kind === "projects") return "projects";
   if (kind === "lab" || kind === "lab-entry") return "lab";
   if (kind === "writing" || kind === "writing-entry") return "writing";
-  if (kind === "about" || kind === "resume") return kind;
+  if (kind === "about" || kind === "resume") return "about";
   return undefined;
 }
 

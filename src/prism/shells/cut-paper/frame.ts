@@ -10,6 +10,7 @@ import { h, link, markup } from "./dom";
 import { noteName } from "./music";
 import { sessionFor, type Session } from "./score";
 import { monthLabel, place, position, Transport } from "./transport";
+import { RESUME_PATH } from "../../routes";
 
 export interface Frame {
   app: HTMLElement;
@@ -28,6 +29,10 @@ interface Key {
   view: string;
   href: string;
   kinds: RouteKind[];
+  /** Kinds this key holds a sub-view for: it stays half-lit on them. */
+  holds?: RouteKind[];
+  /** The key this one is a sub-view of (its parent's degree). */
+  under?: number;
 }
 
 function keysFor(ctx: ShellContext, copy: Copy): Key[] {
@@ -37,8 +42,10 @@ function keysFor(ctx: ShellContext, copy: Copy): Key[] {
     { degree: 0, ...k.home, href: "/", kinds: ["home"] },
     { degree: 1, ...k.projects, href: "/projects", kinds: ["projects", "project"] },
     { degree: 2, ...k.lab, href: "/lab", kinds: ["lab", "lab-entry"] },
-    { degree: 3, ...k.about, href: "/about", kinds: ["about"] },
-    { degree: 4, ...k.resume, href: "/resume", kinds: ["resume"] },
+    // the resume is a page of About's (/about/resume) but keeps its key, so
+    // the scale stays whole: C, the dominant, a step up from About's B♭
+    { degree: 3, ...k.about, href: "/about", kinds: ["about"], holds: ["resume"] },
+    { degree: 4, ...k.resume, href: RESUME_PATH, kinds: ["resume"], under: 3 },
     { degree: 5, ...k.writing, href: "/writing", kinds: ["writing", "writing-entry"] },
     { degree: 6, ...k.hello, href: `mailto:${site.email}`, kinds: [] },
   ];
@@ -211,7 +218,13 @@ export function buildFrame(ctx: ShellContext): Frame {
   const keyLinks = keys.map((key) => {
     const a = link(
       key.href,
-      { class: "cp-key", style: `--note:${noteVar(key.degree)}`, "data-kinds": key.kinds.join(" ") },
+      {
+        class: "cp-key",
+        style: `--note:${noteVar(key.degree)}`,
+        "data-kinds": key.kinds.join(" "),
+        "data-holds": key.holds?.join(" ") ?? null,
+        "data-under": key.under === undefined ? null : "",
+      },
       h("span", { class: "cp-key__note", "aria-hidden": "true" }, noteName(key.degree)),
       h("span", { class: "cp-key__label" }, key.label),
       h("span", { class: "cp-key__view", "aria-hidden": "true" }, key.view),
@@ -258,6 +271,7 @@ export function buildFrame(ctx: ShellContext): Frame {
         const lit = (a.dataset.kinds ?? "").split(" ").includes(kind);
         if (lit) a.setAttribute("aria-current", "page");
         else a.removeAttribute("aria-current");
+        a.toggleAttribute("data-holding", (a.dataset.holds ?? "").split(" ").includes(kind));
       });
     },
   };

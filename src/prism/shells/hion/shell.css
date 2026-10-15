@@ -147,8 +147,8 @@
   margin-right: clamp(20px, 4vw, 64px);
 }
 
-/* Projects, Lab and Writing on the left of the name; About and Resume on
-   the right. */
+/* Projects, Lab and Writing on the left of the name; About (the resume
+   hangs from its knot) on the right. */
 :root[data-lens="hion"] .hion-nav__item:nth-child(4) {
   margin-left: auto;
 }
