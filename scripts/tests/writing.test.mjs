@@ -400,6 +400,44 @@ test("fragment links keep namespaced targets, even on unwrapped wrappers", () =>
   );
 });
 
+test("source-relative links resolve to Substack; local and on-site links stay local", async () => {
+  const body = `<p><a href="/about">about</a> <a href="/subscribe?utm_source=x">subscribe</a> <a href="#note">note</a> <a href="${origin}/p/other#part">other</a> <a href="/p/other">relative other</a> <a href="/p/absent#x">absent</a> <a href="https://example.com/x#frag">external</a> <a href="mailto:a@example.com">mail</a></p><p id="note">Note</p>`;
+  const check = (html) => {
+    assert.match(html, new RegExp(`href="${origin}/about">about`));
+    assert.match(html, new RegExp(`href="${origin}/subscribe">subscribe`));
+    assert.match(html, /href="#ss-note">note/);
+    assert.match(html, /id="ss-note"/);
+    assert.match(html, /href="\/writing\/other#ss-part">other/);
+    assert.match(html, /href="\/writing\/other">relative other/);
+    assert.match(html, new RegExp(`href="${origin}/p/absent#x">absent`));
+    assert.match(html, /href="https:\/\/example\.com\/x#frag">external/);
+    assert.match(html, /href="mailto:a@example\.com">mail/);
+    assert.doesNotMatch(html, /href="\/(about|subscribe|p\/)/);
+  };
+  const api = fixture();
+  api.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? [post(), post("other")]
+      : post("hello", { body_html: body }),
+  );
+  check((await api.source.getPost("hello")).body);
+
+  // The RSS fallback is held to the same link contract as the API body.
+  const feed = fixture();
+  feed.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? [post(), post("other")]
+      : url.pathname === "/feed"
+        ? rss("hello", body)
+        : 500,
+  );
+  check((await feed.source.getPost("hello")).body);
+  // Without a known index the fallback cannot claim an on-site route.
+  const parsed = parseFeed(rss("hello", body), origin)[0].body;
+  assert.match(parsed, new RegExp(`href="${origin}/about">about`));
+  assert.match(parsed, /href="#ss-note">note/);
+});
+
 test("RSS absence does not turn a healthy older article into a false 404", async () => {
   const f = fixture();
   f.routes((url) =>

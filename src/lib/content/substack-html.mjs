@@ -145,6 +145,9 @@ function cleanHref(value, ctx) {
   if (!href) return undefined;
   // A bare fragment stays inside the article, aimed at its namespaced target.
   if (href.startsWith("#")) return href === "#" ? href : articleHash(href);
+  // Source-relative paths belong to the publication, not to this site.
+  if (href.startsWith("/") && ctx.baseUrl)
+    href = new URL(href, ctx.baseUrl).href;
   if (/^https?:/.test(href)) {
     // Only touch the URL when there is tracking to remove; otherwise keep the
     // author's link byte for byte.
@@ -576,13 +579,15 @@ function markdownSafe(html, topLevelPre) {
 /**
  * @param {string} html Substack `body_html` (or RSS `content:encoded`).
  * Bare `#fragment` links and element ids are namespaced together (see
- * `articleId`).
- * @param {{ rewriteHref?: (href: string) => string, imageSizes?: string }} [options]
+ * `articleId`). Root-relative links resolve against `baseUrl` when given, which
+ * should be the post's canonical source URL, before `rewriteHref` sees them.
+ * @param {{ rewriteHref?: (href: string) => string, baseUrl?: string, imageSizes?: string }} [options]
  * @returns {{ html: string, text: string, stats: { images: number, code: number } }}
  */
 export function sanitizeSubstackHtml(html, options = {}) {
   const ctx = {
     rewriteHref: options.rewriteHref,
+    baseUrl: options.baseUrl,
     ids: new Set(),
     imageSizes: options.imageSizes ?? "(min-width: 800px) 720px, 100vw",
     stats: { images: 0, code: 0 },
