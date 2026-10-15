@@ -77,6 +77,11 @@
       "permanent": true
     },
     {
+      "source": "/resume/",
+      "destination": "/about/resume",
+      "permanent": true
+    },
+    {
       "source": "/home",
       "destination": "/",
       "permanent": true
