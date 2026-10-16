@@ -1,14 +1,11 @@
-/** The medium: chalk pastel on black paper.
+/** The medium: threads of light on black paper.
  *
- * Nothing here is a vector line with a glow filter. Every thread is laid
- * down the way a pastel stick lays it: as a run of short, overlapping marks,
- * each made of a few fibres of pigment with its own pressure, trimmed and
- * tapered at the ends, caught by the tooth of the paper (a grain texture in
- * page space, generated once). The light a thread gives off is its pigment
- * dust, scattered beside it, and a soft bloom drawn at quarter resolution
- * and blurred once, when the mark is laid. Marks are plain data; the same
- * seed always draws the same mark, so a canvas can be thrown away and
- * redrawn identically. */
+ * Every thread is laid down as a run of short, overlapping marks, each one
+ * smooth line of its hue (no grain: the colour is the thread), with a
+ * soft bloom drawn at quarter resolution and blurred once, when the mark
+ * is laid. The paper's tooth remains for the words (CSS). Marks are plain
+ * data; the same seed always draws the same mark, so a canvas can be
+ * thrown away and redrawn identically. */
 
 export type Hue = "c" | "m";
 type Tone = Hue | "cl" | "ml" | "k";
@@ -223,60 +220,31 @@ export function paint(
     ctx.restore();
     return;
   }
+  // Light, and nothing else: one smooth line of the hue, the ends of the
+  // mark trimmed and tapered a little so overlapping marks meet softly.
+  // The hue is dimmed for a fainter mark, not made see-through, so marks
+  // of one thread meet without a seam.
   const rand = rng(m.seed);
-  const nm = normals(pts);
-  // A few fibres of pigment per mark; fine marks are a single fibre.
-  const fibres = m.w < 1 ? 1 : Math.max(2, Math.min(6, Math.round(m.w * 1.1)));
+  const [r, g, b] = RGB[m.hue];
+  const k = Math.max(0, Math.min(1, m.a));
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.strokeStyle = pats[m.hue];
-  for (let f = 0; f < fibres; f++) {
-    const off = fibres === 1 ? 0 : (f / (fibres - 1) - 0.5) * m.w * (0.8 + rand() * 0.4);
-    ctx.globalAlpha = m.a * (0.45 + rand() * 0.55);
-    ctx.lineWidth = fibres === 1 ? 0.9 + rand() * 0.5 : Math.max(1, (m.w / fibres) * (0.9 + rand() * 0.9));
-    const s0 = rand() * 0.16;
-    const s1 = 1 - rand() * 0.16;
-    ctx.beginPath();
-    let started = false;
-    for (let i = 0; i < n; i++) {
-      const t = i / (n - 1);
-      if (t < s0 || t > s1) continue;
-      const taper = Math.sqrt(Math.sin(Math.PI * ((t - s0) / (s1 - s0))));
-      const o = off * taper;
-      const x = pts[i * 2] + nm[i * 2] * o;
-      const y = pts[i * 2 + 1] + nm[i * 2 + 1] * o;
-      if (started) ctx.lineTo(x, y);
-      else {
-        ctx.moveTo(x, y);
-        started = true;
-      }
-    }
-    ctx.stroke();
-  }
-  if (m.core && n > 2) {
-    ctx.globalAlpha = m.a * 0.85;
-    ctx.strokeStyle = pats[m.hue === "c" ? "cl" : "ml"];
-    ctx.lineWidth = Math.max(0.8, m.w * 0.3);
-    ctx.beginPath();
-    ctx.moveTo(pts[2], pts[3]);
-    for (let i = 2; i < n - 1; i++) ctx.lineTo(pts[i * 2], pts[i * 2 + 1]);
-    ctx.stroke();
-  }
-  // Pigment dust thrown off beside the stroke: the thread's own light.
-  if (m.w >= 1.5) {
-    ctx.fillStyle = SOLID[m.hue];
-    for (let i = 0; i < n; i += 3) {
-      if (rand() < 0.4) continue;
-      const d = (rand() - 0.5) * 2 * (m.w + rand() * rand() * 15);
-      ctx.globalAlpha = rand() * 0.55 * m.a;
-      ctx.fillRect(
-        pts[i * 2] + nm[i * 2] * d + (rand() - 0.5) * 3,
-        pts[i * 2 + 1] + nm[i * 2 + 1] * d + (rand() - 0.5) * 3,
-        0.9,
-        0.9,
-      );
+  ctx.strokeStyle = `rgb(${(r * k) | 0} ${(g * k) | 0} ${(b * k) | 0})`;
+  ctx.lineWidth = Math.max(0.9, m.w * 0.85);
+  const s0 = rand() * 0.08;
+  const s1 = 1 - rand() * 0.08;
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1);
+    if (t < s0 || t > s1) continue;
+    if (started) ctx.lineTo(pts[i * 2], pts[i * 2 + 1]);
+    else {
+      ctx.moveTo(pts[i * 2], pts[i * 2 + 1]);
+      started = true;
     }
   }
+  ctx.stroke();
   ctx.globalAlpha = 1;
 }
 
