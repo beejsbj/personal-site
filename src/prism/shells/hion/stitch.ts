@@ -14,7 +14,6 @@
  * quarter-resolution canvas, scaled up, which is the blur. At a large
  * scale (a cloth seen close up) each thread is itself two plies twisting
  * round each other: the same weave inside the thread. */
-import type { Immigration } from "./immigration";
 import { type Fabric, topAt } from "./fabric";
 import { css, type Hue, Kind, mark, paint, patterns, type Pt, rng } from "./pastel";
 
@@ -217,125 +216,6 @@ export function paintCrossing(
   ctx.globalAlpha = st.strength;
   ctx.drawImage(g, px, py, g.width / st.dpr, g.height / st.dpr);
   ctx.globalAlpha = 1;
-}
-
-/** Lay the woven ground of one crossing of a living cloth. */
-export function paintGround(
-  ctx: CanvasRenderingContext2D,
-  life: Immigration,
-  st: Stitches,
-  x: number,
-  y: number,
-  drape: Drape,
-  fabric: Fabric,
-) {
-  paintCrossing(ctx, st, x, y, life.woven[x + y * life.w], drape, fabric);
-}
-
-/** Repaint the live threads in one rectangle of crossings [x0, x1) ×
- * [y0, y1) on a tile: clear it, then lay every thread that touches it,
- * under ones first, and their light. */
-export function paintRegion(
-  ctx: CanvasRenderingContext2D,
-  gctx: CanvasRenderingContext2D | null,
-  life: Immigration,
-  st: Stitches,
-  x0: number,
-  y0: number,
-  x1: number,
-  y1: number,
-  drape: Drape,
-) {
-  const S = st.size;
-  const rx = x0 * S;
-  const ry = y0 * S;
-  const rw = (x1 - x0) * S;
-  const rh = (y1 - y0) * S;
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(rx, ry, rw, rh);
-  ctx.clip();
-  ctx.clearRect(rx, ry, rw, rh);
-  ctx.globalAlpha = st.strength;
-  // Threads from crossings up to two away can reach into the rectangle.
-  const m = 2;
-  const ax = Math.max(0, x0 - m);
-  const ay = Math.max(0, y0 - m);
-  const bx = Math.min(life.w, x1 + m);
-  const by = Math.min(life.h, y1 + m);
-  const { cells, stride } = life.grid();
-  const under: number[] = [];
-  const over: number[] = [];
-  // Neighbour offsets in the padded grid, for the four directions drawn.
-  const step = [1, stride, stride + 1, stride - 1];
-  for (let y = ay; y < by; y++) {
-    let i = (y + 1) * stride + ax + 1;
-    for (let x = ax; x < bx; x++, i++) {
-      const v = cells[i];
-      if (!v) continue;
-      let alone = true;
-      for (let d = 0; d < 4; d++) {
-        const o = step[d];
-        if (cells[i - o] === v) alone = false;
-        if (cells[i + o] !== v) continue;
-        alone = false;
-        // A diagonal only where there is no square way round.
-        if (d === 2 && (cells[i + 1] === v || cells[i + stride] === v)) continue;
-        if (d === 3 && (cells[i - 1] === v || cells[i + stride] === v)) continue;
-        // Plain weave: in each square, cyan over on one parity, magenta on
-        // the other.
-        const sx = d === 3 ? x - 1 : x;
-        const top = ((sx + y + (v === 1 ? 0 : 1)) & 1) === 0;
-        (top ? over : under).push(x, y, d, v === 1 ? 0 : 1);
-      }
-      if (alone) under.push(x, y, -1, v === 1 ? 0 : 1);
-    }
-  }
-  // Their light, one path per colour.
-  const light: [Path2D, Path2D] = [new Path2D(), new Path2D()];
-  const lay = (list: number[]) => {
-    for (let i = 0; i < list.length; i += 4) {
-      const x = list[i];
-      const y = list[i + 1];
-      const d = list[i + 2];
-      const hue = list[i + 3];
-      const di = x + y * drape.w;
-      const cx = x * S + S / 2 + drape.dx[di];
-      const cy = y * S + S / 2 + drape.dy[di];
-      const px = cx - st.pad;
-      const py = cy - st.pad;
-      if (d < 0) {
-        const k = st.knots[hue][variant(x, y, 9) % VARIANTS];
-        ctx.drawImage(k, px, py, k.width / st.dpr, k.height / st.dpr);
-        light[hue].moveTo(cx, cy);
-        light[hue].lineTo(cx + 0.1, cy);
-        continue;
-      }
-      const [dx, dy] = DIRS[d];
-      const s = st.threads[hue][d][variant(x, y, d) % VARIANTS];
-      ctx.drawImage(s, px - (dx < 0 ? S : 0), py, s.width / st.dpr, s.height / st.dpr);
-      light[hue].moveTo(cx, cy);
-      light[hue].lineTo(cx + dx * S, cy + dy * S);
-    }
-  };
-  lay(under);
-  lay(over);
-  ctx.restore();
-  if (gctx) {
-    gctx.save();
-    gctx.beginPath();
-    gctx.rect(rx, ry, rw, rh);
-    gctx.clip();
-    gctx.clearRect(rx, ry, rw, rh);
-    gctx.globalCompositeOperation = "lighter";
-    gctx.lineCap = "round";
-    gctx.lineWidth = S * 0.7;
-    gctx.strokeStyle = css("c", 0.1);
-    gctx.stroke(light[0]);
-    gctx.strokeStyle = css("m", 0.1);
-    gctx.stroke(light[1]);
-    gctx.restore();
-  }
 }
 
 /** A piece of cloth woven right through (both colours at every crossing,
