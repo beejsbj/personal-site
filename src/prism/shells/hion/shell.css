@@ -11,8 +11,8 @@
   --hion-ml: rgb(255 216 241);
   --hion-text: rgb(205 240 245);
   /* Fate, not warmth: one inscribed voice in two faces. Display: the
-     woven and hung titles in Aboreto, thin wide capitals cut like a stele;
-     thin, open strokes weave cleanly, and their one weight is the only
+     spun and hung titles in Aboreto, thin wide capitals cut like a stele;
+     thin, open strokes trace cleanly as one thread, and their one weight is the only
      one. Its capitals are for large words only: under about 28px they
      shout, so small titles (head) are set in the reading face. Text:
      Spectral, wide and calm on black. Hand: the spoken lines, in
@@ -749,27 +749,21 @@
   color: var(--hion-c);
 }
 
-/* Woven type (woven.ts): the word's ink is woven by life on a canvas
-   behind it; the text stays, invisible, for reading and selecting. */
-:root[data-lens="hion"] [data-woven] {
+/* Spun type (spun.ts, skein.ts): the word is written by one thread on
+   the skein's canvases under it; the text stays, invisible, for reading
+   and selecting. */
+:root[data-lens="hion"] [data-spun] {
   position: relative;
 }
 
-:root[data-lens="hion"] .hion-title__text[data-woven] {
+:root[data-lens="hion"] .hion-title__text[data-spun] {
   display: inline-block;
 }
 
-:root[data-lens="hion"] [data-woven][data-woven-state] {
+:root[data-lens="hion"] [data-spun][data-spun-state] {
   color: transparent;
   background: none;
   -webkit-text-fill-color: transparent;
-}
-
-:root[data-lens="hion"] .hion-woven {
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  filter: drop-shadow(0 0 5px rgb(79 233 245 / 0.18)) drop-shadow(0 0 7px rgb(255 92 200 / 0.14));
 }
 
 :root[data-lens="hion"] .hion-display {
@@ -1145,7 +1139,7 @@
 
 /* Swatch and label (wide screens): not a card. A project is a piece of
    its cloth (the woven cover), tilted as it was pinned, with its label
-   hung beside it: big woven title, a tag of when, a few lines, its tools
+   hung beside it: big title written by thread, a tag of when, a few lines, its tools
    on beads. They take turns left and right down the page, so the two
    hions run between them. */
 @media (min-width: 720px) {
@@ -1213,14 +1207,14 @@
     transform-origin: 100% 50%;
   }
 
-  /* Large enough to be woven: in the inscribed capitals. */
+  /* Large enough to be written by thread: in the inscribed capitals. */
   :root[data-lens="hion"] .hion-row--works .hion-work__title {
     margin: 0.05em 0 0.25em;
     font: var(--hion-display-weight) clamp(2.4rem, 4.6vw, 3.7rem)/1 var(--hion-display);
     letter-spacing: var(--hion-display-track);
   }
 
-  :root[data-lens="hion"] .hion-row--works .hion-work__title a[data-woven] {
+  :root[data-lens="hion"] .hion-row--works .hion-work__title a[data-spun] {
     display: inline-block;
   }
 

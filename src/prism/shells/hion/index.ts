@@ -28,7 +28,8 @@ import { tooth } from "./pastel";
 import { clothCanvas } from "./stitch";
 import { createPulse } from "./pulse";
 import { createSkein, seedOf } from "./skein";
-import { weaveCovers, weaveType } from "./woven";
+import { spinType } from "./spun";
+import { weaveCovers } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { ACROSS, createTrack } from "./track";
 import { compose } from "./weave";
@@ -217,15 +218,15 @@ function show(route: Route, first: boolean) {
     track?.start();
     life?.start();
     page.dataset.state = "here";
-    // Then the ground and the woven things, once the ribbon has fallen and
-    // the main thread has room: none of it is needed to read the screen.
+    // Then the ground, the spun words and the woven covers, once the
+    // ribbon has fallen and the main thread has room: none of it is needed
+    // to read the screen.
     const ground = () => {
       // Not for a screen already let go (pulled away before it settled).
       if (live?.page !== page || live.left !== undefined) return;
       skein.start();
-      const weaving = { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric };
-      weaveType(page, weaving);
-      weaveCovers(page, weaving);
+      spinType(page, { skein, instant: still(), signal: controller.signal });
+      weaveCovers(page, { signal: controller.signal, fabric });
     };
     if (still()) ground();
     else later(controller.signal, first ? 0 : PULL * DROP, ground);
