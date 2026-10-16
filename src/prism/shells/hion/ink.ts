@@ -40,7 +40,7 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
         ],
         3,
       ),
-      { hue: hueOf, w: 2.4, seed: s, glow: 0.24, wobble: 0.5 },
+      { hue: hueOf, seed: s, glow: 0.24, wobble: 0.5 },
     );
   const out: Mark[] = [];
   if (type === "drop" || type === "charm") {

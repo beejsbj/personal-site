@@ -174,7 +174,7 @@ export function createNav(
           : Math.sin(x / 140 + 0.3) * 4.5 + Math.sin(x / 47 + 1) * 1.2;
         pts.push([x, cordY(x) + sway]);
       }
-      return thread(new Path(pts, 3), { hue, w: i ? 3.4 : 2.8, seed: 5 + i * 9, glow: 0.24 });
+      return thread(new Path(pts, 3), { hue, seed: 5 + i * 9, glow: 0.24 });
     });
     const pats = patterns(ctx, dpr);
     paintGlows(ctx, marks, w, hgt, 0.7);

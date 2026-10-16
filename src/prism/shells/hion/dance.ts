@@ -32,14 +32,12 @@ export interface Temper {
   reach: number;
   /** How readily it throws a loop, 0..1. */
   curl: number;
-  /** Line weight. */
-  weight: number;
   seed: number;
 }
 
 export const TEMPER: Record<Hue, Temper> = {
-  c: { stride: 170, reach: 36, curl: 0.95, weight: 3.1, seed: 7 },
-  m: { stride: 360, reach: 74, curl: 0.45, weight: 4.1, seed: 19 },
+  c: { stride: 170, reach: 36, curl: 0.95, seed: 7 },
+  m: { stride: 360, reach: 74, curl: 0.45, seed: 19 },
 };
 
 /** One thread's path along a line of travel. `scale` shrinks the dance on
@@ -192,7 +190,6 @@ export function pendant(
     out.push(
       ...thread(new Path(pts, 2), {
         hue,
-        w: i ? 2.6 : 2.2,
         seed: seed * 3 + i,
         key: [key, key + length],
         glow: 0.26,

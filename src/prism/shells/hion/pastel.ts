@@ -20,6 +20,11 @@ export const RGB: Record<Tone, [number, number, number]> = {
 };
 export const css = (tone: Tone, alpha = 1) =>
   `rgba(${RGB[tone].join(",")},${alpha})`;
+
+/** The one width of every thread on a Hion screen (css px): the hions,
+ * the ground, what hangs from them, the line at the top, a hover loop.
+ * Brightness differs by kind; width never. */
+export const THREAD = 3;
 const SOLID = { c: css("c"), m: css("m") };
 
 export function rng(seed: number) {
@@ -230,7 +235,7 @@ export function paint(
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   ctx.strokeStyle = `rgb(${(r * k) | 0} ${(g * k) | 0} ${(b * k) | 0})`;
-  ctx.lineWidth = Math.max(0.9, m.w * 0.85);
+  ctx.lineWidth = Math.max(0.9, m.w);
   const s0 = rand() * 0.08;
   const s1 = 1 - rand() * 0.08;
   ctx.beginPath();
@@ -446,7 +451,6 @@ export function hang(points: Pt[], pull = 0.5): Pt[] {
 
 interface ThreadOptions {
   hue: Hue;
-  w?: number;
   alpha?: number;
   seed: number;
   /** Bloom strength, 0 for none. */
@@ -468,13 +472,14 @@ function keyFor(opts: { key?: ThreadOptions["key"] }, s: number, total: number, 
   return from + (to - from) * (s / (total || 1));
 }
 
-/** A single thread, laid as overlapping pastel marks, plus its bloom. */
+/** A single thread, laid as overlapping marks of the one width, plus its
+ * bloom. */
 export function thread(path: Path, opts: ThreadOptions): Mark[] {
   const out: Mark[] = [];
   const total = path.length;
   if (total < 2) return out;
   const rand = rng(opts.seed);
-  const w = opts.w ?? 3;
+  const w = THREAD;
   const wobble = opts.wobble ?? 0.8;
   let s = 0;
   let index = 0;
@@ -493,7 +498,7 @@ export function thread(path: Path, opts: ThreadOptions): Mark[] {
       mark(
         Kind.Stroke,
         opts.hue,
-        w * (0.8 + rand() * 0.4),
+        w,
         (opts.alpha ?? 1) * (0.75 + rand() * 0.25),
         pts,
         opts.seed * 131 + index++,
@@ -565,7 +570,7 @@ export function knot(
       );
     }
     out.push(
-      mark(Kind.Stroke, hue, Math.max(1.4, r * 0.5), 0.95, pts, seed * 37 + l, key ?? y - r),
+      mark(Kind.Stroke, hue, THREAD, 0.95, pts, seed * 37 + l, key ?? y - r),
     );
   }
   out.push(
@@ -596,7 +601,7 @@ export function wraps(
       mark(
         Kind.Stroke,
         hue,
-        2.4,
+        THREAD,
         0.95,
         [cx - dir * len * 0.5, cy + len * 0.5, cx, cy, cx + dir * len * 0.5, cy - len * 0.5].map(
           (v, i) => v + (i % 2 ? rand() - 0.5 : rand() - 0.5),

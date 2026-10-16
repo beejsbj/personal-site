@@ -93,11 +93,10 @@ const sewn = new Map<string, Stitches>();
 function sew(size: number, dpr: number, heavy: boolean, strength: number): Stitches {
   const pad = Math.ceil(size * 0.7 + 6);
   const ply = size >= 17 ? 2 : 1;
-  const weight = heavy
-    ? size * 0.5
-    : size >= 17
-      ? Math.min(4.4, size * 0.13)
-      : Math.max(1.5, size * 0.15);
+  // (Scaled by 0.85: pastel.ts paint once thinned every mark by that,
+  // and the cloth should look as it did.)
+  const weight =
+    (heavy ? size * 0.5 : size >= 17 ? Math.min(4.4, size * 0.13) : Math.max(1.5, size * 0.15)) * 0.85;
   const threads: HTMLCanvasElement[][][] = [];
   const knots: HTMLCanvasElement[][] = [];
   HUES.forEach((hue, hi) => {
