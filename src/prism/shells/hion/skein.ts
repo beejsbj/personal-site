@@ -81,13 +81,11 @@
  * it settled, the hions whole, with no heads and nothing from the pointer.
  *
  * What stays its own: what hangs from the hions (wefts, knots, ties and
- * cords, marks laid by the loom above the ground), the woven words
- * and covers (woven.ts: a cellular cloth, a different medium), the menu
- * cord and its swatches (nav.ts), the ribbon a new screen comes down as
- * (index.ts: a page transition on the compositor, which has to run while
- * the main thread is busiest), and the resume track (its own loom, its
- * hions laid as marks). All of it the one thread, of the one width
- * (pastel.ts THREAD). */
+ * cords, marks laid by the loom above the ground), the woven words and
+ * covers (woven.ts: a cellular cloth, a different medium), the menu cord
+ * and the loose ends under its names (nav.ts), and the resume track (its
+ * own loom, its hions laid as marks). All of it the one thread, of the one
+ * width (pastel.ts THREAD). */
 import { Fate, goalsFor, Ground, type Near, plan, type Gather, type Seed, STEP, type Thread } from "./fate";
 import type { createLoom } from "./loom";
 import { still, unshow } from "./dom";
