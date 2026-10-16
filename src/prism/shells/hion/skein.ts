@@ -39,16 +39,15 @@
  *            the page is laid out anew; it never fades. Its width is the
  *            letters' own stroke, in the family.
  *
- * One material (strokeRun): every run of thread is a soft light under it,
- * two or three fibres of pigment twisted loosely about its line (with the
- * paper's tooth in them) wavering a little together as a hand lays them,
- * a pale core, and, once settled, pigment dust thrown off beside it. The
- * widths are one family (a hion 3.1 or 4.1; the rest 2.5 to 3.1); what
- * differs is how firmly a body lies. The run behind a head is the same
- * run drawn hot: the fibres swell and brighten toward the tip, the core
- * goes white, the light spreads, and a small halo sits on the tip itself;
- * a moving head throws off specks of dust that fall to the paper. No bead
- * on a stick: the light is the thread's own.
+ * One material (strokeRun): every run of thread is one smooth line of
+ * its hue with a little light added under it, and nothing else (no
+ * grain: the colour is the thread). The widths are one family (a hion
+ * 3.1 or 4.1; the rest 2.5 to 3.1); what differs is how strongly a body
+ * lies, which is the hue dimmed, never see-through. The run behind a
+ * head is the same line drawn hot: it brightens toward the tip, a pale
+ * core comes up inside it, the light grows a little, and a small halo no
+ * bigger than the thread sits on the tip. No bead on a stick: the light
+ * is the thread's own.
  *
  * Every strand is in one index (fate's): the hions are fixed company, so
  * ground threads fall in alongside them; ground threads fall in alongside
@@ -57,12 +56,16 @@
  *
  * A head moves every frame while it is active, pulled, eased and pulled
  * again rather than at one rate, drawn between the points fate laid, so
- * it never steps. Behind it a short rope (KNOTS nodes, slightly longer
- * than the path it spans) hangs from the head to where the thread has
- * settled: it sags a little, lags on a turn and sways while the head
- * moves, and settles onto the path as it cools, so what is laid down is
- * what you saw. A hion's head rides a rope too, chasing the loom's reach,
- * and dims to half once it has caught up and waits.
+ * it never steps. Behind it a short rope (KNOTS nodes, a hair longer
+ * than the path it spans: taut) hangs from the head to where the thread
+ * has settled: it lags a little on a turn and sways slightly while the
+ * head moves, and settles onto the path as it cools, so what is laid
+ * down is what you saw. A hion's head rides a rope too, chasing the
+ * loom's reach, and dims to half once it has caught up and waits. On a
+ * screen travelled to the hions set out from where they come down and
+ * run their way at SETOUT, the loom pacing its drawing to them, and the
+ * ground is born live behind them: the screen is seen growing from the
+ * line, not appearing.
  *
  * Paid for elsewhere: one live canvas for everything that moves (a band
  * of the page about one and a half screens tall, so scrolling carries it
@@ -95,7 +98,7 @@ import { Fate, goalsFor, Ground, type Near, plan, type Gather, type Seed, STEP, 
 import type { createLoom } from "./loom";
 import { still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
-import { type Hue, patterns, type Patterns, type Pt, RGB, rng } from "./pastel";
+import { type Hue, type Pt, RGB, rng } from "./pastel";
 import { type Box, encircle as encircle_, ring, smooth, stitches, weave, wordBoxes } from "./wind";
 import type { Measure, Spun } from "./spun";
 
@@ -134,12 +137,12 @@ interface Nature {
  * family (a hion is 3.1 or 4.1 wide: dance.ts TEMPER). What differs is how
  * firmly the body lies and how long. */
 const NATURE: Record<Kind, Nature> = {
-  hion: { w: 3.6, speed: 700, tail: 130, slack: 1.04, glow: 0.16, body: 1, hold: Infinity },
-  ground: { w: 2.5, speed: 150, tail: 110, slack: 1.07, glow: 0, body: 0.5, hold: 55000 },
-  pointer: { w: 2.8, speed: 360, tail: 90, slack: 1.1, glow: 0, body: 0.62, hold: 12000 },
-  loop: { w: 3.1, speed: 1100, tail: 80, slack: 1.05, glow: 0.14, body: 0.95, hold: Infinity },
+  hion: { w: 3.6, speed: 700, tail: 130, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
+  ground: { w: 2.5, speed: 150, tail: 110, slack: 1.02, glow: 0.1, body: 0.5, hold: 55000 },
+  pointer: { w: 2.8, speed: 360, tail: 90, slack: 1.025, glow: 0.12, body: 0.62, hold: 12000 },
+  loop: { w: 3.1, speed: 1100, tail: 80, slack: 1.015, glow: 0.12, body: 0.95, hold: Infinity },
   // Width and speed are set per word (its stroke; about two seconds).
-  title: { w: 3.4, speed: 900, tail: 70, slack: 1.02, glow: 0.16, body: 1, hold: Infinity },
+  title: { w: 3.4, speed: 900, tail: 70, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
 };
 
 interface SkeinOptions {
@@ -153,6 +156,9 @@ interface SkeinOptions {
   scale?: number;
   /** A busy screen (home): more ground, more heads at work, longer. */
   lively?: boolean;
+  /** A screen travelled to (not the one arrived on): its threads are
+   * seen growing from where the hions come down, none ready-made. */
+  travelled?: boolean;
   /** Where the hions come down from the line (page px). */
   origin(): Pt | null;
   /** The page's own seed (its path): the same page grows the same way. */
@@ -164,7 +170,6 @@ interface SkeinOptions {
 interface Pane {
   el: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  pats: Patterns;
   x0: number;
   x1: number;
 }
@@ -233,21 +238,6 @@ interface Strand {
   dirty: boolean;
   /** Baked whole and off the live canvas. */
   cold: boolean;
-  /** How far the head has moved since it last threw off dust (px). */
-  spun: number;
-}
-
-/** A speck of pigment thrown off a moving head, falling to the paper. */
-interface Mote {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  age: number;
-  life: number;
-  hue: Hue;
-  pale: boolean;
-  size: number;
 }
 
 /** A hion, as company and as somewhere for a thread to go. */
@@ -265,6 +255,8 @@ const PANE = 320;
  * two bakes of one strand (ms). */
 const BATCH = 8;
 const BEAT = 320;
+/** How fast a hion runs down a screen it has just come to (px a second). */
+const SETOUT = 1800;
 /** Rope nodes. */
 const KNOTS = 12;
 /** Ground heads growing at once near the reader (fewer on a screen seen
@@ -304,13 +296,6 @@ const hash = (text: string) => {
 };
 export const seedOf = (path: string) => hash(path) % 100000;
 
-/** A cheap hash of two integers in [0, 1): the same mark every time. */
-function hash01(a: number, b: number) {
-  let h = (Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263)) | 0;
-  h = Math.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-}
-
 const TAU = Math.PI * 2;
 /** The farthest apart two consecutive points of one thread can be and
  * still be the same stretch (a hion leaves the page for a track). */
@@ -325,6 +310,8 @@ export function createSkein(options: SkeinOptions) {
   const close = scale > 1;
   const fine = matchMedia("(pointer: fine)").matches;
   const lively = !!options.lively && !close;
+  /** The hions have yet to set out (a screen travelled to). */
+  let fresh = !!options.travelled && !options.instant;
   const nature = (kind: Kind): Nature => {
     const n = NATURE[kind];
     return close && kind !== "title" ? { ...n, w: n.w * 1.6 } : n;
@@ -342,7 +329,6 @@ export function createSkein(options: SkeinOptions) {
   band.className = "hion-skein__band";
   liveLayer.append(band);
   const bctx = band.getContext("2d")!;
-  let bpats: Patterns | undefined;
 
   let ground = new Ground(1, 1);
   let fate = new Fate(ground);
@@ -386,7 +372,6 @@ export function createSkein(options: SkeinOptions) {
   /** Boxes of things gone from the live canvas, to clear. */
   let cleared: Box[] = [];
   const effects: { e: Effect; last: Box[] }[] = [];
-  const motes: Mote[] = [];
   // The pointer, in page space.
   const pointer = { x: -1e4, y: -1e4, at: 0, here: false, lastIssue: 0, hue: "c" as Hue };
   /** When each thread last sent a branch off under the pointer, by id. */
@@ -477,7 +462,10 @@ export function createSkein(options: SkeinOptions) {
       const w = TEMPER[tip.hue].weight * (narrow ? 0.85 : 1) * (close ? 1.3 : 1);
       const st = make("hion", { ...n, w }, fate.bare(tip.hue, tip.points), { by: "hion", keys: tip.keys });
       measureBody(st);
-      st.s = hionTarget(st);
+      // On a screen travelled to, they set out from where they come down
+      // and run after the drawing; a screen arrived on (or re-laid) has
+      // them where the drawing is.
+      st.s = fresh ? 0 : hionTarget(st);
       st.laid = Math.max(0, indexAt(st, st.s - n.tail) - 1);
       strands.unshift(st);
     }
@@ -508,7 +496,12 @@ export function createSkein(options: SkeinOptions) {
     const target = hionTarget(st);
     const total = measureBody(st);
     const gap = target - st.s;
-    if (Math.abs(gap) > 900) st.s = target - Math.sign(gap) * 240;
+    if (fresh) {
+      // Setting out: down from the line at a pace that can be seen, the
+      // drawing waiting for it; once caught up, as the drawing goes.
+      st.s += Math.min(gap, (SETOUT * dt) / 1000);
+      if (gap <= 2) fresh = false;
+    } else if (Math.abs(gap) > 900) st.s = target - Math.sign(gap) * 240;
     else if (gap) {
       const speed = Math.max(st.n.speed, Math.abs(gap) * 7);
       st.s += Math.sign(gap) * Math.min(Math.abs(gap), (speed * dt) / 1000);
@@ -531,7 +524,6 @@ export function createSkein(options: SkeinOptions) {
       return false;
     }
     swing(st, Math.min(dt, 40), now);
-    throwDust(st, st.s - before);
     const moving = st.s !== before || st.heat !== heat || (st.rope?.energy ?? 0) > 0.04 || st.motion > 0.01;
     if (moving || st.box === null) st.dirty = true;
     return moving;
@@ -811,81 +803,54 @@ export function createSkein(options: SkeinOptions) {
     return Math.max(0, a) * st.alpha;
   }
 
-  /** One run of thread, the one way every thread is drawn: a soft light
-   * under it, two or three fibres of pigment twisted loosely about its
-   * line (the paper's tooth in them), a pale core, and, once settled,
-   * pigment dust thrown off beside it. `pts` are x,y pairs and `arc` the
-   * distance along the thread at each (the twist runs along it, so a run
-   * drawn in pieces still reads as one). `heat`, per point, warms the run
-   * toward the head: the fibres swell and brighten and the core goes
-   * white; the light under it spreads. */
+  /** The colour of a thread at a strength, over black paper: the hue
+   * dimmed, not made see-through, so pieces of one thread meet without a
+   * seam and nothing shows through. */
+  function tone(hue: Hue, strength: number, pale = 0) {
+    const [r, g, b] = RGB[hue];
+    const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
+    const k = Math.max(0, Math.min(1, strength));
+    return `rgb(${((r + (lr - r) * pale) * k) | 0} ${((g + (lg - g) * pale) * k) | 0} ${((b + (lb - b) * pale) * k) | 0})`;
+  }
+
+  /** One run of thread, the one way every thread is drawn: light, and
+   * nothing else. A soft wide glow added under it, and one smooth line of
+   * the hue at the thread's strength. `pts` are x,y pairs. `heat`, per
+   * point, warms the run toward the head: the line brightens to full and
+   * widens a little, a pale core comes up inside it, and the glow under
+   * it spreads. `erase` instead takes that fraction of the run off the
+   * paper, along the same line (a fade step that repaints nothing else). */
   function strokeRun(
     ctx: CanvasRenderingContext2D,
-    pats: Patterns,
     hue: Hue,
     w: number,
     glow: number,
     pts: number[],
-    arc: number[],
     base: number,
     heat: number[] | null,
-    dust: boolean,
-    seed: number,
     erase?: number,
   ) {
     const n = pts.length / 2;
     if (n < 2 || base <= 0) return;
-    const nx = new Float32Array(n);
-    const ny = new Float32Array(n);
-    for (let k = 0; k < n; k++) {
-      const a = Math.max(0, k - 1);
-      const b = Math.min(n - 1, k + 1);
-      const dx = pts[b * 2] - pts[a * 2];
-      const dy = pts[b * 2 + 1] - pts[a * 2 + 1];
-      const len = Math.hypot(dx, dy) || 1;
-      nx[k] = -dy / len;
-      ny[k] = dx / len;
-    }
-    const F = w < 3 ? 2 : 3;
-    const ph = hash01(seed, 1) * TAU;
-    const pale = hue === "c" ? "cl" : "ml";
-    const [cr, cg, cb] = RGB[hue];
-    const bands = heat ? 4 : 1;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    // The bundle wavers a little together, as a hand lays it (once per
-    // point); each fibre winds slowly about the line on top of that.
-    const waver = new Float32Array(n);
-    for (let k = 0; k < n; k++) waver[k] = 0.5 * Math.sin(arc[k] * 0.21 + ph * 3);
-    const path = (k0: number, k1: number, f: number) => {
+    const path = (k0: number, k1: number) => {
       ctx.beginPath();
-      const bf = f < 0 ? 0 : (f / (F - 1) - 0.5) * w * 0.85;
-      for (let k = k0; k <= k1; k++) {
-        const o = f < 0 ? 0 : bf * (0.7 + 0.3 * Math.sin(arc[k] * 0.05 + ph + f * 2.4)) + waver[k];
-        const x = pts[k * 2] + nx[k] * o;
-        const y = pts[k * 2 + 1] + ny[k] * o;
-        if (k === k0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
+      ctx.moveTo(pts[k0 * 2], pts[k0 * 2 + 1]);
+      for (let k = k0 + 1; k <= k1; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
     };
     if (erase !== undefined) {
-      // Taking this fraction of the run off the paper, along its own
-      // fibres (a fade step that repaints nothing else).
       ctx.globalCompositeOperation = "destination-out";
       ctx.strokeStyle = "#000";
       ctx.globalAlpha = erase;
-      ctx.lineWidth = Math.max(0.9, (w / F) * 1.25) + 1;
-      for (let f = 0; f < F; f++) {
-        path(0, n - 1, f);
-        ctx.stroke();
-      }
-      ctx.lineWidth = Math.max(0.8, w * 0.28) + 1;
-      path(0, n - 1, -1);
+      ctx.lineWidth = w + 1.2;
+      path(0, n - 1);
       ctx.stroke();
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
       return;
     }
+    const bands = heat ? 4 : 1;
     for (let b = 0; b < bands; b++) {
       const k0 = Math.floor(((n - 1) * b) / bands);
       const k1 = Math.floor(((n - 1) * (b + 1)) / bands);
@@ -895,48 +860,41 @@ export function createSkein(options: SkeinOptions) {
         for (let k = k0; k <= k1; k++) h += heat[k];
         h /= k1 - k0 + 1;
       }
-      const swell = 1 + 0.32 * h;
-      const g = glow * base + 0.2 * h;
+      // The glow: a little light added under the line, a little more at
+      // a head. Kept slight: added light over the line's own colour
+      // saturates quickly, and a bright bar is a blob.
+      const g = glow * base + 0.08 * h;
       if (g > 0.01) {
-        ctx.strokeStyle = `rgb(${cr} ${cg} ${cb})`;
-        ctx.globalAlpha = g;
-        ctx.lineWidth = w * (3 + 2.5 * h);
-        path(k0, k1, -1);
+        ctx.globalCompositeOperation = "lighter";
+        ctx.strokeStyle = tone(hue, g);
+        ctx.lineWidth = w * (2.4 + 1.2 * h);
+        path(k0, k1);
         ctx.stroke();
+        ctx.globalCompositeOperation = "source-over";
       }
-      ctx.strokeStyle = pats[hue];
-      ctx.lineWidth = Math.max(0.9, (w / F) * 1.25) * swell;
-      for (let f = 0; f < F; f++) {
-        const a0 = base * (0.55 + 0.4 * hash01(seed, f + 3));
-        ctx.globalAlpha = Math.min(1, a0 + (1 - a0) * h * 0.85);
-        path(k0, k1, f);
-        ctx.stroke();
-      }
-      ctx.strokeStyle = pats[pale];
-      ctx.globalAlpha = Math.min(1, base * 0.7 + 0.3 * h);
-      ctx.lineWidth = Math.max(0.8, w * 0.28) * (1 + 0.9 * h);
-      path(k0, k1, -1);
+      // The line itself: the hue at its strength, full and a touch wider
+      // toward a head.
+      ctx.strokeStyle = tone(hue, base + (1 - base) * h);
+      ctx.lineWidth = w * (1 + 0.1 * h);
+      path(k0, k1);
       ctx.stroke();
-    }
-    if (dust && w >= 1.5) {
-      ctx.fillStyle = `rgb(${cr} ${cg} ${cb})`;
-      for (let k = 0; k < n; k += 2) {
-        const i = Math.round(arc[k]);
-        if (hash01(seed, i) < 0.6) continue;
-        const r1 = hash01(seed, i + 7);
-        const d = (hash01(seed, i + 11) - 0.5) * 2 * (w + r1 * r1 * 12);
-        ctx.globalAlpha = hash01(seed, i + 3) * 0.5 * base;
-        ctx.fillRect(pts[k * 2] + nx[k] * d, pts[k * 2 + 1] + ny[k] * d, 0.9, 0.9);
+      // Near the head a pale core comes up inside it.
+      if (h > 0.03) {
+        ctx.strokeStyle = tone(hue, 1, 0.85);
+        ctx.globalAlpha = Math.min(1, h * 1.1);
+        ctx.lineWidth = Math.max(0.8, w * 0.32) * (1 + 0.6 * h);
+        path(k0, k1);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
       }
     }
-    ctx.globalAlpha = 1;
   }
 
   /** Lay segments [i0, i1) of a strand's body on a context, settled.
    * With `clip` (a pane's box), segments wholly outside it are skipped:
    * a hion's body is thousands of segments, and a pane sees a few. */
-  function lay(ctx: CanvasRenderingContext2D, pats: Patterns, st: Strand, i0: number, i1: number, tip?: Pt, clip?: Box, erase?: number) {
-    const { xs, ys, under, hue, id } = st.t;
+  function lay(ctx: CanvasRenderingContext2D, st: Strand, i0: number, i1: number, tip?: Pt, clip?: Box, erase?: number) {
+    const { xs, ys, under, hue } = st.t;
     const { ls } = st;
     const base = st.n.body;
     const pad = st.n.w * 3 + 14;
@@ -947,11 +905,9 @@ export function createSkein(options: SkeinOptions) {
         Math.max(ys[i], ys[i + 1]) < clip.t - pad ||
         Math.min(ys[i], ys[i + 1]) > clip.b + pad);
     let pts: number[] = [];
-    let arc: number[] = [];
     const flush = (alpha: number) => {
-      if (pts.length >= 4) strokeRun(ctx, pats, hue, st.n.w, st.n.glow, pts, arc, base * alpha, null, true, id, erase);
+      if (pts.length >= 4) strokeRun(ctx, hue, st.n.w, st.n.glow, pts, base * alpha, null, erase);
       pts = [];
-      arc = [];
     };
     for (let i = i0; i < i1; i++) {
       const a = taper(st, i);
@@ -963,23 +919,15 @@ export function createSkein(options: SkeinOptions) {
       }
       if (a < st.alpha) {
         flush(st.alpha);
-        strokeRun(ctx, pats, hue, st.n.w, st.n.glow, [xs[i], ys[i], xs[i + 1], ys[i + 1]], [ls[i], ls[i + 1]], base * a, null, true, id, erase);
+        strokeRun(ctx, hue, st.n.w, st.n.glow, [xs[i], ys[i], xs[i + 1], ys[i + 1]], base * a, null, erase);
         continue;
       }
-      if (!pts.length) {
-        pts.push(xs[i], ys[i]);
-        arc.push(ls[i]);
-      }
+      if (!pts.length) pts.push(xs[i], ys[i]);
       pts.push(xs[i + 1], ys[i + 1]);
-      arc.push(ls[i + 1]);
     }
     if (tip && pts.length) {
       const k = pts.length - 2;
-      const d = Math.hypot(tip[0] - pts[k], tip[1] - pts[k + 1]);
-      if (d < JUMP) {
-        pts.push(tip[0], tip[1]);
-        arc.push(arc[arc.length - 1] + d);
-      }
+      if (Math.hypot(tip[0] - pts[k], tip[1] - pts[k + 1]) < JUMP) pts.push(tip[0], tip[1]);
     }
     flush(st.alpha);
   }
@@ -1003,7 +951,7 @@ export function createSkein(options: SkeinOptions) {
       for (const st of strands) {
         if (!st.laid || st.bottom < t0 - 4 || st.top > t0 + TILE + 4) continue;
         if (st.right < pane.x0 - 16 || st.left > pane.x1 + 16) continue;
-        lay(ctx, pane.pats, st, 0, st.laid, undefined, { l: pane.x0, t: t0, r: pane.x1, b: t0 + TILE });
+        lay(ctx, st, 0, st.laid, undefined, { l: pane.x0, t: t0, r: pane.x1, b: t0 + TILE });
       }
       still(pane.el);
     }
@@ -1022,7 +970,7 @@ export function createSkein(options: SkeinOptions) {
       const ctx = el.getContext("2d")!;
       ctx.setTransform(dpr, 0, 0, dpr, -x0 * dpr, -index * TILE * dpr);
       layer.append(el);
-      panes.push({ el, ctx, pats: patterns(ctx, dpr), x0, x1: x0 + w });
+      panes.push({ el, ctx, x0, x1: x0 + w });
     }
     const tile = { index, panes };
     paintTile(tile);
@@ -1078,7 +1026,7 @@ export function createSkein(options: SkeinOptions) {
       const tile = tiles.get(k);
       if (!tile) continue;
       for (const pane of panesIn(tile, left, right)) {
-        lay(pane.ctx, pane.pats, st, st.laid, to, undefined, { l: pane.x0, t: k * TILE, r: pane.x1, b: (k + 1) * TILE });
+        lay(pane.ctx, st, st.laid, to, undefined, { l: pane.x0, t: k * TILE, r: pane.x1, b: (k + 1) * TILE });
         still(pane.el);
       }
     }
@@ -1133,7 +1081,6 @@ export function createSkein(options: SkeinOptions) {
       band.height = Math.ceil(bandH * bandDpr);
       band.style.width = `${bandW}px`;
       band.style.height = `${bandH}px`;
-      bpats = patterns(bctx, bandDpr);
     }
     bandTop = Math.round(Math.max(0, Math.min(height - bandH, view - (bandH - innerHeight) / 2)));
     band.style.transform = `translateY(${bandTop}px)`;
@@ -1213,11 +1160,12 @@ export function createSkein(options: SkeinOptions) {
       const vy = (y - rope.oy[k]) * 0.9;
       rope.ox[k] = x;
       rope.oy[k] = y;
-      // A sway across the thread while the head moves, and a little sag.
-      const sway = st.motion * 1300 * Math.sin(now * 0.0036 + k * 0.5 + st.t.id * 1.7) * (1 - u) * u * 4;
+      // A slight sway across the thread while the head moves, and a
+      // little sag: a thread drawn out taut, not a tail.
+      const sway = st.motion * 420 * Math.sin(now * 0.0031 + k * 0.5 + st.t.id * 1.7) * (1 - u) * u * 4;
       x += vx + nx * sway * sec * sec;
-      y += vy + (ny * sway + 700 * st.motion) * sec * sec;
-      const f = 1 - Math.exp(-(2 + 26 * u * u) * sec);
+      y += vy + (ny * sway + 220 * st.motion) * sec * sec;
+      const f = 1 - Math.exp(-(3 + 34 * u * u) * sec);
       x += (tx - x) * f;
       y += (ty - y) * f;
       rope.x[k] = x;
@@ -1245,7 +1193,7 @@ export function createSkein(options: SkeinOptions) {
 
   /** A strand's live part: what has settled but is not yet baked, and the
    * warm run on its rope up to the head, where the thread is hot. */
-  function paintStrand(ctx: CanvasRenderingContext2D, pats: Patterns, st: Strand) {
+  function paintStrand(ctx: CanvasRenderingContext2D, st: Strand) {
     const { hue } = st.t;
     const span = Math.min(st.n.tail, st.s);
     const settled = st.s - span;
@@ -1253,16 +1201,14 @@ export function createSkein(options: SkeinOptions) {
     const i1 = indexAt(st, settled);
     if (st.n.body > 0 && (i1 > st.laid || settled > st.ls[st.laid])) {
       const [tx, ty] = at(st, settled);
-      lay(ctx, pats, st, st.laid, i1, [tx, ty]);
+      lay(ctx, st, st.laid, i1, [tx, ty]);
     }
     if (span < 2) return;
     // The warm run, from where it settles to the head.
     let pts: number[] = [];
-    let arc: number[] = [];
     if (st.rope) {
       // The rope's nodes, smoothed between.
       const r = st.rope;
-      const step = span / KNOTS;
       for (let k = KNOTS; k >= 0; k--) {
         if (k < KNOTS && k > 0) {
           const mx0 = (r.x[k + 1] + r.x[k]) / 2;
@@ -1270,25 +1216,19 @@ export function createSkein(options: SkeinOptions) {
           const mx1 = (r.x[k] + r.x[k - 1]) / 2;
           const my1 = (r.y[k] + r.y[k - 1]) / 2;
           pts.push(mx0, my0, 0.25 * mx0 + 0.5 * r.x[k] + 0.25 * mx1, 0.25 * my0 + 0.5 * r.y[k] + 0.25 * my1);
-          arc.push(st.s - (k + 0.5) * step, st.s - k * step);
-        } else {
-          pts.push(r.x[k], r.y[k]);
-          arc.push(st.s - k * step);
-        }
+        } else pts.push(r.x[k], r.y[k]);
       }
     } else {
       const steps = Math.max(2, Math.ceil(span / 6));
       for (let k = steps; k >= 0; k--) {
         const [x, y] = at(st, st.s - (k * span) / steps);
         pts.push(x, y);
-        arc.push(st.s - (k * span) / steps);
       }
     }
     // Not across a stretch a hion leaves the page for.
     for (let i = pts.length - 4; i >= 0; i -= 2) {
       if (Math.abs(pts[i + 2] - pts[i]) + Math.abs(pts[i + 3] - pts[i + 1]) > JUMP) {
         pts = pts.slice(i + 2);
-        arc = arc.slice(i / 2 + 1);
         break;
       }
     }
@@ -1300,17 +1240,18 @@ export function createSkein(options: SkeinOptions) {
       const u = k / (count - 1);
       warm[k] = heat * u * u;
     }
-    strokeRun(ctx, pats, hue, st.n.w, st.n.glow, pts, arc, st.n.body * st.alpha, warm, false, st.t.id);
+    strokeRun(ctx, hue, st.n.w, st.n.glow, pts, st.n.body * st.alpha, warm);
     if (heat > 0.02) {
-      // The head: the thread's own light, white-hot at the very tip.
+      // The very tip: a point of the thread's own light, no bigger than
+      // the thread.
       const hx = pts[(count - 1) * 2];
       const hy = pts[(count - 1) * 2 + 1];
       const [cr, cg, cb] = RGB[hue];
       const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
-      const rad = st.n.w * 2.4;
+      const rad = st.n.w * 1.4;
       const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, rad);
-      halo.addColorStop(0, `rgba(${lr},${lg},${lb},${0.9 * heat})`);
-      halo.addColorStop(0.3, `rgba(${cr},${cg},${cb},${0.45 * heat})`);
+      halo.addColorStop(0, `rgba(${lr},${lg},${lb},${0.85 * heat})`);
+      halo.addColorStop(0.45, `rgba(${cr},${cg},${cb},${0.35 * heat})`);
       halo.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
       ctx.fillStyle = halo;
       ctx.fillRect(hx - rad, hy - rad, rad * 2, rad * 2);
@@ -1318,64 +1259,10 @@ export function createSkein(options: SkeinOptions) {
     ctx.globalAlpha = 1;
   }
 
-  /* ---------- Dust ---------- */
-
-  /** A moving head throws off a speck of pigment every so far. */
-  function throwDust(st: Strand, moved: number) {
-    if (moved <= 0 || st.heat < 0.3) return;
-    st.spun += moved;
-    while (st.spun > 7) {
-      st.spun -= 7;
-      if (st.rand() < 0.45 || motes.length >= 90) continue;
-      const [x, y, nx, ny] = at(st, st.s);
-      const side = (st.rand() - 0.5) * 2;
-      const sp = 0.01 + st.rand() * 0.05;
-      motes.push({
-        x: x + nx * side * st.n.w,
-        y: y + ny * side * st.n.w,
-        vx: nx * side * sp + (st.rand() - 0.5) * 0.02,
-        vy: ny * side * sp - 0.01,
-        age: 0,
-        life: 500 + st.rand() * 700,
-        hue: st.t.hue,
-        pale: st.rand() < 0.3,
-        size: 0.9 + st.rand() * 1.1,
-      });
-    }
-  }
-
-  effects.push({
-    last: [],
-    e: {
-      step(_now, dt) {
-        for (const m of motes) {
-          m.age += dt;
-          m.vy += 0.00009 * dt;
-          m.x += m.vx * dt;
-          m.y += m.vy * dt;
-        }
-        for (let i = motes.length - 1; i >= 0; i--) if (motes[i].age >= motes[i].life) motes.splice(i, 1);
-        return motes.length > 0;
-      },
-      boxes() {
-        return motes.map((m) => ({ l: m.x - 2, t: m.y - 2, r: m.x + m.size + 2, b: m.y + m.size + 2 }));
-      },
-      paint(ctx) {
-        for (const m of motes) {
-          const life = 1 - m.age / m.life;
-          ctx.globalAlpha = Math.min(1, life * 1.6) * 0.8;
-          ctx.fillStyle = `rgb(${RGB[m.pale ? (m.hue === "c" ? "cl" : "ml") : m.hue].join(" ")})`;
-          ctx.fillRect(m.x, m.y, m.size, m.size);
-        }
-        ctx.globalAlpha = 1;
-      },
-    },
-  });
-
   /** Repaint only where something changed: each changed thing's old box
    * and new one, merged. */
   function paintLive() {
-    if (!bpats) return;
+    if (!bandW) return;
     const dirty: Box[] = cleared;
     cleared = [];
     for (const st of strands) {
@@ -1409,7 +1296,7 @@ export function createSkein(options: SkeinOptions) {
       ctx.rect(r.l, r.t, r.r - r.l, r.b - r.t);
       ctx.clip();
       ctx.clearRect(r.l, r.t, r.r - r.l, r.b - r.t);
-      for (const st of strands) if (st.box && meets(st.box, r)) paintStrand(ctx, bpats, st);
+      for (const st of strands) if (st.box && meets(st.box, r)) paintStrand(ctx, st);
       for (const fx of effects) if (fx.last.some((b) => meets(b, r))) fx.e.paint(ctx);
       ctx.restore();
     }
@@ -1441,7 +1328,6 @@ export function createSkein(options: SkeinOptions) {
       box: null,
       dirty: true,
       cold: false,
-      spun: 0,
     };
   }
 
@@ -1539,7 +1425,7 @@ export function createSkein(options: SkeinOptions) {
       const tile = tiles.get(k);
       if (!tile) continue;
       for (const pane of panesIn(tile, st.left, st.right)) {
-        lay(pane.ctx, pane.pats, st, 0, st.laid, undefined, { l: pane.x0, t: k * TILE, r: pane.x1, b: (k + 1) * TILE }, fraction);
+        lay(pane.ctx, st, 0, st.laid, undefined, { l: pane.x0, t: k * TILE, r: pane.x1, b: (k + 1) * TILE }, fraction);
         still(pane.el);
       }
     }
@@ -1597,7 +1483,6 @@ export function createSkein(options: SkeinOptions) {
       return false;
     }
     swing(st, Math.min(dt, 40), now);
-    throwDust(st, st.s - before);
     const moving = st.s !== before || (st.rope?.energy ?? 0) > 0.04 || (ended && st.heat > 0) || st.motion > 0.01;
     if (moving) st.dirty = true;
     return moving;
@@ -1620,7 +1505,6 @@ export function createSkein(options: SkeinOptions) {
       return going;
     }
     swing(st, Math.min(dt, 40), now);
-    throwDust(st, st.s - before);
     const moving = st.s !== before || (st.rope?.energy ?? 0) > 0.04 || (st.heat > 0 && !going) || st.motion > 0.01 || (going && st.heat < 1);
     if (moving) st.dirty = true;
     return moving;
@@ -2052,9 +1936,13 @@ export function createSkein(options: SkeinOptions) {
       if (instant) settle(Infinity);
       else {
         began = performance.now();
-        pregrow();
+        // The screen arrived on is not bare; one travelled to grows all
+        // of its threads in sight, from where the hions come down.
+        if (!options.travelled) {
+          pregrow();
+          for (const l of [layer, liveLayer]) l.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: "ease" });
+        }
         cull();
-        for (const l of [layer, liveLayer]) l.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: "ease" });
         task.wake();
       }
     },
