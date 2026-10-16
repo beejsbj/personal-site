@@ -188,6 +188,7 @@ function show(route: Route, first: boolean) {
     instant: still(),
     scale: close(route.path) ? 2 : 1,
     lively: route.kind === "home",
+    travelled: !first,
     origin: () => nav.origin(),
     seed: seedOf(route.path),
     isIdle: ctx.isIdle,
@@ -217,18 +218,27 @@ function show(route: Route, first: boolean) {
     track?.start();
     life?.start();
     page.dataset.state = "here";
-    // Then the ground and the woven things, once the ribbon has fallen and
-    // the main thread has room: none of it is needed to read the screen.
+    // Then every thread (the skein), at once: on a screen travelled to the
+    // hions are seen setting out from the line as the ribbon falls. The
+    // woven things come once the ribbon has fallen and the main thread
+    // has room: none of it is needed to read the screen.
+    const gone = () => live?.page !== page || live.left !== undefined;
     const ground = () => {
-      // Not for a screen already let go (pulled away before it settled).
-      if (live?.page !== page || live.left !== undefined) return;
-      skein.start();
+      if (!gone()) skein.start();
+    };
+    const woven = () => {
+      if (gone()) return;
       const weaving = { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric };
       weaveType(page, weaving);
       weaveCovers(page, weaving);
     };
-    if (still()) ground();
-    else later(controller.signal, first ? 0 : PULL * DROP, ground);
+    if (still()) {
+      ground();
+      woven();
+    } else {
+      ground();
+      later(controller.signal, first ? 0 : PULL * DROP, woven);
+    }
   });
   // Keyboard travel ahead of the drawing brings the drawing with it.
   page.addEventListener(

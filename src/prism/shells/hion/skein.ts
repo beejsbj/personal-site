@@ -49,12 +49,16 @@
  *
  * A head moves every frame while it is active, pulled, eased and pulled
  * again rather than at one rate, drawn between the points fate laid, so
- * it never steps. Behind it a short rope (KNOTS nodes, slightly longer
- * than the path it spans) hangs from the head to where the thread has
- * settled: it sags a little, lags on a turn and sways while the head
- * moves, and settles onto the path as it cools, so what is laid down is
- * what you saw. A hion's head rides a rope too, chasing the loom's reach,
- * and dims to half once it has caught up and waits.
+ * it never steps. Behind it a short rope (KNOTS nodes, a hair longer
+ * than the path it spans: taut) hangs from the head to where the thread
+ * has settled: it lags a little on a turn and sways slightly while the
+ * head moves, and settles onto the path as it cools, so what is laid
+ * down is what you saw. A hion's head rides a rope too, chasing the
+ * loom's reach, and dims to half once it has caught up and waits. On a
+ * screen travelled to the hions set out from where they come down and
+ * run their way at SETOUT, the loom pacing its drawing to them, and the
+ * ground is born live behind them: the screen is seen growing from the
+ * line, not appearing.
  *
  * Paid for elsewhere: one live canvas for everything that moves (a band
  * of the page about one and a half screens tall, so scrolling carries it
@@ -142,6 +146,9 @@ interface SkeinOptions {
   scale?: number;
   /** A busy screen (home): more ground, more heads at work, longer. */
   lively?: boolean;
+  /** A screen travelled to (not the one arrived on): its threads are
+   * seen growing from where the hions come down, none ready-made. */
+  travelled?: boolean;
   /** Where the hions come down from the line (page px). */
   origin(): Pt | null;
   /** The page's own seed (its path): the same page grows the same way. */
@@ -237,6 +244,8 @@ const PANE = 320;
  * two bakes of one strand (ms). */
 const BATCH = 8;
 const BEAT = 320;
+/** How fast a hion runs down a screen it has just come to (px a second). */
+const SETOUT = 1800;
 /** Rope nodes. */
 const KNOTS = 12;
 /** Ground heads growing at once near the reader (fewer on a screen seen
@@ -290,6 +299,8 @@ export function createSkein(options: SkeinOptions) {
   const close = scale > 1;
   const fine = matchMedia("(pointer: fine)").matches;
   const lively = !!options.lively && !close;
+  /** The hions have yet to set out (a screen travelled to). */
+  let fresh = !!options.travelled && !options.instant;
   const nature = (kind: Kind): Nature => {
     const n = NATURE[kind];
     return close ? { ...n, w: n.w * 1.6 } : n;
@@ -437,7 +448,10 @@ export function createSkein(options: SkeinOptions) {
       const w = TEMPER[tip.hue].weight * (narrow ? 0.85 : 1) * (close ? 1.3 : 1);
       const st = make("hion", { ...n, w }, fate.bare(tip.hue, tip.points), { by: "hion", keys: tip.keys });
       measureBody(st);
-      st.s = hionTarget(st);
+      // On a screen travelled to, they set out from where they come down
+      // and run after the drawing; a screen arrived on (or re-laid) has
+      // them where the drawing is.
+      st.s = fresh ? 0 : hionTarget(st);
       st.laid = Math.max(0, indexAt(st, st.s - n.tail) - 1);
       strands.unshift(st);
     }
@@ -468,7 +482,12 @@ export function createSkein(options: SkeinOptions) {
     const target = hionTarget(st);
     const total = measureBody(st);
     const gap = target - st.s;
-    if (Math.abs(gap) > 900) st.s = target - Math.sign(gap) * 240;
+    if (fresh) {
+      // Setting out: down from the line at a pace that can be seen, the
+      // drawing waiting for it; once caught up, as the drawing goes.
+      st.s += Math.min(gap, (SETOUT * dt) / 1000);
+      if (gap <= 2) fresh = false;
+    } else if (Math.abs(gap) > 900) st.s = target - Math.sign(gap) * 240;
     else if (gap) {
       const speed = Math.max(st.n.speed, Math.abs(gap) * 7);
       st.s += Math.sign(gap) * Math.min(Math.abs(gap), (speed * dt) / 1000);
@@ -1847,9 +1866,13 @@ export function createSkein(options: SkeinOptions) {
       if (instant) settle(Infinity);
       else {
         began = performance.now();
-        pregrow();
+        // The screen arrived on is not bare; one travelled to grows all
+        // of its threads in sight, from where the hions come down.
+        if (!options.travelled) {
+          pregrow();
+          for (const l of [layer, liveLayer]) l.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: "ease" });
+        }
         cull();
-        for (const l of [layer, liveLayer]) l.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: "ease" });
         task.wake();
       }
     },

@@ -328,9 +328,12 @@ export function createLoom(options: LoomOptions) {
       gap = target - reach;
     }
     if (gap > 0.5) {
+      // A screen travelled to is drawn at about the pace its hions set
+      // out at (skein.ts SETOUT), so what hangs from them appears as they
+      // pass, not before them.
       const speed = intro
         ? options.brisk
-          ? 1.4 + gap / 220
+          ? 0.9 + gap / 900
           : 0.26 + gap / 800
         : 0.45 + gap / 450; // px per ms
       advance(Math.min(target, reach + speed * dt));
