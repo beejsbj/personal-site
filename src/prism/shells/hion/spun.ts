@@ -18,7 +18,7 @@
  * asks again when the page is laid out anew. A visitor who prefers less
  * motion, and a still prism face, get the word written at once. Below
  * SMALLEST the thread would be too fine to read: the word keeps its
- * chalk. */
+ * chalk, as does a word the skein finds it cannot write. */
 import type { Hue, Pt } from "./pastel";
 import { traceWord } from "./trace";
 
@@ -49,9 +49,15 @@ interface SpunOptions {
 const SMALLEST = 36;
 
 export function spinType(root: ParentNode, options: SpunOptions) {
-  const words = [...root.querySelectorAll<HTMLElement>("[data-spun]")];
+  const words = [...root.querySelectorAll<HTMLElement>("[data-spun]")].filter(
+    (el) => (parseFloat(getComputedStyle(el).fontSize) || 0) >= SMALLEST,
+  );
   if (!words.length) return;
   const { signal } = options;
+  // Nothing is written until its thread writes it: the chalk goes now, not
+  // word by word as each gets its turn (the skein gives it back to a word
+  // it cannot write).
+  for (const el of words) el.dataset.spunState = "waiting";
   // The letters have to be the real face: Aboreto, not a fallback.
   document.fonts.ready.then(() => {
     if (signal.aborted) return;
@@ -79,7 +85,6 @@ function hueOf(el: HTMLElement): Hue {
 }
 
 function spinWord(el: HTMLElement, options: SpunOptions) {
-  if ((parseFloat(getComputedStyle(el).fontSize) || 0) < SMALLEST) return;
   const begin = () =>
     options.skein.inscribe(el, hueOf(el), (page) => {
       const t0 = performance.now();

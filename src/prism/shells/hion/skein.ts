@@ -763,6 +763,7 @@ export function createSkein(options: SkeinOptions) {
       }
       const s = t.measure(p);
       if (s) out.push([el, s]);
+      else delete el.dataset.spunState;
     }
     return out;
   }
@@ -2090,7 +2091,12 @@ export function createSkein(options: SkeinOptions) {
       page.classList.add("hion-measuring");
       const spun = measure(page.getBoundingClientRect());
       page.classList.remove("hion-measuring");
-      if (!spun) return;
+      if (!spun) {
+        // It keeps its chalk.
+        delete el.dataset.spunState;
+        titles.delete(el);
+        return;
+      }
       const st = title(el, hue, spun);
       if (instant) whole(st);
       task.wake();
