@@ -287,7 +287,24 @@ function spin(el: HTMLElement, options: SpunOptions) {
     // On from its drop, in its drop's hue (the hue of the cord it hangs
     // from: weave.ts).
     const hue = el.closest<HTMLElement>("[data-ink]")?.dataset.hue === "m" ? "m" : "c";
-    writeLocal(el, hue, options, options.instant, knot);
+    // Once its cord has grown to it and its drop down to the knot
+    // (skein.ts ties it; shell.css grows the drop).
+    const holder = el.closest<HTMLElement>("[data-reveal][data-ink]");
+    if (!holder || options.instant) {
+      writeLocal(el, hue, options, options.instant, knot);
+      return;
+    }
+    const go = () => writeLocal(el, hue, options, false, knotOf(el) ?? knot, 600);
+    if (holder.hasAttribute("data-tied")) go();
+    else {
+      const watch = new MutationObserver(() => {
+        if (!holder.hasAttribute("data-tied")) return;
+        watch.disconnect();
+        go();
+      });
+      watch.observe(holder, { attributes: true, attributeFilter: ["data-tied"] });
+      options.signal.addEventListener("abort", () => watch.disconnect(), { once: true });
+    }
     return;
   }
   options.skein.inscribe(el, hueOf(el), (page) => {
@@ -569,7 +586,7 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
  * canvas of its own, with the skein's material and a head of its own (on
  * the screen's one frame loop), then let it lie cold. Written again,
  * settled, if the heading is laid out anew. */
-function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant, from?: Pt) {
+function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant, from?: Pt, delay = 0) {
   const { signal } = options;
   const material = options.skein.material();
   const { glow } = material.nature();
@@ -680,5 +697,6 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
     still(canvas);
     return false;
   });
-  task.wake();
+  if (delay) task.wakeIn(delay);
+  else task.wake();
 }

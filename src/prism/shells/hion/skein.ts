@@ -359,6 +359,11 @@ export function createSkein(options: SkeinOptions) {
    * reaches them, and how many have been born. */
   let limbs: Limb[] = [];
   let limbSown = 0;
+  /** Things hung on drops from a cord: where each drop meets its cord
+   * (page px), so it is shown when the cord's head has grown over it, not
+   * before (shell.css `data-tied`); and when it was lit, for one whose cord
+   * is not grown here (it is tied 1.4s after, whatever). */
+  let hangers: { el: HTMLElement; x: number; y: number; lit: number }[] = [];
   let sown = 0;
   let strands: Strand[] = [];
   let hions: Hion[] = [];
@@ -591,6 +596,7 @@ export function createSkein(options: SkeinOptions) {
     seeds = planned.buds;
     limbs = loom.limbs().slice().sort((a, b) => a.key - b.key);
     limbSown = 0;
+    readHangers();
     sown = 0;
     trickles = 0;
     cleared = [];
@@ -755,6 +761,48 @@ export function createSkein(options: SkeinOptions) {
     const dy = h.ys[b] - h.ys[a];
     const len = Math.hypot(dx, dy) || 1;
     return [h.xs[lo] + (h.xs[hi] - h.xs[lo]) * u, h.ys[lo] + (h.ys[hi] - h.ys[lo]) * u, -dy / len, dx / len];
+  }
+
+  /** Where each hung thing's drop meets its cord, read with the page
+   * still (no swing, no reveal offset). */
+  function readHangers() {
+    hangers = [];
+    page.classList.add("hion-measuring");
+    const p = page.getBoundingClientRect();
+    for (const el of page.querySelectorAll<HTMLElement>("[data-reveal][data-ink]")) {
+      if (el.hasAttribute("data-tied")) continue;
+      if (instant || el.closest("[data-cloth-hold]")) {
+        el.setAttribute("data-tied", "");
+        continue;
+      }
+      const r = el.getBoundingClientRect();
+      const hang = parseFloat(el.style.getPropertyValue("--hion-hang")) || 0;
+      const kx = parseFloat(el.dataset.knot ?? "");
+      hangers.push({ el, x: r.left - p.left + (Number.isNaN(kx) ? r.width / 2 : kx), y: r.top - p.top - hang, lit: 0 });
+    }
+    page.classList.remove("hion-measuring");
+  }
+
+  /** Show what hangs once its cord has grown to it. */
+  function tieHangers(now: number) {
+    if (!hangers.length) return false;
+    const heads = strands.filter((st) => st.kind === "limb" && !st.cold).map((st) => at(st, st.s));
+    let waiting = false;
+    hangers = hangers.filter((hg) => {
+      const lit = hg.el.hasAttribute("data-lit");
+      if (lit && !hg.lit) hg.lit = now;
+      // Hung from the thing above it: tied when that is.
+      let above = hg.el.dataset.hangFrom === "prev" ? (hg.el.previousElementSibling as HTMLElement | null) : null;
+      while (above && !above.hasAttribute("data-ink")) above = above.previousElementSibling as HTMLElement | null;
+      const reached = above ? above.hasAttribute("data-tied") : heads.some(([x, y]) => Math.abs(x - hg.x) < 14 && Math.abs(y - hg.y) < 18);
+      if (reached || (lit && now - hg.lit > 1400) || !hg.el.isConnected) {
+        hg.el.setAttribute("data-tied", "");
+        return false;
+      }
+      if (lit) waiting = true;
+      return true;
+    });
+    return waiting;
   }
 
   /* ---------- Where a branch leaves from ---------- */
@@ -1910,6 +1958,7 @@ export function createSkein(options: SkeinOptions) {
     // What hangs from the hions grows off them as the drawing reaches it,
     // whether or not anyone is moving: it is what the words hang from.
     while (limbSown < limbs.length && limbs[limbSown].key <= loom.reach() && bear(limbs[limbSown], false)) limbSown++;
+    const tying = tieHangers(now);
     if (here) {
       // Born as the drawing reaches them, a moment apart; only heads near
       // the reader count (the rest hurry out of sight).
@@ -1983,6 +2032,7 @@ export function createSkein(options: SkeinOptions) {
     if (here && sown < seeds.length && seeds[sown].seed.key <= loom.reach()) wait = Math.min(wait, 400);
     else if (here) wait = Math.min(wait, Math.max(nextTrickle - now, 400));
     if (here) wait = Math.min(wait, attend - (now - lastInput) + 20);
+    if (tying) wait = Math.min(wait, 200);
     if (wait < Infinity) task.wakeIn(Math.max(30, wait));
     return false;
   }

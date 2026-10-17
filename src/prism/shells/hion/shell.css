@@ -1997,12 +1997,25 @@
     transform 1.25s var(--hion-ease-swing);
 }
 
-:root[data-lens="hion"] [data-reveal][data-ink]:not([data-lit]) {
+:root[data-lens="hion"] [data-reveal][data-ink]:not([data-tied]) {
+  opacity: 0;
   transform: translateY(-18px) rotate(4deg);
 }
 
-:root[data-lens="hion"] [data-reveal][data-ink]:nth-child(2n):not([data-lit]) {
+:root[data-lens="hion"] [data-reveal][data-ink]:nth-child(2n):not([data-tied]) {
   transform: translateY(-18px) rotate(-4deg);
+}
+
+/* The thread a hung thing hangs on grows down from its cord as the
+   drawing reaches it (and the words on it are then written on from its
+   end, spun.ts): it does not appear whole. */
+:root[data-lens="hion"] [data-reveal][data-ink] > .hion-ink {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.6s cubic-bezier(0.3, 0.1, 0.4, 1) 0.05s;
+}
+
+:root[data-lens="hion"] [data-reveal][data-ink]:not([data-tied]) > .hion-ink {
+  clip-path: inset(0 0 100% 0);
 }
 
 :root[data-lens="hion"] .hion[data-still] *,
@@ -2013,7 +2026,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   :root[data-lens="hion"] [data-reveal]:not([data-lit]),
-  :root[data-lens="hion"] [data-reveal][data-ink]:not([data-lit]) {
+  :root[data-lens="hion"] [data-reveal][data-ink]:not([data-tied]) {
     transform: none;
   }
 
