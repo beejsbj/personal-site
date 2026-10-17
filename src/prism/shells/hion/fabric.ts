@@ -7,10 +7,7 @@
  * basket weave, About a satin (smooth, mostly one colour with points of
  * the other), the resume a broken twill, writing a herringbone, and a
  * page that does not exist a loose, unstructured weave. A single thing
- * seen close (a project, a post) is cut from its list's cloth.
- *
- * The line at the top carries a swatch of each page's cloth under its
- * name; the page you are on is pulled down further than the rest. */
+ * seen close (a project, a post) is cut from its list's cloth. */
 import type { RouteKind } from "../types";
 
 export type Fabric = "plain" | "twill" | "basket" | "satin" | "broken" | "herringbone" | "loose";
@@ -29,12 +26,6 @@ const FABRICS: Record<RouteKind, Fabric> = {
 };
 
 export const fabricOf = (kind: string): Fabric => FABRICS[kind as RouteKind] ?? "loose";
-
-/** The fabric of a place on the site, by its path. */
-export function fabricAt(path: string): Fabric {
-  const first = path.split("/").filter(Boolean)[0] ?? "";
-  return fabricOf(first === "" ? "home" : first);
-}
 
 /** Which colour lies on top at crossing (x, y) where both have been:
  * 1 cyan (the warp), 2 magenta (the weft). */

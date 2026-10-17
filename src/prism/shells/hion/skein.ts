@@ -2,8 +2,9 @@
  * material.
  *
  * A strand is a body grown from its head, a goal that steers the head, a
- * hue, a width, some slack, a glow, a body strength and a lifetime. The
- * kinds differ only in those numbers (NATURE) and in what steers them:
+ * hue, some slack, a glow, a body strength and a lifetime (the width is
+ * every thread's: pastel.ts THREAD). The kinds differ only in those
+ * numbers (NATURE) and in what steers them:
  *
  *   hion     the two hions: persistent and brightest. Their ways down the
  *            page are composed from the screen's stations (weave.ts);
@@ -36,14 +37,14 @@
  *            in from the page's edge or from just before the word, along
  *            a line under its feet and up through each letter in turn,
  *            out past the last. Its way is kept and measured again when
- *            the page is laid out anew; it never fades. Its width is the
- *            letters' own stroke, in the family.
+ *            the page is laid out anew; it never fades. Of the one
+ *            width, like every thread.
  *
  * One material (strokeRun): every run of thread is one smooth line of
  * its hue with a little light added under it, and nothing else (no
- * grain: the colour is the thread). The widths are one family (a hion
- * 3.1 or 4.1; the rest 2.5 to 3.1); what differs is how strongly a body
- * lies, which is the hue dimmed, never see-through. The run behind a
+ * grain: the colour is the thread). One width for every thread on the
+ * screen (pastel.ts THREAD); what differs is how strongly a body lies,
+ * which is the hue dimmed, never see-through. The run behind a
  * head is the same line drawn hot: it brightens toward the tip, a pale
  * core comes up inside it, the light grows a little, and a small halo no
  * bigger than the thread sits on the tip. No bead on a stick: the light
@@ -87,18 +88,16 @@
  * it settled, the hions whole, with no heads and nothing from the pointer.
  *
  * What stays its own: what hangs from the hions (wefts, knots, ties and
- * cords, pastel marks laid by the loom above the ground), the woven
- * covers (woven.ts: a cellular cloth, a different medium), the menu
- * cord and its swatches (nav.ts), the ribbon a new screen comes down as
- * (index.ts: a page transition on the compositor, which has to run while
- * the main thread is busiest), and the resume track (its own loom, its
- * hions still in pastel). */
-import { TEMPER } from "./dance";
+ * cords, marks laid by the loom above the ground), the woven covers
+ * (woven.ts: a cellular cloth, a different medium), the menu cord and the
+ * loose ends under its names (nav.ts), and the resume track (its own
+ * loom, its hions laid as marks). All of it the one thread, of the one
+ * width (pastel.ts THREAD). */
 import { Fate, goalsFor, Ground, type Near, plan, type Gather, type Seed, STEP, type Thread } from "./fate";
 import type { createLoom } from "./loom";
 import { still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
-import { type Hue, type Pt, RGB, rng } from "./pastel";
+import { type Hue, type Pt, RGB, rng, THREAD } from "./pastel";
 import { type Box, encircle as encircle_, ring, smooth, stitches, weave, wordBoxes } from "./wind";
 import type { Measure, Spun } from "./spun";
 
@@ -117,8 +116,6 @@ export interface Effect {
 export type Kind = "hion" | "ground" | "pointer" | "loop" | "title";
 
 interface Nature {
-  /** Thread width (css px): the spread of its fibres. */
-  w: number;
   /** How fast the head goes (px a second). */
   speed: number;
   /** The warm run behind the head (px), which the rope spans. */
@@ -133,16 +130,17 @@ interface Nature {
   hold: number;
 }
 
-/** One material: every thread is the hions' thread, at a width in their
- * family (a hion is 3.1 or 4.1 wide: dance.ts TEMPER). What differs is how
- * firmly the body lies and how long. */
+/** One material: every thread is the one thread, of the one width
+ * (pastel.ts THREAD). What differs is how strongly the body lies and how
+ * long. */
 const NATURE: Record<Kind, Nature> = {
-  hion: { w: 3.6, speed: 700, tail: 130, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
-  ground: { w: 2.5, speed: 150, tail: 110, slack: 1.02, glow: 0.1, body: 0.5, hold: 55000 },
-  pointer: { w: 2.8, speed: 360, tail: 90, slack: 1.025, glow: 0.12, body: 0.62, hold: 12000 },
-  loop: { w: 3.1, speed: 1100, tail: 80, slack: 1.015, glow: 0.12, body: 0.95, hold: Infinity },
-  // Width and speed are set per word (its stroke; about two seconds).
-  title: { w: 3.4, speed: 900, tail: 70, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
+  hion: { speed: 700, tail: 130, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
+  ground: { speed: 150, tail: 110, slack: 1.02, glow: 0.1, body: 0.5, hold: 55000 },
+  pointer: { speed: 360, tail: 90, slack: 1.025, glow: 0.12, body: 0.62, hold: 12000 },
+  loop: { speed: 1100, tail: 80, slack: 1.015, glow: 0.12, body: 0.95, hold: Infinity },
+  // Speed and the warm run are set per heading (spun.ts: its size and
+  // length).
+  title: { speed: 900, tail: 70, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
 };
 
 interface SkeinOptions {
@@ -312,10 +310,7 @@ export function createSkein(options: SkeinOptions) {
   const lively = !!options.lively && !close;
   /** The hions have yet to set out (a screen travelled to). */
   let fresh = !!options.travelled && !options.instant;
-  const nature = (kind: Kind): Nature => {
-    const n = NATURE[kind];
-    return close && kind !== "title" ? { ...n, w: n.w * 1.6 } : n;
-  };
+  const nature = (kind: Kind): Nature => NATURE[kind];
 
   // Under the hions: the ground. Over them (under the words): what moves.
   const layer = document.createElement("div");
@@ -449,18 +444,16 @@ export function createSkein(options: SkeinOptions) {
       fate.fix(tip.hue, tip.points);
     }
     // The hions themselves: strands grown along their composed ways, as
-    // far as the loom has drawn. Each at its own weight (cyan the finer).
+    // far as the loom has drawn.
     strands = strands.filter((st) => {
       if (st.kind !== "hion") return true;
       if (st.box) cleared.push(st.box);
       return false;
     });
-    const narrow = width < 720;
     for (const tip of loom.journeys()) {
       if (tip.points.length < 2) continue;
       const n = nature("hion");
-      const w = TEMPER[tip.hue].weight * (narrow ? 0.85 : 1) * (close ? 1.3 : 1);
-      const st = make("hion", { ...n, w }, fate.bare(tip.hue, tip.points), { by: "hion", keys: tip.keys });
+      const st = make("hion", n, fate.bare(tip.hue, tip.points), { by: "hion", keys: tip.keys });
       measureBody(st);
       // On a screen travelled to, they set out from where they come down
       // and run after the drawing; a screen arrived on (or re-laid) has
@@ -772,7 +765,7 @@ export function createSkein(options: SkeinOptions) {
     const off = nearestHion(x0, y0, 300, hue) ?? nearestHion(x0, y0, 180);
     if (off && off.d > 20 && off.x <= x0 + 24) way = [[off.x, off.y], [(off.x + x0) / 2, (off.y + y0) / 2 + 4], ...way];
     else if (x0 < 240) way = [[-6, y0 + 2], ...way];
-    const n: Nature = { ...nature("title"), w: Math.max(2, Math.min(4.2, spun.width * 0.8)) };
+    const n: Nature = { ...nature("title") };
     const t = fate.bare(hue, smooth(way, 4));
     const st = make("title", n, t, { by: "title", el });
     const total = measureBody(st);
@@ -897,7 +890,7 @@ export function createSkein(options: SkeinOptions) {
     const { xs, ys, under, hue } = st.t;
     const { ls } = st;
     const base = st.n.body;
-    const pad = st.n.w * 3 + 14;
+    const pad = THREAD * 3 + 14;
     const outside = (i: number) =>
       !!clip &&
       (Math.max(xs[i], xs[i + 1]) < clip.l - pad ||
@@ -906,7 +899,7 @@ export function createSkein(options: SkeinOptions) {
         Math.min(ys[i], ys[i + 1]) > clip.b + pad);
     let pts: number[] = [];
     const flush = (alpha: number) => {
-      if (pts.length >= 4) strokeRun(ctx, hue, st.n.w, st.n.glow, pts, base * alpha, null, erase);
+      if (pts.length >= 4) strokeRun(ctx, hue, THREAD, st.n.glow, pts, base * alpha, null, erase);
       pts = [];
     };
     for (let i = i0; i < i1; i++) {
@@ -919,7 +912,7 @@ export function createSkein(options: SkeinOptions) {
       }
       if (a < st.alpha) {
         flush(st.alpha);
-        strokeRun(ctx, hue, st.n.w, st.n.glow, [xs[i], ys[i], xs[i + 1], ys[i + 1]], base * a, null, erase);
+        strokeRun(ctx, hue, THREAD, st.n.glow, [xs[i], ys[i], xs[i + 1], ys[i + 1]], base * a, null, erase);
         continue;
       }
       if (!pts.length) pts.push(xs[i], ys[i]);
@@ -1050,7 +1043,7 @@ export function createSkein(options: SkeinOptions) {
         still(el);
         ctx.save();
         ctx.globalCompositeOperation = "destination-out";
-        ctx.lineWidth = st.n.w + 2.5;
+        ctx.lineWidth = THREAD + 2.5;
         ctx.lineCap = "round";
         ctx.beginPath();
         ctx.moveTo(x0, y0);
@@ -1098,7 +1091,7 @@ export function createSkein(options: SkeinOptions) {
   function boxOf(st: Strand): Box | null {
     if (st.cold) return null;
     const { xs, ys } = st.t;
-    const pad = st.n.w * 3 + 14;
+    const pad = THREAD * 3 + 14;
     let l = Infinity;
     let t = Infinity;
     let r = -Infinity;
@@ -1240,7 +1233,7 @@ export function createSkein(options: SkeinOptions) {
       const u = k / (count - 1);
       warm[k] = heat * u * u;
     }
-    strokeRun(ctx, hue, st.n.w, st.n.glow, pts, st.n.body * st.alpha, warm);
+    strokeRun(ctx, hue, THREAD, st.n.glow, pts, st.n.body * st.alpha, warm);
     if (heat > 0.02) {
       // The very tip: a point of the thread's own light, no bigger than
       // the thread.
@@ -1248,7 +1241,7 @@ export function createSkein(options: SkeinOptions) {
       const hy = pts[(count - 1) * 2 + 1];
       const [cr, cg, cb] = RGB[hue];
       const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
-      const rad = st.n.w * 1.4;
+      const rad = THREAD * 1.4;
       const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, rad);
       halo.addColorStop(0, `rgba(${lr},${lg},${lb},${0.85 * heat})`);
       halo.addColorStop(0.45, `rgba(${cr},${cg},${cb},${0.35 * heat})`);
