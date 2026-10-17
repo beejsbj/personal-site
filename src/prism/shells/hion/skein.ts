@@ -1106,8 +1106,11 @@ export function createSkein(options: SkeinOptions) {
   }
 
   /** Measure what the lines will write, nearest their heads first, a few
-   * milliseconds at a time when the page has room. */
+   * milliseconds at a time when the page has room, and only what the
+   * drawing is coming to (a screen and a half ahead of it): a long page is
+   * measured as it is read, not all on arriving. */
   let pumping = false;
+  const due = (stop: Stop) => stop.state === 0 && stop.box.t < loom.reach() + innerHeight * 1.5;
   function pump() {
     if (pumping || signal.aborted) return;
     pumping = true;
@@ -1120,7 +1123,7 @@ export function createSkein(options: SkeinOptions) {
         let did = false;
         for (const line of lines.values()) {
           const stop = line.stops.find((p) => p.state === 0);
-          if (!stop) continue;
+          if (!stop || !due(stop)) continue;
           measureStop(stop);
           route(line);
           did = true;
@@ -1128,10 +1131,8 @@ export function createSkein(options: SkeinOptions) {
         if (!did) break;
         more = true;
       }
-      if (more || [...lines.values()].some((l) => l.stops.some((p) => p.state === 0))) {
-        task.wake();
-        pump();
-      }
+      if (more) task.wake();
+      if ([...lines.values()].some((l) => l.stops.some(due))) pump();
     };
     if ("requestIdleCallback" in window) requestIdleCallback(run, { timeout: 60 });
     else setTimeout(run, 16);
@@ -2301,6 +2302,8 @@ export function createSkein(options: SkeinOptions) {
     const here = present(performance.now());
     anchor();
     readHions();
+    // What the lines will write next, measured as the drawing comes to it.
+    if (stops.length && !pumping && [...lines.values()].some((l) => l.stops.some(due))) pump();
     // What hangs from the hions grows off them as the drawing reaches it,
     // whether or not anyone is moving: it is what the words hang from.
     while (limbSown < limbs.length && limbs[limbSown].key <= loom.reach() && bear(limbs[limbSown], false)) limbSown++;

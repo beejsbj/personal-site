@@ -68,7 +68,7 @@ function dirs(pts: Pt[]): { start: Pt; end: Pt } {
 /** What a travel costs: its length, and a great deal for each stretch of
  * it over words (not its first and last bits, which leave and arrive
  * beside words), and a little for leaving the screen's sides. */
-function cost(pts: Pt[], clear: Clear, width: number) {
+function cost(pts: Pt[], clear: Clear, width: number): { cost: number; len: number } {
   const n = pts.length;
   const along = new Float32Array(n);
   for (let k = 1; k < n; k++) along[k] = along[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]);
@@ -80,7 +80,7 @@ function cost(pts: Pt[], clear: Clear, width: number) {
     if (along[k] > 16 && len - along[k] > 16 && clear(pts[k][0], pts[k][1]) < 5) blocked++;
     if (pts[k][0] < 4 || pts[k][0] > width - 4) off++;
   }
-  return len + blocked * 900 + off * 300;
+  return { cost: len + blocked * 900 + off * 300, len };
 }
 
 /** A travel from a point going `d0` to a point arriving going `d1`, bowed
@@ -92,8 +92,11 @@ export function travel(a: Pt, d0: Pt, b: Pt, d1: Pt, clear: Clear, width: number
   for (const lift of [0, -1, 1, -2, 2, -3, 3, -4.5, 4.5]) {
     const h = lift * Math.max(28, d * 0.18);
     const pts = cubic([a[0], a[1]], [a[0] + d0[0] * k, a[1] + d0[1] * k + h], [b[0] - d1[0] * k, b[1] - d1[1] * k + h], [b[0], b[1]]);
-    const c = cost(pts, clear, width) + Math.abs(lift) * 20;
-    if (!best || c < best.cost) best = { pts, cost: c };
+    const c = cost(pts, clear, width);
+    const total = c.cost + Math.abs(lift) * 20;
+    if (!best || total < best.cost) best = { pts, cost: total };
+    // Clear of every word and on the page: no bow will do better.
+    if (c.cost <= c.len + 0.5) break;
   }
   return best!;
 }
@@ -113,18 +116,24 @@ export function leg(j: Journey, from: number, pieces: Piece[], clear: Clear, wid
     const b = Math.min(n - 1, i + 3);
     return unit(j.xs[b] - j.xs[a], j.ys[b] - j.ys[a]);
   };
-  // Where it leaves: the best point of the journey from `from` on.
+  // Where it leaves: the best point of the journey from `from` on. The
+  // likeliest few by distance first (later is dearer: the line should not
+  // wait to write what it passes), and only those tried in earnest.
   let out: { i: number; pts: Pt[]; cost: number } | null = null;
   const lo = Math.max(1, from);
+  const near: { i: number; est: number }[] = [];
   for (let i = lo; i < n - 1; i += 3) {
     const x = j.xs[i];
     const y = j.ys[i];
     const d = Math.hypot(first[0][0] - x, first[0][1] - y);
-    if (d > reach || (out && d > out.cost)) continue;
+    if (d > reach) continue;
     // A journey that leaves the page for a stretch (a track) is no way.
     if (Math.abs(j.xs[i + 1] - x) + Math.abs(j.ys[i + 1] - y) > 60) continue;
-    const t = travel([x, y], along(i), first[0], f.start, clear, width);
-    // Later is dearer: the line should not wait to write what it passes.
+    near.push({ i, est: d + (i - lo) * 0.4 });
+  }
+  near.sort((a, b) => a.est - b.est);
+  for (const { i } of near.slice(0, 12)) {
+    const t = travel([j.xs[i], j.ys[i]], along(i), first[0], f.start, clear, width);
     const c = t.cost + (i - lo) * 0.4;
     if (!out || c < out.cost) out = { i, pts: t.pts, cost: c };
   }
@@ -146,20 +155,22 @@ export function leg(j: Journey, from: number, pieces: Piece[], clear: Clear, wid
   const end = last[last.length - 1];
   let back: { i: number; pts: Pt[]; cost: number } | null = null;
   let skipped = 0;
+  const after: { i: number; est: number; skipped: number }[] = [];
   for (let i = out.i + 2; i < n - 1; i += 3) {
     skipped += Math.hypot(j.xs[i] - j.xs[i - 3], j.ys[i] - j.ys[i - 3]);
+    if (skipped > 2400) break;
     const x = j.xs[i];
     const y = j.ys[i];
     const d = Math.hypot(end[0] - x, end[1] - y);
-    if (d > reach) {
-      if (back && skipped > back.cost) break;
-      continue;
-    }
+    if (d > reach) continue;
     if (Math.abs(j.xs[i + 1] - x) + Math.abs(j.ys[i + 1] - y) > 60) continue;
-    const t = travel(end, l.end, [x, y], along(i), clear, width);
-    const c = t.cost + skipped * 0.6;
+    after.push({ i, est: d + skipped * 0.6, skipped });
+  }
+  after.sort((a, b) => a.est - b.est);
+  for (const { i, skipped: gone } of after.slice(0, 12)) {
+    const t = travel(end, l.end, [j.xs[i], j.ys[i]], along(i), clear, width);
+    const c = t.cost + gone * 0.6;
     if (!back || c < back.cost) back = { i, pts: t.pts, cost: c };
-    if (skipped > 2400) break;
   }
   if (back) pts.push(...back.pts.slice(1, -1));
   return { at: out.i, back: back ? back.i : -1, pts, marks };
