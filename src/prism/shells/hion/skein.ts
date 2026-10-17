@@ -42,6 +42,16 @@
  *            the page is laid out anew; it never fades. Of the one width,
  *            like every thread.
  *
+ * The screen's own tree: the two hions are its trunks, and every other
+ * thread is a branch grown in the screen's own structure (tree.ts): a
+ * limb off a trunk for each section, a branch off that for each thing in
+ * it, and a twig for each word and picture, which writes the word or
+ * rings the picture. A fork's branches all leave its end together, so a
+ * big section is a knot of thread fanning out; ones going far down run
+ * down a lane beside it together and leave it level with what they go
+ * to. Every tip grows at once, calmly, as far as the drawing has reached.
+ * No ground and no loose buds: nothing grows without something to go to.
+ *
  * One material (strokeRun): every run of thread is one smooth line of
  * its hue with a little light added under it, and nothing else (no
  * grain: the colour is the thread). One width for every thread on the
@@ -101,8 +111,9 @@ import { still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
 import { type Hue, type Pt, RGB, rng, THREAD } from "./pastel";
 import { type Box, encircle as encircle_, ring, smooth, stitches, weave, wordBoxes } from "./wind";
-import { extend, type Leg, leg, travel } from "./route";
+import { travel } from "./route";
 import type { Material, Measure, Spun } from "./spun";
+import { type Fork, type Leaf, SAID, structure } from "./tree";
 
 type Loom = ReturnType<typeof createLoom>;
 
@@ -252,6 +263,9 @@ interface Strand {
   depth: number;
   /** How far along itself it next forks (arc length; Infinity: never). */
   fork: number;
+  /** A branch of the screen's tree: how far down the drawing must have
+   * reached for each of its points to grow. */
+  keys?: Float64Array;
 }
 
 /** A hion, as company and as somewhere for a thread to go. */
@@ -273,6 +287,8 @@ const BEAT = 320;
 const SETOUT = 1800;
 /** Rope nodes. */
 const KNOTS = 12;
+/** The longest a branch takes to grow to where it is going (s). */
+const BRISK = 1.1;
 /** Ground heads growing at once near the reader (fewer on a screen seen
  * close, where each is twice the size and its page otherwise very still). */
 const LIVE = 3;
@@ -478,51 +494,41 @@ export function createSkein(options: SkeinOptions) {
       hions.push({ hue: tip.hue, xs, ys, ls, keys: tip.keys });
       fate.fix(tip.hue, tip.points);
     }
-    // The two lines: each its journey down the screen, and the legs it
-    // goes out of its way on to write what it writes. A line composed anew
-    // keeps nothing of the old: what it wrote is measured and routed again.
+    // The hions themselves: strands grown along their composed ways, as
+    // far as the loom has drawn: the trunks of the screen's two trees.
+    // Their branches stay theirs.
+    const was = new Map<Hue, Strand>();
     strands = strands.filter((st) => {
       if (st.kind !== "hion") return true;
       if (st.box) cleared.push(st.box);
+      was.set(st.t.hue, st);
       return false;
     });
-    lines.clear();
     for (const tip of loom.journeys()) {
       if (tip.points.length < 2) continue;
-      const n = tip.points.length;
-      const line: Line = {
-        hue: tip.hue,
-        xs: Float64Array.from(tip.points, (p) => p[0]),
-        ys: Float64Array.from(tip.points, (p) => p[1]),
-        keys: tip.keys,
-        legs: [],
-        stops: [],
-        passes: passesOf(tip.hue, tip.points),
-        strand: null,
-        way: null,
-        held: -1,
-        heldAt: 0,
-      };
-      lines.set(tip.hue, line);
-      relay(line);
-      const st = line.strand!;
-      // It sets out from where it comes down and writes its way down: on
-      // a screen arrived on too (what it writes is not ready-made).
-      st.s = 0;
-      st.laid = 0;
-      void n;
+      const n = nature("hion");
+      const st = make("hion", n, fate.bare(tip.hue, tip.points), { by: "hion", keys: tip.keys });
+      measureBody(st);
+      // On a screen travelled to, they set out from where they come down
+      // and run after the drawing; a screen arrived on (or re-laid) has
+      // them where the drawing is.
+      st.s = fresh ? 0 : hionTarget(st);
+      st.laid = Math.max(0, indexAt(st, st.s - n.tail) - 1);
+      const old = was.get(tip.hue);
+      if (old) {
+        st.children = old.children;
+        for (const c of st.children) c.parent = st;
+      }
+      strands.unshift(st);
     }
-    for (const stop of stops) {
-      stop.state = stop.state < 0 ? stop.state : 0;
-      stop.piece = null;
-    }
-    assign();
-    if (stops.length && !busy) pump();
   }
 
   /** How far along its way a hion's drawing has got. */
-  function hionTarget(st: Strand) {
-    const keys = (st.drive as Extract<Drive, { by: "hion" }>).keys;
+  const hionTarget = (st: Strand) => keyed(st, (st.drive as Extract<Drive, { by: "hion" }>).keys);
+
+  /** How far along a thread whose points are revealed at `keys` (how far
+   * down the drawing must have reached) the drawing has got. */
+  function keyed(st: Strand, keys: Float64Array) {
     const reach = loom.reach();
     if (keys[0] > reach) return 0;
     let lo = 0;
@@ -538,35 +544,22 @@ export function createSkein(options: SkeinOptions) {
     return st.ls[lo] + (st.ls[lo + 1] - st.ls[lo]) * u;
   }
 
-  /** A line's head chases its drawing down its journey, quick, a jump
-   * only where it writes nothing; on a leg it goes at the leg's own pace
-   * (brisk between, a hand's pace in the letters), hurrying a little when
-   * the reader is far ahead, but never skipping a word. It waits short of a
-   * word not yet ready to be written (being measured). */
+  /** A hion's head chases its drawing: quick, never a jump unless the
+   * drawing jumped far (a fling), a little dimmer once it has caught up. */
   function chase(st: Strand, dt: number, now: number) {
     const before = st.s;
-    const line = lines.get(st.t.hue);
-    const way = line?.way;
-    let target = hionTarget(st);
-    if (line && way) target = Math.min(target, holdOf(line, now));
+    const target = hionTarget(st);
     const total = measureBody(st);
     const gap = target - st.s;
-    if (way && gap > 0) {
-      const i = Math.min(way.pace.length - 1, indexAt(st, st.s));
-      const pace = way.pace[i];
-      // Behind the reader: hurry, up to four times.
-      const rush = 1 + Math.min(2, Math.max(0, gap - 600) / 1200);
-      if (pace > 0) st.s += Math.min(gap, (pace * rush * dt) / 1000);
-      else {
-        // On the journey: as the drawing goes, but no further than the next
-        // leg, where it slows to write.
-        const next = way.next[i] >= 0 ? st.ls[way.next[i]] : Infinity;
-        const speed = fresh ? SETOUT : Math.max(st.n.speed, gap * 7);
-        let to = st.s + Math.min(gap, (speed * dt) / 1000);
-        if (!fresh && gap > 900) to = Math.max(to, target - 240);
-        st.s = Math.min(to, next, target);
-      }
-      if (fresh && gap <= 2) fresh = false;
+    if (fresh) {
+      // Setting out: down from the line at a pace that can be seen, the
+      // drawing waiting for it; once caught up, as the drawing goes.
+      st.s += Math.min(gap, (SETOUT * dt) / 1000);
+      if (gap <= 2) fresh = false;
+    } else if (Math.abs(gap) > 900) st.s = target - Math.sign(gap) * 240;
+    else if (gap) {
+      const speed = Math.max(st.n.speed, Math.abs(gap) * 7);
+      st.s += Math.sign(gap) * Math.min(Math.abs(gap), (speed * dt) / 1000);
     }
     const going = st.s !== before || loom.drawing();
     st.resting = !going;
@@ -609,8 +602,9 @@ export function createSkein(options: SkeinOptions) {
     hionVersion = -1;
     readHions();
     void spun;
-    // Nothing but the two lines: no ground, no limbs, nothing hung on a
-    // cord of its own (the lines write what hangs, where it hangs).
+    // Nothing but the screen's own tree: no ground, no limbs, nothing hung
+    // on a cord of its own (its twigs write what hangs, where it hangs).
+    plan();
     all = [];
     seeds = [];
     limbs = [];
@@ -825,424 +819,424 @@ export function createSkein(options: SkeinOptions) {
     return waiting;
   }
 
-  /* ---------- The two lines ---------- */
+  /* ---------- The page's own tree ---------- */
 
-  /** Something one of the lines writes (a heading, a label) or rings (a
-   * picture), in the order it comes down the screen. */
-  interface Stop {
+  /** A fork or a leaf of the screen's tree (tree.ts) as it grows: a section
+   * is a limb off a hion, each thing in it a branch off the limb, and each
+   * word and picture a twig off what it sits in, which writes the word or
+   * rings the picture. */
+  interface Part {
     el: HTMLElement;
-    hue: Hue;
+    up: Part | null;
+    kids: Part[];
+    leaf: boolean;
     ring: boolean;
+    /** Said: written by both trees at once, twisted round each other. */
+    said: boolean;
     measure: Measure | null;
-    /** Its way (page px), once measured: a word's letters, or a ring. */
+    /** A word's way through its letters (page px), once measured. */
     piece: Pt[] | null;
     size: number;
-    /** 0 to be measured, 1 measured, 2 on its line, -1 it cannot be (it
-     * keeps its chalk). */
+    /** A leaf: 0 to be measured, 1 ready, -1 it keeps its chalk. */
     state: number;
-    /** The point of its line's journey nearest it: the line waits short of
-     * there until it is on the line. */
-    near: number;
     box: Box;
-    /** Not written: the line's own way through a stretch of the page it
-     * leaves for (the resume's track across), gone through on its way. */
-    pass?: boolean;
-  }
-
-  /** A line's way as it is laid: its journey with its legs spliced in. */
-  interface Way {
-    /** At each point, how fast its head goes there (px a second; 0 on the
-     * journey, where it goes as the drawing goes). */
-    pace: Float32Array;
-    /** At each point, the next point that is on a leg (-1: none). */
-    next: Int32Array;
-    /** Where each journey point is on the way. */
-    at: Int32Array;
-    /** The stretches that write a stop, for a hover to light. */
-    marks: { from: number; to: number; stop: Stop }[];
-  }
-
-  interface Line {
-    hue: Hue;
-    xs: Float64Array;
-    ys: Float64Array;
-    keys: Float64Array;
-    legs: (Leg & { stops: Stop[] })[];
-    /** Its stops, in order. */
-    stops: Stop[];
-    /** Where its journey leaves the page for a track and comes back. */
-    passes: Stop[];
-    strand: Strand | null;
-    way: Way | null;
-    /** The stop it is waiting for, and since when. */
-    held: number;
+    /** A fork: where its branches leave from (page px). */
+    hub: Pt;
+    /** A fork whose branches go far down: the lane they run down together
+     * (x; 0 none), and the side of it they lie further out on. */
+    lane: number;
+    side: number;
+    /** Its thread once born, and a said word's second (the other tree's). */
+    st: Strand | null;
+    twin: Strand | null;
+    /** Since when it has waited on nothing but its measuring. */
     heldAt: number;
   }
 
-  const lines = new Map<Hue, Line>();
-  let stops: Stop[] = [];
-  /** How fast a line travels between what it writes, and rings a picture
-   * (px a second). */
-  const TRAVEL = 1100;
-  const RINGING = 1100;
-  /** How long a line waits for a word to be measured before it goes on
-   * without it (the word keeps its chalk). */
+  /** What the trees write and ring (spun.ts), and the tree that makes,
+   * parents before their kids. */
+  let given: Leaf[] = [];
+  let nodes: Part[] = [];
+  /** Below this far under a fork's hub (px) a branch goes straight to what
+   * it goes to; further, down its fork's lane with the others, this far
+   * apart. */
+  const CABLE = 380;
+  const PITCH = 6;
+  /** How long a word may wait to be measured while nothing else holds it
+   * (ms), before it keeps its chalk. */
   const PATIENCE = 2500;
+  /** A said word's two threads: how far either side of its letters (px),
+   * and how often they cross. */
+  const TWIST = 1.3;
+  const TURN = 48;
 
-  /** How fast a word is written: a hand's pace for its size, quick for a
-   * small one (px of thread a second). */
-  const writingPace = (stop: Stop) => (stop.pass ? TRAVEL : stop.ring ? RINGING : Math.max(650, Math.min(1500, stop.size * 26)));
-
-  /** Lay a line's way again from its journey and legs: the strand keeps
-   * what it has grown (a leg is only ever added ahead of its head). */
-  function relay(line: Line) {
-    const n = line.xs.length;
-    const xs: number[] = [];
-    const ys: number[] = [];
-    const keys: number[] = [];
-    const pace: number[] = [];
-    const at = new Int32Array(n).fill(-1);
-    const marks: Way["marks"] = [];
-    const journey = (i: number) => {
-      at[i] = xs.length;
-      xs.push(line.xs[i]);
-      ys.push(line.ys[i]);
-      keys.push(line.keys[i]);
-      pace.push(0);
-    };
-    let j = 0;
-    let ended = false;
-    for (const lg of line.legs) {
-      for (; j <= lg.at; j++) journey(j);
-      const base = xs.length;
-      // Revealed as the drawing gets down to it, as the journey is (a key
-      // is how far down the drawing has reached).
-      lg.pts.forEach(([x, y]) => {
-        xs.push(x);
-        ys.push(y);
-        keys.push(y);
-        pace.push(TRAVEL);
-      });
-      let prev = 0;
-      for (const mk of lg.marks) {
-        const stop = lg.stops[mk.piece];
-        const v = writingPace(stop);
-        // Gone through, not written: revealed as the journey is.
-        if (stop.pass) {
-          for (let k = mk.from; k <= mk.to; k++) pace[base + k] = v;
-          prev = mk.to + 1;
-          continue;
-        }
-        // A word is written whole once the drawing reaches its top, and the
-        // way to it no later.
-        for (let k = prev; k < mk.from; k++) keys[base + k] = Math.min(keys[base + k], stop.box.t);
-        for (let k = mk.from; k <= mk.to; k++) {
-          pace[base + k] = v;
-          keys[base + k] = stop.box.t;
-        }
-        prev = mk.to + 1;
-        marks.push({ from: base + mk.from, to: base + mk.to, stop });
-      }
-      if (lg.back < 0) {
-        ended = true;
-        break;
-      }
-      j = lg.back;
-    }
-    if (!ended) for (; j < n; j++) journey(j);
-    // Never back: what comes after a leg that went lower waits for it.
-    for (let k = 1; k < keys.length; k++) keys[k] = Math.max(keys[k], keys[k - 1]);
-    const next = new Int32Array(xs.length).fill(-1);
-    for (let k = xs.length - 2; k >= 0; k--) next[k] = pace[k + 1] > 0 ? k + 1 : next[k + 1];
-    line.way = { pace: Float32Array.from(pace), next, at, marks };
-    const st = line.strand;
-    if (!st) {
-      const t = fate.bare(line.hue, xs.map((x, k) => [x, ys[k]] as Pt));
-      const made = make("hion", nature("hion"), t, { by: "hion", keys: Float64Array.from(keys) });
-      measureBody(made);
-      line.strand = made;
-      strands.unshift(made);
-      return;
-    }
-    // The same up to its head; on from there, the new way.
-    const keep = Math.min(st.t.xs.length, indexAt(st, st.s) + 1);
-    st.t.xs.length = 0;
-    st.t.ys.length = 0;
-    st.t.xs.push(...xs);
-    st.t.ys.push(...ys);
-    st.ls.length = Math.min(st.ls.length, keep);
-    measureBody(st);
-    (st.drive as Extract<Drive, { by: "hion" }>).keys = Float64Array.from(keys);
-    st.dirty = true;
-  }
-
-  /** How far a line may go: short of the next stop not on it yet. */
-  function holdOf(line: Line, now: number) {
-    const st = line.strand;
-    const way = line.way;
-    if (!st || !way) return Infinity;
-    const stop = line.stops.find((p) => p.state === 0 || p.state === 1);
-    if (!stop) return Infinity;
-    const i = way.at[stop.near];
-    let hold = i >= 0 ? Math.max(0, st.ls[Math.max(0, i - 4)] ?? Infinity) : Infinity;
-    // Not yet off its journey: it waits where it comes down (it leaves
-    // from there to the first thing it writes).
-    if (!line.legs.length) hold = Math.min(hold, OFF);
-    // Only waiting while its head is held there for a word being measured
-    // (one the drawing has not come near yet is not being measured).
-    if (line.held !== stops.indexOf(stop) || (stop.state === 0 && !due(stop)) || st.s < hold - 2) {
-      line.held = stops.indexOf(stop);
-      line.heldAt = now;
-    }
-    // Waited long enough: on without it (it keeps its chalk).
-    if (now - line.heldAt > PATIENCE) {
-      stop.state = -1;
-      stop.el.dataset.spunState = "chalk";
-      return holdOf(line, now);
-    }
-    return hold;
-  }
-
-  /** Where a journey leaves the page for a track and comes back to it: a
-   * stretch of it either side of each leap, which its line goes through
-   * on its way (the track's own threads go on from there). */
-  function passesOf(hue: Hue, pts: Pt[]): Stop[] {
-    const out: Stop[] = [];
-    for (let i = 0; i < pts.length - 1; i++) {
-      if (Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]) <= JUMP) continue;
-      let a = i;
-      for (let run = 0; a > 0 && run < 80; a--) run += Math.hypot(pts[a][0] - pts[a - 1][0], pts[a][1] - pts[a - 1][1]);
-      let b = i + 1;
-      for (let run = 0; b < pts.length - 1 && run < 80; b++) run += Math.hypot(pts[b + 1][0] - pts[b][0], pts[b + 1][1] - pts[b][1]);
-      const piece = pts.slice(a, b + 1);
-      const xs = piece.map((p) => p[0]);
-      out.push({
-        el: page,
-        hue,
-        ring: false,
-        measure: null,
-        piece,
-        size: 0,
-        state: 1,
-        near: a,
-        box: { l: Math.min(...xs), r: Math.max(...xs), t: pts[i][1], b: pts[i + 1][1] },
-        pass: true,
-      });
-    }
-    return out;
-  }
-
-  /** Which line each stop is on, and the order its line comes to them:
-   * down the screen, from where it is to the nearest of what is next (of
-   * what lies within a little of the highest still to come), so a line
-   * goes from word to word as a hand would, never back up the page. */
-  function assign() {
-    for (const line of lines.values()) line.stops = [];
+  /** Read the tree off the screen, where each thing rests, and where each
+   * fork's branches will leave from. */
+  function plan() {
+    nodes = [];
+    if (!given.length) return;
     const p = page.getBoundingClientRect();
+    const now = performance.now();
     page.classList.add("hion-measuring");
-    for (const stop of stops) {
-      if (!stop.el.isConnected) stop.state = -1;
-      const r = stop.el.getBoundingClientRect();
-      stop.box = { l: r.left - p.left, t: r.top - p.top, r: r.right - p.left, b: r.bottom - p.top };
-      const line = lines.get(stop.hue) ?? [...lines.values()][0];
-      if (!line) continue;
-      const cx = stop.box.l;
-      const cy = (stop.box.t + stop.box.b) / 2;
-      let best = 0;
-      let bd = Infinity;
-      for (let i = 0; i < line.xs.length; i += 2) {
-        const d = Math.hypot(line.xs[i] - cx, (line.ys[i] - cy) * 1.6);
+    const add = (f: Fork, up: Part | null): Part => {
+      const r = f.el.getBoundingClientRect();
+      const n: Part = {
+        el: f.el,
+        up,
+        kids: [],
+        leaf: !!f.leaf,
+        ring: !!f.leaf?.ring,
+        said: !!f.leaf && f.el.matches(SAID),
+        measure: f.leaf?.measure ?? null,
+        piece: null,
+        size: 0,
+        state: !f.leaf ? 1 : !f.el.isConnected ? -1 : f.leaf.ring ? 1 : 0,
+        box: { l: r.left - p.left, t: r.top - p.top, r: r.right - p.left, b: r.bottom - p.top },
+        hub: [0, 0],
+        lane: 0,
+        side: 0,
+        st: null,
+        twin: null,
+        heldAt: now,
+      };
+      nodes.push(n);
+      n.kids = f.kids.map((k) => add(k, n));
+      return n;
+    };
+    for (const f of structure(given, page)) add(f, null);
+    page.classList.remove("hion-measuring");
+    for (const n of nodes) {
+      if (n.leaf) continue;
+      hubOf(n, n.up ? n.up.hub : nearestHion(n.box.l, n.box.t));
+      laneOf(n);
+    }
+  }
+
+  /** The nearest point of either hion's way. */
+  function nearestHion(x: number, y: number): Pt {
+    let best: Pt = [x, y - 80];
+    let bd = Infinity;
+    for (const h of hions) {
+      for (let i = 0; i < h.xs.length; i += 3) {
+        const d = Math.hypot(h.xs[i] - x, h.ys[i] - y);
         if (d < bd) {
           bd = d;
-          best = i;
+          best = [h.xs[i], h.ys[i]];
         }
       }
-      stop.near = best;
-      line.stops.push(stop);
+    }
+    return best;
+  }
+
+  /** Where a fork's branches leave from: clear paper by the top of it,
+   * near where it is come to from and nearer the first thing in it. */
+  function hubOf(n: Part, from: Pt) {
+    const first = n.kids.reduce((a, b) => (b.box.t < a.box.t ? b : a));
+    const aim: Pt = [first.box.l, first.box.t + Math.min(20, (first.box.b - first.box.t) / 2)];
+    let bc = Infinity;
+    n.hub = [Math.max(8, n.box.l - 18), Math.max(4, first.box.t - 22)];
+    for (const y of [first.box.t - 22, first.box.t + 4, n.box.t - 22]) {
+      for (const x of [n.box.l - 18, n.box.l - 36, n.box.r + 18, n.box.r + 36, first.box.l - 24, aim[0] + 40]) {
+        if (x < 8 || x > width - 8 || y < 4) continue;
+        const c = (ground.clear(x, y) < 10 ? 900 : 0) + Math.hypot(x - from[0], y - from[1]) * 0.35 + Math.hypot(x - aim[0], y - aim[1]);
+        if (c < bc) {
+          bc = c;
+          n.hub = [x, y];
+        }
+      }
+    }
+  }
+
+  /** The lane a fork's far branches run down together: beside it, on
+   * whichever side lies clear of words (none if neither does). */
+  function laneOf(n: Part) {
+    n.lane = 0;
+    const far = n.kids.filter((k) => k.box.t - n.hub[1] > CABLE);
+    if (!far.length) return;
+    const lo = n.hub[1] + 70;
+    const hi = Math.max(...far.map((k) => k.box.t)) - 90;
+    const spread = (far.length - 1) * PITCH;
+    let best = Infinity;
+    for (const [x, side] of [
+      [n.box.l - 18, -1],
+      [n.box.l - 34, -1],
+      [n.box.r + 18, 1],
+      [n.box.r + 34, 1],
+    ]) {
+      const outer = x + side * spread;
+      if (Math.min(x, outer) < 6 || Math.max(x, outer) > width - 6) continue;
+      let blocked = 0;
+      let count = 0;
+      for (let y = lo; y <= hi; y += 12, count++) if (ground.clear(x, y) < 5 || ground.clear(outer, y) < 5) blocked++;
+      const c = blocked / Math.max(1, count) + Math.abs(x - n.hub[0]) / 4000;
+      if (c < best) {
+        best = c;
+        n.lane = x;
+        n.side = side;
+      }
+    }
+    if (best > 0.12) n.lane = 0;
+  }
+
+  /** Measure words where they rest, in order, until `end` (the page is
+   * held still once for all of them: each hold is a layout). */
+  function measureParts(list: Part[], end = Infinity) {
+    if (!list.length) return;
+    page.classList.add("hion-measuring");
+    const p = page.getBoundingClientRect();
+    for (const n of list) {
+      if (performance.now() > end) break;
+      const spun = n.measure?.(p) ?? null;
+      n.piece = spun ? smooth(spun.way, 4) : null;
+      n.size = spun?.size ?? 0;
+      n.state = n.piece && n.piece.length > 3 ? 1 : -1;
+      if (n.state < 0) n.el.dataset.spunState = "chalk";
     }
     page.classList.remove("hion-measuring");
-    for (const line of lines.values()) {
-      line.stops.push(...line.passes);
-      const left = line.stops.slice();
-      const order: Stop[] = [];
-      let at: Pt = [line.xs[0], line.ys[0]];
-      while (left.length) {
-        const top = Math.min(...left.map((p) => p.box.t));
-        let best = -1;
-        let bd = Infinity;
-        left.forEach((p, k) => {
-          if (p.box.t > top + AHEAD) return;
-          const y = (p.box.t + Math.min(p.box.b, p.box.t + 60)) / 2;
-          const d =
-            (p.pass ? Math.hypot(p.piece![0][0] - at[0], p.piece![0][1] - at[1]) : Math.min(Math.hypot(p.box.l - at[0], y - at[1]), Math.hypot(p.box.r - at[0], y - at[1]))) +
-            Math.max(0, at[1] - p.box.t) * UPHILL +
-            // And the higher first, as it is read.
-            (p.box.t - top) * 1.2;
-          if (d < bd) {
-            bd = d;
-            best = k;
-          }
-        });
-        const p = left.splice(best, 1)[0];
-        order.push(p);
-        // It leaves from the end it is written to, likelier the far one.
-        const y = (p.box.t + Math.min(p.box.b, p.box.t + 60)) / 2;
-        at = p.pass ? p.piece![p.piece!.length - 1] : Math.hypot(p.box.l - at[0], y - at[1]) < Math.hypot(p.box.r - at[0], y - at[1]) ? [p.box.r, y] : [p.box.l, y];
-      }
-      line.stops = order;
-    }
   }
 
-  /** How far a line comes down its journey before it goes off to the
-   * first thing it writes (px). */
-  const OFF = 70;
-  /** How far below the highest still to come a line may go first to
-   * something nearer (px), and what each px back up the page costs it. */
-  const AHEAD = 420;
-  const UPHILL = 3;
+  /** Born when the drawing has reached it and the fork it is in has grown
+   * to where its branches leave (a section: when a hion has grown near
+   * it), a word once it is measured. A word that waits on nothing but its
+   * measuring keeps its chalk if that takes too long. With `upto`, all
+   * that far down at once (a still screen, or laid out anew). */
+  function spring(now: number, upto = -1) {
+    const force = upto >= 0;
+    const reach = force ? upto : loom.reach();
+    if (force) measureParts(nodes.filter((n) => n.state === 0 && n.box.t <= reach));
+    let made = false;
+    for (const n of nodes) {
+      if (n.st || n.state < 0) continue;
+      const up = n.up?.st;
+      if (n.box.t > reach || (n.up && (!up || (!force && up.s < measureBody(up) - 1)))) {
+        n.heldAt = now;
+        continue;
+      }
+      if (n.state === 0) {
+        if (now - n.heldAt > PATIENCE) {
+          n.state = -1;
+          n.el.dataset.spunState = "chalk";
+        }
+        if (n.state !== 1) continue;
+      }
+      if (!n.up && !force && !rootFor(n.leaf ? [n.box.l, n.box.t] : n.hub, [0, 1], undefined, 900, undefined, false, true)) {
+        // No hion grown near it yet (it will be).
+        if (!strands.some((st) => st.kind === "hion" && at(st, st.s)[1] > n.box.t)) continue;
+      }
+      branch(n);
+      made = true;
+    }
+    if (made) task.wake();
+  }
 
-  /** Measure one stop where it rests. */
-  function measureStop(stop: Stop) {
-    if (stop.ring) {
-      const line = lines.get(stop.hue);
-      const from: Pt = line ? [line.xs[stop.near], line.ys[stop.near]] : [stop.box.l, stop.box.t];
-      stop.piece = encircle_(stop.box, from, 12, Math.floor(stop.box.l + stop.box.t), 1.08);
-      stop.size = 40;
+  /** The way a run sets off at its start (over its first 14px). */
+  function setOff(pts: Pt[]): Pt {
+    let k = 1;
+    while (k < pts.length - 1 && Math.hypot(pts[k][0] - pts[0][0], pts[k][1] - pts[0][1]) < 14) k++;
+    const l = Math.hypot(pts[k][0] - pts[0][0], pts[k][1] - pts[0][1]) || 1;
+    return [(pts[k][0] - pts[0][0]) / l, (pts[k][1] - pts[0][1]) / l];
+  }
+
+  const unit = (x: number, y: number): Pt => {
+    const l = Math.hypot(x, y) || 1;
+    return [x / l, y / l];
+  };
+
+  /** What a node goes to, from a point: a word's letters (written from
+   * whichever end is nearer), a ring round a picture, or a fork's hub. */
+  function goal(n: Part, o: Pt): { to: Pt; arrive: Pt; piece: Pt[] | null } {
+    if (!n.leaf) {
+      // Arriving on its way toward what is in it.
+      let cx = 0;
+      let cy = 0;
+      for (const k of n.kids) {
+        cx += (k.box.l + k.box.r) / 2 / n.kids.length;
+        cy += k.box.t / n.kids.length;
+      }
+      const a = unit(cx - n.hub[0], cy - n.hub[1]);
+      const b = unit(n.hub[0] - o[0], n.hub[1] - o[1]);
+      return { to: n.hub, arrive: unit(a[0] + b[0], a[1] + b[1]), piece: null };
+    }
+    let piece = n.ring ? encircle_(n.box, o, 12, Math.floor(n.box.l + n.box.t), 1.08) : n.piece!;
+    const a = piece[0];
+    const z = piece[piece.length - 1];
+    if (!n.ring && Math.hypot(z[0] - o[0], z[1] - o[1]) + 30 < Math.hypot(a[0] - o[0], a[1] - o[1])) piece = piece.slice().reverse();
+    return { to: piece[0], arrive: setOff(piece), piece };
+  }
+
+  /** A node grows: a section off the nearest hion grown near it (by turns
+   * the cyan and the magenta), anything else off the end of the fork it is
+   * in, all of a fork's branches from about the same spot, fanned forward
+   * toward each; one going far down goes down its fork's lane with the
+   * others and leaves it level with what it goes to. */
+  function branch(n: Part) {
+    const clear = (x: number, y: number) => ground.clear(x, y);
+    let lead: Pt[] = [];
+    let from: { parent: Strand; s: number } | undefined;
+    let g: { to: Pt; arrive: Pt; piece: Pt[] | null };
+    if (!n.up) {
+      const tops = nodes.filter((m) => !m.up);
+      const hue: Hue = tops.indexOf(n) % 2 ? "m" : "c";
+      g = goal(n, n.leaf ? [n.box.l - 60, n.box.t - 40] : n.hub);
+      const root = rootFor(g.to, g.arrive, hue, 900, undefined, false, true) ?? hionRoot(g.to[0], g.to[1], hue);
+      if (!root) {
+        n.state = -1;
+        return;
+      }
+      from = { parent: root.parent, s: root.s };
+      lead = root.way;
     } else {
-      page.classList.add("hion-measuring");
-      const spun = stop.measure?.(page.getBoundingClientRect()) ?? null;
-      page.classList.remove("hion-measuring");
-      stop.piece = spun ? smooth(spun.way, 4) : null;
-      stop.size = spun?.size ?? 0;
-    }
-    stop.state = stop.piece && stop.piece.length > 3 ? 1 : -1;
-    if (stop.state < 0) stop.el.dataset.spunState = "chalk";
-  }
-
-  /** Put what has been measured on its line, a group at a time: stops
-   * close together (a row of tags, a heading and the label under it) are
-   * one leg, the line arcing from one to the next. */
-  function route(line: Line) {
-    const st = line.strand;
-    if (!st) return;
-    let changed = false;
-    for (;;) {
-      const first = line.stops.findIndex((p) => p.state === 1);
-      if (first < 0) break;
-      // Anything before it still to be measured goes first.
-      if (line.stops.slice(0, first).some((p) => p.state === 0)) break;
-      const group: Stop[] = [line.stops[first]];
-      let k = first + 1;
-      let waiting = false;
-      while (k < line.stops.length && group.length < 6) {
-        const next = line.stops[k];
-        const prev = group[group.length - 1];
-        if (next.state < 0) {
-          k++;
-          continue;
-        }
-        if (next.box.t - prev.box.b > 110 || Math.abs(next.box.t - prev.box.t) > 260) break;
-        if (next.state === 0) {
-          waiting = true;
-          break;
-        }
-        if (next.state !== 1) break;
-        group.push(next);
-        k++;
-      }
-      if (waiting) break;
-      // Not before its head, nor before the last leg came back.
-      const head = Math.min(st.t.xs.length - 1, indexAt(st, st.s));
-      let from = 0;
-      for (let i = 0; i < line.xs.length; i++) if (line.way!.at[i] >= 0 && line.way!.at[i] <= head) from = i;
-      const last = line.legs[line.legs.length - 1];
-      if (last) from = Math.max(from, last.back >= 0 ? last.back : line.xs.length);
-      from += 3;
-      // Each word written from whichever end it comes to first (one under
-      // another is written back, as a weft goes), not across it and back.
-      let at: Pt = last && last.back < 0 ? last.pts[last.pts.length - 1] : [line.xs[Math.min(from, line.xs.length - 1)], line.ys[Math.min(from, line.xs.length - 1)]];
-      const pieces = group.map((p) => {
-        let pts = p.piece!;
-        const a = pts[0];
-        const b = pts[pts.length - 1];
-        if (!p.pass && !p.ring && Math.hypot(b[0] - at[0], b[1] - at[1]) + 30 < Math.hypot(a[0] - at[0], a[1] - at[1])) pts = pts.slice().reverse();
-        at = pts[pts.length - 1];
-        return { pts };
-      });
-      const clear = (x: number, y: number) => ground.clear(x, y);
-      let made: Leg | null = null;
-      if (last && last.back < 0) {
-        made = extend(last, pieces, clear, width);
-        line.legs.pop();
-        made = { ...made };
-        (made as Leg & { stops: Stop[] }).stops = [...last.stops, ...group];
-        line.legs.push(made as Leg & { stops: Stop[] });
+      const up = n.up.st!;
+      const total = measureBody(up);
+      const k = n.up.kids.indexOf(n);
+      let s = Math.max(total * 0.6, total - 3 - Math.min(8, k) * 5);
+      // Forward along its fork, turned toward where it goes, never square.
+      const fan = (s: number, to: Pt): Pt => {
+        const [x, y, nx, ny] = at(up, s);
+        let a = Math.atan2(to[1] - y, to[0] - x) - Math.atan2(-nx, ny);
+        a = Math.atan2(Math.sin(a), Math.cos(a));
+        const b = Math.atan2(-nx, ny) + Math.max(-0.6, Math.min(0.6, a));
+        return [Math.cos(b), Math.sin(b)];
+      };
+      const fork = n.up;
+      if (fork.lane && n.box.t - fork.hub[1] > CABLE) {
+        const R = at(up, s).slice(0, 2) as Pt;
+        const far = fork.kids.filter((m) => m.box.t - fork.hub[1] > CABLE).sort((a, b) => a.box.t - b.box.t);
+        const lx = fork.lane + fork.side * far.indexOf(n) * PITCH;
+        const top: Pt = [lx, fork.hub[1] + 70];
+        const bottom: Pt = [lx, Math.max(top[1] + 8, n.box.t - 100)];
+        lead = travel(R, fan(s, top), top, [0, 1], clear, width).pts;
+        for (let yy = top[1] + 8; yy < bottom[1]; yy += 8) lead.push([lx, yy]);
+        lead.push(bottom);
+        g = goal(n, bottom);
+        lead.push(...travel(bottom, [0, 1], g.to, g.arrive, clear, width).pts.slice(1));
       } else {
-        // Off its journey once, to the first thing it writes; and from there
-        // on, from each thing to the next: the line never goes back to it.
-        made = from < line.xs.length - 2 ? leg(line, from, pieces, clear, width, 900, true) : null;
-        made ??= leg(line, Math.max(1, Math.min(from, line.xs.length - 4)), pieces, clear, width, Infinity, true);
-        if (!made) {
-          for (const p of group) {
-            p.state = -1;
-            p.el.dataset.spunState = "chalk";
+        // From the best of its fork's last stretch: where it can set off
+        // forward toward it most easily, the nearer the end the better (so
+        // a fork's branches leave it together).
+        g = goal(n, at(up, total).slice(0, 2) as Pt);
+        let best = Infinity;
+        const lo = Math.max(total * 0.5, total - 200);
+        const step = Math.max(6, (total - lo) / 12);
+        for (let c = total - 2; c >= lo; c -= step) {
+          const [x, y, nx, ny] = at(up, c);
+          const d = Math.hypot(g.to[0] - x, g.to[1] - y) || 1;
+          const cos = ((g.to[0] - x) * ny - (g.to[1] - y) * nx) / d;
+          const t = travel([x, y], fan(c, g.to), g.to, g.arrive, clear, width);
+          const cost = t.cost + (1 - cos) * 200 + (total - c) * 0.4;
+          if (cost < best) {
+            best = cost;
+            s = c;
+            lead = t.pts;
           }
-          continue;
         }
-        line.legs.push({ ...made, stops: group });
       }
-      for (const p of group) {
-        p.state = 2;
-        if (!p.pass) p.el.dataset.spunState = "spun";
-      }
-      changed = true;
+      from = { parent: up, s };
     }
-    if (changed) relay(line);
+    const parent = from!.parent;
+    n.st = twig(n, parent, from!, lead, g.piece, 1);
+    // Said: the other tree writes it too, from its nearest grown thread.
+    if (n.said && g.piece) {
+      const other: Hue = parent.t.hue === "c" ? "m" : "c";
+      const root = rootFor(g.to, g.arrive, other, 1400, undefined, true);
+      if (root) n.twin = twig(n, root.parent, { parent: root.parent, s: root.s }, root.way, g.piece, -1);
+    }
+    if (n.leaf) n.el.dataset.spunState = "spun";
   }
 
-  /** Measure what the lines will write, nearest their heads first, a few
-   * milliseconds at a time when the page has room, and only what the
-   * drawing is coming to (a screen and a half ahead of it): a long page is
-   * measured as it is read, not all on arriving. */
+  /** A said word's two threads through its letters: along the run under
+   * their feet they twist round each other, each going under the other by
+   * turns; up through a letter they are one, the cyan and the magenta on
+   * top letter by letter, so each letter is one clean stroke. */
+  function twisted(piece: Pt[], sign: 1 | -1, base: number) {
+    const out: Pt[] = [];
+    const under: number[] = [];
+    let run = 0;
+    let letter = 0;
+    let was = 1;
+    piece.forEach(([x, y], i) => {
+      if (i) run += Math.hypot(x - piece[i - 1][0], y - piece[i - 1][1]);
+      // The run is the lowest of the way near by (capitals have no tails).
+      let low = y;
+      for (let k = Math.max(0, i - 24); k < Math.min(piece.length, i + 25); k++) low = Math.max(low, piece[k][1]);
+      const on = Math.max(0, Math.min(1, (y - (low - 7)) / 4));
+      if (was >= 0.5 && on < 0.5) letter++;
+      was = on;
+      const a = piece[Math.max(0, i - 3)];
+      const b = piece[Math.min(piece.length - 1, i + 3)];
+      const [tx, ty] = unit(b[0] - a[0], b[1] - a[1]);
+      const w = Math.sin((run / TURN) * Math.PI * 2) * on;
+      out.push([x - ty * w * TWIST * sign, y + tx * w * TWIST * sign]);
+      const c = Math.round(run / (TURN / 2));
+      if (on < 0.5 ? letter % 2 === 0 : Math.abs(w) < 0.5 * on && c % 2 === 0) {
+        if (sign > 0) under.push(base + i);
+      } else if (on < 0.5 || Math.abs(w) < 0.5 * on) {
+        if (sign < 0) under.push(base + i);
+      }
+    });
+    return { out, under };
+  }
+
+  /** A node's thread off `from`: its way in, then (a leaf) its letters or
+   * its ring (a said word's twisted, `twist` telling which of the two). */
+  function twig(n: Part, parent: Strand, from: { parent: Strand; s: number }, lead: Pt[], piece: Pt[] | null, twist: 1 | -1) {
+    const into = smooth(lead, 4);
+    let letters = into.length - 1;
+    let pts = into;
+    let under: number[] = [];
+    if (piece) {
+      let body = piece;
+      if (n.said) ({ out: body, under } = twisted(piece, twist, letters));
+      pts = [...into.slice(0, -1), ...body];
+    }
+    const t = fate.bare(parent.t.hue, pts);
+    for (const i of under) t.under.add(i);
+    const word = !!piece && !n.ring;
+    const kind: Kind = word ? "title" : "limb";
+    const nat: Nature = { ...nature(kind) };
+    const st = make(kind, nat, t, word ? { by: "title", el: n.el } : { by: "way" }, from);
+    const total = measureBody(st);
+    if (!piece) letters = st.t.xs.length - 1;
+    if (word) {
+      Object.assign(nat, writing(n.size, total - st.ls[letters]));
+      st.pace = paceOf(st, letters);
+    } else nat.speed = Math.max(nat.speed, total / BRISK);
+    // Revealed as the drawing gets down to it; a word whole once the
+    // drawing reaches its top, and the way to it no later.
+    const keys = new Float64Array(st.t.xs.length);
+    for (let i = 0; i < keys.length; i++) {
+      const y = st.t.ys[i];
+      keys[i] = Math.max(i ? keys[i - 1] : 0, n.leaf ? Math.min(y, n.box.t) : y);
+    }
+    st.keys = keys;
+    strands.push(st);
+    return st;
+  }
+
+  /** Measure what the trees will write, a few milliseconds at a time when
+   * the page has room, and only what the drawing is coming to (a screen and
+   * a half ahead of it), the nearest first: a long page is measured as it
+   * is read, not all on arriving. */
   let pumping = false;
-  const due = (stop: Stop) => stop.state === 0 && stop.box.t < loom.reach() + innerHeight * 1.5;
+  const due = (n: Part) => n.state === 0 && n.box.t < loom.reach() + innerHeight * 1.5;
   function pump() {
     if (pumping || signal.aborted) return;
     pumping = true;
     const run = () => {
       pumping = false;
       if (signal.aborted || !built) return;
-      const end = performance.now() + 10;
-      let more = false;
-      while (performance.now() < end) {
-        let did = false;
-        for (const line of lines.values()) {
-          const stop = line.stops.find((p) => p.state === 0);
-          if (!stop || !due(stop)) continue;
-          measureStop(stop);
-          route(line);
-          did = true;
-        }
-        if (!did) break;
-        more = true;
-      }
-      if (more) task.wake();
-      if ([...lines.values()].some((l) => l.stops.some(due))) pump();
+      measureParts(
+        nodes.filter(due).sort((a, b) => a.box.t - b.box.t),
+        performance.now() + 10,
+      );
+      task.wake();
+      if (nodes.some(due)) pump();
     };
     if ("requestIdleCallback" in window) requestIdleCallback(run, { timeout: 60 });
     else setTimeout(run, 16);
   }
 
-  /** Everything measured and on its line at once (a still screen, or the
-   * page laid out anew). */
-  function routeAll() {
-    for (const line of lines.values()) {
-      for (const stop of line.stops) if (stop.state === 0) measureStop(stop);
-      route(line);
-    }
-  }
-
-    /* ---------- Where a branch leaves from ---------- */
+  /* ---------- Where a branch leaves from ---------- */
 
   /** Where a branch to `to` leaves the tree, and the way it grows there:
    * from a point already grown on some thread (a hion, a branch lying on
@@ -1250,13 +1244,13 @@ export function createSkein(options: SkeinOptions) {
    * and bending off it at a slant, arriving going `arrive` (a unit
    * vector), across as little of the words as it can. Prefers threads of
    * `hue`. Null if nothing has grown within `far`. */
-  function rootFor(to: Pt, arrive: Pt, hue?: Hue, far = 760, not?: Strand, only = false): { parent: Strand; s: number; way: Pt[] } | null {
+  function rootFor(to: Pt, arrive: Pt, hue?: Hue, far = 760, not?: Strand, only = false, trunk = false): { parent: Strand; s: number; way: Pt[] } | null {
     let best: { parent: Strand; s: number; way: Pt[] } | null = null;
     let bestCost = Infinity;
     const [tx, ty] = to;
     const cubic = cubicWay;
     for (const st of strands) {
-      if (st === not || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30 || (only && st.t.hue !== hue)) continue;
+      if (st === not || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30 || (only && st.t.hue !== hue) || (trunk && st.kind !== "hion")) continue;
       if (st.kind === "ground" && st.fadeAt - performance.now() < 15000) continue;
       const { xs, ys } = st.t;
       const end = Math.min(xs.length - 1, indexAt(st, st.s));
@@ -1351,7 +1345,7 @@ export function createSkein(options: SkeinOptions) {
     const total = measureBody(st);
     // Where the letters begin along it: the approach is grown, not written.
     const letters = approach ? indexAt(st, approachLength(way, approach)) : 0;
-    Object.assign(n, writing(spun, total - st.ls[letters]));
+    Object.assign(n, writing(spun.size, total - st.ls[letters]));
     st.pace = paceOf(st, letters);
     strands.push(st);
     el.dataset.spunState = "spun";
@@ -1390,12 +1384,12 @@ export function createSkein(options: SkeinOptions) {
    * few capitals a second, so larger letters go faster), every heading in
    * one to three seconds and every label in under two; the warm run
    * behind the head about a capital long. */
-  function writing(spun: Spun, total: number) {
+  function writing(size: number, total: number) {
     // A label (small, and there are many) is a quick hand: a screen is not
     // left half written.
-    const small = spun.size < 30;
-    const time = Math.max(small ? 0.6 : 1.1, Math.min(small ? 1.6 : 3, total / (spun.size * (small ? 16 : 11))));
-    return { speed: total / time, tail: Math.max(22, Math.min(70, spun.size * 1.1)) };
+    const small = size < 30;
+    const time = Math.max(small ? 0.6 : 1.1, Math.min(small ? 1.6 : 3, total / (size * (small ? 16 : 11))));
+    return { speed: total / time, tail: Math.max(22, Math.min(70, size * 1.1)) };
   }
 
   /** How fast a heading's head goes at each point of its way, as a share
@@ -1435,7 +1429,7 @@ export function createSkein(options: SkeinOptions) {
     for (let i = letters; i < n; i++) pace[i] /= mean;
     // The branch on its way: brisk, eased out of the thread it leaves and
     // into the first letter.
-    const brisk = Math.max(1.4, 520 / st.n.speed);
+    const brisk = Math.max(1.4, 520 / st.n.speed, start / BRISK / st.n.speed);
     for (let i = 0; i < letters; i++) {
       const u = start ? st.ls[i] / start : 1;
       pace[i] = brisk * Math.min(1, 0.35 + u * 3, 0.6 + (1 - u) * 3);
@@ -2207,7 +2201,7 @@ export function createSkein(options: SkeinOptions) {
     st.cold = true;
     st.fadeAt = fadeFrom(now, st, 0.7 + st.rand() * 0.8);
     // Too short to read as a thread: let it go now.
-    if (st.t.xs.length < 14) st.fadeAt = now;
+    if (st.kind === "ground" && st.t.xs.length < 14) st.fadeAt = now;
   }
 
   /** New branches off the threads near the reader, once the page's own
@@ -2215,8 +2209,8 @@ export function createSkein(options: SkeinOptions) {
    * leaves a hion or a branch lying in sight (not one fading), forward and
    * at a slant, into open paper. */
   function trickle(now: number, near: number) {
-    // Two lines and nothing else: no branch leaves them.
-    if (stops.length >= 0) return;
+    // Only the screen's own tree: no branch without a reason.
+    if (nodes.length >= 0) return;
     if (now < nextTrickle) return;
     const rand = rng(options.seed * 7 + ++trickles * 131);
     // Sooner when nothing near the reader is growing; sooner on home.
@@ -2335,7 +2329,9 @@ export function createSkein(options: SkeinOptions) {
     if (st.drive.by === "loop") return tie(st, st.drive, now, Math.min(dt, 64), before);
     if (st.drive.by === "hion") return chase(st, Math.min(dt, 64), now);
     const near = seen(headY(st), 0.2);
-    st.resting = st.kind === "ground" && !here;
+    // A branch of the tree grows no further than the drawing has got.
+    const cap = st.keys ? keyed(st, st.keys) : Infinity;
+    st.resting = (st.kind === "ground" && !here) || st.s >= cap - 0.5;
     if (!st.resting) {
       // Out of sight a head hurries (a beat at a time, unpainted).
       const pace = near ? 1 : 6;
@@ -2349,7 +2345,7 @@ export function createSkein(options: SkeinOptions) {
       const speed = st.n.speed * pull * (by === "wind" ? 1.25 : 1);
       st.s += (speed * pace * (near ? Math.min(dt, 64) : dt)) / 1000;
       grow(st, st.s + STEP);
-      st.s = Math.min(st.s, measureBody(st));
+      st.s = Math.min(st.s, measureBody(st), Math.max(before, cap));
     }
     dt = Math.min(dt, 64);
     const ended = st.t.done && st.s >= measureBody(st) - 0.01;
@@ -2397,8 +2393,10 @@ export function createSkein(options: SkeinOptions) {
     const here = present(performance.now());
     anchor();
     readHions();
-    // What the lines will write next, measured as the drawing comes to it.
-    if (stops.length && !pumping && [...lines.values()].some((l) => l.stops.some(due))) pump();
+    // What the trees will write next, measured as the drawing comes to it;
+    // and what the drawing has reached grows.
+    if (!pumping && nodes.some(due)) pump();
+    spring(now);
     // What hangs from the hions grows off them as the drawing reaches it,
     // whether or not anyone is moving: it is what the words hang from.
     while (limbSown < limbs.length && limbs[limbSown].key <= loom.reach() && bear(limbs[limbSown], false)) limbSown++;
@@ -2519,9 +2517,6 @@ export function createSkein(options: SkeinOptions) {
     v: number;
     e: number;
     from: Strand | null;
-    /** Where it stops, undimmed till then (a hover's light through a
-     * word). */
-    to?: number;
   }
   /** A thread ringing where it was plucked. */
   interface Ring {
@@ -2556,8 +2551,7 @@ export function createSkein(options: SkeinOptions) {
     for (const l of lights) {
       const before = l.s;
       l.s += l.v * dt;
-      if (l.to === undefined) l.e *= Math.exp(-Math.abs(l.v * dt) / CARRY);
-      else if (l.s >= l.to) l.e = 0;
+      l.e *= Math.exp(-Math.abs(l.v * dt) / CARRY);
       const lo = Math.min(before, l.s);
       const hi = Math.max(before, l.s);
       for (const c of l.st.children) {
@@ -2684,213 +2678,12 @@ export function createSkein(options: SkeinOptions) {
     return null;
   }
 
-  /** A stretch of a line pulled out of its course through something you
-   * hover (a bight: the same line bent, not a thread of its own): `orig`
-   * is the stretch as it lies, `path` where it is pulled to, both resampled
-   * alike; `u` how far it has been pulled (0 to 1). While it is out, the
-   * stretch is lifted off the ground. */
-  interface Bight {
-    el: Element;
-    st: Strand;
-    i0: number;
-    i1: number;
-    orig: Pt[];
-    path: Pt[];
-    u: number;
-    dir: 1 | -1;
-    box: Box;
-  }
-  let bight: Bight | null = null;
-  /** How long a pull takes (ms), and how long a stretch it takes (px). */
-  const PULL = 380;
-  const BIGHT = 150;
-
-  /** Points evenly along a run, n of them. */
-  function resample(pts: Pt[], n: number): Pt[] {
-    const ls = [0];
-    for (let k = 1; k < pts.length; k++) ls.push(ls[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]));
-    const total = ls[ls.length - 1] || 1;
-    const out: Pt[] = [];
-    let j = 1;
-    for (let k = 0; k < n; k++) {
-      const s = (total * k) / (n - 1);
-      while (j < ls.length - 1 && ls[j] < s) j++;
-      const u = (s - ls[j - 1]) / (ls[j] - ls[j - 1] || 1);
-      out.push([pts[j - 1][0] + (pts[j][0] - pts[j - 1][0]) * u, pts[j - 1][1] + (pts[j][1] - pts[j - 1][1]) * u]);
-    }
-    return out;
-  }
-
-  /** Lift a stretch of a strand off the ground (erase), or put the ground
-   * back where it lay (repaint those panes). */
-  function lift(st: Strand, i0: number, i1: number, back: boolean) {
-    const { xs, ys } = st.t;
-    let l = Infinity;
-    let t = Infinity;
-    let r = -Infinity;
-    let b = -Infinity;
-    for (let i = i0; i <= i1; i++) {
-      l = Math.min(l, xs[i]);
-      r = Math.max(r, xs[i]);
-      t = Math.min(t, ys[i]);
-      b = Math.max(b, ys[i]);
-    }
-    const [a, z] = tileRange(t - 12, b + 12);
-    for (let k = a; k <= z; k++) {
-      const tile = tiles.get(k);
-      if (!tile) continue;
-      if (back) {
-        paintTile(tile);
-        continue;
-      }
-      for (const pane of panesIn(tile, l - 12, r + 12)) {
-        const { ctx } = pane;
-        ctx.save();
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.lineWidth = THREAD * 2.8 + 2;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.beginPath();
-        ctx.moveTo(xs[i0], ys[i0]);
-        for (let i = i0 + 1; i <= i1; i++) ctx.lineTo(xs[i], ys[i]);
-        ctx.stroke();
-        ctx.restore();
-        still(pane.el);
-      }
-    }
-  }
-
-  /** Pull the other line through what you hover: the stretch of it nearest
-   * bends out, weaves through the words (or rings a picture), and comes
-   * back in to where it was. */
-  function pull(el: Element) {
-    // Its words' hue, from the line that wrote it; the other line pulls.
-    let hue: Hue | null = null;
-    for (const line of lines.values()) {
-      if (line.way?.marks.some((m) => m.stop.el === el || el.contains(m.stop.el) || m.stop.el.contains(el))) hue = line.hue;
-    }
-    const other = lines.get(hue === "c" ? "m" : "c") ?? lines.get("c");
-    const st = other?.strand;
-    if (!st) return;
-    if (bight) {
-      lift(bight.st, bight.i0, bight.i1, true);
-      bight = null;
-    }
-    const p = page.getBoundingClientRect();
-    const r = el.getBoundingClientRect();
-    const box: Box = { l: r.left - p.left, t: r.top - p.top, r: r.right - p.left, b: r.bottom - p.top };
-    // The nearest of it that has grown, with room either side.
-    const near = touch((box.l + box.r) / 2, (box.t + box.b) / 2, 900, st.t.hue);
-    if (!near || near.st !== st || near.s < BIGHT || near.s > st.s - BIGHT) return;
-    const i0 = indexAt(st, near.s - BIGHT / 2);
-    const i1 = indexAt(st, near.s + BIGHT / 2);
-    if (i1 - i0 < 4 || i1 > st.laid) return;
-    const A: Pt = [st.t.xs[i0], st.t.ys[i0]];
-    const B: Pt = [st.t.xs[i1], st.t.ys[i1]];
-    const seed = Math.floor(performance.now() + box.l * 7);
-    const rand = rng(seed);
-    const pictured = el.querySelector("img, video, canvas.hion-woven-cover, .hion-woven-cover");
-    const text = (el.textContent ?? "").trim();
-    let through: Pt[] = [];
-    if (!pictured && text.length > 0 && text.length < 90) through = weave(wordBoxes(el, p), A, rand);
-    if (through.length < 2) through = encircle_(box, A, padFor(el), seed);
-    if (through.length < 2) return;
-    const dir = (pts: Pt[], end: boolean): Pt => {
-      const n = pts.length - 1;
-      const [a, b] = end ? [pts[Math.max(0, n - 3)], pts[n]] : [pts[0], pts[Math.min(n, 3)]];
-      const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
-      return [(b[0] - a[0]) / l, (b[1] - a[1]) / l];
-    };
-    const along = (i: number): Pt => {
-      const a = Math.max(0, i - 3);
-      const b = Math.min(st.t.xs.length - 1, i + 3);
-      const l = Math.hypot(st.t.xs[b] - st.t.xs[a], st.t.ys[b] - st.t.ys[a]) || 1;
-      return [(st.t.xs[b] - st.t.xs[a]) / l, (st.t.ys[b] - st.t.ys[a]) / l];
-    };
-    const clear = (x: number, y: number) => ground.clear(x, y);
-    const out = travel(A, along(i0), through[0], dir(through, false), clear, width).pts;
-    const back = travel(through[through.length - 1], dir(through, true), B, along(i1), clear, width).pts;
-    const path = [...out.slice(0, -1), ...through, ...back.slice(1)];
-    const n = Math.max(40, Math.ceil(path.length * 0.6));
-    const orig: Pt[] = [];
-    for (let i = i0; i <= i1; i++) orig.push([st.t.xs[i], st.t.ys[i]]);
-    let l = Infinity;
-    let t = Infinity;
-    let rr = -Infinity;
-    let bb = -Infinity;
-    for (const [x, y] of [...path, ...orig]) {
-      l = Math.min(l, x);
-      rr = Math.max(rr, x);
-      t = Math.min(t, y);
-      bb = Math.max(bb, y);
-    }
-    const pad = THREAD * 3 + 14;
-    bight = { el, st, i0, i1, orig: resample(orig, n), path: resample(path, n), u: 0, dir: 1, box: { l: l - pad, t: t - pad, r: rr + pad, b: bb + pad } };
-    lift(st, i0, i1, false);
-    task.wake();
-  }
-
-  effects.push({
-    last: [],
-    e: {
-      step(_now, dt) {
-        const b = bight;
-        if (!b) return false;
-        b.u = Math.max(0, Math.min(1, b.u + (b.dir * Math.min(dt, 48)) / PULL));
-        if (b.dir < 0 && b.u <= 0) {
-          lift(b.st, b.i0, b.i1, true);
-          bight = null;
-          return false;
-        }
-        return b.u < 1 || b.dir < 0;
-      },
-      boxes: () => (bight ? [bight.box] : []),
-      paint(ctx) {
-        const b = bight;
-        if (!b) return;
-        // Eased out of its course and in again, a little overshoot, as a
-        // taut line plucked aside does.
-        const u = b.u;
-        const e = u < 1 ? 1 - Math.pow(1 - u, 3) * (1 + 1.6 * u) : 1;
-        const pts: number[] = [];
-        for (let k = 0; k < b.path.length; k++) {
-          pts.push(b.orig[k][0] + (b.path[k][0] - b.orig[k][0]) * e, b.orig[k][1] + (b.path[k][1] - b.orig[k][1]) * e);
-        }
-        strokeRun(ctx, b.st.t.hue, THREAD, b.st.n.glow, pts, 1, null);
-      },
-    },
-  });
-
-  /** Light through something a line wrote (a word, a ring), letter by
-   * letter along the line, as if it were written again. */
-  function retrace(el: Element) {
-    for (const line of lines.values()) {
-      const st = line.strand;
-      const way = line.way;
-      if (!st || !way) continue;
-      for (const mk of way.marks) {
-        const e = mk.stop.el;
-        if (e !== el && !el.contains(e) && !e.contains(el)) continue;
-        if (st.ls.length <= mk.to || st.ls[mk.to] > st.s) continue;
-        lights = lights.filter((l) => l.to === undefined || l.st !== st);
-        lights.push({ st, s: st.ls[mk.from], v: 1.1, e: 1, from: null, to: st.ls[mk.to] });
-        task.wake();
-      }
-    }
-  }
-
   /** A branch to something you hover: it grows from the nearest thread
    * already grown (forward off it, at a slant), then weaves through its
    * words if it has any to speak of, otherwise loops round it; when you
    * leave, it withdraws into the thread it came from. Nothing near to
    * grow from, nothing grows. */
   function encircle(el: Element) {
-    // Two lines and nothing else: the other line is pulled out of its
-    // course through what you hover, and springs back when you leave.
-    if (lines.size) {
-      pull(el);
-      return;
-    }
     untie(null);
     const p = page.getBoundingClientRect();
     const r = el.getBoundingClientRect();
@@ -2940,7 +2733,6 @@ export function createSkein(options: SkeinOptions) {
 
   /** Untie the loop round el (null: whatever is hovered). */
   function untie(el: Element | null) {
-    if (bight && (el === null || bight.el === el)) bight.dir = -1;
     for (const st of strands) {
       const d = st.drive;
       if (d.by === "loop" && d.until === Infinity && (el === null || d.el === el) && d.state !== "untying") d.state = "untying";
@@ -3059,18 +2851,20 @@ export function createSkein(options: SkeinOptions) {
       delete layer.dataset.state;
       fate.breaks.length = 0;
       while (limbSown < limbs.length && limbs[limbSown].key <= reach) bear(limbs[limbSown++], true);
-      // Everything the lines write, on them (measured again: a lookup for
-      // what was measured before).
-      routeAll();
       const now = performance.now();
       for (const st of strands) {
-        if (st.kind === "hion") {
-          // As far as the loom has drawn; whole and still when nothing moves.
-          st.s = hionTarget(st);
-          st.laid = instant ? st.t.xs.length - 1 : Math.max(0, indexAt(st, st.s - st.n.tail) - 1);
-          st.cold = instant;
-          if (instant) st.heat = 0;
-        } else {
+        if (st.kind !== "hion") continue;
+        // As far as the loom has drawn; whole and still when nothing moves.
+        st.s = hionTarget(st);
+        st.laid = instant ? st.t.xs.length - 1 : Math.max(0, indexAt(st, st.s - st.n.tail) - 1);
+        st.cold = instant;
+        if (instant) st.heat = 0;
+      }
+      // The tree, grown whole as far as the drawing has reached (measured
+      // again: a lookup for what was measured before).
+      spring(now, reach);
+      for (const st of strands) {
+        if (st.kind !== "hion") {
           st.s = measureBody(st);
           st.laid = st.t.xs.length - 1;
           st.cold = true;
@@ -3218,8 +3012,8 @@ export function createSkein(options: SkeinOptions) {
     /** A small loop of a hion's own, tied off it at arc length s and let
      * go after a while (life.ts: left alone, they amuse themselves). */
     knot(hue: Hue, s: number, r: number, hold: number) {
-      // Two lines and nothing else: they tie no loops of their own.
-      if (lines.size) return false;
+      // Only the screen's own tree: they tie no loops of their own.
+      if (nodes.length >= 0) return false;
       const parent = hionOf(hue);
       if (!built || busy || !parent || s > parent.s) return false;
       const [x, y, nx, ny] = at(parent, s);
@@ -3245,13 +3039,13 @@ export function createSkein(options: SkeinOptions) {
     effect(e: Effect) {
       effects.push({ e, last: [] });
     },
-    /** What the two lines write and ring (spun.ts): every heading and
-     * label, and every picture, in the order they come down the screen.
-     * Each line writes those of its hue, going out of its way to them. */
-    write(list: { el: HTMLElement; hue: Hue; ring: boolean; measure: Measure | null }[]) {
-      stops = list.map((x) => ({ ...x, piece: null, size: 0, state: 0, near: 0, box: { l: 0, t: 0, r: 0, b: 0 } }));
+    /** What the trees write and ring (spun.ts): every heading and label,
+     * and every picture, in the order they come down the screen. They grow
+     * in the screen's own structure (tree.ts). */
+    write(list: Leaf[]) {
+      given = list;
       if (!built) return;
-      assign();
+      plan();
       if (instant) settle(Infinity);
       else if (!busy) pump();
       task.wake();
@@ -3282,13 +3076,24 @@ export function createSkein(options: SkeinOptions) {
         run: strokeRun,
         head: paintHead,
         nature: () => ({ w: THREAD, glow: NATURE.title.glow }),
-        pace: (spun, total) => ({ w: THREAD, ...writing(spun, total) }),
+        pace: (spun, total) => ({ w: THREAD, ...writing(spun.size, total) }),
       };
     },
     /** The loom drew on: the hions' heads follow. */
     wake: () => task.wake(),
-    /** For a check: what the lines write, and where each stop is. */
-    lines: () => [...lines.values()].map((l) => ({ hue: l.hue, legs: l.legs.length, s: l.strand?.s, total: l.strand ? measureBody(l.strand) : 0, stops: l.stops.map((p) => ({ text: (p.el.textContent ?? "").trim().slice(0, 24), ring: p.ring, state: p.state, near: p.near })) })),
+    /** For a check: the screen's tree, section by section, and what of it
+     * has grown. */
+    lines: () => {
+      const show = (n: Part): object => ({
+        el: n.leaf ? (n.el.textContent ?? "").trim().slice(0, 24) || n.el.className : `${n.el.tagName.toLowerCase()}.${n.el.className.split(" ")[0]}`,
+        hue: n.st?.t.hue,
+        grown: n.st ? Math.round(n.st.s) : -1,
+        state: n.state,
+        lane: n.lane,
+        kids: n.kids.map(show),
+      });
+      return nodes.filter((n) => !n.up).map(show);
+    },
     /** For a check: the threads themselves. */
     fate: () => fate,
     strands: () => strands,
