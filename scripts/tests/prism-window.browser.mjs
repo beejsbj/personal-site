@@ -570,3 +570,107 @@ test(
     }
   },
 );
+
+/** Every frame of a turn: where the stage draws the live page's face (its
+ * camera, body and face transforms) against where the page actually is (its
+ * own animation), and whether the two animations share a start time. */
+function lockstep() {
+  return new Promise((done) => {
+    const stage = document.getElementById("prism-stage");
+    const camera = stage.querySelector(".prism-camera");
+    const body = stage.querySelector(".prism-body");
+    const live = stage.querySelector(".prism-face--live");
+    const move = (x, y, z = 0) => new DOMMatrix().translateSelf(x, y, z);
+    const about = (el) => {
+      const [x, y, z = 0] = getComputedStyle(el)
+        .transformOrigin.split(" ")
+        .map(parseFloat);
+      return move(x, y, z)
+        .multiply(new DOMMatrix(getComputedStyle(el).transform))
+        .multiply(move(-x, -y, -z));
+    };
+    const project = (m, x, y) => {
+      const p = m.transformPoint(new DOMPoint(x, y, 0, 1));
+      return [p.x / p.w, p.y / p.w];
+    };
+    let worst = 0;
+    const starts = new Set();
+    let frames = 0;
+    const tick = () => {
+      const style = getComputedStyle(camera);
+      const [px, py] = style.perspectiveOrigin.split(" ").map(parseFloat);
+      const eye = new DOMMatrix();
+      eye.m34 = -1 / parseFloat(style.perspective);
+      const drawn = move(px, py)
+        .multiply(eye)
+        .multiply(move(-px, -py))
+        .multiply(move(body.offsetLeft, body.offsetTop))
+        .multiply(about(body))
+        .multiply(about(live));
+      const page = about(document.body);
+      const [w, h] = [live.offsetWidth, live.offsetHeight];
+      for (const [x, y] of [
+        [0, 0],
+        [w, 0],
+        [0, h],
+        [w, h],
+      ]) {
+        const a = project(drawn, x, y);
+        const b = project(page, x, y);
+        worst = Math.max(worst, Math.hypot(a[0] - b[0], a[1] - b[1]));
+      }
+      for (const animation of document.getAnimations())
+        if (
+          animation.startTime !== null &&
+          (animation.effect?.target === body ||
+            (animation.effect?.target === document.body &&
+              animation.effect.getKeyframes().some((k) => k.transform)))
+        )
+          starts.add(animation.startTime);
+      if (++frames < 75) requestAnimationFrame(tick);
+      else done({ worst, starts: starts.size });
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+test(
+  "the live page turns in lockstep with the prism",
+  { skip, timeout: 5 * 60_000 },
+  async (t) => {
+    const { chromium: browserType } = await import("playwright-core");
+    const server = await serveRuntimeFixture();
+    const browser = await browserType.launch({ executablePath: executable });
+    try {
+      for (const size of Object.keys(SIZES))
+        await t.test(size, async () => {
+          const { context, page, errors } = await arrive(
+            browser,
+            server.base,
+            "daylight",
+            size,
+          );
+          try {
+            await pullOut(page);
+            for (const key of ["ArrowRight", "ArrowLeft"]) {
+              const measured = page.evaluate(lockstep);
+              await page.keyboard.press(key);
+              const { worst, starts } = await measured;
+              assert.ok(
+                worst < 1,
+                `${key}: the page drifted ${worst.toFixed(2)}px from its face`,
+              );
+              assert.equal(starts, 1, `${key}: the two moves started apart`);
+              await page.waitForTimeout(1200);
+            }
+            assert.deepEqual(errors, []);
+          } finally {
+            await context.close();
+          }
+        });
+    } finally {
+      await browser.close();
+      await server.close();
+    }
+  },
+);
