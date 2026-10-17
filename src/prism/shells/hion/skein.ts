@@ -917,10 +917,18 @@ export function createSkein(options: SkeinOptions) {
         keys.push(y);
         pace.push(TRAVEL);
       });
+      let prev = 0;
       for (const mk of lg.marks) {
         const stop = lg.stops[mk.piece];
         const v = writingPace(stop);
-        for (let k = mk.from; k <= mk.to; k++) pace[base + k] = v;
+        // A word is written whole once the drawing reaches its top, and the
+        // way to it no later.
+        for (let k = prev; k < mk.from; k++) keys[base + k] = Math.min(keys[base + k], stop.box.t);
+        for (let k = mk.from; k <= mk.to; k++) {
+          pace[base + k] = v;
+          keys[base + k] = stop.box.t;
+        }
+        prev = mk.to + 1;
         marks.push({ from: base + mk.from, to: base + mk.to, stop });
       }
       if (lg.back < 0) {
