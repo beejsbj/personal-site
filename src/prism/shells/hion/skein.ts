@@ -288,7 +288,7 @@ const SETOUT = 1800;
 /** Rope nodes. */
 const KNOTS = 12;
 /** The longest a branch takes to grow to where it is going (s). */
-const BRISK = 1.1;
+const BRISK = 0.75;
 /** Ground heads growing at once near the reader (fewer on a screen seen
  * close, where each is twice the size and its page otherwise very still). */
 const LIVE = 3;
@@ -452,6 +452,9 @@ export function createSkein(options: SkeinOptions) {
       }
     }
     range.detach();
+    // Above the screen is the menu's line: no branch goes up into it.
+    const main = page.querySelector(":scope > main")?.getBoundingClientRect();
+    if (main) ground.hold({ l: 0, t: -2000, r: page.clientWidth, b: main.top - p.top - 28 }, 0, 0);
     // A stretch left to something that draws its own (the resume's timeline
     // when it runs across: track.ts), whole.
     for (const el of page.querySelectorAll("[data-cloth-hold]")) {
@@ -1059,11 +1062,14 @@ export function createSkein(options: SkeinOptions) {
         }
         if (n.state !== 1) continue;
       }
-      // A section waits for its own hion to grow near it, unless that one
-      // has gone on past it without coming near.
-      if (!n.up && !force && !rootFor(n.leaf ? [n.box.l, n.box.t] : n.hub, [0, 1], hueFor(n), 900, undefined, true, true)) {
+      // A section waits for its own hion to come down level with it (so
+      // its limb leaves from the best of it, not the first that grew), and
+      // to grow near it, unless that one has gone on past it without.
+      if (!n.up && !force) {
         const own = hionOf(hueFor(n));
-        if (own && at(own, own.s)[1] < n.box.b + 200) continue;
+        const head = own ? at(own, own.s)[1] : Infinity;
+        if (head < (n.leaf ? n.box.t : n.hub[1]) - 40 && own!.s < measureBody(own!) - 2) continue;
+        if (!rootFor(n.leaf ? [n.box.l, n.box.t] : n.hub, [0, 1], hueFor(n), 900, undefined, true, true) && head < n.box.b + 200) continue;
       }
       branch(n);
       made = true;
@@ -1131,7 +1137,7 @@ export function createSkein(options: SkeinOptions) {
         return;
       }
       from = { parent: root.parent, s: root.s };
-      lead = root.way;
+      lead = bow(root.way, g.to, g.arrive);
     } else {
       const up = n.up.st!;
       const total = measureBody(up);
@@ -1182,11 +1188,26 @@ export function createSkein(options: SkeinOptions) {
     }
     const parent = from!.parent;
     n.st = twig(n, parent, from!, lead, g.piece, 1);
-    // Said: the other tree writes it too, from its nearest grown thread.
+    // Said: the other tree writes it too, from its nearest grown thread,
+    // in from whichever end it comes to more easily (the two may meet).
     if (n.said && g.piece) {
       const other: Hue = parent.t.hue === "c" ? "m" : "c";
-      const root = rootFor(g.to, g.arrive, other, 1400, undefined, true);
-      if (root) n.twin = twig(n, root.parent, { parent: root.parent, s: root.s }, root.way, g.piece, -1);
+      const piece = g.piece;
+      const back = piece.slice().reverse();
+      let best: { root: { parent: Strand; s: number }; way: Pt[]; back: boolean } | null = null;
+      let bc = Infinity;
+      for (const p of [piece, back]) {
+        const arrive = setOff(p);
+        const root = rootFor(p[0], arrive, other, 1400, undefined, true);
+        if (!root) continue;
+        const way = bow(root.way, p[0], arrive);
+        const c = cost(way);
+        if (c < bc) {
+          bc = c;
+          best = { root: { parent: root.parent, s: root.s }, way, back: p === back };
+        }
+      }
+      if (best) n.twin = twig(n, best.root.parent, best.root, best.way, piece, -1, best.back);
     }
     if (n.leaf) n.el.dataset.spunState = "spun";
   }
@@ -1224,16 +1245,42 @@ export function createSkein(options: SkeinOptions) {
     return { out, under };
   }
 
+  /** What a way costs: its length, and much for what of it crosses
+   * words (not where it sets off and arrives). */
+  function cost(way: Pt[]) {
+    let len = 0;
+    let crossed = 0;
+    for (let i = 1; i < way.length; i++) {
+      len += Math.hypot(way[i][0] - way[i - 1][0], way[i][1] - way[i - 1][1]);
+      if (i > way.length * 0.06 && i < way.length * 0.9 && ground.clear(way[i][0], way[i][1]) < 5) crossed++;
+    }
+    return len + crossed * 150;
+  }
+
+  /** A way off the tree (rootFor's), or from the same root bowed over or
+   * under what is in the way, whichever crosses less of it. */
+  function bow(way: Pt[], to: Pt, arrive: Pt): Pt[] {
+    const clear = (x: number, y: number) => ground.clear(x, y);
+    const k = Math.min(way.length - 1, 3);
+    const bowed = travel(way[0], unit(way[k][0] - way[0][0], way[k][1] - way[0][1]), to, arrive, clear, width);
+    return bowed.cost < cost(way) ? bowed.pts : way;
+  }
+
   /** A node's thread off `from`: its way in, then (a leaf) its letters or
    * its ring (a said word's twisted, `twist` telling which of the two). */
-  function twig(n: Part, parent: Strand, from: { parent: Strand; s: number }, lead: Pt[], piece: Pt[] | null, twist: 1 | -1) {
+  function twig(n: Part, parent: Strand, from: { parent: Strand; s: number }, lead: Pt[], piece: Pt[] | null, twist: 1 | -1, back = false) {
     const into = smooth(lead, 4);
     let letters = into.length - 1;
     let pts = into;
     let under: number[] = [];
     if (piece) {
       let body = piece;
-      if (n.said) ({ out: body, under } = twisted(piece, twist, letters));
+      if (n.said) {
+        // Twisted as the other is, whichever end it is written from.
+        const t = twisted(piece, twist, 0);
+        body = back ? t.out.reverse() : t.out;
+        under = t.under.map((i) => letters + (back ? piece.length - 2 - i : i));
+      }
       pts = [...into.slice(0, -1), ...body];
     }
     const t = fate.bare(parent.t.hue, pts);
