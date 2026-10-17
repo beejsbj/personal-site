@@ -134,6 +134,11 @@ class App {
 
     if (ctx.face) {
       this.book.place(pages);
+    } else if (ctx.settled) {
+      // Stepped in from the prism, whose face showed the book already open
+      // here: it lies open, nothing written in, and the desk is live.
+      this.book.place(pages);
+      this.listen();
     } else {
       const cover =
         this.route.kind === "home" && this.book.geo.spread

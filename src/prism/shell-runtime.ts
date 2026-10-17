@@ -138,6 +138,7 @@ async function mount(lens: string) {
     )
       return;
     const shell = module.default;
+    const settled = document.documentElement.hasAttribute("data-prism-settled");
     active = { lens, shell, controller, content: data };
     root.dataset.shell = lens;
     const listeners = new Set<(idle: boolean) => void>();
@@ -149,6 +150,7 @@ async function mount(lens: string) {
       content: data,
       route,
       face: document.documentElement.hasAttribute("data-prism-face"),
+      settled,
       reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches,
       signal: controller.signal,
       isIdle: () => document.documentElement.hasAttribute("data-prism-idle"),
@@ -164,6 +166,7 @@ async function mount(lens: string) {
       unmount();
       return;
     }
+    if (settled) settle(root);
     document.documentElement.setAttribute("data-lens-shell", "");
     document.documentElement.setAttribute("data-shell-ready", "");
   } catch (error) {
@@ -172,6 +175,19 @@ async function mount(lens: string) {
     active = undefined;
     root.replaceChildren();
     document.documentElement.removeAttribute("data-lens-shell");
+  }
+}
+
+/** A settled arrival lands at rest: whatever entrance the first screen
+ * started on its own (any finite CSS or Web animation, or transition, in the
+ * shell) jumps to its end before it is painted. Loops keep running. Shells
+ * skip the entrances they drive from script themselves (ShellContext.settled). */
+export function settle(root: Element) {
+  for (const animation of root.getAnimations({ subtree: true })) {
+    if (animation.effect?.getComputedTiming().iterations === Infinity) continue;
+    try {
+      animation.finish();
+    } catch {}
   }
 }
 

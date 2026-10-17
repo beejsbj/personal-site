@@ -62,10 +62,16 @@ function cssTextures() {
 function show(route: Route, first: boolean) {
   const controller = new AbortController();
   ctx.signal.addEventListener("abort", () => controller.abort(), { once: true });
+  // Stepped in from the prism: the face already showed this screen drawn.
+  const settled = first && ctx.settled;
   const main = buildScreen(ctx.content, route);
   const page = h(
     "div",
-    { class: "hion-page", "data-kind": route.kind, "data-state": first ? "arriving" : "entering" },
+    {
+      class: "hion-page",
+      "data-kind": route.kind,
+      "data-state": settled ? "here" : first ? "arriving" : "entering",
+    },
     main,
     footer(ctx.content),
   );
@@ -83,6 +89,7 @@ function show(route: Route, first: boolean) {
     host: page,
     signal: controller.signal,
     instant: still(),
+    settled,
     lookahead: ctx.face ? 0 : 0.6,
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
@@ -104,11 +111,14 @@ function show(route: Route, first: boolean) {
         onIdleChange: ctx.onIdleChange,
       });
   live = { path: route.path, page, loom, life, controller };
-  requestAnimationFrame(() => {
+  const begin = () => {
     loom.start();
     life?.start();
     page.dataset.state = "here";
-  });
+  };
+  // Settled: drawn before it is first painted, so nothing is seen arriving.
+  if (settled) begin();
+  else requestAnimationFrame(begin);
   // Keyboard travel ahead of the drawing brings the drawing with it.
   page.addEventListener(
     "focusin",

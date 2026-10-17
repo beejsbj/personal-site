@@ -315,6 +315,13 @@ export interface ShellContext {
   route: Route;
   /** Rendering as a prism face: a live but non-interactive preview. */
   face: boolean;
+  /** Arrive already settled: show the first screen at rest and skip its
+   * entrance (the arrival animation, a book coming onto the desk, a drawing
+   * slowly made). True on a prism face and when the visitor steps into this
+   * lens from the prism, where the face they walked through already showed
+   * the page; false on a real first arrival. Running life (loops, play,
+   * route-change transitions) is unaffected. */
+  settled: boolean;
   reducedMotion: boolean;
   /** Aborted when the shell unmounts. Tie listeners and loops to it. */
   signal: AbortSignal;

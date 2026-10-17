@@ -197,7 +197,10 @@ const shell: LensShell = {
     frame.scroller.append(first.el);
     current = first;
     currentPath = context.route.path;
-    requestAnimationFrame(() => land(first.el));
+    // Already on screen (a face, or stepping in from the prism): the view
+    // is printed, not entering on successive sixteenths.
+    if (context.settled) land(first.el);
+    else requestAnimationFrame(() => land(first.el));
     // a face, or a page turned away in the prism, never plays
     const transport = frame.transport;
     transport.setIdle(context.isIdle());

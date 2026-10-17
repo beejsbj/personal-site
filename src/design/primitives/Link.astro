@@ -332,8 +332,11 @@ const satellite = outbound && (ball || arrow);
     translate: var(--face-x) var(--face-y);
     scale: var(--face-sx) var(--face-sy);
   }
+  /* The current ball breathes once on arrival; not on a page that is
+     already there (a prism face, or stepping in from the prism). */
   @media (prefers-reduced-motion: no-preference) {
-    .ds-link--ball[aria-current]::after {
+    :global(:root:not([data-prism-settled]))
+      .ds-link--ball[aria-current]::after {
       animation: ball-breathe calc(var(--duration-settle) * 2) ease-out
         calc(var(--duration-settle) * 2);
     }
