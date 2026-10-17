@@ -873,6 +873,8 @@ export function createSkein(options: SkeinOptions) {
    * apart. */
   const CABLE = 380;
   const PITCH = 6;
+  /** How far a lane sways either side as it goes down (px). */
+  const SWAY = 4;
   /** How long a word may wait to be measured while nothing else holds it
    * (ms), before it keeps its chalk. */
   const PATIENCE = 2500;
@@ -1157,14 +1159,20 @@ export function createSkein(options: SkeinOptions) {
       const lane = fork.lanes.find((l) => l.kids.includes(n));
       if (lane) {
         const R = at(up, s).slice(0, 2) as Pt;
+        // Down the lane, swaying a little as all of it does, and off it
+        // at a slant, sooner the further across it has to go.
         const lx = lane.x + lane.side * lane.kids.indexOf(n) * lane.pitch;
-        const top: Pt = [lx, fork.hub[1] + 70];
-        const bottom: Pt = [lx, Math.max(top[1] + 8, n.box.t - 100)];
+        const sway = (y: number) => lx + Math.sin(y / 150 + lane.x * 0.05) * SWAY;
+        const top: Pt = [sway(fork.hub[1] + 70), fork.hub[1] + 70];
+        const aim = goal(n, [lx, n.box.t - 100]).to;
+        const peel = Math.max(100, Math.min(240, Math.abs(aim[0] - lx) * 0.7));
+        const y1 = Math.max(top[1] + 8, aim[1] - peel);
         lead = travel(R, fan(s, top), top, [0, 1], clear, width).pts;
-        for (let yy = top[1] + 8; yy < bottom[1]; yy += 8) lead.push([lx, yy]);
+        for (let yy = top[1] + 8; yy < y1; yy += 8) lead.push([sway(yy), yy]);
+        const bottom: Pt = [sway(y1), y1];
         lead.push(bottom);
         g = goal(n, bottom);
-        lead.push(...travel(bottom, [0, 1], g.to, g.arrive, clear, width).pts.slice(1));
+        lead.push(...travel(bottom, unit(Math.sign(g.to[0] - bottom[0]) * 0.6, 1), g.to, g.arrive, clear, width).pts.slice(1));
       } else {
         // From the best of its fork's last stretch: where it can set off
         // forward toward it most easily, the nearer the end the better (so
