@@ -3,7 +3,9 @@
  * light catches on something and the lure arrives. Once caught, the lure is
  * tame on every later visit: a small prism in the corner for revisiting.
  *
- * `?prism=lure` reveals the lure at once; `?prism=open` opens the prism. */
+ * `?prism=lure` reveals the lure at once; `?prism=open` opens the prism;
+ * `?prism=webgl` reveals the lure and draws the prism with WebGL (an
+ * experiment: gl/flag.ts). */
 import { isFace } from "./lens-state";
 import { mountLure } from "./lure";
 import { createPrism } from "./stage";
@@ -72,7 +74,11 @@ function mountPage() {
   };
 
   if (stored(localStorage, FOUND_KEY)) summon(true);
-  else if (params.get("prism") === "lure" || views >= 2) {
+  else if (
+    params.get("prism") === "lure" ||
+    params.get("prism") === "webgl" ||
+    views >= 2
+  ) {
     timer = window.setTimeout(() => summon(false), 1600);
   } else {
     // Curiosity: lingering, or reading all the way down.

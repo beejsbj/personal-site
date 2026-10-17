@@ -17,14 +17,22 @@ import {
   EYE_Y,
   SIDES,
   TURN,
+  between,
   bodyPose,
+  bodyTransform,
   facing,
+  facingAt,
   facingTrack,
   geometry,
   pagePose,
+  pageTransform,
+  params,
   type Geometry,
+  type Params,
   type Pose,
 } from "./camera";
+import { wantsWebgl } from "./gl/flag";
+import type { GlPrism } from "./gl/renderer";
 
 const JOURNEY_KEY = "prism:journey";
 const EXITS_KEY = "prism:exits";
@@ -64,6 +72,7 @@ function faceUrl(lens: Lens) {
   const url = new URL(location.href);
   url.searchParams.delete("lens");
   url.searchParams.delete("prism");
+  url.searchParams.delete("renderer");
   url.searchParams.set(FACE_PARAM, lens.id);
   url.hash = "";
   return url.toString();
@@ -90,6 +99,12 @@ export function createPrism(): Prism {
   /** The page, while the prism holds it. */
   let held: LivePage | undefined;
   let closing: (() => void) | undefined;
+  /** The WebGL renderer, when the experiment is on (gl/renderer.ts). */
+  let gl: GlPrism | null = null;
+  /** The renderer is set up (or not: no WebGL2, or the flag is off). */
+  let glReady: Promise<unknown> = Promise.resolve();
+  /** Pictures for its faces, taken once the faces are loaded. */
+  let pictures: Promise<unknown> = Promise.resolve();
 
   function build() {
     if (stage && home === currentLens()) return stage;
@@ -185,6 +200,7 @@ export function createPrism(): Prism {
     // Faces must lay out at full viewport size while dormant; shells size
     // themselves on mount, and a 0x0 face never recovers.
     applyGeometry(stage, measure());
+    if (wantsWebgl()) startWebgl(stage);
     // Both live outside <body>: while the prism is open the body is the live
     // face, carried by the camera, and the room sits under it, the prism
     // over it.
@@ -192,8 +208,52 @@ export function createPrism(): Prism {
     return stage;
   }
 
+  /** The experiment: the faces are drawn by WebGL from pictures of their
+   * frames; the frames stay (hidden) as the pictures' source, and the live
+   * page stays the live page. */
+  function startWebgl(root: HTMLElement) {
+    const live = LENSES.findIndex((lens) => lens.id === home);
+    const built = root;
+    glReady = import("./gl/renderer").then(({ createGlPrism }) => {
+      if (stage !== built) return;
+      gl = createGlPrism(live, () => {
+        // Context lost: back to the CSS faces.
+        delete built.dataset.renderer;
+      });
+      if (!gl) return;
+      built.dataset.renderer = "webgl";
+      gl.resize(measure());
+      built.prepend(gl.canvas);
+    });
+    pictures = glReady.then(async () => {
+      if (!gl) return;
+      await loaded;
+      await shellsReady(frames);
+      await picture(frames);
+    });
+  }
+
+  /** Take (or retake) the pictures that are missing or stale, one at a
+   * time, so a visitor still on the page barely notices. */
+  async function picture(faces: (HTMLIFrameElement | null)[]) {
+    const { snapshot, stale } = await import("./gl/snapshot");
+    for (const [i, frame] of faces.entries()) {
+      if (!frame || !gl?.ok) continue;
+      if (gl.hasTexture(i) && !stale(frame)) continue;
+      const shot = await snapshot(frame);
+      if (shot && gl?.ok) gl.setTexture(i, shot);
+    }
+    // How many faces have pictures (for tests and the curious).
+    stage?.setAttribute(
+      "data-pictured",
+      String(faces.filter((_, i) => gl?.hasTexture(i)).length),
+    );
+  }
+
   function teardown() {
     closing?.();
+    gl?.destroy();
+    gl = null;
     held?.release();
     held = undefined;
     stage?.remove();
@@ -228,6 +288,9 @@ export function createPrism(): Prism {
 
     await loaded;
     await shellsReady(frames);
+    await glReady.catch(() => {});
+    /** Drawn by WebGL this time? (The renderer can be lost mid-session.) */
+    const webgl = () => !!gl?.ok && root.dataset.renderer === "webgl";
 
     const layout = () => {
       geometry = measure();
@@ -268,10 +331,52 @@ export function createPrism(): Prism {
       });
     const rest = (front: number | null) =>
       frames.forEach((face, i) => setIdle(face, i !== front));
+    /** WebGL: the camera at these numbers, everywhere at once (the canvas,
+     * the stage's body for hit-testing and the live face's glass, and the
+     * live page), in the same frame. */
+    const pose = (p: Params) => {
+      body.style.transform = bodyTransform(p);
+      if (held) {
+        held.set(pageTransform(geometry, p, origin));
+        held.sheet.style.opacity = String(
+          facingAt(geometry, p, origin) ? 1 : AWAY,
+        );
+      }
+      gl?.draw(geometry, p);
+    };
+    /** WebGL: the camera moves on requestAnimationFrame, not the
+     * compositor, so the canvas and the live page can't drift apart. */
+    const moveGl = async (outside: boolean, ms: number, easing: string) => {
+      rest(null);
+      const from = at;
+      const to: Pose = { outside, turn };
+      root.dataset.outside = room.dataset.outside = String(outside);
+      gl!.setState(outside, index);
+      const [x1, y1, x2, y2] = (easing.match(/[\d.]+/g) ?? []).map(Number);
+      const { cubicBezier } = await import("./gl/renderer");
+      const curve = cubicBezier(x1, y1, x2, y2);
+      const duration = reduced() ? 0 : ms;
+      await new Promise<void>((resolve) => {
+        let start = 0;
+        const tick = (now: number) => {
+          start ||= now;
+          const t = duration ? Math.min(1, (now - start) / duration) : 1;
+          pose(between(geometry, from, to, curve(t)));
+          if (t < 1) requestAnimationFrame(tick);
+          else resolve();
+        };
+        requestAnimationFrame(tick);
+      });
+      at = to;
+      // Faces drawn by WebGL are pictures: their frames stay held. Only the
+      // live page runs, when it is the face in front.
+      if (outside && index === origin) rest(index);
+    };
     // Web Animations keep the camera on the compositor and report the real
     // finish, even if a face is busy on the main thread. The live page moves
     // with the camera on the same timeline, in the same function list.
     const move = async (outside: boolean, ms: number, easing: string) => {
+      if (webgl()) return moveGl(outside, ms, easing);
       rest(null);
       const to: Pose = { outside, turn };
       root.dataset.outside = room.dataset.outside = String(outside);
@@ -312,6 +417,16 @@ export function createPrism(): Prism {
       const range = win.document.documentElement.scrollHeight - innerHeight;
       win.scrollTo(0, Math.max(0, ratio * range));
     });
+    // WebGL: a face scrolled since its picture was taken is retaken (in the
+    // background: the faces next to the page come round first, and come
+    // round within the pull, so give them a moment).
+    if (webgl()) {
+      await pictures;
+      await Promise.race([
+        picture(frames),
+        new Promise((resolve) => setTimeout(resolve, 1200)),
+      ]);
+    }
 
     const render = () => {
       const lens = LENSES[index];
@@ -329,6 +444,7 @@ export function createPrism(): Prism {
       root.querySelectorAll<HTMLElement>(".prism-face").forEach((face, i) => {
         face.classList.toggle("is-front", i === index);
       });
+      gl?.setState(root.dataset.outside === "true", index);
       room.querySelectorAll<HTMLElement>(".prism-band").forEach((band) => {
         band.classList.toggle("is-lit", band.dataset.band === lens.id);
       });
@@ -477,12 +593,19 @@ export function createPrism(): Prism {
         body.style.transform = bodyPose(geometry, at);
         held?.set(pagePose(geometry, at, origin));
         shadeStill(at);
+        if (webgl()) {
+          gl!.resize(geometry);
+          pose(params(geometry, at));
+          void picture(frames);
+        }
       },
       { signal },
     );
 
     function close() {
       closing = undefined;
+      gl?.destroy();
+      gl = null;
       controller.abort();
       // Faces are rebuilt next time so they follow the page the visitor is on.
       root.remove();
@@ -510,6 +633,11 @@ export function createPrism(): Prism {
     held = holdPage();
     held.set(pagePose(geometry, at, origin));
     shadeStill(at);
+    if (webgl()) {
+      gl!.resize(geometry);
+      gl!.setState(false, index);
+      pose(params(geometry, at));
+    }
     // The page holds still while the camera moves; faces too.
     rest(null);
     delete root.dataset.dormant;

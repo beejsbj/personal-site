@@ -297,6 +297,30 @@
   border: 0;
   pointer-events: none;
 }
+/* The WebGL experiment (gl/renderer.ts): the canvas draws every face but
+   the live page's. The faces' boxes stay, unseen, for taps; their frames
+   stay, unseen, as the source of the pictures. */
+#prism-stage .prism-gl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+#prism-stage[data-renderer="webgl"] .prism-face:not(.prism-face--live) {
+  opacity: 0 !important;
+  background: transparent;
+}
+#prism-stage[data-renderer="webgl"] .prism-cap {
+  display: none;
+}
+#prism-stage[data-renderer="webgl"] .prism-face iframe {
+  visibility: hidden;
+}
+#prism-stage[data-renderer="webgl"] .prism-body {
+  will-change: auto;
+}
+
 /* Glass: an edge that catches light, a sheen, and dimming off-axis. */
 #prism-stage .prism-face::before,
 #prism-stage .prism-face::after {

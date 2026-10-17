@@ -599,3 +599,27 @@ Selector load: `.page-header__intro` and `h1` are read by all four lenses; `.pro
 **Tradeoffs.** Memory: the faces that come round during a turn stay painted. Frame cost: measured equal to before in headless Chromium (an earlier try at opacity 0.004, which draws the faces, cost frames). Faces that sit turned away between turns still lose their tiles; those are painted from the start of the next turn, which leaves a few late tiles in headless Chromium (software rendering, far slower to paint than a GPU). Keeping them painted at rest with an endless opacity animation didn't help there and would keep the compositor busy while the prism is still, so it isn't done.
 
 **Guard.** `scripts/tests/prism-window.browser.mjs`, "turning the prism paints no face late": a full turn of the prism in every lens (desktop, phone, and a 1440×900 desktop at 2× density) traced for late-tile draws. Culled faces gave 18 to 154; shaded, 0 to 12; the bar is 16. `scripts/tests/prism-camera.test.mjs` checks `facing` against how the browser would wind each face, and that the shading never shows a face from behind.
+
+## 8. Experiment: drawing the prism with WebGL (`?renderer=webgl`)
+
+**Why.** On a real GPU every face jittered while the prism turned, and keeping faces painted (above) didn't cure it. This branch tries a different renderer behind a flag, so both can be compared on one build. `?renderer=webgl` (or `?prism=webgl`, which also reveals the lure) turns it on for the tab; `?renderer=css` turns it off. Without the flag nothing changes.
+
+**What it does.**
+
+- **The live page stays the live page.** The face you came from is still the real `<body>`, carried in 3D by CSS exactly as in §7, so the pull-out and stepping back in are untouched: there is no picture of it to match.
+- **The other four faces are textures** on quads in one WebGL2 canvas (`src/prism/gl/renderer.ts`, raw WebGL, about 3 KB gzipped, loaded only with the flag). Each quad is projected with the same transform the CSS uses (`camera.ts: pageTransform`, parsed by `DOMMatrix`), so it lands where its CSS face would and meets the live page edge to edge. The glass (sheen, edge, dimming) and the caps are drawn in the shader with the same values and 0.8s fades as `stage.css`. Textures are mipmapped with anisotropic filtering, so a face shrunk onto the prism is filtered instead of sampled every few pixels.
+- **One clock.** With WebGL the camera runs on `requestAnimationFrame` and poses the canvas, the stage's body (taps, the live face's glass) and the live page in the same frame (`stage.ts: moveGl`), so the canvas and the page can't drift apart. The CSS path keeps Web Animations on the compositor.
+- **Where the pictures come from.** The face frames are still built (hidden) when the lure arrives. Once they load, each is pictured in turn by serialising its DOM into an SVG `foreignObject` (`modern-screenshot`, about 10 KB gzipped, loaded only with the flag; `src/prism/gl/snapshot.ts`). A face frame is held idle while the prism is open, so its picture doesn't go stale while you look; it does when the frame is scrolled (the stage scrolls every face to the page's place in the story on opening) or resized, and those are retaken, in the background (the pull waits up to 1.2s for them). A face with no picture yet is drawn as the face's dark paper.
+- **Stepping into another face** pushes the camera through its texture, then mounts the lens under it and fades the stage out, as the CSS path does with its frame.
+- **WebGL context lost**: the stage goes back to the CSS faces.
+
+**Tradeoffs against CSS.**
+
+- *Liveness.* Faces other than the page you came from are stills while the prism is open (with CSS the face in front runs). The page you came from still runs when in front.
+- *Fidelity.* A `foreignObject` picture is close to the browser's paint but not the same: fonts are inlined, canvases copied, cross-origin images need CORS. Measured against screenshots of the same frames: mean pixel difference 0.003 to 1.3 (of 255) on four lenses, 8.6 on Calling Card, whose portrait (an SVG image under an SVG `filter`) comes out visibly paler.
+- *Cost of the pictures.* In headless Chromium (software rendering), 1.6 to 3.5s per face, and 33s for Calling Card, on the main thread, while the visitor is still on the page. Untested on real hardware.
+- *Main thread.* The camera needs the main thread for every frame. Faces and the page are idle while it moves, so it should be free, but a long task stalls the turn, where a compositor animation wouldn't.
+- *Accessibility.* Unchanged: the faces were already `inert` and `aria-hidden`; the HUD is the same DOM.
+- *Memory.* Four textures at up to 1.5× device pixels, with mipmaps: about 16 MB of GPU memory at 390×844 and 50 MB at 1280×800.
+
+**HTML-in-Canvas** (WICG; Chrome origin trial) would draw a frame's real paint into a texture, live, and could replace the pictures. Not used yet: the frames would have to be children of the canvas, the API's names changed in Chrome 150 and again in 155, and it isn't in any stable browser.
