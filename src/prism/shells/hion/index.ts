@@ -335,6 +335,9 @@ const shell: LensShell = {
     if (native) {
       document.startViewTransition = function (this: Document, ...args: Parameters<typeof native>) {
         const transition = native.apply(this, args);
+        // A skipped transition rejects `ready`, which nobody else awaits:
+        // left alone it is an uncaught "Transition was skipped" every time.
+        transition.ready.catch(() => {});
         transition.skipTransition();
         return transition;
       } as typeof native;
