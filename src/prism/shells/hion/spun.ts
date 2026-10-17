@@ -578,7 +578,9 @@ function strandBeside(el: HTMLElement, y: number): Pt | null {
  * screen); at once on a still screen. A name the face cannot write keeps
  * its chalk. */
 export function spinNav(nav: HTMLElement, options: SpunOptions) {
-  const labels = [...nav.querySelectorAll<HTMLElement>(".hion-charm__label, .hion-pull__label")];
+  // The names are written by the line itself as it passes (nav.ts); the
+  // word under the tassel on from its curl.
+  const labels = [...nav.querySelectorAll<HTMLElement>(".hion-pull__label")];
   if (!labels.length) return;
   const { signal } = options;
   const late = window.setTimeout(() => labels.forEach(chalk), FONT_WAIT);

@@ -3050,6 +3050,14 @@
   letter-spacing: var(--hion-label-track);
 }
 
+/* The names on the line are written by the line itself, dipping down to
+   them (nav.ts): they hang on no drop of their own, and have no loose
+   ends. */
+:root[data-lens="hion"] .hion-charm > .hion-ink,
+:root[data-lens="hion"] .hion-tail {
+  display: none;
+}
+
 /* Two lines, and nothing else (skein.ts): what they write is laid on the
    page under the words, so a strung heading's box is not black over it,
    and nothing hangs on a drop of its own (the lines write what hangs,

@@ -354,6 +354,7 @@ const shell: LensShell = {
     if (live) {
       const pulse = createPulse({ signal, isIdle: context.isIdle, onIdleChange: context.onIdleChange });
       spinNav(nav.el, { skein: live.skein, pulse, instant: still(), signal });
+      nav.write();
     }
     signal.addEventListener("abort", () => live?.controller.abort());
   },

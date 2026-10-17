@@ -15,6 +15,8 @@ import type { SiteContent } from "../types";
 import { h, newTab, still } from "./dom";
 import { ink } from "./ink";
 import { Kind, Path, paint, paintGlows, patterns, thread, type Pt } from "./pastel";
+import { measure } from "./spun";
+import { smooth } from "./wind";
 
 /** A loose end of thread let down under a name: short, let down a
  * little when you reach for it, all the way for the page you are on. The
@@ -33,6 +35,8 @@ export interface Nav {
   cordY(x: number): number;
   setCurrent(path: string): void;
   close(): void;
+  /** Write the names on the line (once the face is in). */
+  write(): void;
 }
 
 const narrowQuery = "(max-width: 719px)";
@@ -142,17 +146,46 @@ export function createNav(
       charm.style.setProperty("--hion-top", `${(cordY(xs[i]) + hang).toFixed(1)}px`);
     });
     drawCord();
+    if (writing) settleNames();
     ink(el);
   }
 
-  /** The line as last drawn (it changes only with the width). */
+  /** The line as last drawn (it changes with the width, and with where
+   * the names hang). */
   let drawn = "";
+  /** Whether the names are written on the line (once the face is in). */
+  let writing = false;
+  let grown = false;
+
+  /** Where each name is written, by hue, left to right: its way along
+   * the line under its letters' feet (nav px). */
+  function namesOf(hue: "c" | "m") {
+    if (!writing) return [];
+    const box = nav.getBoundingClientRect();
+    const out: { way: Pt[]; key: string }[] = [];
+    for (const charm of [home, ...list.querySelectorAll<HTMLElement>(".hion-charm")]) {
+      if ((charm.dataset.hue === "m" ? "m" : "c") !== hue) continue;
+      const label = charm.querySelector<HTMLElement>(".hion-charm__label");
+      if (!label || !label.getClientRects().length) continue;
+      const spun = measure(label, box);
+      if (!spun) {
+        label.dataset.spunState = "chalk";
+        continue;
+      }
+      label.dataset.spunState = "spun";
+      out.push({ way: spun.way, key: `${spun.way[0][0].toFixed(0)},${spun.way[0][1].toFixed(0)}` });
+    }
+    return out.sort((a, b) => a.way[0][0] - b.way[0][0]);
+  }
 
   function drawCord() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
     const w = nav.clientWidth;
-    const hgt = cordTop() + sagOf() + 40;
-    const key = `${w}:${hgt}:${dpr}`;
+    const names = { c: namesOf("c"), m: namesOf("m") };
+    let low = cordTop() + sagOf() + 40;
+    for (const list of [names.c, names.m]) for (const n of list) for (const [, y] of n.way) low = Math.max(low, y + 24);
+    const hgt = Math.ceil(low);
+    const key = `${w}:${hgt}:${dpr}:${[...names.c, ...names.m].map((n) => n.key).join(";")}`;
     if (key === drawn) return;
     drawn = key;
     cord.width = Math.ceil(w * dpr);
@@ -164,21 +197,57 @@ export function createNav(
     ctx.clearRect(0, 0, w, hgt);
     // Two hions slung across the top, each sagging its own way, crossing
     // where they please; the destinations hang from between them.
+    // Each dips down from the line to write the names of its hue, along
+    // the line under their letters' feet, and rises back into it: the
+    // names hang from nothing else.
     const marks = (["c", "m"] as const).flatMap((hue, i) => {
-      const pts: Pt[] = [];
-      for (let x = -10; x <= w + 10; x += 10) {
+      const at = (x: number): Pt => {
         const sway = i
           ? Math.sin(x / 230 + 2.1) * 6 + Math.sin(x / 71) * 1.5
           : Math.sin(x / 140 + 0.3) * 4.5 + Math.sin(x / 47 + 1) * 1.2;
-        pts.push([x, cordY(x) + sway]);
+        return [x, cordY(x) + sway];
+      };
+      const pts: Pt[] = [];
+      let x = -10;
+      for (const { way } of names[hue]) {
+        const [x0, y0] = way[0];
+        const [x1, y1] = way[way.length - 1];
+        // Down in a long easy curve, as a slack line sags to what it
+        // holds, and up again the same way: no corners.
+        const reach = Math.max(36, Math.min(70, (y0 - at(x0)[1]) * 0.9));
+        for (; x < x0 - reach - 6; x += 10) pts.push(at(x));
+        const a = at(x0 - reach);
+        const b = at(x1 + reach);
+        const down: Pt[] = [];
+        const up: Pt[] = [];
+        for (let k = 0; k <= 12; k++) {
+          const u = k / 12;
+          const e = u * u * (3 - 2 * u);
+          down.push([a[0] + (x0 - a[0]) * u, a[1] + (y0 - a[1]) * e]);
+          up.push([x1 + (b[0] - x1) * u, y1 + (b[1] - y1) * e]);
+        }
+        pts.push(...down, ...way.slice(1, -1), ...up);
+        x = x1 + reach + 10;
       }
+      for (; x <= w + 10; x += 10) pts.push(at(x));
       return thread(new Path(pts, 3), { hue, seed: 5 + i * 9, glow: 0.24 });
     });
     const pats = patterns(ctx, dpr);
     paintGlows(ctx, marks, w, hgt, 0.7);
     for (const m of marks) if (m.kind !== Kind.Glow) paint(ctx, m, pats);
     still(cord);
+    // The first time the names are written, the line is seen growing
+    // across, writing them as it goes.
+    if (writing && !grown && !face) {
+      grown = true;
+      cord.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0 0 0)" }], { duration: 1600, easing: "cubic-bezier(0.3, 0.1, 0.4, 1)" });
+    }
   }
+
+  /** Write the names on the line once the face is in (a trace of a
+   * fallback would not be the name), and again whenever they hang
+   * differently, once they have swung into place. */
+  const settleNames = () => window.setTimeout(drawCord, 650);
 
   function setState(state: "rest" | "stowed" | "dropped") {
     if (el.dataset.state === state) return;
@@ -197,6 +266,29 @@ export function createNav(
       return;
     }
     setState(past ? "stowed" : "rest");
+  }
+
+  /** Write the names on the line, once the face is in (a trace of a
+   * fallback would not be the name); each keeps its chalk otherwise. */
+  function write() {
+    const chalk = () => {
+      for (const label of el.querySelectorAll<HTMLElement>(".hion-charm__label")) label.dataset.spunState = "chalk";
+    };
+    const late = window.setTimeout(chalk, 2500);
+    document.fonts.load(`40px ${getComputedStyle(home).fontFamily}`, "A").then(
+      (faces) => {
+        clearTimeout(late);
+        if (signal.aborted) return;
+        if (!faces.length) return chalk();
+        writing = true;
+        drawCord();
+        settleNames();
+      },
+      () => {
+        clearTimeout(late);
+        chalk();
+      },
+    );
   }
 
   if (!face) {
@@ -273,6 +365,7 @@ export function createNav(
 
   return {
     el,
+    write,
     origin() {
       const navBox = nav.getBoundingClientRect();
       if (narrow()) {
