@@ -349,6 +349,8 @@ export function measure(el: HTMLElement, page: DOMRect): Spun | null {
   const room = Math.round(size * 0.12) + 6;
   const runs = textRuns(el);
   if (!runs.length) return null;
+  // The letters as they are set (a label is set in capitals by CSS).
+  if (style.textTransform === "uppercase") for (const run of runs) run.text = run.text.toUpperCase();
   // Where the words sit is read from the bottom of their boxes (the
   // baseline is that less the face's descent): the top of a text box can
   // carry a line's extra height.

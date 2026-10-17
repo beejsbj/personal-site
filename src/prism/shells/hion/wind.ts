@@ -214,6 +214,22 @@ export function encircle(b: Box, from: Pt, pad: number, seed: number, turns = 1.
 
 /** Taut stitches back and forth across a hion: `at(s)` is the hion's
  * point and normal at arc length s. */
+/** The way along another thread from arc length s: in beside it on one
+ * side, across it once (a twist, not a stitch), and on beside it on the
+ * other, taut, one way or the other along it. */
+export function alongside(at: (s: number) => [number, number, number, number], s: number, rand: () => number): Pt[] {
+  const dir = rand() < 0.5 ? -1 : 1;
+  const span = 140 + rand() * 120;
+  const side = rand() < 0.5 ? -1 : 1;
+  const out: Pt[] = [];
+  for (let u = 0; u <= span; u += 10) {
+    const [x, y, nx, ny] = at(s + dir * u);
+    const o = side * 5 * Math.cos((Math.PI * u) / span);
+    out.push([x + nx * o, y + ny * o]);
+  }
+  return smooth(out, 3);
+}
+
 export function stitches(at: (s: number) => [number, number, number, number], s: number, rand: () => number): Pt[] {
   const dir = rand() < 0.5 ? -1 : 1;
   const span = 80 + rand() * 80;
