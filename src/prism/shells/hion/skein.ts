@@ -101,6 +101,7 @@ import { still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
 import { type Hue, type Pt, RGB, rng, THREAD } from "./pastel";
 import { type Box, encircle as encircle_, ring, smooth, stitches, weave, wordBoxes } from "./wind";
+import { extend, type Leg, leg } from "./route";
 import type { Material, Measure, Spun } from "./spun";
 
 type Loom = ReturnType<typeof createLoom>;
@@ -477,32 +478,45 @@ export function createSkein(options: SkeinOptions) {
       hions.push({ hue: tip.hue, xs, ys, ls, keys: tip.keys });
       fate.fix(tip.hue, tip.points);
     }
-    // The hions themselves: strands grown along their composed ways, as
-    // far as the loom has drawn. Their branches stay theirs.
-    const was = new Map<Hue, Strand>();
+    // The two lines: each its journey down the screen, and the legs it
+    // goes out of its way on to write what it writes. A line composed anew
+    // keeps nothing of the old: what it wrote is measured and routed again.
     strands = strands.filter((st) => {
       if (st.kind !== "hion") return true;
       if (st.box) cleared.push(st.box);
-      was.set(st.t.hue, st);
       return false;
     });
+    lines.clear();
     for (const tip of loom.journeys()) {
       if (tip.points.length < 2) continue;
-      const n = nature("hion");
-      const st = make("hion", n, fate.bare(tip.hue, tip.points), { by: "hion", keys: tip.keys });
-      measureBody(st);
-      // On a screen travelled to, they set out from where they come down
-      // and run after the drawing; a screen arrived on (or re-laid) has
-      // them where the drawing is.
-      st.s = fresh ? 0 : hionTarget(st);
-      st.laid = Math.max(0, indexAt(st, st.s - n.tail) - 1);
-      const old = was.get(tip.hue);
-      if (old) {
-        st.children = old.children;
-        for (const c of st.children) c.parent = st;
-      }
-      strands.unshift(st);
+      const n = tip.points.length;
+      const line: Line = {
+        hue: tip.hue,
+        xs: Float64Array.from(tip.points, (p) => p[0]),
+        ys: Float64Array.from(tip.points, (p) => p[1]),
+        keys: tip.keys,
+        legs: [],
+        stops: [],
+        strand: null,
+        way: null,
+        held: -1,
+        heldAt: 0,
+      };
+      lines.set(tip.hue, line);
+      relay(line);
+      const st = line.strand!;
+      // It sets out from where it comes down and writes its way down: on
+      // a screen arrived on too (what it writes is not ready-made).
+      st.s = 0;
+      st.laid = 0;
+      void n;
     }
+    for (const stop of stops) {
+      stop.state = stop.state < 0 ? stop.state : 0;
+      stop.piece = null;
+    }
+    assign();
+    if (stops.length && !busy) pump();
   }
 
   /** How far along its way a hion's drawing has got. */
@@ -523,22 +537,35 @@ export function createSkein(options: SkeinOptions) {
     return st.ls[lo] + (st.ls[lo + 1] - st.ls[lo]) * u;
   }
 
-  /** A hion's head chases its drawing: quick, never a jump unless the
-   * drawing jumped far (a fling), a little dimmer once it has caught up. */
+  /** A line's head chases its drawing down its journey, quick, a jump
+   * only where it writes nothing; on a leg it goes at the leg's own pace
+   * (brisk between, a hand's pace in the letters), hurrying when the
+   * reader is far ahead, but never skipping a word. It waits short of a
+   * word not yet ready to be written (being measured). */
   function chase(st: Strand, dt: number, now: number) {
     const before = st.s;
-    const target = hionTarget(st);
+    const line = lines.get(st.t.hue);
+    const way = line?.way;
+    let target = hionTarget(st);
+    if (line && way) target = Math.min(target, holdOf(line, now));
     const total = measureBody(st);
     const gap = target - st.s;
-    if (fresh) {
-      // Setting out: down from the line at a pace that can be seen, the
-      // drawing waiting for it; once caught up, as the drawing goes.
-      st.s += Math.min(gap, (SETOUT * dt) / 1000);
-      if (gap <= 2) fresh = false;
-    } else if (Math.abs(gap) > 900) st.s = target - Math.sign(gap) * 240;
-    else if (gap) {
-      const speed = Math.max(st.n.speed, Math.abs(gap) * 7);
-      st.s += Math.sign(gap) * Math.min(Math.abs(gap), (speed * dt) / 1000);
+    if (way && gap > 0) {
+      const i = Math.min(way.pace.length - 1, indexAt(st, st.s));
+      const pace = way.pace[i];
+      // Behind the reader: hurry, up to four times.
+      const rush = 1 + Math.min(3, Math.max(0, gap - 500) / 900);
+      if (pace > 0) st.s += Math.min(gap, (pace * rush * dt) / 1000);
+      else {
+        // On the journey: as the drawing goes, but no further than the next
+        // leg, where it slows to write.
+        const next = way.next[i] >= 0 ? st.ls[way.next[i]] : Infinity;
+        const speed = fresh ? SETOUT : Math.max(st.n.speed, gap * 7);
+        let to = st.s + Math.min(gap, (speed * dt) / 1000);
+        if (!fresh && gap > 900) to = Math.max(to, target - 240);
+        st.s = Math.min(to, next, target);
+      }
+      if (fresh && gap <= 2) fresh = false;
     }
     const going = st.s !== before || loom.drawing();
     st.resting = !going;
@@ -580,23 +607,15 @@ export function createSkein(options: SkeinOptions) {
     strands = [];
     hionVersion = -1;
     readHions();
-    // The words written by thread, laid again (settled by settle()).
-    for (const [el, s] of spun) title(el, titles.get(el)!.hue, s);
-    const origin = options.origin();
-    const planned = buds(ground, hions, {
-      width,
-      height,
-      drop: origin?.[0] ?? width * 0.56,
-      top: (origin?.[1] ?? 110) + 16,
-      seed: options.seed,
-      close,
-      lively,
-    });
-    all = planned.gathers;
-    seeds = planned.buds;
-    limbs = loom.limbs().slice().sort((a, b) => a.key - b.key);
+    void spun;
+    // Nothing but the two lines: no ground, no limbs, nothing hung on a
+    // cord of its own (the lines write what hangs, where it hangs).
+    all = [];
+    seeds = [];
+    limbs = [];
     limbSown = 0;
-    readHangers();
+    for (const el of page.querySelectorAll<HTMLElement>("[data-reveal][data-ink]")) el.setAttribute("data-tied", "");
+    hangers = [];
     sown = 0;
     trickles = 0;
     cleared = [];
@@ -805,7 +824,321 @@ export function createSkein(options: SkeinOptions) {
     return waiting;
   }
 
-  /* ---------- Where a branch leaves from ---------- */
+  /* ---------- The two lines ---------- */
+
+  /** Something one of the lines writes (a heading, a label) or rings (a
+   * picture), in the order it comes down the screen. */
+  interface Stop {
+    el: HTMLElement;
+    hue: Hue;
+    ring: boolean;
+    measure: Measure | null;
+    /** Its way (page px), once measured: a word's letters, or a ring. */
+    piece: Pt[] | null;
+    size: number;
+    /** 0 to be measured, 1 measured, 2 on its line, -1 it cannot be (it
+     * keeps its chalk). */
+    state: number;
+    /** The point of its line's journey nearest it: the line waits short of
+     * there until it is on the line. */
+    near: number;
+    box: Box;
+  }
+
+  /** A line's way as it is laid: its journey with its legs spliced in. */
+  interface Way {
+    /** At each point, how fast its head goes there (px a second; 0 on the
+     * journey, where it goes as the drawing goes). */
+    pace: Float32Array;
+    /** At each point, the next point that is on a leg (-1: none). */
+    next: Int32Array;
+    /** Where each journey point is on the way. */
+    at: Int32Array;
+    /** The stretches that write a stop, for a hover to light. */
+    marks: { from: number; to: number; stop: Stop }[];
+  }
+
+  interface Line {
+    hue: Hue;
+    xs: Float64Array;
+    ys: Float64Array;
+    keys: Float64Array;
+    legs: (Leg & { stops: Stop[] })[];
+    /** Its stops, in order. */
+    stops: Stop[];
+    strand: Strand | null;
+    way: Way | null;
+    /** The stop it is waiting for, and since when. */
+    held: number;
+    heldAt: number;
+  }
+
+  const lines = new Map<Hue, Line>();
+  let stops: Stop[] = [];
+  /** How fast a line travels between what it writes, and rings a picture
+   * (px a second). */
+  const TRAVEL = 1500;
+  const RINGING = 1100;
+  /** How long a line waits for a word to be measured before it goes on
+   * without it (the word keeps its chalk). */
+  const PATIENCE = 2500;
+
+  /** How fast a word is written: a hand's pace for its size, quick for a
+   * small one (px of thread a second). */
+  const writingPace = (stop: Stop) => (stop.ring ? RINGING : Math.max(650, Math.min(1500, stop.size * 26)));
+
+  /** Lay a line's way again from its journey and legs: the strand keeps
+   * what it has grown (a leg is only ever added ahead of its head). */
+  function relay(line: Line) {
+    const n = line.xs.length;
+    const xs: number[] = [];
+    const ys: number[] = [];
+    const keys: number[] = [];
+    const pace: number[] = [];
+    const at = new Int32Array(n).fill(-1);
+    const marks: Way["marks"] = [];
+    const journey = (i: number) => {
+      at[i] = xs.length;
+      xs.push(line.xs[i]);
+      ys.push(line.ys[i]);
+      keys.push(line.keys[i]);
+      pace.push(0);
+    };
+    let j = 0;
+    let ended = false;
+    for (const lg of line.legs) {
+      for (; j <= lg.at; j++) journey(j);
+      const base = xs.length;
+      // Revealed as the drawing gets down to it, as the journey is (a key
+      // is how far down the drawing has reached).
+      lg.pts.forEach(([x, y]) => {
+        xs.push(x);
+        ys.push(y);
+        keys.push(y);
+        pace.push(TRAVEL);
+      });
+      for (const mk of lg.marks) {
+        const stop = lg.stops[mk.piece];
+        const v = writingPace(stop);
+        for (let k = mk.from; k <= mk.to; k++) pace[base + k] = v;
+        marks.push({ from: base + mk.from, to: base + mk.to, stop });
+      }
+      if (lg.back < 0) {
+        ended = true;
+        break;
+      }
+      j = lg.back;
+    }
+    if (!ended) for (; j < n; j++) journey(j);
+    // Never back: what comes after a leg that went lower waits for it.
+    for (let k = 1; k < keys.length; k++) keys[k] = Math.max(keys[k], keys[k - 1]);
+    const next = new Int32Array(xs.length).fill(-1);
+    for (let k = xs.length - 2; k >= 0; k--) next[k] = pace[k + 1] > 0 ? k + 1 : next[k + 1];
+    line.way = { pace: Float32Array.from(pace), next, at, marks };
+    const st = line.strand;
+    if (!st) {
+      const t = fate.bare(line.hue, xs.map((x, k) => [x, ys[k]] as Pt));
+      const made = make("hion", nature("hion"), t, { by: "hion", keys: Float64Array.from(keys) });
+      measureBody(made);
+      line.strand = made;
+      strands.unshift(made);
+      return;
+    }
+    // The same up to its head; on from there, the new way.
+    const keep = Math.min(st.t.xs.length, indexAt(st, st.s) + 1);
+    st.t.xs.length = 0;
+    st.t.ys.length = 0;
+    st.t.xs.push(...xs);
+    st.t.ys.push(...ys);
+    st.ls.length = Math.min(st.ls.length, keep);
+    measureBody(st);
+    (st.drive as Extract<Drive, { by: "hion" }>).keys = Float64Array.from(keys);
+    st.dirty = true;
+  }
+
+  /** How far a line may go: short of the next stop not on it yet. */
+  function holdOf(line: Line, now: number) {
+    const st = line.strand;
+    const way = line.way;
+    if (!st || !way) return Infinity;
+    const stop = line.stops.find((p) => p.state === 0 || p.state === 1);
+    if (!stop) return Infinity;
+    if (line.held !== stops.indexOf(stop)) {
+      line.held = stops.indexOf(stop);
+      line.heldAt = now;
+    }
+    // Waited long enough: on without it (it keeps its chalk).
+    if (now - line.heldAt > PATIENCE) {
+      stop.state = -1;
+      stop.el.dataset.spunState = "chalk";
+      return holdOf(line, now);
+    }
+    const i = way.at[stop.near];
+    return i >= 0 ? Math.max(0, st.ls[Math.max(0, i - 4)] ?? Infinity) : Infinity;
+  }
+
+  /** Which line each stop is on, in order, and the point of that line's
+   * journey nearest it. */
+  function assign() {
+    for (const line of lines.values()) line.stops = [];
+    const p = page.getBoundingClientRect();
+    page.classList.add("hion-measuring");
+    for (const stop of stops) {
+      if (!stop.el.isConnected) stop.state = -1;
+      const r = stop.el.getBoundingClientRect();
+      stop.box = { l: r.left - p.left, t: r.top - p.top, r: r.right - p.left, b: r.bottom - p.top };
+      const line = lines.get(stop.hue) ?? [...lines.values()][0];
+      if (!line) continue;
+      const cx = stop.box.l;
+      const cy = (stop.box.t + stop.box.b) / 2;
+      let best = 0;
+      let bd = Infinity;
+      for (let i = 0; i < line.xs.length; i += 2) {
+        const d = Math.hypot(line.xs[i] - cx, (line.ys[i] - cy) * 1.6);
+        if (d < bd) {
+          bd = d;
+          best = i;
+        }
+      }
+      stop.near = best;
+      line.stops.push(stop);
+    }
+    page.classList.remove("hion-measuring");
+    // In the order the line comes to them.
+    for (const line of lines.values()) line.stops.sort((a, b) => a.near - b.near || a.box.t - b.box.t);
+  }
+
+  /** Measure one stop where it rests. */
+  function measureStop(stop: Stop) {
+    if (stop.ring) {
+      const line = lines.get(stop.hue);
+      const from: Pt = line ? [line.xs[stop.near], line.ys[stop.near]] : [stop.box.l, stop.box.t];
+      stop.piece = encircle_(stop.box, from, 12, Math.floor(stop.box.l + stop.box.t), 1.08);
+      stop.size = 40;
+    } else {
+      page.classList.add("hion-measuring");
+      const spun = stop.measure?.(page.getBoundingClientRect()) ?? null;
+      page.classList.remove("hion-measuring");
+      stop.piece = spun ? smooth(spun.way, 4) : null;
+      stop.size = spun?.size ?? 0;
+    }
+    stop.state = stop.piece && stop.piece.length > 3 ? 1 : -1;
+    if (stop.state < 0) stop.el.dataset.spunState = "chalk";
+  }
+
+  /** Put what has been measured on its line, a group at a time: stops
+   * close together (a row of tags, a heading and the label under it) are
+   * one leg, the line arcing from one to the next. */
+  function route(line: Line) {
+    const st = line.strand;
+    if (!st) return;
+    let changed = false;
+    for (;;) {
+      const first = line.stops.findIndex((p) => p.state === 1);
+      if (first < 0) break;
+      // Anything before it still to be measured goes first.
+      if (line.stops.slice(0, first).some((p) => p.state === 0)) break;
+      const group: Stop[] = [line.stops[first]];
+      let k = first + 1;
+      let waiting = false;
+      while (k < line.stops.length && group.length < 6) {
+        const next = line.stops[k];
+        const prev = group[group.length - 1];
+        if (next.state < 0) {
+          k++;
+          continue;
+        }
+        if (next.box.t - prev.box.b > 110 || Math.abs(next.box.t - prev.box.t) > 260) break;
+        if (next.state === 0) {
+          waiting = true;
+          break;
+        }
+        if (next.state !== 1) break;
+        group.push(next);
+        k++;
+      }
+      if (waiting) break;
+      // Not before its head, nor before the last leg came back.
+      const head = Math.min(st.t.xs.length - 1, indexAt(st, st.s));
+      let from = 0;
+      for (let i = 0; i < line.xs.length; i++) if (line.way!.at[i] >= 0 && line.way!.at[i] <= head) from = i;
+      const last = line.legs[line.legs.length - 1];
+      if (last) from = Math.max(from, last.back >= 0 ? last.back : line.xs.length);
+      from += 3;
+      const pieces = group.map((p) => ({ pts: p.piece! }));
+      const clear = (x: number, y: number) => ground.clear(x, y);
+      let made: Leg | null = null;
+      if (last && last.back < 0) {
+        made = extend(last, pieces, clear, width);
+        line.legs.pop();
+        made = { ...made };
+        (made as Leg & { stops: Stop[] }).stops = [...last.stops, ...group];
+        line.legs.push(made as Leg & { stops: Stop[] });
+      } else {
+        made = from < line.xs.length - 2 ? leg(line, from, pieces, clear, width) : null;
+        // Nothing of the journey near enough (or none left): from its end,
+        // and it ends there.
+        made ??= leg(line, Math.max(1, Math.min(from, line.xs.length - 4)), pieces, clear, width, Infinity);
+        if (!made) {
+          for (const p of group) {
+            p.state = -1;
+            p.el.dataset.spunState = "chalk";
+          }
+          continue;
+        }
+        line.legs.push({ ...made, stops: group });
+      }
+      for (const p of group) {
+        p.state = 2;
+        p.el.dataset.spunState = "spun";
+      }
+      changed = true;
+    }
+    if (changed) relay(line);
+  }
+
+  /** Measure what the lines will write, nearest their heads first, a few
+   * milliseconds at a time when the page has room. */
+  let pumping = false;
+  function pump() {
+    if (pumping || signal.aborted) return;
+    pumping = true;
+    const run = () => {
+      pumping = false;
+      if (signal.aborted || !built) return;
+      const end = performance.now() + 10;
+      let more = false;
+      while (performance.now() < end) {
+        let did = false;
+        for (const line of lines.values()) {
+          const stop = line.stops.find((p) => p.state === 0);
+          if (!stop) continue;
+          measureStop(stop);
+          route(line);
+          did = true;
+        }
+        if (!did) break;
+        more = true;
+      }
+      if (more || [...lines.values()].some((l) => l.stops.some((p) => p.state === 0))) {
+        task.wake();
+        pump();
+      }
+    };
+    if ("requestIdleCallback" in window) requestIdleCallback(run, { timeout: 60 });
+    else setTimeout(run, 16);
+  }
+
+  /** Everything measured and on its line at once (a still screen, or the
+   * page laid out anew). */
+  function routeAll() {
+    for (const line of lines.values()) {
+      for (const stop of line.stops) if (stop.state === 0) measureStop(stop);
+      route(line);
+    }
+  }
+
+    /* ---------- Where a branch leaves from ---------- */
 
   /** Where a branch to `to` leaves the tree, and the way it grows there:
    * from a point already grown on some thread (a hion, a branch lying on
@@ -1778,6 +2111,8 @@ export function createSkein(options: SkeinOptions) {
    * leaves a hion or a branch lying in sight (not one fading), forward and
    * at a slant, into open paper. */
   function trickle(now: number, near: number) {
+    // Two lines and nothing else: no branch leaves them.
+    if (stops.length >= 0) return;
     if (now < nextTrickle) return;
     const rand = rng(options.seed * 7 + ++trickles * 131);
     // Sooner when nothing near the reader is growing; sooner on home.
@@ -2074,6 +2409,9 @@ export function createSkein(options: SkeinOptions) {
     v: number;
     e: number;
     from: Strand | null;
+    /** Where it stops, undimmed till then (a hover's light through a
+     * word). */
+    to?: number;
   }
   /** A thread ringing where it was plucked. */
   interface Ring {
@@ -2108,7 +2446,8 @@ export function createSkein(options: SkeinOptions) {
     for (const l of lights) {
       const before = l.s;
       l.s += l.v * dt;
-      l.e *= Math.exp(-Math.abs(l.v * dt) / CARRY);
+      if (l.to === undefined) l.e *= Math.exp(-Math.abs(l.v * dt) / CARRY);
+      else if (l.s >= l.to) l.e = 0;
       const lo = Math.min(before, l.s);
       const hi = Math.max(before, l.s);
       for (const c of l.st.children) {
@@ -2235,12 +2574,36 @@ export function createSkein(options: SkeinOptions) {
     return null;
   }
 
+  /** Light through something a line wrote (a word, a ring), letter by
+   * letter along the line, as if it were written again. */
+  function retrace(el: Element) {
+    for (const line of lines.values()) {
+      const st = line.strand;
+      const way = line.way;
+      if (!st || !way) continue;
+      for (const mk of way.marks) {
+        const e = mk.stop.el;
+        if (e !== el && !el.contains(e) && !e.contains(el)) continue;
+        if (st.ls.length <= mk.to || st.ls[mk.to] > st.s) continue;
+        lights = lights.filter((l) => l.to === undefined || l.st !== st);
+        lights.push({ st, s: st.ls[mk.from], v: 1.1, e: 1, from: null, to: st.ls[mk.to] });
+        task.wake();
+      }
+    }
+  }
+
   /** A branch to something you hover: it grows from the nearest thread
    * already grown (forward off it, at a slant), then weaves through its
    * words if it has any to speak of, otherwise loops round it; when you
    * leave, it withdraws into the thread it came from. Nothing near to
    * grow from, nothing grows. */
   function encircle(el: Element) {
+    // Two lines and nothing else: light runs through what you hover, along
+    // the line that wrote it.
+    if (lines.size) {
+      retrace(el);
+      return;
+    }
     untie(null);
     const p = page.getBoundingClientRect();
     const r = el.getBoundingClientRect();
@@ -2408,6 +2771,9 @@ export function createSkein(options: SkeinOptions) {
       delete layer.dataset.state;
       fate.breaks.length = 0;
       while (limbSown < limbs.length && limbs[limbSown].key <= reach) bear(limbs[limbSown++], true);
+      // Everything the lines write, on them (measured again: a lookup for
+      // what was measured before).
+      routeAll();
       const now = performance.now();
       for (const st of strands) {
         if (st.kind === "hion") {
@@ -2564,6 +2930,8 @@ export function createSkein(options: SkeinOptions) {
     /** A small loop of a hion's own, tied off it at arc length s and let
      * go after a while (life.ts: left alone, they amuse themselves). */
     knot(hue: Hue, s: number, r: number, hold: number) {
+      // Two lines and nothing else: they tie no loops of their own.
+      if (lines.size) return false;
       const parent = hionOf(hue);
       if (!built || busy || !parent || s > parent.s) return false;
       const [x, y, nx, ny] = at(parent, s);
@@ -2588,6 +2956,17 @@ export function createSkein(options: SkeinOptions) {
     /** Something else to move and paint on the live canvas. */
     effect(e: Effect) {
       effects.push({ e, last: [] });
+    },
+    /** What the two lines write and ring (spun.ts): every heading and
+     * label, and every picture, in the order they come down the screen.
+     * Each line writes those of its hue, going out of its way to them. */
+    write(list: { el: HTMLElement; hue: Hue; ring: boolean; measure: Measure | null }[]) {
+      stops = list.map((x) => ({ ...x, piece: null, size: 0, state: 0, near: 0, box: { l: 0, t: 0, r: 0, b: 0 } }));
+      if (!built) return;
+      assign();
+      if (instant) settle(Infinity);
+      else if (!busy) pump();
+      task.wake();
     },
     /** A word to be written by thread (spun.ts): kept, written now if the
      * screen is ready (at once for a still screen), and written again
@@ -2620,6 +2999,8 @@ export function createSkein(options: SkeinOptions) {
     },
     /** The loom drew on: the hions' heads follow. */
     wake: () => task.wake(),
+    /** For a check: what the lines write, and where each stop is. */
+    lines: () => [...lines.values()].map((l) => ({ hue: l.hue, legs: l.legs.length, s: l.strand?.s, total: l.strand ? measureBody(l.strand) : 0, stops: l.stops.map((p) => ({ text: (p.el.textContent ?? "").trim().slice(0, 24), ring: p.ring, state: p.state, near: p.near })) })),
     /** For a check: the threads themselves. */
     fate: () => fate,
     strands: () => strands,

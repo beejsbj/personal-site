@@ -85,6 +85,8 @@ export interface Material {
 
 export interface Spinner {
   inscribe(el: HTMLElement, hue: Hue, measure: Measure): void;
+  /** Everything the two lines write or ring, in document order. */
+  write(list: { el: HTMLElement; hue: Hue; ring: boolean; measure: Measure | null }[]): void;
   material(): Material;
 }
 
@@ -184,7 +186,27 @@ function headings(root: ParentNode): HTMLElement[] {
   return out;
 }
 
-function write(words: HTMLElement[], options: SpunOptions) {
+/** The two lines write every word on the page and ring every picture
+ * (skein.ts): each a stop on the line of its hue. A word on the resume's
+ * sliding track is written on a canvas of its own, as before. */
+function write(all: HTMLElement[], options: SpunOptions) {
+  const words = all.filter((el) => el.closest("[data-cloth-hold]"));
+  const root = all[0]?.closest<HTMLElement>(".hion-page");
+  if (root) {
+    const lined = all.filter((el) => !el.closest("[data-cloth-hold]"));
+    const pictures = [...root.querySelectorAll<HTMLElement>(":scope > main .hion-picture__frame")].filter(
+      (el) => !el.closest("[data-cloth-hold]") && el.getClientRects().length > 0,
+    );
+    const list = [...lined, ...pictures].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+    options.skein.write(
+      list.map((el) => {
+        const ring = pictures.includes(el);
+        const hue: Hue = ring ? (el.closest<HTMLElement>("[data-hue]")?.dataset.hue === "m" ? "m" : "c") : hueOf(el);
+        return { el, hue, ring, measure: ring ? null : (page: DOMRect) => measure(el, page) };
+      }),
+    );
+  }
+  if (!words.length) return;
   const { signal } = options;
   const begun = new Set<HTMLElement>();
   const begin = (el: HTMLElement) => {

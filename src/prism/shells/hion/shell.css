@@ -3050,6 +3050,18 @@
   letter-spacing: var(--hion-label-track);
 }
 
+/* Two lines, and nothing else (skein.ts): what they write is laid on the
+   page under the words, so a strung heading's box is not black over it,
+   and nothing hangs on a drop of its own (the lines write what hangs,
+   where it hangs). The resume's sliding track keeps its own. */
+:root[data-lens="hion"] .hion-page > :is(main, footer) .hion-strung__box:not([data-cloth-hold] *) {
+  background: none;
+}
+
+:root[data-lens="hion"] .hion-page > :is(main, footer) .hion-ink:not([data-cloth-hold] *) {
+  display: none;
+}
+
 /* A tag's term and value are two lines of one label: one size, and room
    between them for the run under the first. */
 :root[data-lens="hion"] .hion-screen .hion-tag--meta dd {
