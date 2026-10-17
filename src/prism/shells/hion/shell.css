@@ -11,8 +11,8 @@
   --hion-ml: rgb(255 216 241);
   --hion-text: rgb(205 240 245);
   /* Fate, not warmth: one inscribed voice in two faces. Display: the
-     woven and hung titles in Aboreto, thin wide capitals cut like a stele;
-     thin, open strokes weave cleanly, and their one weight is the only
+     spun and hung titles in Aboreto, thin wide capitals cut like a stele;
+     thin, open strokes trace cleanly as one thread, and their one weight is the only
      one. Its capitals are for large words only: under about 28px they
      shout, so small titles (head) are set in the reading face. Text:
      Spectral, wide and calm on black. Hand: the spoken lines, in
@@ -756,27 +756,15 @@
   color: var(--hion-c);
 }
 
-/* Woven type (woven.ts): the word's ink is woven by life on a canvas
-   behind it; the text stays, invisible, for reading and selecting. */
-:root[data-lens="hion"] [data-woven] {
+/* Spun type (spun.ts, skein.ts): every heading is written by one thread
+   on the skein's canvases under it. Its rules are at the end of the
+   sheet. */
+:root[data-lens="hion"] [data-spun] {
   position: relative;
 }
 
-:root[data-lens="hion"] .hion-title__text[data-woven] {
+:root[data-lens="hion"] .hion-title__text[data-spun] {
   display: inline-block;
-}
-
-:root[data-lens="hion"] [data-woven][data-woven-state] {
-  color: transparent;
-  background: none;
-  -webkit-text-fill-color: transparent;
-}
-
-:root[data-lens="hion"] .hion-woven {
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  filter: drop-shadow(0 0 5px rgb(79 233 245 / 0.18)) drop-shadow(0 0 7px rgb(255 92 200 / 0.14));
 }
 
 :root[data-lens="hion"] .hion-display {
@@ -1152,7 +1140,7 @@
 
 /* Swatch and label (wide screens): not a card. A project is a piece of
    its cloth (the woven cover), tilted as it was pinned, with its label
-   hung beside it: big woven title, a tag of when, a few lines, its tools
+   hung beside it: big title written by thread, a tag of when, a few lines, its tools
    on beads. They take turns left and right down the page, so the two
    hions run between them. */
 @media (min-width: 720px) {
@@ -1220,14 +1208,14 @@
     transform-origin: 100% 50%;
   }
 
-  /* Large enough to be woven: in the inscribed capitals. */
+  /* Large enough to be written by thread: in the inscribed capitals. */
   :root[data-lens="hion"] .hion-row--works .hion-work__title {
     margin: 0.05em 0 0.25em;
     font: var(--hion-display-weight) clamp(2.4rem, 4.6vw, 3.7rem)/1 var(--hion-display);
     letter-spacing: var(--hion-display-track);
   }
 
-  :root[data-lens="hion"] .hion-row--works .hion-work__title a[data-woven] {
+  :root[data-lens="hion"] .hion-row--works .hion-work__title a[data-spun] {
     display: inline-block;
   }
 
@@ -2981,4 +2969,126 @@
 
 :root[data-lens="hion"] .hion-loom--across {
   right: auto;
+}
+
+/* ---------- Headings written by thread (spun.ts, skein.ts) ---------- */
+
+/* Every heading, whatever its size, in the display face: a thread has one
+   weight, and so has Aboreto; its thin capitals trace as one line where
+   the reading face's thicks, thins and serifs would not. Only body text is
+   type. The selector is spun.ts WRITTEN: keep the two in step. */
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title) {
+  font-family: var(--hion-display);
+  font-weight: var(--hion-display-weight);
+  letter-spacing: var(--hion-display-track);
+}
+
+/* The small ones are a little larger than the reading face had them, and
+   tracked open: a 3px thread needs room inside a capital and between two
+   for its runs down to the line and up again. */
+:root[data-lens="hion"] .hion-screen :is(h3, h4, h5, h6, .hion-tied__title, .hion-fork__title, .hion-work__title):not(.hion-strung) {
+  letter-spacing: 0.06em;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-screen .hion-row--works .hion-work__title {
+    letter-spacing: var(--hion-display-track);
+  }
+}
+
+:root[data-lens="hion"] .hion-screen .hion-tied__title:not(.hion-knots--writing *),
+:root[data-lens="hion"] .hion-screen .hion-prose h3 {
+  font-size: 1.5rem;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-prose :is(h4, h5, h6) {
+  font-size: 1.4rem;
+}
+
+/* The labels (spun.ts LABELS) are written by thread too, so they are set
+   as the small headings are: capitals only (the face's small capitals are
+   too small inside for a 3px thread to run up and down), at least 20px,
+   tracked open, and level (a thread writes along a line; a tag still
+   sways on its drop). */
+:root[data-lens="hion"] .hion-screen :is(.hion-eyebrow, .hion-meta, .hion-resume__when, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li) {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+}
+
+:root[data-lens="hion"] .hion-screen :is(.hion-eyebrow, .hion-meta, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li) {
+  font-size: 20px;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-row--works .hion-meta {
+  rotate: none;
+}
+
+/* Room under a term for the run along its feet, clear of its value. */
+:root[data-lens="hion"] .hion-screen .hion-tag--meta dt {
+  margin-bottom: 0.45em;
+}
+
+/* A run lies under each line of a heading: room between the lines for it,
+   so it reads as the line above's and never strikes through the next. */
+:root[data-lens="hion"] .hion-screen .hion-title {
+  line-height: 1.22;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-row--works .hion-work__title {
+  line-height: 1.18;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-strung:not(.hion-loop--role > *) {
+  line-height: 1.28;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-knots--writing .hion-tied__title {
+  line-height: 1.32;
+}
+
+/* Nothing shows before the thread writes it: a heading's text is
+   transparent from the moment the screen is built (it stays in the
+   accessibility tree, reads, selects and is found, and a link in it keeps
+   its focus ring). A heading the thread cannot write, or that is left in
+   sight unwritten, gets its chalk back (data-spun-state="chalk"). */
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-resume__when, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li):not([data-spun-state="chalk"]),
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-resume__when, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li):not([data-spun-state="chalk"]) :not([data-spun-state="chalk"], [data-spun-state="chalk"] *) {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+/* Nor what paints text with its background (the chalk's tooth), nor the
+   chalk's dust. A strung heading keeps its box, black over the hions and
+   the weft behind it, and is written on a canvas of its own over the box
+   (spun.ts), which its chalk reveal does not clip. */
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6):not([data-spun-state="chalk"]) :is(.hion-strung__chalk, .hion-title__text, .hion-display__word):not([data-spun-state="chalk"]) {
+  background: none;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-strung:not([data-spun-state="chalk"]) .hion-strung__chalk::after {
+  display: none;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-strung[data-spun-state="spun"] {
+  clip-path: none;
+}
+
+/* A word given its chalk inside a heading still being written. */
+:root[data-lens="hion"] .hion-screen .hion-work__title a[data-spun-state="chalk"] {
+  color: var(--hion-cl);
+  -webkit-text-fill-color: currentColor;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-work[data-hue="m"] .hion-work__title a[data-spun-state="chalk"] {
+  color: var(--hion-ml);
+}
+
+/* A strung heading, and any heading that slides with the resume's track,
+   is written on a canvas of its own inside it, over its box. */
+:root[data-lens="hion"] .hion-spun-local {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
 }

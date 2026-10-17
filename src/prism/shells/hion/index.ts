@@ -28,7 +28,8 @@ import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
 import { createPulse } from "./pulse";
 import { createSkein, seedOf } from "./skein";
-import { weaveCovers, weaveType } from "./woven";
+import { spinType } from "./spun";
+import { weaveCovers } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { ACROSS, createTrack } from "./track";
 import { compose } from "./weave";
@@ -201,18 +202,17 @@ function show(route: Route, first: boolean) {
     life?.start();
     page.dataset.state = "here";
     // Then every thread (the skein), at once: on a screen travelled to the
-    // hions are seen setting out from the line. The woven things come a
-    // moment later, once the main thread has room: none of it is needed
-    // to read the screen.
+    // hions are seen setting out from the line. The spun words and the
+    // woven covers come a moment later, once the main thread has room:
+    // none of it is needed to read the screen.
     const gone = () => live?.page !== page || live.left !== undefined;
     const ground = () => {
       if (!gone()) skein.start();
     };
     const woven = () => {
       if (gone()) return;
-      const weaving = { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric };
-      weaveType(page, weaving);
-      weaveCovers(page, weaving);
+      spinType(page, { skein, pulse, instant: still(), signal: controller.signal });
+      weaveCovers(page, { signal: controller.signal, fabric });
     };
     if (still()) {
       ground();

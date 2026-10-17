@@ -174,7 +174,7 @@ function opening(
         "h1",
         "sign",
         { ...marks.title, class: "hion-title", id, "data-hang": "" },
-        h("span", { class: "hion-title__text", "data-woven": "m" }, title),
+        h("span", { class: "hion-title__text", "data-spun": "m" }, title),
       ),
     ),
     intro ? knotPoint("hion-head__knot") : null,
@@ -292,8 +292,8 @@ function workCharm(copy: Copy, project: Project, level: "h2" | "h3", i: number) 
       h(
         level,
         { ...part("project.title", project.slug), class: "hion-work__title", id },
-        // Woven by life, where it is set large enough to read so.
-        link(project.href, { "data-woven": "" }, project.title),
+        // Written by thread, where it is set large enough to read so.
+        link(project.href, { "data-spun": "" }, project.title),
       ),
       h(
         "p",
@@ -347,7 +347,7 @@ function home(content: SiteContent) {
               "data-hang": i === 0 ? "" : undefined,
               "data-hang-from": i === 0 ? undefined : "prev",
               "data-hue": i % 2 ? "c" : "m",
-              "data-woven": "",
+              "data-spun": "",
             },
             word,
           ),
