@@ -3036,19 +3036,15 @@
 }
 
 /* Nor what paints text with its background (the chalk's tooth), nor the
-   chalk's dust; a strung heading's weft stops short of its words in a
-   knot (weave.ts), so its box no longer blacks the weft out, and its
-   chalk reveal does not clip the thread. */
+   chalk's dust. A strung heading keeps its box, black over the hions and
+   the weft behind it, and is written on a canvas of its own over the box
+   (spun.ts), which its chalk reveal does not clip. */
 :root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6):not([data-spun-state="chalk"]) :is(.hion-strung__chalk, .hion-title__text, .hion-display__word):not([data-spun-state="chalk"]) {
   background: none;
 }
 
 :root[data-lens="hion"] .hion-screen .hion-strung:not([data-spun-state="chalk"]) .hion-strung__chalk::after {
   display: none;
-}
-
-:root[data-lens="hion"] .hion-screen .hion-strung__box:not([data-cloth-hold] *) {
-  background: none;
 }
 
 :root[data-lens="hion"] .hion-screen .hion-strung[data-spun-state="spun"] {
@@ -3065,8 +3061,8 @@
   color: var(--hion-ml);
 }
 
-/* A heading that slides with the resume's track is written on a canvas of
-   its own inside it, over its box. */
+/* A strung heading, and any heading that slides with the resume's track,
+   is written on a canvas of its own inside it, over its box. */
 :root[data-lens="hion"] [data-spun-local] {
   position: relative;
 }

@@ -15,7 +15,7 @@
  * a knot (weave.ts), down from the knot before and up into the knot
  * after. Only body text is type.
  *
- * A heading is a strand like every other (skein.ts, the `title` kind: a
+ * Most headings are strands like every other (skein.ts, the `title` kind: a
  * hot head on a slack rope, laid on the ground as it cools, the one
  * material), so a hover loop weaves over and under thread, and a thread
  * from a click winds through it. The real text stays where it was,
@@ -23,10 +23,13 @@
  * so nothing shows before the thread writes it, and it still reads,
  * selects, finds and speaks as text.
  *
- * Headings inside something that slides over the page (the resume's
- * track across, `[data-cloth-hold]`) cannot lie on the page's ground:
- * they are written on a canvas of their own inside the heading, with the
- * skein's material and a head of their own, and slide with it.
+ * Two kinds of heading are written on a canvas of their own inside the
+ * heading, with the skein's material and a head of their own, rather
+ * than on the page's ground: a strung heading, whose black box keeps the
+ * hions and the weft from showing through its words (the thread is drawn
+ * over the box), and any heading inside something that slides over the
+ * page (the resume's track across, `[data-cloth-hold]`), which slides
+ * with it.
  *
  * This file measures and queues: it reads a heading's letters off the
  * page as a bitmap, a line at a time, in the real face (every heading is
@@ -249,7 +252,7 @@ function hueOf(el: HTMLElement): Hue {
 }
 
 function spin(el: HTMLElement, options: SpunOptions) {
-  if (el.closest("[data-cloth-hold]")) {
+  if (el.closest("[data-cloth-hold]") || el.matches(".hion-strung")) {
     writeLocal(el, hueOf(el), options);
     return;
   }
@@ -339,7 +342,7 @@ export function measure(el: HTMLElement, page: DOMRect): Spun | null {
   // before the words, and (when it ends on that side) up into the knot
   // after.
   let knotted = false;
-  const strung = el.matches(".hion-strung") && !el.closest("[data-cloth-hold]") ? el.querySelector(".hion-strung__box")?.getBoundingClientRect() : null;
+  const strung = el.matches(".hion-strung") ? el.querySelector(".hion-strung__box")?.getBoundingClientRect() : null;
   if (strung) {
     const first = runs.reduce((a, b) => (b.rect.top < a.rect.top ? b : a)).rect;
     const y = first.top + first.height * 0.56 - page.top;
@@ -461,7 +464,7 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   el.dataset.spunState = "spun";
   el.setAttribute("data-spun-local", "");
   const lead = 36;
-  const way = smooth([[spun.way[0][0] - lead, spun.way[0][1] + 2], ...spun.way], 4);
+  const way = smooth(spun.knotted ? spun.way : [[spun.way[0][0] - lead, spun.way[0][1] + 2], ...spun.way], 4);
   const arcs = [0];
   for (let k = 1; k < way.length; k++) arcs.push(arcs[k - 1] + Math.hypot(way[k][0] - way[k - 1][0], way[k][1] - way[k - 1][1]));
   const total = arcs[arcs.length - 1];
