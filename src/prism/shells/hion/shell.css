@@ -3016,6 +3016,17 @@
   line-height: 1.3;
 }
 
+/* So are the things said: the role line, the portrait's word and the
+   foot's call, in the label face (a thread cannot write the hand's
+   italic legibly). */
+:root[data-lens="hion"] .hion-screen :is(.hion-role, .hion-portrait__link),
+:root[data-lens="hion"] .hion-foot__call {
+  font-size: max(var(--hion-label-least), calc(1.7rem * var(--hion-hand-scale)));
+  line-height: 1.3;
+}
+
+:root[data-lens="hion"] .hion-screen :is(.hion-role, .hion-portrait__link),
+:root[data-lens="hion"] .hion-foot__call,
 :root[data-lens="hion"] .hion-screen :is(.hion-pullcord, .hion-end__link, .hion-tag--meta dd, .hion-hello) {
   font-family: var(--hion-label);
   font-style: var(--hion-label-style);
@@ -3036,8 +3047,8 @@
 
 /* The foot's labels too: its links hang on drops from a cord, and the
    address is a link on, in the label face. */
-:root[data-lens="hion"] .hion-foot :is(.hion-tag, .hion-foot__mail):not([data-spun-state="chalk"]),
-:root[data-lens="hion"] .hion-foot :is(.hion-tag, .hion-foot__mail):not([data-spun-state="chalk"]) * {
+:root[data-lens="hion"] .hion-foot :is(.hion-tag, .hion-foot__mail, .hion-foot__call):not([data-spun-state="chalk"]),
+:root[data-lens="hion"] .hion-foot :is(.hion-tag, .hion-foot__mail, .hion-foot__call):not([data-spun-state="chalk"]) * {
   color: transparent;
   -webkit-text-fill-color: transparent;
   text-shadow: none;
@@ -3147,8 +3158,8 @@
    accessibility tree, reads, selects and is found, and a link in it keeps
    its focus ring). A heading the thread cannot write, or that is left in
    sight unwritten, gets its chalk back (data-spun-state="chalk"). */
-:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-hello):not([data-spun-state="chalk"]),
-:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-hello):not([data-spun-state="chalk"]) :not([data-spun-state="chalk"], [data-spun-state="chalk"] *) {
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-hello, .hion-role, .hion-portrait__link):not([data-spun-state="chalk"]),
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-hello, .hion-role, .hion-portrait__link):not([data-spun-state="chalk"]) :not([data-spun-state="chalk"], [data-spun-state="chalk"] *) {
   color: transparent;
   -webkit-text-fill-color: transparent;
   text-shadow: none;

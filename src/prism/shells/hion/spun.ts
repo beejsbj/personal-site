@@ -104,10 +104,12 @@ export const WRITTEN = "h1, h2, h3, h4, h5, h6, .hion-tied__title";
 
 /** And every label: eyebrows, dates, years and meta lines, tags and
  * charms, the words of pull-cords and links on, table heads, the home's
- * greeting. Only body text (paragraphs, intros, summaries, captions, the
- * role line, links inside prose) is type. Kept in step with shell.css. */
+ * greeting and the other things said (the role line, the portrait's
+ * "that's me", the foot's call). Only body text (paragraphs, intros,
+ * summaries, captions, links inside prose) is type. Kept in step with
+ * shell.css. */
 export const LABELS =
-  ".hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-foot__mail, .hion-hello";
+  ".hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-foot__mail, .hion-hello, .hion-role, .hion-portrait__link, .hion-foot__call";
 
 /** A label that hangs on a drop or a pull-cord of its own is written on a
  * canvas inside it (it swings), on from the knot its drop ends in: ink.ts
@@ -472,7 +474,7 @@ interface Run {
 }
 
 /** The heading's text, a stretch per line it sits on (viewport px). */
-function textRuns(el: HTMLElement): Run[] {
+function textRuns(el: HTMLElement, all = false): Run[] {
   const runs: Run[] = [];
   const range = document.createRange();
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -481,7 +483,7 @@ function textRuns(el: HTMLElement): Run[] {
     // Hidden inside it (a screen reader's words, an icon's); a label that
     // is itself hidden from a screen reader (the years round a role, which
     // its date line says) is still drawn.
-    const hidden = node.parentElement?.closest(".hion-sr, [hidden], [aria-hidden='true']");
+    const hidden = node.parentElement?.closest(all ? ".hion-sr, [hidden]" : ".hion-sr, [hidden], [aria-hidden='true']");
     if (hidden && hidden !== el && el.contains(hidden)) continue;
     for (const match of text.matchAll(/\S+/g)) {
       const from = match.index;
@@ -496,6 +498,9 @@ function textRuns(el: HTMLElement): Run[] {
     }
   }
   range.detach();
+  // All it shows is hidden from a screen reader (a date line whose words
+  // are said elsewhere): that is what is drawn.
+  if (!runs.length && !all) return textRuns(el, true);
   return runs;
 }
 
