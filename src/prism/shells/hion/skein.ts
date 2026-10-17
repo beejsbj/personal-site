@@ -2252,8 +2252,12 @@ export function createSkein(options: SkeinOptions) {
     // The other hion reaches through it: a heading written in magenta is
     // woven by a branch of the cyan, and the other way about. It comes in
     // from the side that tree is on.
+    // Its words' hue: a heading's strand, or a label written on a canvas
+    // of its own (spun.ts notes the hue).
     const own = strands.find((st) => st.drive.by === "title" && (el === st.drive.el || el.contains(st.drive.el)));
-    const other: Hue | undefined = own ? (own.t.hue === "c" ? "m" : "c") : undefined;
+    const local = (el.matches("[data-spun-hue]") ? el : el.querySelector("[data-spun-hue]")) as HTMLElement | null;
+    const ownHue = own?.t.hue ?? (local?.dataset.spunHue as Hue | undefined);
+    const other: Hue | undefined = ownHue ? (ownHue === "c" ? "m" : "c") : undefined;
     const centre: Pt = [(box.l + box.r) / 2, (box.t + box.b) / 2];
     const near = touch(centre[0], centre[1], 700, other) ?? touch(centre[0], centre[1], 700);
     const toward: Pt = near ? at(near.st, near.s).slice(0, 2) as Pt : [box.l - 40, centre[1]];
@@ -2263,7 +2267,8 @@ export function createSkein(options: SkeinOptions) {
     if (way.length < 2) return;
     const [x1, y1] = way[Math.min(way.length - 1, 3)];
     const l = Math.hypot(x1 - way[0][0], y1 - way[0][1]) || 1;
-    const root = rootFor(way[0], [(x1 - way[0][0]) / l, (y1 - way[0][1]) / l], other, 700, own);
+    const arrive: Pt = [(x1 - way[0][0]) / l, (y1 - way[0][1]) / l];
+    const root = (other && rootFor(way[0], arrive, other, 900, own, true)) || rootFor(way[0], arrive, undefined, 700, own);
     if (!root) return;
     loop(el, root.parent.t.hue, smooth([...root.way.slice(0, -1), ...way], 4), Infinity, { parent: root.parent, s: root.s });
   }

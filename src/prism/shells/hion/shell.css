@@ -3011,7 +3011,12 @@
    words of pull-cords and links on, and a tag's value, are set in it
    rather than the reading face, and none is smaller than a 3px thread can
    write. */
-:root[data-lens="hion"] .hion-screen :is(.hion-pullcord, .hion-end__link, .hion-tag--meta dd) {
+:root[data-lens="hion"] .hion-screen .hion-hello {
+  font-size: max(var(--hion-label-least), calc(2rem * var(--hion-hand-scale)));
+  line-height: 1.3;
+}
+
+:root[data-lens="hion"] .hion-screen :is(.hion-pullcord, .hion-end__link, .hion-tag--meta dd, .hion-hello) {
   font-family: var(--hion-label);
   font-style: var(--hion-label-style);
   font-weight: var(--hion-label-weight);
@@ -3098,8 +3103,8 @@
    accessibility tree, reads, selects and is found, and a link in it keeps
    its focus ring). A heading the thread cannot write, or that is left in
    sight unwritten, gets its chalk back (data-spun-state="chalk"). */
-:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th):not([data-spun-state="chalk"]),
-:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th):not([data-spun-state="chalk"]) :not([data-spun-state="chalk"], [data-spun-state="chalk"] *) {
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-hello):not([data-spun-state="chalk"]),
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-hello):not([data-spun-state="chalk"]) :not([data-spun-state="chalk"], [data-spun-state="chalk"] *) {
   color: transparent;
   -webkit-text-fill-color: transparent;
   text-shadow: none;

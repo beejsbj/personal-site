@@ -101,11 +101,11 @@ interface SpunOptions {
 export const WRITTEN = "h1, h2, h3, h4, h5, h6, .hion-tied__title";
 
 /** And every label: eyebrows, dates, years and meta lines, tags and
- * charms, the words of pull-cords and links on, table heads. Only body
- * text (paragraphs, intros, summaries, captions, the spoken lines, links
- * inside prose) is type. Kept in step with shell.css. */
+ * charms, the words of pull-cords and links on, table heads, the home's
+ * greeting. Only body text (paragraphs, intros, summaries, captions, the
+ * role line, links inside prose) is type. Kept in step with shell.css. */
 export const LABELS =
-  ".hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-foot__mail";
+  ".hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-foot__mail, .hion-hello";
 
 /** A label that hangs on a drop or a pull-cord of its own is written on a
  * canvas inside it (it swings), on from the knot its drop ends in: ink.ts
@@ -603,6 +603,8 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   }
   el.dataset.spunState = "spun";
   el.setAttribute("data-spun-local", "");
+  // For a hover: the other hion weaves through it (skein.ts).
+  el.dataset.spunHue = hue;
   const lead = 36;
   // From the knot its drop ends in (a hung label), straight down into the
   // line under its feet; from the knots its weft stops in (strung); else
