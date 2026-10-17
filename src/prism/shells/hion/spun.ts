@@ -419,7 +419,9 @@ export function measure(el: HTMLElement, page: DOMRect): Spun | null {
   // before the words, and (when it ends on that side) up into the knot
   // after.
   let knotted = false;
-  const strung = el.matches(".hion-strung") ? el.querySelector(".hion-strung__box")?.getBoundingClientRect() : null;
+  // (Across the resume's track a heading is strung on nothing: written on
+  // from the track's own threads, as a label there is.)
+  const strung = el.matches(".hion-strung") && !el.closest("[data-cloth-hold]") ? el.querySelector(".hion-strung__box")?.getBoundingClientRect() : null;
   if (strung) {
     const first = runs.reduce((a, b) => (b.rect.top < a.rect.top ? b : a)).rect;
     const y = first.top + first.height * 0.56 - page.top;

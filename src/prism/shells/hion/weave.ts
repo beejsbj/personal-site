@@ -64,7 +64,6 @@ import {
   thread,
   THREAD,
   turned,
-  acrossX,
 } from "./pastel";
 import type { Composition, Limb } from "./loom";
 import { textExtent } from "./dom";
@@ -318,16 +317,12 @@ export function compose(
     marks.splice(0, marks.length, ...marks.map(turned));
     for (const tip of tips) tip.points = turn(tip.points);
     for (const o of orbits) o.points = turn(o.points);
-    // Headings across a track: strung on a weft level with their words,
-    // thrown as the reach (along x) gets to them.
+    // Headings across a track hang on no weft of their own: the track's
+    // threads write them (spun.ts), on from the strand down the role's side.
     let wi = 0;
     for (const el of own("[data-weft]")) {
-      const y = firstLineMiddle(el);
-      const b = box(el.querySelector(".hion-strung__box") ?? el);
       const hue: Hue = wi++ % 2 ? "c" : "m";
-      marks.push(
-        ...weft(b.l - 36, b.r + 36, y, hue, seed++, undefined, { knotL: true, knotR: true, key: b.l - 60 }).map(acrossX),
-      );
+      if (el.dataset.weftHue !== hue) el.dataset.weftHue = hue;
     }
     return { marks, tips, orbits, end: endAt ? endAt[1] + 120 : null };
   }
