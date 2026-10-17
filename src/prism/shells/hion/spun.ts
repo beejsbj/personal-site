@@ -570,7 +570,7 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
     (faces) => {
       clearTimeout(late);
       if (signal.aborted) return;
-      for (const el of labels) {
+      const write = (el: HTMLElement) => {
         const knot = faces.length ? knotOf(el) : null;
         const hue = el.closest<HTMLElement>("[data-hue]")?.dataset.hue === "m" ? "m" : "c";
         if (!knot) chalk(el);
@@ -581,6 +581,23 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
             el.dataset.spunState = "chalk";
           }
         }
+      };
+      for (const el of labels) {
+        if (el.getClientRects().length) {
+          write(el);
+          continue;
+        }
+        // Folded away (the menu on a phone): written when it is first let
+        // down, once its drop has hung.
+        const shown = new ResizeObserver(() => {
+          if (!el.getClientRects().length) return;
+          shown.disconnect();
+          const timer = window.setTimeout(() => signal.aborted || write(el), 120);
+          signal.addEventListener("abort", () => clearTimeout(timer), { once: true });
+        });
+        // (An inline label has no box of its own to watch: its item's.)
+        shown.observe(el.closest("li") ?? el.parentElement ?? el);
+        signal.addEventListener("abort", () => shown.disconnect(), { once: true });
       }
     },
     () => labels.forEach(chalk),
