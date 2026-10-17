@@ -29,8 +29,12 @@ An alive, catchable affordance from the prism that tempts the visitor to exit th
 _Avoid_: seeker, golden snitch, exit button
 
 **Prism Exit**:
-The moment the camera pulls back from the normal portfolio and reveals that the portfolio is a surface within the prism. The portfolio remains intact rather than being torn, discarded, or exposed as fake.
+The moment the camera pulls back from the normal portfolio and reveals that the portfolio is a surface within the prism. The portfolio remains intact rather than being torn, discarded, or exposed as fake: the face you pull out of is the live page itself, mid-whatever it was doing, and stepping back in returns it exactly as it was.
 _Avoid_: page break, portal tear, escape sequence
+
+**Settled Arrival**:
+Arriving on a page that is already on screen: a prism face, or a lens stepped into from the prism. It lands at rest, without the entrance a real first arrival plays.
+_Avoid_: skip intro, no-animation mode
 
 **Face Travel**:
 Movement outside the prism from one legible face to another, with each face acting as a distinct lens on the normal portfolio. Travel is fixed and deliberate rather than free flight.

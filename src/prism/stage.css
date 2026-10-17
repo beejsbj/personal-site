@@ -34,6 +34,10 @@
 :root.prism-is-open {
   overflow: hidden;
 }
+/* The lure belongs to the room, not the page: it isn't carried onto the face. */
+:root.prism-is-open #prism-lure {
+  visibility: hidden;
+}
 
 /* ── Curiosity Reveal ─────────────────────────────────────────────── */
 .prism-glint {
@@ -211,6 +215,40 @@
 }
 
 /* ── The stage ────────────────────────────────────────────────────── */
+/* Two layers outside <body>, because while the prism is open the body is
+   the live face (live-page.ts): the room (#prism-backdrop: its dark and the
+   whisper) under the page, and the prism (#prism-stage: faces,
+   caps and HUD) over it. The live face itself is clear glass. A face turned
+   away from the eye is shaded all but transparent (stage.ts: shade), so no
+   two faces ever visibly overlap on screen and the page needs no depth
+   sorting against them. */
+#prism-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--prism-void);
+  font: 400 1rem/1.4 var(--prism-font);
+}
+/* The front lens's colour on the dark: one glow per lens on its own
+   compositor layer, crossfaded, so turning to the next lens never repaints
+   the whole room (a full-viewport gradient) in the turn's first frames. */
+#prism-backdrop .prism-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    60% 55% at 50% 52%,
+    color-mix(in srgb, var(--band) 16%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  will-change: opacity;
+}
+#prism-backdrop .prism-glow.is-lit {
+  opacity: 1;
+}
 #prism-stage {
   position: fixed;
   inset: 0;
@@ -222,16 +260,10 @@
   text-transform: none;
   text-shadow: none;
   text-align: start;
-  background:
-    radial-gradient(
-      60% 55% at 50% 52%,
-      color-mix(in srgb, var(--signal, #fff) 16%, transparent),
-      transparent 70%
-    ),
-    var(--prism-void);
   touch-action: none;
   user-select: none;
 }
+#prism-backdrop[data-dormant],
 #prism-stage[data-dormant] {
   visibility: hidden;
   pointer-events: none;
@@ -240,11 +272,11 @@
   position: absolute;
   inset: 0;
   perspective: var(--perspective);
-  perspective-origin: 50% 36%;
+  perspective-origin: 50% var(--eye-y, 36%);
 }
 #prism-stage .prism-body {
   position: absolute;
-  top: 42%;
+  top: var(--body-y, 42%);
   left: 50%;
   width: var(--face-w);
   height: var(--face-h);
@@ -257,9 +289,18 @@
   position: absolute;
   inset: 0;
   transform: rotateY(calc(var(--i) * 72deg)) translateZ(var(--apothem));
-  backface-visibility: hidden;
+  /* Drawn from behind too, so the compositor never drops a face's tiles
+     while it is turned away; the prism shades a face out while it faces
+     away (stage.ts: shade), so its back is never seen. */
+  backface-visibility: visible;
   background: #111;
   cursor: pointer;
+}
+/* The face you came from: the page itself shows through. */
+#prism-stage .prism-face--live {
+  /* clear glass over the page: nothing in it to keep rasterised */
+  backface-visibility: hidden;
+  background: transparent;
 }
 #prism-stage .prism-face iframe {
   display: block;
@@ -276,6 +317,9 @@
   inset: 0;
   pointer-events: none;
   transition: opacity 0.8s ease;
+  /* Kept on their own layers: promoted only while fading, they made the
+     face under them repaint, a whole face at the start and end of a turn. */
+  will-change: opacity;
 }
 #prism-stage .prism-face::before {
   background: linear-gradient(
@@ -300,6 +344,7 @@
 }
 #prism-stage .prism-cap {
   position: absolute;
+  backface-visibility: hidden;
   top: 50%;
   left: 50%;
   width: var(--cap);
@@ -323,40 +368,12 @@
 
 /* Layers that fade in over the moving camera get their own compositor
    layer up front, so the fade never repaints the scene. */
-#prism-stage .prism-light,
 #prism-stage .prism-hud,
-#prism-stage .prism-whisper {
+#prism-backdrop .prism-whisper {
   will-change: opacity, transform;
 }
 
-/* White light in, five lenses out. */
-#prism-stage .prism-light {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1.2s ease 0.3s;
-  pointer-events: none;
-}
-#prism-stage[data-outside="true"] .prism-light {
-  opacity: 1;
-}
-#prism-stage .prism-beam {
-  stroke: #fff;
-  stroke-width: 3;
-  stroke-opacity: 0.9;
-}
-#prism-stage .prism-band {
-  fill: var(--band);
-  opacity: 0.16;
-  transition: opacity 0.6s ease;
-}
-#prism-stage .prism-band.is-lit {
-  opacity: 0.55;
-}
-
-#prism-stage .prism-whisper {
+#prism-backdrop .prism-whisper {
   position: absolute;
   top: 7vh;
   left: 0;
@@ -370,7 +387,7 @@
   opacity: 0;
   transition: opacity 1s ease 0.9s;
 }
-#prism-stage[data-outside="true"] .prism-whisper {
+#prism-backdrop[data-outside="true"] .prism-whisper {
   opacity: 1;
 }
 

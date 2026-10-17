@@ -118,12 +118,13 @@ const { home, projects, updates, labels } = Astro.props;
     margin-top: var(--space-s);
     color: var(--color-text-soft);
   }
-  /* Arrival: the work block follows the welcome. Scroll reveals hide an
+  /* Arrival: the work block follows the welcome (not on a page that is
+     already there: data-prism-settled). Scroll reveals hide an
      element only once the script marks it (data-reveal) and show it when it
      enters the viewport (data-in); --i staggers a batch. Event marks pop in
      after their row; the current note settles like a sheet of paper. */
   @media (prefers-reduced-motion: no-preference) {
-    .below {
+    :global(:root:not([data-prism-settled])) .below {
       animation: below-in var(--duration-settle) var(--ease-settle)
         calc(var(--stagger) * 6) backwards;
     }

@@ -53,6 +53,8 @@ export class Transport {
   private returnTo: number | undefined;
   /** Paused or scrubbed: play carries on from here rather than the top. */
   private resumable = false;
+  /** Paused by idling, not by the visitor: plays on when idling ends. */
+  private held = false;
   private heads = new Set<Head>();
   private watched = new Set<Watched>();
   private ticks = new Set<Tick>();
@@ -169,9 +171,20 @@ export class Transport {
     } else this.render();
   }
 
+  /** The prism holds still whatever isn't being looked at. Playing when it
+   * took the page, the session plays on from the same spot (same region)
+   * once the page is looked at again: one window, not a stop. */
   setIdle(idle: boolean) {
     this.idle = idle;
-    if (idle) this.pause();
+    if (idle) {
+      if (!this.playing) return;
+      this.held = true;
+      this.pause();
+    } else if (this.held) {
+      this.held = false;
+      this.resumable = false;
+      this.start();
+    }
   }
 
   /** Hear one clip in place: its own notes over the chords at its date. */

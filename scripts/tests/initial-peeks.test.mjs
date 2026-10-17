@@ -108,8 +108,12 @@ function harness({
   const document = new Surface();
   document.hidden = false;
   document.cover = false;
+  document.prismOpen = false;
   document.documentElement = {
     hasAttribute: (name) => name === "data-page-cover" && document.cover,
+    classList: {
+      contains: (name) => name === "prism-is-open" && document.prismOpen,
+    },
   };
   document.body = new FakeElement();
   document.createElement = () => new FakeElement();
@@ -302,6 +306,17 @@ test("calm moments only: scrolling, hidden tabs and page transitions postpone a 
   h.document.hidden = false;
   h.advance(h.PEEK.retry[0]);
   assert.equal(h.letter().dataset.peek, "in", "calm again: it peeks");
+});
+
+test("never while the prism is open: the page may be live on its face", () => {
+  const h = harness();
+  h.document.prismOpen = true;
+  h.advance(h.PEEK.firstDelay[0]);
+  h.advance(h.PEEK.retry[0]);
+  assert.equal(h.stage(), undefined, "no peek onto the prism's face");
+  h.document.prismOpen = false;
+  h.advance(h.PEEK.retry[0]);
+  assert.equal(h.letter().dataset.peek, "in", "back on the page: it peeks");
 });
 
 test("shy: an approaching pointer or a scroll makes it duck", () => {
