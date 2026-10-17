@@ -1,36 +1,10 @@
-/** Route: how one line goes out of its way to write words and come back.
+/** Route: how a branch travels from where it leaves to what it goes to.
  *
- * Pure geometry. A hion's composed way down a screen (weave.ts, dance.ts)
- * is its journey; everything it writes is a leg off it: it leaves the
- * journey at a point, travels to the first word of a group (a heading, a
- * row of tags), writes it, arcs over or under to the next and writes that,
- * and comes back to the journey a little further on (or, past the end of
- * the journey, simply ends there). A picture is rung round rather than
- * written. Every travel is a curve that leaves along the way it is going
- * and arrives going the way the next thing is written, weighed by its
- * length and by how much of it would cross words (all but never). */
+ * Pure geometry. Every travel is a curve that leaves along the way it is
+ * going and arrives going the way the next thing is written (or the way
+ * into a fork's hub), bowed over or under a little, weighed by its length
+ * and by how much of it would cross words (all but never). */
 import type { Pt } from "./pastel";
-
-/** A run of points with the way it goes at each end. */
-export interface Piece {
-  pts: Pt[];
-}
-
-/** A leg off a journey: it leaves at journey index `at`, runs `pts`, and
- * comes back at journey index `back` (-1: it ends there). `marks` are the
- * ranges of `pts` that are a word's letters or a ring (written at a hand's
- * pace; the rest is travel, brisk), with which piece each is. */
-export interface Leg {
-  at: number;
-  back: number;
-  pts: Pt[];
-  marks: { from: number; to: number; piece: number }[];
-}
-
-export interface Journey {
-  xs: ArrayLike<number>;
-  ys: ArrayLike<number>;
-}
 
 /** Clear paper at a point (px): under 5 is words. */
 export type Clear = (x: number, y: number) => number;
@@ -48,32 +22,6 @@ function cubic(p0: Pt, p1: Pt, p2: Pt, p3: Pt, step = 6): Pt[] {
     ]);
   }
   return out;
-}
-
-const unit = (dx: number, dy: number): Pt => {
-  const l = Math.hypot(dx, dy) || 1;
-  return [dx / l, dy / l];
-};
-
-/** The way a run goes at its start, and at its end (over its first and
- * last 14px, so a jitter in the letters does not turn it). */
-function dirs(pts: Pt[]): { start: Pt; end: Pt } {
-  const n = pts.length - 1;
-  const over = (from: number, step: number) => {
-    let k = from;
-    let run = 0;
-    while (run < 14 && k + step >= 0 && k + step <= n) {
-      run += Math.hypot(pts[k + step][0] - pts[k][0], pts[k + step][1] - pts[k][1]);
-      k += step;
-    }
-    return k;
-  };
-  const a = over(0, 1);
-  const b = over(n, -1);
-  return {
-    start: unit(pts[a][0] - pts[0][0], pts[a][1] - pts[0][1]),
-    end: unit(pts[n][0] - pts[b][0], pts[n][1] - pts[b][1]),
-  };
 }
 
 /** What a travel costs: its length, and a great deal for each stretch of
@@ -112,100 +60,4 @@ export function travel(a: Pt, d0: Pt, b: Pt, d1: Pt, clear: Clear, width: number
     if (c.cost <= c.len + 0.5) break;
   }
   return best!;
-}
-
-/** A leg off a journey to write a group of pieces (each a word's way, or a
- * ring), in order, leaving at or after journey index `from`. Null if
- * nothing on the journey is near enough to reach it from. A leg that
- * `ends` never comes back: the line goes on from it to what it writes
- * next (`extend`). */
-export function leg(j: Journey, from: number, pieces: Piece[], clear: Clear, width: number, reach = 900, ends = false): Leg | null {
-  const n = j.xs.length;
-  if (!pieces.length || n < 4) return null;
-  const first = pieces[0].pts;
-  const last = pieces[pieces.length - 1].pts;
-  const f = dirs(first);
-  const l = dirs(last);
-  const along = (i: number): Pt => {
-    const a = Math.max(0, i - 3);
-    const b = Math.min(n - 1, i + 3);
-    return unit(j.xs[b] - j.xs[a], j.ys[b] - j.ys[a]);
-  };
-  // Where it leaves: the best point of the journey from `from` on. The
-  // likeliest few by distance first (later is dearer: the line should not
-  // wait to write what it passes), and only those tried in earnest.
-  let out: { i: number; pts: Pt[]; cost: number } | null = null;
-  const lo = Math.max(1, from);
-  const near: { i: number; est: number }[] = [];
-  // A leg that ends leaves from about where the line is.
-  for (let i = lo; i < (ends ? Math.min(n - 1, lo + 40) : n - 1); i += 3) {
-    const x = j.xs[i];
-    const y = j.ys[i];
-    const d = Math.hypot(first[0][0] - x, first[0][1] - y);
-    if (d > reach) continue;
-    // A journey that leaves the page for a stretch (a track) is no way.
-    if (Math.abs(j.xs[i + 1] - x) + Math.abs(j.ys[i + 1] - y) > 60) continue;
-    near.push({ i, est: d + (i - lo) * 0.4 });
-  }
-  near.sort((a, b) => a.est - b.est);
-  for (const { i } of near.slice(0, 12)) {
-    const t = travel([j.xs[i], j.ys[i]], along(i), first[0], f.start, clear, width);
-    const c = t.cost + (i - lo) * 0.4;
-    if (!out || c < out.cost) out = { i, pts: t.pts, cost: c };
-  }
-  if (!out) return null;
-  const pts: Pt[] = out.pts.slice(0, -1);
-  const marks: Leg["marks"] = [];
-  pieces.forEach((piece, p) => {
-    if (p > 0) {
-      const prev = pieces[p - 1].pts;
-      const t = travel(prev[prev.length - 1], dirs(prev).end, piece.pts[0], dirs(piece.pts).start, clear, width);
-      pts.push(...t.pts.slice(1, -1));
-    }
-    const from = pts.length;
-    pts.push(...piece.pts);
-    marks.push({ from, to: pts.length - 1, piece: p });
-  });
-  // Where it comes back: the best point of the journey after it left,
-  // weighing what of the journey it would leave out.
-  const end = last[last.length - 1];
-  let back: { i: number; pts: Pt[]; cost: number } | null = null;
-  let skipped = 0;
-  const after: { i: number; est: number; skipped: number }[] = [];
-  for (let i = out.i + 2; i < n - 1 && !ends; i += 3) {
-    skipped += Math.hypot(j.xs[i] - j.xs[i - 3], j.ys[i] - j.ys[i - 3]);
-    if (skipped > 2400) break;
-    const x = j.xs[i];
-    const y = j.ys[i];
-    const d = Math.hypot(end[0] - x, end[1] - y);
-    if (d > reach) continue;
-    if (Math.abs(j.xs[i + 1] - x) + Math.abs(j.ys[i + 1] - y) > 60) continue;
-    after.push({ i, est: d + skipped * 0.6, skipped });
-  }
-  after.sort((a, b) => a.est - b.est);
-  for (const { i, skipped: gone } of after.slice(0, 12)) {
-    const t = travel(end, l.end, [j.xs[i], j.ys[i]], along(i), clear, width);
-    const c = t.cost + gone * 0.6;
-    if (!back || c < back.cost) back = { i, pts: t.pts, cost: c };
-  }
-  if (back) pts.push(...back.pts.slice(1, -1));
-  return { at: out.i, back: back ? back.i : -1, pts, marks };
-}
-
-/** Add a group to a leg that ends the line (it does not come back): on
- * from where it ended. */
-export function extend(end: Leg, pieces: Piece[], clear: Clear, width: number): Leg {
-  const pts = end.pts.slice();
-  const marks = end.marks.slice();
-  let prev = pts;
-  const base = end.marks.length ? Math.max(...end.marks.map((m) => m.piece)) + 1 : 0;
-  pieces.forEach((piece, p) => {
-    const t = travel(prev[prev.length - 1], dirs(prev).end, piece.pts[0], dirs(piece.pts).start, clear, width);
-    pts.push(...t.pts.slice(1, -1));
-    const from = pts.length;
-    pts.push(...piece.pts);
-    marks.push({ from, to: pts.length - 1, piece: base + p });
-    prev = piece.pts;
-  });
-  return { at: end.at, back: -1, pts, marks };
 }
