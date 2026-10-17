@@ -842,15 +842,23 @@ export function createSkein(options: SkeinOptions) {
     box: Box;
     /** A fork: where its branches leave from (page px). */
     hub: Pt;
-    /** A fork whose branches go far down: the lane they run down together
-     * (x; 0 none), and the side of it they lie further out on. */
-    lane: number;
-    side: number;
+    /** A fork whose branches go far down: the lanes they run down
+     * together. */
+    lanes: Lane[];
     /** Its thread once born, and a said word's second (the other tree's). */
     st: Strand | null;
     twin: Strand | null;
     /** Since when it has waited on nothing but its measuring. */
     heldAt: number;
+  }
+
+  /** A lane down a fork: where (x), which way along it further branches
+   * lie (-1, 1), how far apart, and which go down it, in order. */
+  interface Lane {
+    x: number;
+    side: number;
+    pitch: number;
+    kids: Part[];
   }
 
   /** What the trees write and ring (spun.ts), and the tree that makes,
@@ -878,8 +886,16 @@ export function createSkein(options: SkeinOptions) {
     const p = page.getBoundingClientRect();
     const now = performance.now();
     page.classList.add("hion-measuring");
+    const range = document.createRange();
     const add = (f: Fork, up: Part | null): Part => {
-      const r = f.el.getBoundingClientRect();
+      // A word is where its letters are (a line set right is as wide as
+      // its column, its words at one end).
+      let r = f.el.getBoundingClientRect();
+      if (f.leaf && !f.leaf.ring) {
+        range.selectNodeContents(f.el);
+        const t = range.getBoundingClientRect();
+        if (t.width > 0) r = t;
+      }
       const n: Part = {
         el: f.el,
         up,
@@ -893,8 +909,7 @@ export function createSkein(options: SkeinOptions) {
         state: !f.leaf ? 1 : !f.el.isConnected ? -1 : f.leaf.ring ? 1 : 0,
         box: { l: r.left - p.left, t: r.top - p.top, r: r.right - p.left, b: r.bottom - p.top },
         hub: [0, 0],
-        lane: 0,
-        side: 0,
+        lanes: [],
         st: null,
         twin: null,
         heldAt: now,
@@ -905,9 +920,23 @@ export function createSkein(options: SkeinOptions) {
     };
     for (const f of structure(given, page)) add(f, null);
     page.classList.remove("hion-measuring");
+    // A fork is where what is in it is (a row's box can be the screen's
+    // width, its words on one side).
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const n = nodes[i];
+      if (n.leaf) continue;
+      n.box = {
+        l: Math.min(...n.kids.map((k) => k.box.l)),
+        t: Math.min(...n.kids.map((k) => k.box.t)),
+        r: Math.max(...n.kids.map((k) => k.box.r)),
+        b: Math.max(...n.kids.map((k) => k.box.b)),
+      };
+    }
     for (const n of nodes) {
       if (n.leaf) continue;
-      hubOf(n, n.up ? n.up.hub : nearestHion(n.box.l, n.box.t));
+      // Come to from its fork's hub, or from where it leaves its lane.
+      const lane = n.up?.lanes.find((l) => l.kids.includes(n));
+      hubOf(n, lane ? [lane.x, n.box.t - 100] : n.up ? n.up.hub : nearestHion(n.box.l, n.box.t));
       laneOf(n);
     }
   }
@@ -947,35 +976,46 @@ export function createSkein(options: SkeinOptions) {
     }
   }
 
-  /** The lane a fork's far branches run down together: beside it, on
-   * whichever side lies clear of words (none if neither does). */
+  /** The lanes a fork's far branches run down together: for each column
+   * they lie in (one, or two side by side), the clearest column of paper
+   * down beside it or through it, nearest its hub; none if none lies
+   * clear of words. The more branches, the closer they lie. */
   function laneOf(n: Part) {
-    n.lane = 0;
-    const far = n.kids.filter((k) => k.box.t - n.hub[1] > CABLE);
+    n.lanes = [];
+    const far = n.kids.filter((k) => k.box.t - n.hub[1] > CABLE).sort((a, b) => a.box.t - b.box.t);
     if (!far.length) return;
-    const lo = n.hub[1] + 70;
-    const hi = Math.max(...far.map((k) => k.box.t)) - 90;
-    const spread = (far.length - 1) * PITCH;
-    let best = Infinity;
-    for (const [x, side] of [
-      [n.box.l - 18, -1],
-      [n.box.l - 34, -1],
-      [n.box.r + 18, 1],
-      [n.box.r + 34, 1],
-    ]) {
-      const outer = x + side * spread;
-      if (Math.min(x, outer) < 6 || Math.max(x, outer) > width - 6) continue;
-      let blocked = 0;
-      let count = 0;
-      for (let y = lo; y <= hi; y += 12, count++) if (ground.clear(x, y) < 5 || ground.clear(outer, y) < 5) blocked++;
-      const c = blocked / Math.max(1, count) + Math.abs(x - n.hub[0]) / 4000;
-      if (c < best) {
-        best = c;
-        n.lane = x;
-        n.side = side;
+    const mid = (n.box.l + n.box.r) / 2;
+    const centre = (k: Part) => (k.box.l + k.box.r) / 2;
+    const left = far.filter((k) => centre(k) < mid - 40);
+    const right = far.filter((k) => centre(k) > mid + 40);
+    const groups = left.length && right.length && left.length + right.length === far.length ? [left, right] : [far];
+    for (const kids of groups) {
+      const lo = n.hub[1] + 70;
+      const hi = kids[kids.length - 1].box.t - 90;
+      const pitch = Math.max(5, Math.min(PITCH, 60 / Math.max(1, kids.length - 1)));
+      const spread = (kids.length - 1) * pitch;
+      const l = Math.min(...kids.map((k) => k.box.l));
+      const r = Math.max(...kids.map((k) => k.box.r));
+      let best = Infinity;
+      let lane: Lane | null = null;
+      for (let x = Math.max(8, l - 48); x <= Math.min(width - 8, r + 48); x += 8) {
+        for (const side of [-1, 1]) {
+          const outer = x + side * spread;
+          if (Math.min(x, outer) < 6 || Math.max(x, outer) > width - 6) continue;
+          let blocked = 0;
+          let count = 0;
+          for (let y = lo; y <= hi; y += 12, count++) {
+            if (ground.clear(x, y) < 5 || ground.clear(outer, y) < 5 || ground.clear((x + outer) / 2, y) < 5) blocked++;
+          }
+          const c = blocked / Math.max(1, count) + Math.abs(x - n.hub[0]) / 4000;
+          if (c < best) {
+            best = c;
+            lane = { x, side, pitch, kids };
+          }
+        }
       }
+      if (lane && best <= 0.12) n.lanes.push(lane);
     }
-    if (best > 0.12) n.lane = 0;
   }
 
   /** Measure words where they rest, in order, until `end` (the page is
@@ -1019,15 +1059,20 @@ export function createSkein(options: SkeinOptions) {
         }
         if (n.state !== 1) continue;
       }
-      if (!n.up && !force && !rootFor(n.leaf ? [n.box.l, n.box.t] : n.hub, [0, 1], undefined, 900, undefined, false, true)) {
-        // No hion grown near it yet (it will be).
-        if (!strands.some((st) => st.kind === "hion" && at(st, st.s)[1] > n.box.t)) continue;
+      // A section waits for its own hion to grow near it, unless that one
+      // has gone on past it without coming near.
+      if (!n.up && !force && !rootFor(n.leaf ? [n.box.l, n.box.t] : n.hub, [0, 1], hueFor(n), 900, undefined, true, true)) {
+        const own = hionOf(hueFor(n));
+        if (own && at(own, own.s)[1] < n.box.b + 200) continue;
       }
       branch(n);
       made = true;
     }
     if (made) task.wake();
   }
+
+  /** A section's hion: the cyan and the magenta by turns down the screen. */
+  const hueFor = (n: Part): Hue => (nodes.filter((m) => !m.up).indexOf(n) % 2 ? "m" : "c");
 
   /** The way a run sets off at its start (over its first 14px). */
   function setOff(pts: Pt[]): Pt {
@@ -1075,10 +1120,12 @@ export function createSkein(options: SkeinOptions) {
     let from: { parent: Strand; s: number } | undefined;
     let g: { to: Pt; arrive: Pt; piece: Pt[] | null };
     if (!n.up) {
-      const tops = nodes.filter((m) => !m.up);
-      const hue: Hue = tops.indexOf(n) % 2 ? "m" : "c";
+      const hue = hueFor(n);
       g = goal(n, n.leaf ? [n.box.l - 60, n.box.t - 40] : n.hub);
-      const root = rootFor(g.to, g.arrive, hue, 900, undefined, false, true) ?? hionRoot(g.to[0], g.to[1], hue);
+      const root =
+        rootFor(g.to, g.arrive, hue, 900, undefined, true, true) ??
+        rootFor(g.to, g.arrive, hue, 1400, undefined, false, true) ??
+        hionRoot(g.to[0], g.to[1], hue);
       if (!root) {
         n.state = -1;
         return;
@@ -1099,10 +1146,10 @@ export function createSkein(options: SkeinOptions) {
         return [Math.cos(b), Math.sin(b)];
       };
       const fork = n.up;
-      if (fork.lane && n.box.t - fork.hub[1] > CABLE) {
+      const lane = fork.lanes.find((l) => l.kids.includes(n));
+      if (lane) {
         const R = at(up, s).slice(0, 2) as Pt;
-        const far = fork.kids.filter((m) => m.box.t - fork.hub[1] > CABLE).sort((a, b) => a.box.t - b.box.t);
-        const lx = fork.lane + fork.side * far.indexOf(n) * PITCH;
+        const lx = lane.x + lane.side * lane.kids.indexOf(n) * lane.pitch;
         const top: Pt = [lx, fork.hub[1] + 70];
         const bottom: Pt = [lx, Math.max(top[1] + 8, n.box.t - 100)];
         lead = travel(R, fan(s, top), top, [0, 1], clear, width).pts;
@@ -3089,7 +3136,9 @@ export function createSkein(options: SkeinOptions) {
         hue: n.st?.t.hue,
         grown: n.st ? Math.round(n.st.s) : -1,
         state: n.state,
-        lane: n.lane,
+        lanes: n.lanes.length,
+        hub: n.leaf ? undefined : n.hub.map(Math.round),
+        box: [n.box.l, n.box.t, n.box.r].map(Math.round),
         kids: n.kids.map(show),
       });
       return nodes.filter((n) => !n.up).map(show);
