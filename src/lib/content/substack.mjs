@@ -1,4 +1,4 @@
-import { sanitizeSubstackHtml } from "./substack-html.mjs";
+import { articleHash, sanitizeSubstackHtml } from "./substack-html.mjs";
 
 export class ContentUnavailable extends Error {}
 class SourceError extends Error {
@@ -10,6 +10,27 @@ class SourceError extends Error {
 const SLUG = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,199}$/;
 const FRESH = 300_000;
 const MAX_STALE = 3_600_000;
+
+/** Sanitises a post body whose links still belong to the publication at
+ * `origin`. Source-relative links resolve against the post's Substack URL;
+ * links to posts in `onSite` become local `/writing/<slug>` routes, with the
+ * fragment namespaced like the target post's sanitised ids. */
+function sanitizeBody(html, { origin, canonical, onSite = new Set() }) {
+  return sanitizeSubstackHtml(html, {
+    baseUrl: canonical,
+    rewriteHref: (href) => {
+      try {
+        const url = new URL(href);
+        const target = url.pathname.match(/^\/p\/([\w-]+)\/?$/)?.[1];
+        return url.origin === origin && onSite.has(target)
+          ? `/writing/${target}${articleHash(url.hash)}`
+          : href;
+      } catch {
+        return href;
+      }
+    },
+  });
+}
 
 /** Public-only content source. Cache entries carry timestamps independently of
  * cache storage TTL; a failed request never renews a stale entry's lifetime. */
@@ -211,8 +232,8 @@ export function createSubstackSource({
       "Substack archive pagination did not terminate.",
     );
   }
-  async function feed() {
-    return parseFeed(await text("/feed"), base);
+  async function feed(onSite) {
+    return parseFeed(await text("/feed"), base, { onSite });
   }
   async function getIndex() {
     try {
@@ -270,6 +291,7 @@ export function createSubstackSource({
     try {
       return await cachedValue(`post:${slug}`, async () => {
         const wasRevoked = (await read(`post:${slug}`))?.tombstone;
+        const onSite = new Set(posts.map((post) => post.slug));
         let full;
         try {
           full = await json(`/api/v1/posts/${encodeURIComponent(slug)}`);
@@ -283,7 +305,9 @@ export function createSubstackSource({
             throw error;
           // Feed bodies can be previews. Render only the actual public bytes
           // present; never infer a full or paid post from RSS metadata.
-          const fallback = (await feed()).find((entry) => entry.slug === slug);
+          const fallback = (await feed(onSite)).find(
+            (entry) => entry.slug === slug,
+          );
           if (!fallback?.body) throw error;
           return fallback;
         }
@@ -297,19 +321,10 @@ export function createSubstackSource({
         const entry = metadata(full);
         if (typeof full.body_html !== "string")
           throw new ContentUnavailable("Substack post body changed shape.");
-        const allowed = new Set(posts.map((post) => post.slug));
-        const body = sanitizeSubstackHtml(full.body_html, {
-          rewriteHref: (href) => {
-            try {
-              const url = new URL(href, base);
-              const target = url.pathname.match(/^\/p\/([\w-]+)\/?$/)?.[1];
-              return url.origin === base && allowed.has(target)
-                ? `/writing/${target}${url.hash}`
-                : href;
-            } catch {
-              return href;
-            }
-          },
+        const body = sanitizeBody(full.body_html, {
+          origin: base,
+          canonical: entry.data.canonical,
+          onSite,
         });
         return {
           ...entry,
@@ -334,7 +349,7 @@ export function createSubstackSource({
 
 /** RSS fallback exposes exactly the public content: it does not establish an
  * uncapped archive, free audience status, or completeness of a post body. */
-export function parseFeed(xml, origin) {
+export function parseFeed(xml, origin, { onSite } = {}) {
   if (!/<rss\b/.test(xml) || !/<channel\b/.test(xml))
     throw new ContentUnavailable("Substack feed changed shape.");
   const decode = (s) =>
@@ -373,14 +388,19 @@ export function parseFeed(xml, origin) {
       !Number.isFinite(date.getTime())
     )
       continue;
-    const body = sanitizeSubstackHtml(field(item, "content:encoded"));
+    const canonical = `${origin}/p/${slug}`;
+    const body = sanitizeBody(field(item, "content:encoded"), {
+      origin,
+      canonical,
+      onSite,
+    });
     entries.push({
       id: slug,
       slug,
       data: {
         title,
         date: date.toISOString(),
-        canonical: `${origin}/p/${slug}`,
+        canonical,
         description: sanitizeSubstackHtml(
           field(item, "description"),
         ).text.slice(0, 200),
