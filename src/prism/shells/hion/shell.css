@@ -2043,6 +2043,12 @@
     font-size: 1rem;
   }
 
+  /* The page's head hangs just under the line here: the loose end under
+     the name stops short of it, rather than through its first words. */
+  :root[data-lens="hion"] .hion-charm--home[data-current] .hion-tail {
+    height: 22px;
+  }
+
   :root[data-lens="hion"] .hion-nav__list {
     display: none;
   }
