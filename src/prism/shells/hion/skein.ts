@@ -765,13 +765,13 @@ export function createSkein(options: SkeinOptions) {
    * and bending off it at a slant, arriving going `arrive` (a unit
    * vector), across as little of the words as it can. Prefers threads of
    * `hue`. Null if nothing has grown within `far`. */
-  function rootFor(to: Pt, arrive: Pt, hue?: Hue, far = 760, not?: Strand): { parent: Strand; s: number; way: Pt[] } | null {
+  function rootFor(to: Pt, arrive: Pt, hue?: Hue, far = 760, not?: Strand, only = false): { parent: Strand; s: number; way: Pt[] } | null {
     let best: { parent: Strand; s: number; way: Pt[] } | null = null;
     let bestCost = Infinity;
     const [tx, ty] = to;
     const cubic = cubicWay;
     for (const st of strands) {
-      if (st === not || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30) continue;
+      if (st === not || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30 || (only && st.t.hue !== hue)) continue;
       if (st.kind === "ground" && st.fadeAt - performance.now() < 15000) continue;
       const { xs, ys } = st.t;
       const end = Math.min(xs.length - 1, indexAt(st, st.s));
@@ -792,13 +792,20 @@ export function createSkein(options: SkeinOptions) {
         if (cos < 0.05) continue;
         const k1 = Math.min(140, d * 0.38);
         const k2 = Math.min(120, d * 0.34);
-        const pts = cubic([x, y], [x + fx * k1, y + fy * k1], [tx - arrive[0] * k2, ty - arrive[1] * k2], [tx, ty], 22);
+        // Cheap first: nearer than the best so far could be.
+        const prefer = hue && st.t.hue !== hue ? 700 : 0;
+        if (d + prefer + st.depth * 30 >= bestCost) continue;
+        const n = Math.max(22, Math.ceil(d / 8));
+        const pts = cubic([x, y], [x + fx * k1, y + fy * k1], [tx - arrive[0] * k2, ty - arrive[1] * k2], [tx, ty], n);
+        // Across the words: all but never (the last stretch arrives beside
+        // the words it writes, the first leaves a thread that may run
+        // beside others).
         let blocked = 0;
-        for (let k = 2; k < 18; k++) if (ground.clear(pts[k][0], pts[k][1]) < 5) blocked++;
+        for (let k = Math.ceil(n * 0.06); k < Math.floor(n * 0.84); k++) if (ground.clear(pts[k][0], pts[k][1]) < 5) blocked++;
         // Off the page is no way to go.
         let off = 0;
         for (const [px, py] of pts) if (px < 4 || px > width - 4 || py < 0) off++;
-        const cost = d + blocked * 420 + off * 400 + (1 - cos) * 260 + (hue && st.t.hue !== hue ? 160 : 0) + st.depth * 30;
+        const cost = d + blocked * 900 + off * 400 + (1 - cos) * 260 + prefer + st.depth * 30;
         if (cost < bestCost) {
           bestCost = cost;
           best = { parent: st, s: st.ls[i], way: pts };
@@ -1628,7 +1635,8 @@ export function createSkein(options: SkeinOptions) {
       }
     }
     if (!path) {
-      const root = rootFor([kx, ky], D, limb.hue, 700) ?? hionRoot(kx, ky, limb.hue);
+      // Of its own hue: what hangs from it is already that hue.
+      const root = rootFor([kx, ky], D, limb.hue, 700, undefined, true) ?? hionRoot(kx, ky, limb.hue);
       if (!root) return true;
       path = [...root.way.slice(0, -1), ...way.slice(k)];
       from = { parent: root.parent, s: root.s };

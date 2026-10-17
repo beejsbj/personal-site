@@ -349,7 +349,9 @@ export function compose(
     return best;
   };
   /** A weft, a cord: marks on a track; on a page, the limbs the skein
-   * grows. `thrownHue` is the hue of the hion it is thrown from. */
+   * grows. `thrownHue` is the hue of the hion it is thrown from. Returns
+   * the hue it is (on a page, the hion's it grows from), for what hangs
+   * from it and the words written on it to take. */
   const string = (
     from: number,
     to: number,
@@ -360,8 +362,13 @@ export function compose(
     thrownHue?: Hue,
   ) => {
     const s = seed++;
-    if (heads) limbs.push(...weftLimbs(from, to, y, hue, s, loop, ends, thrownHue));
-    else marks.push(...weft(from, to, y, hue, s, loop, ends));
+    if (!heads) {
+      marks.push(...weft(from, to, y, hue, s, loop, ends));
+      return hue;
+    }
+    const grown = weftLimbs(from, to, y, hue, s, loop, ends, thrownHue);
+    limbs.push(...grown);
+    return grown[0]?.hue ?? hue;
   };
 
   const loopOf = (el: Element) => {
@@ -378,15 +385,14 @@ export function compose(
     const loop = loopOf(el);
     // The words, not the heading's whole line.
     const b = box(el.querySelector(".hion-strung__box") ?? el);
-    const hue: Hue = wi++ % 2 ? "c" : "m";
+    let hue: Hue = wi++ % 2 ? "c" : "m";
     // Its words are written by thread, the weft's own (spun.ts): the weft
     // stops short of them either side in a knot, and the thread that
     // writes them sets out from the knot before and ends in the knot after.
-    if (el.dataset.weftHue !== hue) el.dataset.weftHue = hue;
     const gap: [number, number] = [b.l - WEFT_GAP, b.r + WEFT_GAP];
     if (loop) {
       // Across the loop, and out past it where the heading hangs out.
-      string(Math.min(loop.l - 22, b.l - 30), Math.max(loop.r + 22, b.r + 30), y, hue, loop, { gap });
+      hue = string(Math.min(loop.l - 22, b.l - 30), Math.max(loop.r + 22, b.r + 30), y, hue, loop, { gap });
     } else {
       // Off the loops, a heading beside the hions is strung from them:
       // the weft is thrown out from where they pass, to the words.
@@ -394,11 +400,12 @@ export function compose(
       if (at && (at.x < b.l - 20 || at.x > b.r + 20)) {
         const toLeft = at.x > b.r;
         const [a, c] = toLeft ? [b.l - 36, at.x] : [at.x, b.r + 36];
-        string(a, c, y, hue, undefined, { knotL: true, knotR: true, from: at.x, gap }, at.hue);
+        hue = string(a, c, y, hue, undefined, { knotL: true, knotR: true, from: at.x, gap }, at.hue);
       } else {
-        string(b.l - 36, b.r + 36, y, hue, undefined, { gap });
+        hue = string(b.l - 36, b.r + 36, y, hue, undefined, { gap });
       }
     }
+    if (el.dataset.weftHue !== hue) el.dataset.weftHue = hue;
     // On a page the limbs tie themselves off at the words.
     if (!heads) marks.push(...knot(gap[0], y, 3.5, seed++, y + 20), ...knot(gap[1], y, 3.5, seed++, y + 20));
   }
@@ -448,6 +455,11 @@ export function compose(
       const spanL = Math.min(...lefts);
       const spanR = Math.max(...rights);
       const hue: Hue = wi++ % 2 ? "c" : "m";
+      // On a page, what hangs from a cord hangs in its hue: one thread.
+      const hang = (h: Hue) => {
+        if (!heads) return;
+        for (const item of row.items) if (item.dataset.hue !== h) item.dataset.hue = h;
+      };
       if (kind === "branch") {
         const at = crossing(y, (spanL + spanR) / 2);
         if (at) {
@@ -457,11 +469,11 @@ export function compose(
             const toLeft = spanR < x;
             const end = toLeft ? spanL - 34 : spanR + 34;
             const [a, b] = toLeft ? [end, x] : [x, end];
-            string(a, b, y, hue, undefined, { knotL: true, knotR: true, from: x }, at.hue);
+            hang(string(a, b, y, hue, undefined, { knotL: true, knotR: true, from: x }, at.hue));
           } else if (heads) {
             // Across it: out from where they cross, either way.
             string(spanL - 34, x, y, hue, undefined, { knotL: true, from: x }, at.hue);
-            string(x, spanR + 34, y, hue, undefined, { knotR: true, from: x }, at.hue);
+            hang(string(x, spanR + 34, y, hue, undefined, { knotR: true, from: x }, at.hue));
           } else {
             // Across it, tied on where they cross.
             marks.push(...weft(spanL - 34, spanR + 34, y, hue, seed++, undefined, { knotL: true, knotR: true }));
@@ -471,9 +483,9 @@ export function compose(
         }
       }
       if (loop && kind !== "free") {
-        string(loop.l - 22, loop.r + 22, y, hue, loop);
+        hang(string(loop.l - 22, loop.r + 22, y, hue, loop));
       } else {
-        string(spanL - 30, spanR + 30, y, hue, undefined, { knotL: true, knotR: true });
+        hang(string(spanL - 30, spanR + 30, y, hue, undefined, { knotL: true, knotR: true }));
       }
     });
   }

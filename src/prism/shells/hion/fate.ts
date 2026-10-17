@@ -657,7 +657,11 @@ export function buds(ground: Ground, ways: Way[], o: PlanOptions): { gathers: Ga
   const all = gathers(ground, o);
   const out: Bud[] = [];
   const narrow = o.width < 720;
-  const gap = (narrow ? 230 : 190) * (o.close ? 1.7 : o.lively ? 0.78 : 1);
+  // At the hions' own brightness a branch counts for more than a dim
+  // ground thread did: fewer of them. Home is busier by growing longer
+  // after the reader moves and branching again sooner (skein.ts), not by
+  // more buds.
+  const gap = (narrow ? 260 : 220) * (o.close ? 1.6 : 1);
   ways.forEach((way, w) => {
     const r = rng(o.seed * 53 + w * 977 + 11);
     const n = way.xs.length;

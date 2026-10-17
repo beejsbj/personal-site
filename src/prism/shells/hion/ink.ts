@@ -7,7 +7,9 @@
  * it along a cord, and is revealed with it.
  *
  *   drop   one thread from the cord above to the top of the element,
- *          knotted at both ends (charm: the same, for the line at the top)
+ *          knotted at both ends (charm: the same, for the line at the top);
+ *          a label written by thread hangs from just before its first
+ *          letter, and its thread goes on from the knot (spun.ts)
  *   pair   two threads to its top corners, wound round them (pictures)
  *   sign   two threads to the ends of its words (hung headings)
  *   pull   a pull-cord: a thread down to a knot beside its label
@@ -16,6 +18,7 @@
  * The hang length is `--hion-hang` on the element (px). */
 import { pendant } from "./dance";
 import { drawnOn, still, textExtent } from "./dom";
+import { LABELS } from "./spun";
 import { Kind, type Mark, Path, knot, paint, paintGlows, patterns, rng, thread, wraps, type Hue } from "./pastel";
 
 const PAD = 26;
@@ -44,7 +47,18 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
     );
   const out: Mark[] = [];
   if (type === "drop" || type === "charm") {
-    const x = PAD + w * parseFloat(el.dataset.inkX ?? "0.5");
+    let x = PAD + w * parseFloat(el.dataset.inkX ?? "0.5");
+    const name = type === "charm" ? el.querySelector<HTMLElement>(".hion-charm__label") : null;
+    if ((type === "drop" && el.matches(LABELS)) || name) {
+      // Hung by its corner, like a tag: the thread that writes it goes on
+      // from this knot, straight down to the line under its feet (a name
+      // on the line likewise).
+      const extent = textExtent(name ?? el);
+      const shift = name ? name.getBoundingClientRect().left - el.getBoundingClientRect().left : 0;
+      if (extent) x = PAD + Math.max(3, shift + extent[0] - 15);
+      el.dataset.knot = `${(x - PAD).toFixed(1)},0`;
+      el.style.setProperty("--hion-ink-ox", `${(x - PAD).toFixed(1)}px`);
+    }
     if (drop > 2) out.push(...line(x, top, x, at + 2, seed));
     out.push(...knot(x, top + 1, 3.5, seed + 1));
     out.push(...knot(x, at + 1, type === "charm" ? 5.5 : 4.5, seed + 2));
@@ -71,6 +85,7 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
     out.push(...knot(xl, at, 4.5, seed + 3), ...knot(xr, at, 4.5, seed + 4));
   } else if (type === "pull") {
     const x = PAD + 6;
+    el.dataset.knot = `6,${(h * 0.5).toFixed(1)}`;
     if (drop > 2) out.push(...line(x, top, x, at + h * 0.5 - 6, seed));
     if (!el.hasAttribute("data-hang")) out.push(...knot(x, top + 1, 3.5, seed + 2));
     out.push(...knot(x, at + h * 0.5, 5, seed + 1));
