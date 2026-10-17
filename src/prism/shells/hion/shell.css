@@ -226,36 +226,62 @@
   color: var(--hion-cl);
 }
 
-/* Under each name, a swatch of that page's cloth (fabric.ts): folded up
-   short, let down a little when you reach for it, and pulled all the way
-   down for the page you are on. */
-:root[data-lens="hion"] .hion-swatch {
+/* Under each name, a loose end of thread (nav.ts tail): let down a
+   little, let down more when you reach for it, and all the way for the
+   page you are on. The one thread: 3px of its hue with its light, a knot
+   at the end. */
+:root[data-lens="hion"] .hion-tail {
+  --hion-tail: var(--hion-c);
+  --hion-tail-light: var(--hion-cl);
+  position: relative;
   display: block;
-  width: 44px;
+  width: 3px;
   height: 10px;
-  margin: 6px auto 0;
-  overflow: hidden;
-  opacity: 0.8;
+  margin: 4px auto 0;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--hion-tail) 55%, var(--hion-black));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--hion-tail) 35%, transparent);
   transition:
     height 0.7s var(--hion-ease-swing),
-    opacity 0.3s;
+    background-color 0.3s,
+    box-shadow 0.3s;
 }
 
-:root[data-lens="hion"] .hion-swatch__cloth {
-  display: block;
-  width: 44px;
-  height: 104px;
+:root[data-lens="hion"] .hion-tail[data-hue="m"] {
+  --hion-tail: var(--hion-m);
+  --hion-tail-light: var(--hion-ml);
 }
 
-:root[data-lens="hion"] .hion-charm:hover .hion-swatch,
-:root[data-lens="hion"] .hion-charm:focus-visible .hion-swatch {
+:root[data-lens="hion"] .hion-tail::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  translate: -50% 0;
+  background: color-mix(in srgb, var(--hion-tail) 70%, var(--hion-black));
+  box-shadow: 0 0 5px color-mix(in srgb, var(--hion-tail) 45%, transparent);
+  transition: background-color 0.3s;
+}
+
+:root[data-lens="hion"] .hion-charm:hover .hion-tail,
+:root[data-lens="hion"] .hion-charm:focus-visible .hion-tail {
   height: 22px;
-  opacity: 1;
+  background: var(--hion-tail);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--hion-tail) 55%, transparent);
 }
 
-:root[data-lens="hion"] .hion-charm[data-current] .hion-swatch {
+:root[data-lens="hion"] .hion-charm[data-current] .hion-tail {
   height: 46px;
-  opacity: 1;
+  background: var(--hion-tail);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--hion-tail) 60%, transparent);
+}
+
+:root[data-lens="hion"] .hion-charm:hover .hion-tail::after,
+:root[data-lens="hion"] .hion-charm[data-current] .hion-tail::after {
+  background: var(--hion-tail-light);
 }
 
 :root[data-lens="hion"] .hion-charm--home {
@@ -333,25 +359,6 @@
     transform 0.38s var(--hion-ease-out);
 }
 
-/* A new page comes out of its swatch on the line (index.ts pullDown);
-   this is the woven hem riding its leading edge. */
-:root[data-lens="hion"] .hion-hem {
-  position: absolute;
-  z-index: 3;
-  height: 20px;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-:root[data-lens="hion"] .hion-hem__cloth {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: left top;
-  filter: drop-shadow(0 6px 10px rgb(6 4 8 / 0.9));
-}
-
 :root[data-lens="hion"] .hion-page > main,
 :root[data-lens="hion"] .hion-page > footer {
   transition:
@@ -385,30 +392,29 @@
 
 
 
-/* Threads of intent (threads.ts): under the hions, page-tall, painted
-   only near the viewport; each growing head has a small canvas of its own. */
-:root[data-lens="hion"] .hion-threads {
+/* The skein (skein.ts): every thread, the hions included. The ground
+   lies under the loom (what hangs from the hions), page-tall, painted
+   only near the viewport; what moves is one canvas over it and under the
+   words, a band of the page about one and a half screens tall, moved as
+   you scroll on. */
+:root[data-lens="hion"] .hion-skein {
   position: absolute;
   inset: 0 0 auto;
   z-index: 0;
+  overflow: clip;
   pointer-events: none;
   transition: opacity 0.6s ease;
 }
 
 /* Growing out of sight until settled (reduced motion, a still face, a new
    layout). */
-:root[data-lens="hion"] .hion-threads[data-state="settling"] {
+:root[data-lens="hion"] .hion-skein[data-state="settling"] {
   opacity: 0;
   transition: none;
 }
 
-:root[data-lens="hion"] .hion-threads__tile {
-  position: absolute;
-  left: 0;
-  width: 100%;
-}
-
-:root[data-lens="hion"] .hion-threads__head {
+:root[data-lens="hion"] .hion-skein__pane,
+:root[data-lens="hion"] .hion-skein__band {
   position: absolute;
   top: 0;
   left: 0;
@@ -2049,6 +2055,12 @@
     font-size: 1rem;
   }
 
+  /* The page's head hangs just under the line here: the loose end under
+     the name stops short of it, rather than through its first words. */
+  :root[data-lens="hion"] .hion-charm--home[data-current] .hion-tail {
+    height: 22px;
+  }
+
   :root[data-lens="hion"] .hion-nav__list {
     display: none;
   }
@@ -2265,23 +2277,17 @@
 
 /* ---------- Life: what moves over the drawing ---------- */
 
-/* The layer the threads answer on: over the page, under the line. */
-:root[data-lens="hion"] .hion-life {
-  position: fixed;
+/* The glints, on the page with the drawing (life.ts). */
+:root[data-lens="hion"] .hion-glints {
+  position: absolute;
   inset: 0;
-  z-index: 30;
+  z-index: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
-:root[data-lens="hion"] .hion-life[data-state="leaving"] {
+:root[data-lens="hion"] .hion-glints[data-state="leaving"] {
   opacity: 0;
-}
-
-:root[data-lens="hion"] .hion-life > canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 
 /* A glint riding slowly round each circle the hions drew. */
@@ -2301,8 +2307,9 @@
     color-mix(in srgb, var(--hion-bead) 20%, transparent) 55%,
     transparent 72%
   );
-  transition: opacity 0.8s ease;
+  /* Round its circle on the compositor (life.ts animates a transform). */
   will-change: transform;
+  transition: opacity 0.8s ease;
 }
 
 :root[data-lens="hion"] .hion-glint[data-hue="m"] {

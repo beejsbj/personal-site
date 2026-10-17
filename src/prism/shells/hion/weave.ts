@@ -31,6 +31,11 @@
  *   that draws its own (track.ts). They go in at its top and come out at
  *   its foot; nothing of theirs is drawn between.
  *
+ * With `heads` (a page), the hions themselves are the skein's (skein.ts):
+ * their bodies and heads are strands there, so no marks are composed for
+ * them here, only their ways down (`tips`) for the skein to grow along.
+ * Without it (a track), they are laid here in pastel.
+ *
  * Only what belongs to the host is read: the nearest `[data-loom]` round
  * it is the host (a track inside the page is not the page's).
  *
@@ -40,7 +45,7 @@
  * (pastel.ts `turned`), their keys running along x. Its headings are strung
  * on wefts laid as they are, level with their words. Cords and ties are not
  * read across (a track has none). */
-import { curl, dancer, journeyKeys, orbit, TEMPER } from "./dance";
+import { curl, dancer, journeyKeys, orbit } from "./dance";
 import {
   cubic,
   hang,
@@ -53,6 +58,7 @@ import {
   type Pt,
   rng,
   thread,
+  THREAD,
   turned,
   acrossX,
 } from "./pastel";
@@ -81,7 +87,7 @@ const GAP = 400;
 export function compose(
   host: HTMLElement,
   origin: () => Pt | null,
-  { axis = "y" }: { axis?: "x" | "y" } = {},
+  { axis = "y", heads = false }: { axis?: "x" | "y"; heads?: boolean } = {},
 ): Composition {
   const hostBox = host.getBoundingClientRect();
   const across = axis === "x";
@@ -282,13 +288,12 @@ export function compose(
     // One thread, unless it leaves the page for a track (a gap): then one
     // for each stretch drawn, keyed by where it is along the whole.
     let from = 0;
-    for (let i = 1; i <= pts.length; i++) {
+    for (let i = 1; i <= pts.length && !heads; i++) {
       if (i < pts.length && Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]) < GAP) continue;
       const offset = keys.lens[from];
       marks.push(
         ...thread(new Path(pts.slice(from, i), 3), {
           hue,
-          w: TEMPER[hue].weight * (narrow ? 0.85 : 1),
           seed: seed++,
           key: (s) => keys.keyAt(s + offset),
           glow: 0.22,
@@ -462,7 +467,7 @@ export function compose(
         [end, y],
       ];
       marks.push(
-        ...thread(new Path(pts, 3), { hue, w: 2.2, seed: seed++, key: [y - 40, y - 10], glow: 0.16 }),
+        ...thread(new Path(pts, 3), { hue, seed: seed++, key: [y - 40, y - 10], glow: 0.16 }),
         ...knot(end, y, 3.5, seed++, y - 10),
       );
       continue;
@@ -473,7 +478,7 @@ export function compose(
       [b.l - 12, y],
     ];
     marks.push(
-      ...thread(new Path(pts, 3), { hue, w: 2.2, seed: seed++, key: [y - 50, y - 20], glow: 0.16 }),
+      ...thread(new Path(pts, 3), { hue, seed: seed++, key: [y - 50, y - 20], glow: 0.16 }),
       ...knot(loop.l, y - 4, 5, seed++, y - 50),
       ...knot(b.l - 12, y, 3.5, seed++, y - 20),
     );
@@ -529,7 +534,7 @@ function looseFibres(loop: Loop, seed: number): Mark[] {
       3,
     );
     out.push(
-      ...thread(loose, { hue, w: 1.5, alpha: 0.65, seed: seed * 7 + (dir > 0 ? 3 : 4), glow: 0, core: false }),
+      ...thread(loose, { hue, alpha: 0.65, seed: seed * 7 + (dir > 0 ? 3 : 4), glow: 0, core: false }),
     );
   }
   return out;
@@ -571,15 +576,15 @@ function weft(
     const under = flip ? loop.r : loop.l;
     // Where the weft passes over a strand, part the strand first.
     out.push(mark(Kind.Erase, hue, 8, 1, [over, y - 8, over, y + 8], 0, key - 1));
-    out.push(...thread(path, { hue, w: 3.2, seed: seed * 11, key: keys, glow: 0.18 }));
+    out.push(...thread(path, { hue, seed: seed * 11, key: keys, glow: 0.18 }));
     // Where it passes under, cut the weft and lay the strand back over it.
     out.push(mark(Kind.Erase, hue, 9, 1, [under - 6, y, under + 6, y], 0, keys[1] + 1));
     const strandHue: Hue = under === loop.l ? "c" : "m";
     out.push(
-      mark(Kind.Stroke, strandHue, 3.8, 1, [under, y - 13, under + 0.6, y, under, y + 13], seed * 13, keys[1] + 2),
+      mark(Kind.Stroke, strandHue, THREAD, 1, [under, y - 13, under + 0.6, y, under, y + 13], seed * 13, keys[1] + 2),
     );
   } else {
-    out.push(...thread(path, { hue, w: 2.8, seed: seed * 11, key: keys, glow: 0.16 }));
+    out.push(...thread(path, { hue, seed: seed * 11, key: keys, glow: 0.16 }));
   }
   if (ends.knotL) out.push(...knot(pts[0][0], pts[0][1], 5, seed + 3, reversed ? keys[1] : keys[0]));
   if (ends.knotR) {

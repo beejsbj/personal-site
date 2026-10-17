@@ -12,21 +12,22 @@
  * other in two curls. Headings are strung on woven wefts, lists dangle like
  * charms, pictures hang wound at their corners, links are pull-cords.
  *
- * As you scroll, the two draw themselves just ahead of you, a bead of light
- * at each tip: reading is following them. Leaving a screen reels the
- * drawing back up toward the line it came from, and the next screen's
- * threads come down from the new place. */
+ * As you scroll, the two draw themselves just ahead of you, each tip hot
+ * with its own light: reading is following them. Leaving a screen reels
+ * the drawing back up toward the line it came from, and the next screen's
+ * threads grow down from the new place. Every thread on the screen is
+ * the one thread, of the one width (pastel.ts THREAD). */
 import { kindOf } from "../../routes";
 import type { LensShell, Route, ShellContext } from "../types";
-import { h, setNewTabNote, wait } from "./dom";
+import { h, setNewTabNote, still as showStill, wait } from "./dom";
 import { ink } from "./ink";
-import { type Fabric, fabricAt, fabricOf } from "./fabric";
+import { fabricOf } from "./fabric";
 import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
-import { clothCanvas } from "./stitch";
-import { createThreads, seedOf } from "./threads";
+import { createPulse } from "./pulse";
+import { createSkein, seedOf } from "./skein";
 import { weaveCovers, weaveType } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { ACROSS, createTrack } from "./track";
@@ -37,7 +38,7 @@ interface Live {
   path: string;
   page: HTMLElement;
   loom: ReturnType<typeof createLoom>;
-  threads: ReturnType<typeof createThreads>;
+  skein: ReturnType<typeof createSkein>;
   life: ReturnType<typeof createLife> | undefined;
   /** The resume's timeline, when it runs across. */
   track: ReturnType<typeof createTrack> | undefined;
@@ -46,30 +47,15 @@ interface Live {
   left?: number;
 }
 
-/** The ribbon the next screen comes down as: begun the moment you pull a
- * destination, before the screen itself has arrived, so the page answers
- * in the frame you clicked. The screen is clipped to it when it comes. */
-interface Ribbon {
-  path: string;
-  /** The swatch it falls from, on screen. */
-  from: { left: number; right: number; top: number };
-  /** When it began, on the document timeline. */
-  start: number;
-}
-
 let ctx: ShellContext;
 let world: HTMLElement;
 let stage: HTMLElement;
 let nav: Nav;
 let live: Live | undefined;
-let ribbon: Ribbon | undefined;
 
-/** How long a ribbon takes to unfurl, and how far through it has fallen
- * to the foot of the screen (then it spreads to the whole page). */
-const PULL = 640;
-const DROP = 0.42;
-/** How long a leaving screen takes to reel up (loom.ts, threads.ts). */
-const LEAVE = 440;
+/** How long after a travelled-to screen arrives its woven things are
+ * made (the threads are growing; the main thread should have room). */
+const WOVEN = 270;
 
 const still = () => ctx.reducedMotion || ctx.face;
 
@@ -116,13 +102,10 @@ function show(route: Route, first: boolean) {
     main,
     footer(ctx.content),
   );
-  // A screen still reeling up stays under the new one until it has gone.
-  for (const child of [...stage.children]) if (!child.hasAttribute("data-lingering")) child.remove();
-  stage.append(page);
-  // Its fabric pulled down from the line like a blind (not on arrival: the
-  // line and the page come together then).
+  // The screen you left reeled up while the router fetched this one; now
+  // this one's threads grow from the line.
+  stage.replaceChildren(page);
   nav.setCurrent(route.path);
-  if (!first && !still()) pullDown(page, route.path);
   // Which side the threads drop on, so the screen's head keeps clear of them.
   const drop = nav.origin();
   if (drop) {
@@ -155,6 +138,9 @@ function show(route: Route, first: boolean) {
     },
     { signal: controller.signal },
   );
+  // One frame loop for everything that moves on this screen.
+  const pulse = createPulse({ signal: controller.signal, isIdle: ctx.isIdle, onIdleChange: ctx.onIdleChange });
+  let drew = () => {};
   const loom = createLoom({
     host: page,
     signal: controller.signal,
@@ -163,24 +149,33 @@ function show(route: Route, first: boolean) {
     brisk: !first,
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
+    pulse,
+    // The hions are the skein's: bodies and heads.
+    beads: false,
+    onDraw: () => drew(),
     compose: () => {
-      const composition = compose(page, () => nav.origin());
+      const composition = compose(page, () => nav.origin(), { heads: true });
       ink(page);
       return composition;
     },
   });
-  // Threads of intent under it all; a single thing is seen close up.
-  const threads = createThreads({
+  // Every thread as one system (skein.ts): the hions, the ground under
+  // them, threads from a click or a touched thread, loops round what you
+  // hover. A single thing is seen close up; home is the busiest.
+  const skein = createSkein({
     page,
     loom,
+    pulse,
     signal: controller.signal,
     instant: still(),
     scale: close(route.path) ? 2 : 1,
+    lively: route.kind === "home",
+    travelled: !first,
     origin: () => nav.origin(),
     seed: seedOf(route.path),
     isIdle: ctx.isIdle,
-    onIdleChange: ctx.onIdleChange,
   });
+
   // What moves over the drawing, for a visitor who can see it move.
   const life = still()
     ? undefined
@@ -188,11 +183,16 @@ function show(route: Route, first: boolean) {
         world,
         page,
         loom,
+        skein,
+        pulse,
         signal: controller.signal,
         isIdle: ctx.isIdle,
         onIdleChange: ctx.onIdleChange,
       });
-  live = { path: route.path, page, loom, threads, life, track, controller };
+  drew = () => (life ? life.wake() : skein.wake());
+  live = { path: route.path, page, loom, skein, life, track, controller };
+  // For a look from the console while developing.
+  if (import.meta.env.DEV) Object.assign(window, { __hion: live });
   requestAnimationFrame(() => {
     if (controller.signal.aborted) return;
     // The threads first: they are what you follow onto the screen.
@@ -200,18 +200,27 @@ function show(route: Route, first: boolean) {
     track?.start();
     life?.start();
     page.dataset.state = "here";
-    // Then the ground and the woven things, once the ribbon has fallen and
-    // the main thread has room: none of it is needed to read the screen.
+    // Then every thread (the skein), at once: on a screen travelled to the
+    // hions are seen setting out from the line. The woven things come a
+    // moment later, once the main thread has room: none of it is needed
+    // to read the screen.
+    const gone = () => live?.page !== page || live.left !== undefined;
     const ground = () => {
-      // Not for a screen already let go (pulled away before it settled).
-      if (live?.page !== page || live.left !== undefined) return;
-      threads.start();
+      if (!gone()) skein.start();
+    };
+    const woven = () => {
+      if (gone()) return;
       const weaving = { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric };
       weaveType(page, weaving);
       weaveCovers(page, weaving);
     };
-    if (still()) ground();
-    else later(controller.signal, first ? 0 : PULL * DROP, ground);
+    if (still()) {
+      ground();
+      woven();
+    } else {
+      ground();
+      later(controller.signal, first ? 0 : WOVEN, woven);
+    }
   });
   // Keyboard travel ahead of the drawing brings the drawing with it.
   page.addEventListener(
@@ -227,8 +236,8 @@ function show(route: Route, first: boolean) {
 }
 
 /** The screen you are on lets go: its drawing reels back up toward the
- * line, its threads go, and the place you pulled drops and starts its
- * ribbon down. Begun at the click; the next screen need not be here yet. */
+ * line and its threads go. Begun at the click; the next screen need not
+ * be here yet, and it replaces this one whole when it comes. */
 function leave(path: string) {
   const leaving = live;
   if (!leaving || leaving.left !== undefined) return;
@@ -239,119 +248,11 @@ function leave(path: string) {
   // per step, in the frame you clicked.
   leaving.loom.release();
   leaving.track?.release();
-  leaving.threads.release(closer(leaving.page, path));
+  leaving.skein.release(closer(leaving.page, path));
   leaving.life?.release();
   nav.setCurrent(path);
-  ribbon = unfurl(path);
   leaving.page.dataset.state = "leaving";
   leaving.page.setAttribute("inert", "");
-}
-
-/** Keep a leaving screen where it was, under the new one, until it has
- * reeled up (the window scrolls to the top for the new one). */
-function linger(leaving: Live, scrolled: number) {
-  const { page } = leaving;
-  page.setAttribute("data-lingering", "");
-  page.setAttribute("aria-hidden", "true");
-  Object.assign(page.style, {
-    position: "fixed",
-    top: `${-scrolled}px`,
-    left: "0",
-    width: "100%",
-    pointerEvents: "none",
-  });
-  const gone = Math.max(0, (leaving.left ?? 0) + LEAVE - performance.now());
-  window.setTimeout(() => page.remove(), gone + 40);
-}
-
-/** The hem cloth, drawn once per fabric and width and copied after. */
-const hems = new Map<string, HTMLCanvasElement>();
-function hemCloth(fabric: Fabric, width: number) {
-  const key = `${fabric}:${width}`;
-  let source = hems.get(key);
-  if (!source) {
-    source = clothCanvas(fabric, Math.ceil(width / 5), 4, 5, 41);
-    hems.set(key, source);
-  }
-  const copy = document.createElement("canvas");
-  copy.width = source.width;
-  copy.height = source.height;
-  copy.getContext("2d")!.drawImage(source, 0, 0);
-  return copy;
-}
-
-/** Start the ribbon of a place down from its swatch on the line: a woven
- * hem drops from the swatch to the foot of the screen, then spreads
- * sideways until it is the whole width. Nothing slides under the line; it
- * all comes out of the thing you pulled. */
-function unfurl(path: string): Ribbon {
-  const width = world.clientWidth || innerWidth;
-  // Where it comes from: the swatch, or (no swatch shown) where the
-  // threads drop from.
-  const drop = nav.origin();
-  const box = nav.swatch();
-  const x = drop?.[0] ?? width / 2;
-  const from = box
-    ? { left: box.left, right: box.right, top: Math.max(0, box.top) }
-    : { left: x - 22, right: x + 22, top: 60 };
-  const band = hemCloth(fabricAt(path), width);
-  band.className = "hion-hem__cloth";
-  const hem = h("div", { class: "hion-hem", "aria-hidden": "true", style: "position: fixed" }, band);
-  world.append(hem);
-  const at = (top: number, left: number, w: number) => ({
-    top: `${top}px`,
-    left: `${left}px`,
-    width: `${w}px`,
-  });
-  const w0 = from.right - from.left;
-  const fold = innerHeight - 20;
-  const start = Number(document.timeline.currentTime ?? performance.now());
-  const fall = hem.animate(
-    [
-      { ...at(from.top, from.left, w0), easing: "cubic-bezier(0.55, 0, 0.75, 0.35)" },
-      { ...at(fold, from.left, w0), offset: DROP, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" },
-      at(fold, 0, width),
-    ],
-    { duration: PULL, fill: "forwards" },
-  );
-  fall.startTime = start;
-  fall.finished
-    .then(() => hem.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: "forwards" }).finished)
-    .then(() => hem.remove(), () => hem.remove());
-  return { path, from, start };
-}
-
-/** Pull a new screen down as the ribbon of its own cloth: the screen is
- * shown only through the ribbon (begun at the click, or now), so it is
- * there as far as the ribbon has come. */
-function pullDown(page: HTMLElement, path: string) {
-  const pulled = ribbon?.path === path ? ribbon : unfurl(path);
-  ribbon = undefined;
-  const pageBox = page.getBoundingClientRect();
-  const width = page.clientWidth || innerWidth;
-  const height = page.scrollHeight;
-  const fold = innerHeight - pageBox.top;
-  const l = pulled.from.left - pageBox.left;
-  const r = width - (pulled.from.right - pageBox.left);
-  const t = pulled.from.top - pageBox.top;
-  const below = (y: number) => Math.max(0, height - y);
-  const clip = (top: number, right: number, bottom: number, left: number) =>
-    `inset(${top}px ${right}px ${bottom}px ${left}px)`;
-  // Its own paper inside the ribbon, over the screen still reeling up.
-  page.style.background = "var(--hion-black)";
-  const pull = page.animate(
-    [
-      { clipPath: clip(t, r, below(t + 20), l), easing: "cubic-bezier(0.55, 0, 0.75, 0.35)" },
-      { clipPath: clip(t, r, below(fold), l), offset: DROP, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" },
-      { clipPath: clip(0, 0, below(fold), 0) },
-    ],
-    { duration: PULL },
-  );
-  pull.startTime = pulled.start;
-  pull.finished.then(
-    () => page.style.removeProperty("background"),
-    () => {},
-  );
 }
 
 /** A single thing seen close: a project, a lab entry, a post. */
@@ -414,8 +315,8 @@ const shell: LensShell = {
       },
       { capture: true, signal },
     );
-    // A destination pulled: the screen lets go and its ribbon starts down
-    // at once, while the router fetches the page (update() follows).
+    // A destination pulled: the screen lets go at once, while the router
+    // fetches the page (update() follows).
     document.addEventListener(
       "astro:before-preparation",
       (event) => {
@@ -428,24 +329,27 @@ const shell: LensShell = {
     );
     // Hion moves between screens its own way. The router's view transition
     // would first hold the page still to photograph it (hundreds of
-    // milliseconds on a page of canvases, freezing the ribbon), for a
-    // crossfade prism.css turns off anyway: skip it while Hion is here.
+    // milliseconds on a page of canvases), for a crossfade prism.css turns
+    // off anyway: skip it while Hion is here.
     const native = document.startViewTransition;
     if (native) {
       document.startViewTransition = function (this: Document, ...args: Parameters<typeof native>) {
         const transition = native.apply(this, args);
+        // A skipped transition rejects `ready`, which nobody else awaits:
+        // left alone it is an uncaught "Transition was skipped" every time.
+        transition.ready.catch(() => {});
         transition.skipTransition();
         return transition;
       } as typeof native;
       signal.addEventListener("abort", () => Reflect.deleteProperty(document, "startViewTransition"), { once: true });
     }
     root.replaceChildren(world);
+    // The line is drawn once: shown as a still (dom.ts).
+    for (const canvas of world.querySelectorAll<HTMLCanvasElement>(".hion-nav canvas")) showStill(canvas);
     // Let the faces arrive before measuring words to hang them.
     await Promise.race([document.fonts?.ready, wait(600)]);
     show(context.route, true);
     signal.addEventListener("abort", () => live?.controller.abort());
-    // Thread for the first ribbon, so the first click draws none.
-    later(signal, 1500, () => hemCloth(fabricOf(context.route.kind), world.clientWidth || innerWidth));
   },
 
   async update(route) {
@@ -454,11 +358,7 @@ const shell: LensShell = {
     // Usually already begun, at the click.
     leave(route.path);
     leaving?.controller.abort();
-    const scrolled = scrollY;
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-    // The new screen comes down over the old one as it reels up, rather
-    // than after it.
-    if (leaving && !still()) linger(leaving, scrolled);
     show(route, false);
   },
 

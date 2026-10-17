@@ -14,6 +14,7 @@
  * is simply finished. */
 import type { Fabric } from "./fabric";
 import { Immigration, type Species } from "./immigration";
+import { still } from "./dom";
 import { rng } from "./pastel";
 import { drape, paintCrossing, paintGround, paintRegion, stitches } from "./stitch";
 
@@ -199,6 +200,7 @@ function weaveWord(el: HTMLElement, options: WovenOptions) {
   function paint(final: boolean) {
     const { ctx, life, cols, rows, hang } = woven;
     paintRegion(ctx, null, life, st, 0, 0, cols, rows, hang);
+    still(canvas);
     if (!final) return;
     // The finished word: a float of its colour at every crossing, under
     // the thread.
@@ -430,6 +432,7 @@ function weaveCover(figure: HTMLElement, options: WovenOptions, done: () => void
       return;
     }
     frameEl.append(canvas);
+    still(canvas);
     frameEl.dataset.wovenState = "done";
     done();
   };
