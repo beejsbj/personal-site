@@ -130,7 +130,10 @@ export function createNav(
         // A cascade: each further destination hangs lower.
         hang = 96 + (i - 1) * 64;
       } else if (charm === home) {
-        hang = isCurrent ? 34 : 18;
+        // Written by thread, the names are large enough that on a narrower
+        // screen the line cannot hold them all in one row: the name in the
+        // middle hangs below the rest, on a longer thread.
+        hang = (isCurrent ? 34 : 18) + (!narrow() && innerWidth < 1240 ? 48 : 0);
       } else {
         hang = (isCurrent ? 58 : 20) + ((i * 7) % 3) * 6;
       }

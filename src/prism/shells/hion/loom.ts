@@ -58,6 +58,25 @@ export interface Composition {
   orbits: { hue: Hue; points: Pt[]; key: number }[];
   /** Where the threads end (along the axis the drawing reads), if they do. */
   end: number | null;
+  /** On a page (the hions are the skein's), what hangs from them is grown
+   * by the skein as branches, not laid here as marks. */
+  limbs?: Limb[];
+}
+
+/** A branch of a hion the composition asks for: a weft, a cord, a tie, a
+ * knot where the two are tied. The skein grows it when the drawing reaches
+ * `key`: off the hion of its hue where `way` begins (`tied`: thrown from
+ * it), or off whatever thread has grown nearest. */
+export interface Limb {
+  hue: Hue;
+  /** The way it means to go, from where it leaves (page px). */
+  way: Pt[];
+  key: number;
+  tied: boolean;
+  /** It ties itself off at its end. */
+  knot: boolean;
+  /** Where along it (x, page px) it passes under the other hion. */
+  under?: number[];
 }
 
 /** The stretch of a drawing in sight: where it starts along the axis the
@@ -118,6 +137,7 @@ export function createLoom(options: LoomOptions) {
   let marks: Mark[] = [];
   let tips: Composition["tips"] = [];
   let orbits: Composition["orbits"] = [];
+  let limbs: Limb[] = [];
   let end = Infinity;
   /** Counts up each time the drawing is composed afresh. */
   let version = 0;
@@ -167,6 +187,7 @@ export function createLoom(options: LoomOptions) {
     });
     tips = composed.tips;
     orbits = composed.orbits;
+    limbs = composed.limbs ?? [];
     end = composed.end ?? Infinity;
     version++;
     for (const tile of tiles.values()) tile.el.remove();
@@ -422,6 +443,7 @@ export function createLoom(options: LoomOptions) {
     /* What is drawn, for life.ts: the threads answer the visitor on it. */
     journeys: () => tips,
     orbits: () => orbits,
+    limbs: () => limbs,
     reach: () => reach,
     /** Whether the hand is still drawing toward where you are. */
     drawing: () => target - reach > 0.5,

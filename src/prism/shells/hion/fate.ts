@@ -19,13 +19,15 @@
  *
  * Every thread on the screen is in the same index (skein.ts): the hions
  * are fixed company (fix()), so threads fall in alongside them; threads
- * steered by something else (one from the pointer, winding round a
- * heading) grow by extend(), and can be handed back to fate to run on.
+ * steered by something else grow by extend(), and can be handed back to
+ * fate to run on.
  *
- * Where a thread means to go is planned for it (plan()): most pass through
- * a gather, a lane in the most open place of a stretch of the page, so
- * several converge there and part again; a few are lone and run off into
- * the distance. Everything is deterministic for a seed and a layout. */
+ * Every thread is a branch of a hion (buds()): it leaves one where it
+ * passes, forward at a slant into open paper (leave()). Where it means to
+ * go is planned for it: most pass through a gather, a lane in the most
+ * open place of a stretch of the page, so several converge there and part
+ * again; a few are lone and run off into the distance. Everything is
+ * deterministic for a seed and a layout. */
 
 import { type Hue, type Pt, rng } from "./pastel";
 
@@ -522,6 +524,10 @@ export class Fate {
       const s = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / den;
       const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / den;
       if (s < 0 || s > 1 || u < 0 || u > 1) continue;
+      // Two running nearly together just lie one on the other: a break at
+      // every shallow crossing would dash a bundle.
+      const sin = Math.abs(den) / (Math.hypot(bx - ax, by - ay) * Math.hypot(dx - cx, dy - cy) || 1);
+      if (sin < 0.4) continue;
       const n = t.xs.length - 1;
       // A hion lies over every thread; otherwise it is a coin toss.
       if (o.fixed || ((t.id * 7 + id * 13 + i) & 1) === 0) {
@@ -613,67 +619,93 @@ export function goalsFor(all: Gather[], x: number, y: number, a: number, lone: b
   return goals;
 }
 
-/** A page's threads: a fan from where the hions come down, and threads in
- * from either edge down the page (cyan-leaning left, magenta-leaning
- * right), each born as the drawing reaches it. */
-export function plan(ground: Ground, o: PlanOptions) {
+/** A hion's way, as the skein grew it: points, arc length and the loom's
+ * reveal key at each. */
+export interface Way {
+  hue: Hue;
+  xs: ArrayLike<number>;
+  ys: ArrayLike<number>;
+  ls: ArrayLike<number>;
+  keys: ArrayLike<number>;
+}
+
+/** Where a branch leaves a thread: the seed it grows from, and how far
+ * along its parent (arc length) it leaves. */
+export interface Bud {
+  seed: Seed;
+  hue: Hue;
+  s: number;
+}
+
+/** How a branch leaves a thread at (x, y) running at `along`: forward, at a
+ * slant to one side (never back the way it came, never square), turned
+ * down the page rather than up it. Null if the side it would take has no
+ * open paper. */
+export function leave(ground: Ground, x: number, y: number, along: number, side: 1 | -1, r: () => number) {
+  for (const s of [side, -side] as const) {
+    let a = along + s * (22 + r() * 26) * DEG;
+    // A branch that would climb leans down instead: the page grows down.
+    if (Math.sin(a) < -0.35) a = along + s * 18 * DEG;
+    if (Math.sin(a) < -0.35) continue;
+    if (ground.ray(x + Math.cos(a) * 18, y + Math.sin(a) * 18, a, 150, 10) >= 110) return a;
+  }
+  return null;
+}
+
+/** A page's threads, every one a branch: buds along the two hions' ways,
+ * a slant off them into open paper, each born when the hion's head passes
+ * where it leaves. Home buds most often, a single thing seen close least. */
+export function buds(ground: Ground, ways: Way[], o: PlanOptions): { gathers: Gather[]; buds: Bud[] } {
   const all = gathers(ground, o);
-  const rand = rng(o.seed * 31 + 3);
-  const { width: W, height: H } = o;
-  const narrow = W < 720;
-  const seeds: Seed[] = [];
-  // Clear of the way the hions themselves come down (straight below).
-  const fan = o.close
-    ? [-48, -26, 28, 50]
-    : narrow
-      ? o.lively
-        ? [-44, -30, -16, 18, 30, 44]
-        : [-40, -22, 22, 40]
-      : o.lively
-        ? [-72, -58, -46, -34, -22, -12, 14, 24, 36, 48, 60, 72]
-        : [-66, -50, -34, -22, 24, 36, 52, 68];
-  const down = Math.PI / 2;
-  fan.forEach((d, i) => {
-    const s = o.seed * 977 + i;
-    const r = rng(s);
-    const a = down + d * DEG;
-    const lone = i === 0 || i === fan.length - 1;
-    seeds.push({
-      x: o.drop + d * 0.5,
-      y: o.top,
-      a,
-      hue: i % 2 ? "m" : "c",
-      len: 1400 + r() * 1800,
-      seed: s,
-      key: o.top + i * 30,
-      lone,
-      free: 240,
-      goals: goalsFor(all, o.drop, o.top, a, lone, r),
-    });
-  });
-  let k = 0;
-  const gap = (narrow ? 520 : 380) * (o.close ? 1.4 : o.lively ? 0.6 : 1);
-  for (let y = o.top + 180; y < H - 120; y += gap) {
-    for (const side of [0, 1]) {
-      if (rand() < (o.lively ? 0.15 : 0.3)) continue;
-      const tilt = (14 + rand() * 40) * DEG;
-      const hue: Hue = side ? (rand() < 0.72 ? "m" : "c") : rand() < 0.72 ? "c" : "m";
-      const yy = y + rand() * 160;
-      const lone = rand() < 0.22;
-      const a = side ? Math.PI - tilt : tilt;
-      const s = o.seed * 31 + ++k * 7;
-      seeds.push({
-        x: side ? W + 6 : -6,
-        y: yy,
-        a,
-        hue,
-        len: 900 + rand() * 1800,
-        seed: s,
-        key: yy - 260 + rand() * 120,
-        lone,
-        goals: goalsFor(all, side ? W : 0, yy, a, lone, rng(s)),
+  const out: Bud[] = [];
+  const narrow = o.width < 720;
+  // At the hions' own brightness a branch counts for more than a dim
+  // ground thread did: fewer of them. Home is busier by growing longer
+  // after the reader moves and branching again sooner (skein.ts), not by
+  // more buds.
+  const gap = (narrow ? 260 : 220) * (o.close ? 1.6 : 1);
+  ways.forEach((way, w) => {
+    const r = rng(o.seed * 53 + w * 977 + 11);
+    const n = way.xs.length;
+    if (n < 8) return;
+    const total = way.ls[n - 1];
+    let i = 0;
+    let side: 1 | -1 = w ? 1 : -1;
+    for (let s = 70 + r() * gap * 0.6; s < total - 40; s += gap * (0.6 + r() * 0.8)) {
+      while (i < n - 1 && way.ls[i] < s) i++;
+      const x = way.xs[i];
+      const y = way.ys[i];
+      if (y < o.top) continue;
+      const a0 = Math.max(0, i - 3);
+      const a1 = Math.min(n - 1, i + 3);
+      // Not across a stretch it leaves the page for (a track).
+      if (way.ls[a1] - way.ls[a0] < 2) continue;
+      const along = Math.atan2(way.ys[a1] - way.ys[a0], way.xs[a1] - way.xs[a0]);
+      if (r() < 0.62) side = side === 1 ? -1 : 1;
+      const a = leave(ground, x, y, along, side, r);
+      if (a === null) continue;
+      const lone = r() < 0.2;
+      const seed = o.seed * 31 + w * 7919 + out.length * 7;
+      out.push({
+        hue: way.hue,
+        s: way.ls[i],
+        seed: {
+          x,
+          y,
+          a,
+          hue: way.hue,
+          len: (o.close ? 700 : 900) + r() * (o.lively ? 1800 : 1300),
+          seed,
+          key: way.keys[i],
+          lone,
+          // Clear of its parent before it keeps company, and clear of the
+          // words the hion may run beside.
+          free: 160,
+          grace: 36,
+          goals: goalsFor(all, x, y, a, lone, rng(seed)),
+        },
       });
     }
-  }
-  return { gathers: all, seeds: seeds.sort((a, b) => a.key - b.key) };
+  });
+  return { gathers: all, buds: out.sort((a, b) => a.seed.key - b.seed.key) };
 }

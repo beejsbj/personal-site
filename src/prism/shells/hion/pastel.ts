@@ -364,6 +364,10 @@ export class Path {
   get count() {
     return this.xs.length;
   }
+  /** Its points, evenly spaced. */
+  points(): Pt[] {
+    return this.xs.map((x, i) => [x, this.ys[i]]);
+  }
   /** Point and unit normal at arc length s. */
   at(s: number): [number, number, number, number] {
     const n = this.xs.length;

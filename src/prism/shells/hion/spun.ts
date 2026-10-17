@@ -16,20 +16,20 @@
  * after. Only body text is type.
  *
  * Most headings are strands like every other (skein.ts, the `title` kind: a
- * growing end on a slack rope, finer toward its tip, laid on the ground
- * as it settles, the one material), so a hover loop weaves over and under thread, and a thread
+ * hot head on a slack rope, laid on the ground as it cools, the one
+ * material), so a hover loop weaves over and under thread, and a thread
  * from a click winds through it. The real text stays where it was,
  * transparent from the moment the screen is built (shell.css `WRITTEN`),
  * so nothing shows before the thread writes it, and it still reads,
  * selects, finds and speaks as text.
  *
- * Three kinds of heading are written on a canvas of their own inside the
+ * Two kinds of heading are written on a canvas of their own inside the
  * heading, with the skein's material and a head of their own, rather
  * than on the page's ground: a strung heading, whose black box keeps the
  * hions and the weft from showing through its words (the thread is drawn
- * over the box), any heading inside something that slides over the
+ * over the box), and any heading inside something that slides over the
  * page (the resume's track across, `[data-cloth-hold]`), which slides
- * with it, and every label (`LABELS`), most of which hang and sway.
+ * with it.
  *
  * This file measures and queues: it reads a heading's letters off the
  * page as a bitmap, a line at a time, in the real face (every heading is
@@ -74,9 +74,8 @@ export interface Measure {
  * canvas: a run of thread (pts are x,y pairs; `heat` per point warms it
  * toward a head) and the head's own light. */
 export interface Material {
-  run(ctx: CanvasRenderingContext2D, hue: Hue, w: number, glow: number, pts: number[], base: number): void;
-  /** A growing end, finer toward its tip by `grow` (pts end at the tip). */
-  tip(ctx: CanvasRenderingContext2D, hue: Hue, glow: number, pts: number[], base: number, grow: number): void;
+  run(ctx: CanvasRenderingContext2D, hue: Hue, w: number, glow: number, pts: number[], base: number, heat: number[] | null): void;
+  head(ctx: CanvasRenderingContext2D, hue: Hue, w: number, x: number, y: number, heat: number): void;
   /** The title kind's width and glow. */
   nature(): { w: number; glow: number };
   /** How a title is written: its width, pace (px a second) and the warm
@@ -97,17 +96,35 @@ interface SpunOptions {
   signal: AbortSignal;
 }
 
-/** The small words set in the label face: eyebrows, dates and kinds
- * (project meta, an update's date, a role's dates), the resume's years,
- * tags, link charms and the tools on a project. Written by thread like a
- * heading, each on a canvas of its own inside it (most of them hang and
- * sway). Kept in step with shell.css. */
-export const LABELS = ".hion-eyebrow, .hion-meta, .hion-resume__when, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li";
+/** What is written by thread: every heading on a screen, and the titles
+ * of updates (set as paragraphs). Kept in step with shell.css. */
+export const WRITTEN = "h1, h2, h3, h4, h5, h6, .hion-tied__title";
 
-/** What is written by thread: every heading on a screen, the titles of
- * updates (set as paragraphs), and the labels. Kept in step with
+/** And every label: eyebrows, dates, years and meta lines, tags and
+ * charms, the words of pull-cords and links on, table heads, the home's
+ * greeting and the other things said (the role line, the portrait's
+ * "that's me", the foot's call). Only body text (paragraphs, intros,
+ * summaries, captions, links inside prose) is type. Kept in step with
  * shell.css. */
-export const WRITTEN = `h1, h2, h3, h4, h5, h6, .hion-tied__title, ${LABELS}`;
+export const LABELS =
+  ".hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-foot__mail, .hion-hello, .hion-role, .hion-portrait__link, .hion-foot__call";
+
+/** A label that hangs on a drop or a pull-cord of its own is written on a
+ * canvas inside it (it swings), on from the knot its drop ends in: ink.ts
+ * hangs such a drop at the label's left, before its first letter, and
+ * notes where (`data-knot`, "x,y" px in the holder). */
+export function knotOf(el: HTMLElement): Pt | null {
+  const holder = el.closest<HTMLElement>("[data-ink]");
+  const at = holder?.dataset.knot;
+  if (!holder || !at) return null;
+  // A name on the line is its charm's label (the charm also carries words
+  // only a screen reader hears).
+  if (!el.matches(".hion-charm__label") && (holder.textContent ?? "").trim() !== (el.textContent ?? "").trim()) return null;
+  const [x, y] = at.split(",").map(Number);
+  const hb = holder.getBoundingClientRect();
+  const eb = el.getBoundingClientRect();
+  return [hb.left + x - eb.left, hb.top + y - eb.top];
+}
 
 /** Below this font size a thread cannot write legibly. */
 const SMALLEST = 15;
@@ -157,8 +174,10 @@ const chalk = (el: HTMLElement) => {
  * inside it (the home words, one thread each), in document order. */
 function headings(root: ParentNode): HTMLElement[] {
   const out: HTMLElement[] = [];
-  for (const el of root.querySelectorAll<HTMLElement>(`main :is(${WRITTEN}), main [data-spun]`)) {
+  for (const el of root.querySelectorAll<HTMLElement>(`main :is(${WRITTEN}), main [data-spun], :is(main, .hion-foot) :is(${LABELS})`)) {
     if (el.closest(".hion-sr, [hidden]")) continue;
+    // A label inside something already written is written with it.
+    if (el.matches(LABELS) && el.parentElement?.closest(`${WRITTEN}, ${LABELS}`)) continue;
     if (el.matches(WRITTEN) && el.querySelector("[data-spun]")) continue;
     if (!el.hasAttribute("data-spun") && el.closest("[data-spun]")) continue;
     if (!(el.textContent ?? "").trim()) continue;
@@ -261,8 +280,33 @@ function hueOf(el: HTMLElement): Hue {
 }
 
 function spin(el: HTMLElement, options: SpunOptions) {
-  if (el.closest("[data-cloth-hold]") || el.matches(`.hion-strung, ${LABELS}`)) {
+  if (el.closest("[data-cloth-hold]") || el.matches(".hion-strung")) {
     writeLocal(el, hueOf(el), options);
+    return;
+  }
+  const knot = el.matches(LABELS) ? knotOf(el) : null;
+  if (knot) {
+    // On from its drop, in its drop's hue (the hue of the cord it hangs
+    // from: weave.ts).
+    const hue = el.closest<HTMLElement>("[data-ink]")?.dataset.hue === "m" ? "m" : "c";
+    // Once its cord has grown to it and its drop down to the knot
+    // (skein.ts ties it; shell.css grows the drop).
+    const holder = el.closest<HTMLElement>("[data-reveal][data-ink]");
+    if (!holder || options.instant) {
+      writeLocal(el, hue, options, options.instant, knot);
+      return;
+    }
+    const go = () => writeLocal(el, hue, options, false, knotOf(el) ?? knot, 600);
+    if (holder.hasAttribute("data-tied")) go();
+    else {
+      const watch = new MutationObserver(() => {
+        if (!holder.hasAttribute("data-tied")) return;
+        watch.disconnect();
+        go();
+      });
+      watch.observe(holder, { attributes: true, attributeFilter: ["data-tied"] });
+      options.signal.addEventListener("abort", () => watch.disconnect(), { once: true });
+    }
     return;
   }
   options.skein.inscribe(el, hueOf(el), (page) => {
@@ -408,19 +452,17 @@ interface Run {
 }
 
 /** The heading's text, a stretch per line it sits on (viewport px). */
-function textRuns(el: HTMLElement): Run[] {
+function textRuns(el: HTMLElement, all = false): Run[] {
   const runs: Run[] = [];
   const range = document.createRange();
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const text = node.nodeValue ?? "";
-    const parent = node.parentElement;
-    if (!parent || parent.closest(".hion-sr, [hidden]")) continue;
-    // Hidden from a reader inside the word (an icon, a mark); a word
-    // hidden as a whole (the resume's years, a picture of the dates read
-    // elsewhere) is still written.
-    const hid = parent.closest("[aria-hidden='true']");
-    if (hid && hid !== el && el.contains(hid)) continue;
+    // Hidden inside it (a screen reader's words, an icon's); a label that
+    // is itself hidden from a screen reader (the years round a role, which
+    // its date line says) is still drawn.
+    const hidden = node.parentElement?.closest(all ? ".hion-sr, [hidden]" : ".hion-sr, [hidden], [aria-hidden='true']");
+    if (hidden && hidden !== el && el.contains(hidden)) continue;
     for (const match of text.matchAll(/\S+/g)) {
       const from = match.index;
       const to = from + match[0].length;
@@ -434,6 +476,9 @@ function textRuns(el: HTMLElement): Run[] {
     }
   }
   range.detach();
+  // All it shows is hidden from a screen reader (a date line whose words
+  // are said elsewhere): that is what is drawn.
+  if (!runs.length && !all) return textRuns(el, true);
   return runs;
 }
 
@@ -461,18 +506,120 @@ function lineRuns(range: Range, node: Node, from: number, to: number): [number, 
   return runs;
 }
 
+/** A label's way, on from a knot (its drop's end, a strand beside it):
+ * down from it into the line under the letters' feet and along that to
+ * where the first letter rises, the lead before the knot given up; or, a
+ * knot over the word itself, round above the first letter and down into
+ * the line before it, never through a letter. */
+function onFrom(from: Pt, way: Pt[]): Pt[] {
+  const line = way[0][1];
+  let rise = 0;
+  while (rise < way.length - 2 && Math.abs(way[rise + 1][1] - line) < 2) rise++;
+  const [fx, fy] = from;
+  if (fx > way[rise][0] + 4) {
+    return [from, [way[0][0] - 2, fy + (line - fy) * 0.3], [way[0][0] - 3, line - 8], ...way];
+  }
+  let k = 0;
+  while (k < rise && way[k][0] <= fx + 5) k++;
+  if (Math.abs(fy - line) <= 12) return [from, ...way.slice(k)];
+  return [...bend(from, line), ...way.slice(k)];
+}
+
+/** Straight down from a knot to the line at y and into it, turning a
+ * tight corner (as the thread turns at every letter's foot): dense enough
+ * that the curve laid through it does not swing out into a bracket. */
+function bend([x, y0]: Pt, y: number): Pt[] {
+  const r = 5;
+  const out: Pt[] = [];
+  for (let yy = y0; yy < y - r; yy += 4) out.push([x, yy]);
+  for (let k = 0; k <= 6; k++) {
+    const a = Math.PI - (k / 6) * (Math.PI / 2);
+    out.push([x + r + Math.cos(a) * r, y - r + Math.sin(a) * r]);
+  }
+  return out;
+}
+
+/** Where a thread of the resume's track runs beside a label on it, level
+ * with y (the label's own px): the circle a year sits in (its pad, weave.ts
+ * `data-orbit-pad`), or the strand down the left of the role it is in. */
+function strandBeside(el: HTMLElement, y: number): Pt | null {
+  if (!el.closest("[data-cloth-hold]")) return null;
+  if (el.hasAttribute("data-orbit")) {
+    const pad = parseFloat((el.dataset.orbitPad ?? "34,30").split(",")[0]);
+    return [-pad + 4, y];
+  }
+  const role = el.closest<HTMLElement>("[data-spine='loop']");
+  if (!role) return null;
+  return [role.getBoundingClientRect().left - el.getBoundingClientRect().left, y];
+}
+
+/* ---------- The names on the line ---------- */
+
+/** The names hanging from the line at the top, written by thread like
+ * every label, each on from the knot its charm's drop ends in (ink.ts),
+ * in its hue. Once, when the shell mounts (the line stays from screen to
+ * screen); at once on a still screen. A name the face cannot write keeps
+ * its chalk. */
+export function spinNav(nav: HTMLElement, options: SpunOptions) {
+  const labels = [...nav.querySelectorAll<HTMLElement>(".hion-charm__label, .hion-pull__label")];
+  if (!labels.length) return;
+  const { signal } = options;
+  const late = window.setTimeout(() => labels.forEach(chalk), FONT_WAIT);
+  signal.addEventListener("abort", () => clearTimeout(late), { once: true });
+  document.fonts.load(`40px ${getComputedStyle(labels[0]).fontFamily}`, "A").then(
+    (faces) => {
+      clearTimeout(late);
+      if (signal.aborted) return;
+      const write = (el: HTMLElement) => {
+        const knot = faces.length ? knotOf(el) : null;
+        const hue = el.closest<HTMLElement>("[data-hue]")?.dataset.hue === "m" ? "m" : "c";
+        if (!knot) chalk(el);
+        else {
+          try {
+            writeLocal(el, hue, options, options.instant, knot);
+          } catch {
+            el.dataset.spunState = "chalk";
+          }
+        }
+      };
+      for (const el of labels) {
+        if (el.getClientRects().length) {
+          write(el);
+          continue;
+        }
+        // Folded away (the menu on a phone): written when it is first let
+        // down, once its drop has hung.
+        const shown = new ResizeObserver(() => {
+          if (!el.getClientRects().length) return;
+          shown.disconnect();
+          const timer = window.setTimeout(() => signal.aborted || write(el), 120);
+          signal.addEventListener("abort", () => clearTimeout(timer), { once: true });
+        });
+        // (An inline label has no box of its own to watch: its item's.)
+        shown.observe(el.closest("li") ?? el.parentElement ?? el);
+        signal.addEventListener("abort", () => shown.disconnect(), { once: true });
+      }
+    },
+    () => labels.forEach(chalk),
+  );
+}
+
 /* ---------- A heading that slides: written on its own canvas ---------- */
 
 /** Write a heading inside something that moves over the page on a
  * canvas of its own, with the skein's material and a head of its own (on
  * the screen's one frame loop), then let it lie cold. Written again,
  * settled, if the heading is laid out anew. */
-function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant) {
+function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant, from?: Pt, delay = 0) {
   const { signal } = options;
   const material = options.skein.material();
   const { glow } = material.nature();
+  // Where it rests, not where a swing has it.
+  const host = el.closest<HTMLElement>(".hion-page");
+  host?.classList.add("hion-measuring");
   const own = el.getBoundingClientRect();
   const spun = measure(el, own);
+  host?.classList.remove("hion-measuring");
   el.querySelector(":scope > .hion-spun-local")?.remove();
   if (!spun) {
     el.dataset.spunState = "chalk";
@@ -480,13 +627,16 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   }
   el.dataset.spunState = "spun";
   el.setAttribute("data-spun-local", "");
-  // Its canvas is placed inside it: somewhere to place it from, unless it
-  // is placed already (the resume's years hang where the track puts them).
-  if (getComputedStyle(el).position === "static") el.style.position = "relative";
-  // A little line in before the first letter: shorter for a small word,
-  // or it reads as an underline.
-  const lead = Math.min(36, spun.size * 0.8);
-  const way = smooth(spun.knotted ? spun.way : [[spun.way[0][0] - lead, spun.way[0][1] + 2], ...spun.way], 4);
+  // For a hover: the other hion weaves through it (skein.ts).
+  el.dataset.spunHue = hue;
+  const lead = 36;
+  // From the knot its drop ends in (a hung label), straight down into the
+  // line under its feet; from the knots its weft stops in (strung); else
+  // in along the line.
+  // Riding the resume's track: on from the track's own threads, the circle
+  // round a year or the strand down the role's side, along the line.
+  if (!from && !spun.knotted) from = strandBeside(el, spun.way[0][1]) ?? undefined;
+  const way = smooth(spun.knotted ? spun.way : from ? onFrom(from, spun.way) : [[spun.way[0][0] - lead, spun.way[0][1] + 2], ...spun.way], 4);
   const arcs = [0];
   for (let k = 1; k < way.length; k++) arcs.push(arcs[k - 1] + Math.hypot(way[k][0] - way[k - 1][0], way[k][1] - way[k - 1][1]));
   const total = arcs[arcs.length - 1];
@@ -531,12 +681,18 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
     const pts: number[] = [];
     for (let k = 0; k < way.length && arcs[k] <= cool; k++) pts.push(way[k][0], way[k][1]);
     if (cool > 0 && cool < total) pts.push(...at(cool));
-    if (pts.length >= 4) material.run(ctx, hue, w, glow, pts, 1);
+    if (pts.length >= 4) material.run(ctx, hue, w, glow, pts, 1, null);
     if (heat <= 0.001 || span < 2) return;
-    const growing: number[] = [];
+    const hot: number[] = [];
+    const warm: number[] = [];
     const steps = Math.max(2, Math.ceil(span / 4));
-    for (let j = 0; j <= steps; j++) growing.push(...at(cool + (span * j) / steps));
-    material.tip(ctx, hue, glow, growing, 1, heat);
+    for (let j = 0; j <= steps; j++) {
+      hot.push(...at(cool + (span * j) / steps));
+      warm[j] = heat * (j / steps) ** 2;
+    }
+    material.run(ctx, hue, w, glow, hot, 1, warm);
+    const [hx, hy] = at(s);
+    material.head(ctx, hue, w, hx, hy, heat);
   };
   // Laid out anew (the track fits its roles to the window): written
   // again, settled.
@@ -544,7 +700,7 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   const resized = new ResizeObserver(() => {
     if (el.clientWidth === width || signal.aborted) return;
     resized.disconnect();
-    writeLocal(el, hue, options, true);
+    writeLocal(el, hue, options, true, from && knotOf(el) ? knotOf(el)! : undefined);
   });
   resized.observe(el);
   signal.addEventListener("abort", () => resized.disconnect(), { once: true });
@@ -567,5 +723,6 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
     still(canvas);
     return false;
   });
-  task.wake();
+  if (delay) task.wakeIn(delay);
+  else task.wake();
 }

@@ -364,7 +364,50 @@ export function graph(s: Uint8Array, w: number, h: number, short = 0): Component
       }
     }
     const lowestNode = Math.max(...cnodes.map((nd) => nd.y));
-    if (low && low.y > lowestNode + Math.max(2, short)) cnodes.push(splitEdge(low.e, low.k, nodes, edges, w));
+    if (low && low.y > lowestNode + Math.max(2, short)) {
+      // The middle of where it lies lowest: a flat bottom's first lowest
+      // pixel is its corner, under a stem.
+      const p = low.e.pts;
+      let a = low.k;
+      let b = low.k;
+      while (a > 1 && Math.floor(p[a - 1] / w) >= low.y - 1) a--;
+      while (b < p.length - 2 && Math.floor(p[b + 1] / w) >= low.y - 1) b++;
+      cnodes.push(splitEdge(low.e, Math.round((a + b) / 2), nodes, edges, w));
+    }
+    // A bowl's bottom run between two corners (a U's cup, the lower bowl
+    // of a D or a B), sitting on the line no lower than its corners: a node
+    // in its middle too. Small letters have square corners there, and a
+    // connector from a corner, straight under the stem above it, reads as
+    // the stem run on down (a U becomes an H, a D a P); from the middle it
+    // is a stalk under the bowl. Feet that end in a terminal (an L, an E)
+    // keep theirs.
+    else if (low) {
+      const bottom = Math.max(...cnodes.map((nd) => nd.y));
+      for (const e of edges.slice()) {
+        if (e.a === e.b || e.a.edges.length < 2 || e.b.edges.length < 2) continue;
+        let k = -1;
+        let ky = -1;
+        for (let j = 1; j < e.pts.length - 1; j++) {
+          const y = Math.floor(e.pts[j] / w);
+          if (y > ky) {
+            ky = y;
+            k = j;
+          }
+        }
+        if (k < 0 || ky < bottom - Math.max(2, short)) continue;
+        const x = e.pts[k] % w;
+        const far = Math.max(4, short * 2.5);
+        if (Math.abs(x - e.a.x) < far || Math.abs(x - e.b.x) < far) continue;
+        // Its middle, where it lies on the line, rather than its lowest
+        // pixel (a flat run's lowest is anywhere along it).
+        let a = k;
+        let b = k;
+        while (a > 1 && Math.floor(e.pts[a - 1] / w) >= ky - 1) a--;
+        while (b < e.pts.length - 2 && Math.floor(e.pts[b + 1] / w) >= ky - 1) b++;
+        cnodes.push(splitEdge(e, Math.round((a + b) / 2), nodes, edges, w));
+        break;
+      }
+    }
     let l = Infinity;
     let r = -Infinity;
     let t = Infinity;
@@ -505,6 +548,29 @@ function letterStroke(comp: Component, from: Pt, base: number, w: number, mask: 
     const dy = Math.floor(pts[0] / w) - Math.floor(q / w);
     return Math.abs(dy) < Math.hypot(dx, dy) * 0.6;
   };
+  // A corner with a stem straight up from it and the letter running on
+  // across from it (the bottom of a U's, a D's stem): a connector there
+  // reads as the stem run on down to the line.
+  const stem = (n: Node) => {
+    if (n.edges.length !== 2) return false;
+    let up = false;
+    let side = false;
+    for (const e of n.edges) {
+      const pts = e.a === n ? e.pts : e.pts.slice().reverse();
+      const q = pts[Math.min(pts.length - 1, Math.round(width * 2.5))];
+      const dx = (q % w) - (pts[0] % w);
+      const dy = Math.floor(q / w) - Math.floor(pts[0] / w);
+      if (dy < 0 && Math.abs(dx) < -dy * 0.35) up = true;
+      else if (Math.abs(dy) < Math.hypot(dx, dy) * 0.6) side = true;
+    }
+    return up && side;
+  };
+  // A terminal high in a letter that also has a node on the line (the top
+  // of a U's stem): a drop from it runs down the stem and on past the
+  // bowl, so the bowl reads as a bar across two stems (a U as an H).
+  const tall = comp.box.b - comp.box.t;
+  const footed = comp.nodes.some((n) => n.y >= comp.box.b - width * 2);
+  const high = (n: Node) => footed && n.edges.length === 1 && n.y < comp.box.t + tall * 0.35;
   const nodes = comp.nodes.slice().sort((p, q) => q.y - p.y);
   const starts = nodes.length > 8 ? nodes.slice(0, 6) : nodes;
   const costs = new Map<Node, number>();
@@ -512,7 +578,7 @@ function letterStroke(comp: Component, from: Pt, base: number, w: number, mask: 
     let c = costs.get(n);
     if (c === undefined) {
       const d = drop(mask, w, n.x, n.y, base, width);
-      c = d.cross ? 1e6 : (d.bare + (across(n) ? width * 3 : 0)) * BARE;
+      c = d.cross ? 1e6 : (d.bare + (across(n) ? width * 3 : 0) + (stem(n) ? width * 3 : 0) + (high(n) ? tall * 0.6 : 0)) * BARE;
       costs.set(n, c);
     }
     return c;
