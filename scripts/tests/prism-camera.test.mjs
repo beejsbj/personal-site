@@ -277,3 +277,37 @@ test("turning, a face is shaded in only once it faces the eye, and out before it
       }
   }
 });
+
+/** Two transform strings with the same functions and numbers equal to
+ * within floating-point noise. */
+function sameTransform(a, b) {
+  const nums = (s) => s.match(/-?[\d.]+(e-?\d+)?/g).map(Number);
+  assert.equal(
+    a.replace(/-?[\d.]+(e-?\d+)?/g, "#"),
+    b.replace(/-?[\d.]+(e-?\d+)?/g, "#"),
+  );
+  nums(a).forEach((n, k) =>
+    assert.ok(Math.abs(n - nums(b)[k]) < 1e-9, `${a} vs ${b}`),
+  );
+}
+
+test("the WebGL renderer's camera (between, pageTransform) is the CSS camera", () => {
+  for (const [w, h] of SIZES) {
+    const g = camera.geometry(w, h);
+    for (const [from, to] of MOVES) {
+      sameTransform(
+        camera.bodyTransform(camera.between(g, from, to, 0)),
+        camera.bodyPose(g, from),
+      );
+      sameTransform(
+        camera.bodyTransform(camera.between(g, from, to, 1)),
+        camera.bodyPose(g, to),
+      );
+      for (let i = 0; i < camera.SIDES; i += 1)
+        assert.equal(
+          camera.pageTransform(g, camera.params(g, to), i),
+          camera.pagePose(g, to, i),
+        );
+    }
+  }
+});

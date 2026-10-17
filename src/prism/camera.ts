@@ -40,12 +40,15 @@ export interface Pose {
 /** The camera, as a transform of the prism's body. Inside, the front face
  * sits exactly on the viewport (the body hangs at BODY_Y, so it is lifted
  * back down); outside, the prism hangs where it is composed. */
-export function bodyPose(g: Geometry, { outside, turn }: Pose) {
-  const drop = outside ? 0 : (0.5 - BODY_Y) * g.h;
-  const depth = -g.apothem - (outside ? g.pull : 0);
+export function bodyPose(g: Geometry, pose: Pose) {
+  return bodyTransform(params(g, pose));
+}
+
+/** bodyPose, from the camera's numbers (see `between`). */
+export function bodyTransform({ drop, depth, tilt, turn }: Params) {
   return (
     `translateY(${drop}px) translateZ(${depth}px) ` +
-    `rotateX(${outside ? TILT : 0}deg) rotateY(${turn}deg)`
+    `rotateX(${tilt}deg) rotateY(${turn}deg)`
   );
 }
 
@@ -54,17 +57,32 @@ export function bodyPose(g: Geometry, { outside, turn }: Pose) {
  * top-left corner. It ends in the same function list as bodyPose, so the
  * two interpolate in lockstep. */
 export function pagePose(g: Geometry, pose: Pose, i: number) {
+  return pageTransform(g, params(g, pose), i);
+}
+
+/** pagePose, from the camera's numbers. Also what the WebGL renderer
+ * (gl/renderer.ts) projects each face with, so both renderers share one
+ * camera. */
+export function pageTransform(g: Geometry, p: Params, i: number) {
   return (
-    `translate(${g.w / 2}px, ${EYE_Y * g.h}px) perspective(${g.perspective}px) ` +
-    `translate(0px, ${(BODY_Y - EYE_Y) * g.h}px) ${bodyPose(g, pose)} ` +
+    `${eyeTransform(g)} ${bodyTransform(p)} ` +
     `rotateY(${i * TURN}deg) translateZ(${g.apothem}px) ` +
     `translate(${-g.w / 2}px, ${-g.h / 2}px)`
   );
 }
 
+/** From the viewport's top-left corner to the body's centre, through the
+ * stage's perspective. */
+export function eyeTransform(g: Geometry) {
+  return (
+    `translate(${g.w / 2}px, ${EYE_Y * g.h}px) perspective(${g.perspective}px) ` +
+    `translate(0px, ${(BODY_Y - EYE_Y) * g.h}px)`
+  );
+}
+
 /** A pose as the numbers the camera's transform interpolates, linearly in
  * an animation's progress (the function list never changes). */
-function params(g: Geometry, { outside, turn }: Pose) {
+export function params(g: Geometry, { outside, turn }: Pose) {
   return {
     drop: outside ? 0 : (0.5 - BODY_Y) * g.h,
     depth: -g.apothem - (outside ? g.pull : 0),
@@ -72,7 +90,21 @@ function params(g: Geometry, { outside, turn }: Pose) {
     turn,
   };
 }
-type Params = ReturnType<typeof params>;
+export type Params = ReturnType<typeof params>;
+
+/** The camera `t` of the way from one pose to another (t already eased):
+ * what a CSS animation between bodyPose(from) and bodyPose(to) shows at
+ * that progress, since its function lists match. */
+export function between(g: Geometry, from: Pose, to: Pose, t: number): Params {
+  const a = params(g, from);
+  const b = params(g, to);
+  return {
+    drop: a.drop + (b.drop - a.drop) * t,
+    depth: a.depth + (b.depth - a.depth) * t,
+    tilt: a.tilt + (b.tilt - a.tilt) * t,
+    turn: a.turn + (b.turn - a.turn) * t,
+  };
+}
 
 /** Does face `i` show its front to the eye? It does when the eye is on the
  * front side of its plane. Worked in the eye's frame (origin at the
@@ -96,6 +128,11 @@ function faces(g: Geometry, p: Params, i: number) {
   const dy = -((BODY_Y - EYE_Y) * g.h + p.drop + g.apothem * ny);
   const dz = g.perspective - (p.depth + g.apothem * nz);
   return nx * dx + ny * dy + nz * dz > 0;
+}
+
+/** Whether face `i` shows its front to the eye, from the camera's numbers. */
+export function facingAt(g: Geometry, p: Params, i: number) {
+  return faces(g, p, i);
 }
 
 /** Whether face `i` shows its front to the eye in this pose. */
