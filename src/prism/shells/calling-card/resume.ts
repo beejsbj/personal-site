@@ -89,7 +89,7 @@ export function resume(route: Route, env: Env): Screen {
     { class: "cc-status__name", tabindex: "-1", ...part("page.title", "resume") },
     ransom(header.title, { boxes: 0.16, salt: 8 }),
   );
-  const back = backLink(copy, "/", copy.sections.home);
+  const back = backLink(copy, "/about", copy.sections.about);
 
   const sections: { kind: Kind; title: string; content: Node[]; attrs?: PartAttrs }[] = [];
   if (experience.roles.length)

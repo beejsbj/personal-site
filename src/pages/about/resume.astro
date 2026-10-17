@@ -1,0 +1,27 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import ResumeProse from "../../components/ResumeProse.astro";
+import { getResume } from "../../lib/portfolio";
+import { part } from "../../prism/parts";
+
+const resume = await getResume();
+const { Content } = await resume.entry.render();
+---
+
+<BaseLayout
+  title={resume.title}
+  description={resume.description}
+  pageClass="page-copy"
+>
+  <section class="shell page-section page-section--copy">
+    <PageHeader {...resume.header} page="resume" />
+
+    <article class="prose prose--copy">
+      <ResumeProse resume={resume} />
+      <div class="resume-body" {...part("page.body", "resume")}>
+        <Content />
+      </div>
+    </article>
+  </section>
+</BaseLayout>

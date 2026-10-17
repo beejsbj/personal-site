@@ -1,27 +1,8 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import PageHeader from "../components/PageHeader.astro";
-import ResumeProse from "../components/ResumeProse.astro";
-import { getResume } from "../lib/portfolio";
-import { part } from "../prism/parts";
-
-const resume = await getResume();
-const { Content } = await resume.entry.render();
+// The resume lives under About now. Vercel redirects /resume before it
+// gets here; this keeps the old address working wherever the app answers
+// it directly (dev, the built handler), query string and all.
+import { getLegacyRedirect } from "../lib/legacyRedirects";
+export const prerender = false;
+return Astro.redirect(getLegacyRedirect(Astro.url) ?? "/about/resume", 301);
 ---
-
-<BaseLayout
-  title={resume.title}
-  description={resume.description}
-  pageClass="page-copy"
->
-  <section class="shell page-section page-section--copy">
-    <PageHeader {...resume.header} page="resume" />
-
-    <article class="prose prose--copy">
-      <ResumeProse resume={resume} />
-      <div class="resume-body" {...part("page.body", "resume")}>
-        <Content />
-      </div>
-    </article>
-  </section>
-</BaseLayout>

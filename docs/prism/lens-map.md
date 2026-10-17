@@ -99,10 +99,10 @@ Two Daylight facts that make the rest harder to read:
 
 | ID | Part | Source of truth | In JSON |
 |---|---|---|---|
-| AB1 | Header: eyebrow "About", title "Burooj, again!", intro "Frontend developer. Curious about people, stories, and the places we make on the web.", action "Experience & resume" -> /resume | Daylight-only | no |
+| AB1 | Header: eyebrow "About", title "Burooj, again!", intro "Frontend developer. Curious about people, stories, and the places we make on the web.", action "Experience & resume" -> /about/resume | Daylight-only | no |
 | AB2 | Prose (sections "People, stories, interfaces", "Still exploring", contact links) | `pages/about.md` body | `pages.about.body` (raw markdown) |
 
-### Resume (`pages/resume.astro`)
+### Resume (`pages/about/resume.astro`, served at `/about/resume`)
 
 | ID | Part | Source of truth | In JSON |
 |---|---|---|---|
@@ -203,7 +203,7 @@ Each cell: how the lens presents the part, then `file:function`. Hion cells are 
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| RS1 Header | Eyebrow "Resume", h1 "Burooj Rashid", intro | "Status" screen: h1 + intro from main; eyebrow dropped, `CC/resume.ts:resume` | `pageHead` from `pages.resume.header`, `CP/views.ts:resume` | Stapled into the About book after the notes (`/resume` opens it there): a typed letterhead slip with title, intro and contacts, `ch:resume` | `pageHead` from main |
+| RS1 Header | Eyebrow "Resume", h1 "Burooj Rashid", intro | "Status" screen: h1 + intro from main; eyebrow dropped, `CC/resume.ts:resume` | `pageHead` from `pages.resume.header`, `CP/views.ts:resume` | Stapled into the About book after the notes (`/about/resume` opens it there): a typed letterhead slip with title, intro and contacts, `ch:resume` | `pageHead` from main |
 | RS2 Contact actions | Email, LinkedIn, GitHub | All, as a "Contact" list | All, as chips | All, joined with " · " | **Only the first (email)**, as a pull-cord; LinkedIn and GitHub — MISSING |
 | RS3 Experience | h2 + h3 role entries, dates, bullets | "Party member" rows (role/org split on " · ", `<em>` date, "Leader" tag on the first), `CC/resume.ts:row` | The Roles track drawn out: one row per `experience.roles` entry (title · org, `dateLine`, summary, bullets) with its clip spanning `start`–`end` on the ruler; undated entries say so | One slip per role, stapled on: index card, typed half-sheet, till receipt in turn; heading, date line, summary, bullets from `resume.experience.roles`, `ch:entrySlip` | Prose; h2 strung, h3 knotted |
 | RS3 Education | h2 + entries | Same rows, tag "Study" | Same rows for `education.entries` (they are on the Roles track too) | One manila library-card slip per course | same |
@@ -556,3 +556,11 @@ Selector load: `.page-header__intro` and `h1` are read by all four lenses; `.pro
 **Parts.** `src/prism/parts.ts` names each piece of content (`page.title`, `project.body`, `update.item`, `resume.role`…); Daylight and every shell mark the element with `data-part` and `data-ref`. `src/prism/parity.ts` lists the routes the content generates, the parts each must show (with their words), and `GAPS`, what a lens leaves out on purpose.
 
 **Guards.** `scripts/tests/prism-drift.test.mjs` (in `test`): no 12+ character string from `src/content` in shell source, no `route.main` read outside `fallbackBody`, and `content.json` covers every entry. `scripts/tests/prism-parity.browser.mjs` (`test:prism`): every lens on every route and every fuzz fixture (`src/prism/fixtures.ts`, mounted by `/prism/harness`) shows every part, with no console errors and one visible h1. `/prism/atlas` shows every route in every lens, and in parts mode outlines a chosen part in all five.
+
+**The resume is a page of About's (issue #25).** It is served at `/about/resume`; `/resume` (and `?page=resume`) redirect there permanently, query string kept (`vercel.json`, `src/lib/legacyRedirects.ts`, and `src/pages/resume.astro` for the app; `scripts/tests/redirect-parity.test.mjs` holds them together). `src/prism/routes.ts` classifies `/about/resume` as the `resume` kind and any other `/about/*` as `other`. `site.nav` no longer lists Resume, so no lens offers it as a top-level destination. Each lens's nav treats it as part of About:
+
+- **Daylight:** the six balls are unchanged (Resume was never a ball); the About ball reads as current on `/about/resume`. About's "Experience & resume" pill, the home hero and the footer link to it.
+- **Calling Card:** the Status tab is gone from the L1/R1 strip (Projects, Lab, About, Writing), About stays lit on the Status screen, and its Back prompt returns to About. The pause menu keeps its Status command, as a game's pause menu does.
+- **Cut Paper:** the C · Resume key stays, so the keyboard is still the whole F major scale and each route keeps its degree; it is drawn as About's sub-view (indented and tied to B♭ · About, which stays half-lit while the resume is open).
+- **Back Page:** unchanged in shape: the resume is stapled into the About book, and `/about/resume` opens the book at the first slip.
+- **Hion:** with Resume off the line, About's charm hangs lowest on `/about/resume` (the current knot) and the resume ends with a thread back up to About, as a lab entry's leads back to the lab.

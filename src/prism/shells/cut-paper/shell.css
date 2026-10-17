@@ -589,6 +589,30 @@
   color: rgba(10, 9, 8, 0.7);
 }
 
+:root[data-lens="cut-paper"] .cp-key[data-holding] {
+  box-shadow: var(--cp-ring), inset -3px 0 0 var(--note);
+}
+
+/* A sub-view's key (the resume, under About) sits a little in from its
+   parent, tied to it by a short line in the parent's colour. */
+:root[data-lens="cut-paper"] li:has(> .cp-key[data-under]) {
+  position: relative;
+  padding-left: 14px;
+}
+
+:root[data-lens="cut-paper"] li:has(> .cp-key[data-under])::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 4px;
+  width: 8px;
+  height: 33px;
+  border-bottom: 2px solid var(--cp-ivory-3);
+  border-left: 2px solid var(--cp-ivory-3);
+  border-bottom-left-radius: 6px;
+  pointer-events: none;
+}
+
 /* ── the view ──────────────────────────────────────────────── */
 
 :root[data-lens="cut-paper"] .cp-view {
@@ -3584,6 +3608,24 @@
 
   :root[data-lens="cut-paper"] .cp-key:hover {
     box-shadow: var(--cp-ring);
+  }
+
+  :root[data-lens="cut-paper"] li:has(> .cp-key[data-under]) {
+    padding-left: 0;
+  }
+
+  :root[data-lens="cut-paper"] li:has(> .cp-key[data-under])::before {
+    top: auto;
+    bottom: -5px;
+    left: -6px;
+    width: 10px;
+    height: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-key[data-holding] {
+    box-shadow: var(--cp-ring), inset 0 -3px 0 var(--note);
   }
 
   :root[data-lens="cut-paper"] .cp-wide {

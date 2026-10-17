@@ -53,7 +53,7 @@ export function routesFor(content: SiteContent): RouteRef[] {
       slug: entry.slug,
     })),
     { kind: "about", path: "/about" },
-    { kind: "resume", path: "/resume" },
+    { kind: "resume", path: "/about/resume" },
   ];
 }
 

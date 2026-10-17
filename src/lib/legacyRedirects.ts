@@ -1,7 +1,7 @@
 const pageRedirects: Record<string, string> = {
   home: "/",
   about: "/about",
-  resume: "/resume",
+  resume: "/about/resume",
   projects: "/projects",
   blog: "/writing",
   garden: "/projects/garden",
@@ -25,7 +25,16 @@ const projectRedirects: Record<string, string> = {
   "desci-bengaluru": "/projects",
 };
 
+/** Old paths that moved. The visitor's query string (a `?lens=`, say)
+ * travels with them, as it does through Vercel's redirects. */
+const pathRedirects: Record<string, string> = {
+  "/resume": "/about/resume",
+};
+
 export function getLegacyRedirect(url: URL): string | undefined {
+  const moved = pathRedirects[url.pathname.replace(/(.)\/$/, "$1")];
+  if (moved) return `${moved}${url.search}`;
+
   const page = url.searchParams.get("page");
 
   if (page === "project") {
