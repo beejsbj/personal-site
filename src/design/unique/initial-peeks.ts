@@ -297,12 +297,13 @@ export function installInitialPeeks() {
       timer = undefined;
       if (!motion.matches || active) return;
       // Only Daylight peeks: never over another lens, a prism face or the
-      // open prism.
+      // open prism (where the page may be live on its face).
       const root = document.documentElement;
       if (
         root.hasAttribute("data-lens-shell") ||
         root.hasAttribute("data-prism-face") ||
-        root.hasAttribute("data-prism-idle")
+        root.hasAttribute("data-prism-idle") ||
+        root.classList.contains("prism-is-open")
       )
         return retry();
       const now = Date.now();
