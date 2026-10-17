@@ -55,13 +55,24 @@ const unit = (dx: number, dy: number): Pt => {
   return [dx / l, dy / l];
 };
 
-/** The way a run goes at its start, and at its end. */
+/** The way a run goes at its start, and at its end (over its first and
+ * last 14px, so a jitter in the letters does not turn it). */
 function dirs(pts: Pt[]): { start: Pt; end: Pt } {
   const n = pts.length - 1;
-  const k = Math.min(n, 3);
+  const over = (from: number, step: number) => {
+    let k = from;
+    let run = 0;
+    while (run < 14 && k + step >= 0 && k + step <= n) {
+      run += Math.hypot(pts[k + step][0] - pts[k][0], pts[k + step][1] - pts[k][1]);
+      k += step;
+    }
+    return k;
+  };
+  const a = over(0, 1);
+  const b = over(n, -1);
   return {
-    start: unit(pts[k][0] - pts[0][0], pts[k][1] - pts[0][1]),
-    end: unit(pts[n][0] - pts[n - k][0], pts[n][1] - pts[n - k][1]),
+    start: unit(pts[a][0] - pts[0][0], pts[a][1] - pts[0][1]),
+    end: unit(pts[n][0] - pts[b][0], pts[n][1] - pts[b][1]),
   };
 }
 
@@ -80,20 +91,22 @@ function cost(pts: Pt[], clear: Clear, width: number): { cost: number; len: numb
     if (along[k] > 16 && len - along[k] > 16 && clear(pts[k][0], pts[k][1]) < 5) blocked++;
     if (pts[k][0] < 4 || pts[k][0] > width - 4) off++;
   }
-  return { cost: len + blocked * 900 + off * 300, len };
+  return { cost: len + blocked * 150 + off * 300, len };
 }
 
 /** A travel from a point going `d0` to a point arriving going `d1`, bowed
- * over or under (the least crossing of the bows tried). */
+ * over or under a little (the least crossing of the bows tried, a wide bow
+ * only when a shallow one would cross a good deal of words: a calm line
+ * rather than one that leaps round everything). */
 export function travel(a: Pt, d0: Pt, b: Pt, d1: Pt, clear: Clear, width: number): { pts: Pt[]; cost: number } {
   const d = Math.hypot(b[0] - a[0], b[1] - a[1]);
-  const k = Math.min(160, Math.max(24, d * 0.4));
+  const k = Math.min(120, Math.max(20, d * 0.35));
   let best: { pts: Pt[]; cost: number } | null = null;
-  for (const lift of [0, -1, 1, -2, 2, -3, 3, -4.5, 4.5]) {
-    const h = lift * Math.max(28, d * 0.18);
+  for (const lift of [0, -1, 1, -2, 2]) {
+    const h = lift * Math.max(24, Math.min(90, d * 0.14));
     const pts = cubic([a[0], a[1]], [a[0] + d0[0] * k, a[1] + d0[1] * k + h], [b[0] - d1[0] * k, b[1] - d1[1] * k + h], [b[0], b[1]]);
     const c = cost(pts, clear, width);
-    const total = c.cost + Math.abs(lift) * 20;
+    const total = c.cost + Math.abs(lift) * 60;
     if (!best || total < best.cost) best = { pts, cost: total };
     // Clear of every word and on the page: no bow will do better.
     if (c.cost <= c.len + 0.5) break;
@@ -103,8 +116,10 @@ export function travel(a: Pt, d0: Pt, b: Pt, d1: Pt, clear: Clear, width: number
 
 /** A leg off a journey to write a group of pieces (each a word's way, or a
  * ring), in order, leaving at or after journey index `from`. Null if
- * nothing on the journey is near enough to reach it from. */
-export function leg(j: Journey, from: number, pieces: Piece[], clear: Clear, width: number, reach = 900): Leg | null {
+ * nothing on the journey is near enough to reach it from. A leg that
+ * `ends` never comes back: the line goes on from it to what it writes
+ * next (`extend`). */
+export function leg(j: Journey, from: number, pieces: Piece[], clear: Clear, width: number, reach = 900, ends = false): Leg | null {
   const n = j.xs.length;
   if (!pieces.length || n < 4) return null;
   const first = pieces[0].pts;
@@ -122,7 +137,8 @@ export function leg(j: Journey, from: number, pieces: Piece[], clear: Clear, wid
   let out: { i: number; pts: Pt[]; cost: number } | null = null;
   const lo = Math.max(1, from);
   const near: { i: number; est: number }[] = [];
-  for (let i = lo; i < n - 1; i += 3) {
+  // A leg that ends leaves from about where the line is.
+  for (let i = lo; i < (ends ? Math.min(n - 1, lo + 40) : n - 1); i += 3) {
     const x = j.xs[i];
     const y = j.ys[i];
     const d = Math.hypot(first[0][0] - x, first[0][1] - y);
@@ -156,7 +172,7 @@ export function leg(j: Journey, from: number, pieces: Piece[], clear: Clear, wid
   let back: { i: number; pts: Pt[]; cost: number } | null = null;
   let skipped = 0;
   const after: { i: number; est: number; skipped: number }[] = [];
-  for (let i = out.i + 2; i < n - 1; i += 3) {
+  for (let i = out.i + 2; i < n - 1 && !ends; i += 3) {
     skipped += Math.hypot(j.xs[i] - j.xs[i - 3], j.ys[i] - j.ys[i - 3]);
     if (skipped > 2400) break;
     const x = j.xs[i];

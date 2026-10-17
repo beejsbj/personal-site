@@ -497,6 +497,7 @@ export function createSkein(options: SkeinOptions) {
         keys: tip.keys,
         legs: [],
         stops: [],
+        passes: passesOf(tip.hue, tip.points),
         strand: null,
         way: null,
         held: -1,
@@ -539,8 +540,8 @@ export function createSkein(options: SkeinOptions) {
 
   /** A line's head chases its drawing down its journey, quick, a jump
    * only where it writes nothing; on a leg it goes at the leg's own pace
-   * (brisk between, a hand's pace in the letters), hurrying when the
-   * reader is far ahead, but never skipping a word. It waits short of a
+   * (brisk between, a hand's pace in the letters), hurrying a little when
+   * the reader is far ahead, but never skipping a word. It waits short of a
    * word not yet ready to be written (being measured). */
   function chase(st: Strand, dt: number, now: number) {
     const before = st.s;
@@ -554,7 +555,7 @@ export function createSkein(options: SkeinOptions) {
       const i = Math.min(way.pace.length - 1, indexAt(st, st.s));
       const pace = way.pace[i];
       // Behind the reader: hurry, up to four times.
-      const rush = 1 + Math.min(3, Math.max(0, gap - 500) / 900);
+      const rush = 1 + Math.min(2, Math.max(0, gap - 600) / 1200);
       if (pace > 0) st.s += Math.min(gap, (pace * rush * dt) / 1000);
       else {
         // On the journey: as the drawing goes, but no further than the next
@@ -843,6 +844,9 @@ export function createSkein(options: SkeinOptions) {
      * there until it is on the line. */
     near: number;
     box: Box;
+    /** Not written: the line's own way through a stretch of the page it
+     * leaves for (the resume's track across), gone through on its way. */
+    pass?: boolean;
   }
 
   /** A line's way as it is laid: its journey with its legs spliced in. */
@@ -866,6 +870,8 @@ export function createSkein(options: SkeinOptions) {
     legs: (Leg & { stops: Stop[] })[];
     /** Its stops, in order. */
     stops: Stop[];
+    /** Where its journey leaves the page for a track and comes back. */
+    passes: Stop[];
     strand: Strand | null;
     way: Way | null;
     /** The stop it is waiting for, and since when. */
@@ -877,7 +883,7 @@ export function createSkein(options: SkeinOptions) {
   let stops: Stop[] = [];
   /** How fast a line travels between what it writes, and rings a picture
    * (px a second). */
-  const TRAVEL = 1500;
+  const TRAVEL = 1100;
   const RINGING = 1100;
   /** How long a line waits for a word to be measured before it goes on
    * without it (the word keeps its chalk). */
@@ -885,7 +891,7 @@ export function createSkein(options: SkeinOptions) {
 
   /** How fast a word is written: a hand's pace for its size, quick for a
    * small one (px of thread a second). */
-  const writingPace = (stop: Stop) => (stop.ring ? RINGING : Math.max(650, Math.min(1500, stop.size * 26)));
+  const writingPace = (stop: Stop) => (stop.pass ? TRAVEL : stop.ring ? RINGING : Math.max(650, Math.min(1500, stop.size * 26)));
 
   /** Lay a line's way again from its journey and legs: the strand keeps
    * what it has grown (a leg is only ever added ahead of its head). */
@@ -921,6 +927,12 @@ export function createSkein(options: SkeinOptions) {
       for (const mk of lg.marks) {
         const stop = lg.stops[mk.piece];
         const v = writingPace(stop);
+        // Gone through, not written: revealed as the journey is.
+        if (stop.pass) {
+          for (let k = mk.from; k <= mk.to; k++) pace[base + k] = v;
+          prev = mk.to + 1;
+          continue;
+        }
         // A word is written whole once the drawing reaches its top, and the
         // way to it no later.
         for (let k = prev; k < mk.from; k++) keys[base + k] = Math.min(keys[base + k], stop.box.t);
@@ -971,7 +983,14 @@ export function createSkein(options: SkeinOptions) {
     if (!st || !way) return Infinity;
     const stop = line.stops.find((p) => p.state === 0 || p.state === 1);
     if (!stop) return Infinity;
-    if (line.held !== stops.indexOf(stop)) {
+    const i = way.at[stop.near];
+    let hold = i >= 0 ? Math.max(0, st.ls[Math.max(0, i - 4)] ?? Infinity) : Infinity;
+    // Not yet off its journey: it waits where it comes down (it leaves
+    // from there to the first thing it writes).
+    if (!line.legs.length) hold = Math.min(hold, OFF);
+    // Only waiting while its head is held there for a word being measured
+    // (one the drawing has not come near yet is not being measured).
+    if (line.held !== stops.indexOf(stop) || (stop.state === 0 && !due(stop)) || st.s < hold - 2) {
       line.held = stops.indexOf(stop);
       line.heldAt = now;
     }
@@ -981,12 +1000,42 @@ export function createSkein(options: SkeinOptions) {
       stop.el.dataset.spunState = "chalk";
       return holdOf(line, now);
     }
-    const i = way.at[stop.near];
-    return i >= 0 ? Math.max(0, st.ls[Math.max(0, i - 4)] ?? Infinity) : Infinity;
+    return hold;
   }
 
-  /** Which line each stop is on, in order, and the point of that line's
-   * journey nearest it. */
+  /** Where a journey leaves the page for a track and comes back to it: a
+   * stretch of it either side of each leap, which its line goes through
+   * on its way (the track's own threads go on from there). */
+  function passesOf(hue: Hue, pts: Pt[]): Stop[] {
+    const out: Stop[] = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      if (Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]) <= JUMP) continue;
+      let a = i;
+      for (let run = 0; a > 0 && run < 80; a--) run += Math.hypot(pts[a][0] - pts[a - 1][0], pts[a][1] - pts[a - 1][1]);
+      let b = i + 1;
+      for (let run = 0; b < pts.length - 1 && run < 80; b++) run += Math.hypot(pts[b + 1][0] - pts[b][0], pts[b + 1][1] - pts[b][1]);
+      const piece = pts.slice(a, b + 1);
+      const xs = piece.map((p) => p[0]);
+      out.push({
+        el: page,
+        hue,
+        ring: false,
+        measure: null,
+        piece,
+        size: 0,
+        state: 1,
+        near: a,
+        box: { l: Math.min(...xs), r: Math.max(...xs), t: pts[i][1], b: pts[i + 1][1] },
+        pass: true,
+      });
+    }
+    return out;
+  }
+
+  /** Which line each stop is on, and the order its line comes to them:
+   * down the screen, from where it is to the nearest of what is next (of
+   * what lies within a little of the highest still to come), so a line
+   * goes from word to word as a hand would, never back up the page. */
   function assign() {
     for (const line of lines.values()) line.stops = [];
     const p = page.getBoundingClientRect();
@@ -1012,9 +1061,45 @@ export function createSkein(options: SkeinOptions) {
       line.stops.push(stop);
     }
     page.classList.remove("hion-measuring");
-    // In the order the line comes to them.
-    for (const line of lines.values()) line.stops.sort((a, b) => a.near - b.near || a.box.t - b.box.t);
+    for (const line of lines.values()) {
+      line.stops.push(...line.passes);
+      const left = line.stops.slice();
+      const order: Stop[] = [];
+      let at: Pt = [line.xs[0], line.ys[0]];
+      while (left.length) {
+        const top = Math.min(...left.map((p) => p.box.t));
+        let best = -1;
+        let bd = Infinity;
+        left.forEach((p, k) => {
+          if (p.box.t > top + AHEAD) return;
+          const y = (p.box.t + Math.min(p.box.b, p.box.t + 60)) / 2;
+          const d =
+            (p.pass ? Math.hypot(p.piece![0][0] - at[0], p.piece![0][1] - at[1]) : Math.min(Math.hypot(p.box.l - at[0], y - at[1]), Math.hypot(p.box.r - at[0], y - at[1]))) +
+            Math.max(0, at[1] - p.box.t) * UPHILL +
+            // And the higher first, as it is read.
+            (p.box.t - top) * 1.2;
+          if (d < bd) {
+            bd = d;
+            best = k;
+          }
+        });
+        const p = left.splice(best, 1)[0];
+        order.push(p);
+        // It leaves from the end it is written to, likelier the far one.
+        const y = (p.box.t + Math.min(p.box.b, p.box.t + 60)) / 2;
+        at = p.pass ? p.piece![p.piece!.length - 1] : Math.hypot(p.box.l - at[0], y - at[1]) < Math.hypot(p.box.r - at[0], y - at[1]) ? [p.box.r, y] : [p.box.l, y];
+      }
+      line.stops = order;
+    }
   }
+
+  /** How far a line comes down its journey before it goes off to the
+   * first thing it writes (px). */
+  const OFF = 70;
+  /** How far below the highest still to come a line may go first to
+   * something nearer (px), and what each px back up the page costs it. */
+  const AHEAD = 420;
+  const UPHILL = 3;
 
   /** Measure one stop where it rests. */
   function measureStop(stop: Stop) {
@@ -1073,7 +1158,17 @@ export function createSkein(options: SkeinOptions) {
       const last = line.legs[line.legs.length - 1];
       if (last) from = Math.max(from, last.back >= 0 ? last.back : line.xs.length);
       from += 3;
-      const pieces = group.map((p) => ({ pts: p.piece! }));
+      // Each word written from whichever end it comes to first (one under
+      // another is written back, as a weft goes), not across it and back.
+      let at: Pt = last && last.back < 0 ? last.pts[last.pts.length - 1] : [line.xs[Math.min(from, line.xs.length - 1)], line.ys[Math.min(from, line.xs.length - 1)]];
+      const pieces = group.map((p) => {
+        let pts = p.piece!;
+        const a = pts[0];
+        const b = pts[pts.length - 1];
+        if (!p.pass && !p.ring && Math.hypot(b[0] - at[0], b[1] - at[1]) + 30 < Math.hypot(a[0] - at[0], a[1] - at[1])) pts = pts.slice().reverse();
+        at = pts[pts.length - 1];
+        return { pts };
+      });
       const clear = (x: number, y: number) => ground.clear(x, y);
       let made: Leg | null = null;
       if (last && last.back < 0) {
@@ -1083,10 +1178,10 @@ export function createSkein(options: SkeinOptions) {
         (made as Leg & { stops: Stop[] }).stops = [...last.stops, ...group];
         line.legs.push(made as Leg & { stops: Stop[] });
       } else {
-        made = from < line.xs.length - 2 ? leg(line, from, pieces, clear, width) : null;
-        // Nothing of the journey near enough (or none left): from its end,
-        // and it ends there.
-        made ??= leg(line, Math.max(1, Math.min(from, line.xs.length - 4)), pieces, clear, width, Infinity);
+        // Off its journey once, to the first thing it writes; and from there
+        // on, from each thing to the next: the line never goes back to it.
+        made = from < line.xs.length - 2 ? leg(line, from, pieces, clear, width, 900, true) : null;
+        made ??= leg(line, Math.max(1, Math.min(from, line.xs.length - 4)), pieces, clear, width, Infinity, true);
         if (!made) {
           for (const p of group) {
             p.state = -1;
@@ -1098,7 +1193,7 @@ export function createSkein(options: SkeinOptions) {
       }
       for (const p of group) {
         p.state = 2;
-        p.el.dataset.spunState = "spun";
+        if (!p.pass) p.el.dataset.spunState = "spun";
       }
       changed = true;
     }
