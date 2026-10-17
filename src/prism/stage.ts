@@ -110,23 +110,17 @@ export function createPrism(): Prism {
     if (stage && home === currentLens()) return stage;
     teardown();
     home = currentLens();
-    // The room: its dark, the light and the whisper. It sits under the page,
-    // so the page can be a face of the prism without anything drawn over it.
+    // The room: its dark and the whisper. It sits under the page, so the
+    // page can be a face of the prism without anything drawn over it.
     backdrop = document.createElement("div");
     backdrop.id = "prism-backdrop";
     backdrop.dataset.dormant = "";
     backdrop.setAttribute("aria-hidden", "true");
-    // White light in from the left; the five lenses fan out to the right.
-    const spectrum = LENSES.map((lens, i) => {
-      const top = 52 + i * 8;
-      return `<polygon class="prism-band" data-band="${lens.id}" style="--band:${lens.signal}" points="50,50 100,${top} 100,${top + 8}"/>`;
-    }).join("");
-    backdrop.innerHTML = `
-      <svg class="prism-light" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <line class="prism-beam" x1="0" y1="28" x2="50" y2="50" vector-effect="non-scaling-stroke"/>
-        ${spectrum}
-      </svg>
-      <p class="prism-whisper">Same work. Different light.</p>`;
+    backdrop.innerHTML =
+      LENSES.map(
+        (lens) =>
+          `<div class="prism-glow" data-glow="${lens.id}" style="--band:${lens.signal}"></div>`,
+      ).join("") + `<p class="prism-whisper">Same work. Different light.</p>`;
     stage = document.createElement("div");
     stage.id = "prism-stage";
     stage.className = "prism-stage";
@@ -324,11 +318,35 @@ export function createPrism(): Prism {
         keyframes.push({ offset: 1, opacity: keyframes.at(-1)!.opacity });
         return [sheet.animate(keyframes, timing)];
       });
-    const shadeStill = (pose: Pose) =>
+    // At rest, a face turned away keeps an opacity animation that holds it
+    // at 0 (for days) before it would ever show. The compositor keeps a
+    // layer that may yet be shown painted, so the faces that could come
+    // round next are painted while the prism is still, not in the first
+    // frames of the next turn, where that painting competed with the turn.
+    let ready: Animation[] = [];
+    const unready = () => {
+      ready.forEach((animation) => animation.cancel());
+      ready = [];
+    };
+    const shadeStill = (pose: Pose) => {
+      unready();
       sheets().forEach((sheet, i) => {
-        if (sheet)
-          sheet.style.opacity = String(facing(geometry, pose, i) ? 1 : AWAY);
+        if (!sheet) return;
+        const toward = facing(geometry, pose, i);
+        sheet.style.opacity = String(toward ? 1 : AWAY);
+        if (!toward)
+          ready.push(
+            sheet.animate(
+              [
+                { opacity: AWAY, offset: 0 },
+                { opacity: AWAY, offset: 0.999999 },
+                { opacity: 1 },
+              ],
+              { duration: 1e9 },
+            ),
+          );
       });
+    };
     const rest = (front: number | null) =>
       frames.forEach((face, i) => setIdle(face, i !== front));
     /** WebGL: the camera at these numbers, everywhere at once (the canvas,
@@ -397,6 +415,7 @@ export function createPrism(): Prism {
         pagePose(geometry, to, origin),
         timing,
       );
+      unready();
       const shading = shade(at, to, timing);
       await Promise.all([camera.finished, page?.finished]).catch(() => {});
       at = to;
@@ -435,7 +454,9 @@ export function createPrism(): Prism {
       const free = journey.size >= SIDES;
       root.dataset.journey = free ? "revisiting" : "first";
       root.style.setProperty("--signal", lens.signal);
-      room.style.setProperty("--signal", lens.signal);
+      room.querySelectorAll<HTMLElement>(".prism-glow").forEach((glow) => {
+        glow.classList.toggle("is-lit", glow.dataset.glow === lens.id);
+      });
       root.querySelector(".prism-name")!.textContent = lens.name;
       root.querySelector(".prism-source")!.textContent = `from ${lens.source}`;
       root.querySelector(".prism-count")!.textContent = free
@@ -445,9 +466,6 @@ export function createPrism(): Prism {
         face.classList.toggle("is-front", i === index);
       });
       gl?.setState(root.dataset.outside === "true", index);
-      room.querySelectorAll<HTMLElement>(".prism-band").forEach((band) => {
-        band.classList.toggle("is-lit", band.dataset.band === lens.id);
-      });
       root.querySelectorAll<HTMLElement>(".prism-dot").forEach((dot, i) => {
         dot.setAttribute("aria-current", String(i === index));
       });

@@ -216,8 +216,8 @@
 
 /* ── The stage ────────────────────────────────────────────────────── */
 /* Two layers outside <body>, because while the prism is open the body is
-   the live face (live-page.ts): the room (#prism-backdrop: its dark, the
-   light, the whisper) under the page, and the prism (#prism-stage: faces,
+   the live face (live-page.ts): the room (#prism-backdrop: its dark and the
+   whisper) under the page, and the prism (#prism-stage: faces,
    caps and HUD) over it. The live face itself is clear glass. A face turned
    away from the eye is shaded all but transparent (stage.ts: shade), so no
    two faces ever visibly overlap on screen and the page needs no depth
@@ -228,14 +228,26 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(
-      60% 55% at 50% 52%,
-      color-mix(in srgb, var(--signal, #fff) 16%, transparent),
-      transparent 70%
-    ),
-    var(--prism-void);
+  background: var(--prism-void);
   font: 400 1rem/1.4 var(--prism-font);
+}
+/* The front lens's colour on the dark: one glow per lens on its own
+   compositor layer, crossfaded, so turning to the next lens never repaints
+   the whole room (a full-viewport gradient) in the turn's first frames. */
+#prism-backdrop .prism-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    60% 55% at 50% 52%,
+    color-mix(in srgb, var(--band) 16%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  will-change: opacity;
+}
+#prism-backdrop .prism-glow.is-lit {
+  opacity: 1;
 }
 #prism-stage {
   position: fixed;
@@ -329,6 +341,9 @@
   inset: 0;
   pointer-events: none;
   transition: opacity 0.8s ease;
+  /* Kept on their own layers: promoted only while fading, they made the
+     face under them repaint, a whole face at the start and end of a turn. */
+  will-change: opacity;
 }
 #prism-stage .prism-face::before {
   background: linear-gradient(
@@ -377,37 +392,9 @@
 
 /* Layers that fade in over the moving camera get their own compositor
    layer up front, so the fade never repaints the scene. */
-#prism-backdrop .prism-light,
 #prism-stage .prism-hud,
 #prism-backdrop .prism-whisper {
   will-change: opacity, transform;
-}
-
-/* White light in, five lenses out. */
-#prism-backdrop .prism-light {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1.2s ease 0.3s;
-  pointer-events: none;
-}
-#prism-backdrop[data-outside="true"] .prism-light {
-  opacity: 1;
-}
-#prism-backdrop .prism-beam {
-  stroke: #fff;
-  stroke-width: 3;
-  stroke-opacity: 0.9;
-}
-#prism-backdrop .prism-band {
-  fill: var(--band);
-  opacity: 0.16;
-  transition: opacity 0.6s ease;
-}
-#prism-backdrop .prism-band.is-lit {
-  opacity: 0.55;
 }
 
 #prism-backdrop .prism-whisper {
