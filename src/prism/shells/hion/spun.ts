@@ -105,7 +105,7 @@ export const WRITTEN = "h1, h2, h3, h4, h5, h6, .hion-tied__title";
  * text (paragraphs, intros, summaries, captions, the spoken lines, links
  * inside prose) is type. Kept in step with shell.css. */
 export const LABELS =
-  ".hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th";
+  ".hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-foot__mail";
 
 /** A label that hangs on a drop or a pull-cord of its own is written on a
  * canvas inside it (it swings), on from the knot its drop ends in: ink.ts
@@ -172,7 +172,7 @@ const chalk = (el: HTMLElement) => {
  * inside it (the home words, one thread each), in document order. */
 function headings(root: ParentNode): HTMLElement[] {
   const out: HTMLElement[] = [];
-  for (const el of root.querySelectorAll<HTMLElement>(`main :is(${WRITTEN}), main [data-spun], main :is(${LABELS})`)) {
+  for (const el of root.querySelectorAll<HTMLElement>(`main :is(${WRITTEN}), main [data-spun], :is(main, .hion-foot) :is(${LABELS})`)) {
     if (el.closest(".hion-sr, [hidden]")) continue;
     // A label inside something already written is written with it.
     if (el.matches(LABELS) && el.parentElement?.closest(`${WRITTEN}, ${LABELS}`)) continue;
@@ -437,7 +437,11 @@ function textRuns(el: HTMLElement): Run[] {
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const text = node.nodeValue ?? "";
-    if (node.parentElement?.closest(".hion-sr, [hidden], [aria-hidden='true']")) continue;
+    // Hidden inside it (a screen reader's words, an icon's); a label that
+    // is itself hidden from a screen reader (the years round a role, which
+    // its date line says) is still drawn.
+    const hidden = node.parentElement?.closest(".hion-sr, [hidden], [aria-hidden='true']");
+    if (hidden && hidden !== el && el.contains(hidden)) continue;
     for (const match of text.matchAll(/\S+/g)) {
       const from = match.index;
       const to = from + match[0].length;
@@ -478,6 +482,53 @@ function lineRuns(range: Range, node: Node, from: number, to: number): [number, 
   return runs;
 }
 
+/** A label's way, on from a knot (its drop's end, a strand beside it):
+ * down from it into the line under the letters' feet and along that to
+ * where the first letter rises, the lead before the knot given up; or, a
+ * knot over the word itself, round above the first letter and down into
+ * the line before it, never through a letter. */
+function onFrom(from: Pt, way: Pt[]): Pt[] {
+  const line = way[0][1];
+  let rise = 0;
+  while (rise < way.length - 2 && Math.abs(way[rise + 1][1] - line) < 2) rise++;
+  const [fx, fy] = from;
+  if (fx > way[rise][0] + 4) {
+    return [from, [way[0][0] - 2, fy + (line - fy) * 0.3], [way[0][0] - 3, line - 8], ...way];
+  }
+  let k = 0;
+  while (k < rise && way[k][0] <= fx + 5) k++;
+  if (Math.abs(fy - line) <= 12) return [from, ...way.slice(k)];
+  return [...bend(from, line), ...way.slice(k)];
+}
+
+/** Straight down from a knot to the line at y and into it, turning a
+ * tight corner (as the thread turns at every letter's foot): dense enough
+ * that the curve laid through it does not swing out into a bracket. */
+function bend([x, y0]: Pt, y: number): Pt[] {
+  const r = 5;
+  const out: Pt[] = [];
+  for (let yy = y0; yy < y - r; yy += 4) out.push([x, yy]);
+  for (let k = 0; k <= 6; k++) {
+    const a = Math.PI - (k / 6) * (Math.PI / 2);
+    out.push([x + r + Math.cos(a) * r, y - r + Math.sin(a) * r]);
+  }
+  return out;
+}
+
+/** Where a thread of the resume's track runs beside a label on it, level
+ * with y (the label's own px): the circle a year sits in (its pad, weave.ts
+ * `data-orbit-pad`), or the strand down the left of the role it is in. */
+function strandBeside(el: HTMLElement, y: number): Pt | null {
+  if (!el.closest("[data-cloth-hold]")) return null;
+  if (el.hasAttribute("data-orbit")) {
+    const pad = parseFloat((el.dataset.orbitPad ?? "34,30").split(",")[0]);
+    return [-pad + 4, y];
+  }
+  const role = el.closest<HTMLElement>("[data-spine='loop']");
+  if (!role) return null;
+  return [role.getBoundingClientRect().left - el.getBoundingClientRect().left, y];
+}
+
 /* ---------- The names on the line ---------- */
 
 /** The names hanging from the line at the top, written by thread like
@@ -486,7 +537,7 @@ function lineRuns(range: Range, node: Node, from: number, to: number): [number, 
  * screen); at once on a still screen. A name the face cannot write keeps
  * its chalk. */
 export function spinNav(nav: HTMLElement, options: SpunOptions) {
-  const labels = [...nav.querySelectorAll<HTMLElement>(".hion-charm__label")];
+  const labels = [...nav.querySelectorAll<HTMLElement>(".hion-charm__label, .hion-pull__label")];
   if (!labels.length) return;
   const { signal } = options;
   const late = window.setTimeout(() => labels.forEach(chalk), FONT_WAIT);
@@ -539,16 +590,10 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   // From the knot its drop ends in (a hung label), straight down into the
   // line under its feet; from the knots its weft stops in (strung); else
   // in along the line.
-  let start = 0;
-  if (from) while (start < spun.way.length - 2 && spun.way[start][0] < from[0]) start++;
-  const way = smooth(
-    spun.knotted
-      ? spun.way
-      : from
-        ? [from, [from[0], spun.way[start][1] - 6], ...spun.way.slice(start)]
-        : [[spun.way[0][0] - lead, spun.way[0][1] + 2], ...spun.way],
-    4,
-  );
+  // Riding the resume's track: on from the track's own threads, the circle
+  // round a year or the strand down the role's side, along the line.
+  if (!from && !spun.knotted) from = strandBeside(el, spun.way[0][1]) ?? undefined;
+  const way = smooth(spun.knotted ? spun.way : from ? onFrom(from, spun.way) : [[spun.way[0][0] - lead, spun.way[0][1] + 2], ...spun.way], 4);
   const arcs = [0];
   for (let k = 1; k < way.length; k++) arcs.push(arcs[k - 1] + Math.hypot(way[k][0] - way[k - 1][0], way[k][1] - way[k - 1][1]));
   const total = arcs[arcs.length - 1];

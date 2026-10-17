@@ -41,9 +41,9 @@
   --hion-label-caps: normal;
   --hion-label-track: 0.12em;
   /* The least a label is set at: a 3px thread writes Aboreto's capitals
-     legibly from about 22px (spun.ts LABELS); smaller, they clog (a U
+     legibly from about 24px (spun.ts LABELS); smaller, they clog (a U
      reads as a Y, a D as a P). */
-  --hion-label-least: 1.375rem;
+  --hion-label-least: 1.5rem;
   --hion-gutter: clamp(20px, 6vw, 96px);
   --hion-loop-pad: clamp(40px, 5vw, 72px);
   --hion-ease-swing: cubic-bezier(0.2, 1.55, 0.4, 1);
@@ -212,7 +212,7 @@
 
 /* The names on the line are written by thread too (spun.ts spinNav), on
    from the knot each hangs by: nothing shows before the thread. */
-:root[data-lens="hion"] .hion-charm__label:not([data-spun-state="chalk"]) {
+:root[data-lens="hion"] :is(.hion-charm__label, .hion-pull__label):not([data-spun-state="chalk"]) {
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
@@ -3010,6 +3010,22 @@
   line-height: 1.5;
 }
 
+/* The foot's labels too: its links hang on drops from a cord, and the
+   address is a link on, in the label face. */
+:root[data-lens="hion"] .hion-foot :is(.hion-tag, .hion-foot__mail):not([data-spun-state="chalk"]),
+:root[data-lens="hion"] .hion-foot :is(.hion-tag, .hion-foot__mail):not([data-spun-state="chalk"]) * {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+:root[data-lens="hion"] .hion-foot__mail {
+  font-family: var(--hion-label);
+  font-size: clamp(var(--hion-label-least), 3vw, 1.9rem);
+  font-weight: var(--hion-label-weight);
+  letter-spacing: var(--hion-label-track);
+}
+
 /* A tag's term and value are two lines of one label: one size, and room
    between them for the run under the first. */
 :root[data-lens="hion"] .hion-screen .hion-tag--meta dd {
@@ -3096,9 +3112,11 @@
   color: var(--hion-ml);
 }
 
-/* A strung heading, and any heading that slides with the resume's track,
-   is written on a canvas of its own inside it, over its box. */
-:root[data-lens="hion"] [data-spun-local] {
+/* A strung heading, any heading or label that slides with the resume's
+   track, and a hung label are written on a canvas of its own inside it,
+   over its box: it is the canvas's containing block, unless it is placed
+   already (a year in its circle is absolute). */
+:root[data-lens="hion"] :where([data-spun-local]) {
   position: relative;
 }
 

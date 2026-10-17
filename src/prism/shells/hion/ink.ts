@@ -16,7 +16,7 @@
  *   tassel the two hions falling from a knot and parting in two curls
  *
  * The hang length is `--hion-hang` on the element (px). */
-import { pendant } from "./dance";
+import { curl, pendant } from "./dance";
 import { drawnOn, still, textExtent } from "./dom";
 import { LABELS } from "./spun";
 import { Kind, type Mark, Path, knot, paint, paintGlows, patterns, rng, thread, wraps, type Hue } from "./pastel";
@@ -59,9 +59,12 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
       el.dataset.knot = `${(x - PAD).toFixed(1)},0`;
       el.style.setProperty("--hion-ink-ox", `${(x - PAD).toFixed(1)}px`);
     }
-    if (drop > 2) out.push(...line(x, top, x, at + 2, seed));
+    // Written by thread, the drop goes on into the words: no knot at its
+    // end (a ring there reads as an opening bracket).
+    const on = !!el.dataset.knot && (type === "charm" ? !!el.querySelector(".hion-charm__label") : el.matches(LABELS));
+    if (drop > 2) out.push(...line(x, top, x, at + (on ? 0 : 2), seed));
     out.push(...knot(x, top + 1, 3.5, seed + 1));
-    out.push(...knot(x, at + 1, type === "charm" ? 5.5 : 4.5, seed + 2));
+    if (!on) out.push(...knot(x, at + 1, type === "charm" ? 5.5 : 4.5, seed + 2));
   } else if (type === "pair") {
     const inset = Math.min(18, w * 0.08);
     const xl = PAD + inset;
@@ -86,14 +89,21 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
   } else if (type === "pull") {
     const x = PAD + 6;
     el.dataset.knot = `6,${(h * 0.5).toFixed(1)}`;
-    if (drop > 2) out.push(...line(x, top, x, at + h * 0.5 - 6, seed));
+    // The thread goes on from here into the words (spun.ts): no knot.
+    if (drop > 2) out.push(...line(x, top, x, at + h * 0.5, seed));
     if (!el.hasAttribute("data-hang")) out.push(...knot(x, top + 1, 3.5, seed + 2));
-    out.push(...knot(x, at + h * 0.5, 5, seed + 1));
   } else if (type === "tassel") {
     const side = parseFloat(getComputedStyle(el).getPropertyValue("--hion-tassel-x"));
     const x = PAD + (Number.isNaN(side) ? w / 2 : 12 + side * (w - 24));
     if (drop > 2) out.push(...line(x, top, x, at, seed));
-    out.push(...pendant(x, at, Math.min(70, h * 0.85), seed + 2));
+    const length = Math.min(70, h * 0.85);
+    out.push(...pendant(x, at, length, seed + 2));
+    if (el.querySelector(".hion-pull__label")) {
+      // The word under the tassel is written on from the end of its cyan
+      // curl (pendant's own, dance.ts).
+      const end = curl(x, at, -1, length * 0.85, seed + 2, 1.8).at(-1);
+      if (end) el.dataset.knot = `${(end[0] - PAD).toFixed(1)},${(end[1] - at).toFixed(1)}`;
+    }
   }
   return out;
 }
