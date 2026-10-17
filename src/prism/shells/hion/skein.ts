@@ -951,10 +951,13 @@ export function createSkein(options: SkeinOptions) {
 
   /** How a heading is written: at a hand's pace for letters its size (a
    * few capitals a second, so larger letters go faster), every heading in
-   * one to three seconds; the warm run behind the head about a capital
-   * long. */
+   * one to three seconds and every label in under two; the warm run
+   * behind the head about a capital long. */
   function writing(spun: Spun, total: number) {
-    const time = Math.max(1.1, Math.min(3, total / (spun.size * 11)));
+    // A label (small, and there are many) is a quick hand: a screen is not
+    // left half written.
+    const small = spun.size < 30;
+    const time = Math.max(small ? 0.6 : 1.1, Math.min(small ? 1.6 : 3, total / (spun.size * (small ? 16 : 11))));
     return { speed: total / time, tail: Math.max(22, Math.min(70, spun.size * 1.1)) };
   }
 
