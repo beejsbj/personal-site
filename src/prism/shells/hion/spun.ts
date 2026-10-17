@@ -16,8 +16,8 @@
  * after. Only body text is type.
  *
  * Most headings are strands like every other (skein.ts, the `title` kind: a
- * hot head on a slack rope, laid on the ground as it cools, the one
- * material), so a hover loop weaves over and under thread, and a thread
+ * growing end on a slack rope, finer toward its tip, laid on the ground
+ * as it settles, the one material), so a hover loop weaves over and under thread, and a thread
  * from a click winds through it. The real text stays where it was,
  * transparent from the moment the screen is built (shell.css `WRITTEN`),
  * so nothing shows before the thread writes it, and it still reads,
@@ -74,8 +74,9 @@ export interface Measure {
  * canvas: a run of thread (pts are x,y pairs; `heat` per point warms it
  * toward a head) and the head's own light. */
 export interface Material {
-  run(ctx: CanvasRenderingContext2D, hue: Hue, w: number, glow: number, pts: number[], base: number, heat: number[] | null): void;
-  head(ctx: CanvasRenderingContext2D, hue: Hue, w: number, x: number, y: number, heat: number): void;
+  run(ctx: CanvasRenderingContext2D, hue: Hue, w: number, glow: number, pts: number[], base: number): void;
+  /** A growing end, finer toward its tip by `grow` (pts end at the tip). */
+  tip(ctx: CanvasRenderingContext2D, hue: Hue, glow: number, pts: number[], base: number, grow: number): void;
   /** The title kind's width and glow. */
   nature(): { w: number; glow: number };
   /** How a title is written: its width, pace (px a second) and the warm
@@ -509,18 +510,12 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
     const pts: number[] = [];
     for (let k = 0; k < way.length && arcs[k] <= cool; k++) pts.push(way[k][0], way[k][1]);
     if (cool > 0 && cool < total) pts.push(...at(cool));
-    if (pts.length >= 4) material.run(ctx, hue, w, glow, pts, 1, null);
+    if (pts.length >= 4) material.run(ctx, hue, w, glow, pts, 1);
     if (heat <= 0.001 || span < 2) return;
-    const hot: number[] = [];
-    const warm: number[] = [];
+    const growing: number[] = [];
     const steps = Math.max(2, Math.ceil(span / 4));
-    for (let j = 0; j <= steps; j++) {
-      hot.push(...at(cool + (span * j) / steps));
-      warm[j] = heat * (j / steps) ** 2;
-    }
-    material.run(ctx, hue, w, glow, hot, 1, warm);
-    const [hx, hy] = at(s);
-    material.head(ctx, hue, w, hx, hy, heat);
+    for (let j = 0; j <= steps; j++) growing.push(...at(cool + (span * j) / steps));
+    material.tip(ctx, hue, glow, growing, 1, heat);
   };
   // Laid out anew (the track fits its roles to the window): written
   // again, settled.
