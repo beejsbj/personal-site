@@ -3005,6 +3005,30 @@
   font-size: 1.4rem;
 }
 
+/* The labels (spun.ts LABELS) are written by thread too, so they are set
+   as the small headings are: capitals only (the face's small capitals are
+   too small inside for a 3px thread to run up and down), at least 20px,
+   tracked open, and level (a thread writes along a line; a tag still
+   sways on its drop). */
+:root[data-lens="hion"] .hion-screen :is(.hion-eyebrow, .hion-meta, .hion-resume__when, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li) {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+}
+
+:root[data-lens="hion"] .hion-screen :is(.hion-eyebrow, .hion-meta, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li) {
+  font-size: 20px;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-row--works .hion-meta {
+  rotate: none;
+}
+
+/* Room under a term for the run along its feet, clear of its value. */
+:root[data-lens="hion"] .hion-screen .hion-tag--meta dt {
+  margin-bottom: 0.45em;
+}
+
 /* A run lies under each line of a heading: room between the lines for it,
    so it reads as the line above's and never strikes through the next. */
 :root[data-lens="hion"] .hion-screen .hion-title {
@@ -3028,8 +3052,8 @@
    accessibility tree, reads, selects and is found, and a link in it keeps
    its focus ring). A heading the thread cannot write, or that is left in
    sight unwritten, gets its chalk back (data-spun-state="chalk"). */
-:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title):not([data-spun-state="chalk"]),
-:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title):not([data-spun-state="chalk"]) :not([data-spun-state="chalk"], [data-spun-state="chalk"] *) {
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-resume__when, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li):not([data-spun-state="chalk"]),
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-resume__when, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li):not([data-spun-state="chalk"]) :not([data-spun-state="chalk"], [data-spun-state="chalk"] *) {
   color: transparent;
   -webkit-text-fill-color: transparent;
   text-shadow: none;
@@ -3063,10 +3087,6 @@
 
 /* A strung heading, and any heading that slides with the resume's track,
    is written on a canvas of its own inside it, over its box. */
-:root[data-lens="hion"] [data-spun-local] {
-  position: relative;
-}
-
 :root[data-lens="hion"] .hion-spun-local {
   position: absolute;
   z-index: 1;

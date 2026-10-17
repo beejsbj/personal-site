@@ -23,13 +23,13 @@
  * so nothing shows before the thread writes it, and it still reads,
  * selects, finds and speaks as text.
  *
- * Two kinds of heading are written on a canvas of their own inside the
+ * Three kinds of heading are written on a canvas of their own inside the
  * heading, with the skein's material and a head of their own, rather
  * than on the page's ground: a strung heading, whose black box keeps the
  * hions and the weft from showing through its words (the thread is drawn
- * over the box), and any heading inside something that slides over the
+ * over the box), any heading inside something that slides over the
  * page (the resume's track across, `[data-cloth-hold]`), which slides
- * with it.
+ * with it, and every label (`LABELS`), most of which hang and sway.
  *
  * This file measures and queues: it reads a heading's letters off the
  * page as a bitmap, a line at a time, in the real face (every heading is
@@ -97,9 +97,17 @@ interface SpunOptions {
   signal: AbortSignal;
 }
 
-/** What is written by thread: every heading on a screen, and the titles
- * of updates (set as paragraphs). Kept in step with shell.css. */
-export const WRITTEN = "h1, h2, h3, h4, h5, h6, .hion-tied__title";
+/** The small words set in the label face: eyebrows, dates and kinds
+ * (project meta, an update's date, a role's dates), the resume's years,
+ * tags, link charms and the tools on a project. Written by thread like a
+ * heading, each on a canvas of its own inside it (most of them hang and
+ * sway). Kept in step with shell.css. */
+export const LABELS = ".hion-eyebrow, .hion-meta, .hion-resume__when, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li";
+
+/** What is written by thread: every heading on a screen, the titles of
+ * updates (set as paragraphs), and the labels. Kept in step with
+ * shell.css. */
+export const WRITTEN = `h1, h2, h3, h4, h5, h6, .hion-tied__title, ${LABELS}`;
 
 /** Below this font size a thread cannot write legibly. */
 const SMALLEST = 15;
@@ -253,7 +261,7 @@ function hueOf(el: HTMLElement): Hue {
 }
 
 function spin(el: HTMLElement, options: SpunOptions) {
-  if (el.closest("[data-cloth-hold]") || el.matches(".hion-strung")) {
+  if (el.closest("[data-cloth-hold]") || el.matches(`.hion-strung, ${LABELS}`)) {
     writeLocal(el, hueOf(el), options);
     return;
   }
@@ -299,6 +307,8 @@ export function measure(el: HTMLElement, page: DOMRect): Spun | null {
   const room = Math.round(size * 0.12) + 6;
   const runs = textRuns(el);
   if (!runs.length) return null;
+  // The letters as they are set (a label is set in capitals by CSS).
+  if (style.textTransform === "uppercase") for (const run of runs) run.text = run.text.toUpperCase();
   // Where the words sit is read from the bottom of their boxes (the
   // baseline is that less the face's descent): the top of a text box can
   // carry a line's extra height.
@@ -404,7 +414,13 @@ function textRuns(el: HTMLElement): Run[] {
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const text = node.nodeValue ?? "";
-    if (node.parentElement?.closest(".hion-sr, [hidden], [aria-hidden='true']")) continue;
+    const parent = node.parentElement;
+    if (!parent || parent.closest(".hion-sr, [hidden]")) continue;
+    // Hidden from a reader inside the word (an icon, a mark); a word
+    // hidden as a whole (the resume's years, a picture of the dates read
+    // elsewhere) is still written.
+    const hid = parent.closest("[aria-hidden='true']");
+    if (hid && hid !== el && el.contains(hid)) continue;
     for (const match of text.matchAll(/\S+/g)) {
       const from = match.index;
       const to = from + match[0].length;
@@ -464,7 +480,12 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   }
   el.dataset.spunState = "spun";
   el.setAttribute("data-spun-local", "");
-  const lead = 36;
+  // Its canvas is placed inside it: somewhere to place it from, unless it
+  // is placed already (the resume's years hang where the track puts them).
+  if (getComputedStyle(el).position === "static") el.style.position = "relative";
+  // A little line in before the first letter: shorter for a small word,
+  // or it reads as an underline.
+  const lead = Math.min(36, spun.size * 0.8);
   const way = smooth(spun.knotted ? spun.way : [[spun.way[0][0] - lead, spun.way[0][1] + 2], ...spun.way], 4);
   const arcs = [0];
   for (let k = 1; k < way.length; k++) arcs.push(arcs[k - 1] + Math.hypot(way[k][0] - way[k - 1][0], way[k][1] - way[k - 1][1]));
