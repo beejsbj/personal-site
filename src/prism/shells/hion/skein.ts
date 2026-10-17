@@ -1918,9 +1918,31 @@ export function createSkein(options: SkeinOptions) {
       tiles.clear();
       cull();
       bandFresh = true;
+      layWaiting();
       task.wake();
     };
     slice();
+  }
+
+  /** Headings begun while the screen was settling (spun.ts): laid now,
+   * written at once on a still screen. */
+  function layWaiting() {
+    const laid = new Set(strands.map((st) => (st.drive.by === "title" ? st.drive.el : null)));
+    const waiting = [...titles.keys()].filter((el) => !laid.has(el));
+    if (!waiting.length) return;
+    page.classList.add("hion-measuring");
+    const p = page.getBoundingClientRect();
+    const measured = waiting.map((el) => [el, el.isConnected ? titles.get(el)!.measure(p) : null] as const);
+    page.classList.remove("hion-measuring");
+    for (const [el, spun] of measured) {
+      if (!spun) {
+        el.dataset.spunState = "chalk";
+        titles.delete(el);
+        continue;
+      }
+      const st = title(el, titles.get(el)!.hue, spun);
+      if (instant) whole(st);
+    }
   }
 
   /** On arrival the first screen is not bare: its threads are already
