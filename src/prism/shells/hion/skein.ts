@@ -888,7 +888,7 @@ export function createSkein(options: SkeinOptions) {
    * nearest drawn hion of its own hue if one runs near, otherwise in from
    * the page's edge when the heading is near it, otherwise from a little
    * before the word. */
-  function title(el: HTMLElement, hue: Hue, spun: Spun) {
+  function title(el: HTMLElement, hue: Hue, spun: Spun, twist: 0 | 1 | -1 = el.matches(SAID) ? 1 : 0): Strand {
     let way = spun.way;
     let from: { parent: Strand; s: number } | undefined;
     let approach = 0;
@@ -899,7 +899,8 @@ export function createSkein(options: SkeinOptions) {
       const [x0, y0] = way[0];
       const [x1, y1] = way[Math.min(way.length - 1, 3)];
       const l = Math.hypot(x1 - x0, y1 - y0) || 1;
-      const root = rootFor([x0, y0], [(x1 - x0) / l, (y1 - y0) / l], hue) ?? hionRoot(x0, y0, hue);
+      // A said word's second thread comes off the other tree.
+      const root = rootFor([x0, y0], [(x1 - x0) / l, (y1 - y0) / l], hue, 760, undefined, twist < 0) ?? hionRoot(x0, y0, hue);
       if (root) {
         from = { parent: root.parent, s: root.s };
         hue = root.parent.t.hue;
@@ -908,8 +909,19 @@ export function createSkein(options: SkeinOptions) {
       }
     }
     const n: Nature = { ...nature("title") };
-    const smoothed = smooth(way, 4);
+    let smoothed = smooth(way, 4);
+    let under: number[] = [];
+    if (twist) {
+      // Where the letters begin along the smoothed way.
+      const lead = approach ? approachLength(way, approach) : 0;
+      let at = 0;
+      for (let run = 0; at < smoothed.length - 1 && run < lead; at++) run += Math.hypot(smoothed[at + 1][0] - smoothed[at][0], smoothed[at + 1][1] - smoothed[at][1]);
+      const tw = twisted(smoothed.slice(at), twist, at);
+      smoothed = [...smoothed.slice(0, at), ...tw.out];
+      under = tw.under;
+    }
     const t = fate.bare(hue, smoothed);
+    for (const i of under) t.under.add(i);
     const st = make("title", n, t, { by: "title", el }, from);
     const total = measureBody(st);
     // Where the letters begin along it: the approach is grown, not written.
@@ -918,7 +930,57 @@ export function createSkein(options: SkeinOptions) {
     st.pace = paceOf(st, letters);
     strands.push(st);
     el.dataset.spunState = "spun";
+    // Said: written by both trees at once, the other's thread twisted
+    // round this one.
+    if (twist > 0) twins.set(st, title(el, hue === "c" ? "m" : "c", spun, -1));
     return st;
+  }
+
+  /** What is said (spun.ts LABELS: the greeting, the role line, the
+   * portrait's word, the foot's call): written by both trees. */
+  const SAID = ".hion-hello, .hion-role, .hion-portrait__link, .hion-foot__call";
+  /** A said word's two threads: how far either side of its letters (in
+   * threads), and how often they cross (px). */
+  const TWIST = 1.3;
+  const TURN = 48;
+
+  /** A said word's second thread, by its first. */
+  const twins = new WeakMap<Strand, Strand>();
+
+  /** A said word's two threads through its letters: along the run under
+   * their feet they twist round each other, each going under the other by
+   * turns; up through a letter they are one, the cyan and the magenta on
+   * top letter by letter, so each letter is one clean stroke (twisted
+   * through the letters themselves, they could not be read). */
+  function twisted(piece: Pt[], sign: 1 | -1, base: number) {
+    const out: Pt[] = [];
+    const under: number[] = [];
+    let run = 0;
+    let letter = 0;
+    let was = 1;
+    piece.forEach(([x, y], i) => {
+      if (i) run += Math.hypot(x - piece[i - 1][0], y - piece[i - 1][1]);
+      // The run is the lowest of the way near by (capitals have no tails).
+      let low = y;
+      for (let k = Math.max(0, i - 24); k < Math.min(piece.length, i + 25); k++) low = Math.max(low, piece[k][1]);
+      const on = Math.max(0, Math.min(1, (y - (low - 7)) / 4));
+      if (was >= 0.5 && on < 0.5) letter++;
+      was = on;
+      const a = piece[Math.max(0, i - 3)];
+      const b = piece[Math.min(piece.length - 1, i + 3)];
+      const d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      const tx = (b[0] - a[0]) / d;
+      const ty = (b[1] - a[1]) / d;
+      const w = Math.sin((run / TURN) * Math.PI * 2) * on;
+      out.push([x - ty * w * TWIST * THREAD * sign, y + tx * w * TWIST * THREAD * sign]);
+      const c = Math.round(run / (TURN / 2));
+      if (on < 0.5 ? letter % 2 === 0 : Math.abs(w) < 0.5 * on && c % 2 === 0) {
+        if (sign > 0) under.push(base + i);
+      } else if (on < 0.5 || Math.abs(w) < 0.5 * on) {
+        if (sign < 0) under.push(base + i);
+      }
+    });
+    return { out, under };
   }
 
   /** How long the first `n` points of a way run (px). */
@@ -1008,6 +1070,8 @@ export function createSkein(options: SkeinOptions) {
 
   /** A word's thread, written at once and lying cold. */
   function whole(st: Strand) {
+    const twin = twins.get(st);
+    if (twin) whole(twin);
     st.s = measureBody(st);
     st.heat = 0;
     st.motion = 0;
