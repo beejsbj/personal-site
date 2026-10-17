@@ -101,7 +101,7 @@ import { still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
 import { type Hue, type Pt, RGB, rng, THREAD } from "./pastel";
 import { type Box, encircle as encircle_, ring, smooth, stitches, weave, wordBoxes } from "./wind";
-import { extend, type Leg, leg } from "./route";
+import { extend, type Leg, leg, travel } from "./route";
 import type { Material, Measure, Spun } from "./spun";
 
 type Loom = ReturnType<typeof createLoom>;
@@ -2315,9 +2315,13 @@ export function createSkein(options: SkeinOptions) {
     let moving = false;
     let offscreen = false;
     for (const fx of effects) {
+      // Moving, it is repainted where it was and is; held still (a line
+      // pulled aside while you hover), it stays where it is, untouched;
+      // gone, where it was is cleared.
       const alive = fx.e.step(now, Math.min(dt, 64));
-      const boxes = alive ? fx.e.boxes() : [];
-      if (alive || fx.last.length) cleared.push(...fx.last, ...boxes);
+      const boxes = fx.e.boxes();
+      if (alive) cleared.push(...fx.last, ...boxes);
+      else if (fx.last.length && !boxes.length) cleared.push(...fx.last);
       fx.last = boxes;
       if (alive) moving = true;
     }
@@ -2574,6 +2578,183 @@ export function createSkein(options: SkeinOptions) {
     return null;
   }
 
+  /** A stretch of a line pulled out of its course through something you
+   * hover (a bight: the same line bent, not a thread of its own): `orig`
+   * is the stretch as it lies, `path` where it is pulled to, both resampled
+   * alike; `u` how far it has been pulled (0 to 1). While it is out, the
+   * stretch is lifted off the ground. */
+  interface Bight {
+    el: Element;
+    st: Strand;
+    i0: number;
+    i1: number;
+    orig: Pt[];
+    path: Pt[];
+    u: number;
+    dir: 1 | -1;
+    box: Box;
+  }
+  let bight: Bight | null = null;
+  /** How long a pull takes (ms), and how long a stretch it takes (px). */
+  const PULL = 380;
+  const BIGHT = 150;
+
+  /** Points evenly along a run, n of them. */
+  function resample(pts: Pt[], n: number): Pt[] {
+    const ls = [0];
+    for (let k = 1; k < pts.length; k++) ls.push(ls[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]));
+    const total = ls[ls.length - 1] || 1;
+    const out: Pt[] = [];
+    let j = 1;
+    for (let k = 0; k < n; k++) {
+      const s = (total * k) / (n - 1);
+      while (j < ls.length - 1 && ls[j] < s) j++;
+      const u = (s - ls[j - 1]) / (ls[j] - ls[j - 1] || 1);
+      out.push([pts[j - 1][0] + (pts[j][0] - pts[j - 1][0]) * u, pts[j - 1][1] + (pts[j][1] - pts[j - 1][1]) * u]);
+    }
+    return out;
+  }
+
+  /** Lift a stretch of a strand off the ground (erase), or put the ground
+   * back where it lay (repaint those panes). */
+  function lift(st: Strand, i0: number, i1: number, back: boolean) {
+    const { xs, ys } = st.t;
+    let l = Infinity;
+    let t = Infinity;
+    let r = -Infinity;
+    let b = -Infinity;
+    for (let i = i0; i <= i1; i++) {
+      l = Math.min(l, xs[i]);
+      r = Math.max(r, xs[i]);
+      t = Math.min(t, ys[i]);
+      b = Math.max(b, ys[i]);
+    }
+    const [a, z] = tileRange(t - 12, b + 12);
+    for (let k = a; k <= z; k++) {
+      const tile = tiles.get(k);
+      if (!tile) continue;
+      if (back) {
+        paintTile(tile);
+        continue;
+      }
+      for (const pane of panesIn(tile, l - 12, r + 12)) {
+        const { ctx } = pane;
+        ctx.save();
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.lineWidth = THREAD * 2.8 + 2;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(xs[i0], ys[i0]);
+        for (let i = i0 + 1; i <= i1; i++) ctx.lineTo(xs[i], ys[i]);
+        ctx.stroke();
+        ctx.restore();
+        still(pane.el);
+      }
+    }
+  }
+
+  /** Pull the other line through what you hover: the stretch of it nearest
+   * bends out, weaves through the words (or rings a picture), and comes
+   * back in to where it was. */
+  function pull(el: Element) {
+    // Its words' hue, from the line that wrote it; the other line pulls.
+    let hue: Hue | null = null;
+    for (const line of lines.values()) {
+      if (line.way?.marks.some((m) => m.stop.el === el || el.contains(m.stop.el) || m.stop.el.contains(el))) hue = line.hue;
+    }
+    const other = lines.get(hue === "c" ? "m" : "c") ?? lines.get("c");
+    const st = other?.strand;
+    if (!st) return;
+    if (bight) {
+      lift(bight.st, bight.i0, bight.i1, true);
+      bight = null;
+    }
+    const p = page.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const box: Box = { l: r.left - p.left, t: r.top - p.top, r: r.right - p.left, b: r.bottom - p.top };
+    // The nearest of it that has grown, with room either side.
+    const near = touch((box.l + box.r) / 2, (box.t + box.b) / 2, 900, st.t.hue);
+    if (!near || near.st !== st || near.s < BIGHT || near.s > st.s - BIGHT) return;
+    const i0 = indexAt(st, near.s - BIGHT / 2);
+    const i1 = indexAt(st, near.s + BIGHT / 2);
+    if (i1 - i0 < 4 || i1 > st.laid) return;
+    const A: Pt = [st.t.xs[i0], st.t.ys[i0]];
+    const B: Pt = [st.t.xs[i1], st.t.ys[i1]];
+    const seed = Math.floor(performance.now() + box.l * 7);
+    const rand = rng(seed);
+    const pictured = el.querySelector("img, video, canvas.hion-woven-cover, .hion-woven-cover");
+    const text = (el.textContent ?? "").trim();
+    let through: Pt[] = [];
+    if (!pictured && text.length > 0 && text.length < 90) through = weave(wordBoxes(el, p), A, rand);
+    if (through.length < 2) through = encircle_(box, A, padFor(el), seed);
+    if (through.length < 2) return;
+    const dir = (pts: Pt[], end: boolean): Pt => {
+      const n = pts.length - 1;
+      const [a, b] = end ? [pts[Math.max(0, n - 3)], pts[n]] : [pts[0], pts[Math.min(n, 3)]];
+      const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      return [(b[0] - a[0]) / l, (b[1] - a[1]) / l];
+    };
+    const along = (i: number): Pt => {
+      const a = Math.max(0, i - 3);
+      const b = Math.min(st.t.xs.length - 1, i + 3);
+      const l = Math.hypot(st.t.xs[b] - st.t.xs[a], st.t.ys[b] - st.t.ys[a]) || 1;
+      return [(st.t.xs[b] - st.t.xs[a]) / l, (st.t.ys[b] - st.t.ys[a]) / l];
+    };
+    const clear = (x: number, y: number) => ground.clear(x, y);
+    const out = travel(A, along(i0), through[0], dir(through, false), clear, width).pts;
+    const back = travel(through[through.length - 1], dir(through, true), B, along(i1), clear, width).pts;
+    const path = [...out.slice(0, -1), ...through, ...back.slice(1)];
+    const n = Math.max(40, Math.ceil(path.length * 0.6));
+    const orig: Pt[] = [];
+    for (let i = i0; i <= i1; i++) orig.push([st.t.xs[i], st.t.ys[i]]);
+    let l = Infinity;
+    let t = Infinity;
+    let rr = -Infinity;
+    let bb = -Infinity;
+    for (const [x, y] of [...path, ...orig]) {
+      l = Math.min(l, x);
+      rr = Math.max(rr, x);
+      t = Math.min(t, y);
+      bb = Math.max(bb, y);
+    }
+    const pad = THREAD * 3 + 14;
+    bight = { el, st, i0, i1, orig: resample(orig, n), path: resample(path, n), u: 0, dir: 1, box: { l: l - pad, t: t - pad, r: rr + pad, b: bb + pad } };
+    lift(st, i0, i1, false);
+    task.wake();
+  }
+
+  effects.push({
+    last: [],
+    e: {
+      step(_now, dt) {
+        const b = bight;
+        if (!b) return false;
+        b.u = Math.max(0, Math.min(1, b.u + (b.dir * Math.min(dt, 48)) / PULL));
+        if (b.dir < 0 && b.u <= 0) {
+          lift(b.st, b.i0, b.i1, true);
+          bight = null;
+          return false;
+        }
+        return b.u < 1 || b.dir < 0;
+      },
+      boxes: () => (bight ? [bight.box] : []),
+      paint(ctx) {
+        const b = bight;
+        if (!b) return;
+        // Eased out of its course and in again, a little overshoot, as a
+        // taut line plucked aside does.
+        const u = b.u;
+        const e = u < 1 ? 1 - Math.pow(1 - u, 3) * (1 + 1.6 * u) : 1;
+        const pts: number[] = [];
+        for (let k = 0; k < b.path.length; k++) {
+          pts.push(b.orig[k][0] + (b.path[k][0] - b.orig[k][0]) * e, b.orig[k][1] + (b.path[k][1] - b.orig[k][1]) * e);
+        }
+        strokeRun(ctx, b.st.t.hue, THREAD, b.st.n.glow, pts, 1, null);
+      },
+    },
+  });
+
   /** Light through something a line wrote (a word, a ring), letter by
    * letter along the line, as if it were written again. */
   function retrace(el: Element) {
@@ -2598,10 +2779,10 @@ export function createSkein(options: SkeinOptions) {
    * leave, it withdraws into the thread it came from. Nothing near to
    * grow from, nothing grows. */
   function encircle(el: Element) {
-    // Two lines and nothing else: light runs through what you hover, along
-    // the line that wrote it.
+    // Two lines and nothing else: the other line is pulled out of its
+    // course through what you hover, and springs back when you leave.
     if (lines.size) {
-      retrace(el);
+      pull(el);
       return;
     }
     untie(null);
@@ -2653,6 +2834,7 @@ export function createSkein(options: SkeinOptions) {
 
   /** Untie the loop round el (null: whatever is hovered). */
   function untie(el: Element | null) {
+    if (bight && (el === null || bight.el === el)) bight.dir = -1;
     for (const st of strands) {
       const d = st.drive;
       if (d.by === "loop" && d.until === Infinity && (el === null || d.el === el) && d.state !== "untying") d.state = "untying";

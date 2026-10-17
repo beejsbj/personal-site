@@ -85,7 +85,7 @@ function cost(pts: Pt[], clear: Clear, width: number) {
 
 /** A travel from a point going `d0` to a point arriving going `d1`, bowed
  * over or under (the least crossing of the bows tried). */
-function travel(a: Pt, d0: Pt, b: Pt, d1: Pt, clear: Clear, width: number): { pts: Pt[]; cost: number } {
+export function travel(a: Pt, d0: Pt, b: Pt, d1: Pt, clear: Clear, width: number): { pts: Pt[]; cost: number } {
   const d = Math.hypot(b[0] - a[0], b[1] - a[1]);
   const k = Math.min(160, Math.max(24, d * 0.4));
   let best: { pts: Pt[]; cost: number } | null = null;
