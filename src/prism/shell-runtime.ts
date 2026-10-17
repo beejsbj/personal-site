@@ -73,12 +73,24 @@ if (document.documentElement.hasAttribute("data-prism-face")) {
 }
 
 const idleListeners = new Set<(idle: boolean) => void>();
-new MutationObserver(() => {
-  const idle = document.documentElement.hasAttribute("data-prism-idle");
-  idleListeners.forEach((listener) => listener(idle));
+const prismListeners = new Set<(open: boolean) => void>();
+/** The page is on its face of the open prism (Prism Exit to stepping in). */
+const inPrism = () =>
+  document.documentElement.classList.contains("prism-is-open");
+let wasInPrism = inPrism();
+new MutationObserver((records) => {
+  if (records.some((record) => record.attributeName === "data-prism-idle")) {
+    const idle = document.documentElement.hasAttribute("data-prism-idle");
+    idleListeners.forEach((listener) => listener(idle));
+  }
+  const open = inPrism();
+  if (open !== wasInPrism) {
+    wasInPrism = open;
+    prismListeners.forEach((listener) => listener(open));
+  }
 }).observe(document.documentElement, {
   attributes: true,
-  attributeFilter: ["data-prism-idle"],
+  attributeFilter: ["data-prism-idle", "class"],
 });
 
 let active:
@@ -142,9 +154,11 @@ async function mount(lens: string) {
     active = { lens, shell, controller, content: data };
     root.dataset.shell = lens;
     const listeners = new Set<(idle: boolean) => void>();
-    controller.signal.addEventListener("abort", () =>
-      listeners.forEach((listener) => idleListeners.delete(listener)),
-    );
+    const prismWatchers = new Set<(open: boolean) => void>();
+    controller.signal.addEventListener("abort", () => {
+      listeners.forEach((listener) => idleListeners.delete(listener));
+      prismWatchers.forEach((listener) => prismListeners.delete(listener));
+    });
     await shell.mount({
       root,
       content: data,
@@ -157,6 +171,11 @@ async function mount(lens: string) {
       onIdleChange(listener) {
         listeners.add(listener);
         idleListeners.add(listener);
+      },
+      inPrism,
+      onPrismChange(listener) {
+        prismWatchers.add(listener);
+        prismListeners.add(listener);
       },
     });
     if (

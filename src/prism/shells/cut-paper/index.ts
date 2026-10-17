@@ -10,7 +10,7 @@
 // swaps <head> on navigation and would drop a lazily injected stylesheet.
 import css from "./shell.css?inline";
 import type { LensShell, Route, RouteKind, ShellContext } from "../types";
-import { closeSound, stopAudition } from "./audio";
+import { closeSound, hush, stopAudition } from "./audio";
 import { noteVar, type Env, type Screen } from "./bits";
 import { h, setNewTabNote } from "./dom";
 import { EIGHTH_SECONDS } from "./music";
@@ -205,6 +205,11 @@ const shell: LensShell = {
     const transport = frame.transport;
     transport.setIdle(context.isIdle());
     context.onIdleChange((idle) => transport.setIdle(idle));
+    // On its face of the prism the session plays on (the playhead keeps
+    // moving while the face is looked at) but isn't heard; stepping back in
+    // it is heard again from wherever the playhead is.
+    hush(context.inPrism());
+    context.onPrismChange(hush);
     context.signal.addEventListener("abort", () => closeSound());
     // The router copies <html> attributes from the incoming page, which says
     // data-lens="daylight" until LensBoot re-applies the lens after the

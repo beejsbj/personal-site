@@ -329,6 +329,12 @@ export interface ShellContext {
    * CSS animations pause automatically; pause JS/canvas loops yourself. */
   isIdle(): boolean;
   onIdleChange(listener: (idle: boolean) => void): void;
+  /** The live page is showing on its face of the open prism, from Prism
+   * Exit until the visitor steps back in (or into another lens). It may
+   * still run there while it is the face being looked at; it should not be
+   * heard. */
+  inPrism(): boolean;
+  onPrismChange(listener: (open: boolean) => void): void;
 }
 
 export interface LensShell {

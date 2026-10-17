@@ -450,3 +450,123 @@ test(
     }
   },
 );
+
+/** Listens to every AudioContext's output and counts every note struck. */
+function earsOn() {
+  const connect = AudioNode.prototype.connect;
+  window.__ears = [];
+  AudioNode.prototype.connect = function (target, ...rest) {
+    if (target instanceof AudioDestinationNode) {
+      const ear = this.context.createAnalyser();
+      ear.fftSize = 2048;
+      connect.call(this, ear);
+      window.__ears.push(ear);
+    }
+    return connect.call(this, target, ...rest);
+  };
+  window.__strikes = [];
+  const start = AudioScheduledSourceNode.prototype.start;
+  AudioScheduledSourceNode.prototype.start = function (...args) {
+    window.__strikes.push(performance.now());
+    return start.apply(this, args);
+  };
+  window.__peak = () => {
+    const buffer = new Float32Array(2048);
+    let peak = 0;
+    for (const ear of window.__ears) {
+      ear.getFloatTimeDomainData(buffer);
+      for (const v of buffer) peak = Math.max(peak, Math.abs(v));
+    }
+    return peak;
+  };
+}
+
+test(
+  "Cut Paper plays on unheard in the prism, and is heard again stepping back in",
+  {
+    skip: skip || (LENSES.includes("cut-paper") ? false : "no cut-paper"),
+    timeout: 5 * 60_000,
+  },
+  async () => {
+    const { chromium: browserType } = await import("playwright-core");
+    const server = await serveRuntimeFixture();
+    const browser = await browserType.launch({ executablePath: executable });
+    try {
+      const context = await browser.newContext({ ...SIZES.desktop });
+      await context.addInitScript((all) => {
+        try {
+          localStorage.setItem("prism:found", "1");
+          localStorage.setItem("prism:journey", JSON.stringify(all));
+        } catch {}
+      }, ALL);
+      await context.addInitScript(earsOn);
+      const page = await context.newPage();
+      await page.goto(`${server.base}/?lens=cut-paper`);
+      await page.waitForSelector("html[data-shell-ready]");
+      await page.waitForTimeout(1200);
+      await page.click(".cp-sound");
+      await page.click(".cp-tp--play");
+      await page.waitForTimeout(1500);
+      const loudness = async () => {
+        let peak = 0;
+        for (let i = 0; i < 8; i += 1) {
+          peak = Math.max(peak, await page.evaluate(() => window.__peak()));
+          await page.waitForTimeout(60);
+        }
+        return peak;
+      };
+      const where = () =>
+        page.evaluate(() =>
+          document
+            .querySelector(".cp-pos__num")
+            .textContent.split(".")
+            .map(Number),
+        );
+      const later = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || 0;
+      assert.ok(
+        (await loudness()) > 0.01,
+        "the session is heard to begin with",
+      );
+
+      await pullOut(page);
+      const onFace = await where();
+      assert.ok((await loudness()) < 0.001, "heard on its face of the prism");
+      await page.waitForTimeout(800);
+      const stillOnFace = await where();
+      assert.ok(
+        later(stillOnFace, onFace) > 0,
+        `the playhead stopped on the face (${onFace} → ${stillOnFace})`,
+      );
+      assert.ok(
+        await page.evaluate(() =>
+          document.querySelector(".cp-app").hasAttribute("data-playing"),
+        ),
+      );
+
+      await page.keyboard.press("Escape");
+      await until(
+        page,
+        "Esc never stepped back in",
+        () => !document.getElementById("prism-stage"),
+      );
+      const stepped = await page.evaluate(() => performance.now());
+      const back = await where();
+      assert.ok(
+        later(back, stillOnFace) >= 0,
+        `the playhead went back (${stillOnFace} → ${back})`,
+      );
+      assert.ok((await loudness()) > 0.01, "not heard again stepping back in");
+      await page.waitForTimeout(300);
+      const struck = await page.evaluate(
+        (t) => window.__strikes.filter((at) => at > t && at < t + 300).length,
+        stepped,
+      );
+      // a held chord and bass at most, not the notes the hush passed over
+      assert.ok(struck <= 6, `${struck} notes struck on stepping back in`);
+      await context.close();
+    } finally {
+      await browser.close();
+      await server.close();
+    }
+  },
+);
