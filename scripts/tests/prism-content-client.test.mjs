@@ -136,5 +136,12 @@ test("the resume is classified under About, and nowhere else", () => {
   assert.equal(kindOf("/about/resume").kind, "resume");
   assert.equal(kindOf("/about/resume/").kind, "resume");
   assert.equal(kindOf("/about/elsewhere").kind, "other");
+  for (const path of [
+    "/about/resume/extra",
+    "/about/resume/extra/",
+    "/about/resume//",
+    "/about//resume",
+  ])
+    assert.equal(kindOf(path).kind, "other", path);
   assert.equal(kindOf("/resume").kind, "other");
 });

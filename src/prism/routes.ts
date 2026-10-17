@@ -16,11 +16,17 @@ export function kindOf(path: string): { kind: RouteKind; slug?: string } {
       ? { kind: match[1] ? "writing-entry" : "writing", slug: match[1] }
       : { kind: "other" };
   }
+  if (first === "about") {
+    // the resume is a page of About's; nothing else is, and no surplus segments
+    if (/^\/about\/?$/.test(path)) return { kind: "about", slug };
+    return {
+      kind: /^\/about\/resume\/?$/.test(path) ? "resume" : "other",
+      slug,
+    };
+  }
   const kinds: Record<string, RouteKind> = {
     projects: slug ? "project" : "projects",
     lab: slug ? "lab-entry" : "lab",
-    // the resume is a page of About's; nothing else is
-    about: !slug ? "about" : slug === "resume" ? "resume" : "other",
   };
   return { kind: path === "/" ? "home" : (kinds[first] ?? "other"), slug };
 }
