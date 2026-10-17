@@ -37,7 +37,8 @@
  *            off the hion if one runs near, else in from the page's edge
  *            or from just before the word, along a line under its feet
  *            and up through each letter in turn, out past the last. At a
- *            hand's pace for its size. Its way is kept and measured again when
+ *            hand's pace for its size, slower into the letters' turns,
+ *            its rope held close. Its way is kept and measured again when
  *            the page is laid out anew; it never fades. Of the one width,
  *            like every thread.
  *
@@ -237,6 +238,8 @@ interface Strand {
   dirty: boolean;
   /** Baked whole and off the live canvas. */
   cold: boolean;
+  /** A heading's pace at each point of its way (paceOf). */
+  pace?: Float32Array;
 }
 
 /** A hion, as company and as somewhere for a thread to go. */
@@ -785,6 +788,7 @@ export function createSkein(options: SkeinOptions) {
     const t = fate.bare(hue, smooth(way, 4));
     const st = make("title", n, t, { by: "title", el });
     Object.assign(n, writing(spun, measureBody(st)));
+    st.pace = paceOf(st);
     strands.push(st);
     el.dataset.spunState = "spun";
     return st;
@@ -799,6 +803,40 @@ export function createSkein(options: SkeinOptions) {
     return { speed: total / time, tail: Math.max(22, Math.min(70, spun.size * 1.1)) };
   }
 
+  /** How fast a heading's head goes at each point of its way, as a share
+   * of its speed: a hand slows into the turns of the letters and runs on
+   * along the line between them, and eases out at the start and in at the
+   * end. Averages to 1, so the heading takes as long as `writing` says. */
+  function paceOf(st: Strand) {
+    const { xs, ys } = st.t;
+    const n = xs.length;
+    const raw = new Float32Array(n);
+    const k = 3;
+    for (let i = 0; i < n; i++) {
+      const a = Math.max(0, i - k);
+      const b = Math.min(n - 1, i + k);
+      const ax = xs[i] - xs[a];
+      const ay = ys[i] - ys[a];
+      const bx = xs[b] - xs[i];
+      const by = ys[b] - ys[i];
+      const cos = (ax * bx + ay * by) / (Math.hypot(ax, ay) * Math.hypot(bx, by) || 1);
+      raw[i] = 1.3 - 0.75 * Math.sqrt(Math.max(0, (1 - cos) / 2));
+    }
+    const pace = new Float32Array(n);
+    const total = st.ls[n - 1] || 1;
+    let sum = 0;
+    for (let i = 0; i < n; i++) {
+      let s = 0;
+      let c = 0;
+      for (let j = Math.max(0, i - 5); j <= Math.min(n - 1, i + 5); j++, c++) s += raw[j];
+      const at = st.ls[i];
+      pace[i] = (s / c) * Math.min(1, 0.3 + at / 60, 0.3 + (total - at) / 90);
+      sum += pace[i];
+    }
+    const mean = sum / n || 1;
+    for (let i = 0; i < n; i++) pace[i] /= mean;
+    return pace;
+  }
 
   /** A word's thread, written at once and lying cold. */
   function whole(st: Strand) {
@@ -1193,9 +1231,11 @@ export function createSkein(options: SkeinOptions) {
       rope.oy[k] = y;
       // A slight sway across the thread while the head moves, and a
       // little sag: a thread drawn out taut, not a tail.
-      const sway = st.motion * 420 * Math.sin(now * 0.0031 + k * 0.5 + st.t.id * 1.7) * (1 - u) * u * 4;
+      // A heading's rope is held closer: its letters are small beside it.
+      const calm = st.kind === "title" ? 0.3 : 1;
+      const sway = calm * st.motion * 420 * Math.sin(now * 0.0031 + k * 0.5 + st.t.id * 1.7) * (1 - u) * u * 4;
       x += vx + nx * sway * sec * sec;
-      y += vy + (ny * sway + 220 * st.motion) * sec * sec;
+      y += vy + (ny * sway + calm * 220 * st.motion) * sec * sec;
       const f = 1 - Math.exp(-(3 + 34 * u * u) * sec);
       x += (tx - x) * f;
       y += (ty - y) * f;
@@ -1482,7 +1522,11 @@ export function createSkein(options: SkeinOptions) {
       const pace = near ? 1 : 6;
       const by = st.drive.by;
       // Drawn out by hand: pulled, eased, pulled again, never at one rate.
-      const pull = 0.72 + 0.28 * Math.sin(now * 0.0021 + st.t.id * 1.3) + 0.14 * Math.sin(now * 0.0053 + st.t.id * 0.7);
+      // A heading is written at its own pace (slower into the turns of its
+      // letters), barely pulled, so its letters come out even.
+      const pull = st.pace
+        ? st.pace[indexAt(st, st.s)] * (0.94 + 0.06 * Math.sin(now * 0.0021 + st.t.id * 1.3))
+        : 0.72 + 0.28 * Math.sin(now * 0.0021 + st.t.id * 1.3) + 0.14 * Math.sin(now * 0.0053 + st.t.id * 0.7);
       const speed = st.n.speed * pull * (by === "wind" ? 1.25 : by === "fate" && st.kind === "pointer" ? 0.55 : 1);
       st.s += (speed * pace * (near ? Math.min(dt, 64) : dt)) / 1000;
       grow(st, st.s + STEP);
