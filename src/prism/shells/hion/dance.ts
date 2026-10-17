@@ -193,7 +193,6 @@ export function pendant(
         seed: seed * 3 + i,
         key: [key, key + length],
         glow: 0.26,
-        wobble: 0.4,
       }),
     );
   });

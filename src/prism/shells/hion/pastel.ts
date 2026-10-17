@@ -145,7 +145,7 @@ export function mark(
   key?: number,
   core = true,
 ): Mark {
-  // Short strokes get enough points to taper and trim.
+  // Short strokes get enough points to bend smoothly.
   if (kind === Kind.Stroke && pts.length < 16) pts = densify(pts, 8);
   const pad = kind === Kind.Glow ? w * 2 + 24 : w + 18;
   const box = bounds(pts, pad);
@@ -225,30 +225,18 @@ export function paint(
     ctx.restore();
     return;
   }
-  // Light, and nothing else: one smooth line of the hue, the ends of the
-  // mark trimmed and tapered a little so overlapping marks meet softly.
-  // The hue is dimmed for a fainter mark, not made see-through, so marks
-  // of one thread meet without a seam.
-  const rand = rng(m.seed);
+  // Light, and nothing else: one smooth line of the hue. The hue is
+  // dimmed for a fainter mark, not made see-through, so marks of one
+  // thread meet without a seam.
   const [r, g, b] = RGB[m.hue];
   const k = Math.max(0, Math.min(1, m.a));
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   ctx.strokeStyle = `rgb(${(r * k) | 0} ${(g * k) | 0} ${(b * k) | 0})`;
   ctx.lineWidth = Math.max(0.9, m.w);
-  const s0 = rand() * 0.08;
-  const s1 = 1 - rand() * 0.08;
   ctx.beginPath();
-  let started = false;
-  for (let i = 0; i < n; i++) {
-    const t = i / (n - 1);
-    if (t < s0 || t > s1) continue;
-    if (started) ctx.lineTo(pts[i * 2], pts[i * 2 + 1]);
-    else {
-      ctx.moveTo(pts[i * 2], pts[i * 2 + 1]);
-      started = true;
-    }
-  }
+  ctx.moveTo(pts[0], pts[1]);
+  for (let i = 1; i < n; i++) ctx.lineTo(pts[i * 2], pts[i * 2 + 1]);
   ctx.stroke();
   ctx.globalAlpha = 1;
 }
@@ -455,8 +443,6 @@ interface ThreadOptions {
   seed: number;
   /** Bloom strength, 0 for none. */
   glow?: number;
-  /** How much the hand wobbles. */
-  wobble?: number;
   /** Reveal keys: by page y (default), a fixed key for the whole thread,
    * spread along the thread from `from` to `to`, or a function of the
    * distance along the thread. */
@@ -473,25 +459,24 @@ function keyFor(opts: { key?: ThreadOptions["key"] }, s: number, total: number, 
 }
 
 /** A single thread, laid as overlapping marks of the one width, plus its
- * bloom. */
+ * bloom: taut and of one strength along its length, so the marks read as
+ * one line (a hand's wobble and marks of uneven strength read as a line
+ * drawn in strokes, not a thread). */
 export function thread(path: Path, opts: ThreadOptions): Mark[] {
   const out: Mark[] = [];
   const total = path.length;
   if (total < 2) return out;
   const rand = rng(opts.seed);
   const w = THREAD;
-  const wobble = opts.wobble ?? 0.8;
   let s = 0;
   let index = 0;
   while (s < total - 1) {
     const len = Math.min(total - s, 36 + rand() * 54);
     const pts: number[] = [];
-    const phase = rand() * 6;
     const steps = Math.max(2, Math.round(len / 3));
     for (let k = 0; k <= steps; k++) {
-      const [x, y, nx, ny] = path.at(s + (len * k) / steps);
-      const o = Math.sin(k * 0.45 + phase) * wobble;
-      pts.push(x + nx * o, y + ny * o);
+      const [x, y] = path.at(s + (len * k) / steps);
+      pts.push(x, y);
     }
     const [, y0] = path.at(s);
     out.push(
@@ -499,7 +484,7 @@ export function thread(path: Path, opts: ThreadOptions): Mark[] {
         Kind.Stroke,
         opts.hue,
         w,
-        (opts.alpha ?? 1) * (0.75 + rand() * 0.25),
+        opts.alpha ?? 1,
         pts,
         opts.seed * 131 + index++,
         keyFor(opts, s, total, y0),
