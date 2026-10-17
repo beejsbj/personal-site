@@ -154,4 +154,7 @@ test("the resume moved under About, and its old path keeps the query string", ()
     readFileSync("src/pages/resume.astro", "utf8"),
     /getLegacyRedirect\(Astro\.url\)[\s\S]*301/,
   );
+  const sitemap = readFileSync("dist/client/sitemap-0.xml", "utf8");
+  assert.match(sitemap, /<loc>https:\/\/burooj\.dev\/about\/resume\/<\/loc>/);
+  assert.doesNotMatch(sitemap, /<loc>https:\/\/burooj\.dev\/resume\/<\/loc>/);
 });

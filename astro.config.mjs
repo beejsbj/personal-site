@@ -7,6 +7,8 @@ const excludedPaths = new Set([
   "/garden/",
   "/style-guide/",
   "/design-system/",
+  // only redirects to /about/resume now
+  "/resume/",
   "/lab/e4p/",
   "/lab/garden/",
   "/lab/flashcards/",
