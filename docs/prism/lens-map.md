@@ -444,6 +444,20 @@ Derived "content": page numbers are hard-coded (`ch:45-48,276-281`, labs `15+i`,
 
 ### 3.4 Hion (`HI`, provisional)
 
+**Two lines (`hion/two-lines`, experiment on `hion/two-threads`).** No branches at all: the cyan line and the magenta line each run unbroken from the line at the top to the foot of the screen, and between them they write every heading and label and ring every picture. Nothing else is drawn: no ground, no limbs, no drops, no loose ends, no hover threads.
+
+| What | How the line does it | Where |
+|---|---|---|
+| Its way down | The composed journey (stations, loops round sections, circles round what it loves: `weave.ts`, `dance.ts`), as before | `skein.ts` `lines` |
+| A word or a picture of its hue | A leg: it leaves its journey, travels to the first of a group (things close together: a heading and the label under it, a row of tags), writes it (rings a picture), arcs over or under to the next, and comes back to its journey a little further on; past the journey's end it simply ends there | `route.ts` `leg`, `extend`; `skein.ts` `route`, `relay` |
+| The names on the menu | The two lines slung across the top sag down to write the names of their hue, along the line under each name's feet, and rise back; the page's lines leave from under the current name | `nav.ts` `drawCord`, `namesOf` |
+| Hover | The other line is pulled out of its course: the stretch of it nearest bends out, weaves through the words (or rings a picture), holds, and springs back; the stretch is lifted off the ground while it is out | `skein.ts` `pull` |
+| A tap, a brush | Light runs along the line both ways | `skein.ts` `light` |
+
+Travels are curves that leave along the way the line is going and arrive going the way the next thing is written, weighed by length and by how much of them would cross words (all but never; the bit beside a word excepted). Words are measured in idle slots as the drawing comes to them (a screen and a half ahead), nearest each line's head first; a leg is only ever spliced in ahead of where its line has grown, so nothing drawn changes. A line waits short of a word still being measured (2.5s at most; then it keeps its chalk). On its journey a head goes as the drawing goes; on a leg at the leg's pace (travel 1500px/s, a word at a hand's pace for its size, a ring 1100px/s), hurrying up to four times when the reader is ahead, never jumping a word; a word is released to its line whole once the drawing reaches its top. Everything is written on the page under the words, so a strung heading has no black box; hung things do not swing their words (the line holds them). The resume's sliding track keeps its own writing (its words come in off the track's threads) and the word under the menu's tassel is written on from its curl: the two places something is still written apart from the lines.
+
+Costs against `hion/two-threads` (dev servers side by side, software-rendered; relative only): cheaper everywhere, arriving included after measuring was spread out (home arriving 440 vs 704 ms/s at 1280, 423 vs 464 on a phone; scrolling 15 to 50% less; after scrolling 50 to 80% less). It is calmer: two lines on black, not a busy ground. The composed journeys cross a little body text here and there (home's role line), as they did under the ground, where it showed less.
+
 **Two threads (`hion/two-threads`, experiment on `hion/thread-titles`).** There are only two threads, the cyan and the magenta hion, and they make everything on a screen: every other visible line is a branch grown from one of them, and stays connected to it. The skein keeps a tree (`HI/skein.ts`): every strand but the two hions has a parent, the arc length on the parent where it leaves (its root), and its parent's hue, so everything cyan belongs to the cyan tree.
 
 | What | How it is a branch | Where |
