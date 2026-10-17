@@ -32,13 +32,14 @@
  *            pointer still on their way somewhere near turn to it too.
  *            Left alone a while, the hions now and then tie a small one of
  *            their own (life.ts).
- *   title    a large word written by one thread (spun.ts measures it,
- *            trace.ts finds the way): off the hion if one runs near, else
- *            in from the page's edge or from just before the word, along
- *            a line under its feet and up through each letter in turn,
- *            out past the last. Its way is kept and measured again when
- *            the page is laid out anew; it never fades. Of the one
- *            width, like every thread.
+ *   title    a heading written by one thread (spun.ts measures it,
+ *            trace.ts finds the way): from the knot its weft stops in, or
+ *            off the hion if one runs near, else in from the page's edge
+ *            or from just before the word, along a line under its feet
+ *            and up through each letter in turn, out past the last. At a
+ *            hand's pace for its size. Its way is kept and measured again when
+ *            the page is laid out anew; it never fades. Of the one width,
+ *            like every thread.
  *
  * One material (strokeRun): every run of thread is one smooth line of
  * its hue with a little light added under it, and nothing else (no
@@ -99,7 +100,7 @@ import { still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
 import { type Hue, type Pt, RGB, rng, THREAD } from "./pastel";
 import { type Box, encircle as encircle_, ring, smooth, stitches, weave, wordBoxes } from "./wind";
-import type { Measure, Spun } from "./spun";
+import type { Material, Measure, Spun } from "./spun";
 
 type Loom = ReturnType<typeof createLoom>;
 
@@ -748,33 +749,56 @@ export function createSkein(options: SkeinOptions) {
       }
       const s = t.measure(p);
       if (s) out.push([el, s]);
-      else delete el.dataset.spunState;
+      else el.dataset.spunState = "chalk";
     }
     return out;
   }
 
-  /** A word's thread, laid whole (its head at the start; the caller moves
-   * it or settles it). It comes off the nearest drawn hion of its own hue
-   * if one runs near, otherwise in from the page's edge when the word is
-   * near it, otherwise from a little before the word. */
+  /** A heading's thread, laid whole (its head at the start; the caller
+   * moves it or settles it). Strung on a weft, the weft writes it (the way
+   * already comes from the knot it stops in). Otherwise it comes off the
+   * nearest drawn hion of its own hue if one runs near, otherwise in from
+   * the page's edge when the heading is near it, otherwise from a little
+   * before the word. */
   function title(el: HTMLElement, hue: Hue, spun: Spun) {
     const [x0, y0] = spun.way[0];
     let way = spun.way;
-    // Only from this side of the word: an approach from beyond its start
-    // would cross the letters.
-    const off = nearestHion(x0, y0, 300, hue) ?? nearestHion(x0, y0, 180);
-    if (off && off.d > 20 && off.x <= x0 + 24) way = [[off.x, off.y], [(off.x + x0) / 2, (off.y + y0) / 2 + 4], ...way];
-    else if (x0 < 240) way = [[-6, y0 + 2], ...way];
+    if (!spun.knotted) {
+      // Only from this side of the word: an approach from beyond its
+      // start would cross the letters. A small heading looks less far.
+      const reach = spun.size >= 40 ? 300 : 140;
+      const off = nearestHion(x0, y0, reach, hue) ?? nearestHion(x0, y0, reach * 0.6);
+      // Nor across them from above or below.
+      const { box } = spun;
+      const crosses = (ax: number, ay: number) => {
+        for (let k = 1; k < 16; k++) {
+          const x = ax + ((x0 - ax) * k) / 16;
+          const y = ay + ((y0 - ay) * k) / 16;
+          if (x > box.l - 4 && x < box.r + 4 && y > box.t - 4 && y < box.b + 2) return true;
+        }
+        return false;
+      };
+      if (off && off.d > 20 && off.x <= x0 + 24 && !crosses(off.x, off.y)) way = [[off.x, off.y], [(off.x + x0) / 2, (off.y + y0) / 2 + 4], ...way];
+      else if (x0 < 240) way = [[-6, y0 + 2], ...way];
+    }
     const n: Nature = { ...nature("title") };
     const t = fate.bare(hue, smooth(way, 4));
     const st = make("title", n, t, { by: "title", el });
-    const total = measureBody(st);
-    // About two seconds a word, however long; a short one no quicker.
-    n.speed = Math.max(700, total / 1.8);
+    Object.assign(n, writing(spun, measureBody(st)));
     strands.push(st);
     el.dataset.spunState = "spun";
     return st;
   }
+
+  /** How a heading is written: at a hand's pace for letters its size (a
+   * few capitals a second, so larger letters go faster), every heading in
+   * one to three seconds; the warm run behind the head about a capital
+   * long. */
+  function writing(spun: Spun, total: number) {
+    const time = Math.max(1.1, Math.min(3, total / (spun.size * 11)));
+    return { speed: total / time, tail: Math.max(22, Math.min(70, spun.size * 1.1)) };
+  }
+
 
   /** A word's thread, written at once and lying cold. */
   function whole(st: Strand) {
@@ -881,6 +905,20 @@ export function createSkein(options: SkeinOptions) {
         ctx.globalAlpha = 1;
       }
     }
+  }
+
+  /** A head's own light: a point of the thread's light, white-hot at the
+   * very tip, no bigger than the thread. */
+  function paintHead(ctx: CanvasRenderingContext2D, hue: Hue, w: number, hx: number, hy: number, heat: number) {
+    const [cr, cg, cb] = RGB[hue];
+    const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
+    const rad = w * 1.4;
+    const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, rad);
+    halo.addColorStop(0, `rgba(${lr},${lg},${lb},${0.85 * heat})`);
+    halo.addColorStop(0.45, `rgba(${cr},${cg},${cb},${0.35 * heat})`);
+    halo.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+    ctx.fillStyle = halo;
+    ctx.fillRect(hx - rad, hy - rad, rad * 2, rad * 2);
   }
 
   /** Lay segments [i0, i1) of a strand's body on a context, settled.
@@ -1234,21 +1272,7 @@ export function createSkein(options: SkeinOptions) {
       warm[k] = heat * u * u;
     }
     strokeRun(ctx, hue, THREAD, st.n.glow, pts, st.n.body * st.alpha, warm);
-    if (heat > 0.02) {
-      // The very tip: a point of the thread's own light, no bigger than
-      // the thread.
-      const hx = pts[(count - 1) * 2];
-      const hy = pts[(count - 1) * 2 + 1];
-      const [cr, cg, cb] = RGB[hue];
-      const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
-      const rad = THREAD * 1.4;
-      const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, rad);
-      halo.addColorStop(0, `rgba(${lr},${lg},${lb},${0.85 * heat})`);
-      halo.addColorStop(0.45, `rgba(${cr},${cg},${cb},${0.35 * heat})`);
-      halo.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
-      ctx.fillStyle = halo;
-      ctx.fillRect(hx - rad, hy - rad, rad * 2, rad * 2);
-    }
+    if (heat > 0.02) paintHead(ctx, hue, THREAD, pts[(count - 1) * 2], pts[(count - 1) * 2 + 1], heat);
     ctx.globalAlpha = 1;
   }
 
@@ -1973,14 +1997,24 @@ export function createSkein(options: SkeinOptions) {
       const spun = measure(page.getBoundingClientRect());
       page.classList.remove("hion-measuring");
       if (!spun) {
-        // It keeps its chalk.
-        delete el.dataset.spunState;
+        // It gets its chalk back.
+        el.dataset.spunState = "chalk";
         titles.delete(el);
         return;
       }
       const st = title(el, hue, spun);
       if (instant) whole(st);
       task.wake();
+    },
+    /** The one material, lent to a heading written on a canvas of its own
+     * (spun.ts: inside something that slides over the page). */
+    material(): Material {
+      return {
+        run: strokeRun,
+        head: paintHead,
+        nature: () => ({ w: THREAD, glow: NATURE.title.glow }),
+        pace: (spun, total) => ({ w: THREAD, ...writing(spun, total) }),
+      };
     },
     /** The loom drew on: the hions' heads follow. */
     wake: () => task.wake(),

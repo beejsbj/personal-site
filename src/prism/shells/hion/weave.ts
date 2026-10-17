@@ -64,6 +64,7 @@ import {
 } from "./pastel";
 import type { Composition } from "./loom";
 import { textExtent } from "./dom";
+import { WEFT_GAP } from "./spun";
 
 interface Box {
   l: number;
@@ -354,21 +355,27 @@ export function compose(
     // The words, not the heading's whole line.
     const b = box(el.querySelector(".hion-strung__box") ?? el);
     const hue: Hue = wi++ % 2 ? "c" : "m";
+    // Its words are written by thread, the weft's own (spun.ts): the weft
+    // stops short of them either side in a knot, and the thread that
+    // writes them sets out from the knot before and ends in the knot after.
+    if (el.dataset.weftHue !== hue) el.dataset.weftHue = hue;
+    const gap: [number, number] = [b.l - WEFT_GAP, b.r + WEFT_GAP];
     if (loop) {
       // Across the loop, and out past it where the heading hangs out.
-      marks.push(...weft(Math.min(loop.l - 22, b.l - 30), Math.max(loop.r + 22, b.r + 30), y, hue, seed++, loop));
-      continue;
-    }
-    // Off the loops, a heading beside the hions is strung from them: the
-    // weft is thrown out from where they pass, through the words.
-    const x = threadAt(y, (b.l + b.r) / 2);
-    if (x !== null && (x < b.l - 20 || x > b.r + 20)) {
-      const toLeft = x > b.r;
-      const [a, c] = toLeft ? [b.l - 36, x] : [x, b.r + 36];
-      marks.push(...weft(a, c, y, hue, seed++, undefined, { knotL: true, knotR: true, from: x }));
+      marks.push(...weft(Math.min(loop.l - 22, b.l - 30), Math.max(loop.r + 22, b.r + 30), y, hue, seed++, loop, { gap }));
     } else {
-      marks.push(...weft(b.l - 36, b.r + 36, y, hue, seed++, undefined));
+      // Off the loops, a heading beside the hions is strung from them:
+      // the weft is thrown out from where they pass, to the words.
+      const x = threadAt(y, (b.l + b.r) / 2);
+      if (x !== null && (x < b.l - 20 || x > b.r + 20)) {
+        const toLeft = x > b.r;
+        const [a, c] = toLeft ? [b.l - 36, x] : [x, b.r + 36];
+        marks.push(...weft(a, c, y, hue, seed++, undefined, { knotL: true, knotR: true, from: x, gap }));
+      } else {
+        marks.push(...weft(b.l - 36, b.r + 36, y, hue, seed++, undefined, { gap }));
+      }
     }
+    marks.push(...knot(gap[0], y, 3.5, seed++, y + 20), ...knot(gap[1], y, 3.5, seed++, y + 20));
   }
 
   /* ---- Things that hang ---- */
@@ -551,7 +558,7 @@ function weft(
   hue: Hue,
   seed: number,
   loop: Loop | undefined,
-  ends: { knotL?: boolean; knotR?: boolean; from?: number; key?: number } = {},
+  ends: { knotL?: boolean; knotR?: boolean; from?: number; key?: number; gap?: [number, number] } = {},
 ): Mark[] {
   const out: Mark[] = [];
   const rand = rng(seed);
@@ -566,7 +573,23 @@ function weft(
     ]);
   }
   const reversed = ends.from !== undefined && Math.abs(ends.from - to) < Math.abs(ends.from - from);
-  const path = new Path(reversed ? pts.slice().reverse() : pts, 3);
+  // Not across a heading written by thread: the weft stops short of its
+  // words either side (`gap`), glow and all.
+  const at = (x: number): Pt => {
+    const i = Math.max(1, pts.findIndex((p) => p[0] >= x));
+    const [a, b] = [pts[i - 1], pts[i] ?? pts[i - 1]];
+    const u = b[0] === a[0] ? 0 : (x - a[0]) / (b[0] - a[0]);
+    return [x, a[1] + (b[1] - a[1]) * u];
+  };
+  const { gap } = ends;
+  const parts = gap
+    ? [
+        [...pts.filter((p) => p[0] < gap[0]), at(gap[0])],
+        [at(gap[1]), ...pts.filter((p) => p[0] > gap[1])],
+      ].filter((part) => part.length >= 2 && part[part.length - 1][0] - part[0][0] > 4)
+    : [pts];
+  const threads = (opts: Parameters<typeof thread>[1]) =>
+    parts.flatMap((part) => thread(new Path(reversed ? part.slice().reverse() : part, 3), opts));
   const key = ends.key ?? y - 40;
   // Thrown across as the reach passes them.
   const keys: [number, number] = [key, key + 60];
@@ -576,7 +599,7 @@ function weft(
     const under = flip ? loop.r : loop.l;
     // Where the weft passes over a strand, part the strand first.
     out.push(mark(Kind.Erase, hue, 8, 1, [over, y - 8, over, y + 8], 0, key - 1));
-    out.push(...thread(path, { hue, seed: seed * 11, key: keys, glow: 0.18 }));
+    out.push(...threads({ hue, seed: seed * 11, key: keys, glow: 0.18 }));
     // Where it passes under, cut the weft and lay the strand back over it.
     out.push(mark(Kind.Erase, hue, 9, 1, [under - 6, y, under + 6, y], 0, keys[1] + 1));
     const strandHue: Hue = under === loop.l ? "c" : "m";
@@ -584,7 +607,7 @@ function weft(
       mark(Kind.Stroke, strandHue, THREAD, 1, [under, y - 13, under + 0.6, y, under, y + 13], seed * 13, keys[1] + 2),
     );
   } else {
-    out.push(...thread(path, { hue, seed: seed * 11, key: keys, glow: 0.16 }));
+    out.push(...threads({ hue, seed: seed * 11, key: keys, glow: 0.16 }));
   }
   if (ends.knotL) out.push(...knot(pts[0][0], pts[0][1], 5, seed + 3, reversed ? keys[1] : keys[0]));
   if (ends.knotR) {

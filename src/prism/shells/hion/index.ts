@@ -211,7 +211,7 @@ function show(route: Route, first: boolean) {
     };
     const woven = () => {
       if (gone()) return;
-      spinType(page, { skein, instant: still(), signal: controller.signal });
+      spinType(page, { skein, pulse, instant: still(), signal: controller.signal });
       weaveCovers(page, { signal: controller.signal, fabric });
     };
     if (still()) {
