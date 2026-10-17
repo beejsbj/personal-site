@@ -1021,12 +1021,14 @@ export function createSkein(options: SkeinOptions) {
     }
   }
 
-  /** Measure words where they rest, in order, until `end` (the page is
-   * held still once for all of them: each hold is a layout). */
-  function measureParts(list: Part[], end = Infinity) {
+  /** Measure words where they rest, in order, for `budget` ms (the page
+   * is held still once for all of them: each hold is a layout, so the
+   * budget counts from after it). */
+  function measureParts(list: Part[], budget = Infinity) {
     if (!list.length) return;
     page.classList.add("hion-measuring");
     const p = page.getBoundingClientRect();
+    const end = performance.now() + budget;
     for (const n of list) {
       if (performance.now() > end) break;
       const spun = n.measure?.(p) ?? null;
@@ -1321,7 +1323,7 @@ export function createSkein(options: SkeinOptions) {
       if (signal.aborted || !built) return;
       measureParts(
         nodes.filter(due).sort((a, b) => a.box.t - b.box.t),
-        performance.now() + 10,
+        8,
       );
       task.wake();
       if (nodes.some(due)) pump();
