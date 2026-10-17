@@ -95,23 +95,13 @@ export function createPrism(): Prism {
     if (stage && home === currentLens()) return stage;
     teardown();
     home = currentLens();
-    // The room: its dark, the light and the whisper. It sits under the page,
-    // so the page can be a face of the prism without anything drawn over it.
+    // The room: its dark and the whisper. It sits under the page, so the
+    // page can be a face of the prism without anything drawn over it.
     backdrop = document.createElement("div");
     backdrop.id = "prism-backdrop";
     backdrop.dataset.dormant = "";
     backdrop.setAttribute("aria-hidden", "true");
-    // White light in from the left; the five lenses fan out to the right.
-    const spectrum = LENSES.map((lens, i) => {
-      const top = 52 + i * 8;
-      return `<polygon class="prism-band" data-band="${lens.id}" style="--band:${lens.signal}" points="50,50 100,${top} 100,${top + 8}"/>`;
-    }).join("");
-    backdrop.innerHTML = `
-      <svg class="prism-light" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <line class="prism-beam" x1="0" y1="28" x2="50" y2="50" vector-effect="non-scaling-stroke"/>
-        ${spectrum}
-      </svg>
-      <p class="prism-whisper">Same work. Different light.</p>`;
+    backdrop.innerHTML = `<p class="prism-whisper">Same work. Different light.</p>`;
     stage = document.createElement("div");
     stage.id = "prism-stage";
     stage.className = "prism-stage";
@@ -328,9 +318,6 @@ export function createPrism(): Prism {
         : `${journey.size} of ${SIDES} lenses seen`;
       root.querySelectorAll<HTMLElement>(".prism-face").forEach((face, i) => {
         face.classList.toggle("is-front", i === index);
-      });
-      room.querySelectorAll<HTMLElement>(".prism-band").forEach((band) => {
-        band.classList.toggle("is-lit", band.dataset.band === lens.id);
       });
       root.querySelectorAll<HTMLElement>(".prism-dot").forEach((dot, i) => {
         dot.setAttribute("aria-current", String(i === index));

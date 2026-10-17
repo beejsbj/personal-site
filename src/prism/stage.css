@@ -216,8 +216,8 @@
 
 /* ── The stage ────────────────────────────────────────────────────── */
 /* Two layers outside <body>, because while the prism is open the body is
-   the live face (live-page.ts): the room (#prism-backdrop: its dark, the
-   light, the whisper) under the page, and the prism (#prism-stage: faces,
+   the live face (live-page.ts): the room (#prism-backdrop: its dark and the
+   whisper) under the page, and the prism (#prism-stage: faces,
    caps and HUD) over it. The live face itself is clear glass. A face turned
    away from the eye is shaded all but transparent (stage.ts: shade), so no
    two faces ever visibly overlap on screen and the page needs no depth
@@ -353,37 +353,9 @@
 
 /* Layers that fade in over the moving camera get their own compositor
    layer up front, so the fade never repaints the scene. */
-#prism-backdrop .prism-light,
 #prism-stage .prism-hud,
 #prism-backdrop .prism-whisper {
   will-change: opacity, transform;
-}
-
-/* White light in, five lenses out. */
-#prism-backdrop .prism-light {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1.2s ease 0.3s;
-  pointer-events: none;
-}
-#prism-backdrop[data-outside="true"] .prism-light {
-  opacity: 1;
-}
-#prism-backdrop .prism-beam {
-  stroke: #fff;
-  stroke-width: 3;
-  stroke-opacity: 0.9;
-}
-#prism-backdrop .prism-band {
-  fill: var(--band);
-  opacity: 0.16;
-  transition: opacity 0.6s ease;
-}
-#prism-backdrop .prism-band.is-lit {
-  opacity: 0.55;
 }
 
 #prism-backdrop .prism-whisper {

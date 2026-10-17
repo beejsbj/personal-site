@@ -18,7 +18,7 @@ first, and the prism must not add, remove, or rename base content types.
 
 ## What the first build decided
 
-- **Five faces on a pentagonal prism.** This replaced the earlier plan for six faces. A prism splits one white beam into colours, so the stage shows white light going in and a five-band spectrum coming out, one band per lens.
+- **Five faces on a pentagonal prism.** This replaced the earlier plan for six faces. A prism splits one white beam into colours, one per lens. (The first build drew that literally, a white beam in and a five-band spectrum out; it flickered while the prism turned and was removed. The room is dark, lit only by the front lens's colour.)
 - **Lenses:**
   1. Daylight: the warm welcome, the default.
   2. Calling Card: the Roll to Win lottery, Persona 5.
