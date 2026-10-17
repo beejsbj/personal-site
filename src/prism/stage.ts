@@ -101,7 +101,11 @@ export function createPrism(): Prism {
     backdrop.id = "prism-backdrop";
     backdrop.dataset.dormant = "";
     backdrop.setAttribute("aria-hidden", "true");
-    backdrop.innerHTML = `<p class="prism-whisper">Same work. Different light.</p>`;
+    backdrop.innerHTML =
+      LENSES.map(
+        (lens) =>
+          `<div class="prism-glow" data-glow="${lens.id}" style="--band:${lens.signal}"></div>`,
+      ).join("") + `<p class="prism-whisper">Same work. Different light.</p>`;
     stage = document.createElement("div");
     stage.id = "prism-stage";
     stage.className = "prism-stage";
@@ -251,11 +255,35 @@ export function createPrism(): Prism {
         keyframes.push({ offset: 1, opacity: keyframes.at(-1)!.opacity });
         return [sheet.animate(keyframes, timing)];
       });
-    const shadeStill = (pose: Pose) =>
+    // At rest, a face turned away keeps an opacity animation that holds it
+    // at 0 (for days) before it would ever show. The compositor keeps a
+    // layer that may yet be shown painted, so the faces that could come
+    // round next are painted while the prism is still, not in the first
+    // frames of the next turn, where that painting competed with the turn.
+    let ready: Animation[] = [];
+    const unready = () => {
+      ready.forEach((animation) => animation.cancel());
+      ready = [];
+    };
+    const shadeStill = (pose: Pose) => {
+      unready();
       sheets().forEach((sheet, i) => {
-        if (sheet)
-          sheet.style.opacity = String(facing(geometry, pose, i) ? 1 : AWAY);
+        if (!sheet) return;
+        const toward = facing(geometry, pose, i);
+        sheet.style.opacity = String(toward ? 1 : AWAY);
+        if (!toward)
+          ready.push(
+            sheet.animate(
+              [
+                { opacity: AWAY, offset: 0 },
+                { opacity: AWAY, offset: 0.999999 },
+                { opacity: 1 },
+              ],
+              { duration: 1e9 },
+            ),
+          );
       });
+    };
     const rest = (front: number | null) =>
       frames.forEach((face, i) => setIdle(face, i !== front));
     // Web Animations keep the camera on the compositor and report the real
@@ -282,6 +310,7 @@ export function createPrism(): Prism {
         pagePose(geometry, to, origin),
         timing,
       );
+      unready();
       const shading = shade(at, to, timing);
       await Promise.all([camera.finished, page?.finished]).catch(() => {});
       at = to;
@@ -310,7 +339,9 @@ export function createPrism(): Prism {
       const free = journey.size >= SIDES;
       root.dataset.journey = free ? "revisiting" : "first";
       root.style.setProperty("--signal", lens.signal);
-      room.style.setProperty("--signal", lens.signal);
+      room.querySelectorAll<HTMLElement>(".prism-glow").forEach((glow) => {
+        glow.classList.toggle("is-lit", glow.dataset.glow === lens.id);
+      });
       root.querySelector(".prism-name")!.textContent = lens.name;
       root.querySelector(".prism-source")!.textContent = `from ${lens.source}`;
       root.querySelector(".prism-count")!.textContent = free

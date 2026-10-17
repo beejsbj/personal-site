@@ -228,14 +228,26 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(
-      60% 55% at 50% 52%,
-      color-mix(in srgb, var(--signal, #fff) 16%, transparent),
-      transparent 70%
-    ),
-    var(--prism-void);
+  background: var(--prism-void);
   font: 400 1rem/1.4 var(--prism-font);
+}
+/* The front lens's colour on the dark: one glow per lens on its own
+   compositor layer, crossfaded, so turning to the next lens never repaints
+   the whole room (a full-viewport gradient) in the turn's first frames. */
+#prism-backdrop .prism-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    60% 55% at 50% 52%,
+    color-mix(in srgb, var(--band) 16%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  will-change: opacity;
+}
+#prism-backdrop .prism-glow.is-lit {
+  opacity: 1;
 }
 #prism-stage {
   position: fixed;
@@ -305,6 +317,9 @@
   inset: 0;
   pointer-events: none;
   transition: opacity 0.8s ease;
+  /* Kept on their own layers: promoted only while fading, they made the
+     face under them repaint, a whole face at the start and end of a turn. */
+  will-change: opacity;
 }
 #prism-stage .prism-face::before {
   background: linear-gradient(
