@@ -65,6 +65,9 @@ function fixedElements(root: HTMLElement) {
 export interface LivePage {
   /** Where the window was scrolled when the page was taken up. */
   readonly scroll: number;
+  /** The sheet the camera carries (the body), for the prism to shade like
+   * any other face. */
+  readonly sheet: HTMLElement;
   /** Pose the page: a transform about its top-left corner. */
   set(transform: string): void;
   /** Move the page with the camera, frame for frame. */
@@ -93,6 +96,7 @@ export function holdPage(): LivePage {
     "transform-origin",
     "backface-visibility",
     "will-change",
+    "opacity",
     ...PAPER,
   ]);
   const inert = body.inert;
@@ -114,7 +118,9 @@ export function holdPage(): LivePage {
   body.style.setProperty("inset", "0");
   body.style.setProperty("overflow", "hidden");
   body.style.setProperty("transform-origin", "0 0");
-  body.style.setProperty("backface-visibility", "hidden");
+  // Like the stage's faces, its back is drawn (the prism shades it out while
+  // it faces away), so the compositor keeps it rasterised for its return.
+  body.style.setProperty("backface-visibility", "visible");
   body.style.setProperty("will-change", "transform");
   body.scrollTo({ top: scroll, behavior: "instant" });
   if (scrollY !== scroll) scrollTo({ top: scroll, behavior: "instant" });
@@ -141,6 +147,7 @@ export function holdPage(): LivePage {
   let released = false;
   return {
     scroll,
+    sheet: body,
     set(transform) {
       body.style.setProperty("transform", transform);
     },

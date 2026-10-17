@@ -197,3 +197,83 @@ test("the stage CSS hangs the prism where the camera says", () => {
   assert.match(stage, /--body-y", `\$\{BODY_Y \* 100\}%`/);
   assert.match(stage, /--eye-y", `\$\{EYE_Y \* 100\}%`/);
 });
+
+/** The reference: a face shows its front when its corners, projected as the
+ * stage projects them, wind clockwise on screen (what the browser culls). */
+function windsFront(g, pose, i) {
+  const m = stageFace(g, pose, i);
+  const [a, b, c] = [
+    [0, 0],
+    [g.w, 0],
+    [g.w, g.h],
+  ].map((point) => project(m, point));
+  return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) > 0;
+}
+
+test("a face is known to face the eye exactly when the browser would draw its front", () => {
+  for (const [w, h] of SIZES) {
+    const g = camera.geometry(w, h);
+    for (const outside of [true, false])
+      for (let turn = -400; turn <= 400; turn += 7)
+        for (let i = 0; i < camera.SIDES; i += 1)
+          assert.equal(
+            camera.facing(g, { outside, turn }, i),
+            windsFront(g, { outside, turn }, i),
+            `${w}×${h} face ${i} ${JSON.stringify({ outside, turn })}`,
+          );
+  }
+});
+
+/** Turns, pulls and steps the stage really makes. */
+const MOVES = [
+  [
+    { outside: true, turn: 0 },
+    { outside: true, turn: -72 },
+  ],
+  [
+    { outside: true, turn: -72 },
+    { outside: true, turn: 0 },
+  ],
+  [
+    { outside: true, turn: -144 },
+    { outside: true, turn: 0 },
+  ],
+  [
+    { outside: false, turn: 0 },
+    { outside: true, turn: 0 },
+  ],
+  [
+    { outside: true, turn: -216 },
+    { outside: false, turn: -144 },
+  ],
+];
+
+test("turning, a face is shaded in only once it faces the eye, and out before it turns away", () => {
+  for (const [w, h] of SIZES) {
+    const g = camera.geometry(w, h);
+    for (const [from, to] of MOVES)
+      for (let i = 0; i < camera.SIDES; i += 1) {
+        const track = camera.facingTrack(g, from, to, i);
+        assert.equal(track[0].offset, 0);
+        const shown = (t) =>
+          track.filter((step) => step.offset <= t).at(-1).toward;
+        for (let k = 0; k <= 1000; k += 1) {
+          const t = k / 1000;
+          const pose = {
+            outside: from.outside,
+            turn: from.turn + (to.turn - from.turn) * t,
+          };
+          // the camera's numbers move linearly in progress; outside/inside
+          // differs only at the ends of a pull, where facing is checked below
+          if (from.outside !== to.outside) continue;
+          if (shown(t))
+            assert.ok(
+              windsFront(g, pose, i),
+              `${w}×${h} face ${i} shown from behind at ${t} of ${JSON.stringify([from, to])}`,
+            );
+        }
+        assert.equal(track[0].toward, camera.facing(g, from, i));
+        assert.equal(track.at(-1).toward, camera.facing(g, to, i));
+      }
+  }
+});

@@ -218,9 +218,10 @@
 /* Two layers outside <body>, because while the prism is open the body is
    the live face (live-page.ts): the room (#prism-backdrop: its dark, the
    light, the whisper) under the page, and the prism (#prism-stage: faces,
-   caps and HUD) over it. The live face itself is clear glass. Faces cull
-   their backs, so no two faces ever overlap on screen and the page needs no
-   depth sorting against them. */
+   caps and HUD) over it. The live face itself is clear glass. A face turned
+   away from the eye is shaded all but transparent (stage.ts: shade), so no
+   two faces ever visibly overlap on screen and the page needs no depth
+   sorting against them. */
 #prism-backdrop {
   position: fixed;
   inset: 0;
@@ -276,12 +277,17 @@
   position: absolute;
   inset: 0;
   transform: rotateY(calc(var(--i) * 72deg)) translateZ(var(--apothem));
-  backface-visibility: hidden;
+  /* Drawn from behind too, so the compositor never drops a face's tiles
+     while it is turned away; the prism shades a face out while it faces
+     away (stage.ts: shade), so its back is never seen. */
+  backface-visibility: visible;
   background: #111;
   cursor: pointer;
 }
 /* The face you came from: the page itself shows through. */
 #prism-stage .prism-face--live {
+  /* clear glass over the page: nothing in it to keep rasterised */
+  backface-visibility: hidden;
   background: transparent;
 }
 #prism-stage .prism-face iframe {

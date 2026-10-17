@@ -18,6 +18,8 @@ import {
   SIDES,
   TURN,
   bodyPose,
+  facing,
+  facingTrack,
   geometry,
   pagePose,
   type Geometry,
@@ -28,6 +30,8 @@ const JOURNEY_KEY = "prism:journey";
 const EXITS_KEY = "prism:exits";
 const OUT_MS = 1500;
 const TRAVEL_MS = 950;
+/** A face turned away: drawn (so it stays rasterised) but not seen. */
+const AWAY = 0;
 const IN_MS = 1100;
 
 const measure = () => geometry(innerWidth, innerHeight);
@@ -230,6 +234,38 @@ export function createPrism(): Prism {
       applyGeometry(root, geometry);
     };
     /** Only the face being looked at, with the camera still, may move. */
+    /** What carries face i: its frame's face, or the live page's sheet. */
+    const sheets = () =>
+      [...root.querySelectorAll<HTMLElement>(".prism-face")].map((face, i) =>
+        i === origin ? held?.sheet : face,
+      );
+    // A face turned away from the eye is still drawn, all but transparent,
+    // rather than culled: a culled layer loses its tiles, so a face coming
+    // round would be painted late (blank, then filled in, mid-turn). Each
+    // face switches between the two while it is edge-on, in step with the
+    // camera (same timing and easing; the camera's numbers move linearly in
+    // its progress, so facingTrack's offsets land on the frame it turns).
+    const shade = (from: Pose, to: Pose, timing: KeyframeAnimationOptions) =>
+      sheets().flatMap((sheet, i) => {
+        if (!sheet) return [];
+        const track = facingTrack(geometry, from, to, i);
+        if (track.length < 2) {
+          sheet.style.opacity = String(track[0].toward ? 1 : AWAY);
+          return [];
+        }
+        const keyframes: Keyframe[] = track.map(({ offset, toward }) => ({
+          offset,
+          opacity: toward ? 1 : AWAY,
+          easing: "step-end",
+        }));
+        keyframes.push({ offset: 1, opacity: keyframes.at(-1)!.opacity });
+        return [sheet.animate(keyframes, timing)];
+      });
+    const shadeStill = (pose: Pose) =>
+      sheets().forEach((sheet, i) => {
+        if (sheet)
+          sheet.style.opacity = String(facing(geometry, pose, i) ? 1 : AWAY);
+      });
     const rest = (front: number | null) =>
       frames.forEach((face, i) => setIdle(face, i !== front));
     // Web Animations keep the camera on the compositor and report the real
@@ -256,12 +292,15 @@ export function createPrism(): Prism {
         pagePose(geometry, to, origin),
         timing,
       );
+      const shading = shade(at, to, timing);
       await Promise.all([camera.finished, page?.finished]).catch(() => {});
       at = to;
       body.style.transform = bodyPose(geometry, at);
       held?.set(pagePose(geometry, at, origin));
+      shadeStill(at);
       camera.cancel();
       page?.cancel();
+      shading.forEach((animation) => animation.cancel());
       if (outside) rest(index);
     };
 
@@ -437,6 +476,7 @@ export function createPrism(): Prism {
         body.style.transition = "none";
         body.style.transform = bodyPose(geometry, at);
         held?.set(pagePose(geometry, at, origin));
+        shadeStill(at);
       },
       { signal },
     );
@@ -469,6 +509,7 @@ export function createPrism(): Prism {
     root.dataset.outside = room.dataset.outside = "false";
     held = holdPage();
     held.set(pagePose(geometry, at, origin));
+    shadeStill(at);
     // The page holds still while the camera moves; faces too.
     rest(null);
     delete root.dataset.dormant;
