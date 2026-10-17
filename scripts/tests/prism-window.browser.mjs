@@ -113,8 +113,16 @@ const entrancesSince = (page, since) =>
     since,
   );
 
+/** A high-density desktop, where late paint shows most. */
+const HIDPI = {
+  viewport: { width: 1440, height: 900 },
+  deviceScaleFactor: 2,
+};
+
 async function arrive(browser, base, lens, size) {
-  const context = await browser.newContext({ ...SIZES[size] });
+  const context = await browser.newContext({
+    ...(SIZES[size] ?? (size === "desktop-2x" ? HIDPI : {})),
+  });
   await context.addInitScript(watchEntrances);
   await context.addInitScript((lenses) => {
     try {
@@ -375,6 +383,67 @@ test(
             },
           );
         }
+    } finally {
+      await browser.close();
+      await server.close();
+    }
+  },
+);
+
+/** Turning the prism once all the way round, how often the compositor drew
+ * a face with tiles it hadn't painted yet ("checkerboard": blank, then
+ * filled in, the pop-in Burooj saw). Faces turned away used to be culled,
+ * so they lost their tiles and were painted late as they came round. */
+async function lateTiles(browser, base, lens, size) {
+  const { context, page, errors } = await arrive(browser, base, lens, size);
+  try {
+    await pullOut(page);
+    await browser.startTracing(page, { categories: ["cc"] });
+    for (let i = 0; i < ALL.length; i += 1) {
+      await page.keyboard.press("ArrowRight");
+      await page.waitForTimeout(300);
+      await until(
+        page,
+        "the prism never finished turning",
+        () =>
+          !document.querySelector("#prism-stage .prism-body")?.getAnimations()
+            .length,
+      );
+      await page.waitForTimeout(400);
+    }
+    const trace = JSON.parse((await browser.stopTracing()).toString());
+    const events = trace.traceEvents ?? trace;
+    assert.deepEqual(errors, []);
+    return events.filter(
+      (event) => event.name === "PictureLayerImpl::AppendQuads checkerboard",
+    ).length;
+  } finally {
+    await context.close();
+  }
+}
+
+/** Late-tile draws in a full turn, measured in headless Chromium (software
+ * compositing, so far slower to paint than a real GPU): with faces culled,
+ * 18 to 154; shaded instead, 0 to 12. */
+const LATE_TILES = 16;
+
+test(
+  "turning the prism paints no face late",
+  { skip, timeout: 20 * 60_000 },
+  async (t) => {
+    const { chromium: browserType } = await import("playwright-core");
+    const server = await serveRuntimeFixture();
+    const browser = await browserType.launch({ executablePath: executable });
+    try {
+      for (const size of [...Object.keys(SIZES), "desktop-2x"])
+        for (const lens of size === "desktop-2x" ? ["daylight"] : LENSES)
+          await t.test(`${size} ${lens}: a full turn`, async () => {
+            const late = await lateTiles(browser, server.base, lens, size);
+            assert.ok(
+              late <= LATE_TILES,
+              `${late} draws with faces painted late (at most ${LATE_TILES})`,
+            );
+          });
     } finally {
       await browser.close();
       await server.close();
