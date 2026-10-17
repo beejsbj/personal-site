@@ -19,13 +19,15 @@
  *
  * Every thread on the screen is in the same index (skein.ts): the hions
  * are fixed company (fix()), so threads fall in alongside them; threads
- * steered by something else (one from the pointer, winding round a
- * heading) grow by extend(), and can be handed back to fate to run on.
+ * steered by something else grow by extend(), and can be handed back to
+ * fate to run on.
  *
- * Where a thread means to go is planned for it (plan()): most pass through
- * a gather, a lane in the most open place of a stretch of the page, so
- * several converge there and part again; a few are lone and run off into
- * the distance. Everything is deterministic for a seed and a layout. */
+ * Every thread is a branch of a hion (buds()): it leaves one where it
+ * passes, forward at a slant into open paper (leave()). Where it means to
+ * go is planned for it: most pass through a gather, a lane in the most
+ * open place of a stretch of the page, so several converge there and part
+ * again; a few are lone and run off into the distance. Everything is
+ * deterministic for a seed and a layout. */
 
 import { type Hue, type Pt, rng } from "./pastel";
 
@@ -706,69 +708,4 @@ export function buds(ground: Ground, ways: Way[], o: PlanOptions): { gathers: Ga
     }
   });
   return { gathers: all, buds: out.sort((a, b) => a.seed.key - b.seed.key) };
-}
-
-/** A page's threads: a fan from where the hions come down, and threads in
- * from either edge down the page (cyan-leaning left, magenta-leaning
- * right), each born as the drawing reaches it. */
-export function plan(ground: Ground, o: PlanOptions) {
-  const all = gathers(ground, o);
-  const rand = rng(o.seed * 31 + 3);
-  const { width: W, height: H } = o;
-  const narrow = W < 720;
-  const seeds: Seed[] = [];
-  // Clear of the way the hions themselves come down (straight below).
-  const fan = o.close
-    ? [-48, -26, 28, 50]
-    : narrow
-      ? o.lively
-        ? [-44, -30, -16, 18, 30, 44]
-        : [-40, -22, 22, 40]
-      : o.lively
-        ? [-72, -58, -46, -34, -22, -12, 14, 24, 36, 48, 60, 72]
-        : [-66, -50, -34, -22, 24, 36, 52, 68];
-  const down = Math.PI / 2;
-  fan.forEach((d, i) => {
-    const s = o.seed * 977 + i;
-    const r = rng(s);
-    const a = down + d * DEG;
-    const lone = i === 0 || i === fan.length - 1;
-    seeds.push({
-      x: o.drop + d * 0.5,
-      y: o.top,
-      a,
-      hue: i % 2 ? "m" : "c",
-      len: 1400 + r() * 1800,
-      seed: s,
-      key: o.top + i * 30,
-      lone,
-      free: 240,
-      goals: goalsFor(all, o.drop, o.top, a, lone, r),
-    });
-  });
-  let k = 0;
-  const gap = (narrow ? 520 : 380) * (o.close ? 1.4 : o.lively ? 0.6 : 1);
-  for (let y = o.top + 180; y < H - 120; y += gap) {
-    for (const side of [0, 1]) {
-      if (rand() < (o.lively ? 0.15 : 0.3)) continue;
-      const tilt = (14 + rand() * 40) * DEG;
-      const hue: Hue = side ? (rand() < 0.72 ? "m" : "c") : rand() < 0.72 ? "c" : "m";
-      const yy = y + rand() * 160;
-      const lone = rand() < 0.22;
-      const a = side ? Math.PI - tilt : tilt;
-      const s = o.seed * 31 + ++k * 7;
-      seeds.push({
-        x: side ? W + 6 : -6,
-        y: yy,
-        a,
-        hue,
-        len: 900 + rand() * 1800,
-        seed: s,
-        key: yy - 260 + rand() * 120,
-        lone,
-        goals: goalsFor(all, side ? W : 0, yy, a, lone, rng(s)),
-      });
-    }
-  }
-  return { gathers: all, seeds: seeds.sort((a, b) => a.key - b.key) };
 }
