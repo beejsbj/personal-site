@@ -2523,9 +2523,8 @@ export function createSkein(options: SkeinOptions) {
     let moving = false;
     let offscreen = false;
     for (const fx of effects) {
-      // Moving, it is repainted where it was and is; held still (a line
-      // pulled aside while you hover), it stays where it is, untouched;
-      // gone, where it was is cleared.
+      // Moving, it is repainted where it was and is; held still, it stays
+      // where it is, untouched; gone, where it was is cleared.
       const alive = fx.e.step(now, Math.min(dt, 64));
       const boxes = fx.e.boxes();
       if (alive) cleared.push(...fx.last, ...boxes);
