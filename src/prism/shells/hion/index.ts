@@ -147,7 +147,10 @@ function show(route: Route, first: boolean) {
     signal: controller.signal,
     instant: still(),
     lookahead: ctx.face ? 0 : 0.6,
-    brisk: !first,
+    // Arrived on or travelled to, a screen grows from where the hions come
+    // down (the current destination's knot on the line): none of it is
+    // ready-made.
+    brisk: true,
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
     pulse,
@@ -171,7 +174,7 @@ function show(route: Route, first: boolean) {
     instant: still(),
     scale: close(route.path) ? 2 : 1,
     lively: route.kind === "home",
-    travelled: !first,
+    travelled: true,
     origin: () => nav.origin(),
     seed: seedOf(route.path),
     isIdle: ctx.isIdle,
@@ -219,7 +222,7 @@ function show(route: Route, first: boolean) {
       woven();
     } else {
       ground();
-      later(controller.signal, first ? 0 : WOVEN, woven);
+      later(controller.signal, WOVEN, woven);
     }
   });
   // Keyboard travel ahead of the drawing brings the drawing with it.
