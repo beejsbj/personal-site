@@ -2433,32 +2433,61 @@ export function createSkein(options: SkeinOptions) {
   let sent: Strand[] = [];
 
   /** A pair from a tap: for each hue, a branch off its own tree out
-   * through the point, curving on to a thread of the other tree near by
-   * (or any other, failing that) and weaving over and under along it. It
-   * never goes back: it lies as the ground does, and fades as it does,
-   * leaves first. */
+   * through the point, and on from there, the way it was going, into the
+   * nearest other branch ahead (of the other tree by preference, never the
+   * one it grew from or anything that one grew from), weaving over and
+   * under along it. It never goes back: it lies as the ground does, and
+   * fades as it does, leaves first. */
   function sendOut(x: number, y: number, now: number) {
     sent = sent.filter((st) => !st.t.gone);
     for (const st of sent.slice(0, Math.max(0, sent.length - SENT + 2))) st.fadeAt = Math.min(st.fadeAt, now);
     const rand = rng(Math.floor(now * 7 + x * 13 + y));
     for (const hue of ["c", "m"] as Hue[]) {
       const other: Hue = hue === "c" ? "m" : "c";
-      // Somewhere to weave into: off to one side of the tap, not on it.
-      const a = rand() * Math.PI * 2;
-      const fx = x + Math.cos(a) * 140;
-      const fy = y + Math.sin(a) * 140;
-      const into = touch(fx, fy, 320, other) ?? touch(fx, fy, 320);
+      // Out to the tap from the nearest grown thread of its tree, going
+      // away from it.
+      const near = touch(x, y, 700, hue) ?? touch(x, y, 700);
+      if (!near) continue;
+      const [nx0, ny0] = at(near.st, near.s);
+      const fl = Math.hypot(x - nx0, y - ny0) || 1;
+      const fwd: Pt = [(x - nx0) / fl, (y - ny0) / fl];
+      const root = rootFor([x, y], fwd, hue, 700, undefined, true) ?? rootFor([x, y], fwd, undefined, 700);
+      if (!root) continue;
+      // Never back into its own line: not the thread it leaves, nor any it
+      // came from.
+      const lineage = new Set<Strand>();
+      for (let p: Strand | null = root.parent; p; p = p.parent) lineage.add(p);
+      const [rx, ry] = at(root.parent, root.s);
+      let into: { st: Strand; s: number; d: number } | null = null;
+      let bestScore = Infinity;
+      for (const st of strands) {
+        if (lineage.has(st) || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30) continue;
+        const { xs, ys } = st.t;
+        const end = Math.min(xs.length - 1, indexAt(st, st.s));
+        for (let i = 0; i <= end; i += 3) {
+          const dx = xs[i] - x;
+          const dy = ys[i] - y;
+          if (Math.abs(dx) > 420 || Math.abs(dy) > 420) continue;
+          const d = Math.hypot(dx, dy);
+          if (d < 50 || d > 420 || Math.hypot(xs[i] - rx, ys[i] - ry) < 140) continue;
+          // Ahead, the way it was going (a little to either side).
+          const ahead = (dx * fwd[0] + dy * fwd[1]) / d;
+          if (ahead < 0.1) continue;
+          const score = d * (st.t.hue === other ? 1 : 1.3) - ahead * 60;
+          if (score < bestScore) {
+            bestScore = score;
+            into = { st, s: st.ls[i], d };
+          }
+        }
+      }
       if (!into) continue;
       const [tx, ty, nx, ny] = at(into.st, into.s);
-      if (Math.hypot(tx - x, ty - y) < 40) continue;
-      // Along the thread it weaves into, either way.
-      const dir = rand() < 0.5 ? -1 : 1;
+      // Along that thread the way that carries on, not back.
+      const dir = ny * (tx - x) - nx * (ty - y) >= 0 ? 1 : -1;
       const ax = ny * dir;
       const ay = -nx * dir;
-      const to = Math.atan2(ty - y, tx - x);
-      const lean = to + (rand() < 0.5 ? -1 : 1) * (0.3 + rand() * 0.35);
-      const d = Math.hypot(tx - x, ty - y);
-      const reach = cubicWay([x, y], [x + Math.cos(lean) * d * 0.45, y + Math.sin(lean) * d * 0.45], [tx - ax * d * 0.35, ty - ay * d * 0.35], [tx, ty], Math.max(6, Math.ceil(d / 6)));
+      const d = into.d;
+      const reach = cubicWay([x, y], [x + fwd[0] * d * 0.45, y + fwd[1] * d * 0.45], [tx - ax * d * 0.35, ty - ay * d * 0.35], [tx, ty], Math.max(6, Math.ceil(d / 6)));
       // Over and under it, a good way along.
       const weaveIn: Pt[] = [];
       const span = 160 + rand() * 140;
@@ -2467,10 +2496,7 @@ export function createSkein(options: SkeinOptions) {
         const side = k % 2 ? 8 : -8;
         weaveIn.push([px + qx * side, py + qy * side]);
       }
-      const arrive: Pt = [Math.cos(lean), Math.sin(lean)];
-      const root = rootFor([x, y], arrive, hue, 700, into.st, true) ?? rootFor([x, y], arrive, undefined, 700, into.st);
-      if (!root) continue;
-      const t = fate.bare(root.parent.t.hue, smooth([...root.way.slice(0, -1), ...reach, ...weaveIn.slice(1)], 4));
+      const t = fate.bare(root.parent.t.hue, smooth([...root.way.slice(0, -1), ...reach.slice(1), ...weaveIn.slice(1)], 4));
       const st = make("ground", nature("ground"), t, { by: "way" }, { parent: root.parent, s: root.s });
       measureBody(st);
       strands.push(st);
