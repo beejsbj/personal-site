@@ -97,7 +97,7 @@
  * width (pastel.ts THREAD). */
 import { type Bud, buds, Fate, goalsFor, Ground, leave, type Gather, type Seed, STEP, type Thread } from "./fate";
 import type { createLoom, Limb } from "./loom";
-import { still, unshow } from "./dom";
+import { measured, still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
 import { type Hue, type Pt, RGB, rng, THREAD } from "./pastel";
 import { type Box, encircle as encircle_, ring, smooth, stitches, weave, wordBoxes } from "./wind";
@@ -571,10 +571,10 @@ export function createSkein(options: SkeinOptions) {
     layer.style.height = liveLayer.style.height = `${height}px`;
     tileRows = Math.ceil(height / TILE);
     ground = new Ground(width, height, 8);
-    page.classList.add("hion-measuring");
-    readPage();
-    const spun = measureTitles();
-    page.classList.remove("hion-measuring");
+    const spun = measured(page, () => {
+      readPage();
+      return measureTitles();
+    });
     ground.finish();
     fate = new Fate(ground);
     strands = [];
@@ -767,20 +767,22 @@ export function createSkein(options: SkeinOptions) {
    * still (no swing, no reveal offset). */
   function readHangers() {
     hangers = [];
-    page.classList.add("hion-measuring");
-    const p = page.getBoundingClientRect();
-    for (const el of page.querySelectorAll<HTMLElement>("[data-reveal][data-ink]")) {
-      if (el.hasAttribute("data-tied")) continue;
-      if (instant || el.closest("[data-cloth-hold]")) {
-        el.setAttribute("data-tied", "");
-        continue;
+    const tied: HTMLElement[] = [];
+    measured(page, () => {
+      const p = page.getBoundingClientRect();
+      for (const el of page.querySelectorAll<HTMLElement>("[data-reveal][data-ink]")) {
+        if (el.hasAttribute("data-tied")) continue;
+        if (instant || el.closest("[data-cloth-hold]")) {
+          tied.push(el);
+          continue;
+        }
+        const r = el.getBoundingClientRect();
+        const hang = parseFloat(el.style.getPropertyValue("--hion-hang")) || 0;
+        const kx = parseFloat(el.dataset.knot ?? "");
+        hangers.push({ el, x: r.left - p.left + (Number.isNaN(kx) ? r.width / 2 : kx), y: r.top - p.top - hang, lit: 0 });
       }
-      const r = el.getBoundingClientRect();
-      const hang = parseFloat(el.style.getPropertyValue("--hion-hang")) || 0;
-      const kx = parseFloat(el.dataset.knot ?? "");
-      hangers.push({ el, x: r.left - p.left + (Number.isNaN(kx) ? r.width / 2 : kx), y: r.top - p.top - hang, lit: 0 });
-    }
-    page.classList.remove("hion-measuring");
+    });
+    for (const el of tied) el.setAttribute("data-tied", "");
   }
 
   /** Show what hangs once its cord has grown to it. */
@@ -2586,11 +2588,11 @@ export function createSkein(options: SkeinOptions) {
     const laid = new Set(strands.map((st) => (st.drive.by === "title" ? st.drive.el : null)));
     const waiting = [...titles.keys()].filter((el) => !laid.has(el));
     if (!waiting.length) return;
-    page.classList.add("hion-measuring");
-    const p = page.getBoundingClientRect();
-    const measured = waiting.map((el) => [el, el.isConnected ? titles.get(el)!.measure(p) : null] as const);
-    page.classList.remove("hion-measuring");
-    for (const [el, spun] of measured) {
+    const spuns = measured(page, () => {
+      const p = page.getBoundingClientRect();
+      return waiting.map((el) => [el, el.isConnected ? titles.get(el)!.measure(p) : null] as const);
+    });
+    for (const [el, spun] of spuns) {
       if (!spun) {
         el.dataset.spunState = "chalk";
         titles.delete(el);
@@ -2740,9 +2742,7 @@ export function createSkein(options: SkeinOptions) {
     inscribe(el: HTMLElement, hue: Hue, measure: Measure) {
       titles.set(el, { hue, measure });
       if (!built || busy || signal.aborted) return;
-      page.classList.add("hion-measuring");
-      const spun = measure(page.getBoundingClientRect());
-      page.classList.remove("hion-measuring");
+      const spun = measured(page, () => measure(page.getBoundingClientRect()));
       if (!spun) {
         // It gets its chalk back.
         el.dataset.spunState = "chalk";

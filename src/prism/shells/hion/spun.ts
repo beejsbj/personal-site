@@ -46,7 +46,7 @@
  * does every heading on the screen if the face is late or will not load;
  * and a heading left in sight unwritten is begun anyway, then given its
  * chalk. */
-import { still } from "./dom";
+import { measured, still } from "./dom";
 import { type Hue, type Pt, THREAD } from "./pastel";
 import type { Pulse } from "./pulse";
 import { joinLines, type Traced, traceWord } from "./trace";
@@ -198,15 +198,14 @@ function write(words: HTMLElement[], options: SpunOptions) {
       el.dataset.spunState = "chalk";
     }
   };
-  // One heading per idle slot.
+  // A heading per idle slot, a few while the slot has room (their reads
+  // of the page share one measuring pass: dom.ts `measured`).
   const queue: HTMLElement[] = [];
   let waiting = false;
-  const pump = () => {
+  const pump = (slot?: IdleDeadline) => {
     waiting = false;
-    const el = queue.shift();
-    if (!el || signal.aborted) return;
-    begin(el);
-    if (queue.length) {
+    for (let n = 0; queue.length && !signal.aborted && (!n || (n < 4 && (slot?.timeRemaining() ?? 0) > 4)); n++) begin(queue.shift()!);
+    if (queue.length && !signal.aborted) {
       waiting = true;
       soon(pump);
     }
@@ -266,7 +265,7 @@ const near = (el: HTMLElement) => {
   return r.bottom > -innerHeight * 0.5 && r.top < innerHeight * 1.5;
 };
 
-const soon = (run: () => void) =>
+const soon = (run: (slot?: IdleDeadline) => void) =>
   "requestIdleCallback" in window ? requestIdleCallback(run, { timeout: 300 }) : setTimeout(run, 16);
 
 /** A heading's hue: its weft's (weave.ts), its own or its holder's, else
@@ -614,17 +613,23 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   const { signal } = options;
   const material = options.skein.material();
   const { glow } = material.nature();
-  // Where it rests, not where a swing has it.
+  // Where it rests, not where a swing has it (dom.ts `measured`): every
+  // read of the page first, then the writes, so nothing is laid out twice.
   const host = el.closest<HTMLElement>(".hion-page");
-  host?.classList.add("hion-measuring");
-  const own = el.getBoundingClientRect();
-  const spun = measure(el, own);
-  host?.classList.remove("hion-measuring");
+  const read = measured(host, () => {
+    const spun = measure(el, el.getBoundingClientRect());
+    if (!spun) return null;
+    // Riding the resume's track: on from the track's own threads, the
+    // circle round a year or the strand down the role's side.
+    if (!from && !spun.knotted) from = strandBeside(el, spun.way[0][1]) ?? undefined;
+    return { spun, width: el.clientWidth };
+  });
   el.querySelector(":scope > .hion-spun-local")?.remove();
-  if (!spun) {
+  if (!read) {
     el.dataset.spunState = "chalk";
     return;
   }
+  const { spun, width } = read;
   el.dataset.spunState = "spun";
   el.setAttribute("data-spun-local", "");
   // For a hover: the other hion weaves through it (skein.ts).
@@ -633,9 +638,6 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   // From the knot its drop ends in (a hung label), straight down into the
   // line under its feet; from the knots its weft stops in (strung); else
   // in along the line.
-  // Riding the resume's track: on from the track's own threads, the circle
-  // round a year or the strand down the role's side, along the line.
-  if (!from && !spun.knotted) from = strandBeside(el, spun.way[0][1]) ?? undefined;
   const way = smooth(spun.knotted ? spun.way : from ? onFrom(from, spun.way) : [[spun.way[0][0] - lead, spun.way[0][1] + 2], ...spun.way], 4);
   const arcs = [0];
   for (let k = 1; k < way.length; k++) arcs.push(arcs[k - 1] + Math.hypot(way[k][0] - way[k - 1][0], way[k][1] - way[k - 1][1]));
@@ -696,7 +698,6 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   };
   // Laid out anew (the track fits its roles to the window): written
   // again, settled.
-  const width = el.clientWidth;
   const resized = new ResizeObserver(() => {
     if (el.clientWidth === width || signal.aborted) return;
     resized.disconnect();
