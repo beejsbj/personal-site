@@ -319,9 +319,104 @@ function spin(el: HTMLElement, options: SpunOptions) {
 
 /** Lines already traced, by everything that makes the bitmap: a page
  * laid out anew (a resize, a font swap elsewhere) asks again, and a
- * screen come back to is the same words. */
-const traced = new Map<string, Traced | null>();
+ * screen come back to is the same words. Kept in localStorage too (the
+ * number in the key is the tracer's version): tracing is the dearest
+ * thing a screen does on arrival (the names on the line alone are over
+ * 100ms), and the same words in the same face trace the same way, so the
+ * second visit traces nothing it has seen. A kept way is packed (deltas
+ * at a tenth of a bitmap px, as a polyline string): about 1.5KB a line,
+ * where its JSON was 6. */
 const TRACED = 400;
+const KEPT = "hion:traced:1";
+interface Kept {
+  w: number;
+  l: number;
+  p: string;
+}
+const traced = new Map<string, Traced | null>();
+let kept: Map<string, Kept | null> | undefined;
+function load() {
+  if (kept) return kept;
+  kept = new Map();
+  try {
+    const raw = localStorage.getItem(KEPT);
+    if (raw) for (const [k, v] of JSON.parse(raw) as [string, Kept | null][]) kept.set(k, v);
+  } catch {
+    // Nothing kept, or nowhere to keep it: traced afresh.
+  }
+  return kept;
+}
+function recall(key: string) {
+  const got = traced.get(key);
+  if (got !== undefined) return got;
+  const k = load().get(key);
+  if (k === undefined) return undefined;
+  const trace = k && { way: unpack(k.p), width: k.w, line: k.l };
+  traced.set(key, trace);
+  return trace;
+}
+let keeping = 0;
+function keep(key: string, trace: Traced | null) {
+  traced.set(key, trace);
+  if (traced.size > TRACED) traced.delete(traced.keys().next().value!);
+  const all = load();
+  all.set(key, trace && { w: trace.width, l: trace.line, p: pack(trace.way) });
+  while (all.size > TRACED) all.delete(all.keys().next().value!);
+  if (keeping) return;
+  keeping = window.setTimeout(() => {
+    keeping = 0;
+    try {
+      localStorage.setItem(KEPT, JSON.stringify([...all]));
+    } catch {
+      // Full, or not allowed: this visit's traces live in memory only.
+    }
+  }, 2500);
+}
+
+/** A way as a string: each coordinate's change from the last, in tenths,
+ * five bits a character (the polyline way). */
+function pack(way: Pt[]) {
+  let out = "";
+  let px = 0;
+  let py = 0;
+  const put = (v: number) => {
+    let n = v < 0 ? ~(v << 1) : v << 1;
+    for (; n >= 0x20; n >>= 5) out += String.fromCharCode((0x20 | (n & 0x1f)) + 63);
+    out += String.fromCharCode(n + 63);
+  };
+  for (const [x, y] of way) {
+    const ix = Math.round(x * 10);
+    const iy = Math.round(y * 10);
+    put(ix - px);
+    put(iy - py);
+    px = ix;
+    py = iy;
+  }
+  return out;
+}
+
+function unpack(s: string): Pt[] {
+  const out: Pt[] = [];
+  let x = 0;
+  let y = 0;
+  for (let i = 0; i < s.length; ) {
+    const take = () => {
+      let n = 0;
+      let shift = 0;
+      let b: number;
+      do {
+        b = s.charCodeAt(i++) - 63;
+        n |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      return n & 1 ? ~(n >> 1) : n >> 1;
+    };
+    x += take();
+    y += take();
+    out.push([x / 10, y / 10]);
+  }
+  return out;
+}
 
 /** The face's descent, by font. */
 const descents = new Map<string, number>();
@@ -377,11 +472,10 @@ export function measure(el: HTMLElement, page: DOMRect): Spun | null {
     const h = Math.ceil((size * 1.4 + room * 2) * scale);
     if (w < 4 || h < 4 || w * h > 4e6) return;
     const key = [font, style.letterSpacing, scale, back ? "<" : ">", ...line.map((run) => `${(run.rect.left - l).toFixed(1)}:${run.text}`)].join("|");
-    let trace = traced.get(key);
+    let trace = recall(key);
     if (trace === undefined) {
       trace = traceLine(line, { font, spacing: style.letterSpacing, scale, room, l, w, h, top: baseline - t + room, back });
-      if (traced.size >= TRACED) traced.delete(traced.keys().next().value!);
-      traced.set(key, trace);
+      keep(key, trace);
     }
     if (!trace) return;
     const toPage = ([x, y]: Pt): Pt => [x / scale - room + l - page.left, y / scale - room + t - page.top];
@@ -581,11 +675,18 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
           }
         }
       };
+      // One a task (a name untraced is tens of milliseconds; all of them
+      // in one task is a hitch on arrival), as good as together.
+      const shown = labels.filter((el) => el.getClientRects().length);
+      const next = () => {
+        const el = shown.shift();
+        if (!el || signal.aborted) return;
+        write(el);
+        if (shown.length) setTimeout(next, 0);
+      };
+      next();
       for (const el of labels) {
-        if (el.getClientRects().length) {
-          write(el);
-          continue;
-        }
+        if (el.getClientRects().length) continue;
         // Folded away (the menu on a phone): written when it is first let
         // down, once its drop has hung.
         const shown = new ResizeObserver(() => {
