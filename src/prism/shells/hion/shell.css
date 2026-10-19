@@ -15,24 +15,25 @@
      thin, open strokes trace cleanly as one thread, and their one weight is the only
      one. Its capitals are for large words only: under about 28px they
      shout, so small titles (head) are set in the reading face. Text:
-     Spectral, wide and calm on black. Hand: the spoken lines, in
-     Spectral's light italic. Label: charms, dates, tags, in Aboreto's
+     Literata, low in contrast and naturally bold, large enough to hold its
+     own beside the threads. Hand: what is said in type, in Literata's
+     italic. Label: charms, dates, tags, in Aboreto's
      capitals, tracked open. Every weight here is in a loaded file, and
      nothing is synthesised. */
-  --hion-serif: "Spectral", Georgia, serif;
+  --hion-serif: "Literata", Georgia, serif;
   --hion-display: "Aboreto", Georgia, serif;
   --hion-display-weight: 400;
   --hion-display-track: 0.02em;
   --hion-display-leading: 1;
   --hion-head: var(--hion-serif);
-  --hion-head-weight: 600;
-  --hion-text-size: 1.125rem;
-  --hion-read-size: 1.2rem;
-  --hion-text-weight: 400;
-  --hion-strong-weight: 600;
+  --hion-head-weight: 700;
+  --hion-text-size: 1.3rem;
+  --hion-read-size: 1.35rem;
+  --hion-text-weight: 600;
+  --hion-strong-weight: 800;
   --hion-hand: var(--hion-serif);
   --hion-hand-style: italic;
-  --hion-hand-weight: 300;
+  --hion-hand-weight: 500;
   --hion-hand-scale: 0.82;
   --hion-label: "Aboreto", Georgia, serif;
   --hion-label-style: normal;
@@ -52,7 +53,7 @@
   min-height: 100vh;
   color: var(--hion-text);
   background: var(--hion-black);
-  font: var(--hion-text-weight) var(--hion-text-size)/1.7 var(--hion-serif);
+  font: var(--hion-text-weight) var(--hion-text-size)/1.6 var(--hion-serif);
   font-kerning: normal;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -550,8 +551,8 @@
 :root[data-lens="hion"] .hion-intro {
   max-width: 34em;
   margin: 0.9em 0 0;
-  font-size: 1.2rem;
-  line-height: 1.65;
+  font-size: var(--hion-read-size);
+  line-height: 1.6;
   color: var(--hion-cl);
 }
 
@@ -726,7 +727,7 @@
     }
 
     :root[data-lens="hion"] .hion-head .hion-intro {
-      font-size: 1.08rem;
+      font-size: var(--hion-text-size);
     }
   }
 
@@ -828,8 +829,8 @@
 :root[data-lens="hion"] .hion-welcome {
   max-width: 22em;
   margin: 0.35em 0 0;
-  font-size: 1.25rem;
-  line-height: 1.6;
+  font-size: var(--hion-read-size);
+  line-height: 1.55;
   color: var(--hion-cl);
 }
 
@@ -1145,7 +1146,7 @@
 
 :root[data-lens="hion"] .hion-work__summary {
   margin: 0;
-  font-size: 1.06rem;
+  font-size: calc(var(--hion-text-size) * 0.92);
   line-height: 1.65;
 }
 
@@ -1232,7 +1233,7 @@
 
   :root[data-lens="hion"] .hion-row--works .hion-work__summary {
     max-width: 24em;
-    font-size: 1.06rem;
+    font-size: calc(var(--hion-text-size) * 0.92);
   }
 
   :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) .hion-work__summary {
@@ -1320,7 +1321,7 @@
 
 :root[data-lens="hion"] .hion-tied__summary {
   margin: 0.4em 0 0;
-  font-size: 1.06rem;
+  font-size: calc(var(--hion-text-size) * 0.92);
   line-height: 1.6;
   color: var(--hion-text);
 }
@@ -2049,8 +2050,8 @@
   :root[data-lens="hion"] .hion {
     --hion-gutter: 20px;
     --hion-loop-pad: 26px;
-    --hion-text-size: 1.0625rem;
-    --hion-read-size: 1.125rem;
+    --hion-text-size: 1.15rem;
+    --hion-read-size: 1.2rem;
     /* Wide capitals on a narrow screen: a little less air between them. */
     --hion-label-track: 0.08em;
     font-size: var(--hion-text-size);

@@ -5,14 +5,16 @@
    shells/hion/shell.css.
 
    Two faces, one inscribed voice. Aboreto, thin capitals cut like a stele,
-   for the large titles and the labels; Spectral for reading, its light
-   italic for the spoken lines. Latin only, and only the weights the shell
-   asks for: Spectral 400, 600 (strong words and small titles) and light
-   italic; Aboreto has one weight. */
+   for the large titles and the labels; Literata for reading, low in
+   contrast and naturally bold, so it holds its own on black beside the
+   threads; its italic for what is said in type. Latin only, and only the
+   weights the shell asks for: Literata 600 (reading), 700 (small titles),
+   800 (strong words) and 500 italic; Aboreto has one weight. */
 @import "@fontsource/aboreto/latin-400.css";
-@import "@fontsource/spectral/latin-400.css";
-@import "@fontsource/spectral/latin-600.css";
-@import "@fontsource/spectral/latin-300-italic.css";
+@import "@fontsource/literata/latin-600.css";
+@import "@fontsource/literata/latin-700.css";
+@import "@fontsource/literata/latin-800.css";
+@import "@fontsource/literata/latin-500-italic.css";
 
 :root[data-lens="hion"],
 :root[data-lens="hion"] body {
