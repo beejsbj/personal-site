@@ -228,6 +228,9 @@ interface Strand {
   bottom: number;
   left: number;
   right: number;
+  /** The extent of the whole body grown so far (page px): a search for
+   * the nearest point skips a strand nowhere near. */
+  ext: Box;
   /** How much its head is moving (eases to 0 when it stops). */
   motion: number;
   /** The head's light: 1 while it grows, cooling to 0 once it has ended. */
@@ -621,10 +624,15 @@ export function createSkein(options: SkeinOptions) {
   function measureBody(st: Strand) {
     const { xs, ys } = st.t;
     const ls = st.ls;
+    const e = st.ext;
     for (let i = ls.length; i < xs.length; i++) {
       const d = i ? Math.hypot(xs[i] - xs[i - 1], ys[i] - ys[i - 1]) : 0;
       // A stretch a hion leaves the page for (a track) is no length.
       ls.push(i ? ls[i - 1] + (d > JUMP ? 0 : d) : 0);
+      if (xs[i] < e.l) e.l = xs[i];
+      if (xs[i] > e.r) e.r = xs[i];
+      if (ys[i] < e.t) e.t = ys[i];
+      if (ys[i] > e.b) e.b = ys[i];
     }
     return ls[ls.length - 1] ?? 0;
   }
@@ -828,13 +836,23 @@ export function createSkein(options: SkeinOptions) {
    * vector), across as little of the words as it can. Prefers threads of
    * `hue`. Null if nothing has grown within `far`. */
   function rootFor(to: Pt, arrive: Pt, hue?: Hue, far = 760, not?: Strand, only = false): { parent: Strand; s: number; way: Pt[] } | null {
-    let best: { parent: Strand; s: number; way: Pt[] } | null = null;
-    let bestCost = Infinity;
     const [tx, ty] = to;
-    const cubic = cubicWay;
+    const [ax, ay] = arrive;
+    const now = performance.now();
+    // Every point it could leave from, weighed cheaply first (how far, how
+    // far off forward, its hue, its depth); the way itself (a curve,
+    // sampled against the words) is drawn only for the likeliest, in that
+    // order, until none left could beat the best. With a heading hemmed
+    // in by words every way is across some, and once every point of a
+    // busy screen was drawn to it: a hitch of a few hundred milliseconds
+    // on a hover.
+    const cands: { st: Strand; i: number; d: number; fx: number; fy: number; lb: number }[] = [];
     for (const st of strands) {
       if (st === not || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30 || (only && st.t.hue !== hue)) continue;
-      if (st.kind === "ground" && st.fadeAt - performance.now() < 15000) continue;
+      if (st.kind === "ground" && st.fadeAt - now < 15000) continue;
+      const e = st.ext;
+      if (tx < e.l - far || tx > e.r + far || ty < e.t - far || ty > e.b + far) continue;
+      const prefer = hue && st.t.hue !== hue ? 700 : 0;
       const { xs, ys } = st.t;
       const end = Math.min(xs.length - 1, indexAt(st, st.s));
       for (let i = 3; i <= end - 3; i += 4) {
@@ -852,29 +870,54 @@ export function createSkein(options: SkeinOptions) {
         const cos = ((tx - x) * fx + (ty - y) * fy) / d;
         // Behind it or square to it: it would have to turn back on itself.
         if (cos < 0.05) continue;
-        const k1 = Math.min(140, d * 0.38);
-        const k2 = Math.min(120, d * 0.34);
-        // Cheap first: nearer than the best so far could be.
-        const prefer = hue && st.t.hue !== hue ? 700 : 0;
-        if (d + prefer + st.depth * 30 >= bestCost) continue;
-        const n = Math.max(22, Math.ceil(d / 8));
-        const pts = cubic([x, y], [x + fx * k1, y + fy * k1], [tx - arrive[0] * k2, ty - arrive[1] * k2], [tx, ty], n);
-        // Across the words: all but never (the last stretch arrives beside
-        // the words it writes, the first leaves a thread that may run
-        // beside others).
-        let blocked = 0;
-        for (let k = Math.ceil(n * 0.06); k < Math.floor(n * 0.84); k++) if (ground.clear(pts[k][0], pts[k][1]) < 5) blocked++;
-        // Off the page is no way to go.
-        let off = 0;
-        for (const [px, py] of pts) if (px < 4 || px > width - 4 || py < 0) off++;
-        const cost = d + blocked * 900 + off * 400 + (1 - cos) * 260 + prefer + st.depth * 30;
-        if (cost < bestCost) {
-          bestCost = cost;
-          best = { parent: st, s: st.ls[i], way: pts };
-        }
+        cands.push({ st, i, d, fx, fy, lb: d + (1 - cos) * 260 + prefer + st.depth * 30 });
       }
     }
-    return best;
+    cands.sort((a, b) => a.lb - b.lb);
+    let best: (typeof cands)[number] | null = null;
+    let bestCost = Infinity;
+    for (let c = 0; c < cands.length && c < 400; c++) {
+      const cand = cands[c];
+      if (cand.lb >= bestCost) break;
+      const { st, i, d, fx, fy } = cand;
+      const x = st.t.xs[i];
+      const y = st.t.ys[i];
+      const k1 = Math.min(140, d * 0.38);
+      const k2 = Math.min(120, d * 0.34);
+      const p1x = x + fx * k1;
+      const p1y = y + fy * k1;
+      const p2x = tx - ax * k2;
+      const p2y = ty - ay * k2;
+      const n = Math.max(22, Math.ceil(d / 8));
+      // Across the words: all but never (the last stretch arrives beside
+      // the words it writes, the first leaves a thread that may run
+      // beside others). Off the page is no way to go.
+      const k0 = Math.ceil(n * 0.06);
+      const k1n = Math.floor(n * 0.84);
+      let blocked = 0;
+      let off = 0;
+      for (let k = 0; k <= n; k++) {
+        const u = k / n;
+        const v = 1 - u;
+        const px = v * v * v * x + 3 * v * v * u * p1x + 3 * v * u * u * p2x + u * u * u * tx;
+        const py = v * v * v * y + 3 * v * v * u * p1y + 3 * v * u * u * p2y + u * u * u * ty;
+        if (k >= k0 && k < k1n && ground.clear(px, py) < 5) blocked++;
+        if (px < 4 || px > width - 4 || py < 0) off++;
+      }
+      const cost = cand.lb + blocked * 900 + off * 400;
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = cand;
+      }
+    }
+    if (!best) return null;
+    const { st, i, d, fx, fy } = best;
+    const x = st.t.xs[i];
+    const y = st.t.ys[i];
+    const k1 = Math.min(140, d * 0.38);
+    const k2 = Math.min(120, d * 0.34);
+    const way = cubicWay([x, y], [x + fx * k1, y + fy * k1], [tx - ax * k2, ty - ay * k2], [tx, ty], Math.max(22, Math.ceil(d / 8)));
+    return { parent: st, s: st.ls[i], way };
   }
 
   /* ---------- Words written by thread ---------- */
@@ -1666,6 +1709,7 @@ export function createSkein(options: SkeinOptions) {
       bottom: t.ys[0],
       left: t.xs[0],
       right: t.xs[0],
+      ext: { l: t.xs[0], t: t.ys[0], r: t.xs[0], b: t.ys[0] },
       motion: 1,
       heat: 1,
       resting: false,
@@ -2123,6 +2167,8 @@ export function createSkein(options: SkeinOptions) {
     let bd = r;
     for (const st of strands) {
       if (st.t.gone || st.s < 4 || st.alpha < 1 || (hue && st.t.hue !== hue)) continue;
+      const e = st.ext;
+      if (x < e.l - bd || x > e.r + bd || y < e.t - bd || y > e.b + bd) continue;
       const { xs, ys } = st.t;
       const end = Math.min(xs.length - 1, indexAt(st, st.s));
       for (let i = 0; i <= end; i += 2) {
@@ -2472,6 +2518,8 @@ export function createSkein(options: SkeinOptions) {
       let bestScore = Infinity;
       for (const st of strands) {
         if (lineage.has(st) || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30) continue;
+        const e = st.ext;
+        if (x < e.l - 420 || x > e.r + 420 || y < e.t - 420 || y > e.b + 420) continue;
         const { xs, ys } = st.t;
         const end = Math.min(xs.length - 1, indexAt(st, st.s));
         for (let i = 0; i <= end; i += 3) {
