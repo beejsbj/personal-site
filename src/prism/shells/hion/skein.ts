@@ -2407,9 +2407,11 @@ export function createSkein(options: SkeinOptions) {
     task.wake();
   }
 
-  /** A tap plucks the nearest thread: it rings where it was struck, and
-   * light runs away from there both ways through the whole tree. Nothing
-   * is made. */
+  /** A tap on a thread plucks it: it rings where it was struck, and light
+   * runs away from there both ways through the whole tree. Anywhere, a tap
+   * sends out a pair: a branch off each tree grows out through where you
+   * tapped and on to a thread of the other near by, and weaves into it
+   * (`sendOut`). */
   function onDown(event: PointerEvent) {
     lastInput = performance.now();
     if (!built || busy || event.button > 0) return;
@@ -2418,10 +2420,58 @@ export function createSkein(options: SkeinOptions) {
     const x = event.clientX;
     const y = event.clientY + scrollY - pageTop;
     if (y < 0 || y > height) return;
-    const hit = touch(x, y, 64);
-    if (!hit) return;
-    rings.push({ st: hit.st, s: hit.s, age: 0 });
-    light(hit.st, hit.s, 1);
+    const hit = touch(x, y, 24);
+    if (hit) {
+      rings.push({ st: hit.st, s: hit.s, age: 0 });
+      light(hit.st, hit.s, 1);
+    }
+    sendOut(x, y, performance.now());
+  }
+
+  /** How many a tap's branches may be out at once, and how long each stays
+   * woven in before it withdraws into its tree (ms). */
+  const SENT = 4;
+  const STAYS = 7000;
+
+  /** A pair from a tap: for each hue, a branch off its own tree out
+   * through the point, curving on to a thread of the other tree near by
+   * (or any other, failing that) and weaving across it in stitches; it
+   * stays a while, then withdraws into the thread it came from. */
+  function sendOut(x: number, y: number, now: number) {
+    const out = strands.filter((st) => st.drive.by === "loop" && st.drive.el === null && st.drive.state !== "untying");
+    for (const st of out.slice(0, Math.max(0, out.length - SENT + 2))) (st.drive as Extract<Drive, { by: "loop" }>).state = "untying";
+    const rand = rng(Math.floor(now * 7 + x * 13 + y));
+    for (const hue of ["c", "m"] as Hue[]) {
+      const other: Hue = hue === "c" ? "m" : "c";
+      // Somewhere to weave into: off to one side of the tap, not on it.
+      const a = rand() * Math.PI * 2;
+      const fx = x + Math.cos(a) * 140;
+      const fy = y + Math.sin(a) * 140;
+      const into = touch(fx, fy, 320, other) ?? touch(fx, fy, 320);
+      if (!into) continue;
+      const [tx, ty, nx, ny] = at(into.st, into.s);
+      if (Math.hypot(tx - x, ty - y) < 40) continue;
+      // Along the thread it weaves into, either way.
+      const dir = rand() < 0.5 ? -1 : 1;
+      const ax = ny * dir;
+      const ay = -nx * dir;
+      const to = Math.atan2(ty - y, tx - x);
+      const lean = to + (rand() < 0.5 ? -1 : 1) * (0.3 + rand() * 0.35);
+      const d = Math.hypot(tx - x, ty - y);
+      const reach = cubicWay([x, y], [x + Math.cos(lean) * d * 0.45, y + Math.sin(lean) * d * 0.45], [tx - ax * d * 0.35, ty - ay * d * 0.35], [tx, ty], Math.max(6, Math.ceil(d / 6)));
+      // Over and under it, a good way along.
+      const weaveIn: Pt[] = [];
+      const span = 160 + rand() * 140;
+      for (let k = 0, u = 0; u <= span; k++, u += 22) {
+        const [px, py, qx, qy] = at(into.st, into.s + dir * u);
+        const side = k % 2 ? 8 : -8;
+        weaveIn.push([px + qx * side, py + qy * side]);
+      }
+      const arrive: Pt = [Math.cos(lean), Math.sin(lean)];
+      const root = rootFor([x, y], arrive, hue, 700, into.st, true) ?? rootFor([x, y], arrive, undefined, 700, into.st);
+      if (!root) continue;
+      loop(null, root.parent.t.hue, smooth([...root.way.slice(0, -1), ...reach, ...weaveIn.slice(1)], 4), now + STAYS + rand() * 2500, { parent: root.parent, s: root.s });
+    }
   }
 
   function onScroll() {
