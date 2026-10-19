@@ -2428,18 +2428,18 @@ export function createSkein(options: SkeinOptions) {
     sendOut(x, y, performance.now());
   }
 
-  /** How many a tap's branches may be out at once, and how long each stays
-   * woven in before it withdraws into its tree (ms). */
-  const SENT = 4;
-  const STAYS = 7000;
+  /** How many of a tap's branches may lie at once (the oldest fade). */
+  const SENT = 8;
+  let sent: Strand[] = [];
 
   /** A pair from a tap: for each hue, a branch off its own tree out
    * through the point, curving on to a thread of the other tree near by
-   * (or any other, failing that) and weaving across it in stitches; it
-   * stays a while, then withdraws into the thread it came from. */
+   * (or any other, failing that) and weaving over and under along it. It
+   * never goes back: it lies as the ground does, and fades as it does,
+   * leaves first. */
   function sendOut(x: number, y: number, now: number) {
-    const out = strands.filter((st) => st.drive.by === "loop" && st.drive.el === null && st.drive.state !== "untying");
-    for (const st of out.slice(0, Math.max(0, out.length - SENT + 2))) (st.drive as Extract<Drive, { by: "loop" }>).state = "untying";
+    sent = sent.filter((st) => !st.t.gone);
+    for (const st of sent.slice(0, Math.max(0, sent.length - SENT + 2))) st.fadeAt = Math.min(st.fadeAt, now);
     const rand = rng(Math.floor(now * 7 + x * 13 + y));
     for (const hue of ["c", "m"] as Hue[]) {
       const other: Hue = hue === "c" ? "m" : "c";
@@ -2470,7 +2470,12 @@ export function createSkein(options: SkeinOptions) {
       const arrive: Pt = [Math.cos(lean), Math.sin(lean)];
       const root = rootFor([x, y], arrive, hue, 700, into.st, true) ?? rootFor([x, y], arrive, undefined, 700, into.st);
       if (!root) continue;
-      loop(null, root.parent.t.hue, smooth([...root.way.slice(0, -1), ...reach, ...weaveIn.slice(1)], 4), now + STAYS + rand() * 2500, { parent: root.parent, s: root.s });
+      const t = fate.bare(root.parent.t.hue, smooth([...root.way.slice(0, -1), ...reach, ...weaveIn.slice(1)], 4));
+      const st = make("ground", nature("ground"), t, { by: "way" }, { parent: root.parent, s: root.s });
+      measureBody(st);
+      strands.push(st);
+      sent.push(st);
+      task.wake();
     }
   }
 
