@@ -67,7 +67,9 @@ export interface Spun {
 }
 
 export interface Measure {
-  (page: DOMRect): Spun | null;
+  /** `page` gives the page's box when it is needed (a read of the layout;
+   * a heading whose reads were taken ahead needs none). */
+  (page: () => DOMRect): Spun | null;
 }
 
 /** The one material, lent by the skein for a heading written on its own
@@ -202,8 +204,18 @@ function write(words: HTMLElement[], options: SpunOptions) {
   // of the page share one measuring pass: dom.ts `measured`).
   const queue: HTMLElement[] = [];
   let waiting = false;
+  const host = words[0].closest<HTMLElement>(".hion-page");
   const pump = (slot?: IdleDeadline) => {
     waiting = false;
+    if (signal.aborted) return;
+    // The next few words' reads, under one pass, for the slots to come.
+    const ahead = queue.slice(0, 6).filter((el) => !prepared.has(el) && el.isConnected && !el.closest("[data-cloth-hold]") && !el.matches(".hion-strung"));
+    if (ahead.length) {
+      measured(host, () => {
+        const page = host?.getBoundingClientRect();
+        for (const el of ahead) prepared.set(el, read(el, page));
+      });
+    }
     for (let n = 0; queue.length && !signal.aborted && (!n || (n < 4 && (slot?.timeRemaining() ?? 0) > 4)); n++) begin(queue.shift()!);
     if (queue.length && !signal.aborted) {
       waiting = true;
@@ -268,6 +280,24 @@ const near = (el: HTMLElement) => {
 const soon = (run: (slot?: IdleDeadline) => void) =>
   "requestIdleCallback" in window ? requestIdleCallback(run, { timeout: 300 }) : setTimeout(run, 16);
 
+/** One a task, back to back: a label untraced is tens of milliseconds,
+ * and a row of them is tied at once; one task of them all is a hitch, a
+ * task each is as good as together. */
+const spreading: (() => void)[] = [];
+function spread(run: () => void) {
+  spreading.push(run);
+  if (spreading.length > 1) return;
+  const next = () => {
+    try {
+      spreading[0]?.();
+    } finally {
+      spreading.shift();
+      if (spreading.length) setTimeout(next, 0);
+    }
+  };
+  setTimeout(next, 0);
+}
+
 /** A heading's hue: its weft's (weave.ts), its own or its holder's, else
  * by turns down the screen (cyan, magenta, cyan). */
 function hueOf(el: HTMLElement): Hue {
@@ -283,7 +313,9 @@ function spin(el: HTMLElement, options: SpunOptions) {
     writeLocal(el, hueOf(el), options);
     return;
   }
-  const knot = el.matches(LABELS) ? knotOf(el) : null;
+  const host = el.closest<HTMLElement>(".hion-page");
+  const r = taken(el) ?? measured(host, () => read(el));
+  const knot = el.matches(LABELS) ? r.knot : null;
   if (knot) {
     // On from its drop, in its drop's hue (the hue of the cord it hangs
     // from: weave.ts).
@@ -292,10 +324,16 @@ function spin(el: HTMLElement, options: SpunOptions) {
     // (skein.ts ties it; shell.css grows the drop).
     const holder = el.closest<HTMLElement>("[data-reveal][data-ink]");
     if (!holder || options.instant) {
-      writeLocal(el, hue, options, options.instant, knot);
+      writeLocal(el, hue, options, options.instant, knot, 0, r);
       return;
     }
-    const go = () => writeLocal(el, hue, options, false, knotOf(el) ?? knot, 600);
+    // A row is tied at once: every label's reads then, under one pass
+    // (measured), and the writing one label a task (spread).
+    const go = () => {
+      if (options.signal.aborted || !el.isConnected) return;
+      const now = measured(host, () => read(el));
+      spread(() => options.signal.aborted || !el.isConnected || writeLocal(el, hue, options, false, now.knot ?? knot, 600, now));
+    };
     if (holder.hasAttribute("data-tied")) go();
     else {
       const watch = new MutationObserver(() => {
@@ -308,13 +346,62 @@ function spin(el: HTMLElement, options: SpunOptions) {
     }
     return;
   }
+  let first: Read | undefined = r;
   options.skein.inscribe(el, hueOf(el), (page) => {
     const t0 = performance.now();
-    const spun = measure(el, page);
+    // Its reads were taken with its turn in the queue; asked again (the
+    // page laid out anew), it reads afresh.
+    const rd = first ?? taken(el) ?? measured(host, () => read(el, page()));
+    first = undefined;
+    const spun = measure(rd, "page");
     // For a look while developing: how long a heading takes to read.
     if (import.meta.env.DEV) performance.measure("hion:spun", { start: t0, detail: el.textContent });
     return spun;
   });
+}
+
+/** What a word's writing needs of the page: its boxes and the words in
+ * them, its face. The one part that reads the layout, taken apart from
+ * the tracing so several words' reads can share one pass (every pass
+ * restyles the page: dom.ts `measured`). */
+interface Read {
+  /** The page's box and the word's own (viewport px, as the runs). */
+  page: DOMRect;
+  own: DOMRect;
+  /** The knot its drop ends in (a hung label), its px. */
+  knot: Pt | null;
+  font: string;
+  size: number;
+  spacing: string;
+  upper: boolean;
+  runs: Run[];
+  /** A strung heading's box. */
+  strung: DOMRect | null;
+  width: number;
+}
+
+function read(el: HTMLElement, page = el.closest(".hion-page")?.getBoundingClientRect() ?? el.getBoundingClientRect()): Read {
+  const style = getComputedStyle(el);
+  return {
+    page,
+    own: el.getBoundingClientRect(),
+    knot: el.matches(LABELS) ? knotOf(el) : null,
+    font: `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`,
+    size: parseFloat(style.fontSize) || 0,
+    spacing: style.letterSpacing,
+    upper: style.textTransform === "uppercase",
+    runs: textRuns(el),
+    strung: el.matches(".hion-strung") ? (el.querySelector(".hion-strung__box")?.getBoundingClientRect() ?? null) : null,
+    width: el.clientWidth,
+  };
+}
+
+/** Reads taken ahead of a word's turn (the queue takes a few at once). */
+const prepared = new WeakMap<HTMLElement, Read>();
+function taken(el: HTMLElement) {
+  const r = prepared.get(el);
+  prepared.delete(el);
+  return r;
 }
 
 /** Lines already traced, by everything that makes the bitmap: a page
@@ -434,19 +521,17 @@ function descentOf(font: string) {
 
 /** The heading's letters, read off the page a line at a time and traced,
  * as one way in page px. Null when there is nothing to write. */
-export function measure(el: HTMLElement, page: DOMRect): Spun | null {
-  const style = getComputedStyle(el);
-  const size = parseFloat(style.fontSize) || 0;
+export function measure(rd: Read, rel: "page" | "own"): Spun | null {
+  const page = rel === "page" ? rd.page : rd.own;
+  const { font, size, runs } = rd;
   if (size < SMALLEST) return null;
-  const font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
   // Drawn large enough that a stroke is about five pixels, which thins
   // cleanly; a big word is drawn as it is.
   const scale = Math.max(1, Math.min(4, 5 / (size * 0.058)));
   const room = Math.round(size * 0.12) + 6;
-  const runs = textRuns(el);
   if (!runs.length) return null;
   // The letters as they are set (a label is set in capitals by CSS).
-  if (style.textTransform === "uppercase") for (const run of runs) run.text = run.text.toUpperCase();
+  if (rd.upper) for (const run of runs) run.text = run.text.toUpperCase();
   // Where the words sit is read from the bottom of their boxes (the
   // baseline is that less the face's descent): the top of a text box can
   // carry a line's extra height.
@@ -471,10 +556,10 @@ export function measure(el: HTMLElement, page: DOMRect): Spun | null {
     const w = Math.ceil((r - l + room * 2) * scale);
     const h = Math.ceil((size * 1.4 + room * 2) * scale);
     if (w < 4 || h < 4 || w * h > 4e6) return;
-    const key = [font, style.letterSpacing, scale, back ? "<" : ">", ...line.map((run) => `${(run.rect.left - l).toFixed(1)}:${run.text}`)].join("|");
+    const key = [font, rd.spacing, scale, back ? "<" : ">", ...line.map((run) => `${(run.rect.left - l).toFixed(1)}:${run.text}`)].join("|");
     let trace = recall(key);
     if (trace === undefined) {
-      trace = traceLine(line, { font, spacing: style.letterSpacing, scale, room, l, w, h, top: baseline - t + room, back });
+      trace = traceLine(line, { font, spacing: rd.spacing, scale, room, l, w, h, top: baseline - t + room, back });
       keep(key, trace);
     }
     if (!trace) return;
@@ -490,7 +575,7 @@ export function measure(el: HTMLElement, page: DOMRect): Spun | null {
   // before the words, and (when it ends on that side) up into the knot
   // after.
   let knotted = false;
-  const strung = el.matches(".hion-strung") ? el.querySelector(".hion-strung__box")?.getBoundingClientRect() : null;
+  const { strung } = rd;
   if (strung) {
     const first = runs.reduce((a, b) => (b.rect.top < a.rect.top ? b : a)).rect;
     const y = first.top + first.height * 0.56 - page.top;
@@ -675,18 +760,12 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
           }
         }
       };
-      // One a task (a name untraced is tens of milliseconds; all of them
-      // in one task is a hitch on arrival), as good as together.
-      const shown = labels.filter((el) => el.getClientRects().length);
-      const next = () => {
-        const el = shown.shift();
-        if (!el || signal.aborted) return;
-        write(el);
-        if (shown.length) setTimeout(next, 0);
-      };
-      next();
+      // One a task (all of them in one was a hitch on arrival).
       for (const el of labels) {
-        if (el.getClientRects().length) continue;
+        if (el.getClientRects().length) {
+          spread(() => signal.aborted || write(el));
+          continue;
+        }
         // Folded away (the menu on a phone): written when it is first let
         // down, once its drop has hung.
         const shown = new ResizeObserver(() => {
@@ -710,29 +789,36 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
  * canvas of its own, with the skein's material and a head of its own (on
  * the screen's one frame loop), then let it lie cold. Written again,
  * settled, if the heading is laid out anew. */
-function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant, from?: Pt, delay = 0) {
+function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant, from?: Pt, delay = 0, given?: Read) {
   const { signal } = options;
   const material = options.skein.material();
   const { glow } = material.nature();
   // Where it rests, not where a swing has it (dom.ts `measured`): every
   // read of the page first, then the writes, so nothing is laid out twice.
+  // Reads already taken (a row tied at once) need no pass at all.
   const host = el.closest<HTMLElement>(".hion-page");
   const t0 = performance.now();
-  const read = measured(host, () => {
-    const spun = measure(el, el.getBoundingClientRect());
-    if (import.meta.env.DEV) performance.measure("hion:spun", { start: t0, detail: el.textContent });
-    if (!spun) return null;
-    // Riding the resume's track: on from the track's own threads, the
-    // circle round a year or the strand down the role's side.
-    if (!from && !spun.knotted) from = strandBeside(el, spun.way[0][1]) ?? undefined;
-    return { spun, width: el.clientWidth };
-  });
+  let spun: Spun | null = null;
+  let width = 0;
+  if (given) {
+    spun = measure(given, "own");
+    width = given.width;
+  } else {
+    measured(host, () => {
+      const rd = read(el);
+      spun = measure(rd, "own");
+      width = rd.width;
+      // Riding the resume's track: on from the track's own threads, the
+      // circle round a year or the strand down the role's side.
+      if (spun && !from && !spun.knotted) from = strandBeside(el, spun.way[0][1]) ?? undefined;
+    });
+  }
+  if (import.meta.env.DEV) performance.measure("hion:spun", { start: t0, detail: el.textContent });
   el.querySelector(":scope > .hion-spun-local")?.remove();
-  if (!read) {
+  if (!spun) {
     el.dataset.spunState = "chalk";
     return;
   }
-  const { spun, width } = read;
   el.dataset.spunState = "spun";
   el.setAttribute("data-spun-local", "");
   // For a hover: the other hion weaves through it (skein.ts).

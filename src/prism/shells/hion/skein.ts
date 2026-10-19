@@ -409,6 +409,8 @@ export function createSkein(options: SkeinOptions) {
   let skipPaint = false;
   /** Boxes of things gone from the live canvas, to clear. */
   let cleared: Box[] = [];
+  /** Panes broken (a thread went under) since the last beat, to still. */
+  const stale = new Set<HTMLCanvasElement>();
   const effects: { e: Effect; last: Box[] }[] = [];
   // The pointer, in page space.
   const pointer = { x: -1e4, y: -1e4, at: 0, here: false, looked: 0 };
@@ -932,7 +934,7 @@ export function createSkein(options: SkeinOptions) {
         titles.delete(el);
         continue;
       }
-      const s = t.measure(p);
+      const s = t.measure(() => p);
       if (s) out.push([el, s]);
       else el.dataset.spunState = "chalk";
     }
@@ -1405,7 +1407,10 @@ export function createSkein(options: SkeinOptions) {
       const tile = tiles.get(k);
       if (!tile) continue;
       for (const { ctx, el } of panesIn(tile, Math.min(x0, x1), Math.max(x0, x1))) {
-        still(el);
+        // Shown on the beat, with the bakes: a crossing a frame would have
+        // the pane stilled (a new bitmap) every frame. The thread going
+        // over lies live on top until then anyway.
+        stale.add(el);
         ctx.save();
         ctx.globalCompositeOperation = "destination-out";
         ctx.lineWidth = THREAD + 2.5;
@@ -2136,6 +2141,10 @@ export function createSkein(options: SkeinOptions) {
     }
     for (const [t, i] of fate.breaks) breakAt(t, i);
     fate.breaks.length = 0;
+    if (baking && stale.size) {
+      for (const el of stale) still(el);
+      stale.clear();
+    }
     fade(now);
     // Paint, every other frame when frames run long.
     if (!skipPaint || !moving) {
@@ -2647,7 +2656,7 @@ export function createSkein(options: SkeinOptions) {
     if (!waiting.length) return;
     const spuns = measured(page, () => {
       const p = page.getBoundingClientRect();
-      return waiting.map((el) => [el, el.isConnected ? titles.get(el)!.measure(p) : null] as const);
+      return waiting.map((el) => [el, el.isConnected ? titles.get(el)!.measure(() => p) : null] as const);
     });
     for (const [el, spun] of spuns) {
       if (!spun) {
@@ -2799,7 +2808,9 @@ export function createSkein(options: SkeinOptions) {
     inscribe(el: HTMLElement, hue: Hue, measure: Measure) {
       titles.set(el, { hue, measure });
       if (!built || busy || signal.aborted) return;
-      const spun = measured(page, () => measure(page.getBoundingClientRect()));
+      // (spun.ts reads the page under one pass for several words at once,
+      // and only when it has to.)
+      const spun = measure(() => page.getBoundingClientRect());
       if (!spun) {
         // It gets its chalk back.
         el.dataset.spunState = "chalk";
