@@ -717,8 +717,10 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   // Where it rests, not where a swing has it (dom.ts `measured`): every
   // read of the page first, then the writes, so nothing is laid out twice.
   const host = el.closest<HTMLElement>(".hion-page");
+  const t0 = performance.now();
   const read = measured(host, () => {
     const spun = measure(el, el.getBoundingClientRect());
+    if (import.meta.env.DEV) performance.measure("hion:spun", { start: t0, detail: el.textContent });
     if (!spun) return null;
     // Riding the resume's track: on from the track's own threads, the
     // circle round a year or the strand down the role's side.
