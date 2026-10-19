@@ -194,6 +194,7 @@ export function createLife(options: LifeOptions) {
   function sync() {
     if (loom.version() === version) return;
     version = loom.version();
+    measure();
     strands = {};
     for (const tip of loom.journeys()) strands[tip.hue] = new Strand(tip.points, tip.keys);
     for (const g of glints) g.el.remove();
@@ -357,7 +358,8 @@ export function createLife(options: LifeOptions) {
   function tick(_now: number, dt: number) {
     if (options.isIdle()) return false;
     dt = Math.min(48, dt);
-    measure();
+    // (The page's box is read on a scroll or a resize, not here: a layout
+    // read mid-frame lays the page out again for every change so far.)
     sync();
     lightGlints();
 
@@ -407,6 +409,7 @@ export function createLife(options: LifeOptions) {
   function onScroll() {
     const now = performance.now();
     lastInput = now;
+    measure();
     const dy = scrollY - lastScroll;
     lastScroll = scrollY;
     swayV += Math.max(-0.22, Math.min(0.22, dy * 0.0007));
@@ -444,7 +447,7 @@ export function createLife(options: LifeOptions) {
       addEventListener("pointermove", onMove, { passive: true, signal });
       document.addEventListener("pointerleave", onLeave, { signal });
       addEventListener("scroll", onScroll, { passive: true, signal });
-      addEventListener("resize", () => wake(), { signal });
+      addEventListener("resize", () => (measure(), wake()), { signal });
       if (fine) {
         world.addEventListener(
           "pointerenter",

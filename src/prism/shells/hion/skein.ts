@@ -228,8 +228,6 @@ interface Strand {
   bottom: number;
   left: number;
   right: number;
-  /** When it was last baked (performance.now()). */
-  bakedAt: number;
   /** How much its head is moving (eases to 0 when it stops). */
   motion: number;
   /** The head's light: 1 while it grows, cooling to 0 once it has ended. */
@@ -264,9 +262,9 @@ interface Hion {
 
 const TILE = 512;
 const PANE = 320;
-/** Segments laid onto the ground at once, and the least time between
- * two bakes of one strand (ms). */
-const BATCH = 8;
+/** How often what has cooled is laid onto the ground (ms): every strand
+ * on one shared beat, so a pane many heads cross is re-stilled (a new
+ * bitmap) once a beat, not once for each. */
 const BEAT = 320;
 /** How fast a hion runs down a screen it has just come to (px a second). */
 const SETOUT = 1800;
@@ -376,11 +374,18 @@ export function createSkein(options: SkeinOptions) {
   let width = 0;
   let height = 0;
   let pageTop = 0;
+  /** The viewport on the page (its top in page px, its height), read when
+   * the reader scrolls or the window changes: a frame reads no layout (a
+   * read of scrollY mid-frame lays the page out again for every change
+   * the frame has made). */
+  let viewTop = 0;
+  let viewH = 0;
   let tileRows = 1;
   let dpr = 1;
   let built = false;
   let busy = false;
   let lastTick = 0;
+  let lastBeat = 0;
   let lastBirth = 0;
   let nextTrickle = 0;
   let lastInput = 0;
@@ -563,10 +568,17 @@ export function createSkein(options: SkeinOptions) {
     return moving;
   }
 
+  /** Where the reader is looking. */
+  function look() {
+    viewTop = scrollY - pageTop;
+    viewH = innerHeight;
+  }
+
   function build() {
     width = page.clientWidth;
     height = page.scrollHeight;
     pageTop = page.getBoundingClientRect().top + scrollY;
+    look();
     dpr = Math.min(devicePixelRatio || 1, 1.5);
     layer.style.height = liveLayer.style.height = `${height}px`;
     tileRows = Math.ceil(height / TILE);
@@ -1284,9 +1296,8 @@ export function createSkein(options: SkeinOptions) {
 
   /** Keep ground near the viewport; drop far panes. */
   function cull() {
-    const top = scrollY - pageTop;
-    const from = Math.max(0, Math.floor((top - innerHeight * 0.3) / TILE));
-    const to = Math.min(tileRows - 1, Math.floor((top + innerHeight * 1.3) / TILE));
+    const from = Math.max(0, Math.floor((viewTop - viewH * 0.3) / TILE));
+    const to = Math.min(tileRows - 1, Math.floor((viewTop + viewH * 1.3) / TILE));
     for (const [index, tile] of tiles) {
       if (index < from - 1 || index > to + 1) {
         for (const pane of tile.panes) unshow(pane.el);
@@ -1325,7 +1336,6 @@ export function createSkein(options: SkeinOptions) {
     st.bottom = Math.max(st.bottom, bottom);
     st.left = Math.min(st.left, left);
     st.right = Math.max(st.right, right);
-    st.bakedAt = performance.now();
     const [a, b] = tileRange(top, bottom);
     for (let k = a; k <= b; k++) {
       const tile = tiles.get(k);
@@ -1371,10 +1381,10 @@ export function createSkein(options: SkeinOptions) {
   /** Keep the band over the viewport; moved (and repainted whole) only
    * when the reader has scrolled near its edge. */
   function anchor() {
-    const view = scrollY - pageTop;
-    const want = Math.min(height, Math.ceil(innerHeight * BAND));
+    const view = viewTop;
+    const want = Math.min(height, Math.ceil(viewH * BAND));
     const w = width;
-    if (!bandFresh && want === bandH && w === bandW && view >= bandTop - 1 && view + innerHeight <= bandTop + bandH + 1) {
+    if (!bandFresh && want === bandH && w === bandW && view >= bandTop - 1 && view + viewH <= bandTop + bandH + 1) {
       return;
     }
     const d = Math.min(devicePixelRatio || 1, 1.5);
@@ -1387,7 +1397,7 @@ export function createSkein(options: SkeinOptions) {
       band.style.width = `${bandW}px`;
       band.style.height = `${bandH}px`;
     }
-    bandTop = Math.round(Math.max(0, Math.min(height - bandH, view - (bandH - innerHeight) / 2)));
+    bandTop = Math.round(Math.max(0, Math.min(height - bandH, view - (bandH - viewH) / 2)));
     band.style.transform = `translateY(${bandTop}px)`;
     bctx.setTransform(1, 0, 0, 1, 0, 0);
     bctx.clearRect(0, 0, band.width, band.height);
@@ -1656,7 +1666,6 @@ export function createSkein(options: SkeinOptions) {
       bottom: t.ys[0],
       left: t.xs[0],
       right: t.xs[0],
-      bakedAt: 0,
       motion: 1,
       heat: 1,
       resting: false,
@@ -1821,8 +1830,7 @@ export function createSkein(options: SkeinOptions) {
 
   /** Is a point near enough the reader to be seen? */
   function seen(y: number, margin = 0.5) {
-    const view = scrollY - pageTop;
-    return y > view - innerHeight * margin && y < view + innerHeight * (1 + margin);
+    return y > viewTop - viewH * margin && y < viewTop + viewH * (1 + margin);
   }
 
   const headY = (st: Strand) => at(st, st.s)[1];
@@ -1848,9 +1856,8 @@ export function createSkein(options: SkeinOptions) {
     const rand = rng(options.seed * 7 + ++trickles * 131);
     // Sooner when nothing near the reader is growing; sooner on home.
     nextTrickle = now + (2500 + near * 3000 + rand() * 3000) * (lively ? 0.45 : 1);
-    const view = scrollY - pageTop;
-    const top = Math.max(0, view) + innerHeight * 0.08;
-    const bottom = view + innerHeight * 0.8;
+    const top = Math.max(0, viewTop) + viewH * 0.08;
+    const bottom = viewTop + viewH * 0.8;
     const from = strands.filter(
       (st) =>
         (st.kind === "hion" || (st.kind === "ground" && st.cold && st.alpha === 1 && st.fadeAt - now > 20000)) &&
@@ -2053,6 +2060,9 @@ export function createSkein(options: SkeinOptions) {
       if (alive) moving = true;
     }
     let untied = false;
+    const beat = Math.floor(now / BEAT);
+    const baking = beat !== lastBeat;
+    lastBeat = beat;
     for (const st of strands) {
       if (st.cold) continue;
       if (move(st, now, dt, here)) moving = true;
@@ -2064,13 +2074,11 @@ export function createSkein(options: SkeinOptions) {
         } else if (st.drive.state === "held" && st.drive.until < Infinity) offscreen = true;
         continue;
       }
-      // Lay what has cooled behind the head, a batch at a time.
-      // Lay what has cooled behind the head, a batch at a time, and not
-      // more often than a few times a second: every bake re-stills a pane
-      // (a new bitmap), and a quick head would do that every frame.
-      const settled = st.s - Math.min(st.n.tail, st.s);
-      const to = indexAt(st, settled);
-      if (to - st.laid >= BATCH && now - st.bakedAt > BEAT) bake(st, to);
+      // Lay what has cooled behind the head, on the beat.
+      if (baking) {
+        const to = indexAt(st, st.s - Math.min(st.n.tail, st.s));
+        if (to > st.laid) bake(st, to);
+      }
       // A hion is never finished: its way is drawn as far as the loom has.
       if (st.kind === "hion") continue;
       if (st.t.done && st.heat <= 0 && (!st.rope || st.rope.energy < 0.04)) finish(st, now);
@@ -2508,6 +2516,7 @@ export function createSkein(options: SkeinOptions) {
   }
 
   function onScroll() {
+    look();
     if (!built || busy) return;
     cull();
     lastInput = performance.now();
@@ -2607,7 +2616,7 @@ export function createSkein(options: SkeinOptions) {
    * part grown (the first few still growing, their heads live), so the
    * ground is there at once and a few heads are at work in it. */
   function pregrow() {
-    const fold = Math.max(0, scrollY - pageTop) + innerHeight;
+    const fold = Math.max(0, viewTop) + viewH;
     let started = 0;
     const now = performance.now();
     // Branches that leave the hions above the fold, as far as the drawing

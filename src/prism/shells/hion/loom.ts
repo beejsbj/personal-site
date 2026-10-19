@@ -152,6 +152,9 @@ export function createLoom(options: LoomOptions) {
   let buckets: number[][] = []; // per tile, the marks that touch it
   let reach = 0;
   let target = 0;
+  /** The window's height, read on a scroll or a resize (not every frame:
+   * a layout read mid-frame lays the page out again). */
+  let viewSize = innerHeight;
   /** Length along the axis the drawing reads, and breadth across it. */
   let length = 0;
   let breadth = 0;
@@ -368,7 +371,7 @@ export function createLoom(options: LoomOptions) {
     let gap = target - reach;
     // Far behind (a jump, a fling): lay what you have passed at once, and
     // draw only the last stretch in front of you.
-    const size = across ? sight().size : innerHeight;
+    const size = across ? sight().size : viewSize;
     if (gap > size * 1.4) {
       advance(target - size * 0.9);
       gap = target - reach;
@@ -396,6 +399,7 @@ export function createLoom(options: LoomOptions) {
   }
 
   function onScroll() {
+    viewSize = innerHeight;
     if (!built) return;
     if (across ? sight().start > 0 : scrollY > 0) intro = false;
     cull();
