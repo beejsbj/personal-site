@@ -39,13 +39,20 @@ const GLOW = 0.25;
 interface Tile {
   index: number;
   el: HTMLElement;
+  /** Its canvases, made the first time a mark is laid on it: a 2D canvas
+   * on the page costs every frame, drawn on or not, and on a page the
+   * hions and their limbs are the skein's, so most tiles never get one. */
+  drawn: Drawn | null;
+  /** Next position in this tile's bucket still to lay. */
+  cursor: number;
+}
+
+interface Drawn {
   canvas: HTMLCanvasElement;
   glow: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   gctx: CanvasRenderingContext2D;
   pats: Patterns;
-  /** Next position in this tile's bucket still to lay. */
-  cursor: number;
 }
 
 export interface Composition {
@@ -216,6 +223,15 @@ export function createLoom(options: LoomOptions) {
       el.style.top = `${index * TILE}px`;
       el.style.height = `${h}px`;
     }
+    layer.append(el);
+    return { index, el, drawn: null, cursor: 0 };
+  }
+
+  /** A tile's canvases, made when the first mark is laid on it. */
+  function drawnOn(tile: Tile): Drawn {
+    if (tile.drawn) return tile.drawn;
+    const tileLength = Math.min(TILE, length - tile.index * TILE);
+    const [w, h] = across ? [tileLength, breadth] : [breadth, tileLength];
     const canvas = document.createElement("canvas");
     canvas.width = Math.ceil(w * dpr);
     canvas.height = Math.ceil(h * dpr);
@@ -223,25 +239,33 @@ export function createLoom(options: LoomOptions) {
     glow.className = "hion-loom__glow";
     glow.width = Math.ceil(w * GLOW);
     glow.height = Math.ceil(h * GLOW);
-    el.append(glow, canvas);
-    layer.append(el);
-    const shift = -index * TILE;
+    tile.el.append(glow, canvas);
+    const shift = -tile.index * TILE;
     const ctx = canvas.getContext("2d")!;
     ctx.setTransform(dpr, 0, 0, dpr, across ? shift * dpr : 0, across ? 0 : shift * dpr);
     const gctx = glow.getContext("2d")!;
     gctx.setTransform(GLOW, 0, 0, GLOW, across ? shift * GLOW : 0, across ? 0 : shift * GLOW);
-    return { index, el, canvas, glow, ctx, gctx, pats: patterns(ctx, dpr), cursor: 0 };
+    return (tile.drawn = { canvas, glow, ctx, gctx, pats: patterns(ctx, dpr) });
   }
 
   function lay(tile: Tile, m: Mark) {
-    if (m.kind === Kind.Glow) paintGlow(tile.gctx, m);
-    else paint(tile.ctx, m, tile.pats);
+    const d = drawnOn(tile);
+    if (m.kind === Kind.Glow) paintGlow(d.gctx, m);
+    else paint(d.ctx, m, d.pats);
   }
 
   /** Lay what is due on each tile, nearest the reader first, within a
    * budget, so a new tile never stalls a frame: tiles are made well ahead
    * of the viewport and fill in over a few frames. */
   function fill(deadline: number, inView = false) {
+    // Nothing due on any tile (a page, whose threads are all the skein's):
+    // no layout read for nothing.
+    let due = false;
+    for (const tile of tiles.values()) {
+      const bucket = buckets[tile.index];
+      if (bucket && tile.cursor < bucket.length && bucket[tile.cursor] < upto) due = true;
+    }
+    if (!due) return false;
     const { start: top, size } = sight();
     const middle = top + size / 2;
     const order = [...tiles.values()]
@@ -260,8 +284,9 @@ export function createLoom(options: LoomOptions) {
     const drawn = new Set<Tile>();
     const show = () => {
       for (const tile of drawn) {
-        still(tile.canvas);
-        still(tile.glow);
+        if (!tile.drawn) continue;
+        still(tile.drawn.canvas);
+        still(tile.drawn.glow);
       }
     };
     for (const tile of order) {
