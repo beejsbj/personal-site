@@ -76,12 +76,9 @@ export interface Measure {
  * canvas: a run of thread (pts are x,y pairs; `heat` per point warms it
  * toward a head) and the head's own light. */
 export interface Material {
-  run(ctx: CanvasRenderingContext2D, hue: Hue, w: number, glow: number, pts: number[], base: number, heat: number[] | null): void;
-  head(ctx: CanvasRenderingContext2D, hue: Hue, w: number, x: number, y: number, heat: number): void;
-  /** The title kind's width and glow. */
-  nature(): { w: number; glow: number };
-  /** How a title is written: its width, pace (px a second) and the warm
-   * run behind its head, for a way this long at this size. */
+  run(ctx: CanvasRenderingContext2D, hue: Hue, w: number, pts: number[], base: number): void;
+  /** How a title is written: its width and pace (px a second), for a way
+   * this long at this size. */
   pace(spun: Spun, total: number): { w: number; speed: number; tail: number };
 }
 
@@ -792,7 +789,6 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
 function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant, from?: Pt, delay = 0, given?: Read) {
   const { signal } = options;
   const material = options.skein.material();
-  const { glow } = material.nature();
   // Where it rests, not where a swing has it (dom.ts `measured`): every
   // read of the page first, then the writes, so nothing is laid out twice.
   // Reads already taken (a row tied at once) need no pass at all.
@@ -831,7 +827,7 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   const arcs = [0];
   for (let k = 1; k < way.length; k++) arcs.push(arcs[k - 1] + Math.hypot(way[k][0] - way[k - 1][0], way[k][1] - way[k - 1][1]));
   const total = arcs[arcs.length - 1];
-  const { w, speed, tail } = material.pace(spun, total);
+  const { w, speed } = material.pace(spun, total);
   let l = Infinity;
   let t = Infinity;
   let r = -Infinity;
@@ -865,25 +861,13 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
     const u = (s - arcs[i - 1]) / (arcs[i] - arcs[i - 1] || 1);
     return [way[i - 1][0] + (way[i][0] - way[i - 1][0]) * u, way[i - 1][1] + (way[i][1] - way[i - 1][1]) * u];
   };
-  const paint = (s: number, heat: number) => {
+  // Written up to s, as it will lie: one line, no hot head, no glow.
+  const paint = (s: number) => {
     ctx.clearRect(l - pad, t - pad, r - l + pad * 2, b - t + pad * 2);
-    const span = Math.min(tail, s);
-    const cool = s - span;
     const pts: number[] = [];
-    for (let k = 0; k < way.length && arcs[k] <= cool; k++) pts.push(way[k][0], way[k][1]);
-    if (cool > 0 && cool < total) pts.push(...at(cool));
-    if (pts.length >= 4) material.run(ctx, hue, w, glow, pts, 1, null);
-    if (heat <= 0.001 || span < 2) return;
-    const hot: number[] = [];
-    const warm: number[] = [];
-    const steps = Math.max(2, Math.ceil(span / 4));
-    for (let j = 0; j <= steps; j++) {
-      hot.push(...at(cool + (span * j) / steps));
-      warm[j] = heat * (j / steps) ** 2;
-    }
-    material.run(ctx, hue, w, glow, hot, 1, warm);
-    const [hx, hy] = at(s);
-    material.head(ctx, hue, w, hx, hy, heat);
+    for (let k = 0; k < way.length && arcs[k] <= s; k++) pts.push(way[k][0], way[k][1]);
+    if (s > 0 && s < total) pts.push(...at(s));
+    if (pts.length >= 4) material.run(ctx, hue, w, pts, 1);
   };
   // Laid out anew (the track fits its roles to the window): written
   // again, settled.
@@ -895,21 +879,20 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   resized.observe(el);
   signal.addEventListener("abort", () => resized.disconnect(), { once: true });
   if (settled || signal.aborted) {
-    paint(total, 0);
+    paint(total);
     still(canvas);
     return;
   }
   let s = 0;
-  let heat = 1;
   const task = options.pulse.add((now, dt) => {
     if (signal.aborted || !canvas.isConnected) return false;
     if (s < total) {
       // Eased in and out, nearly steady between.
       const ease = Math.min(1, 0.35 + s / 60, 0.35 + (total - s) / 80);
       s = Math.min(total, s + (speed * ease * (0.92 + 0.08 * Math.sin(now * 0.0021)) * dt) / 1000);
-    } else heat = Math.max(0, heat - dt / 700);
-    paint(s, heat);
-    if (s < total || heat > 0) return true;
+    }
+    paint(s);
+    if (s < total) return true;
     still(canvas);
     return false;
   });

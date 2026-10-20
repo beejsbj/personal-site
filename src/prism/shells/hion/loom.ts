@@ -27,14 +27,13 @@
  * the stretch of the track its `view()` reports. Everything else is the
  * same: the marks only need composing with their keys and extents along x
  * (weave.ts composes such a drawing turned, as if it read down). */
-import { type Hue, Kind, type Mark, paint, paintGlow, patterns, type Patterns, type Pt } from "./pastel";
+import { type Hue, type Mark, paint, patterns, type Patterns, type Pt } from "./pastel";
 import { still } from "./dom";
 import { createPulse, type Pulse } from "./pulse";
 
 /** Tile length: a frame that draws re-sends only the tiles it touched,
  * so shorter tiles cost less each frame. */
 const TILE = 512;
-const GLOW = 0.25;
 
 interface Tile {
   index: number;
@@ -49,9 +48,7 @@ interface Tile {
 
 interface Drawn {
   canvas: HTMLCanvasElement;
-  glow: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  gctx: CanvasRenderingContext2D;
   pats: Patterns;
 }
 
@@ -238,23 +235,16 @@ export function createLoom(options: LoomOptions) {
     const canvas = document.createElement("canvas");
     canvas.width = Math.ceil(w * dpr);
     canvas.height = Math.ceil(h * dpr);
-    const glow = document.createElement("canvas");
-    glow.className = "hion-loom__glow";
-    glow.width = Math.ceil(w * GLOW);
-    glow.height = Math.ceil(h * GLOW);
-    tile.el.append(glow, canvas);
+    tile.el.append(canvas);
     const shift = -tile.index * TILE;
     const ctx = canvas.getContext("2d")!;
     ctx.setTransform(dpr, 0, 0, dpr, across ? shift * dpr : 0, across ? 0 : shift * dpr);
-    const gctx = glow.getContext("2d")!;
-    gctx.setTransform(GLOW, 0, 0, GLOW, across ? shift * GLOW : 0, across ? 0 : shift * GLOW);
-    return (tile.drawn = { canvas, glow, ctx, gctx, pats: patterns(ctx, dpr) });
+    return (tile.drawn = { canvas, ctx, pats: patterns(ctx, dpr) });
   }
 
   function lay(tile: Tile, m: Mark) {
     const d = drawnOn(tile);
-    if (m.kind === Kind.Glow) paintGlow(d.gctx, m);
-    else paint(d.ctx, m, d.pats);
+    paint(d.ctx, m, d.pats);
   }
 
   /** Lay what is due on each tile, nearest the reader first, within a
@@ -289,7 +279,6 @@ export function createLoom(options: LoomOptions) {
       for (const tile of drawn) {
         if (!tile.drawn) continue;
         still(tile.drawn.canvas);
-        still(tile.drawn.glow);
       }
     };
     for (const tile of order) {

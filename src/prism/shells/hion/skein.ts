@@ -2,7 +2,7 @@
  * material.
  *
  * A strand is a body grown from its head, a goal that steers the head, a
- * hue, some slack, a glow, a body strength and a lifetime (the width is
+ * hue, some slack, a body strength and a lifetime (the width is
  * every thread's: pastel.ts THREAD). The kinds differ only in those
  * numbers (NATURE) and in what steers them:
  *
@@ -124,8 +124,6 @@ interface Nature {
   tail: number;
   /** The rope's length over the path it spans. */
   slack: number;
-  /** The soft light along its settled body (the fibres being 1). */
-  glow: number;
   /** How strongly its settled body lies (a hion being 1). */
   body: number;
   /** How long it lies once finished, before it fades (ms). */
@@ -137,13 +135,13 @@ interface Nature {
  * brightly as they do. What differs is how fast it grows and how long it
  * lies. */
 const NATURE: Record<Kind, Nature> = {
-  hion: { speed: 700, tail: 130, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
-  ground: { speed: 150, tail: 110, slack: 1.016, glow: 0.14, body: 1, hold: 55000 },
-  limb: { speed: 460, tail: 80, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
-  loop: { speed: 1100, tail: 80, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
+  hion: { speed: 700, tail: 130, slack: 1.012, body: 1, hold: Infinity },
+  ground: { speed: 150, tail: 110, slack: 1.016, body: 1, hold: 55000 },
+  limb: { speed: 460, tail: 80, slack: 1.012, body: 1, hold: Infinity },
+  loop: { speed: 1100, tail: 80, slack: 1.012, body: 1, hold: Infinity },
   // Speed and the warm run are set per heading (spun.ts: its size and
   // length).
-  title: { speed: 900, tail: 70, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
+  title: { speed: 900, tail: 70, slack: 1.012, body: 1, hold: Infinity },
 };
 
 interface SkeinOptions {
@@ -1140,17 +1138,6 @@ export function createSkein(options: SkeinOptions) {
 
   /* ---------- The thread itself ---------- */
 
-  /** How strongly segment i lies: tapered at its end once it has one, and
-   * at its start only if it has no thread to leave (a branch is whole
-   * where it leaves its parent, so the fork reads). */
-  function taper(st: Strand, i: number) {
-    const n = st.t.xs.length - 1;
-    let a = st.parent || st.kind === "hion" ? 1 : Math.min(1, (i + 1) / 16);
-    // A twig thins out; a thread tied off in a knot (a limb) does not.
-    if (st.t.done && st.kind !== "hion" && st.kind !== "limb") a = Math.min(a, (n - i) / 10);
-    return Math.max(0, a) * st.alpha;
-  }
-
   /** The colour of a thread at a strength, over black paper: the hue
    * dimmed, not made see-through, so pieces of one thread meet without a
    * seam and nothing shows through. */
@@ -1161,95 +1148,32 @@ export function createSkein(options: SkeinOptions) {
     return `rgb(${((r + (lr - r) * pale) * k) | 0} ${((g + (lg - g) * pale) * k) | 0} ${((b + (lb - b) * pale) * k) | 0})`;
   }
 
-  /** One run of thread, the one way every thread is drawn: light, and
-   * nothing else. A soft wide glow added under it, and one smooth line of
-   * the hue at the thread's strength. `pts` are x,y pairs. `heat`, per
-   * point, warms the run toward the head: the line brightens to full and
-   * widens a little, a pale core comes up inside it, and the glow under
-   * it spreads. `erase` instead takes that fraction of the run off the
-   * paper, along the same line (a fade step that repaints nothing else). */
-  function strokeRun(
-    ctx: CanvasRenderingContext2D,
-    hue: Hue,
-    w: number,
-    glow: number,
-    pts: number[],
-    base: number,
-    heat: number[] | null,
-    erase?: number,
-  ) {
+  /** One run of thread, the one way every thread is drawn: one smooth
+   * line of the hue at the thread's strength, flat light, no glow and no
+   * taper (a thread is as strong at its ends as along it). `pts` are x,y
+   * pairs. `erase` instead takes that fraction of the run off the paper,
+   * along the same line (a fade step that repaints nothing else). */
+  function strokeRun(ctx: CanvasRenderingContext2D, hue: Hue, w: number, pts: number[], base: number, erase?: number) {
     const n = pts.length / 2;
     if (n < 2 || base <= 0) return;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    const path = (k0: number, k1: number) => {
-      ctx.beginPath();
-      ctx.moveTo(pts[k0 * 2], pts[k0 * 2 + 1]);
-      for (let k = k0 + 1; k <= k1; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
-    };
+    ctx.beginPath();
+    ctx.moveTo(pts[0], pts[1]);
+    for (let k = 1; k < n; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
     if (erase !== undefined) {
       ctx.globalCompositeOperation = "destination-out";
       ctx.strokeStyle = "#000";
       ctx.globalAlpha = erase;
       ctx.lineWidth = w + 1.2;
-      path(0, n - 1);
       ctx.stroke();
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
       return;
     }
-    const bands = heat ? 4 : 1;
-    for (let b = 0; b < bands; b++) {
-      const k0 = Math.floor(((n - 1) * b) / bands);
-      const k1 = Math.floor(((n - 1) * (b + 1)) / bands);
-      if (k1 <= k0) continue;
-      let h = 0;
-      if (heat) {
-        for (let k = k0; k <= k1; k++) h += heat[k];
-        h /= k1 - k0 + 1;
-      }
-      // The glow: a little light added under the line, a little more at
-      // a head. Kept slight: added light over the line's own colour
-      // saturates quickly, and a bright bar is a blob.
-      const g = glow * base + 0.08 * h;
-      if (g > 0.01) {
-        ctx.globalCompositeOperation = "lighter";
-        ctx.strokeStyle = tone(hue, g);
-        ctx.lineWidth = w * (2.4 + 1.2 * h);
-        path(k0, k1);
-        ctx.stroke();
-        ctx.globalCompositeOperation = "source-over";
-      }
-      // The line itself: the hue at its strength, full and a touch wider
-      // toward a head.
-      ctx.strokeStyle = tone(hue, base + (1 - base) * h);
-      ctx.lineWidth = w * (1 + 0.1 * h);
-      path(k0, k1);
-      ctx.stroke();
-      // Near the head a pale core comes up inside it.
-      if (h > 0.03) {
-        ctx.strokeStyle = tone(hue, 1, 0.85);
-        ctx.globalAlpha = Math.min(1, h * 1.1);
-        ctx.lineWidth = Math.max(0.8, w * 0.32) * (1 + 0.6 * h);
-        path(k0, k1);
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
-    }
-  }
-
-  /** A head's own light: a point of the thread's light, white-hot at the
-   * very tip, no bigger than the thread. */
-  function paintHead(ctx: CanvasRenderingContext2D, hue: Hue, w: number, hx: number, hy: number, heat: number) {
-    const [cr, cg, cb] = RGB[hue];
-    const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
-    const rad = w * 1.4;
-    const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, rad);
-    halo.addColorStop(0, `rgba(${lr},${lg},${lb},${0.85 * heat})`);
-    halo.addColorStop(0.45, `rgba(${cr},${cg},${cb},${0.35 * heat})`);
-    halo.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
-    ctx.fillStyle = halo;
-    ctx.fillRect(hx - rad, hy - rad, rad * 2, rad * 2);
+    ctx.strokeStyle = tone(hue, base);
+    ctx.lineWidth = w;
+    ctx.stroke();
   }
 
   /** Lay segments [i0, i1) of a strand's body on a context, settled.
@@ -1268,20 +1192,14 @@ export function createSkein(options: SkeinOptions) {
         Math.min(ys[i], ys[i + 1]) > clip.b + pad);
     let pts: number[] = [];
     const flush = (alpha: number) => {
-      if (pts.length >= 4) strokeRun(ctx, hue, THREAD, st.n.glow, pts, base * alpha, null, erase);
+      if (pts.length >= 4) strokeRun(ctx, hue, THREAD, pts, base * alpha, erase);
       pts = [];
     };
     for (let i = i0; i < i1; i++) {
-      const a = taper(st, i);
       // Under another thread, across a stretch it leaves the page for, or
       // out of this pane's sight.
-      if (under.has(i) || a <= 0 || ls[i + 1] - ls[i] <= 0 || outside(i)) {
+      if (under.has(i) || st.alpha <= 0 || ls[i + 1] - ls[i] <= 0 || outside(i)) {
         flush(st.alpha);
-        continue;
-      }
-      if (a < st.alpha) {
-        flush(st.alpha);
-        strokeRun(ctx, hue, THREAD, st.n.glow, [xs[i], ys[i], xs[i + 1], ys[i + 1]], base * a, null, erase);
         continue;
       }
       if (!pts.length) pts.push(xs[i], ys[i]);
@@ -1599,55 +1517,9 @@ export function createSkein(options: SkeinOptions) {
     }
     const count = pts.length / 2;
     if (count < 2) return;
-    const heat = st.heat * st.alpha;
-    if (st.kind === "title") {
-      // A heading is written: its head is the hand's, warm.
-      const warm = new Array<number>(count);
-      for (let k = 0; k < count; k++) {
-        const u = k / (count - 1);
-        warm[k] = heat * u * u;
-      }
-      strokeRun(ctx, hue, THREAD, st.n.glow, pts, st.n.body * st.alpha, warm);
-      if (heat > 0.02) paintHead(ctx, hue, THREAD, pts[(count - 1) * 2], pts[(count - 1) * 2 + 1], heat);
-    } else ripen(ctx, hue, pts, st.n.body * st.alpha, st.n.glow, heat);
-    ctx.globalAlpha = 1;
-  }
-
-  /** A run growing: the newest of it is the youngest, so the faintest,
-   * ripening to the thread's full light a little way behind the tip (no
-   * hot nib: nothing is drawing it). `pts` run from where it has settled
-   * to the tip; `growing` (0 to 1) is how much it is still growing. */
-  function ripen(ctx: CanvasRenderingContext2D, hue: Hue, pts: number[], base: number, glow: number, growing: number) {
-    const n = pts.length / 2;
-    const bands = Math.min(10, n - 1);
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    for (let b = 0; b < bands; b++) {
-      const k0 = Math.floor(((n - 1) * b) / bands);
-      const k1 = Math.floor(((n - 1) * (b + 1)) / bands);
-      if (k1 <= k0) continue;
-      const u = (b + 0.5) / bands;
-      const young = growing * Math.pow(u, 1.6);
-      const strength = base * (1 - 0.78 * young);
-      const path = () => {
-        ctx.beginPath();
-        ctx.moveTo(pts[k0 * 2], pts[k0 * 2 + 1]);
-        for (let k = k0 + 1; k <= k1; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
-      };
-      const g = glow * strength;
-      if (g > 0.01) {
-        ctx.globalCompositeOperation = "lighter";
-        ctx.strokeStyle = tone(hue, g);
-        ctx.lineWidth = THREAD * 2.4;
-        path();
-        ctx.stroke();
-        ctx.globalCompositeOperation = "source-over";
-      }
-      ctx.strokeStyle = tone(hue, strength);
-      ctx.lineWidth = THREAD;
-      path();
-      ctx.stroke();
-    }
+    // Growing or being written, it lies as it will lie: one line, no hot
+    // head, no glow.
+    strokeRun(ctx, hue, THREAD, pts, st.n.body * st.alpha);
   }
 
   /** Repaint only where something changed: each changed thing's old box
@@ -2315,22 +2187,11 @@ export function createSkein(options: SkeinOptions) {
           }
         }
         for (const l of lights) {
-          // A bead of the thread's own light running along it, a short
-          // warm run behind.
+          // The thread's own light running along it: a short pale run,
+          // brightest at its front, of the thread's own width (no glow).
           const hue = l.st.t.hue;
           const trail = 56 * Math.sign(l.v);
-          const [hx, hy] = at(l.st, l.s);
-          ctx.globalCompositeOperation = "lighter";
-          ctx.beginPath();
-          ctx.moveTo(hx, hy);
-          for (let k = 1; k <= 6; k++) {
-            const [x, y] = at(l.st, Math.max(0, Math.min(l.st.s, l.s - (trail * k) / 6)));
-            ctx.lineTo(x, y);
-          }
-          ctx.lineWidth = THREAD * 3;
-          ctx.strokeStyle = tone(hue, 0.4 * l.e, 0.5);
-          ctx.stroke();
-          ctx.globalCompositeOperation = "source-over";
+          ctx.lineCap = "round";
           for (let k = 0; k < 6; k++) {
             const s0 = l.s - (trail * k) / 6;
             const s1 = l.s - (trail * (k + 1)) / 6;
@@ -2345,8 +2206,6 @@ export function createSkein(options: SkeinOptions) {
             ctx.strokeStyle = tone(hue, 1, 0.9 * l.e * (1 - k / 6));
             ctx.stroke();
           }
-          const [x, y] = at(l.st, l.s);
-          paintHead(ctx, hue, THREAD, x, y, Math.min(1, l.e * 1.2));
         }
       },
     },
@@ -2826,8 +2685,6 @@ export function createSkein(options: SkeinOptions) {
     material(): Material {
       return {
         run: strokeRun,
-        head: paintHead,
-        nature: () => ({ w: THREAD, glow: NATURE.title.glow }),
         pace: (spun, total) => ({ w: THREAD, ...writing(spun, total) }),
       };
     },
