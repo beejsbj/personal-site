@@ -27,25 +27,29 @@
  * the stretch of the track its `view()` reports. Everything else is the
  * same: the marks only need composing with their keys and extents along x
  * (weave.ts composes such a drawing turned, as if it read down). */
-import { type Hue, Kind, type Mark, paint, paintGlow, patterns, type Patterns, type Pt } from "./pastel";
+import { type Hue, type Mark, paint, patterns, type Patterns, type Pt } from "./pastel";
 import { still } from "./dom";
 import { createPulse, type Pulse } from "./pulse";
 
 /** Tile length: a frame that draws re-sends only the tiles it touched,
  * so shorter tiles cost less each frame. */
 const TILE = 512;
-const GLOW = 0.25;
 
 interface Tile {
   index: number;
   el: HTMLElement;
-  canvas: HTMLCanvasElement;
-  glow: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
-  gctx: CanvasRenderingContext2D;
-  pats: Patterns;
+  /** Its canvases, made the first time a mark is laid on it: a 2D canvas
+   * on the page costs every frame, drawn on or not, and on a page the
+   * hions and their limbs are the skein's, so most tiles never get one. */
+  drawn: Drawn | null;
   /** Next position in this tile's bucket still to lay. */
   cursor: number;
+}
+
+interface Drawn {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  pats: Patterns;
 }
 
 export interface Composition {
@@ -58,6 +62,25 @@ export interface Composition {
   orbits: { hue: Hue; points: Pt[]; key: number }[];
   /** Where the threads end (along the axis the drawing reads), if they do. */
   end: number | null;
+  /** On a page (the hions are the skein's), what hangs from them is grown
+   * by the skein as branches, not laid here as marks. */
+  limbs?: Limb[];
+}
+
+/** A branch of a hion the composition asks for: a weft, a cord, a tie, a
+ * knot where the two are tied. The skein grows it when the drawing reaches
+ * `key`: off the hion of its hue where `way` begins (`tied`: thrown from
+ * it), or off whatever thread has grown nearest. */
+export interface Limb {
+  hue: Hue;
+  /** The way it means to go, from where it leaves (page px). */
+  way: Pt[];
+  key: number;
+  tied: boolean;
+  /** It ties itself off at its end. */
+  knot: boolean;
+  /** Where along it (x, page px) it passes under the other hion. */
+  under?: number[];
 }
 
 /** The stretch of a drawing in sight: where it starts along the axis the
@@ -118,6 +141,7 @@ export function createLoom(options: LoomOptions) {
   let marks: Mark[] = [];
   let tips: Composition["tips"] = [];
   let orbits: Composition["orbits"] = [];
+  let limbs: Limb[] = [];
   let end = Infinity;
   /** Counts up each time the drawing is composed afresh. */
   let version = 0;
@@ -125,6 +149,9 @@ export function createLoom(options: LoomOptions) {
   let buckets: number[][] = []; // per tile, the marks that touch it
   let reach = 0;
   let target = 0;
+  /** The window's height, read on a scroll or a resize (not every frame:
+   * a layout read mid-frame lays the page out again). */
+  let viewSize = innerHeight;
   /** Length along the axis the drawing reads, and breadth across it. */
   let length = 0;
   let breadth = 0;
@@ -167,6 +194,7 @@ export function createLoom(options: LoomOptions) {
     });
     tips = composed.tips;
     orbits = composed.orbits;
+    limbs = composed.limbs ?? [];
     end = composed.end ?? Infinity;
     version++;
     for (const tile of tiles.values()) tile.el.remove();
@@ -195,32 +223,42 @@ export function createLoom(options: LoomOptions) {
       el.style.top = `${index * TILE}px`;
       el.style.height = `${h}px`;
     }
+    layer.append(el);
+    return { index, el, drawn: null, cursor: 0 };
+  }
+
+  /** A tile's canvases, made when the first mark is laid on it. */
+  function drawnOn(tile: Tile): Drawn {
+    if (tile.drawn) return tile.drawn;
+    const tileLength = Math.min(TILE, length - tile.index * TILE);
+    const [w, h] = across ? [tileLength, breadth] : [breadth, tileLength];
     const canvas = document.createElement("canvas");
     canvas.width = Math.ceil(w * dpr);
     canvas.height = Math.ceil(h * dpr);
-    const glow = document.createElement("canvas");
-    glow.className = "hion-loom__glow";
-    glow.width = Math.ceil(w * GLOW);
-    glow.height = Math.ceil(h * GLOW);
-    el.append(glow, canvas);
-    layer.append(el);
-    const shift = -index * TILE;
+    tile.el.append(canvas);
+    const shift = -tile.index * TILE;
     const ctx = canvas.getContext("2d")!;
     ctx.setTransform(dpr, 0, 0, dpr, across ? shift * dpr : 0, across ? 0 : shift * dpr);
-    const gctx = glow.getContext("2d")!;
-    gctx.setTransform(GLOW, 0, 0, GLOW, across ? shift * GLOW : 0, across ? 0 : shift * GLOW);
-    return { index, el, canvas, glow, ctx, gctx, pats: patterns(ctx, dpr), cursor: 0 };
+    return (tile.drawn = { canvas, ctx, pats: patterns(ctx, dpr) });
   }
 
   function lay(tile: Tile, m: Mark) {
-    if (m.kind === Kind.Glow) paintGlow(tile.gctx, m);
-    else paint(tile.ctx, m, tile.pats);
+    const d = drawnOn(tile);
+    paint(d.ctx, m, d.pats);
   }
 
   /** Lay what is due on each tile, nearest the reader first, within a
    * budget, so a new tile never stalls a frame: tiles are made well ahead
    * of the viewport and fill in over a few frames. */
   function fill(deadline: number, inView = false) {
+    // Nothing due on any tile (a page, whose threads are all the skein's):
+    // no layout read for nothing.
+    let due = false;
+    for (const tile of tiles.values()) {
+      const bucket = buckets[tile.index];
+      if (bucket && tile.cursor < bucket.length && bucket[tile.cursor] < upto) due = true;
+    }
+    if (!due) return false;
     const { start: top, size } = sight();
     const middle = top + size / 2;
     const order = [...tiles.values()]
@@ -239,8 +277,8 @@ export function createLoom(options: LoomOptions) {
     const drawn = new Set<Tile>();
     const show = () => {
       for (const tile of drawn) {
-        still(tile.canvas);
-        still(tile.glow);
+        if (!tile.drawn) continue;
+        still(tile.drawn.canvas);
       }
     };
     for (const tile of order) {
@@ -322,7 +360,7 @@ export function createLoom(options: LoomOptions) {
     let gap = target - reach;
     // Far behind (a jump, a fling): lay what you have passed at once, and
     // draw only the last stretch in front of you.
-    const size = across ? sight().size : innerHeight;
+    const size = across ? sight().size : viewSize;
     if (gap > size * 1.4) {
       advance(target - size * 0.9);
       gap = target - reach;
@@ -350,6 +388,7 @@ export function createLoom(options: LoomOptions) {
   }
 
   function onScroll() {
+    viewSize = innerHeight;
     if (!built) return;
     if (across ? sight().start > 0 : scrollY > 0) intro = false;
     cull();
@@ -422,6 +461,7 @@ export function createLoom(options: LoomOptions) {
     /* What is drawn, for life.ts: the threads answer the visitor on it. */
     journeys: () => tips,
     orbits: () => orbits,
+    limbs: () => limbs,
     reach: () => reach,
     /** Whether the hand is still drawing toward where you are. */
     drawing: () => target - reach > 0.5,
