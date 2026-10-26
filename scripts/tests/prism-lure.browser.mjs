@@ -37,7 +37,7 @@ test(
       );
     const server = external ? null : await serveRuntimeFixture();
     const base = external ?? server.base;
-    const browser = await browserType.launch({ executablePath: executable });
+    let browser;
     const visit = async (path, { returning = false } = {}) => {
       const context = await browser.newContext({
         viewport: { width: 1280, height: 800 },
@@ -58,6 +58,7 @@ test(
       return { context, page, errors, faceRequests };
     };
     try {
+      browser = await browserType.launch({ executablePath: executable });
       await t.test(
         "a docked lure loads nothing until reached for",
         async () => {
@@ -145,8 +146,43 @@ test(
         assert.deepEqual(errors, []);
         await context.close();
       });
+
+      await t.test("a catch with no reach first builds the stage", async () => {
+        const { context, page, errors, faceRequests } = await visit("/", {
+          returning: true,
+        });
+        await page.waitForSelector("#prism-lure.is-docked");
+        // When the stage opens, note whether every face had loaded.
+        await page.evaluate(() => {
+          new MutationObserver(() => {
+            const stage = document.querySelector("#prism-stage.is-open");
+            if (!stage || "facesReady" in window) return;
+            window.facesReady = [...stage.querySelectorAll("iframe")].map(
+              (frame) => frame.contentDocument?.readyState === "complete",
+            );
+          }).observe(document.body, {
+            subtree: true,
+            childList: true,
+            attributeFilter: ["class"],
+          });
+        });
+        assert.equal(faceRequests.length, 0, "no face was requested");
+        // A scripted click, as ?prism=open does: no pointer, no focus.
+        await page.evaluate(() =>
+          document.getElementById("prism-lure").click(),
+        );
+        await page.waitForSelector("#prism-stage.is-open", { timeout: 15000 });
+        const ready = await page.evaluate(() => window.facesReady);
+        assert.deepEqual(
+          ready,
+          [true, true, true, true, true],
+          "the camera waits for all five faces",
+        );
+        assert.deepEqual(errors, []);
+        await context.close();
+      });
     } finally {
-      await browser.close();
+      await browser?.close();
       await server?.close();
     }
   },
