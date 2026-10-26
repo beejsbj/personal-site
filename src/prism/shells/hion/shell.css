@@ -2796,6 +2796,12 @@
   display: none;
 }
 
+/* A sideways swipe along the track is read as scrolling (track.ts); keep
+   the browser from also taking it as swipe-to-go-back. */
+:root[data-lens="hion"]:has(.hion-timeline[data-timeline="across"]) {
+  overscroll-behavior-x: none;
+}
+
 :root[data-lens="hion"] .hion-timeline[data-timeline="across"] {
   /* Where the hions come down into it: the knot, this far across. */
   --hion-timeline-in: clamp(300px, 30vw, 480px);
