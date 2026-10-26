@@ -319,6 +319,17 @@ test("never while the prism is open: the page may be live on its face", () => {
   assert.equal(h.letter().dataset.peek, "in", "back on the page: it peeks");
 });
 
+test("a peek already out leaves the moment the prism opens", () => {
+  const h = harness();
+  h.advance(h.PEEK.firstDelay[0]);
+  assert.equal(h.letter().dataset.peek, "in");
+  h.document.prismOpen = true;
+  h.document.emit("prism:open");
+  assert.equal(h.stage(), undefined, "no peek left on the held page");
+  h.advance(h.PEEK.retry[1] * 2);
+  assert.equal(h.stage(), undefined, "and none while it stays open");
+});
+
 test("shy: an approaching pointer or a scroll makes it duck", () => {
   const h = harness();
   h.advance(h.PEEK.firstDelay[0]);

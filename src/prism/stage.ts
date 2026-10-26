@@ -520,6 +520,8 @@ export function createPrism(): Prism {
     // stage is clear glass and the room is under it, so nothing changes on
     // screen), then the camera pulls back.
     html.classList.add("prism-is-open");
+    // Anything floating over the page (a B/J peek) leaves before it is held.
+    document.dispatchEvent(new Event("prism:open"));
     layout();
     render();
     body.style.transition = "none";

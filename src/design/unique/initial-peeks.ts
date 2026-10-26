@@ -403,6 +403,15 @@ export function installInitialPeeks() {
       },
       { signal },
     );
+    // The prism opening holds the page as its face: a peek on it goes now.
+    document.addEventListener(
+      "prism:open",
+      () => {
+        removeNow();
+        schedule();
+      },
+      { signal },
+    );
     motion.addEventListener(
       "change",
       () => {
