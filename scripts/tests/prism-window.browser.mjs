@@ -451,7 +451,8 @@ test(
   },
 );
 
-/** Listens to every AudioContext's output and counts every note struck. */
+/** Listens to every AudioContext's output and notes every sound started:
+ * when, and how far ahead of the audio clock it was set to sound. */
 function earsOn() {
   const connect = AudioNode.prototype.connect;
   window.__ears = [];
@@ -466,9 +467,12 @@ function earsOn() {
   };
   window.__strikes = [];
   const start = AudioScheduledSourceNode.prototype.start;
-  AudioScheduledSourceNode.prototype.start = function (...args) {
-    window.__strikes.push(performance.now());
-    return start.apply(this, args);
+  AudioScheduledSourceNode.prototype.start = function (when = 0, ...rest) {
+    window.__strikes.push({
+      at: performance.now(),
+      ahead: when - this.context.currentTime,
+    });
+    return start.call(this, when, ...rest);
   };
   window.__peak = () => {
     const buffer = new Float32Array(2048);
@@ -543,13 +547,13 @@ test(
         ),
       );
 
+      const pressed = await page.evaluate(() => performance.now());
       await page.keyboard.press("Escape");
       await until(
         page,
         "Esc never stepped back in",
         () => !document.getElementById("prism-stage"),
       );
-      const stepped = await page.evaluate(() => performance.now());
       const back = await where();
       assert.ok(
         later(back, stillOnFace) >= 0,
@@ -557,12 +561,16 @@ test(
       );
       assert.ok((await loudness()) > 0.01, "not heard again stepping back in");
       await page.waitForTimeout(300);
-      const struck = await page.evaluate(
-        (t) => window.__strikes.filter((at) => at > t && at < t + 300).length,
-        stepped,
+      // Stepping in re-strikes what should already be sounding (a held
+      // chord and a bass), at once, a moment before the stage is gone; what
+      // comes next is set ahead to sound on its beat. Sounds started to play
+      // right away, from Esc on: that held chord at most, never the notes
+      // the hush passed over. A chord is struck as up to 16 oscillators.
+      const atOnce = await page.evaluate(
+        (t) => window.__strikes.filter((s) => s.at > t && s.ahead < 0.02).length,
+        pressed,
       );
-      // a held chord and bass at most, not the notes the hush passed over
-      assert.ok(struck <= 6, `${struck} notes struck on stepping back in`);
+      assert.ok(atOnce <= 18, `${atOnce} sounds started at once stepping back in`);
       await context.close();
     } finally {
       await browser.close();
