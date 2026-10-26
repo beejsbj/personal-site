@@ -439,6 +439,8 @@ export function createLife(options: LifeOptions) {
     if (now - lastInput < 14000 || now - lastEgg < 30000 || rand() > 0.3) return;
     if (egg(now)) wake();
   }, 4000);
+  // Cleared with the screen even if it is aborted before start().
+  signal.addEventListener("abort", () => clearInterval(eggs), { once: true });
 
   return {
     start() {
