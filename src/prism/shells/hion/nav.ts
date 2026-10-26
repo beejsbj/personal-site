@@ -14,7 +14,7 @@
 import type { SiteContent } from "../types";
 import { h, newTab, still } from "./dom";
 import { ink } from "./ink";
-import { Kind, Path, paint, paintGlows, patterns, thread, type Pt } from "./pastel";
+import { Path, paint, patterns, thread, type Pt } from "./pastel";
 
 /** A loose end of thread let down under a name: short, let down a
  * little when you reach for it, all the way for the page you are on. The
@@ -172,11 +172,10 @@ export function createNav(
           : Math.sin(x / 140 + 0.3) * 4.5 + Math.sin(x / 47 + 1) * 1.2;
         pts.push([x, cordY(x) + sway]);
       }
-      return thread(new Path(pts, 3), { hue, seed: 5 + i * 9, glow: 0.24 });
+      return thread(new Path(pts, 3), { hue, seed: 5 + i * 9 });
     });
     const pats = patterns(ctx, dpr);
-    paintGlows(ctx, marks, w, hgt, 0.7);
-    for (const m of marks) if (m.kind !== Kind.Glow) paint(ctx, m, pats);
+    for (const m of marks) paint(ctx, m, pats);
     still(cord);
   }
 

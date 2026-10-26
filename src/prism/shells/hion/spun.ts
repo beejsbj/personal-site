@@ -46,7 +46,7 @@
  * does every heading on the screen if the face is late or will not load;
  * and a heading left in sight unwritten is begun anyway, then given its
  * chalk. */
-import { still } from "./dom";
+import { measured, still } from "./dom";
 import { type Hue, type Pt, THREAD } from "./pastel";
 import type { Pulse } from "./pulse";
 import { joinLines, type Traced, traceWord } from "./trace";
@@ -67,19 +67,18 @@ export interface Spun {
 }
 
 export interface Measure {
-  (page: DOMRect): Spun | null;
+  /** `page` gives the page's box when it is needed (a read of the layout;
+   * a heading whose reads were taken ahead needs none). */
+  (page: () => DOMRect): Spun | null;
 }
 
 /** The one material, lent by the skein for a heading written on its own
  * canvas: a run of thread (pts are x,y pairs; `heat` per point warms it
  * toward a head) and the head's own light. */
 export interface Material {
-  run(ctx: CanvasRenderingContext2D, hue: Hue, w: number, glow: number, pts: number[], base: number, heat: number[] | null): void;
-  head(ctx: CanvasRenderingContext2D, hue: Hue, w: number, x: number, y: number, heat: number): void;
-  /** The title kind's width and glow. */
-  nature(): { w: number; glow: number };
-  /** How a title is written: its width, pace (px a second) and the warm
-   * run behind its head, for a way this long at this size. */
+  run(ctx: CanvasRenderingContext2D, hue: Hue, w: number, pts: number[], base: number): void;
+  /** How a title is written: its width and pace (px a second), for a way
+   * this long at this size. */
   pace(spun: Spun, total: number): { w: number; speed: number; tail: number };
 }
 
@@ -198,15 +197,24 @@ function write(words: HTMLElement[], options: SpunOptions) {
       el.dataset.spunState = "chalk";
     }
   };
-  // One heading per idle slot.
+  // A heading per idle slot, a few while the slot has room (their reads
+  // of the page share one measuring pass: dom.ts `measured`).
   const queue: HTMLElement[] = [];
   let waiting = false;
-  const pump = () => {
+  const host = words[0].closest<HTMLElement>(".hion-page");
+  const pump = (slot?: IdleDeadline) => {
     waiting = false;
-    const el = queue.shift();
-    if (!el || signal.aborted) return;
-    begin(el);
-    if (queue.length) {
+    if (signal.aborted) return;
+    // The next few words' reads, under one pass, for the slots to come.
+    const ahead = queue.slice(0, 6).filter((el) => !prepared.has(el) && el.isConnected && !el.closest("[data-cloth-hold]") && !el.matches(".hion-strung"));
+    if (ahead.length) {
+      measured(host, () => {
+        const page = host?.getBoundingClientRect();
+        for (const el of ahead) prepared.set(el, read(el, page));
+      });
+    }
+    for (let n = 0; queue.length && !signal.aborted && (!n || (n < 4 && (slot?.timeRemaining() ?? 0) > 4)); n++) begin(queue.shift()!);
+    if (queue.length && !signal.aborted) {
       waiting = true;
       soon(pump);
     }
@@ -266,8 +274,26 @@ const near = (el: HTMLElement) => {
   return r.bottom > -innerHeight * 0.5 && r.top < innerHeight * 1.5;
 };
 
-const soon = (run: () => void) =>
+const soon = (run: (slot?: IdleDeadline) => void) =>
   "requestIdleCallback" in window ? requestIdleCallback(run, { timeout: 300 }) : setTimeout(run, 16);
+
+/** One a task, back to back: a label untraced is tens of milliseconds,
+ * and a row of them is tied at once; one task of them all is a hitch, a
+ * task each is as good as together. */
+const spreading: (() => void)[] = [];
+function spread(run: () => void) {
+  spreading.push(run);
+  if (spreading.length > 1) return;
+  const next = () => {
+    try {
+      spreading[0]?.();
+    } finally {
+      spreading.shift();
+      if (spreading.length) setTimeout(next, 0);
+    }
+  };
+  setTimeout(next, 0);
+}
 
 /** A heading's hue: its weft's (weave.ts), its own or its holder's, else
  * by turns down the screen (cyan, magenta, cyan). */
@@ -284,7 +310,9 @@ function spin(el: HTMLElement, options: SpunOptions) {
     writeLocal(el, hueOf(el), options);
     return;
   }
-  const knot = el.matches(LABELS) ? knotOf(el) : null;
+  const host = el.closest<HTMLElement>(".hion-page");
+  const r = taken(el) ?? measured(host, () => read(el));
+  const knot = el.matches(LABELS) ? r.knot : null;
   if (knot) {
     // On from its drop, in its drop's hue (the hue of the cord it hangs
     // from: weave.ts).
@@ -293,10 +321,16 @@ function spin(el: HTMLElement, options: SpunOptions) {
     // (skein.ts ties it; shell.css grows the drop).
     const holder = el.closest<HTMLElement>("[data-reveal][data-ink]");
     if (!holder || options.instant) {
-      writeLocal(el, hue, options, options.instant, knot);
+      writeLocal(el, hue, options, options.instant, knot, 0, r);
       return;
     }
-    const go = () => writeLocal(el, hue, options, false, knotOf(el) ?? knot, 600);
+    // A row is tied at once: every label's reads then, under one pass
+    // (measured), and the writing one label a task (spread).
+    const go = () => {
+      if (options.signal.aborted || !el.isConnected) return;
+      const now = measured(host, () => read(el));
+      spread(() => options.signal.aborted || !el.isConnected || writeLocal(el, hue, options, false, now.knot ?? knot, 600, now));
+    };
     if (holder.hasAttribute("data-tied")) go();
     else {
       const watch = new MutationObserver(() => {
@@ -309,20 +343,164 @@ function spin(el: HTMLElement, options: SpunOptions) {
     }
     return;
   }
+  let first: Read | undefined = r;
   options.skein.inscribe(el, hueOf(el), (page) => {
     const t0 = performance.now();
-    const spun = measure(el, page);
+    // Its reads were taken with its turn in the queue; asked again (the
+    // page laid out anew), it reads afresh.
+    const rd = first ?? taken(el) ?? measured(host, () => read(el, page()));
+    first = undefined;
+    const spun = measure(rd, "page");
     // For a look while developing: how long a heading takes to read.
     if (import.meta.env.DEV) performance.measure("hion:spun", { start: t0, detail: el.textContent });
     return spun;
   });
 }
 
+/** What a word's writing needs of the page: its boxes and the words in
+ * them, its face. The one part that reads the layout, taken apart from
+ * the tracing so several words' reads can share one pass (every pass
+ * restyles the page: dom.ts `measured`). */
+interface Read {
+  /** The page's box and the word's own (viewport px, as the runs). */
+  page: DOMRect;
+  own: DOMRect;
+  /** The knot its drop ends in (a hung label), its px. */
+  knot: Pt | null;
+  font: string;
+  size: number;
+  spacing: string;
+  upper: boolean;
+  runs: Run[];
+  /** A strung heading's box. */
+  strung: DOMRect | null;
+  width: number;
+}
+
+function read(el: HTMLElement, page = el.closest(".hion-page")?.getBoundingClientRect() ?? el.getBoundingClientRect()): Read {
+  const style = getComputedStyle(el);
+  return {
+    page,
+    own: el.getBoundingClientRect(),
+    knot: el.matches(LABELS) ? knotOf(el) : null,
+    font: `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`,
+    size: parseFloat(style.fontSize) || 0,
+    spacing: style.letterSpacing,
+    upper: style.textTransform === "uppercase",
+    runs: textRuns(el),
+    strung: el.matches(".hion-strung") ? (el.querySelector(".hion-strung__box")?.getBoundingClientRect() ?? null) : null,
+    width: el.clientWidth,
+  };
+}
+
+/** Reads taken ahead of a word's turn (the queue takes a few at once). */
+const prepared = new WeakMap<HTMLElement, Read>();
+function taken(el: HTMLElement) {
+  const r = prepared.get(el);
+  prepared.delete(el);
+  return r;
+}
+
 /** Lines already traced, by everything that makes the bitmap: a page
  * laid out anew (a resize, a font swap elsewhere) asks again, and a
- * screen come back to is the same words. */
-const traced = new Map<string, Traced | null>();
+ * screen come back to is the same words. Kept in localStorage too (the
+ * number in the key is the tracer's version): tracing is the dearest
+ * thing a screen does on arrival (the names on the line alone are over
+ * 100ms), and the same words in the same face trace the same way, so the
+ * second visit traces nothing it has seen. A kept way is packed (deltas
+ * at a tenth of a bitmap px, as a polyline string): about 1.5KB a line,
+ * where its JSON was 6. */
 const TRACED = 400;
+const KEPT = "hion:traced:1";
+interface Kept {
+  w: number;
+  l: number;
+  p: string;
+}
+const traced = new Map<string, Traced | null>();
+let kept: Map<string, Kept | null> | undefined;
+function load() {
+  if (kept) return kept;
+  kept = new Map();
+  try {
+    const raw = localStorage.getItem(KEPT);
+    if (raw) for (const [k, v] of JSON.parse(raw) as [string, Kept | null][]) kept.set(k, v);
+  } catch {
+    // Nothing kept, or nowhere to keep it: traced afresh.
+  }
+  return kept;
+}
+function recall(key: string) {
+  const got = traced.get(key);
+  if (got !== undefined) return got;
+  const k = load().get(key);
+  if (k === undefined) return undefined;
+  const trace = k && { way: unpack(k.p), width: k.w, line: k.l };
+  traced.set(key, trace);
+  return trace;
+}
+let keeping = 0;
+function keep(key: string, trace: Traced | null) {
+  traced.set(key, trace);
+  if (traced.size > TRACED) traced.delete(traced.keys().next().value!);
+  const all = load();
+  all.set(key, trace && { w: trace.width, l: trace.line, p: pack(trace.way) });
+  while (all.size > TRACED) all.delete(all.keys().next().value!);
+  if (keeping) return;
+  keeping = window.setTimeout(() => {
+    keeping = 0;
+    try {
+      localStorage.setItem(KEPT, JSON.stringify([...all]));
+    } catch {
+      // Full, or not allowed: this visit's traces live in memory only.
+    }
+  }, 2500);
+}
+
+/** A way as a string: each coordinate's change from the last, in tenths,
+ * five bits a character (the polyline way). */
+function pack(way: Pt[]) {
+  let out = "";
+  let px = 0;
+  let py = 0;
+  const put = (v: number) => {
+    let n = v < 0 ? ~(v << 1) : v << 1;
+    for (; n >= 0x20; n >>= 5) out += String.fromCharCode((0x20 | (n & 0x1f)) + 63);
+    out += String.fromCharCode(n + 63);
+  };
+  for (const [x, y] of way) {
+    const ix = Math.round(x * 10);
+    const iy = Math.round(y * 10);
+    put(ix - px);
+    put(iy - py);
+    px = ix;
+    py = iy;
+  }
+  return out;
+}
+
+function unpack(s: string): Pt[] {
+  const out: Pt[] = [];
+  let x = 0;
+  let y = 0;
+  for (let i = 0; i < s.length; ) {
+    const take = () => {
+      let n = 0;
+      let shift = 0;
+      let b: number;
+      do {
+        b = s.charCodeAt(i++) - 63;
+        n |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      return n & 1 ? ~(n >> 1) : n >> 1;
+    };
+    x += take();
+    y += take();
+    out.push([x / 10, y / 10]);
+  }
+  return out;
+}
 
 /** The face's descent, by font. */
 const descents = new Map<string, number>();
@@ -340,19 +518,17 @@ function descentOf(font: string) {
 
 /** The heading's letters, read off the page a line at a time and traced,
  * as one way in page px. Null when there is nothing to write. */
-export function measure(el: HTMLElement, page: DOMRect): Spun | null {
-  const style = getComputedStyle(el);
-  const size = parseFloat(style.fontSize) || 0;
+export function measure(rd: Read, rel: "page" | "own"): Spun | null {
+  const page = rel === "page" ? rd.page : rd.own;
+  const { font, size, runs } = rd;
   if (size < SMALLEST) return null;
-  const font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
   // Drawn large enough that a stroke is about five pixels, which thins
   // cleanly; a big word is drawn as it is.
   const scale = Math.max(1, Math.min(4, 5 / (size * 0.058)));
   const room = Math.round(size * 0.12) + 6;
-  const runs = textRuns(el);
   if (!runs.length) return null;
   // The letters as they are set (a label is set in capitals by CSS).
-  if (style.textTransform === "uppercase") for (const run of runs) run.text = run.text.toUpperCase();
+  if (rd.upper) for (const run of runs) run.text = run.text.toUpperCase();
   // Where the words sit is read from the bottom of their boxes (the
   // baseline is that less the face's descent): the top of a text box can
   // carry a line's extra height.
@@ -377,12 +553,11 @@ export function measure(el: HTMLElement, page: DOMRect): Spun | null {
     const w = Math.ceil((r - l + room * 2) * scale);
     const h = Math.ceil((size * 1.4 + room * 2) * scale);
     if (w < 4 || h < 4 || w * h > 4e6) return;
-    const key = [font, style.letterSpacing, scale, back ? "<" : ">", ...line.map((run) => `${(run.rect.left - l).toFixed(1)}:${run.text}`)].join("|");
-    let trace = traced.get(key);
+    const key = [font, rd.spacing, scale, back ? "<" : ">", ...line.map((run) => `${(run.rect.left - l).toFixed(1)}:${run.text}`)].join("|");
+    let trace = recall(key);
     if (trace === undefined) {
-      trace = traceLine(line, { font, spacing: style.letterSpacing, scale, room, l, w, h, top: baseline - t + room, back });
-      if (traced.size >= TRACED) traced.delete(traced.keys().next().value!);
-      traced.set(key, trace);
+      trace = traceLine(line, { font, spacing: rd.spacing, scale, room, l, w, h, top: baseline - t + room, back });
+      keep(key, trace);
     }
     if (!trace) return;
     const toPage = ([x, y]: Pt): Pt => [x / scale - room + l - page.left, y / scale - room + t - page.top];
@@ -397,7 +572,7 @@ export function measure(el: HTMLElement, page: DOMRect): Spun | null {
   // before the words, and (when it ends on that side) up into the knot
   // after.
   let knotted = false;
-  const strung = el.matches(".hion-strung") ? el.querySelector(".hion-strung__box")?.getBoundingClientRect() : null;
+  const { strung } = rd;
   if (strung) {
     const first = runs.reduce((a, b) => (b.rect.top < a.rect.top ? b : a)).rect;
     const y = first.top + first.height * 0.56 - page.top;
@@ -582,9 +757,10 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
           }
         }
       };
+      // One a task (all of them in one was a hitch on arrival).
       for (const el of labels) {
         if (el.getClientRects().length) {
-          write(el);
+          spread(() => signal.aborted || write(el));
           continue;
         }
         // Folded away (the menu on a phone): written when it is first let
@@ -610,16 +786,30 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
  * canvas of its own, with the skein's material and a head of its own (on
  * the screen's one frame loop), then let it lie cold. Written again,
  * settled, if the heading is laid out anew. */
-function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant, from?: Pt, delay = 0) {
+function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant, from?: Pt, delay = 0, given?: Read) {
   const { signal } = options;
   const material = options.skein.material();
-  const { glow } = material.nature();
-  // Where it rests, not where a swing has it.
+  // Where it rests, not where a swing has it (dom.ts `measured`): every
+  // read of the page first, then the writes, so nothing is laid out twice.
+  // Reads already taken (a row tied at once) need no pass at all.
   const host = el.closest<HTMLElement>(".hion-page");
-  host?.classList.add("hion-measuring");
-  const own = el.getBoundingClientRect();
-  const spun = measure(el, own);
-  host?.classList.remove("hion-measuring");
+  const t0 = performance.now();
+  let spun: Spun | null = null;
+  let width = 0;
+  if (given) {
+    spun = measure(given, "own");
+    width = given.width;
+  } else {
+    measured(host, () => {
+      const rd = read(el);
+      spun = measure(rd, "own");
+      width = rd.width;
+      // Riding the resume's track: on from the track's own threads, the
+      // circle round a year or the strand down the role's side.
+      if (spun && !from && !spun.knotted) from = strandBeside(el, spun.way[0][1]) ?? undefined;
+    });
+  }
+  if (import.meta.env.DEV) performance.measure("hion:spun", { start: t0, detail: el.textContent });
   el.querySelector(":scope > .hion-spun-local")?.remove();
   if (!spun) {
     el.dataset.spunState = "chalk";
@@ -633,14 +823,11 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   // From the knot its drop ends in (a hung label), straight down into the
   // line under its feet; from the knots its weft stops in (strung); else
   // in along the line.
-  // Riding the resume's track: on from the track's own threads, the circle
-  // round a year or the strand down the role's side, along the line.
-  if (!from && !spun.knotted) from = strandBeside(el, spun.way[0][1]) ?? undefined;
   const way = smooth(spun.knotted ? spun.way : from ? onFrom(from, spun.way) : [[spun.way[0][0] - lead, spun.way[0][1] + 2], ...spun.way], 4);
   const arcs = [0];
   for (let k = 1; k < way.length; k++) arcs.push(arcs[k - 1] + Math.hypot(way[k][0] - way[k - 1][0], way[k][1] - way[k - 1][1]));
   const total = arcs[arcs.length - 1];
-  const { w, speed, tail } = material.pace(spun, total);
+  const { w, speed } = material.pace(spun, total);
   let l = Infinity;
   let t = Infinity;
   let r = -Infinity;
@@ -674,29 +861,16 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
     const u = (s - arcs[i - 1]) / (arcs[i] - arcs[i - 1] || 1);
     return [way[i - 1][0] + (way[i][0] - way[i - 1][0]) * u, way[i - 1][1] + (way[i][1] - way[i - 1][1]) * u];
   };
-  const paint = (s: number, heat: number) => {
+  // Written up to s, as it will lie: one line, no hot head, no glow.
+  const paint = (s: number) => {
     ctx.clearRect(l - pad, t - pad, r - l + pad * 2, b - t + pad * 2);
-    const span = Math.min(tail, s);
-    const cool = s - span;
     const pts: number[] = [];
-    for (let k = 0; k < way.length && arcs[k] <= cool; k++) pts.push(way[k][0], way[k][1]);
-    if (cool > 0 && cool < total) pts.push(...at(cool));
-    if (pts.length >= 4) material.run(ctx, hue, w, glow, pts, 1, null);
-    if (heat <= 0.001 || span < 2) return;
-    const hot: number[] = [];
-    const warm: number[] = [];
-    const steps = Math.max(2, Math.ceil(span / 4));
-    for (let j = 0; j <= steps; j++) {
-      hot.push(...at(cool + (span * j) / steps));
-      warm[j] = heat * (j / steps) ** 2;
-    }
-    material.run(ctx, hue, w, glow, hot, 1, warm);
-    const [hx, hy] = at(s);
-    material.head(ctx, hue, w, hx, hy, heat);
+    for (let k = 0; k < way.length && arcs[k] <= s; k++) pts.push(way[k][0], way[k][1]);
+    if (s > 0 && s < total) pts.push(...at(s));
+    if (pts.length >= 4) material.run(ctx, hue, w, pts, 1);
   };
   // Laid out anew (the track fits its roles to the window): written
   // again, settled.
-  const width = el.clientWidth;
   const resized = new ResizeObserver(() => {
     if (el.clientWidth === width || signal.aborted) return;
     resized.disconnect();
@@ -705,21 +879,20 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   resized.observe(el);
   signal.addEventListener("abort", () => resized.disconnect(), { once: true });
   if (settled || signal.aborted) {
-    paint(total, 0);
+    paint(total);
     still(canvas);
     return;
   }
   let s = 0;
-  let heat = 1;
   const task = options.pulse.add((now, dt) => {
     if (signal.aborted || !canvas.isConnected) return false;
     if (s < total) {
       // Eased in and out, nearly steady between.
       const ease = Math.min(1, 0.35 + s / 60, 0.35 + (total - s) / 80);
       s = Math.min(total, s + (speed * ease * (0.92 + 0.08 * Math.sin(now * 0.0021)) * dt) / 1000);
-    } else heat = Math.max(0, heat - dt / 700);
-    paint(s, heat);
-    if (s < total || heat > 0) return true;
+    }
+    paint(s);
+    if (s < total) return true;
     still(canvas);
     return false;
   });

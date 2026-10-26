@@ -252,11 +252,9 @@
   margin: 4px auto 0;
   border-radius: 2px;
   background: color-mix(in srgb, var(--hion-tail) 55%, var(--hion-black));
-  box-shadow: 0 0 6px color-mix(in srgb, var(--hion-tail) 35%, transparent);
   transition:
     height 0.7s var(--hion-ease-swing),
-    background-color 0.3s,
-    box-shadow 0.3s;
+    background-color 0.3s;
 }
 
 :root[data-lens="hion"] .hion-tail[data-hue="m"] {
@@ -274,7 +272,6 @@
   border-radius: 50%;
   translate: -50% 0;
   background: color-mix(in srgb, var(--hion-tail) 70%, var(--hion-black));
-  box-shadow: 0 0 5px color-mix(in srgb, var(--hion-tail) 45%, transparent);
   transition: background-color 0.3s;
 }
 
@@ -282,13 +279,11 @@
 :root[data-lens="hion"] .hion-charm:focus-visible .hion-tail {
   height: 22px;
   background: var(--hion-tail);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--hion-tail) 55%, transparent);
 }
 
 :root[data-lens="hion"] .hion-charm[data-current] .hion-tail {
   height: 46px;
   background: var(--hion-tail);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--hion-tail) 60%, transparent);
 }
 
 :root[data-lens="hion"] .hion-charm:hover .hion-tail::after,

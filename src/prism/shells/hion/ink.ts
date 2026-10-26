@@ -19,7 +19,7 @@
 import { curl, pendant } from "./dance";
 import { drawnOn, still, textExtent } from "./dom";
 import { LABELS } from "./spun";
-import { Kind, type Mark, Path, knot, paint, paintGlows, patterns, rng, thread, wraps, type Hue } from "./pastel";
+import { type Mark, Path, knot, paint, patterns, rng, thread, wraps, type Hue } from "./pastel";
 
 const PAD = 26;
 
@@ -43,7 +43,7 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
         ],
         3,
       ),
-      { hue: hueOf, seed: s, glow: 0.24 },
+      { hue: hueOf, seed: s },
     );
   const out: Mark[] = [];
   if (type === "drop" || type === "charm") {
@@ -140,9 +140,7 @@ function inkOne(el: HTMLElement) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const pats = patterns(ctx, dpr);
   const marks = marksFor(el, w, h, drop);
-  // Blooms first, faintly, under the threads.
-  paintGlows(ctx, marks, cw, ch, 0.6);
-  for (const m of marks) if (m.kind !== Kind.Glow) paint(ctx, m, pats);
+  for (const m of marks) paint(ctx, m, pats);
   still(canvas);
 }
 

@@ -2,7 +2,7 @@
  * material.
  *
  * A strand is a body grown from its head, a goal that steers the head, a
- * hue, some slack, a glow, a body strength and a lifetime (the width is
+ * hue, some slack, a body strength and a lifetime (the width is
  * every thread's: pastel.ts THREAD). The kinds differ only in those
  * numbers (NATURE) and in what steers them:
  *
@@ -97,7 +97,7 @@
  * width (pastel.ts THREAD). */
 import { type Bud, buds, Fate, goalsFor, Ground, leave, type Gather, type Seed, STEP, type Thread } from "./fate";
 import type { createLoom, Limb } from "./loom";
-import { still, unshow } from "./dom";
+import { measured, still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
 import { type Hue, type Pt, RGB, rng, THREAD } from "./pastel";
 import { type Box, encircle as encircle_, ring, smooth, stitches, weave, wordBoxes } from "./wind";
@@ -124,8 +124,6 @@ interface Nature {
   tail: number;
   /** The rope's length over the path it spans. */
   slack: number;
-  /** The soft light along its settled body (the fibres being 1). */
-  glow: number;
   /** How strongly its settled body lies (a hion being 1). */
   body: number;
   /** How long it lies once finished, before it fades (ms). */
@@ -137,13 +135,13 @@ interface Nature {
  * brightly as they do. What differs is how fast it grows and how long it
  * lies. */
 const NATURE: Record<Kind, Nature> = {
-  hion: { speed: 700, tail: 130, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
-  ground: { speed: 150, tail: 110, slack: 1.016, glow: 0.14, body: 1, hold: 55000 },
-  limb: { speed: 460, tail: 80, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
-  loop: { speed: 1100, tail: 80, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
+  hion: { speed: 700, tail: 130, slack: 1.012, body: 1, hold: Infinity },
+  ground: { speed: 150, tail: 110, slack: 1.016, body: 1, hold: 55000 },
+  limb: { speed: 460, tail: 80, slack: 1.012, body: 1, hold: Infinity },
+  loop: { speed: 1100, tail: 80, slack: 1.012, body: 1, hold: Infinity },
   // Speed and the warm run are set per heading (spun.ts: its size and
   // length).
-  title: { speed: 900, tail: 70, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
+  title: { speed: 900, tail: 70, slack: 1.012, body: 1, hold: Infinity },
 };
 
 interface SkeinOptions {
@@ -228,8 +226,9 @@ interface Strand {
   bottom: number;
   left: number;
   right: number;
-  /** When it was last baked (performance.now()). */
-  bakedAt: number;
+  /** The extent of the whole body grown so far (page px): a search for
+   * the nearest point skips a strand nowhere near. */
+  ext: Box;
   /** How much its head is moving (eases to 0 when it stops). */
   motion: number;
   /** The head's light: 1 while it grows, cooling to 0 once it has ended. */
@@ -264,9 +263,9 @@ interface Hion {
 
 const TILE = 512;
 const PANE = 320;
-/** Segments laid onto the ground at once, and the least time between
- * two bakes of one strand (ms). */
-const BATCH = 8;
+/** How often what has cooled is laid onto the ground (ms): every strand
+ * on one shared beat, so a pane many heads cross is re-stilled (a new
+ * bitmap) once a beat, not once for each. */
 const BEAT = 320;
 /** How fast a hion runs down a screen it has just come to (px a second). */
 const SETOUT = 1800;
@@ -376,11 +375,18 @@ export function createSkein(options: SkeinOptions) {
   let width = 0;
   let height = 0;
   let pageTop = 0;
+  /** The viewport on the page (its top in page px, its height), read when
+   * the reader scrolls or the window changes: a frame reads no layout (a
+   * read of scrollY mid-frame lays the page out again for every change
+   * the frame has made). */
+  let viewTop = 0;
+  let viewH = 0;
   let tileRows = 1;
   let dpr = 1;
   let built = false;
   let busy = false;
   let lastTick = 0;
+  let lastBeat = 0;
   let lastBirth = 0;
   let nextTrickle = 0;
   let lastInput = 0;
@@ -401,6 +407,8 @@ export function createSkein(options: SkeinOptions) {
   let skipPaint = false;
   /** Boxes of things gone from the live canvas, to clear. */
   let cleared: Box[] = [];
+  /** Panes broken (a thread went under) since the last beat, to still. */
+  const stale = new Set<HTMLCanvasElement>();
   const effects: { e: Effect; last: Box[] }[] = [];
   // The pointer, in page space.
   const pointer = { x: -1e4, y: -1e4, at: 0, here: false, looked: 0 };
@@ -563,18 +571,25 @@ export function createSkein(options: SkeinOptions) {
     return moving;
   }
 
+  /** Where the reader is looking. */
+  function look() {
+    viewTop = scrollY - pageTop;
+    viewH = innerHeight;
+  }
+
   function build() {
     width = page.clientWidth;
     height = page.scrollHeight;
     pageTop = page.getBoundingClientRect().top + scrollY;
+    look();
     dpr = Math.min(devicePixelRatio || 1, 1.5);
     layer.style.height = liveLayer.style.height = `${height}px`;
     tileRows = Math.ceil(height / TILE);
     ground = new Ground(width, height, 8);
-    page.classList.add("hion-measuring");
-    readPage();
-    const spun = measureTitles();
-    page.classList.remove("hion-measuring");
+    const spun = measured(page, () => {
+      readPage();
+      return measureTitles();
+    });
     ground.finish();
     fate = new Fate(ground);
     strands = [];
@@ -609,10 +624,15 @@ export function createSkein(options: SkeinOptions) {
   function measureBody(st: Strand) {
     const { xs, ys } = st.t;
     const ls = st.ls;
+    const e = st.ext;
     for (let i = ls.length; i < xs.length; i++) {
       const d = i ? Math.hypot(xs[i] - xs[i - 1], ys[i] - ys[i - 1]) : 0;
       // A stretch a hion leaves the page for (a track) is no length.
       ls.push(i ? ls[i - 1] + (d > JUMP ? 0 : d) : 0);
+      if (xs[i] < e.l) e.l = xs[i];
+      if (xs[i] > e.r) e.r = xs[i];
+      if (ys[i] < e.t) e.t = ys[i];
+      if (ys[i] > e.b) e.b = ys[i];
     }
     return ls[ls.length - 1] ?? 0;
   }
@@ -767,20 +787,22 @@ export function createSkein(options: SkeinOptions) {
    * still (no swing, no reveal offset). */
   function readHangers() {
     hangers = [];
-    page.classList.add("hion-measuring");
-    const p = page.getBoundingClientRect();
-    for (const el of page.querySelectorAll<HTMLElement>("[data-reveal][data-ink]")) {
-      if (el.hasAttribute("data-tied")) continue;
-      if (instant || el.closest("[data-cloth-hold]")) {
-        el.setAttribute("data-tied", "");
-        continue;
+    const tied: HTMLElement[] = [];
+    measured(page, () => {
+      const p = page.getBoundingClientRect();
+      for (const el of page.querySelectorAll<HTMLElement>("[data-reveal][data-ink]")) {
+        if (el.hasAttribute("data-tied")) continue;
+        if (instant || el.closest("[data-cloth-hold]")) {
+          tied.push(el);
+          continue;
+        }
+        const r = el.getBoundingClientRect();
+        const hang = parseFloat(el.style.getPropertyValue("--hion-hang")) || 0;
+        const kx = parseFloat(el.dataset.knot ?? "");
+        hangers.push({ el, x: r.left - p.left + (Number.isNaN(kx) ? r.width / 2 : kx), y: r.top - p.top - hang, lit: 0 });
       }
-      const r = el.getBoundingClientRect();
-      const hang = parseFloat(el.style.getPropertyValue("--hion-hang")) || 0;
-      const kx = parseFloat(el.dataset.knot ?? "");
-      hangers.push({ el, x: r.left - p.left + (Number.isNaN(kx) ? r.width / 2 : kx), y: r.top - p.top - hang, lit: 0 });
-    }
-    page.classList.remove("hion-measuring");
+    });
+    for (const el of tied) el.setAttribute("data-tied", "");
   }
 
   /** Show what hangs once its cord has grown to it. */
@@ -814,13 +836,23 @@ export function createSkein(options: SkeinOptions) {
    * vector), across as little of the words as it can. Prefers threads of
    * `hue`. Null if nothing has grown within `far`. */
   function rootFor(to: Pt, arrive: Pt, hue?: Hue, far = 760, not?: Strand, only = false): { parent: Strand; s: number; way: Pt[] } | null {
-    let best: { parent: Strand; s: number; way: Pt[] } | null = null;
-    let bestCost = Infinity;
     const [tx, ty] = to;
-    const cubic = cubicWay;
+    const [ax, ay] = arrive;
+    const now = performance.now();
+    // Every point it could leave from, weighed cheaply first (how far, how
+    // far off forward, its hue, its depth); the way itself (a curve,
+    // sampled against the words) is drawn only for the likeliest, in that
+    // order, until none left could beat the best. With a heading hemmed
+    // in by words every way is across some, and once every point of a
+    // busy screen was drawn to it: a hitch of a few hundred milliseconds
+    // on a hover.
+    const cands: { st: Strand; i: number; d: number; fx: number; fy: number; lb: number }[] = [];
     for (const st of strands) {
       if (st === not || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30 || (only && st.t.hue !== hue)) continue;
-      if (st.kind === "ground" && st.fadeAt - performance.now() < 15000) continue;
+      if (st.kind === "ground" && st.fadeAt - now < 15000) continue;
+      const e = st.ext;
+      if (tx < e.l - far || tx > e.r + far || ty < e.t - far || ty > e.b + far) continue;
+      const prefer = hue && st.t.hue !== hue ? 700 : 0;
       const { xs, ys } = st.t;
       const end = Math.min(xs.length - 1, indexAt(st, st.s));
       for (let i = 3; i <= end - 3; i += 4) {
@@ -838,29 +870,54 @@ export function createSkein(options: SkeinOptions) {
         const cos = ((tx - x) * fx + (ty - y) * fy) / d;
         // Behind it or square to it: it would have to turn back on itself.
         if (cos < 0.05) continue;
-        const k1 = Math.min(140, d * 0.38);
-        const k2 = Math.min(120, d * 0.34);
-        // Cheap first: nearer than the best so far could be.
-        const prefer = hue && st.t.hue !== hue ? 700 : 0;
-        if (d + prefer + st.depth * 30 >= bestCost) continue;
-        const n = Math.max(22, Math.ceil(d / 8));
-        const pts = cubic([x, y], [x + fx * k1, y + fy * k1], [tx - arrive[0] * k2, ty - arrive[1] * k2], [tx, ty], n);
-        // Across the words: all but never (the last stretch arrives beside
-        // the words it writes, the first leaves a thread that may run
-        // beside others).
-        let blocked = 0;
-        for (let k = Math.ceil(n * 0.06); k < Math.floor(n * 0.84); k++) if (ground.clear(pts[k][0], pts[k][1]) < 5) blocked++;
-        // Off the page is no way to go.
-        let off = 0;
-        for (const [px, py] of pts) if (px < 4 || px > width - 4 || py < 0) off++;
-        const cost = d + blocked * 900 + off * 400 + (1 - cos) * 260 + prefer + st.depth * 30;
-        if (cost < bestCost) {
-          bestCost = cost;
-          best = { parent: st, s: st.ls[i], way: pts };
-        }
+        cands.push({ st, i, d, fx, fy, lb: d + (1 - cos) * 260 + prefer + st.depth * 30 });
       }
     }
-    return best;
+    cands.sort((a, b) => a.lb - b.lb);
+    let best: (typeof cands)[number] | null = null;
+    let bestCost = Infinity;
+    for (let c = 0; c < cands.length && c < 400; c++) {
+      const cand = cands[c];
+      if (cand.lb >= bestCost) break;
+      const { st, i, d, fx, fy } = cand;
+      const x = st.t.xs[i];
+      const y = st.t.ys[i];
+      const k1 = Math.min(140, d * 0.38);
+      const k2 = Math.min(120, d * 0.34);
+      const p1x = x + fx * k1;
+      const p1y = y + fy * k1;
+      const p2x = tx - ax * k2;
+      const p2y = ty - ay * k2;
+      const n = Math.max(22, Math.ceil(d / 8));
+      // Across the words: all but never (the last stretch arrives beside
+      // the words it writes, the first leaves a thread that may run
+      // beside others). Off the page is no way to go.
+      const k0 = Math.ceil(n * 0.06);
+      const k1n = Math.floor(n * 0.84);
+      let blocked = 0;
+      let off = 0;
+      for (let k = 0; k <= n; k++) {
+        const u = k / n;
+        const v = 1 - u;
+        const px = v * v * v * x + 3 * v * v * u * p1x + 3 * v * u * u * p2x + u * u * u * tx;
+        const py = v * v * v * y + 3 * v * v * u * p1y + 3 * v * u * u * p2y + u * u * u * ty;
+        if (k >= k0 && k < k1n && ground.clear(px, py) < 5) blocked++;
+        if (px < 4 || px > width - 4 || py < 0) off++;
+      }
+      const cost = cand.lb + blocked * 900 + off * 400;
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = cand;
+      }
+    }
+    if (!best) return null;
+    const { st, i, d, fx, fy } = best;
+    const x = st.t.xs[i];
+    const y = st.t.ys[i];
+    const k1 = Math.min(140, d * 0.38);
+    const k2 = Math.min(120, d * 0.34);
+    const way = cubicWay([x, y], [x + fx * k1, y + fy * k1], [tx - ax * k2, ty - ay * k2], [tx, ty], Math.max(22, Math.ceil(d / 8)));
+    return { parent: st, s: st.ls[i], way };
   }
 
   /* ---------- Words written by thread ---------- */
@@ -875,7 +932,7 @@ export function createSkein(options: SkeinOptions) {
         titles.delete(el);
         continue;
       }
-      const s = t.measure(p);
+      const s = t.measure(() => p);
       if (s) out.push([el, s]);
       else el.dataset.spunState = "chalk";
     }
@@ -1081,17 +1138,6 @@ export function createSkein(options: SkeinOptions) {
 
   /* ---------- The thread itself ---------- */
 
-  /** How strongly segment i lies: tapered at its end once it has one, and
-   * at its start only if it has no thread to leave (a branch is whole
-   * where it leaves its parent, so the fork reads). */
-  function taper(st: Strand, i: number) {
-    const n = st.t.xs.length - 1;
-    let a = st.parent || st.kind === "hion" ? 1 : Math.min(1, (i + 1) / 16);
-    // A twig thins out; a thread tied off in a knot (a limb) does not.
-    if (st.t.done && st.kind !== "hion" && st.kind !== "limb") a = Math.min(a, (n - i) / 10);
-    return Math.max(0, a) * st.alpha;
-  }
-
   /** The colour of a thread at a strength, over black paper: the hue
    * dimmed, not made see-through, so pieces of one thread meet without a
    * seam and nothing shows through. */
@@ -1102,95 +1148,32 @@ export function createSkein(options: SkeinOptions) {
     return `rgb(${((r + (lr - r) * pale) * k) | 0} ${((g + (lg - g) * pale) * k) | 0} ${((b + (lb - b) * pale) * k) | 0})`;
   }
 
-  /** One run of thread, the one way every thread is drawn: light, and
-   * nothing else. A soft wide glow added under it, and one smooth line of
-   * the hue at the thread's strength. `pts` are x,y pairs. `heat`, per
-   * point, warms the run toward the head: the line brightens to full and
-   * widens a little, a pale core comes up inside it, and the glow under
-   * it spreads. `erase` instead takes that fraction of the run off the
-   * paper, along the same line (a fade step that repaints nothing else). */
-  function strokeRun(
-    ctx: CanvasRenderingContext2D,
-    hue: Hue,
-    w: number,
-    glow: number,
-    pts: number[],
-    base: number,
-    heat: number[] | null,
-    erase?: number,
-  ) {
+  /** One run of thread, the one way every thread is drawn: one smooth
+   * line of the hue at the thread's strength, flat light, no glow and no
+   * taper (a thread is as strong at its ends as along it). `pts` are x,y
+   * pairs. `erase` instead takes that fraction of the run off the paper,
+   * along the same line (a fade step that repaints nothing else). */
+  function strokeRun(ctx: CanvasRenderingContext2D, hue: Hue, w: number, pts: number[], base: number, erase?: number) {
     const n = pts.length / 2;
     if (n < 2 || base <= 0) return;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    const path = (k0: number, k1: number) => {
-      ctx.beginPath();
-      ctx.moveTo(pts[k0 * 2], pts[k0 * 2 + 1]);
-      for (let k = k0 + 1; k <= k1; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
-    };
+    ctx.beginPath();
+    ctx.moveTo(pts[0], pts[1]);
+    for (let k = 1; k < n; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
     if (erase !== undefined) {
       ctx.globalCompositeOperation = "destination-out";
       ctx.strokeStyle = "#000";
       ctx.globalAlpha = erase;
       ctx.lineWidth = w + 1.2;
-      path(0, n - 1);
       ctx.stroke();
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
       return;
     }
-    const bands = heat ? 4 : 1;
-    for (let b = 0; b < bands; b++) {
-      const k0 = Math.floor(((n - 1) * b) / bands);
-      const k1 = Math.floor(((n - 1) * (b + 1)) / bands);
-      if (k1 <= k0) continue;
-      let h = 0;
-      if (heat) {
-        for (let k = k0; k <= k1; k++) h += heat[k];
-        h /= k1 - k0 + 1;
-      }
-      // The glow: a little light added under the line, a little more at
-      // a head. Kept slight: added light over the line's own colour
-      // saturates quickly, and a bright bar is a blob.
-      const g = glow * base + 0.08 * h;
-      if (g > 0.01) {
-        ctx.globalCompositeOperation = "lighter";
-        ctx.strokeStyle = tone(hue, g);
-        ctx.lineWidth = w * (2.4 + 1.2 * h);
-        path(k0, k1);
-        ctx.stroke();
-        ctx.globalCompositeOperation = "source-over";
-      }
-      // The line itself: the hue at its strength, full and a touch wider
-      // toward a head.
-      ctx.strokeStyle = tone(hue, base + (1 - base) * h);
-      ctx.lineWidth = w * (1 + 0.1 * h);
-      path(k0, k1);
-      ctx.stroke();
-      // Near the head a pale core comes up inside it.
-      if (h > 0.03) {
-        ctx.strokeStyle = tone(hue, 1, 0.85);
-        ctx.globalAlpha = Math.min(1, h * 1.1);
-        ctx.lineWidth = Math.max(0.8, w * 0.32) * (1 + 0.6 * h);
-        path(k0, k1);
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
-    }
-  }
-
-  /** A head's own light: a point of the thread's light, white-hot at the
-   * very tip, no bigger than the thread. */
-  function paintHead(ctx: CanvasRenderingContext2D, hue: Hue, w: number, hx: number, hy: number, heat: number) {
-    const [cr, cg, cb] = RGB[hue];
-    const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
-    const rad = w * 1.4;
-    const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, rad);
-    halo.addColorStop(0, `rgba(${lr},${lg},${lb},${0.85 * heat})`);
-    halo.addColorStop(0.45, `rgba(${cr},${cg},${cb},${0.35 * heat})`);
-    halo.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
-    ctx.fillStyle = halo;
-    ctx.fillRect(hx - rad, hy - rad, rad * 2, rad * 2);
+    ctx.strokeStyle = tone(hue, base);
+    ctx.lineWidth = w;
+    ctx.stroke();
   }
 
   /** Lay segments [i0, i1) of a strand's body on a context, settled.
@@ -1209,20 +1192,14 @@ export function createSkein(options: SkeinOptions) {
         Math.min(ys[i], ys[i + 1]) > clip.b + pad);
     let pts: number[] = [];
     const flush = (alpha: number) => {
-      if (pts.length >= 4) strokeRun(ctx, hue, THREAD, st.n.glow, pts, base * alpha, null, erase);
+      if (pts.length >= 4) strokeRun(ctx, hue, THREAD, pts, base * alpha, erase);
       pts = [];
     };
     for (let i = i0; i < i1; i++) {
-      const a = taper(st, i);
       // Under another thread, across a stretch it leaves the page for, or
       // out of this pane's sight.
-      if (under.has(i) || a <= 0 || ls[i + 1] - ls[i] <= 0 || outside(i)) {
+      if (under.has(i) || st.alpha <= 0 || ls[i + 1] - ls[i] <= 0 || outside(i)) {
         flush(st.alpha);
-        continue;
-      }
-      if (a < st.alpha) {
-        flush(st.alpha);
-        strokeRun(ctx, hue, THREAD, st.n.glow, [xs[i], ys[i], xs[i + 1], ys[i + 1]], base * a, null, erase);
         continue;
       }
       if (!pts.length) pts.push(xs[i], ys[i]);
@@ -1282,9 +1259,8 @@ export function createSkein(options: SkeinOptions) {
 
   /** Keep ground near the viewport; drop far panes. */
   function cull() {
-    const top = scrollY - pageTop;
-    const from = Math.max(0, Math.floor((top - innerHeight * 0.3) / TILE));
-    const to = Math.min(tileRows - 1, Math.floor((top + innerHeight * 1.3) / TILE));
+    const from = Math.max(0, Math.floor((viewTop - viewH * 0.3) / TILE));
+    const to = Math.min(tileRows - 1, Math.floor((viewTop + viewH * 1.3) / TILE));
     for (const [index, tile] of tiles) {
       if (index < from - 1 || index > to + 1) {
         for (const pane of tile.panes) unshow(pane.el);
@@ -1323,7 +1299,6 @@ export function createSkein(options: SkeinOptions) {
     st.bottom = Math.max(st.bottom, bottom);
     st.left = Math.min(st.left, left);
     st.right = Math.max(st.right, right);
-    st.bakedAt = performance.now();
     const [a, b] = tileRange(top, bottom);
     for (let k = a; k <= b; k++) {
       const tile = tiles.get(k);
@@ -1350,7 +1325,10 @@ export function createSkein(options: SkeinOptions) {
       const tile = tiles.get(k);
       if (!tile) continue;
       for (const { ctx, el } of panesIn(tile, Math.min(x0, x1), Math.max(x0, x1))) {
-        still(el);
+        // Shown on the beat, with the bakes: a crossing a frame would have
+        // the pane stilled (a new bitmap) every frame. The thread going
+        // over lies live on top until then anyway.
+        stale.add(el);
         ctx.save();
         ctx.globalCompositeOperation = "destination-out";
         ctx.lineWidth = THREAD + 2.5;
@@ -1369,10 +1347,10 @@ export function createSkein(options: SkeinOptions) {
   /** Keep the band over the viewport; moved (and repainted whole) only
    * when the reader has scrolled near its edge. */
   function anchor() {
-    const view = scrollY - pageTop;
-    const want = Math.min(height, Math.ceil(innerHeight * BAND));
+    const view = viewTop;
+    const want = Math.min(height, Math.ceil(viewH * BAND));
     const w = width;
-    if (!bandFresh && want === bandH && w === bandW && view >= bandTop - 1 && view + innerHeight <= bandTop + bandH + 1) {
+    if (!bandFresh && want === bandH && w === bandW && view >= bandTop - 1 && view + viewH <= bandTop + bandH + 1) {
       return;
     }
     const d = Math.min(devicePixelRatio || 1, 1.5);
@@ -1385,7 +1363,7 @@ export function createSkein(options: SkeinOptions) {
       band.style.width = `${bandW}px`;
       band.style.height = `${bandH}px`;
     }
-    bandTop = Math.round(Math.max(0, Math.min(height - bandH, view - (bandH - innerHeight) / 2)));
+    bandTop = Math.round(Math.max(0, Math.min(height - bandH, view - (bandH - viewH) / 2)));
     band.style.transform = `translateY(${bandTop}px)`;
     bctx.setTransform(1, 0, 0, 1, 0, 0);
     bctx.clearRect(0, 0, band.width, band.height);
@@ -1539,55 +1517,9 @@ export function createSkein(options: SkeinOptions) {
     }
     const count = pts.length / 2;
     if (count < 2) return;
-    const heat = st.heat * st.alpha;
-    if (st.kind === "title") {
-      // A heading is written: its head is the hand's, warm.
-      const warm = new Array<number>(count);
-      for (let k = 0; k < count; k++) {
-        const u = k / (count - 1);
-        warm[k] = heat * u * u;
-      }
-      strokeRun(ctx, hue, THREAD, st.n.glow, pts, st.n.body * st.alpha, warm);
-      if (heat > 0.02) paintHead(ctx, hue, THREAD, pts[(count - 1) * 2], pts[(count - 1) * 2 + 1], heat);
-    } else ripen(ctx, hue, pts, st.n.body * st.alpha, st.n.glow, heat);
-    ctx.globalAlpha = 1;
-  }
-
-  /** A run growing: the newest of it is the youngest, so the faintest,
-   * ripening to the thread's full light a little way behind the tip (no
-   * hot nib: nothing is drawing it). `pts` run from where it has settled
-   * to the tip; `growing` (0 to 1) is how much it is still growing. */
-  function ripen(ctx: CanvasRenderingContext2D, hue: Hue, pts: number[], base: number, glow: number, growing: number) {
-    const n = pts.length / 2;
-    const bands = Math.min(10, n - 1);
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    for (let b = 0; b < bands; b++) {
-      const k0 = Math.floor(((n - 1) * b) / bands);
-      const k1 = Math.floor(((n - 1) * (b + 1)) / bands);
-      if (k1 <= k0) continue;
-      const u = (b + 0.5) / bands;
-      const young = growing * Math.pow(u, 1.6);
-      const strength = base * (1 - 0.78 * young);
-      const path = () => {
-        ctx.beginPath();
-        ctx.moveTo(pts[k0 * 2], pts[k0 * 2 + 1]);
-        for (let k = k0 + 1; k <= k1; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
-      };
-      const g = glow * strength;
-      if (g > 0.01) {
-        ctx.globalCompositeOperation = "lighter";
-        ctx.strokeStyle = tone(hue, g);
-        ctx.lineWidth = THREAD * 2.4;
-        path();
-        ctx.stroke();
-        ctx.globalCompositeOperation = "source-over";
-      }
-      ctx.strokeStyle = tone(hue, strength);
-      ctx.lineWidth = THREAD;
-      path();
-      ctx.stroke();
-    }
+    // Growing or being written, it lies as it will lie: one line, no hot
+    // head, no glow.
+    strokeRun(ctx, hue, THREAD, pts, st.n.body * st.alpha);
   }
 
   /** Repaint only where something changed: each changed thing's old box
@@ -1654,7 +1586,7 @@ export function createSkein(options: SkeinOptions) {
       bottom: t.ys[0],
       left: t.xs[0],
       right: t.xs[0],
-      bakedAt: 0,
+      ext: { l: t.xs[0], t: t.ys[0], r: t.xs[0], b: t.ys[0] },
       motion: 1,
       heat: 1,
       resting: false,
@@ -1819,8 +1751,7 @@ export function createSkein(options: SkeinOptions) {
 
   /** Is a point near enough the reader to be seen? */
   function seen(y: number, margin = 0.5) {
-    const view = scrollY - pageTop;
-    return y > view - innerHeight * margin && y < view + innerHeight * (1 + margin);
+    return y > viewTop - viewH * margin && y < viewTop + viewH * (1 + margin);
   }
 
   const headY = (st: Strand) => at(st, st.s)[1];
@@ -1846,9 +1777,8 @@ export function createSkein(options: SkeinOptions) {
     const rand = rng(options.seed * 7 + ++trickles * 131);
     // Sooner when nothing near the reader is growing; sooner on home.
     nextTrickle = now + (2500 + near * 3000 + rand() * 3000) * (lively ? 0.45 : 1);
-    const view = scrollY - pageTop;
-    const top = Math.max(0, view) + innerHeight * 0.08;
-    const bottom = view + innerHeight * 0.8;
+    const top = Math.max(0, viewTop) + viewH * 0.08;
+    const bottom = viewTop + viewH * 0.8;
     const from = strands.filter(
       (st) =>
         (st.kind === "hion" || (st.kind === "ground" && st.cold && st.alpha === 1 && st.fadeAt - now > 20000)) &&
@@ -2051,6 +1981,9 @@ export function createSkein(options: SkeinOptions) {
       if (alive) moving = true;
     }
     let untied = false;
+    const beat = Math.floor(now / BEAT);
+    const baking = beat !== lastBeat;
+    lastBeat = beat;
     for (const st of strands) {
       if (st.cold) continue;
       if (move(st, now, dt, here)) moving = true;
@@ -2062,13 +1995,11 @@ export function createSkein(options: SkeinOptions) {
         } else if (st.drive.state === "held" && st.drive.until < Infinity) offscreen = true;
         continue;
       }
-      // Lay what has cooled behind the head, a batch at a time.
-      // Lay what has cooled behind the head, a batch at a time, and not
-      // more often than a few times a second: every bake re-stills a pane
-      // (a new bitmap), and a quick head would do that every frame.
-      const settled = st.s - Math.min(st.n.tail, st.s);
-      const to = indexAt(st, settled);
-      if (to - st.laid >= BATCH && now - st.bakedAt > BEAT) bake(st, to);
+      // Lay what has cooled behind the head, on the beat.
+      if (baking) {
+        const to = indexAt(st, st.s - Math.min(st.n.tail, st.s));
+        if (to > st.laid) bake(st, to);
+      }
       // A hion is never finished: its way is drawn as far as the loom has.
       if (st.kind === "hion") continue;
       if (st.t.done && st.heat <= 0 && (!st.rope || st.rope.energy < 0.04)) finish(st, now);
@@ -2082,6 +2013,10 @@ export function createSkein(options: SkeinOptions) {
     }
     for (const [t, i] of fate.breaks) breakAt(t, i);
     fate.breaks.length = 0;
+    if (baking && stale.size) {
+      for (const el of stale) still(el);
+      stale.clear();
+    }
     fade(now);
     // Paint, every other frame when frames run long.
     if (!skipPaint || !moving) {
@@ -2113,6 +2048,8 @@ export function createSkein(options: SkeinOptions) {
     let bd = r;
     for (const st of strands) {
       if (st.t.gone || st.s < 4 || st.alpha < 1 || (hue && st.t.hue !== hue)) continue;
+      const e = st.ext;
+      if (x < e.l - bd || x > e.r + bd || y < e.t - bd || y > e.b + bd) continue;
       const { xs, ys } = st.t;
       const end = Math.min(xs.length - 1, indexAt(st, st.s));
       for (let i = 0; i <= end; i += 2) {
@@ -2250,22 +2187,11 @@ export function createSkein(options: SkeinOptions) {
           }
         }
         for (const l of lights) {
-          // A bead of the thread's own light running along it, a short
-          // warm run behind.
+          // The thread's own light running along it: a short pale run,
+          // brightest at its front, of the thread's own width (no glow).
           const hue = l.st.t.hue;
           const trail = 56 * Math.sign(l.v);
-          const [hx, hy] = at(l.st, l.s);
-          ctx.globalCompositeOperation = "lighter";
-          ctx.beginPath();
-          ctx.moveTo(hx, hy);
-          for (let k = 1; k <= 6; k++) {
-            const [x, y] = at(l.st, Math.max(0, Math.min(l.st.s, l.s - (trail * k) / 6)));
-            ctx.lineTo(x, y);
-          }
-          ctx.lineWidth = THREAD * 3;
-          ctx.strokeStyle = tone(hue, 0.4 * l.e, 0.5);
-          ctx.stroke();
-          ctx.globalCompositeOperation = "source-over";
+          ctx.lineCap = "round";
           for (let k = 0; k < 6; k++) {
             const s0 = l.s - (trail * k) / 6;
             const s1 = l.s - (trail * (k + 1)) / 6;
@@ -2280,8 +2206,6 @@ export function createSkein(options: SkeinOptions) {
             ctx.strokeStyle = tone(hue, 1, 0.9 * l.e * (1 - k / 6));
             ctx.stroke();
           }
-          const [x, y] = at(l.st, l.s);
-          paintHead(ctx, hue, THREAD, x, y, Math.min(1, l.e * 1.2));
         }
       },
     },
@@ -2462,6 +2386,8 @@ export function createSkein(options: SkeinOptions) {
       let bestScore = Infinity;
       for (const st of strands) {
         if (lineage.has(st) || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30) continue;
+        const e = st.ext;
+        if (x < e.l - 420 || x > e.r + 420 || y < e.t - 420 || y > e.b + 420) continue;
         const { xs, ys } = st.t;
         const end = Math.min(xs.length - 1, indexAt(st, st.s));
         for (let i = 0; i <= end; i += 3) {
@@ -2506,6 +2432,7 @@ export function createSkein(options: SkeinOptions) {
   }
 
   function onScroll() {
+    look();
     if (!built || busy) return;
     cull();
     lastInput = performance.now();
@@ -2586,11 +2513,11 @@ export function createSkein(options: SkeinOptions) {
     const laid = new Set(strands.map((st) => (st.drive.by === "title" ? st.drive.el : null)));
     const waiting = [...titles.keys()].filter((el) => !laid.has(el));
     if (!waiting.length) return;
-    page.classList.add("hion-measuring");
-    const p = page.getBoundingClientRect();
-    const measured = waiting.map((el) => [el, el.isConnected ? titles.get(el)!.measure(p) : null] as const);
-    page.classList.remove("hion-measuring");
-    for (const [el, spun] of measured) {
+    const spuns = measured(page, () => {
+      const p = page.getBoundingClientRect();
+      return waiting.map((el) => [el, el.isConnected ? titles.get(el)!.measure(() => p) : null] as const);
+    });
+    for (const [el, spun] of spuns) {
       if (!spun) {
         el.dataset.spunState = "chalk";
         titles.delete(el);
@@ -2605,7 +2532,7 @@ export function createSkein(options: SkeinOptions) {
    * part grown (the first few still growing, their heads live), so the
    * ground is there at once and a few heads are at work in it. */
   function pregrow() {
-    const fold = Math.max(0, scrollY - pageTop) + innerHeight;
+    const fold = Math.max(0, viewTop) + viewH;
     let started = 0;
     const now = performance.now();
     // Branches that leave the hions above the fold, as far as the drawing
@@ -2740,9 +2667,9 @@ export function createSkein(options: SkeinOptions) {
     inscribe(el: HTMLElement, hue: Hue, measure: Measure) {
       titles.set(el, { hue, measure });
       if (!built || busy || signal.aborted) return;
-      page.classList.add("hion-measuring");
-      const spun = measure(page.getBoundingClientRect());
-      page.classList.remove("hion-measuring");
+      // (spun.ts reads the page under one pass for several words at once,
+      // and only when it has to.)
+      const spun = measure(() => page.getBoundingClientRect());
       if (!spun) {
         // It gets its chalk back.
         el.dataset.spunState = "chalk";
@@ -2758,8 +2685,6 @@ export function createSkein(options: SkeinOptions) {
     material(): Material {
       return {
         run: strokeRun,
-        head: paintHead,
-        nature: () => ({ w: THREAD, glow: NATURE.title.glow }),
         pace: (spun, total) => ({ w: THREAD, ...writing(spun, total) }),
       };
     },
