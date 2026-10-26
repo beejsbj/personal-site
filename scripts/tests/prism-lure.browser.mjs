@@ -58,65 +58,75 @@ test(
       return { context, page, errors, faceRequests };
     };
     try {
-      await t.test("a docked lure loads nothing until reached for", async () => {
-        const { context, page, errors, faceRequests } = await visit(
-          "/?lens=hion",
-          { returning: true },
-        );
-        await page.waitForSelector("#prism-lure.is-docked");
-        await page.waitForTimeout(1500);
-        assert.equal(await page.locator("#prism-stage").count(), 0);
-        assert.equal(faceRequests.length, 0, "no face was requested");
+      await t.test(
+        "a docked lure loads nothing until reached for",
+        async () => {
+          const { context, page, errors, faceRequests } = await visit(
+            "/?lens=hion",
+            { returning: true },
+          );
+          await page.waitForSelector("#prism-lure.is-docked");
+          await page.waitForTimeout(1500);
+          assert.equal(await page.locator("#prism-stage").count(), 0);
+          assert.equal(faceRequests.length, 0, "no face was requested");
 
-        await page.hover("#prism-lure");
-        await page.waitForSelector("#prism-stage", { state: "attached" });
-        await page.waitForFunction(
-          () =>
-            [...document.querySelectorAll("#prism-stage iframe")].every(
-              (frame) => frame.contentDocument?.readyState === "complete",
-            ),
-          null,
-          { timeout: 15000 },
-        );
-        const built = await faces(page);
-        assert.equal(built.length, 5, "five faces");
-        assert.ok(
-          built.every((face) => face.idle),
-          "every face is idle until the stage opens",
-        );
+          await page.hover("#prism-lure");
+          await page.waitForSelector("#prism-stage", { state: "attached" });
+          await page.waitForFunction(
+            () =>
+              [...document.querySelectorAll("#prism-stage iframe")].every(
+                (frame) => frame.contentDocument?.readyState === "complete",
+              ),
+            null,
+            { timeout: 15000 },
+          );
+          const built = await faces(page);
+          assert.equal(built.length, 5, "five faces");
+          assert.ok(
+            built.every((face) => face.idle),
+            "every face is idle until the stage opens",
+          );
 
-        await page.click("#prism-lure");
-        await page.waitForSelector("#prism-stage.is-open", { timeout: 15000 });
-        await page.waitForFunction(
-          () =>
-            document.querySelector("#prism-stage")?.dataset.outside === "true",
-        );
-        await page.waitForTimeout(200);
-        const open = await faces(page);
-        assert.equal(
-          open.filter((face) => !face.idle).length,
-          1,
-          "only the face in front is awake",
-        );
+          await page.click("#prism-lure");
+          await page.waitForSelector("#prism-stage.is-open", {
+            timeout: 15000,
+          });
+          await page.waitForFunction(
+            () =>
+              document.querySelector("#prism-stage")?.dataset.outside ===
+              "true",
+          );
+          await page.waitForTimeout(200);
+          const open = await faces(page);
+          assert.equal(
+            open.filter((face) => !face.idle).length,
+            1,
+            "only the face in front is awake",
+          );
 
-        // Closing hands focus back to the lure; that is not a new reach.
-        await page.keyboard.press("Escape");
-        await page.waitForSelector("#prism-stage", {
-          state: "detached",
-          timeout: 15000,
-        });
-        const before = faceRequests.length;
-        await page.waitForTimeout(800);
-        assert.equal(await page.locator("#prism-stage").count(), 0);
-        assert.equal(faceRequests.length, before, "no face reloaded on close");
-        // Reaching again builds the stage again.
-        await page.mouse.move(10, 10);
-        await page.hover("#prism-lure");
-        await page.waitForSelector("#prism-stage", { state: "attached" });
-        assert.equal((await faces(page)).length, 5);
-        assert.deepEqual(errors, []);
-        await context.close();
-      });
+          // Closing hands focus back to the lure; that is not a new reach.
+          await page.keyboard.press("Escape");
+          await page.waitForSelector("#prism-stage", {
+            state: "detached",
+            timeout: 15000,
+          });
+          const before = faceRequests.length;
+          await page.waitForTimeout(800);
+          assert.equal(await page.locator("#prism-stage").count(), 0);
+          assert.equal(
+            faceRequests.length,
+            before,
+            "no face reloaded on close",
+          );
+          // Reaching again builds the stage again.
+          await page.mouse.move(10, 10);
+          await page.hover("#prism-lure");
+          await page.waitForSelector("#prism-stage", { state: "attached" });
+          assert.equal((await faces(page)).length, 5);
+          assert.deepEqual(errors, []);
+          await context.close();
+        },
+      );
 
       await t.test("a wild lure loads nothing until reached for", async () => {
         const { context, page, errors, faceRequests } =
