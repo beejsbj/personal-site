@@ -14,7 +14,7 @@
 import type { SiteContent } from "../types";
 import { h, newTab, still } from "./dom";
 import { ink } from "./ink";
-import { Path, paint, patterns, thread, type Pt } from "./pastel";
+import { Path, paint, thread, type Pt } from "./pastel";
 
 /** A loose end of thread let down under a name: short, let down a
  * little when you reach for it, all the way for the page you are on. The
@@ -174,8 +174,7 @@ export function createNav(
       }
       return thread(new Path(pts, 3), { hue, seed: 5 + i * 9 });
     });
-    const pats = patterns(ctx, dpr);
-    for (const m of marks) paint(ctx, m, pats);
+    for (const m of marks) paint(ctx, m);
     still(cord);
   }
 

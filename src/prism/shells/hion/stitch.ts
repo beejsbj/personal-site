@@ -15,7 +15,7 @@
  * scale (a cloth seen close up) each thread is itself two plies twisting
  * round each other: the same weave inside the thread. */
 import { type Fabric, topAt } from "./fabric";
-import { css, type Hue, Kind, mark, paint, patterns, type Pt, rng } from "./pastel";
+import { css, type Hue, Kind, mark, paint, type Pt, rng } from "./pastel";
 
 /** Directions thread runs from a crossing (the others are drawn from the
  * crossing at their other end). */
@@ -103,14 +103,13 @@ function sew(size: number, dpr: number, heavy: boolean, strength: number): Stitc
         const w = Math.abs(dx) * size + pad * 2;
         const h = Math.abs(dy) * size + pad * 2;
         const { canvas, ctx } = sprite(w, h, dpr);
-        const pats = patterns(ctx, dpr);
         const rand = rng(hi * 1000 + di * 100 + v * 7 + size);
         // Crossings in sprite space: a at the anchor (pad, pad), or offset
         // right when the thread runs down and to the left.
         const a: Pt = [pad + (dx < 0 ? size : 0), pad];
         const b: Pt = [a[0] + dx * size, a[1] + dy * size];
         if (ply === 1) {
-          paint(ctx, mark(Kind.Stroke, hue, weight * (0.85 + rand() * 0.3), 0.8 + rand() * 0.2, float(a, b, rand, 0.22), rand() * 1e6), pats);
+          paint(ctx, mark(Kind.Stroke, hue, weight * (0.85 + rand() * 0.3), 0.8 + rand() * 0.2, float(a, b, rand, 0.22), rand() * 1e6));
         } else {
           // Two plies, twisting round each other along the thread.
           const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
@@ -125,7 +124,7 @@ function sew(size: number, dpr: number, heavy: boolean, strength: number): Stitc
               const o = Math.sin(u * Math.PI * 2 + phase + p * Math.PI) * weight * 0.9;
               pts.push(a[0] + (b[0] - a[0]) * u + nx * o, a[1] + (b[1] - a[1]) * u + ny * o);
             }
-            paint(ctx, mark(Kind.Stroke, hue, weight * 0.62, 0.9, pts, rand() * 1e6), pats);
+            paint(ctx, mark(Kind.Stroke, hue, weight * 0.62, 0.9, pts, rand() * 1e6));
           }
         }
         return canvas;
@@ -133,7 +132,6 @@ function sew(size: number, dpr: number, heavy: boolean, strength: number): Stitc
     );
     knots[hi] = Array.from({ length: VARIANTS }, (_, v) => {
       const { canvas, ctx } = sprite(pad * 2, pad * 2, dpr);
-      const pats = patterns(ctx, dpr);
       const rand = rng(hi * 77 + v * 13 + size);
       const r = size * 0.24;
       const pts: number[] = [];
@@ -143,7 +141,7 @@ function sew(size: number, dpr: number, heavy: boolean, strength: number): Stitc
         const rr = r * (1 - (k / 16) * 0.35);
         pts.push(pad + Math.cos(t) * rr * 1.15, pad + Math.sin(t) * rr);
       }
-      paint(ctx, mark(Kind.Stroke, hue, weight * 0.9, 0.95, pts, rand() * 1e6), pats);
+      paint(ctx, mark(Kind.Stroke, hue, weight * 0.9, 0.95, pts, rand() * 1e6));
       return canvas;
     });
   });
@@ -152,12 +150,11 @@ function sew(size: number, dpr: number, heavy: boolean, strength: number): Stitc
   const ground: HTMLCanvasElement[][] = HUES.map((hue, hi) =>
     Array.from({ length: VARIANTS }, (_, v) => {
       const { canvas, ctx } = sprite(pad * 2, pad * 2, dpr);
-      const pats = patterns(ctx, dpr);
       const rand = rng(hi * 31 + v * 17 + size * 3);
       const half = size * (0.68 + rand() * 0.06);
       const a: Pt = hi ? [pad - half, pad] : [pad, pad - half];
       const b: Pt = hi ? [pad + half, pad] : [pad, pad + half];
-      paint(ctx, mark(Kind.Stroke, hue, weight * 0.75, (heavy ? 0.8 : 0.24) + rand() * 0.08, float(a, b, rand, 0), rand() * 1e6, undefined, false), pats);
+      paint(ctx, mark(Kind.Stroke, hue, weight * 0.75, (heavy ? 0.8 : 0.24) + rand() * 0.08, float(a, b, rand, 0), rand() * 1e6, undefined, false));
       return canvas;
     }),
   );

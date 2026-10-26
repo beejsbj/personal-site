@@ -24,7 +24,6 @@ export const css = (tone: Tone, alpha = 1) =>
  * the ground, what hangs from them, the line at the top, a hover loop.
  * Brightness differs by kind; width never. */
 export const THREAD = 3;
-const SOLID = { c: css("c"), m: css("m") };
 
 export function rng(seed: number) {
   let s = (Math.abs(Math.floor(seed * 9301 + 49297)) % 2147483646) + 1;
@@ -83,21 +82,6 @@ export function tooth() {
   });
 }
 
-export type Patterns = Record<Tone, CanvasPattern>;
-
-/** Tooth patterns for one context, one texel per device pixel, anchored to
- * the context's user-space origin (page space for the loom). */
-export function patterns(ctx: CanvasRenderingContext2D, dpr: number) {
-  const t = tooth();
-  const out = {} as Patterns;
-  for (const key of Object.keys(t) as Tone[]) {
-    const pattern = ctx.createPattern(t[key], "repeat")!;
-    pattern.setTransform(new DOMMatrix().scale(1 / dpr));
-    out[key] = pattern;
-  }
-  return out;
-}
-
 /* ---------- Marks ---------- */
 
 export const enum Kind {
@@ -110,7 +94,7 @@ export interface Mark {
   key: number;
   kind: Kind;
   hue: Hue;
-  /** Width of the mark (fibre spread, eraser width). */
+  /** Width of the mark (line width, eraser width). */
   w: number;
   a: number;
   /** x,y pairs. */
@@ -118,7 +102,7 @@ export interface Mark {
   seed: number;
   core: boolean;
   /** Extent along the way the drawing reads (page y; x across a track),
-   * padded for dust. */
+   * padded by its width. */
   y0: number;
   y1: number;
 }
@@ -185,26 +169,10 @@ export function acrossX(m: Mark): Mark {
   return { ...m, y0: x0 - pad, y1: x1 + pad };
 }
 
-function normals(pts: number[]) {
-  const n = pts.length / 2;
-  const out = new Float32Array(pts.length);
-  for (let i = 0; i < n; i++) {
-    const a = Math.max(0, i - 1);
-    const b = Math.min(n - 1, i + 1);
-    const dx = pts[b * 2] - pts[a * 2];
-    const dy = pts[b * 2 + 1] - pts[a * 2 + 1];
-    const len = Math.hypot(dx, dy) || 1;
-    out[i * 2] = -dy / len;
-    out[i * 2 + 1] = dx / len;
-  }
-  return out;
-}
-
 /** Lay one mark on a canvas whose user space is the marks' space. */
 export function paint(
   ctx: CanvasRenderingContext2D,
   m: Mark,
-  pats: Patterns,
 ) {
   const pts = m.pts;
   const n = pts.length / 2;

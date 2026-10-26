@@ -19,7 +19,7 @@
 import { curl, pendant } from "./dance";
 import { drawnOn, still, textExtent } from "./dom";
 import { LABELS } from "./spun";
-import { type Mark, Path, knot, paint, patterns, rng, thread, wraps, type Hue } from "./pastel";
+import { type Mark, Path, knot, paint, rng, thread, wraps, type Hue } from "./pastel";
 
 const PAD = 26;
 
@@ -138,9 +138,8 @@ function inkOne(el: HTMLElement) {
   canvas.style.top = `${-PAD - drop}px`;
   const ctx = canvas.getContext("2d")!;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const pats = patterns(ctx, dpr);
   const marks = marksFor(el, w, h, drop);
-  for (const m of marks) paint(ctx, m, pats);
+  for (const m of marks) paint(ctx, m);
   still(canvas);
 }
 

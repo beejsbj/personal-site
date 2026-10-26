@@ -27,7 +27,7 @@
  * the stretch of the track its `view()` reports. Everything else is the
  * same: the marks only need composing with their keys and extents along x
  * (weave.ts composes such a drawing turned, as if it read down). */
-import { type Hue, type Mark, paint, patterns, type Patterns, type Pt } from "./pastel";
+import { type Hue, type Mark, paint, type Pt } from "./pastel";
 import { still } from "./dom";
 import { createPulse, type Pulse } from "./pulse";
 
@@ -49,7 +49,6 @@ interface Tile {
 interface Drawn {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  pats: Patterns;
 }
 
 export interface Composition {
@@ -239,12 +238,12 @@ export function createLoom(options: LoomOptions) {
     const shift = -tile.index * TILE;
     const ctx = canvas.getContext("2d")!;
     ctx.setTransform(dpr, 0, 0, dpr, across ? shift * dpr : 0, across ? 0 : shift * dpr);
-    return (tile.drawn = { canvas, ctx, pats: patterns(ctx, dpr) });
+    return (tile.drawn = { canvas, ctx });
   }
 
   function lay(tile: Tile, m: Mark) {
     const d = drawnOn(tile);
-    paint(d.ctx, m, d.pats);
+    paint(d.ctx, m);
   }
 
   /** Lay what is due on each tile, nearest the reader first, within a
