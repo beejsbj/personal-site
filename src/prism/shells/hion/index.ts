@@ -93,6 +93,8 @@ function show(route: Route, first: boolean) {
   const endWithLens = () => controller.abort();
   ctx.signal.addEventListener("abort", endWithLens, { once: true });
   controller.signal.addEventListener("abort", () => ctx.signal.removeEventListener("abort", endWithLens), { once: true });
+  // Stepped in from the prism: the face already showed this screen drawn.
+  const settled = first && ctx.settled;
   const main = buildScreen(ctx.content, route);
   const fabric = fabricOf(route.kind);
   const page = h(
@@ -101,7 +103,7 @@ function show(route: Route, first: boolean) {
       class: "hion-page",
       "data-kind": route.kind,
       "data-fabric": fabric,
-      "data-state": first ? "arriving" : "entering",
+      "data-state": settled ? "here" : first ? "arriving" : "entering",
     },
     main,
     footer(ctx.content),
@@ -128,6 +130,7 @@ function show(route: Route, first: boolean) {
           section: timeline,
           signal: controller.signal,
           instant: still(),
+          settled,
           face: ctx.face,
           isIdle: ctx.isIdle,
           onIdleChange: ctx.onIdleChange,
@@ -149,6 +152,7 @@ function show(route: Route, first: boolean) {
     host: page,
     signal: controller.signal,
     instant: still(),
+    settled,
     lookahead: ctx.face ? 0 : 0.6,
     // Arrived on or travelled to, a screen grows from where the hions come
     // down (the current destination's knot on the line): none of it is
@@ -177,7 +181,8 @@ function show(route: Route, first: boolean) {
     instant: still(),
     scale: close(route.path) ? 2 : 1,
     lively: route.kind === "home",
-    travelled: true,
+    // settled: already on the screen, so no hions setting out from the line
+    travelled: !settled,
     origin: () => nav.origin(),
     seed: seedOf(route.path),
     isIdle: ctx.isIdle,
@@ -200,7 +205,7 @@ function show(route: Route, first: boolean) {
   live = { path: route.path, page, loom, skein, life, track, controller };
   // For a look from the console while developing.
   if (import.meta.env.DEV) Object.assign(window, { __hion: live });
-  requestAnimationFrame(() => {
+  const begin = () => {
     if (controller.signal.aborted) return;
     // The threads first: they are what you follow onto the screen.
     loom.start();
@@ -217,17 +222,20 @@ function show(route: Route, first: boolean) {
     };
     const woven = () => {
       if (gone()) return;
-      spinType(page, { skein, pulse, instant: still(), signal: controller.signal });
+      spinType(page, { skein, pulse, instant: still() || settled, signal: controller.signal });
       weaveCovers(page, { signal: controller.signal, fabric });
     };
-    if (still()) {
+    if (still() || settled) {
       ground();
       woven();
     } else {
       ground();
       later(controller.signal, WOVEN, woven);
     }
-  });
+  };
+  // Settled: drawn before it is first painted, so nothing is seen arriving.
+  if (settled) begin();
+  else requestAnimationFrame(begin);
   // Keyboard travel ahead of the drawing brings the drawing with it.
   page.addEventListener(
     "focusin",

@@ -13,6 +13,9 @@ export interface Env {
   content: SiteContent;
   face: boolean;
   reducedMotion: boolean;
+  /** This screen is already on screen (the first screen of a settled
+   * arrival: a prism face, or stepping in from the prism). No entrance. */
+  settled: boolean;
   signal: AbortSignal;
   /** True while this page is an off-axis prism face; JS loops should rest. */
   isIdle(): boolean;

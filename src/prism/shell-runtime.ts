@@ -76,12 +76,24 @@ if (document.documentElement.hasAttribute("data-prism-face")) {
 }
 
 const idleListeners = new Set<(idle: boolean) => void>();
-new MutationObserver(() => {
-  const idle = document.documentElement.hasAttribute("data-prism-idle");
-  idleListeners.forEach((listener) => listener(idle));
+const prismListeners = new Set<(open: boolean) => void>();
+/** The page is on its face of the open prism (Prism Exit to stepping in). */
+const inPrism = () =>
+  document.documentElement.classList.contains("prism-is-open");
+let wasInPrism = inPrism();
+new MutationObserver((records) => {
+  if (records.some((record) => record.attributeName === "data-prism-idle")) {
+    const idle = document.documentElement.hasAttribute("data-prism-idle");
+    idleListeners.forEach((listener) => listener(idle));
+  }
+  const open = inPrism();
+  if (open !== wasInPrism) {
+    wasInPrism = open;
+    prismListeners.forEach((listener) => listener(open));
+  }
 }).observe(document.documentElement, {
   attributes: true,
-  attributeFilter: ["data-prism-idle"],
+  attributeFilter: ["data-prism-idle", "class"],
 });
 
 let active:
@@ -141,17 +153,21 @@ async function mount(lens: string) {
     )
       return;
     const shell = module.default;
+    const settled = document.documentElement.hasAttribute("data-prism-settled");
     active = { lens, shell, controller, content: data };
     root.dataset.shell = lens;
     const listeners = new Set<(idle: boolean) => void>();
-    controller.signal.addEventListener("abort", () =>
-      listeners.forEach((listener) => idleListeners.delete(listener)),
-    );
+    const prismWatchers = new Set<(open: boolean) => void>();
+    controller.signal.addEventListener("abort", () => {
+      listeners.forEach((listener) => idleListeners.delete(listener));
+      prismWatchers.forEach((listener) => prismListeners.delete(listener));
+    });
     await shell.mount({
       root,
       content: data,
       route,
       face: document.documentElement.hasAttribute("data-prism-face"),
+      settled,
       reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches,
       signal: controller.signal,
       isIdle: () => document.documentElement.hasAttribute("data-prism-idle"),
@@ -161,7 +177,13 @@ async function mount(lens: string) {
         return () => {
           listeners.delete(listener);
           idleListeners.delete(listener);
-        };      },
+        };
+      },
+      inPrism,
+      onPrismChange(listener) {
+        prismWatchers.add(listener);
+        prismListeners.add(listener);
+      },
     });
     if (
       document.documentElement.dataset.lens !== lens ||
@@ -170,6 +192,7 @@ async function mount(lens: string) {
       unmount();
       return;
     }
+    if (settled) settle(root);
     document.documentElement.setAttribute("data-lens-shell", "");
     document.documentElement.setAttribute("data-shell-ready", "");
   } catch (error) {
@@ -178,6 +201,19 @@ async function mount(lens: string) {
     active = undefined;
     root.replaceChildren();
     document.documentElement.removeAttribute("data-lens-shell");
+  }
+}
+
+/** A settled arrival lands at rest: whatever entrance the first screen
+ * started on its own (any finite CSS or Web animation, or transition, in the
+ * shell) jumps to its end before it is painted. Loops keep running. Shells
+ * skip the entrances they drive from script themselves (ShellContext.settled). */
+export function settle(root: Element) {
+  for (const animation of root.getAnimations({ subtree: true })) {
+    if (animation.effect?.getComputedTiming().iterations === Infinity) continue;
+    try {
+      animation.finish();
+    } catch {}
   }
 }
 

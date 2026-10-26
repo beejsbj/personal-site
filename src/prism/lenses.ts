@@ -6,7 +6,7 @@ export interface Lens {
   name: string;
   /** Where this refraction comes from. */
   source: string;
-  /** Signature colour: the band this face contributes to the spectrum. */
+  /** Signature colour: this face's glow in the room, its dot and caption. */
   signal: string;
 }
 

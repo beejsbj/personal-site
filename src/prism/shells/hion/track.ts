@@ -36,6 +36,8 @@ interface TrackOptions {
   signal: AbortSignal;
   /** Draw everything at once and never glide (reduced motion, a face). */
   instant: boolean;
+  /** Stepped in from the prism: the face already showed it drawn. */
+  settled?: boolean;
   face: boolean;
   isIdle(): boolean;
   onIdleChange(listener: (idle: boolean) => void): () => void;
@@ -50,7 +52,7 @@ const DRIFT = 0.075;
 const SLOP = 10;
 
 export function createTrack(options: TrackOptions) {
-  const { section, signal, instant } = options;
+  const { section, signal, instant, settled } = options;
   const pin = section.querySelector<HTMLElement>(".hion-timeline__pin")!;
   const track = section.querySelector<HTMLElement>(".hion-timeline__track")!;
   const knot = track.querySelector<HTMLElement>("[data-spine='knot']");
@@ -156,6 +158,7 @@ export function createTrack(options: TrackOptions) {
     host: track,
     signal,
     instant,
+    settled,
     axis: "x",
     view,
     lookahead: options.face ? 0 : 0.6,

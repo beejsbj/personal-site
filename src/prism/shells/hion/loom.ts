@@ -95,6 +95,9 @@ interface LoomOptions {
   signal: AbortSignal;
   /** Draw everything at once (reduced motion, still face). */
   instant: boolean;
+  /** The screen is already there (stepping in from the prism): what is in
+   * view is drawn at once, then the threads keep pace with the reader. */
+  settled?: boolean;
   /** How far beyond the viewport to keep tiles, in viewports (a still
    * face never scrolls, so it keeps none). */
   lookahead?: number;
@@ -422,8 +425,9 @@ export function createLoom(options: LoomOptions) {
       observedHeight = measureLength();
       build();
       cull();
+      if (options.settled) intro = false;
       aim();
-      if (instant) {
+      if (instant || options.settled) {
         advance(target);
         fill(Infinity, true);
       } else advance(0);

@@ -79,8 +79,9 @@ function dateWidget(env: Env) {
   const month = h("span", { class: "cc-date__m" }, String(day.getUTCMonth() + 1));
   const date = h("span", { class: "cc-date__d" }, String(day.getUTCDate()));
   const weekday = h("span", { class: "cc-date__wd" }, weekdays[day.getUTCDay()]);
-  // The calendar flips forward to today once the screen lands.
-  if (!env.face) {
+  // The calendar flips forward to today once the screen lands; a screen
+  // that is already there shows the day.
+  if (!env.face && !env.settled) {
     tickUp(month, day.getUTCMonth() + 1, { delay: 420, duration: 360 });
     tickUp(date, day.getUTCDate(), { delay: 480, duration: 520 });
     tickWords(weekday, [...weekdays, ...weekdays].slice(day.getUTCDay() + 1, day.getUTCDay() + 8), weekdays[day.getUTCDay()], { delay: 480, duration: 520 });

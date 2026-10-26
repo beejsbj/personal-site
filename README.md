@@ -88,7 +88,7 @@ chapter fetches its body only when requested.
 corepack pnpm@10.6.5 check
 corepack pnpm@10.6.5 build
 corepack pnpm@10.6.5 test
-# Browser parity (set PRISM_CHROMIUM for local Chromium when needed):
+# Browser parity and the one-window round trip (set PRISM_CHROMIUM for local Chromium when needed):
 corepack pnpm@10.6.5 test:prism
 ```
 

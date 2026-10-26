@@ -78,30 +78,32 @@ const mark = (name: Parameters<typeof part>[0]) =>
   }
   /* Arrival: the greeting waves, the headline lands as its tracking settles,
      then the role, welcome and links rise in turn. CSS only; reduced motion
-     and no-JavaScript visitors simply see the resting state. */
+     and no-JavaScript visitors simply see the resting state, and so does a
+     page that is already there (data-prism-settled: a prism face, or
+     stepping in from the prism). */
   @media (prefers-reduced-motion: no-preference) {
-    .greeting {
+    :global(:root:not([data-prism-settled])) .greeting {
       transform-origin: 0 100%;
       animation: wave calc(var(--duration-settle) * 1.25) var(--ease-settle)
         backwards;
     }
-    .title {
+    :global(:root:not([data-prism-settled])) .title {
       transform-origin: 0 100%;
       animation: land var(--duration-settle) var(--ease-settle)
         calc(var(--stagger) * 2) backwards;
     }
-    .occupation,
-    .welcome,
-    .socials {
+    :global(:root:not([data-prism-settled])) .occupation,
+    :global(:root:not([data-prism-settled])) .welcome,
+    :global(:root:not([data-prism-settled])) .socials {
       animation: rise var(--duration-settle) var(--ease-settle) backwards;
     }
-    .occupation {
+    :global(:root:not([data-prism-settled])) .occupation {
       animation-delay: calc(var(--stagger) * 3);
     }
-    .welcome {
+    :global(:root:not([data-prism-settled])) .welcome {
       animation-delay: calc(var(--stagger) * 4);
     }
-    .socials {
+    :global(:root:not([data-prism-settled])) .socials {
       animation-delay: calc(var(--stagger) * 5);
     }
   }

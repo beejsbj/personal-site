@@ -68,13 +68,17 @@ const { src, alt, caption, href, ...data } = Astro.props;
   }
   @media (prefers-reduced-motion: no-preference) {
     img {
-      animation: portrait-in var(--duration-settle) var(--ease-settle)
-        var(--stagger) backwards;
       transition:
         transform var(--duration-hover) var(--ease-settle),
         translate var(--duration-hover) var(--ease-settle);
     }
-    figure::before {
+    /* Arrival only, not on a page that is already there (a prism face, or
+       stepping in from the prism). */
+    :global(:root:not([data-prism-settled])) img {
+      animation: portrait-in var(--duration-settle) var(--ease-settle)
+        var(--stagger) backwards;
+    }
+    :global(:root:not([data-prism-settled])) figure::before {
       animation: ring-breathe calc(var(--duration-settle) * 2) ease-out
         calc(var(--stagger) * 4) 2;
     }

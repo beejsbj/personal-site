@@ -14,6 +14,10 @@ const LEVEL = 0.2;
 
 let context: AudioContext | undefined;
 let master: GainNode | undefined;
+/** Between master and the speakers: closed while the page is on a face of
+ * the prism, so the session plays on, unheard. */
+let hushGain: GainNode | undefined;
+let hushed = false;
 let noise: AudioBuffer | undefined;
 let playBus: GainNode | undefined;
 let auditionBus: GainNode | undefined;
@@ -42,6 +46,18 @@ export function onSound(fn: (on: boolean) => void, signal: AbortSignal) {
   signal.addEventListener("abort", () => listeners.delete(fn));
 }
 
+/** Hush everything without stopping it: notes keep being scheduled on time
+ * and play on silently, so opening up again neither restarts nor re-strikes
+ * anything; whatever is sounding at that moment is simply heard again. */
+export function hush(on: boolean) {
+  hushed = on;
+  if (!context || !hushGain) return;
+  const t = context.currentTime;
+  hushGain.gain.cancelScheduledValues(t);
+  hushGain.gain.setValueAtTime(hushGain.gain.value, t);
+  hushGain.gain.linearRampToValueAtTime(on ? 0 : 1, t + (on ? 0.08 : 0.15));
+}
+
 /** A prism face never makes a sound. */
 export function forbidSound() {
   allowed = false;
@@ -64,7 +80,9 @@ function build() {
   limit.ratio.value = 6;
   limit.attack.value = 0.003;
   limit.release.value = 0.25;
-  master.connect(tone).connect(limit).connect(context.destination);
+  hushGain = context.createGain();
+  hushGain.gain.value = hushed ? 0 : 1;
+  master.connect(hushGain).connect(tone).connect(limit).connect(context.destination);
   noise = context.createBuffer(1, context.sampleRate * 0.25, context.sampleRate);
   const data = noise.getChannelData(0);
   for (let i = 0; i < data.length; i += 1) data[i] = Math.random() * 2 - 1;
@@ -311,4 +329,5 @@ export function closeSound() {
   void context?.close();
   context = undefined;
   master = undefined;
+  hushGain = undefined;
 }

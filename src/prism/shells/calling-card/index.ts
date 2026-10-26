@@ -46,18 +46,20 @@ let queue: Promise<void> = Promise.resolve();
 let pendingTitle: string | undefined;
 let currentPath: string | undefined;
 
-function build(route: Route) {
+/** `settled`: the screen is already on screen (the first screen of a
+ * settled arrival), so it lands without its entrance. */
+function build(route: Route, settled = false) {
   screenController?.abort();
   screen?.destroy?.();
   screenController = new AbortController();
   const signal = AbortSignal.any
     ? AbortSignal.any([ctx!.signal, screenController.signal])
     : ctx!.signal;
-  const next = FACTORIES[route.kind](route, { ...env!, signal });
+  const next = FACTORIES[route.kind](route, { ...env!, signal, settled });
   currentPath = route.path;
   rememberCommand(route.kind);
   stage.replaceChildren(next.el);
-  next.el.dataset.enter = ctx!.reducedMotion ? "calm" : "in";
+  next.el.dataset.enter = ctx!.reducedMotion || settled ? "calm" : "in";
   screen = next;
   return next;
 }
@@ -179,6 +181,7 @@ const shell: LensShell = {
       content: context.content,
       face: context.face,
       reducedMotion: context.reducedMotion,
+      settled: false,
       signal,
       isIdle: () => context.isIdle(),
       open: openPanel,
@@ -200,7 +203,7 @@ const shell: LensShell = {
     );
     root.replaceChildren(skip, stage, panelHost);
     wipe = createWipe(root, context.reducedMotion);
-    build(context.route);
+    build(context.route, context.settled);
     root.addEventListener("click", onClick, { signal });
     // Which hand is on the controller: touch screens get the tap-again cue.
     root.dataset.input = matchMedia("(hover: none)").matches ? "touch" : "mouse";
