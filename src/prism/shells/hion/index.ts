@@ -12,18 +12,26 @@
  * other in two curls. Headings are strung on woven wefts, lists dangle like
  * charms, pictures hang wound at their corners, links are pull-cords.
  *
- * As you scroll, the two draw themselves just ahead of you, a bead of light
- * at each tip: reading is following them. Leaving a screen reels the
- * drawing back up toward the line it came from, and the next screen's
- * threads come down from the new place. */
+ * As you scroll, the two draw themselves just ahead of you, each tip hot
+ * with its own light: reading is following them. Leaving a screen reels
+ * the drawing back up toward the line it came from, and the next screen's
+ * threads grow down from the new place. Every thread on the screen is
+ * the one thread, of the one width (pastel.ts THREAD). */
+import { kindOf } from "../../routes";
 import type { LensShell, Route, ShellContext } from "../types";
-import { h, setNewTabNote, wait } from "./dom";
+import { h, setNewTabNote, still as showStill, wait } from "./dom";
 import { ink } from "./ink";
+import { fabricOf } from "./fabric";
 import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
+import { createPulse } from "./pulse";
+import { createSkein, seedOf, threadMaterial } from "./skein";
+import { spinNav, spinType } from "./spun";
+import { weaveCovers } from "./woven";
 import { buildScreen, footer } from "./screens";
+import { ACROSS, createTrack } from "./track";
 import { compose } from "./weave";
 import "./shell.css";
 
@@ -31,8 +39,13 @@ interface Live {
   path: string;
   page: HTMLElement;
   loom: ReturnType<typeof createLoom>;
+  skein: ReturnType<typeof createSkein>;
   life: ReturnType<typeof createLife> | undefined;
+  /** The resume's timeline, when it runs across. */
+  track: ReturnType<typeof createTrack> | undefined;
   controller: AbortController;
+  /** When it began to leave (performance.now()), once it has. */
+  left?: number;
 }
 
 let ctx: ShellContext;
@@ -40,7 +53,10 @@ let world: HTMLElement;
 let stage: HTMLElement;
 let nav: Nav;
 let live: Live | undefined;
-let token = 0;
+
+/** How long after a travelled-to screen arrives its woven things are
+ * made (the threads are growing; the main thread should have room). */
+const WOVEN = 270;
 
 const still = () => ctx.reducedMotion || ctx.face;
 
@@ -59,22 +75,41 @@ function cssTextures() {
   ).then((entries) => Object.fromEntries(entries)));
 }
 
+/** Run when the main thread has room (soon regardless), unless aborted. */
+function later(signal: AbortSignal, delay: number, run: () => void) {
+  const go = () => {
+    if (!signal.aborted) run();
+  };
+  const timer = window.setTimeout(() => {
+    if ("requestIdleCallback" in window) requestIdleCallback(go, { timeout: 500 });
+    else go();
+  }, delay);
+  signal.addEventListener("abort", () => clearTimeout(timer), { once: true });
+}
+
 function show(route: Route, first: boolean) {
   const controller = new AbortController();
-  ctx.signal.addEventListener("abort", () => controller.abort(), { once: true });
+  // The screen ends with the lens, and lets go of the lens when it ends first.
+  const endWithLens = () => controller.abort();
+  ctx.signal.addEventListener("abort", endWithLens, { once: true });
+  controller.signal.addEventListener("abort", () => ctx.signal.removeEventListener("abort", endWithLens), { once: true });
   // Stepped in from the prism: the face already showed this screen drawn.
   const settled = first && ctx.settled;
   const main = buildScreen(ctx.content, route);
+  const fabric = fabricOf(route.kind);
   const page = h(
     "div",
     {
       class: "hion-page",
       "data-kind": route.kind,
+      "data-fabric": fabric,
       "data-state": settled ? "here" : first ? "arriving" : "entering",
     },
     main,
     footer(ctx.content),
   );
+  // The screen you left reeled up while the router fetched this one; now
+  // this one's threads grow from the line.
   stage.replaceChildren(page);
   nav.setCurrent(route.path);
   // Which side the threads drop on, so the screen's head keeps clear of them.
@@ -85,20 +120,73 @@ function show(route: Route, first: boolean) {
     page.dataset.drop =
       drop[0] < width * 0.4 ? "left" : drop[0] > width * 0.6 ? "right" : "center";
   }
+  // The resume's timeline runs across, on a track that draws its own
+  // threads; laid again if the window crosses over (too short for it).
+  const timeline = page.querySelector<HTMLElement>("[data-timeline]");
+  const across = timeline ? matchMedia(ACROSS) : undefined;
+  const track =
+    timeline && across?.matches
+      ? createTrack({
+          section: timeline,
+          signal: controller.signal,
+          instant: still(),
+          face: ctx.face,
+          isIdle: ctx.isIdle,
+          onIdleChange: ctx.onIdleChange,
+        })
+      : undefined;
+  across?.addEventListener(
+    "change",
+    () => {
+      if (live?.page !== page || live.left !== undefined) return;
+      controller.abort();
+      show(route, true);
+    },
+    { signal: controller.signal },
+  );
+  // One frame loop for everything that moves on this screen.
+  const pulse = createPulse({ signal: controller.signal, isIdle: ctx.isIdle, onIdleChange: ctx.onIdleChange });
+  let drew = () => {};
   const loom = createLoom({
     host: page,
     signal: controller.signal,
     instant: still(),
     settled,
     lookahead: ctx.face ? 0 : 0.6,
+    // Arrived on or travelled to, a screen grows from where the hions come
+    // down (the current destination's knot on the line): none of it is
+    // ready-made.
+    brisk: true,
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
+    pulse,
+    // The hions are the skein's: bodies and heads.
+    beads: false,
+    onDraw: () => drew(),
     compose: () => {
-      const composition = compose(page, () => nav.origin());
+      const composition = compose(page, () => nav.origin(), { heads: true });
       ink(page);
       return composition;
     },
   });
+  // Every thread as one system (skein.ts): the hions, the ground under
+  // them, threads from a click or a touched thread, loops round what you
+  // hover. A single thing is seen close up; home is the busiest.
+  const skein = createSkein({
+    page,
+    loom,
+    pulse,
+    signal: controller.signal,
+    instant: still(),
+    scale: close(route.path) ? 2 : 1,
+    lively: route.kind === "home",
+    // settled: already on the screen, so no hions setting out from the line
+    travelled: !settled,
+    origin: () => nav.origin(),
+    seed: seedOf(route.path),
+    isIdle: ctx.isIdle,
+  });
+
   // What moves over the drawing, for a visitor who can see it move.
   const life = still()
     ? undefined
@@ -106,15 +194,43 @@ function show(route: Route, first: boolean) {
         world,
         page,
         loom,
+        skein,
+        pulse,
         signal: controller.signal,
         isIdle: ctx.isIdle,
         onIdleChange: ctx.onIdleChange,
       });
-  live = { path: route.path, page, loom, life, controller };
+  drew = () => (life ? life.wake() : skein.wake());
+  live = { path: route.path, page, loom, skein, life, track, controller };
+  // For a look from the console while developing.
+  if (import.meta.env.DEV) Object.assign(window, { __hion: live });
   const begin = () => {
+    if (controller.signal.aborted) return;
+    // The threads first: they are what you follow onto the screen.
     loom.start();
+    track?.start();
     life?.start();
     page.dataset.state = "here";
+    // Then every thread (the skein), at once: on a screen travelled to the
+    // hions are seen setting out from the line. The spun words and the
+    // woven covers come a moment later, once the main thread has room:
+    // none of it is needed to read the screen.
+    const gone = () => live?.page !== page || live.left !== undefined;
+    const ground = () => {
+      if (!gone()) skein.start();
+    };
+    const woven = () => {
+      if (gone()) return;
+      spinType(page, { skein, pulse, instant: still() || settled, signal: controller.signal });
+      weaveCovers(page, { signal: controller.signal, fabric });
+    };
+    if (still() || settled) {
+      ground();
+      woven();
+    } else {
+      ground();
+      later(controller.signal, WOVEN, woven);
+    }
   };
   // Settled: drawn before it is first painted, so nothing is seen arriving.
   if (settled) begin();
@@ -130,6 +246,47 @@ function show(route: Route, first: boolean) {
     { signal: controller.signal },
   );
   if (!first && !ctx.face) main.focus({ preventScroll: true });
+}
+
+/** The screen you are on lets go: its drawing reels back up toward the
+ * line and its threads go. Begun at the click; the next screen need not
+ * be here yet, and it replaces this one whole when it comes. */
+function leave(path: string) {
+  const leaving = live;
+  if (!leaving || leaving.left !== undefined) return;
+  leaving.left = performance.now();
+  nav.close();
+  if (still()) return;
+  // What has to be measured first, then what moves: one layout, not one
+  // per step, in the frame you clicked.
+  leaving.loom.release();
+  leaving.track?.release();
+  leaving.skein.release(closer(leaving.page, path));
+  leaving.life?.release();
+  nav.setCurrent(path);
+  leaving.page.dataset.state = "leaving";
+  leaving.page.setAttribute("inert", "");
+}
+
+/** A single thing seen close: a project, a lab entry, a post. */
+const close = (path: string) => {
+  const { kind } = kindOf(path);
+  return kind === "project" || kind === "lab-entry" || kind === "writing-entry";
+};
+
+/** The link you followed, when it opens one thing out of a cloth of many
+ * (a project or a post from a list): the threads magnify round it on the way. */
+let followed: { el: HTMLAnchorElement; at: number } | undefined;
+
+function closer(page: HTMLElement, path: string): [number, number] | undefined {
+  if (!close(path)) return undefined;
+  if (!followed || performance.now() - followed.at > 2000 || !page.contains(followed.el)) return undefined;
+  if (new URL(followed.el.href, location.href).pathname.replace(/\/$/, "") !== path.replace(/\/$/, "")) {
+    return undefined;
+  }
+  const p = page.getBoundingClientRect();
+  const r = followed.el.getBoundingClientRect();
+  return [(r.left + r.right) / 2 - p.left, (r.top + r.bottom) / 2 - p.top];
 }
 
 const shell: LensShell = {
@@ -163,26 +320,63 @@ const shell: LensShell = {
     for (const [key, url] of Object.entries(urls)) {
       world.style.setProperty(`--hion-tooth-${key}`, `url("${url}")`);
     }
+    world.addEventListener(
+      "click",
+      (event) => {
+        const el = (event.target as Element).closest?.("a");
+        if (el) followed = { el, at: performance.now() };
+      },
+      { capture: true, signal },
+    );
+    // A destination pulled: the screen lets go at once, while the router
+    // fetches the page (update() follows).
+    document.addEventListener(
+      "astro:before-preparation",
+      (event) => {
+        const to = (event as Event & { to?: URL }).to;
+        if (!to || to.origin !== location.origin) return;
+        const path = to.pathname.replace(/\/+$/, "") || "/";
+        if (live && path !== live.path) leave(path);
+      },
+      { signal },
+    );
+    // Hion moves between screens its own way. The router's view transition
+    // would first hold the page still to photograph it (hundreds of
+    // milliseconds on a page of canvases), for a crossfade prism.css turns
+    // off anyway: skip it while Hion is here.
+    const native = document.startViewTransition;
+    if (native) {
+      document.startViewTransition = function (this: Document, ...args: Parameters<typeof native>) {
+        const transition = native.apply(this, args);
+        // A skipped transition rejects `ready`, which nobody else awaits:
+        // left alone it is an uncaught "Transition was skipped" every time.
+        transition.ready.catch(() => {});
+        transition.skipTransition();
+        return transition;
+      } as typeof native;
+      signal.addEventListener("abort", () => Reflect.deleteProperty(document, "startViewTransition"), { once: true });
+    }
     root.replaceChildren(world);
+    // The line is drawn once: shown as a still (dom.ts).
+    for (const canvas of world.querySelectorAll<HTMLCanvasElement>(".hion-nav canvas")) showStill(canvas);
     // Let the faces arrive before measuring words to hang them.
     await Promise.race([document.fonts?.ready, wait(600)]);
     show(context.route, true);
+    // The names on the line are written once, by threads of their own
+    // frame loop (the line outlives every screen).
+    if (live) {
+      const pulse = createPulse({ signal, isIdle: context.isIdle, onIdleChange: context.onIdleChange });
+      spinNav(nav.el, { skein: { material: threadMaterial }, pulse, instant: still(), signal });
+    }
     signal.addEventListener("abort", () => live?.controller.abort());
   },
 
   async update(route) {
-    if (live && route.path === live.path && !route.refresh) return;
-    const mine = ++token;
+    // A screen that already let go (leave) is brought back, even for the same path.
+    if (live && route.path === live.path && !route.refresh && live.left === undefined) return;
     const leaving = live;
-    nav.close();
-    if (leaving && !still()) {
-      leaving.page.dataset.state = "leaving";
-      leaving.page.setAttribute("inert", "");
-      leaving.loom.release();
-      leaving.life?.release();
-      await wait(430);
-      if (mine !== token) return;
-    }
+    // Usually already begun, at the click.
+    leave(route.path);
     leaving?.controller.abort();
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
     show(route, false);
