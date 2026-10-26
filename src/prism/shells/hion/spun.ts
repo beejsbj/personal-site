@@ -95,6 +95,10 @@ interface SpunOptions {
   signal: AbortSignal;
 }
 
+/** What a heading on a canvas of its own needs: the material and the
+ * frame loop, not a screen's skein (the nav outlives every screen). */
+export type LocalOptions = Omit<SpunOptions, "skein"> & { skein: Pick<Spinner, "material"> };
+
 /** What is written by thread: every heading on a screen, and the titles
  * of updates (set as paragraphs). Kept in step with shell.css. */
 export const WRITTEN = "h1, h2, h3, h4, h5, h6, .hion-tied__title";
@@ -735,7 +739,7 @@ function strandBeside(el: HTMLElement, y: number): Pt | null {
  * in its hue. Once, when the shell mounts (the line stays from screen to
  * screen); at once on a still screen. A name the face cannot write keeps
  * its chalk. */
-export function spinNav(nav: HTMLElement, options: SpunOptions) {
+export function spinNav(nav: HTMLElement, options: LocalOptions) {
   const labels = [...nav.querySelectorAll<HTMLElement>(".hion-charm__label, .hion-pull__label")];
   if (!labels.length) return;
   const { signal } = options;
@@ -786,7 +790,7 @@ export function spinNav(nav: HTMLElement, options: SpunOptions) {
  * canvas of its own, with the skein's material and a head of its own (on
  * the screen's one frame loop), then let it lie cold. Written again,
  * settled, if the heading is laid out anew. */
-function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = options.instant, from?: Pt, delay = 0, given?: Read) {
+function writeLocal(el: HTMLElement, hue: Hue, options: LocalOptions, settled = options.instant, from?: Pt, delay = 0, given?: Read) {
   const { signal } = options;
   const material = options.skein.material();
   // Where it rests, not where a swing has it (dom.ts `measured`): every

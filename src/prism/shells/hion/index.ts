@@ -27,7 +27,7 @@ import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
 import { createPulse } from "./pulse";
-import { createSkein, seedOf } from "./skein";
+import { createSkein, seedOf, threadMaterial } from "./skein";
 import { spinNav, spinType } from "./spun";
 import { weaveCovers } from "./woven";
 import { buildScreen, footer } from "./screens";
@@ -359,7 +359,7 @@ const shell: LensShell = {
     // frame loop (the line outlives every screen).
     if (live) {
       const pulse = createPulse({ signal, isIdle: context.isIdle, onIdleChange: context.onIdleChange });
-      spinNav(nav.el, { skein: live.skein, pulse, instant: still(), signal });
+      spinNav(nav.el, { skein: { material: threadMaterial }, pulse, instant: still(), signal });
     }
     signal.addEventListener("abort", () => live?.controller.abort());
   },

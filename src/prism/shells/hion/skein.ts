@@ -325,6 +325,66 @@ function cubicWay(p0: Pt, p1: Pt, p2: Pt, p3: Pt, n: number): Pt[] {
 
 const meets = (a: Box, b: Box) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
 
+/** How a heading is written: at a hand's pace for letters its size (a
+ * few capitals a second, so larger letters go faster), every heading in
+ * one to three seconds and every label in under two; the warm run
+ * behind the head about a capital long. */
+export function writing(spun: Spun, total: number) {
+  // A label (small, and there are many) is a quick hand: a screen is not
+  // left half written.
+  const small = spun.size < 30;
+  const time = Math.max(small ? 0.6 : 1.1, Math.min(small ? 1.6 : 3, total / (spun.size * (small ? 16 : 11))));
+  return { speed: total / time, tail: Math.max(22, Math.min(70, spun.size * 1.1)) };
+}
+
+/** The colour of a thread at a strength, over black paper: the hue
+ * dimmed, not made see-through, so pieces of one thread meet without a
+ * seam and nothing shows through. */
+function tone(hue: Hue, strength: number, pale = 0) {
+  const [r, g, b] = RGB[hue];
+  const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
+  const k = Math.max(0, Math.min(1, strength));
+  return `rgb(${((r + (lr - r) * pale) * k) | 0} ${((g + (lg - g) * pale) * k) | 0} ${((b + (lb - b) * pale) * k) | 0})`;
+}
+
+/** One run of thread, the one way every thread is drawn: one smooth
+ * line of the hue at the thread's strength, flat light, no glow and no
+ * taper (a thread is as strong at its ends as along it). `pts` are x,y
+ * pairs. `erase` instead takes that fraction of the run off the paper,
+ * along the same line (a fade step that repaints nothing else). */
+function strokeRun(ctx: CanvasRenderingContext2D, hue: Hue, w: number, pts: number[], base: number, erase?: number) {
+  const n = pts.length / 2;
+  if (n < 2 || base <= 0) return;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.moveTo(pts[0], pts[1]);
+  for (let k = 1; k < n; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
+  if (erase !== undefined) {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.strokeStyle = "#000";
+    ctx.globalAlpha = erase;
+    ctx.lineWidth = w + 1.2;
+    ctx.stroke();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = 1;
+    return;
+  }
+  ctx.strokeStyle = tone(hue, base);
+  ctx.lineWidth = w;
+  ctx.stroke();
+}
+
+/** The one material, lent to a heading written on a canvas of its own
+ * (spun.ts: inside something that slides over the page). Pure: it holds
+ * no screen, so the nav can keep it for the life of the lens. */
+export function threadMaterial(): Material {
+  return {
+    run: strokeRun,
+    pace: (spun, total) => ({ w: THREAD, ...writing(spun, total) }),
+  };
+}
+
 export function createSkein(options: SkeinOptions) {
   const { page, loom, signal, instant } = options;
   const scale = options.scale ?? 1;
@@ -1068,18 +1128,6 @@ export function createSkein(options: SkeinOptions) {
     return best;
   }
 
-  /** How a heading is written: at a hand's pace for letters its size (a
-   * few capitals a second, so larger letters go faster), every heading in
-   * one to three seconds and every label in under two; the warm run
-   * behind the head about a capital long. */
-  function writing(spun: Spun, total: number) {
-    // A label (small, and there are many) is a quick hand: a screen is not
-    // left half written.
-    const small = spun.size < 30;
-    const time = Math.max(small ? 0.6 : 1.1, Math.min(small ? 1.6 : 3, total / (spun.size * (small ? 16 : 11))));
-    return { speed: total / time, tail: Math.max(22, Math.min(70, spun.size * 1.1)) };
-  }
-
   /** How fast a heading's head goes at each point of its way, as a share
    * of its speed: a hand slows into the turns of the letters and runs on
    * along the line between them, and eases out at the start and in at the
@@ -1137,44 +1185,6 @@ export function createSkein(options: SkeinOptions) {
   }
 
   /* ---------- The thread itself ---------- */
-
-  /** The colour of a thread at a strength, over black paper: the hue
-   * dimmed, not made see-through, so pieces of one thread meet without a
-   * seam and nothing shows through. */
-  function tone(hue: Hue, strength: number, pale = 0) {
-    const [r, g, b] = RGB[hue];
-    const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
-    const k = Math.max(0, Math.min(1, strength));
-    return `rgb(${((r + (lr - r) * pale) * k) | 0} ${((g + (lg - g) * pale) * k) | 0} ${((b + (lb - b) * pale) * k) | 0})`;
-  }
-
-  /** One run of thread, the one way every thread is drawn: one smooth
-   * line of the hue at the thread's strength, flat light, no glow and no
-   * taper (a thread is as strong at its ends as along it). `pts` are x,y
-   * pairs. `erase` instead takes that fraction of the run off the paper,
-   * along the same line (a fade step that repaints nothing else). */
-  function strokeRun(ctx: CanvasRenderingContext2D, hue: Hue, w: number, pts: number[], base: number, erase?: number) {
-    const n = pts.length / 2;
-    if (n < 2 || base <= 0) return;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.beginPath();
-    ctx.moveTo(pts[0], pts[1]);
-    for (let k = 1; k < n; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
-    if (erase !== undefined) {
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.strokeStyle = "#000";
-      ctx.globalAlpha = erase;
-      ctx.lineWidth = w + 1.2;
-      ctx.stroke();
-      ctx.globalCompositeOperation = "source-over";
-      ctx.globalAlpha = 1;
-      return;
-    }
-    ctx.strokeStyle = tone(hue, base);
-    ctx.lineWidth = w;
-    ctx.stroke();
-  }
 
   /** Lay segments [i0, i1) of a strand's body on a context, settled.
    * With `clip` (a pane's box), segments wholly outside it are skipped:
@@ -2676,14 +2686,7 @@ export function createSkein(options: SkeinOptions) {
       if (instant) whole(st);
       task.wake();
     },
-    /** The one material, lent to a heading written on a canvas of its own
-     * (spun.ts: inside something that slides over the page). */
-    material(): Material {
-      return {
-        run: strokeRun,
-        pace: (spun, total) => ({ w: THREAD, ...writing(spun, total) }),
-      };
-    },
+    material: threadMaterial,
     /** The loom drew on: the hions' heads follow. */
     wake: () => task.wake(),
     /** For a check: the threads themselves. */
