@@ -36,7 +36,7 @@ interface LifeOptions {
   pulse: Pulse;
   signal: AbortSignal;
   isIdle(): boolean;
-  onIdleChange(listener: (idle: boolean) => void): void;
+  onIdleChange(listener: (idle: boolean) => void): () => void;
 }
 
 /** What hangs and swings with a scroll (shell.css reads --hion-sway). */
@@ -423,13 +423,14 @@ export function createLife(options: LifeOptions) {
 
   // The glints hold still while the prism holds the page (prism.css stops
   // CSS animations; these are the shell's own).
-  options.onIdleChange((idle) => {
+  const unlisten = options.onIdleChange((idle) => {
     for (const g of glints) {
       if (idle || !g.shown) g.ride.pause();
       else g.ride.play();
     }
     if (!idle) wake();
   });
+  signal.addEventListener("abort", unlisten, { once: true });
 
   // Left alone, the threads amuse themselves. Rarely.
   const eggs = window.setInterval(() => {

@@ -89,7 +89,10 @@ function later(signal: AbortSignal, delay: number, run: () => void) {
 
 function show(route: Route, first: boolean) {
   const controller = new AbortController();
-  ctx.signal.addEventListener("abort", () => controller.abort(), { once: true });
+  // The screen ends with the lens, and lets go of the lens when it ends first.
+  const endWithLens = () => controller.abort();
+  ctx.signal.addEventListener("abort", endWithLens, { once: true });
+  controller.signal.addEventListener("abort", () => ctx.signal.removeEventListener("abort", endWithLens), { once: true });
   const main = buildScreen(ctx.content, route);
   const fabric = fabricOf(route.kind);
   const page = h(

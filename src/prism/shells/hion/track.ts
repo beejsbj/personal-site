@@ -38,7 +38,7 @@ interface TrackOptions {
   instant: boolean;
   face: boolean;
   isIdle(): boolean;
-  onIdleChange(listener: (idle: boolean) => void): void;
+  onIdleChange(listener: (idle: boolean) => void): () => void;
 }
 
 /** How tall a role may stand in the pin, as a share of its height. */

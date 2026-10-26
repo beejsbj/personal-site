@@ -31,7 +31,7 @@ interface Entry {
 export function createPulse(options: {
   signal: AbortSignal;
   isIdle(): boolean;
-  onIdleChange(listener: (idle: boolean) => void): void;
+  onIdleChange(listener: (idle: boolean) => void): () => void;
 }): Pulse {
   const { signal } = options;
   const entries: Entry[] = [];
@@ -85,7 +85,7 @@ export function createPulse(options: {
     schedule();
   }
 
-  options.onIdleChange((idle) => {
+  const unlisten = options.onIdleChange((idle) => {
     if (!idle) request();
   });
   document.addEventListener("visibilitychange", () => request(), { signal });
@@ -93,6 +93,7 @@ export function createPulse(options: {
     cancelAnimationFrame(frame);
     clearTimeout(timer);
     frame = timer = 0;
+    unlisten();
   });
 
   return {

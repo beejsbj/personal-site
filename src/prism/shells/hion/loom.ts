@@ -107,7 +107,7 @@ interface LoomOptions {
   /** Reading across: what of the track is in sight. */
   view?: () => View;
   isIdle(): boolean;
-  onIdleChange(listener: (idle: boolean) => void): void;
+  onIdleChange(listener: (idle: boolean) => void): () => void;
   compose(): Composition;
   /** The screen's frame loop (a track without one makes its own). */
   pulse?: Pulse;
