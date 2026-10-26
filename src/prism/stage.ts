@@ -135,14 +135,8 @@ export function createPrism(): Prism {
       frames.map(
         (frame) =>
           new Promise((resolve) => {
-            frame.addEventListener(
-              "load",
-              (event) => {
-                setIdle(frame, true);
-                resolve(event);
-              },
-              { once: true },
-            );
+            // Faces boot idle (LensBoot), so they hold still while loading.
+            frame.addEventListener("load", resolve, { once: true });
             setTimeout(resolve, 4000);
           }),
       ),
