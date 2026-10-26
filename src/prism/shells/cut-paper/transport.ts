@@ -50,6 +50,12 @@ export class Transport {
   private anchorT = 0;
   private cursor = 0;
   private lastFrame = 0;
+  /** When the tab was last hidden: a stall across it is a hidden tab, not
+   * slow frames. */
+  private hiddenAt = -Infinity;
+  private readonly onVisibility = () => {
+    if (document.hidden) this.hiddenAt = performance.now();
+  };
   private returnTo: number | undefined;
   /** Paused or scrubbed: play carries on from here rather than the top. */
   private resumable = false;
@@ -63,6 +69,7 @@ export class Transport {
   constructor(readonly session: Session) {
     this.t = session.now;
     this.region = { from: session.from, to: session.end };
+    document.addEventListener("visibilitychange", this.onVisibility);
   }
 
   audible(track: TrackId) {
@@ -218,6 +225,7 @@ export class Transport {
   }
 
   destroy() {
+    document.removeEventListener("visibilitychange", this.onVisibility);
     this.halt();
     this.heads.clear();
     this.watched.clear();
@@ -277,18 +285,22 @@ export class Transport {
       // one clock: the anchor is performance.now(), so time is read from it
       // too (a frame's own timestamp can run on a different base)
       const time = performance.now();
-      // after a stall (a hidden tab) carry on from where the playhead was,
-      // dropping what was scheduled, rather than catching up in a burst
-      if (time - this.lastFrame > 400) {
+      const stalled = time - this.lastFrame > 400;
+      // after a hidden tab, carry on from where the playhead was, dropping
+      // what was scheduled
+      if (stalled && this.hiddenAt >= this.lastFrame) {
         stopPlayback();
         this.anchorT = this.t;
         this.anchorTime = time;
-        this.cursor = this.t;
       }
       this.lastFrame = time;
       const { to } = this.region;
       const t = Math.min(this.anchorT + (time - this.anchorTime) / 1000 / YEAR_SECONDS, to);
       this.t = t;
+      // after any stall (a hidden tab, or slow frames, say a phone carrying
+      // the prism), what it passed over is dropped rather than caught up in
+      // a burst; on slow frames the playhead keeps time
+      if (stalled) this.cursor = Math.max(this.cursor, t);
       const final = to >= this.session.end - 1e-9;
       const until = Math.min(t + AHEAD, to + (final ? 1e-6 : 0));
       if (soundLive() && until > this.cursor) {
