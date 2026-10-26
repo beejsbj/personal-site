@@ -222,6 +222,9 @@ export function createPrism(): Prism {
 
     await loaded;
     await shellsReady(frames);
+    // Torn down while the faces loaded (a navigation, a lens change): leave
+    // the page as it is, not held and inert under a prism that is gone.
+    if (stage !== root) return;
 
     const layout = () => {
       geometry = measure();
