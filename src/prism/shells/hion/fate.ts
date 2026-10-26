@@ -1,6 +1,6 @@
 /** Fate: how a thread of intent finds its way across a page.
  *
- * Pure geometry, no DOM: threads.ts lays the page in and paints what grows.
+ * Pure geometry, no DOM: skein.ts lays the page in and paints what grows.
  *
  * A thread grows only from its head. It holds a heading with a slight bow
  * (the tension of a taut thread), and only at a moment of decision turns:
