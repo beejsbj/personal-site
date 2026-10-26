@@ -2452,8 +2452,8 @@ export function createSkein(options: SkeinOptions) {
   /* ---------- Arriving, and a new layout ---------- */
 
   /** Grow every thread the drawing has reached to its end, out of sight, a
-   * few milliseconds at a time and never while the prism holds the page
-   * still; then show them. A screen already showing keeps its threads until
+   * few milliseconds at a time and, for a moving screen, never while the
+   * prism holds the page still; then show them. A screen already showing keeps its threads until
    * the new ones are ready (a picture loading changes the page's height). */
   let settling = 0;
   let settleTimer = 0;
@@ -2463,7 +2463,9 @@ export function createSkein(options: SkeinOptions) {
     if (!tiles.size) layer.dataset.state = "settling";
     const slice = () => {
       if (mine !== settling || signal.aborted) return;
-      if (options.isIdle()) {
+      // A still screen settles once and then lies still: that is not an
+      // animation, so a face held idle by the prism still gets its headings.
+      if (options.isIdle() && !instant) {
         settleTimer = window.setTimeout(slice, 250);
         return;
       }
