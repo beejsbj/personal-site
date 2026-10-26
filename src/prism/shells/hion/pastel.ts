@@ -1,14 +1,10 @@
-/** The medium: chalk pastel on black paper.
+/** The medium: threads of light on black paper.
  *
- * Nothing here is a vector line with a glow filter. Every thread is laid
- * down the way a pastel stick lays it: as a run of short, overlapping marks,
- * each made of a few fibres of pigment with its own pressure, trimmed and
- * tapered at the ends, caught by the tooth of the paper (a grain texture in
- * page space, generated once). The light a thread gives off is its pigment
- * dust, scattered beside it, and a soft bloom drawn at quarter resolution
- * and blurred once, when the mark is laid. Marks are plain data; the same
- * seed always draws the same mark, so a canvas can be thrown away and
- * redrawn identically. */
+ * Every thread is laid down as a run of short, overlapping marks, each one
+ * smooth line of its hue (no grain: the colour is the thread): flat light,
+ * no glow. The paper's tooth remains for the words (CSS). Marks are plain
+ * data; the same seed always draws the same mark, so a canvas can be
+ * thrown away and redrawn identically. */
 
 export type Hue = "c" | "m";
 type Tone = Hue | "cl" | "ml" | "k";
@@ -23,7 +19,11 @@ export const RGB: Record<Tone, [number, number, number]> = {
 };
 export const css = (tone: Tone, alpha = 1) =>
   `rgba(${RGB[tone].join(",")},${alpha})`;
-const SOLID = { c: css("c"), m: css("m") };
+
+/** The one width of every thread on a Hion screen (css px): the hions,
+ * the ground, what hangs from them, the line at the top, a hover loop.
+ * Brightness differs by kind; width never. */
+export const THREAD = 3;
 
 export function rng(seed: number) {
   let s = (Math.abs(Math.floor(seed * 9301 + 49297)) % 2147483646) + 1;
@@ -82,26 +82,10 @@ export function tooth() {
   });
 }
 
-export type Patterns = Record<Tone, CanvasPattern>;
-
-/** Tooth patterns for one context, one texel per device pixel, anchored to
- * the context's user-space origin (page space for the loom). */
-export function patterns(ctx: CanvasRenderingContext2D, dpr: number) {
-  const t = tooth();
-  const out = {} as Patterns;
-  for (const key of Object.keys(t) as Tone[]) {
-    const pattern = ctx.createPattern(t[key], "repeat")!;
-    pattern.setTransform(new DOMMatrix().scale(1 / dpr));
-    out[key] = pattern;
-  }
-  return out;
-}
-
 /* ---------- Marks ---------- */
 
 export const enum Kind {
   Stroke,
-  Glow,
   Erase,
 }
 
@@ -110,14 +94,15 @@ export interface Mark {
   key: number;
   kind: Kind;
   hue: Hue;
-  /** Width of the mark (fibre spread, glow width, eraser width). */
+  /** Width of the mark (line width, eraser width). */
   w: number;
   a: number;
   /** x,y pairs. */
   pts: number[];
   seed: number;
   core: boolean;
-  /** Bounding box, padded for dust and glow. */
+  /** Extent along the way the drawing reads (page y; x across a track),
+   * padded by its width. */
   y0: number;
   y1: number;
 }
@@ -142,9 +127,9 @@ export function mark(
   key?: number,
   core = true,
 ): Mark {
-  // Short strokes get enough points to taper and trim.
+  // Short strokes get enough points to bend smoothly.
   if (kind === Kind.Stroke && pts.length < 16) pts = densify(pts, 8);
-  const pad = kind === Kind.Glow ? w * 2 + 24 : w + 18;
+  const pad = w + 18;
   const box = bounds(pts, pad);
   return {
     key: key ?? box.y0 + pad,
@@ -159,26 +144,35 @@ export function mark(
   };
 }
 
-function normals(pts: number[]) {
-  const n = pts.length / 2;
-  const out = new Float32Array(pts.length);
-  for (let i = 0; i < n; i++) {
-    const a = Math.max(0, i - 1);
-    const b = Math.min(n - 1, i + 1);
-    const dx = pts[b * 2] - pts[a * 2];
-    const dy = pts[b * 2 + 1] - pts[a * 2 + 1];
-    const len = Math.hypot(dx, dy) || 1;
-    out[i * 2] = -dy / len;
-    out[i * 2 + 1] = dx / len;
+/** A mark composed with x and y swapped (a drawing that reads across a
+ * track is composed as if it read down, then turned): its points are
+ * swapped back; its key and extent, already along x, are kept. */
+export function turned(m: Mark): Mark {
+  const pts = new Array<number>(m.pts.length);
+  for (let i = 0; i < m.pts.length; i += 2) {
+    pts[i] = m.pts[i + 1];
+    pts[i + 1] = m.pts[i];
   }
-  return out;
+  return { ...m, pts };
+}
+
+/** A mark laid as it is on a drawing that reads across: its extent is
+ * measured along x. */
+export function acrossX(m: Mark): Mark {
+  const pad = m.w + 18;
+  let x0 = Infinity;
+  let x1 = -Infinity;
+  for (let i = 0; i < m.pts.length; i += 2) {
+    if (m.pts[i] < x0) x0 = m.pts[i];
+    if (m.pts[i] > x1) x1 = m.pts[i];
+  }
+  return { ...m, y0: x0 - pad, y1: x1 + pad };
 }
 
 /** Lay one mark on a canvas whose user space is the marks' space. */
 export function paint(
   ctx: CanvasRenderingContext2D,
   m: Mark,
-  pats: Patterns,
 ) {
   const pts = m.pts;
   const n = pts.length / 2;
@@ -197,60 +191,19 @@ export function paint(
     ctx.restore();
     return;
   }
-  const rand = rng(m.seed);
-  const nm = normals(pts);
-  // A few fibres of pigment per mark; fine marks are a single fibre.
-  const fibres = m.w < 1 ? 1 : Math.max(2, Math.min(6, Math.round(m.w * 1.1)));
+  // Light, and nothing else: one smooth line of the hue. The hue is
+  // dimmed for a fainter mark, not made see-through, so marks of one
+  // thread meet without a seam.
+  const [r, g, b] = RGB[m.hue];
+  const k = Math.max(0, Math.min(1, m.a));
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.strokeStyle = pats[m.hue];
-  for (let f = 0; f < fibres; f++) {
-    const off = fibres === 1 ? 0 : (f / (fibres - 1) - 0.5) * m.w * (0.8 + rand() * 0.4);
-    ctx.globalAlpha = m.a * (0.45 + rand() * 0.55);
-    ctx.lineWidth = fibres === 1 ? 0.9 + rand() * 0.5 : Math.max(1, (m.w / fibres) * (0.9 + rand() * 0.9));
-    const s0 = rand() * 0.16;
-    const s1 = 1 - rand() * 0.16;
-    ctx.beginPath();
-    let started = false;
-    for (let i = 0; i < n; i++) {
-      const t = i / (n - 1);
-      if (t < s0 || t > s1) continue;
-      const taper = Math.sqrt(Math.sin(Math.PI * ((t - s0) / (s1 - s0))));
-      const o = off * taper;
-      const x = pts[i * 2] + nm[i * 2] * o;
-      const y = pts[i * 2 + 1] + nm[i * 2 + 1] * o;
-      if (started) ctx.lineTo(x, y);
-      else {
-        ctx.moveTo(x, y);
-        started = true;
-      }
-    }
-    ctx.stroke();
-  }
-  if (m.core && n > 2) {
-    ctx.globalAlpha = m.a * 0.85;
-    ctx.strokeStyle = pats[m.hue === "c" ? "cl" : "ml"];
-    ctx.lineWidth = Math.max(0.8, m.w * 0.3);
-    ctx.beginPath();
-    ctx.moveTo(pts[2], pts[3]);
-    for (let i = 2; i < n - 1; i++) ctx.lineTo(pts[i * 2], pts[i * 2 + 1]);
-    ctx.stroke();
-  }
-  // Pigment dust thrown off beside the stroke: the thread's own light.
-  if (m.w >= 1.5) {
-    ctx.fillStyle = SOLID[m.hue];
-    for (let i = 0; i < n; i += 3) {
-      if (rand() < 0.4) continue;
-      const d = (rand() - 0.5) * 2 * (m.w + rand() * rand() * 15);
-      ctx.globalAlpha = rand() * 0.55 * m.a;
-      ctx.fillRect(
-        pts[i * 2] + nm[i * 2] * d + (rand() - 0.5) * 3,
-        pts[i * 2 + 1] + nm[i * 2 + 1] * d + (rand() - 0.5) * 3,
-        0.9,
-        0.9,
-      );
-    }
-  }
+  ctx.strokeStyle = `rgb(${(r * k) | 0} ${(g * k) | 0} ${(b * k) | 0})`;
+  ctx.lineWidth = Math.max(0.9, m.w);
+  ctx.beginPath();
+  ctx.moveTo(pts[0], pts[1]);
+  for (let i = 1; i < n; i++) ctx.lineTo(pts[i * 2], pts[i * 2 + 1]);
+  ctx.stroke();
   ctx.globalAlpha = 1;
 }
 
@@ -275,63 +228,6 @@ function densify(pts: number[], count: number) {
     );
   }
   return out;
-}
-
-/** The bloom of a thread, on a quarter-resolution canvas. Glow marks along
- * one thread never overlap and add with "lighter", so the blur of the parts
- * sums to the blur of the whole: no beading where they meet. */
-export function paintGlow(ctx: CanvasRenderingContext2D, m: Mark) {
-  const pts = m.pts;
-  const n = pts.length / 2;
-  if (n < 2 || m.kind !== Kind.Glow) return;
-  ctx.save();
-  ctx.globalCompositeOperation = "lighter";
-  // Runs of glow along one thread meet end to end: butt ends, so they
-  // don't double up where they meet. A point of glow (a knot) is round.
-  ctx.lineCap = n <= 2 ? "round" : "butt";
-  ctx.lineJoin = "round";
-  ctx.strokeStyle = css(m.hue);
-  // No filters: a few widening, fainter passes on a quarter-resolution
-  // canvas, softened by being scaled up. (A canvas blur filter per mark was
-  // the single most expensive thing on the page.)
-  const passes: [number, number][] = [
-    [m.w * 1.7, m.a * 0.22],
-    [m.w * 1.15, m.a * 0.3],
-    [m.w * 0.65, m.a * 0.38],
-  ];
-  for (const [w, a] of passes) {
-    ctx.globalAlpha = a;
-    ctx.lineWidth = w;
-    ctx.beginPath();
-    ctx.moveTo(pts[0], pts[1]);
-    for (let i = 1; i < n; i++) ctx.lineTo(pts[i * 2], pts[i * 2 + 1]);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-/** Blooms for a small canvas (ink, the line at the top): drawn at quarter
- * resolution on a scratch canvas and scaled up onto it, which is the blur. */
-export function paintGlows(
-  ctx: CanvasRenderingContext2D,
-  marks: Mark[],
-  width: number,
-  height: number,
-  strength = 1,
-) {
-  const glows = marks.filter((m) => m.kind === Kind.Glow);
-  if (!glows.length) return;
-  const scratch = document.createElement("canvas");
-  scratch.width = Math.max(1, Math.ceil(width / 4));
-  scratch.height = Math.max(1, Math.ceil(height / 4));
-  const g = scratch.getContext("2d")!;
-  g.setTransform(0.25, 0, 0, 0.25, 0, 0);
-  for (const m of glows) paintGlow(g, strength === 1 ? m : { ...m, a: m.a * strength });
-  ctx.save();
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(scratch, 0, 0, width, height);
-  ctx.restore();
 }
 
 /* ---------- Paths ---------- */
@@ -376,6 +272,10 @@ export class Path {
   }
   get count() {
     return this.xs.length;
+  }
+  /** Its points, evenly spaced. */
+  points(): Pt[] {
+    return this.xs.map((x, i) => [x, this.ys[i]]);
   }
   /** Point and unit normal at arc length s. */
   at(s: number): [number, number, number, number] {
@@ -452,13 +352,8 @@ export function hang(points: Pt[], pull = 0.5): Pt[] {
 
 interface ThreadOptions {
   hue: Hue;
-  w?: number;
   alpha?: number;
   seed: number;
-  /** Bloom strength, 0 for none. */
-  glow?: number;
-  /** How much the hand wobbles. */
-  wobble?: number;
   /** Reveal keys: by page y (default), a fixed key for the whole thread,
    * spread along the thread from `from` to `to`, or a function of the
    * distance along the thread. */
@@ -474,33 +369,33 @@ function keyFor(opts: { key?: ThreadOptions["key"] }, s: number, total: number, 
   return from + (to - from) * (s / (total || 1));
 }
 
-/** A single thread, laid as overlapping pastel marks, plus its bloom. */
+/** A single thread, laid as overlapping marks of the one width: flat
+ * light, no glow, taut and of one strength along its length, so the marks
+ * read as one line (a hand's wobble and marks of uneven strength read as a line
+ * drawn in strokes, not a thread). */
 export function thread(path: Path, opts: ThreadOptions): Mark[] {
   const out: Mark[] = [];
   const total = path.length;
   if (total < 2) return out;
   const rand = rng(opts.seed);
-  const w = opts.w ?? 3;
-  const wobble = opts.wobble ?? 0.8;
+  const w = THREAD;
   let s = 0;
   let index = 0;
   while (s < total - 1) {
     const len = Math.min(total - s, 36 + rand() * 54);
     const pts: number[] = [];
-    const phase = rand() * 6;
     const steps = Math.max(2, Math.round(len / 3));
     for (let k = 0; k <= steps; k++) {
-      const [x, y, nx, ny] = path.at(s + (len * k) / steps);
-      const o = Math.sin(k * 0.45 + phase) * wobble;
-      pts.push(x + nx * o, y + ny * o);
+      const [x, y] = path.at(s + (len * k) / steps);
+      pts.push(x, y);
     }
     const [, y0] = path.at(s);
     out.push(
       mark(
         Kind.Stroke,
         opts.hue,
-        w * (0.8 + rand() * 0.4),
-        (opts.alpha ?? 1) * (0.75 + rand() * 0.25),
+        w,
+        opts.alpha ?? 1,
         pts,
         opts.seed * 131 + index++,
         keyFor(opts, s, total, y0),
@@ -509,34 +404,6 @@ export function thread(path: Path, opts: ThreadOptions): Mark[] {
     );
     if (s + len >= total - 1) break;
     s += Math.max(8, len - 6 - rand() * 12);
-  }
-  if (opts.glow !== 0) out.push(...bloom(path, opts.hue, w * 2.6 + 6, opts.glow ?? 0.26, opts));
-  return out;
-}
-
-function bloom(
-  path: Path,
-  hue: Hue,
-  w: number,
-  alpha: number,
-  opts: { key?: ThreadOptions["key"] },
-): Mark[] {
-  const out: Mark[] = [];
-  const total = path.length;
-  const chunk = 60;
-  for (let s = 0; s < total; s += chunk) {
-    const pts: number[] = [];
-    const end = Math.min(total, s + chunk);
-    for (let t = s; t < end; t += 6) {
-      const [x, y] = path.at(t);
-      pts.push(x, y);
-    }
-    const [ex, ey] = path.at(end);
-    pts.push(ex, ey);
-    const [, y0] = path.at(s);
-    out.push(
-      mark(Kind.Glow, hue, w, alpha, pts, 0, keyFor(opts, s, total, y0)),
-    );
   }
   return out;
 }
@@ -572,13 +439,9 @@ export function knot(
       );
     }
     out.push(
-      mark(Kind.Stroke, hue, Math.max(1.4, r * 0.5), 0.95, pts, seed * 37 + l, key ?? y - r),
+      mark(Kind.Stroke, hue, THREAD, 0.95, pts, seed * 37 + l, key ?? y - r),
     );
   }
-  out.push(
-    mark(Kind.Glow, "c", r * 2.4, 0.3, [x - 0.5, y, x + 0.5, y], 0, key ?? y - r),
-    mark(Kind.Glow, "m", r * 1.6, 0.3, [x, y - 0.5, x, y + 0.5], 0, key ?? y - r),
-  );
   return out;
 }
 
@@ -603,7 +466,7 @@ export function wraps(
       mark(
         Kind.Stroke,
         hue,
-        2.4,
+        THREAD,
         0.95,
         [cx - dir * len * 0.5, cy + len * 0.5, cx, cy, cx + dir * len * 0.5, cy - len * 0.5].map(
           (v, i) => v + (i % 2 ? rand() - 0.5 : rand() - 0.5),

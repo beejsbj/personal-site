@@ -2,10 +2,19 @@
    magenta, in chalk pastel on black paper. This file only holds what must
    exist before the shell's JS arrives: the black paper itself, so there is
    no flash, and the faces the shell writes in. Everything else lives in
-   shells/hion/shell.css. */
-@import "@fontsource/shippori-mincho/latin-500.css";
-@import "@fontsource/shippori-mincho/latin-800.css";
-@import "@fontsource/caveat/latin-600.css";
+   shells/hion/shell.css.
+
+   Two faces, one inscribed voice. Aboreto, thin capitals cut like a stele,
+   for the large titles and the labels; Literata for reading, low in
+   contrast and naturally bold, so it holds its own on black beside the
+   threads; its italic for what is said in type. Latin only, and only the
+   weights the shell asks for: Literata 600 (reading), 700 (small titles),
+   800 (strong words) and 500 italic; Aboreto has one weight. */
+@import "@fontsource/aboreto/latin-400.css";
+@import "@fontsource/literata/latin-600.css";
+@import "@fontsource/literata/latin-700.css";
+@import "@fontsource/literata/latin-800.css";
+@import "@fontsource/literata/latin-500-italic.css";
 
 :root[data-lens="hion"],
 :root[data-lens="hion"] body {
