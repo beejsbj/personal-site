@@ -11,7 +11,7 @@
     "check": "astro check",
     "test:homepage": "node --test scripts/tests/homepage-base.test.mjs",
     "test": "node --test scripts/tests/*.test.mjs",
-    "test:prism": "node --test scripts/tests/prism-parity.browser.mjs",
+    "test:prism": "node --test scripts/tests/*.browser.mjs",
     "format": "prettier --write src astro.config.mjs tsconfig.json scripts/tests"
   },
   "dependencies": {
