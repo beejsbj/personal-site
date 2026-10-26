@@ -786,6 +786,42 @@ export function spinNav(nav: HTMLElement, options: LocalOptions) {
 
 /* ---------- A heading that slides: written on its own canvas ---------- */
 
+/** What a heading written on its own canvas keeps to be written again. */
+interface Watch {
+  hue: Hue;
+  options: LocalOptions;
+  /** The width it was written at. */
+  width: number;
+  /** It was written on from a knot, and is again. */
+  hadFrom: boolean;
+}
+
+const watchers = new WeakMap<HTMLElement, Watch>();
+const RESIZE_WAIT = 220;
+
+function watchLocal(el: HTMLElement, state: Watch) {
+  watchers.set(el, state);
+  let timer = 0;
+  const resized = new ResizeObserver(() => {
+    if (state.options.signal.aborted || el.clientWidth === state.width) return;
+    clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      if (state.options.signal.aborted || !el.isConnected || el.clientWidth === state.width) return;
+      writeLocal(el, state.hue, state.options, true, state.hadFrom && knotOf(el) ? knotOf(el)! : undefined);
+    }, RESIZE_WAIT);
+  });
+  resized.observe(el);
+  state.options.signal.addEventListener(
+    "abort",
+    () => {
+      clearTimeout(timer);
+      resized.disconnect();
+      watchers.delete(el);
+    },
+    { once: true },
+  );
+}
+
 /** Write a heading inside something that moves over the page on a
  * canvas of its own, with the skein's material and a head of its own (on
  * the screen's one frame loop), then let it lie cold. Written again,
@@ -880,14 +916,11 @@ function writeLocal(el: HTMLElement, hue: Hue, options: LocalOptions, settled = 
     if (pts.length >= 4) material.run(ctx, hue, w, pts, 1);
   };
   // Laid out anew (the track fits its roles to the window): written
-  // again, settled.
-  const resized = new ResizeObserver(() => {
-    if (el.clientWidth === width || signal.aborted) return;
-    resized.disconnect();
-    writeLocal(el, hue, options, true, from && knotOf(el) ? knotOf(el)! : undefined);
-  });
-  resized.observe(el);
-  signal.addEventListener("abort", () => resized.disconnect(), { once: true });
+  // again, settled, once the window has stopped moving. One observer an
+  // element, kept across rewrites.
+  const watch = watchers.get(el);
+  if (watch) Object.assign(watch, { hue, options, width, hadFrom: !!from });
+  else watchLocal(el, { hue, options, width, hadFrom: !!from });
   if (settled || signal.aborted) {
     paint(total);
     still(canvas);
