@@ -853,7 +853,13 @@ function writeLocal(el: HTMLElement, hue: Hue, options: SpunOptions, settled = o
   });
   el.append(canvas);
   const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  if (!ctx) {
+    // No canvas to write on: the heading gets its chalk back.
+    canvas.remove();
+    el.removeAttribute("data-spun-local");
+    el.dataset.spunState = "chalk";
+    return;
+  }
   ctx.setTransform(dpr, 0, 0, dpr, (pad - l) * dpr, (pad - t) * dpr);
   const at = (s: number): Pt => {
     let i = 1;
