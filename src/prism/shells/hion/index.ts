@@ -130,6 +130,7 @@ function show(route: Route, first: boolean) {
           section: timeline,
           signal: controller.signal,
           instant: still(),
+          settled,
           face: ctx.face,
           isIdle: ctx.isIdle,
           onIdleChange: ctx.onIdleChange,
