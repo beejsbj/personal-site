@@ -1,6 +1,6 @@
 /** Fate: how a thread of intent finds its way across a page.
  *
- * Pure geometry, no DOM: threads.ts lays the page in and paints what grows.
+ * Pure geometry, no DOM: skein.ts lays the page in and paints what grows.
  *
  * A thread grows only from its head. It holds a heading with a slight bow
  * (the tension of a taut thread), and only at a moment of decision turns:
@@ -10,14 +10,24 @@
  * get round content: open paper ahead, room either side of the way, the
  * bearing to where it means to go, and the company of a thread nearby (it
  * falls in alongside, a lane apart, so threads run together in bundles).
- * The turn is drawn, a quick curve, never a corner; and the turning over
- * its last few hundred pixels is limited, so it never comes round on
- * itself. Where it crosses another, one goes under (a short break in it).
+ * The turn is drawn, a curve eased in and out (its curvature changes a
+ * little each step, never jumps, so a run and a turn meet without a
+ * corner), and the turning over its last few hundred pixels is limited, so
+ * it never comes round on itself. Between turns it meanders a little, a
+ * slow drift either side of its bow, like a thread laid by hand rather
+ * than ruled. Where it crosses another, one goes under (a short break).
  *
- * Where a thread means to go is planned for it (plan()): most pass through
- * a gather, a lane in the most open place of a stretch of the page, so
- * several converge there and part again; a few are lone and run off into
- * the distance. Everything is deterministic for a seed and a layout. */
+ * Every thread on the screen is in the same index (skein.ts): the hions
+ * are fixed company (fix()), so threads fall in alongside them; threads
+ * steered by something else grow by extend(), and can be handed back to
+ * fate to run on.
+ *
+ * Every thread is a branch of a hion (buds()): it leaves one where it
+ * passes, forward at a slant into open paper (leave()). Where it means to
+ * go is planned for it: most pass through a gather, a lane in the most
+ * open place of a stretch of the page, so several converge there and part
+ * again; a few are lone and run off into the distance. Everything is
+ * deterministic for a seed and a layout. */
 
 import { type Hue, type Pt, rng } from "./pastel";
 
@@ -131,6 +141,11 @@ export interface Seed {
   lone?: boolean;
   /** Keeps no company for this far after it is born (px). */
   free?: number;
+  /** May pass held ground for this far after it is born (px): a thread
+   * that starts beside the words, leaving them. */
+  grace?: number;
+  /** How much it meanders (1 is a ground thread's). */
+  wander?: number;
   seed: number;
   /** Reveal key: born when the hions' drawing reaches this page y. */
   key: number;
@@ -159,15 +174,26 @@ export interface Thread {
   joined: number;
   goals: Pt[];
   goal: number;
+  /** Its curvature now (radians a step): eased toward what it wants. */
+  k: number;
+  /** The phase and strength of its meander. */
+  phase: number;
+  wander: number;
+  grace: number;
+  /** Company only: drawn by something else (a hion), never steps, never
+   * goes under. */
+  fixed: boolean;
 }
 
-interface Near {
+export interface Near {
   d: number;
   x: number;
   y: number;
   dx: number;
   dy: number;
   id: number;
+  hue: Hue;
+  fixed: boolean;
 }
 
 export class Fate {
@@ -201,12 +227,82 @@ export class Fate {
       joined: -1,
       goals: seed.goals,
       goal: 0,
+      k: 0,
+      phase: rand() * 100,
+      wander: seed.wander ?? 1,
+      grace: seed.grace ?? 0,
+      fixed: false,
     };
     this.newRun(t);
     this.threads.push(t);
     this.byId.set(t.id, t);
     this.index(t, 0);
     return t;
+  }
+
+  /** A thread drawn by something else (a hion): company for the rest,
+   * already whole. Points closer than a step are skipped. */
+  fix(hue: Hue, points: Pt[]) {
+    const t = this.add({ x: points[0]?.[0] ?? 0, y: points[0]?.[1] ?? 0, a: 0, hue, len: 0, goals: [], seed: 1, key: 0 });
+    t.fixed = true;
+    t.done = true;
+    for (let i = 1; i < points.length; i++) {
+      const [x, y] = points[i];
+      const n = t.xs.length - 1;
+      if (Math.abs(x - t.xs[n]) + Math.abs(y - t.ys[n]) < STEP) continue;
+      t.xs.push(x);
+      t.ys.push(y);
+      this.index(t, n + 1);
+    }
+    return t;
+  }
+
+  /** A thread that is no one's company: drawn whole and soon taken back
+   * (a loop tied round something while it is hovered). Not indexed. */
+  bare(hue: Hue, points: Pt[]): Thread {
+    const t = this.add({ x: points[0][0], y: points[0][1], a: 0, hue, len: 0, goals: [], seed: 7, key: 0 });
+    this.threads.pop();
+    this.byId.delete(t.id);
+    const k = this.key(t.xs[0], t.ys[0]);
+    this.grid.get(k)?.pop();
+    for (let i = 1; i < points.length; i++) {
+      t.xs.push(points[i][0]);
+      t.ys.push(points[i][1]);
+    }
+    t.done = true;
+    return t;
+  }
+
+  /** Grow a thread by a point something else chose (its head is steered
+   * from outside: the pointer's, winding round a heading). It still goes
+   * over and under what it crosses, and is company. */
+  extend(t: Thread, x: number, y: number) {
+    const n = t.xs.length - 1;
+    const px = t.xs[n];
+    const py = t.ys[n];
+    if (x === px && y === py) return;
+    this.cross(t, px, py, x, y);
+    t.a = Math.atan2(y - py, x - px);
+    t.xs.push(x);
+    t.ys.push(y);
+    this.index(t, n + 1);
+  }
+
+  /** Hand a thread back to fate from where it is: it runs on toward these
+   * goals for this much further. */
+  resume(t: Thread, goals: Pt[], further: number, grace = 40) {
+    t.done = false;
+    t.goals = goals;
+    t.goal = 0;
+    t.len = (t.xs.length - 1) * STEP + further;
+    t.free = 0;
+    t.grace = (t.xs.length - 1) * STEP + grace;
+    t.turns = [];
+    t.turned = 0;
+    t.turnTo = null;
+    t.k = 0;
+    t.joined = -1;
+    this.newRun(t);
   }
 
   /** Forget threads that have faded away (they are no company). */
@@ -231,8 +327,9 @@ export class Fate {
     else this.grid.set(k, [v]);
   }
 
-  /** The nearest point of another thread within r, and its direction. */
-  private near(t: Thread, x: number, y: number, r: number): Near | null {
+  /** The nearest drawn point of any thread (but the one with id `self`)
+   * within r of (x, y), and the way it runs there. */
+  nearest(x: number, y: number, r: number, self = -1): Near | null {
     let best = r * r;
     let hit: Near | null = null;
     const c0 = Math.floor((x - r) / CELL);
@@ -245,7 +342,7 @@ export class Fate {
         if (!b) continue;
         for (const v of b) {
           const id = Math.floor(v / 65536);
-          if (id === t.id) continue;
+          if (id === self) continue;
           const o = this.byId.get(id);
           if (!o || o.gone) continue;
           const i = v % 65536;
@@ -259,7 +356,7 @@ export class Fate {
           const ex = o.xs[j] - o.xs[k];
           const ey = o.ys[j] - o.ys[k];
           const el = Math.hypot(ex, ey) || 1;
-          hit = { d: Math.sqrt(d), x: o.xs[i], y: o.ys[i], dx: ex / el, dy: ey / el, id };
+          hit = { d: Math.sqrt(d), x: o.xs[i], y: o.ys[i], dx: ex / el, dy: ey / el, id, hue: o.hue, fixed: o.fixed };
         }
       }
     }
@@ -301,7 +398,7 @@ export class Fate {
     if (b !== null && t.turnTo === null && t.runLeft < 100 && Math.abs(wrap(b - t.a)) > 50 * DEG) decide = true;
     let n: Near | null = null;
     if (!t.lone && (t.xs.length - 1) * STEP > t.free) {
-      n = this.near(t, x, y, 70);
+      n = this.nearest(x, y, 70, t.id);
       if (n && n.id !== t.joined && t.turnTo === null) {
         const s = Math.abs(n.dx * Math.cos(t.a) + n.dy * Math.sin(t.a));
         // Meeting another at a slant: fall in beside it.
@@ -327,9 +424,12 @@ export class Fate {
         let score = clear * 3 + (room / 120) * 1.2 - Math.abs(turn) * 0.25 + r() * 0.3;
         if (b !== null) score += Math.cos(wrap(a - b)) * 1.3;
         if (n) {
+          // A hion is company too, a little less keenly kept, a lane
+          // further off.
+          const keen = n.fixed ? 0.8 : 1;
           const along = Math.abs(n.dx * Math.cos(a) + n.dy * Math.sin(a));
-          score += along * 1.4 * (1 - n.d / 70);
-          if (n.d > 16) score += (((n.x - x) * Math.cos(a) + (n.y - y) * Math.sin(a)) / n.d) * 0.35;
+          score += along * 1.4 * keen * (1 - n.d / 70);
+          if (n.d > (n.fixed ? 26 : 16)) score += (((n.x - x) * Math.cos(a) + (n.y - y) * Math.sin(a)) / n.d) * 0.35 * keen;
         }
         if (k && clear < 0.2) score -= 2;
         if (score > best) {
@@ -341,22 +441,28 @@ export class Fate {
       t.turnTo = Math.abs(wrap(pick - t.a)) > DEG ? pick : null;
       this.newRun(t);
     }
+    // What it wants to turn by this step: its drift (the bow and a slow
+    // meander), or a drawn turn. Its curvature eases toward that a little
+    // each step, never jumps; a turn eases out so it ends on its heading.
+    const at = t.xs.length;
+    let want = t.bow + (Math.sin(at * 0.09 + t.phase) * 0.35 + Math.sin(at * 0.017 + t.phase * 2.3) * 0.12) * DEG * t.wander;
+    let ramp = 0.5 * DEG;
     if (t.turnTo !== null) {
       const left = wrap(t.turnTo - t.a);
-      // A drawn turn: quick, but a curve, not a corner.
-      const rate = 7 * DEG;
-      if (Math.abs(left) <= rate) {
-        t.turnTo = null;
-        return left;
-      }
-      return Math.sign(left) * rate;
+      const urgent = ahead < 40;
+      ramp = (urgent ? 3 : 1.4) * DEG;
+      const max = (urgent ? 10 : 7) * DEG;
+      // As fast as it can still ease out of by the time it is round.
+      want = Math.sign(left) * Math.min(max, Math.sqrt(2 * ramp * Math.abs(left)) * 0.92);
+      if (Math.abs(left) < 0.8 * DEG && Math.abs(t.k) < ramp) t.turnTo = null;
     }
-    return t.bow;
+    t.k += Math.max(-ramp, Math.min(ramp, want - t.k));
+    return t.k;
   }
 
   /** Grow a thread one step from its head. False once it has finished. */
   step(t: Thread) {
-    if (t.done) return false;
+    if (t.done || t.fixed) return false;
     const n = t.xs.length - 1;
     const x = t.xs[n];
     const y = t.ys[n];
@@ -365,10 +471,11 @@ export class Fate {
       t.done = true;
       return false;
     }
-    // Never into content: the turn, or harder either way, or stop.
+    // Never into content: the turn, or harder either way, or stop. (Unless
+    // it is still leaving the words it started beside.)
     const g = this.ground;
-    let ok = false;
-    for (const extra of [0, 8, -8, 16, -16, 26, -26, 40, -40]) {
+    let ok = n * STEP < t.grace;
+    for (const extra of ok ? [] : [0, 8, -8, 16, -16, 26, -26, 40, -40]) {
       const a = t.a + turn + extra * DEG;
       if (g.clear(x + Math.cos(a) * STEP * 2, y + Math.sin(a) * STEP * 2) >= MARGIN) {
         turn += extra * DEG;
@@ -417,8 +524,13 @@ export class Fate {
       const s = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / den;
       const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / den;
       if (s < 0 || s > 1 || u < 0 || u > 1) continue;
+      // Two running nearly together just lie one on the other: a break at
+      // every shallow crossing would dash a bundle.
+      const sin = Math.abs(den) / (Math.hypot(bx - ax, by - ay) * Math.hypot(dx - cx, dy - cy) || 1);
+      if (sin < 0.4) continue;
       const n = t.xs.length - 1;
-      if (((t.id * 7 + id * 13 + i) & 1) === 0) {
+      // A hion lies over every thread; otherwise it is a coin toss.
+      if (o.fixed || ((t.id * 7 + id * 13 + i) & 1) === 0) {
         t.under.add(n - 1).add(n).add(n + 1);
       } else {
         for (const k of [i - 1, i, i + 1]) {
@@ -443,6 +555,8 @@ interface PlanOptions {
   seed: number;
   /** A screen seen close: fewer threads. */
   close: boolean;
+  /** A screen that should be busy (home): more, sooner. */
+  lively?: boolean;
 }
 
 /** The gathers of a page: the most open place in each stretch of it,
@@ -505,59 +619,93 @@ export function goalsFor(all: Gather[], x: number, y: number, a: number, lone: b
   return goals;
 }
 
-/** A page's threads: a fan from where the hions come down, and threads in
- * from either edge down the page (cyan-leaning left, magenta-leaning
- * right), each born as the drawing reaches it. */
-export function plan(ground: Ground, o: PlanOptions) {
+/** A hion's way, as the skein grew it: points, arc length and the loom's
+ * reveal key at each. */
+export interface Way {
+  hue: Hue;
+  xs: ArrayLike<number>;
+  ys: ArrayLike<number>;
+  ls: ArrayLike<number>;
+  keys: ArrayLike<number>;
+}
+
+/** Where a branch leaves a thread: the seed it grows from, and how far
+ * along its parent (arc length) it leaves. */
+export interface Bud {
+  seed: Seed;
+  hue: Hue;
+  s: number;
+}
+
+/** How a branch leaves a thread at (x, y) running at `along`: forward, at a
+ * slant to one side (never back the way it came, never square), turned
+ * down the page rather than up it. Null if the side it would take has no
+ * open paper. */
+export function leave(ground: Ground, x: number, y: number, along: number, side: 1 | -1, r: () => number) {
+  for (const s of [side, -side] as const) {
+    let a = along + s * (22 + r() * 26) * DEG;
+    // A branch that would climb leans down instead: the page grows down.
+    if (Math.sin(a) < -0.35) a = along + s * 18 * DEG;
+    if (Math.sin(a) < -0.35) continue;
+    if (ground.ray(x + Math.cos(a) * 18, y + Math.sin(a) * 18, a, 150, 10) >= 110) return a;
+  }
+  return null;
+}
+
+/** A page's threads, every one a branch: buds along the two hions' ways,
+ * a slant off them into open paper, each born when the hion's head passes
+ * where it leaves. Home buds most often, a single thing seen close least. */
+export function buds(ground: Ground, ways: Way[], o: PlanOptions): { gathers: Gather[]; buds: Bud[] } {
   const all = gathers(ground, o);
-  const rand = rng(o.seed * 31 + 3);
-  const { width: W, height: H } = o;
-  const narrow = W < 720;
-  const seeds: Seed[] = [];
-  // Clear of the way the hions themselves come down (straight below).
-  const fan = o.close ? [-48, -26, 28, 50] : narrow ? [-40, -22, 22, 40] : [-66, -50, -34, -22, 24, 36, 52, 68];
-  const down = Math.PI / 2;
-  fan.forEach((d, i) => {
-    const s = o.seed * 977 + i;
-    const r = rng(s);
-    const a = down + d * DEG;
-    const lone = i === 0 || i === fan.length - 1;
-    seeds.push({
-      x: o.drop + d * 0.5,
-      y: o.top,
-      a,
-      hue: i % 2 ? "m" : "c",
-      len: 1400 + r() * 1800,
-      seed: s,
-      key: o.top + i * 30,
-      lone,
-      free: 240,
-      goals: goalsFor(all, o.drop, o.top, a, lone, r),
-    });
-  });
-  let k = 0;
-  const gap = (narrow ? 520 : 380) * (o.close ? 1.4 : 1);
-  for (let y = o.top + 180; y < H - 120; y += gap) {
-    for (const side of [0, 1]) {
-      if (rand() < 0.3) continue;
-      const tilt = (14 + rand() * 40) * DEG;
-      const hue: Hue = side ? (rand() < 0.72 ? "m" : "c") : rand() < 0.72 ? "c" : "m";
-      const yy = y + rand() * 160;
-      const lone = rand() < 0.22;
-      const a = side ? Math.PI - tilt : tilt;
-      const s = o.seed * 31 + ++k * 7;
-      seeds.push({
-        x: side ? W + 6 : -6,
-        y: yy,
-        a,
-        hue,
-        len: 900 + rand() * 1800,
-        seed: s,
-        key: yy - 260 + rand() * 120,
-        lone,
-        goals: goalsFor(all, side ? W : 0, yy, a, lone, rng(s)),
+  const out: Bud[] = [];
+  const narrow = o.width < 720;
+  // At the hions' own brightness a branch counts for more than a dim
+  // ground thread did: fewer of them. Home is busier by growing longer
+  // after the reader moves and branching again sooner (skein.ts), not by
+  // more buds.
+  const gap = (narrow ? 260 : 220) * (o.close ? 1.6 : 1);
+  ways.forEach((way, w) => {
+    const r = rng(o.seed * 53 + w * 977 + 11);
+    const n = way.xs.length;
+    if (n < 8) return;
+    const total = way.ls[n - 1];
+    let i = 0;
+    let side: 1 | -1 = w ? 1 : -1;
+    for (let s = 70 + r() * gap * 0.6; s < total - 40; s += gap * (0.6 + r() * 0.8)) {
+      while (i < n - 1 && way.ls[i] < s) i++;
+      const x = way.xs[i];
+      const y = way.ys[i];
+      if (y < o.top) continue;
+      const a0 = Math.max(0, i - 3);
+      const a1 = Math.min(n - 1, i + 3);
+      // Not across a stretch it leaves the page for (a track).
+      if (way.ls[a1] - way.ls[a0] < 2) continue;
+      const along = Math.atan2(way.ys[a1] - way.ys[a0], way.xs[a1] - way.xs[a0]);
+      if (r() < 0.62) side = side === 1 ? -1 : 1;
+      const a = leave(ground, x, y, along, side, r);
+      if (a === null) continue;
+      const lone = r() < 0.2;
+      const seed = o.seed * 31 + w * 7919 + out.length * 7;
+      out.push({
+        hue: way.hue,
+        s: way.ls[i],
+        seed: {
+          x,
+          y,
+          a,
+          hue: way.hue,
+          len: (o.close ? 700 : 900) + r() * (o.lively ? 1800 : 1300),
+          seed,
+          key: way.keys[i],
+          lone,
+          // Clear of its parent before it keeps company, and clear of the
+          // words the hion may run beside.
+          free: 160,
+          grace: 36,
+          goals: goalsFor(all, x, y, a, lone, rng(seed)),
+        },
       });
     }
-  }
-  return { gathers: all, seeds: seeds.sort((a, b) => a.key - b.key) };
+  });
+  return { gathers: all, buds: out.sort((a, b) => a.seed.key - b.seed.key) };
 }

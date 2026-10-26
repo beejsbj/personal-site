@@ -321,7 +321,7 @@ export interface ShellContext {
   /** True while this page is an off-axis prism face or the camera is moving.
    * CSS animations pause automatically; pause JS/canvas loops yourself. */
   isIdle(): boolean;
-  onIdleChange(listener: (idle: boolean) => void): void;
+  onIdleChange(listener: (idle: boolean) => void): () => void;
 }
 
 export interface LensShell {

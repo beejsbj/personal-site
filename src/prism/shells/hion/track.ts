@@ -38,7 +38,7 @@ interface TrackOptions {
   instant: boolean;
   face: boolean;
   isIdle(): boolean;
-  onIdleChange(listener: (idle: boolean) => void): void;
+  onIdleChange(listener: (idle: boolean) => void): () => void;
 }
 
 /** How tall a role may stand in the pin, as a share of its height. */
@@ -97,16 +97,26 @@ export function createTrack(options: TrackOptions) {
     const spare = pin.clientWidth >= 720 && pin.clientHeight >= 600 ? drift : 0;
     const tall = Math.min(pin.clientHeight * STAND, room - spare);
     const widest = Math.max(1100, pin.clientWidth * 1.6);
-    track.querySelectorAll<HTMLElement>(".hion-loop--role").forEach((role, i) => {
+    const roles = [...track.querySelectorAll<HTMLElement>(".hion-loop--role")];
+    for (const role of roles) {
       role.style.removeProperty("width");
       role.style.removeProperty("top");
-      let width = role.offsetWidth;
-      while (role.offsetHeight > tall && width < widest) {
-        width += 60;
-        role.style.width = `${width}px`;
+    }
+    // All the roles a step at a time, their heights read between steps
+    // (one layout a step, not one a role a step: a role's width changes
+    // no other's height).
+    const widths = roles.map((role) => role.offsetWidth);
+    for (let tooTall = roles.filter((role, i) => role.offsetHeight > tall && widths[i] < widest); tooTall.length; ) {
+      for (const role of tooTall) {
+        const i = roles.indexOf(role);
+        widths[i] += 60;
+        role.style.width = `${widths[i]}px`;
       }
-      const shift = Math.min(drift, Math.max(0, room - role.offsetHeight) / 2);
-      if (shift >= 4) role.style.top = `${Math.round(i % 2 ? shift : -shift)}px`;
+      tooTall = tooTall.filter((role) => role.offsetHeight > tall && widths[roles.indexOf(role)] < widest);
+    }
+    const shifts = roles.map((role) => Math.min(drift, Math.max(0, room - role.offsetHeight) / 2));
+    roles.forEach((role, i) => {
+      if (shifts[i] >= 4) role.style.top = `${Math.round(i % 2 ? shifts[i] : -shifts[i])}px`;
     });
   }
 

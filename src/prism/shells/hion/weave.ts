@@ -31,6 +31,15 @@
  *   that draws its own (track.ts). They go in at its top and come out at
  *   its foot; nothing of theirs is drawn between.
  *
+ * With `heads` (a page), the hions themselves are the skein's (skein.ts):
+ * their bodies and heads are strands there, so no marks are composed for
+ * them here, only their ways down (`tips`) for the skein to grow along;
+ * and everything that hangs from them (wefts, cords, ties, the knots
+ * where they are tied) is a limb, the way a branch of a hion should go,
+ * which the skein grows off the hion as the drawing reaches it. Every
+ * thread on a page is one of the two hions or a branch of one. Without it
+ * (a track), they and what hangs from them are laid here in pastel.
+ *
  * Only what belongs to the host is read: the nearest `[data-loom]` round
  * it is the host (a track inside the page is not the page's).
  *
@@ -40,7 +49,7 @@
  * (pastel.ts `turned`), their keys running along x. Its headings are strung
  * on wefts laid as they are, level with their words. Cords and ties are not
  * read across (a track has none). */
-import { curl, dancer, journeyKeys, orbit, TEMPER } from "./dance";
+import { curl, dancer, journeyKeys, orbit } from "./dance";
 import {
   cubic,
   hang,
@@ -53,11 +62,13 @@ import {
   type Pt,
   rng,
   thread,
+  THREAD,
   turned,
   acrossX,
 } from "./pastel";
-import type { Composition } from "./loom";
+import type { Composition, Limb } from "./loom";
 import { textExtent } from "./dom";
+import { WEFT_GAP } from "./spun";
 
 interface Box {
   l: number;
@@ -81,7 +92,7 @@ const GAP = 400;
 export function compose(
   host: HTMLElement,
   origin: () => Pt | null,
-  { axis = "y" }: { axis?: "x" | "y" } = {},
+  { axis = "y", heads = false }: { axis?: "x" | "y"; heads?: boolean } = {},
 ): Composition {
   const hostBox = host.getBoundingClientRect();
   const across = axis === "x";
@@ -137,6 +148,7 @@ export function compose(
     return box(el).t + (first.top - own.top) + first.height * 0.56;
   };
   const marks: Mark[] = [];
+  const limbs: Limb[] = [];
   let seed = 1;
 
   /* ---- Stations along the main cord ---- */
@@ -210,7 +222,8 @@ export function compose(
       const p: Pt = [(b.l + b.r) / 2, (b.t + b.b) / 2];
       if (!run.length) run.push([p[0], Math.max(0, p[1] - 160)]);
       run.push(p);
-      marks.push(...knot(p[0], p[1], narrow ? 7 : 9, seed++, p[1] - 30));
+      if (heads) limbs.push({ hue: "c", way: tie(p, narrow ? 7 : 9, seed++), key: p[1] - 30, tied: true, knot: false });
+      else marks.push(...knot(p[0], p[1], narrow ? 7 : 9, seed++, p[1] - 30));
       close("knot");
       run = [p];
     } else {
@@ -261,8 +274,10 @@ export function compose(
       }
     }
   });
+  // The finer fibre beside each side of a loop is its own line, not a
+  // branch: on a page, where every thread is one of the two, it goes.
   for (const loop of loopList) {
-    marks.push(...looseFibres(loop, seed));
+    if (!heads) marks.push(...looseFibres(loop, seed));
     seed += 10;
   }
   // At the end they let go of each other: each curls away on its own.
@@ -282,16 +297,14 @@ export function compose(
     // One thread, unless it leaves the page for a track (a gap): then one
     // for each stretch drawn, keyed by where it is along the whole.
     let from = 0;
-    for (let i = 1; i <= pts.length; i++) {
+    for (let i = 1; i <= pts.length && !heads; i++) {
       if (i < pts.length && Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]) < GAP) continue;
       const offset = keys.lens[from];
       marks.push(
         ...thread(new Path(pts.slice(from, i), 3), {
           hue,
-          w: TEMPER[hue].weight * (narrow ? 0.85 : 1),
           seed: seed++,
           key: (s) => keys.keyAt(s + offset),
-          glow: 0.22,
         }),
       );
       from = i;
@@ -317,10 +330,11 @@ export function compose(
     }
     return { marks, tips, orbits, end: endAt ? endAt[1] + 120 : null };
   }
-  /** Where a hion crosses height y nearest to x (for things to tie on). */
-  const threadAt = (y: number, x: number) => {
+  /** Where a hion crosses height y nearest to x (for things to tie on),
+   * and which hion it is. */
+  const crossing = (y: number, x: number) => {
     if (!runs.some((run) => y >= run.top && y <= run.bottom)) return null;
-    let best: number | null = null;
+    let best: { x: number; hue: Hue } | null = null;
     for (const hue of ["c", "m"] as Hue[]) {
       const pts = journey[hue];
       for (let i = 1; i < pts.length; i++) {
@@ -328,10 +342,32 @@ export function compose(
         const [bx, by] = pts[i];
         if ((ay - y) * (by - y) > 0 || ay === by) continue;
         const cx = ax + ((y - ay) / (by - ay)) * (bx - ax);
-        if (best === null || Math.abs(cx - x) < Math.abs(best - x)) best = cx;
+        if (best === null || Math.abs(cx - x) < Math.abs(best.x - x)) best = { x: cx, hue };
       }
     }
     return best;
+  };
+  /** A weft, a cord: marks on a track; on a page, the limbs the skein
+   * grows. `thrownHue` is the hue of the hion it is thrown from. Returns
+   * the hue it is (on a page, the hion's it grows from), for what hangs
+   * from it and the words written on it to take. */
+  const string = (
+    from: number,
+    to: number,
+    y: number,
+    hue: Hue,
+    loop: Loop | undefined,
+    ends: Parameters<typeof weft>[6] = {},
+    thrownHue?: Hue,
+  ) => {
+    const s = seed++;
+    if (!heads) {
+      marks.push(...weft(from, to, y, hue, s, loop, ends));
+      return hue;
+    }
+    const grown = weftLimbs(from, to, y, hue, s, loop, ends, thrownHue);
+    limbs.push(...grown);
+    return grown[0]?.hue ?? hue;
   };
 
   const loopOf = (el: Element) => {
@@ -348,22 +384,29 @@ export function compose(
     const loop = loopOf(el);
     // The words, not the heading's whole line.
     const b = box(el.querySelector(".hion-strung__box") ?? el);
-    const hue: Hue = wi++ % 2 ? "c" : "m";
+    let hue: Hue = wi++ % 2 ? "c" : "m";
+    // Its words are written by thread, the weft's own (spun.ts): the weft
+    // stops short of them either side in a knot, and the thread that
+    // writes them sets out from the knot before and ends in the knot after.
+    const gap: [number, number] = [b.l - WEFT_GAP, b.r + WEFT_GAP];
     if (loop) {
       // Across the loop, and out past it where the heading hangs out.
-      marks.push(...weft(Math.min(loop.l - 22, b.l - 30), Math.max(loop.r + 22, b.r + 30), y, hue, seed++, loop));
-      continue;
-    }
-    // Off the loops, a heading beside the hions is strung from them: the
-    // weft is thrown out from where they pass, through the words.
-    const x = threadAt(y, (b.l + b.r) / 2);
-    if (x !== null && (x < b.l - 20 || x > b.r + 20)) {
-      const toLeft = x > b.r;
-      const [a, c] = toLeft ? [b.l - 36, x] : [x, b.r + 36];
-      marks.push(...weft(a, c, y, hue, seed++, undefined, { knotL: true, knotR: true, from: x }));
+      hue = string(Math.min(loop.l - 22, b.l - 30), Math.max(loop.r + 22, b.r + 30), y, hue, loop, { gap });
     } else {
-      marks.push(...weft(b.l - 36, b.r + 36, y, hue, seed++, undefined));
+      // Off the loops, a heading beside the hions is strung from them:
+      // the weft is thrown out from where they pass, to the words.
+      const at = crossing(y, (b.l + b.r) / 2);
+      if (at && (at.x < b.l - 20 || at.x > b.r + 20)) {
+        const toLeft = at.x > b.r;
+        const [a, c] = toLeft ? [b.l - 36, at.x] : [at.x, b.r + 36];
+        hue = string(a, c, y, hue, undefined, { knotL: true, knotR: true, from: at.x, gap }, at.hue);
+      } else {
+        hue = string(b.l - 36, b.r + 36, y, hue, undefined, { gap });
+      }
     }
+    if (el.dataset.weftHue !== hue) el.dataset.weftHue = hue;
+    // On a page the limbs tie themselves off at the words.
+    if (!heads) marks.push(...knot(gap[0], y, 3.5, seed++, y + 20), ...knot(gap[1], y, 3.5, seed++, y + 20));
   }
 
   /* ---- Things that hang ---- */
@@ -411,15 +454,25 @@ export function compose(
       const spanL = Math.min(...lefts);
       const spanR = Math.max(...rights);
       const hue: Hue = wi++ % 2 ? "c" : "m";
+      // On a page, what hangs from a cord hangs in its hue: one thread.
+      const hang = (h: Hue) => {
+        if (!heads) return;
+        for (const item of row.items) if (item.dataset.hue !== h) item.dataset.hue = h;
+      };
       if (kind === "branch") {
-        const x = threadAt(y, (spanL + spanR) / 2);
-        if (x !== null) {
+        const at = crossing(y, (spanL + spanR) / 2);
+        if (at) {
+          const x = at.x;
           if (spanR < x || spanL > x) {
             // Out to one side of the main cord.
             const toLeft = spanR < x;
             const end = toLeft ? spanL - 34 : spanR + 34;
             const [a, b] = toLeft ? [end, x] : [x, end];
-            marks.push(...weft(a, b, y, hue, seed++, undefined, { knotL: true, knotR: true, from: x }));
+            hang(string(a, b, y, hue, undefined, { knotL: true, knotR: true, from: x }, at.hue));
+          } else if (heads) {
+            // Across it: out from where they cross, either way.
+            string(spanL - 34, x, y, hue, undefined, { knotL: true, from: x }, at.hue);
+            hang(string(x, spanR + 34, y, hue, undefined, { knotR: true, from: x }, at.hue));
           } else {
             // Across it, tied on where they cross.
             marks.push(...weft(spanL - 34, spanR + 34, y, hue, seed++, undefined, { knotL: true, knotR: true }));
@@ -429,9 +482,9 @@ export function compose(
         }
       }
       if (loop && kind !== "free") {
-        marks.push(...weft(loop.l - 22, loop.r + 22, y, hue, seed++, loop));
+        hang(string(loop.l - 22, loop.r + 22, y, hue, loop));
       } else {
-        marks.push(...weft(spanL - 30, spanR + 30, y, hue, seed++, undefined, { knotL: true, knotR: true }));
+        hang(string(spanL - 30, spanR + 30, y, hue, undefined, { knotL: true, knotR: true }));
       }
     });
   }
@@ -451,8 +504,10 @@ export function compose(
     const b = box(el);
     const hue: Hue = (el.closest<HTMLElement>("[data-hue]")?.dataset.hue ?? "c") === "m" ? "m" : "c";
     if (!loop) {
-      const x = threadAt(y, (b.l + b.r) / 2);
-      if (x === null || (x > b.l - 8 && x < b.r + 8)) continue;
+      const at = crossing(y, (b.l + b.r) / 2);
+      if (!at) continue;
+      const x = at.x;
+      if (x > b.l - 8 && x < b.r + 8) continue;
       const right = x < b.l;
       const end = right ? b.l - 10 : b.r + 10;
       if (Math.abs(end - x) > 260) continue;
@@ -461,8 +516,12 @@ export function compose(
         [(x + end) / 2, y + 4],
         [end, y],
       ];
+      if (heads) {
+        limbs.push({ hue: at.hue, way: new Path(pts, 3).points(), key: y - 40, tied: true, knot: true });
+        continue;
+      }
       marks.push(
-        ...thread(new Path(pts, 3), { hue, w: 2.2, seed: seed++, key: [y - 40, y - 10], glow: 0.16 }),
+        ...thread(new Path(pts, 3), { hue, seed: seed++, key: [y - 40, y - 10] }),
         ...knot(end, y, 3.5, seed++, y - 10),
       );
       continue;
@@ -472,14 +531,18 @@ export function compose(
       [(loop.l + b.l) / 2, y + 3],
       [b.l - 12, y],
     ];
+    if (heads) {
+      limbs.push({ hue: "c", way: new Path(pts, 3).points(), key: y - 50, tied: true, knot: true });
+      continue;
+    }
     marks.push(
-      ...thread(new Path(pts, 3), { hue, w: 2.2, seed: seed++, key: [y - 50, y - 20], glow: 0.16 }),
+      ...thread(new Path(pts, 3), { hue, seed: seed++, key: [y - 50, y - 20] }),
       ...knot(loop.l, y - 4, 5, seed++, y - 50),
       ...knot(b.l - 12, y, 3.5, seed++, y - 20),
     );
   }
 
-  return { marks, tips, orbits, end: endAt ? endAt[1] + 120 : null };
+  return { marks, tips, orbits, end: endAt ? endAt[1] + 120 : null, limbs };
 }
 
 /** The way one hion goes round a loop: from where they meet at its top,
@@ -529,7 +592,7 @@ function looseFibres(loop: Loop, seed: number): Mark[] {
       3,
     );
     out.push(
-      ...thread(loose, { hue, w: 1.5, alpha: 0.65, seed: seed * 7 + (dir > 0 ? 3 : 4), glow: 0, core: false }),
+      ...thread(loose, { hue, alpha: 0.65, seed: seed * 7 + (dir > 0 ? 3 : 4), core: false }),
     );
   }
   return out;
@@ -546,7 +609,7 @@ function weft(
   hue: Hue,
   seed: number,
   loop: Loop | undefined,
-  ends: { knotL?: boolean; knotR?: boolean; from?: number; key?: number } = {},
+  ends: { knotL?: boolean; knotR?: boolean; from?: number; key?: number; gap?: [number, number] } = {},
 ): Mark[] {
   const out: Mark[] = [];
   const rand = rng(seed);
@@ -561,7 +624,23 @@ function weft(
     ]);
   }
   const reversed = ends.from !== undefined && Math.abs(ends.from - to) < Math.abs(ends.from - from);
-  const path = new Path(reversed ? pts.slice().reverse() : pts, 3);
+  // Not across a heading written by thread: the weft stops short of its
+  // words either side (`gap`).
+  const at = (x: number): Pt => {
+    const i = Math.max(1, pts.findIndex((p) => p[0] >= x));
+    const [a, b] = [pts[i - 1], pts[i] ?? pts[i - 1]];
+    const u = b[0] === a[0] ? 0 : (x - a[0]) / (b[0] - a[0]);
+    return [x, a[1] + (b[1] - a[1]) * u];
+  };
+  const { gap } = ends;
+  const parts = gap
+    ? [
+        [...pts.filter((p) => p[0] < gap[0]), at(gap[0])],
+        [at(gap[1]), ...pts.filter((p) => p[0] > gap[1])],
+      ].filter((part) => part.length >= 2 && part[part.length - 1][0] - part[0][0] > 4)
+    : [pts];
+  const threads = (opts: Parameters<typeof thread>[1]) =>
+    parts.flatMap((part) => thread(new Path(reversed ? part.slice().reverse() : part, 3), opts));
   const key = ends.key ?? y - 40;
   // Thrown across as the reach passes them.
   const keys: [number, number] = [key, key + 60];
@@ -571,15 +650,15 @@ function weft(
     const under = flip ? loop.r : loop.l;
     // Where the weft passes over a strand, part the strand first.
     out.push(mark(Kind.Erase, hue, 8, 1, [over, y - 8, over, y + 8], 0, key - 1));
-    out.push(...thread(path, { hue, w: 3.2, seed: seed * 11, key: keys, glow: 0.18 }));
+    out.push(...threads({ hue, seed: seed * 11, key: keys }));
     // Where it passes under, cut the weft and lay the strand back over it.
     out.push(mark(Kind.Erase, hue, 9, 1, [under - 6, y, under + 6, y], 0, keys[1] + 1));
     const strandHue: Hue = under === loop.l ? "c" : "m";
     out.push(
-      mark(Kind.Stroke, strandHue, 3.8, 1, [under, y - 13, under + 0.6, y, under, y + 13], seed * 13, keys[1] + 2),
+      mark(Kind.Stroke, strandHue, THREAD, 1, [under, y - 13, under + 0.6, y, under, y + 13], seed * 13, keys[1] + 2),
     );
   } else {
-    out.push(...thread(path, { hue, w: 2.8, seed: seed * 11, key: keys, glow: 0.16 }));
+    out.push(...threads({ hue, seed: seed * 11, key: keys }));
   }
   if (ends.knotL) out.push(...knot(pts[0][0], pts[0][1], 5, seed + 3, reversed ? keys[1] : keys[0]));
   if (ends.knotR) {
@@ -587,4 +666,92 @@ function weft(
     out.push(...knot(last[0], last[1], 5, seed + 4, reversed ? keys[0] : keys[1]));
   }
   return out;
+}
+
+/** The points of a weft across [from, to] at y: a slight sag and tilt, as
+ * a thread pulled across by hand lies. */
+function weftPoints(from: number, to: number, y: number, seed: number): Pt[] {
+  const rand = rng(seed);
+  const pts: Pt[] = [];
+  const steps = Math.max(2, Math.round((to - from) / 40));
+  const tilt = (rand() - 0.5) * 5;
+  for (let i = 0; i <= steps; i++) {
+    const u = i / steps;
+    pts.push([from + (to - from) * u, y + Math.sin(u * Math.PI) * 2.5 + tilt * (u - 0.5) + Math.sin(u * 9 + seed) * 0.8]);
+  }
+  return pts;
+}
+
+/** A weft on a page, as the limbs that grow it (skein.ts grows each off a
+ * hion). Across a loop: off its left strand (cyan) across, over or under
+ * the right; with words strung on it, a limb in from each strand to the
+ * words, each tied off in a knot beside them (the words are written
+ * between, spun.ts). Thrown from a hion (`ends.from`): out from it to the
+ * words or to its end, knotted there; past the words it does not go on.
+ * Anywhere else: grown from the nearest thread to its start, across to the
+ * words or to its end. */
+function weftLimbs(
+  from: number,
+  to: number,
+  y: number,
+  hue: Hue,
+  seed: number,
+  loop: Loop | undefined,
+  ends: { knotL?: boolean; knotR?: boolean; from?: number; key?: number; gap?: [number, number] },
+  thrownHue?: Hue,
+): Limb[] {
+  const key = ends.key ?? y - 40;
+  const pts = weftPoints(from, to, y, seed);
+  const at = (x: number): Pt => {
+    const i = Math.max(1, pts.findIndex((p) => p[0] >= x));
+    const [a, b] = [pts[i - 1], pts[i] ?? pts[i - 1]];
+    const u = b[0] === a[0] ? 0 : (x - a[0]) / (b[0] - a[0]);
+    return [x, a[1] + (b[1] - a[1]) * u];
+  };
+  /** From x0 to x1 along it, whichever way that runs. */
+  const span = (x0: number, x1: number): Pt[] => {
+    const lo = Math.min(x0, x1);
+    const hi = Math.max(x0, x1);
+    const part = [at(lo), ...pts.filter((p) => p[0] > lo && p[0] < hi), at(hi)];
+    return new Path(x0 <= x1 ? part : part.reverse(), 3).points();
+  };
+  const { gap } = ends;
+  if (loop) {
+    const over = seed % 2 === 1;
+    const out: Limb[] = [
+      {
+        hue: "c",
+        way: span(loop.l, gap ? gap[0] : to),
+        key,
+        tied: true,
+        knot: !!gap,
+        // Across the far strand, under it or over by turns.
+        under: !gap && !over ? [loop.r] : undefined,
+      },
+    ];
+    if (gap) out.push({ hue: "m", way: span(loop.r, gap[1]), key: key + 30, tied: true, knot: true });
+    return out;
+  }
+  if (ends.from !== undefined) {
+    const x = ends.from;
+    const far = Math.abs(x - from) > Math.abs(x - to) ? from : to;
+    const end = gap ? (Math.abs(gap[0] - x) < Math.abs(gap[1] - x) ? gap[0] : gap[1]) : far;
+    return [{ hue: thrownHue ?? hue, way: span(x, end), key, tied: true, knot: true }];
+  }
+  return [{ hue, way: span(from, gap ? gap[0] : to), key, tied: false, knot: true }];
+}
+
+/** A knot where the two are tied together: a small loop out of the cyan
+ * and back through itself. */
+function tie(p: Pt, r: number, seed: number): Pt[] {
+  const rand = rng(seed);
+  const out: Pt[] = [p];
+  const a0 = -Math.PI / 2 + (rand() - 0.5) * 0.6;
+  const cx = p[0] + Math.cos(a0 + Math.PI) * r * -0.9;
+  const cy = p[1] + Math.sin(a0 + Math.PI) * r * -0.9;
+  for (let k = 0; k <= 30; k++) {
+    const a = a0 + Math.PI + (k / 30) * Math.PI * 2.1;
+    out.push([cx + Math.cos(a) * r * 0.9, cy + Math.sin(a) * r * 0.75]);
+  }
+  return new Path(out, 3).points();
 }

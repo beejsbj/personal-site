@@ -158,7 +158,10 @@ async function mount(lens: string) {
       onIdleChange(listener) {
         listeners.add(listener);
         idleListeners.add(listener);
-      },
+        return () => {
+          listeners.delete(listener);
+          idleListeners.delete(listener);
+        };      },
     });
     if (
       document.documentElement.dataset.lens !== lens ||
