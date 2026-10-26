@@ -63,7 +63,8 @@ const CAP_TOP =
   "polygon(50% 0%, 97.55% 34.55%, 79.39% 90.45%, 20.61% 90.45%, 2.45% 34.55%)";
 
 export interface Prism {
-  /** Warm the faces while the visitor is still deciding to catch the lure. */
+  /** Warm the faces once the visitor reaches for the lure, while they are
+   * still deciding to catch it. Faces arrive idle and stay so until shown. */
   preload(): void;
   open(options?: { onClose?: () => void }): Promise<void>;
   destroy(): void;

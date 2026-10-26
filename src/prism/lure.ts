@@ -12,10 +12,13 @@ const EDGE = 56;
 export interface LureOptions {
   /** Already found on an earlier visit: sits still in its corner. */
   tamed: boolean;
+  /** The visitor reaches for it: a pointer near or on it, focus, a touch.
+   * Fires on every reach, so it must be cheap to repeat. */
+  onIntent?: () => void;
   onCatch: (from: DOMRect) => void;
 }
 
-export function mountLure({ tamed, onCatch }: LureOptions) {
+export function mountLure({ tamed, onIntent, onCatch }: LureOptions) {
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lure = document.createElement("button");
   lure.type = "button";
@@ -39,6 +42,9 @@ export function mountLure({ tamed, onCatch }: LureOptions) {
   let lastMove = { x: 0, y: 0, t: 0 };
   const controller = new AbortController();
   const { signal } = controller;
+  const reach = () => onIntent?.();
+  for (const type of ["pointerenter", "pointerdown", "focus"])
+    lure.addEventListener(type, reach, { signal });
 
   const place = (nextX: number, nextY: number) => {
     x = Math.min(Math.max(nextX, EDGE), innerWidth - EDGE);
@@ -87,6 +93,7 @@ export function mountLure({ tamed, onCatch }: LureOptions) {
           return;
         const near =
           Math.hypot(event.clientX - x, event.clientY - y) < DODGE_RADIUS;
+        if (near && lure.dataset.state === "wild") reach();
         if (near && speed > GRAB_SPEED) dodge(event.clientX, event.clientY);
       },
       { signal, passive: true },

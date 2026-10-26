@@ -50,21 +50,28 @@ function mountPage() {
   store(sessionStorage, VIEWS_KEY, String(views));
   let lure: ReturnType<typeof mountLure> | undefined;
   let timer = 0;
+  let handingBack = false;
 
   const summon = (tamed: boolean) => {
     if (lure || signal.aborted) return;
     clearTimeout(timer);
     if (!tamed) glint();
-    prism.preload();
     lure = mountLure({
       tamed,
+      // Nothing of the prism loads until the visitor reaches for the lure.
+      onIntent: () => {
+        if (!handingBack) prism.preload();
+      },
       onCatch: async () => {
         store(localStorage, FOUND_KEY, "1");
         await prism.open({
           onClose: () => {
             lure?.tame();
             lure?.release();
+            // Handing focus back is not the visitor reaching for it again.
+            handingBack = true;
             lure?.element.focus({ preventScroll: true });
+            handingBack = false;
           },
         });
       },
