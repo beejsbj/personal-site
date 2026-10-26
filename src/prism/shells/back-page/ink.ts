@@ -1,9 +1,13 @@
 /** Biro ink: every drawing on the page is made here, from a seed, so the same
  * page always looks the same (a camp never redraws itself differently). */
 
-export const BLUE = "#1b3899";
-export const RED = "#c01e2a";
-export const PENCIL = "#3f3c39";
+/** The book's two pens and its pencil, as CSS variables: every book is its
+ * own paper (themes.css), and the ink follows it. SVG built from these goes
+ * through `svg()`/`paint()` (dom.ts), which move them into `style`, since a
+ * presentation attribute can't hold a `var()`. */
+export const BLUE = "var(--bp-blue)";
+export const RED = "var(--bp-red)";
+export const PENCIL = "var(--bp-pencil)";
 
 export type Rng = () => number;
 
@@ -222,4 +226,89 @@ export function doodle(kind: number, rng: Rng) {
 export function tapeClip(rng: Rng) {
   const j = () => f(between(rng, 0, 9));
   return `polygon(0 ${j()}%, 6% 0, 94% ${j()}%, 100% 0, 97% 50%, 100% 100%, 93% ${f(91 + rng() * 9)}%, 5% 100%, 0 ${f(90 + rng() * 10)}%, 3% 50%)`;
+}
+
+// ---- a used book: what a bored hand leaves on printed matter ---------------------
+// Each is an SVG stretched over the thing it marks (a cell, a row, a word), so
+// it lands where the print is at any size; the strokes keep their weight.
+
+const scrawl = (kind: string, view: string, body: string, stretch = true) =>
+  `<svg class="bp-scrawl bp-scrawl--${kind}" viewBox="${view}"${stretch ? ' preserveAspectRatio="none"' : ""} aria-hidden="true">${body}</svg>`;
+const NS = 'fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"';
+
+/** Pencil shading, back and forth along a row, `cells` cells of it, the
+ * strokes leaning the way a right hand leans them: even where he meant it,
+ * then shorter and further apart where he gave up. */
+export function shading(cells: number, rng: Rng) {
+  const W = cells * 100;
+  let x = between(rng, 0, 4);
+  let d = `M${f(x)} ${f(between(rng, 86, 94))}`;
+  while (x < W - 24) {
+    // how far from where he stopped: the last stretch thins and shortens
+    const tail = Math.max(0, Math.min(1, (W - x) / 180));
+    const reach = 42 * (0.45 + 0.55 * tail) + between(rng, -4, 2);
+    const mid = 50 + between(rng, -3, 3);
+    const lean = between(rng, 16, 22);
+    d += `L${f(x + lean)} ${f(mid - reach)}`;
+    x += between(rng, 5, 8) + (1 - tail) * between(rng, 3, 10);
+    d += `L${f(x)} ${f(mid + reach)}`;
+  }
+  return scrawl("shade", `0 0 ${W} 100`, `<path d="${d}" stroke="${PENCIL}" stroke-width=".9" ${NS}/>`);
+}
+
+/** A ring drawn round a cell's number. */
+export function ring(ink: string, rng: Rng) {
+  return scrawl("ring", "-50 -50 100 100", `<path d="${handCircle(0, 0, 40, rng)}" stroke="${ink}" stroke-width="1.4" ${NS}/>`);
+}
+
+/** A tick, the kind that means "know this one". */
+export function tick(ink: string, rng: Rng) {
+  const j = () => between(rng, -1.2, 1.2);
+  return scrawl(
+    "tick",
+    "0 0 20 16",
+    `<path d="M${f(2 + j())} ${f(8 + j())}Q${f(5)} ${f(11)} ${f(7 + j())} ${f(14.5)}Q${f(11)} ${f(6)} ${f(19 + j())} ${f(1.5 + j())}" stroke="${ink}" stroke-width="1.7" ${NS}/>`,
+    false,
+  );
+}
+
+/** Two quick strokes through a wrong answer. */
+export function strike(ink: string, rng: Rng) {
+  const y = () => f(between(rng, 38, 62));
+  return scrawl(
+    "strike",
+    "0 0 100 100",
+    `<path d="M-6 ${y()}L106 ${y()}M-2 ${f(between(rng, 70, 85))}L104 ${f(between(rng, 15, 30))}" stroke="${ink}" stroke-width="1.5" ${NS}/>`,
+  );
+}
+
+/** A curling arrow from a note to what it's about, pointing right. */
+export function arrow(ink: string, rng: Rng) {
+  const lift = between(rng, 6, 10);
+  return scrawl(
+    "arrow",
+    "0 0 40 24",
+    `<path d="M2 ${f(16 + lift / 3)}C 12 ${f(4 - lift / 2)}, 26 ${f(4)}, 37 12M30 ${f(6.5)}L37 12L${f(29.5)} ${f(15.5)}" stroke="${ink}" stroke-width="1.5" ${NS}/>`,
+    false,
+  );
+}
+
+/** A face drawn round a hundred: its noughts are the eyes. The pupils are
+ * inked on the noughts themselves (.bp-eye), so they stay put whatever the
+ * cell's width or the font. */
+export function face(ink: string, rng: Rng) {
+  const j = () => between(rng, -1.5, 1.5);
+  return scrawl(
+    "face",
+    "-50 -50 100 100",
+    `<path d="${handCircle(6, 4, 47, rng)}" stroke="${ink}" stroke-width="1.3" ${NS}/>` +
+      `<path d="M-4 ${f(24 + j())}Q12 ${f(38 + j())} 30 ${f(22 + j())}" stroke="${ink}" stroke-width="1.6" ${NS}/>` +
+      // and a tuft of hair
+      `<path d="M4 -40q0 -12 6 -16M13 -41q5 -10 11 -11" stroke="${ink}" stroke-width="1.3" ${NS}/>`,
+  );
+}
+
+/** A soldier from an old war, pressed in and crossed out where he fell. */
+export function fallen(ink: string, killer: string, rng: Rng) {
+  return scrawl("fallen", "-10 -10 20 20", `${dot(0, 0, 3.4, rng, ink)}${cross(0, 0, 6.6, rng, killer)}`, false);
 }

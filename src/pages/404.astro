@@ -24,7 +24,7 @@ const { header } = page;
     </p>
     <div {...part("page.actions", "not-found")}>
       {header.actions.map((action) => (
-        <Link treatment="action" tone="wine" href={action.href}>
+        <Link treatment="pill" tone="wine" href={action.href}>
           {action.label}
         </Link>
       ))}

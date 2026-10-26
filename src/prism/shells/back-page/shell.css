@@ -14,6 +14,7 @@
   --bp-grid: rgba(84, 128, 168, 0.24);
   --bp-margin: rgba(200, 64, 64, 0.5);
   --bp-hand: "Caveat", "Patrick Hand", cursive;
+  --bp-brush: "Caveat Brush", "Caveat", cursive;
   --bp-print: "Patrick Hand", "Caveat", sans-serif;
   --bp-type: "Special Elite", "Courier New", monospace;
   --bp-circle-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M64 5 C 100 3, 117 13, 115 26 C 113 41, 82 47, 56 46 C 26 45, 5 38, 6 24 C 7 11, 33 4, 76 7' fill='none' stroke='%23c01e2a' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
@@ -120,9 +121,9 @@
 }
 :root[data-lens="back-page"] .bp-pen--red {
   --ink: #c01e2a;
-  left: calc(var(--bx) + var(--bw) + 74px);
-  top: calc(var(--by) + var(--bh) * 0.56);
-  transform: rotate(-11deg);
+  left: calc(var(--bx) - 40px);
+  top: calc(var(--by) + var(--bh) * 0.1);
+  transform: rotate(-8deg);
 }
 
 /* ---- the book --------------------------------------------------------------- */
@@ -177,7 +178,7 @@
   position: absolute;
   top: 2px;
   bottom: -3px;
-  background: repeating-linear-gradient(90deg, #eee8da 0 1px, #cfc6b3 1px 2px);
+  background: repeating-linear-gradient(90deg, var(--bp-edge-1) 0 1px, var(--bp-edge-2) 1px 2px);
 }
 :root[data-lens="back-page"] .bp-edges::before {
   right: 100%;
@@ -334,8 +335,8 @@
   --mx: 3.3em;
 }
 :root[data-lens="back-page"] .bp-page[data-paper="squared"]::before,
-:root[data-lens="back-page"] .bp-page[data-paper="letter"]::before,
-:root[data-lens="back-page"] .bp-page[data-paper="typed"]::before {
+:root[data-lens="back-page"] .bp-page[data-paper="notes"]::before,
+:root[data-lens="back-page"] .bp-page[data-paper="ruled"]::before {
   content: "";
   position: absolute;
   top: 0;
@@ -403,7 +404,7 @@
 :root[data-lens="back-page"] .bp-flow a {
   color: var(--bp-blue);
   text-decoration: underline;
-  text-decoration-color: rgba(27, 56, 153, 0.4);
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
   text-decoration-thickness: 1.5px;
   text-underline-offset: 0.18em;
 }
@@ -478,11 +479,6 @@
   padding-left: 0.8em;
   border-left: 2px solid var(--bp-red);
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow :is(h4, h5, h6) {
-  margin: 0.8em 0 0.15em;
-  font: 1em/1.35 var(--bp-type);
-  color: #111;
-}
 
 /* ---- handwriting ------------------------------------------------------------------ */
 :root[data-lens="back-page"] .bp-h1 {
@@ -522,7 +518,7 @@
   font: 0.7em/1.4 var(--bp-type);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--bp-label-ink);
+  color: var(--bp-type-ink, var(--bp-label-ink));
 }
 :root[data-lens="back-page"] .bp-lead {
   font: 400 1.32em/var(--lh) var(--bp-hand);
@@ -691,7 +687,14 @@
 }
 :root[data-lens="back-page"] .bp-label__field b {
   font: 700 1.9em/1.1 var(--bp-hand);
-  color: var(--bp-blue);
+  color: var(--bp-title-a);
+}
+/* the label is its own white sticker: written in the cover's inks, whatever the paper */
+:root[data-lens="back-page"] .bp-label .bp-blue {
+  color: var(--bp-title-a);
+}
+:root[data-lens="back-page"] .bp-label .bp-red {
+  color: var(--bp-title-b);
 }
 :root[data-lens="back-page"] .bp-cover-doodle {
   width: 42%;
@@ -700,86 +703,27 @@
   transform: rotate(-8deg);
   mix-blend-mode: multiply;
 }
+:root[data-lens="back-page"] .bp-page[data-kind="inside-cover"] .bp-cover-doodle {
+  width: 64%;
+  margin: auto;
+  transform: rotate(-4deg);
+}
 :root[data-lens="back-page"] .bp-belongs {
   margin: 0 auto;
   padding: 0.5em 1em;
   background: var(--bp-label);
   font: 400 1.2em/1.3 var(--bp-hand);
-  color: var(--bp-pencil);
+  color: #3f3c39;
   transform: rotate(-1.5deg);
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
   border-radius: 3px;
 }
 :root[data-lens="back-page"] .bp-belongs b {
   font-weight: 700;
-  color: var(--bp-blue);
+  color: var(--bp-title-a);
   font-size: 1.2em;
 }
 
-/* the contents: a slip of squared paper tucked into the cover */
-:root[data-lens="back-page"] .bp-contents {
-  position: relative;
-  padding: 1em 1.1em 0.8em 2.2em;
-  background:
-    linear-gradient(90deg, transparent 1.45em, var(--bp-margin) 1.45em calc(1.45em + 1.5px), transparent calc(1.45em + 1.5px)),
-    linear-gradient(var(--bp-grid) 1px, transparent 1px) 0 0 / 14px 14px,
-    linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px) 0 0 / 14px 14px,
-    var(--bp-paper);
-  transform: rotate(1.4deg);
-  box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.38),
-    0 1px 0 rgba(0, 0, 0, 0.2);
-  clip-path: polygon(0 1.2%, 8% 0, 16% 1.4%, 25% 0, 33% 1%, 42% 0, 51% 1.2%, 60% 0, 69% 1.3%, 78% 0, 87% 1.1%, 100% 0, 100% 100%, 0 100%);
-}
-:root[data-lens="back-page"] .bp-contents__title {
-  margin: 0 0 0.2em;
-  font: 700 1.6em/1 var(--bp-hand);
-  color: var(--bp-pencil);
-  text-decoration: underline 2px var(--bp-red);
-  text-underline-offset: 0.2em;
-}
-:root[data-lens="back-page"] .bp-contents__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-:root[data-lens="back-page"] .bp-contents__list a {
-  display: flex;
-  align-items: baseline;
-  gap: 0.35em;
-  padding: 0.18em 0;
-  min-height: 44px;
-  box-sizing: border-box;
-  color: var(--bp-blue);
-  text-decoration: none;
-}
-:root[data-lens="back-page"] .bp-contents__list [data-ink="red"] a {
-  color: var(--bp-red);
-}
-:root[data-lens="back-page"] .bp-contents__name {
-  font: 700 1.55em/1.1 var(--bp-hand);
-  white-space: nowrap;
-}
-:root[data-lens="back-page"] .bp-contents__list small {
-  font: 400 1.1em/1 var(--bp-hand);
-  color: var(--bp-fine);
-  white-space: nowrap;
-}
-:root[data-lens="back-page"] .bp-contents__dots {
-  flex: 1;
-  min-width: 1em;
-  border-bottom: 2px dotted rgba(63, 60, 57, 0.45);
-  transform: translateY(-0.3em);
-}
-:root[data-lens="back-page"] .bp-contents__no {
-  font: 700 1.3em/1 var(--bp-hand);
-  color: var(--bp-pencil);
-}
-:root[data-lens="back-page"] .bp-contents__list a[aria-current="page"] .bp-contents__name {
-  padding: 0 0.25em;
-  margin: 0 -0.25em;
-  background: var(--bp-circle-red) center / 100% 100% no-repeat;
-}
 :root[data-lens="back-page"] .bp-return {
   margin: 0 auto;
   padding: 0.55em 1em 0.6em;
@@ -788,14 +732,14 @@
   transform: rotate(-1deg);
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
   font: 400 1.15em/1.35 var(--bp-hand);
-  color: var(--bp-pencil);
+  color: #3f3c39;
   text-align: center;
 }
 :root[data-lens="back-page"] .bp-return p {
   margin: 0;
 }
 :root[data-lens="back-page"] .bp-return a {
-  color: var(--bp-blue);
+  color: var(--bp-title-a);
   font-weight: 700;
 }
 :root[data-lens="back-page"] .bp-return__socials {
@@ -834,7 +778,7 @@
   font: 0.72em/1.6 var(--bp-type);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--bp-label-ink);
+  color: var(--bp-type-ink, var(--bp-label-ink));
 }
 :root[data-lens="back-page"] .bp-note {
   display: block;
@@ -847,7 +791,7 @@
   transform: rotate(-1.2deg);
   box-shadow: 0 5px 12px rgba(60, 40, 20, 0.25);
   font: 400 1.15em/1.3 var(--bp-hand);
-  color: var(--bp-pencil);
+  color: #3f3c39;
 }
 :root[data-lens="back-page"] .bp-note b {
   color: var(--bp-red);
@@ -909,129 +853,478 @@
   color: var(--bp-fine);
 }
 
-/* ---- the letter --------------------------------------------------------------------- */
-:root[data-lens="back-page"] .bp-page[data-paper="letter"] .bp-flow {
-  font: 400 1.34em/var(--lh) var(--bp-hand);
-  color: #22306e;
+/* ---- study notes: the about book -------------------------------------------------
+   A meticulous student's notes: brush-pen headings, highlighter, tidy
+   bullets on the ruling, boxed key facts, a taped photo and a sticky note. */
+:root[data-lens="back-page"] .bp-desk {
+  --bp-hl-yellow: rgba(255, 226, 60, 0.62);
+  --bp-hl-pink: rgba(255, 128, 176, 0.42);
+  --bp-hl-green: rgba(132, 226, 150, 0.55);
+  --bp-sticky: #fbe882;
+  --bp-washi: #f2a7b8;
+  --bp-hand-box: 255px 14px 225px 16px / 16px 225px 14px 255px;
 }
-:root[data-lens="back-page"] .bp-page[data-paper="letter"] .bp-flow .bp-lead {
-  font-size: 1em;
-  color: var(--bp-fine);
+:root[data-lens="back-page"] .bp-page[data-paper="notes"] .bp-flow {
+  color: var(--bp-letter);
 }
-:root[data-lens="back-page"] .bp-page[data-paper="letter"] .bp-flow h2 {
-  font-size: 1.3em;
+:root[data-lens="back-page"] .bp-noteshead {
+  margin-bottom: calc(var(--g) * 0.5);
+}
+/* the subject tab, printed, at the top of the notes */
+:root[data-lens="back-page"] .bp-ntab {
+  display: inline-block;
+  margin: 0 !important;
+  padding: 0 0.6em;
+  font: 0.68em/1.7 var(--bp-type);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--bp-red);
-  line-height: calc(var(--lh) * 1.5);
+  border: 1.5px solid currentColor;
+  border-radius: var(--bp-hand-box);
+  transform: rotate(-2deg);
 }
-:root[data-lens="back-page"] .bp-page[data-paper="letter"] .bp-h1 {
-  font-size: 1.9em;
-}
-:root[data-lens="back-page"] .bp-salute {
-  margin-top: var(--g) !important;
-  font-weight: 700;
-}
-:root[data-lens="back-page"] .bp-signoff {
-  margin-top: var(--g) !important;
-}
-:root[data-lens="back-page"] .bp-signoff span {
-  font-weight: 700;
-  font-size: 1.5em;
+:root[data-lens="back-page"] .bp-brush {
+  font: 400 2.35em/calc(var(--lh) * 2) var(--bp-brush);
   color: var(--bp-blue);
+  letter-spacing: 0.01em;
 }
-:root[data-lens="back-page"] .bp-ps {
-  color: var(--bp-red);
+/* a highlighter swipe: tapered ends, a little low, a little crooked */
+:root[data-lens="back-page"] .bp-hl {
+  padding: 0 0.2em;
+  margin: 0 -0.1em;
+  background: linear-gradient(100deg, transparent 0.15em, var(--bp-hl-green) 0.35em, var(--bp-hl-green) calc(100% - 0.4em), transparent calc(100% - 0.12em)) 0 78% / 100% 52% no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
-:root[data-lens="back-page"] .bp-ps a {
-  color: var(--bp-red) !important;
-  text-decoration-color: rgba(192, 30, 42, 0.4) !important;
+/* the photo, small, taped in with patterned washi tape */
+:root[data-lens="back-page"] .bp-notephoto {
+  float: right;
+  width: 30%;
+  max-width: 9.5em;
+  margin: 0.2em 0 0.4em 0.9em;
+  --tilt: 3deg !important;
 }
-
-/* ---- typed, and stapled in ------------------------------------------------------------ */
-:root[data-lens="back-page"] .bp-sheet {
-  position: absolute;
-  top: calc(var(--lh) * 2.2);
-  bottom: 1.2em;
-  left: calc(var(--mx) - 1.6em);
-  right: 0.9em;
+:root[data-lens="back-page"] .bp-notephoto img {
+  aspect-ratio: 1;
+}
+:root[data-lens="back-page"] .bp-notephoto .bp-tape {
+  width: 3.4em;
+  height: 1.1em;
   background:
-    radial-gradient(ellipse at 40% 20%, rgba(255, 255, 255, 0.7), transparent 70%),
-    #fbf9f3;
-  box-shadow:
-    0 1px 1px rgba(0, 0, 0, 0.2),
-    0 8px 18px rgba(60, 40, 20, 0.3);
-  transform: rotate(-0.6deg);
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.55) 0 3px, transparent 3px 7px),
+    var(--bp-washi);
+  opacity: 0.88;
 }
-:root[data-lens="back-page"] .bp-staple {
+:root[data-lens="back-page"] .bp-notephoto .bp-tape--b {
+  display: none;
+}
+:root[data-lens="back-page"] .bp-notephoto .bp-tape--a {
+  left: 50%;
+  margin-left: -1.7em;
+  transform: rotate(-4deg);
+}
+:root[data-lens="back-page"] .bp-notephoto figcaption {
+  font-size: 1.05em;
+  transform: rotate(-3deg);
+}
+/* the key fact, boxed in pen, its tag sitting on the box's edge */
+:root[data-lens="back-page"] .bp-keybox {
+  position: relative;
+  margin: var(--g) 0.3em var(--lh) 0;
+  padding: calc(var(--g) * 0.9) 0.8em calc(var(--g) * 0.6);
+  display: flow-root;
+  border: 2px solid var(--bp-blue);
+  border-radius: var(--bp-hand-box);
+  background: color-mix(in srgb, var(--bp-paper) 80%, transparent);
+  transform: rotate(-0.4deg);
+}
+:root[data-lens="back-page"] .bp-keybox p {
+  margin: 0 !important;
+  font: 400 1.05em/var(--lh) var(--bp-print);
+  color: var(--bp-letter);
+}
+:root[data-lens="back-page"] .bp-keybox__tag {
   position: absolute;
-  z-index: 2;
-  left: 1.1em;
-  top: 0.9em;
-  width: 1.9em;
-  height: 0.28em;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #d8dde0, #8d9397);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
-  transform: rotate(-32deg);
-}
-:root[data-lens="back-page"] .bp-sheet .bp-flow {
-  top: 2em;
-  bottom: 1.8em;
-  left: 1.6em;
-  right: 1.5em;
-  padding-left: 0;
-  font: 0.84em/1.55 var(--bp-type);
-  color: #232120;
-}
-:root[data-lens="back-page"] .bp-sheet .bp-flow p,
-:root[data-lens="back-page"] .bp-sheet .bp-flow ul,
-:root[data-lens="back-page"] .bp-sheet .bp-flow ol {
-  margin-bottom: 0.7em;
-}
-:root[data-lens="back-page"] .bp-sheet .bp-flow ul {
-  padding-left: 1.2em;
-  list-style: "- ";
-}
-:root[data-lens="back-page"] .bp-sheet .bp-flow li::marker {
-  font-family: var(--bp-type);
-  color: #232120;
-}
-:root[data-lens="back-page"] .bp-sheet .bp-flow h2 {
-  margin: 0.9em 0 0.5em;
-  font: 1.15em/1.3 var(--bp-type);
+  top: -0.75em;
+  left: 0.8em;
+  padding: 0 0.35em;
+  background: var(--bp-paper);
+  font: 0.62em/1.4 var(--bp-type);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--bp-red);
-  border-bottom: 1.5px solid rgba(192, 30, 42, 0.5);
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow h3 {
-  margin: 0.8em 0 0.15em;
-  font: 1.05em/1.35 var(--bp-type);
+/* the sticky note: a square of yellow, curling off the page at one corner */
+:root[data-lens="back-page"] .bp-sticky {
+  position: relative;
+  float: right;
+  clear: right;
+  width: min(36%, 9.5em);
+  margin: 0 -0.4em var(--g) 0.9em;
+  padding: 0.7em 0.75em 0.8em;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.06), transparent 1.1em),
+    linear-gradient(165deg, transparent 70%, rgba(120, 90, 0, 0.08)),
+    var(--bp-sticky);
+  color: #3a3420 !important;
+  text-decoration: none !important;
+  transform: rotate(2.4deg);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.12),
+    6px 12px 12px -8px rgba(60, 40, 0, 0.45);
+  border-bottom-right-radius: 40% 6%;
+  z-index: 1;
+}
+:root[data-lens="back-page"] .bp-sticky__label {
+  display: block;
+  font: 700 1.3em/1.1 var(--bp-hand);
+  color: var(--bp-red);
+}
+:root[data-lens="back-page"] .bp-sticky__where {
+  display: block;
+  margin-top: 0.3em;
+  font: 400 1.05em/1.1 var(--bp-hand);
+  color: #5d5432;
+}
+:root[data-lens="back-page"] .bp-sticky__where:empty {
+  display: none;
+}
+/* numbered headings: the number circled in red, the words in brush pen */
+:root[data-lens="back-page"] .bp-flow .bp-nh {
+  position: relative;
+  margin: var(--g) 0 calc(var(--g) * 0.2);
+  padding-left: 1.55em;
+  font: 400 1.65em/calc(var(--lh) * 1.5) var(--bp-brush);
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-flow > .bp-nh:first-child {
+  margin-top: 0;
+}
+:root[data-lens="back-page"] .bp-nh::before {
+  content: attr(data-n);
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: -0.6em;
+  border: 2px solid var(--bp-red);
+  border-radius: 50% 46% 52% 44%;
+  font: 700 0.62em/1.75em var(--bp-hand);
+  width: 1.8em;
+  height: 1.8em;
+  margin-top: -0.95em;
+  text-align: center;
+  color: var(--bp-red);
+  transform: rotate(-8deg);
+}
+:root[data-lens="back-page"] .bp-flow .bp-nsub {
+  margin: calc(var(--g) * 0.5) 0 0;
+  font: 400 1.25em/var(--lh) var(--bp-brush);
+  color: var(--bp-red);
+  text-decoration: underline 1.5px var(--bp-red);
+  text-underline-offset: 0.2em;
+}
+/* tidy bullets on the ruling: a point, and arrows for what follows from it */
+:root[data-lens="back-page"] .bp-flow .bp-bullets {
+  list-style: none;
+  margin: 0 0 calc(var(--g) * 0.5);
+  padding-left: 1.1em;
+}
+:root[data-lens="back-page"] .bp-bullets > li {
+  position: relative;
+  font: 400 1.04em/var(--lh) var(--bp-print);
+}
+:root[data-lens="back-page"] .bp-bullets > li::before {
+  position: absolute;
+  font: 700 1.1em/var(--lh) var(--bp-hand);
+}
+:root[data-lens="back-page"] .bp-bullets > .bp-point::before {
+  content: "";
+  left: -0.85em;
+  top: calc(var(--lh) * 0.5 - 0.2em);
+  width: 0.36em;
+  height: 0.36em;
+  border-radius: 50% 40% 55% 45%;
+  background: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-bullets > .bp-more {
+  margin-left: 1.05em;
+}
+:root[data-lens="back-page"] .bp-bullets > .bp-more::before {
+  content: "→";
+  left: -1.1em;
+  top: 0;
+  color: var(--bp-red);
+}
+/* a list Burooj wrote himself keeps its own markers */
+:root[data-lens="back-page"] .bp-flow .bp-bullets--list {
+  list-style: disc;
+  padding-left: 1.3em;
+}
+:root[data-lens="back-page"] .bp-bullets--list > li::before {
+  content: none;
+}
+/* the callout: a quotation boxed twice in pen, a star at its corner */
+:root[data-lens="back-page"] .bp-flow .bp-callout {
+  position: relative;
+  margin: calc(var(--g) * 0.5) 0.6em var(--lh) 1.1em;
+  padding: calc(var(--g) * 0.7) 1em;
+  border: 4px double var(--bp-red);
+  border-radius: var(--bp-hand-box);
+  font: 400 1.32em/var(--lh) var(--bp-hand);
+  color: var(--bp-blue);
+  transform: rotate(0.6deg);
+}
+:root[data-lens="back-page"] .bp-flow .bp-callout p {
+  margin: 0;
+}
+:root[data-lens="back-page"] .bp-callout::before {
+  content: "★";
+  position: absolute;
+  left: -1.05em;
+  top: -0.55em;
+  font: 1.15em/1 var(--bp-print);
+  color: var(--bp-red);
+  transform: rotate(-12deg);
+}
+:root[data-lens="back-page"] .bp-nh .bp-underline {
+  width: min(60%, 9em);
+  margin-top: -0.2em;
+}
+:root[data-lens="back-page"] .bp-notedoodle {
+  position: absolute;
+  left: 0.15em;
+  top: calc(var(--lh) * 3);
+  width: calc(var(--mx) - 0.9em);
+  opacity: 0.8;
+  transform: rotate(-10deg);
+  pointer-events: none;
+}
+/* highlights: links in yellow (still underlined, still links), emphasis in pink */
+:root[data-lens="back-page"] .bp-page[data-paper="notes"] .bp-flow :is(.bp-bullets, .bp-callout, .bp-keybox) a {
+  color: inherit;
+  text-decoration-color: color-mix(in srgb, var(--bp-blue) 55%, transparent);
+  background: linear-gradient(100deg, transparent 0.1em, var(--bp-hl-yellow) 0.25em, var(--bp-hl-yellow) calc(100% - 0.25em), transparent calc(100% - 0.08em)) 0 70% / 100% 62% no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+:root[data-lens="back-page"] .bp-page[data-paper="notes"] .bp-flow :is(em, strong) {
+  font-style: normal;
+  font-weight: inherit;
+  color: inherit;
+  padding: 0 0.1em;
+  background: linear-gradient(100deg, transparent 0.1em, var(--bp-hl-pink) 0.25em, var(--bp-hl-pink) calc(100% - 0.25em), transparent calc(100% - 0.08em)) 0 70% / 100% 62% no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ---- slips stapled into the about book: the resume -----------------------------------
+   Each role, course and the tools on its own slip: a ruled index card, a
+   typed half-sheet, a till receipt, a manila library card, a scrap of graph
+   paper. Each is stapled at the top, turned a little, and lifts off the page;
+   reaching for one lifts it further, pivoting on its staple. */
+:root[data-lens="back-page"] .bp-flow .bp-stapledhead {
+  margin: calc(var(--g) * 0.4) 0 0;
+  font: 400 1.45em/var(--lh) var(--bp-brush);
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-slip {
+  --slip: #fdfcf8;
+  --slip-ink: #24222a;
+  position: relative;
+  margin: calc(var(--g) * 0.7) 0.5em calc(var(--g) * 1.4) 0.1em;
+  padding: 1em 0.9em 0.6em;
+  font: 0.78em/1.42 var(--bp-type);
+  color: var(--slip-ink);
+  background: var(--slip);
+  transform: rotate(var(--tilt, 0deg));
+  transform-origin: var(--ox, 50%) 0.5em;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.16),
+    0 7px 14px -4px rgba(60, 40, 20, 0.34),
+    0 16px 18px -14px rgba(60, 40, 20, 0.4);
+}
+:root[data-lens="back-page"] .bp-slip p,
+:root[data-lens="back-page"] .bp-slip ul {
+  margin: 0 0 0.45em !important;
+}
+:root[data-lens="back-page"] .bp-slip ul {
+  padding-left: 1.1em;
+  list-style: "– ";
+}
+:root[data-lens="back-page"] .bp-slip li::marker {
+  font: inherit;
+  color: inherit;
+}
+:root[data-lens="back-page"] .bp-flow .bp-slip a {
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-flow .bp-slip .bp-slip__title {
+  margin: 0 0 0.1em;
+  font: 1.08em/1.3 var(--bp-type);
   color: #111;
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow em {
-  font-style: normal;
-  color: var(--bp-fine);
+:root[data-lens="back-page"] .bp-slip__date {
+  color: #6b6560;
 }
-:root[data-lens="back-page"] .bp-sheet .bp-flow a {
-  color: #1d2f80;
+/* the staple: a bent wire through the paper, its ends pressed in */
+:root[data-lens="back-page"] .bp-staple {
+  position: absolute;
+  z-index: 2;
+  top: 0.4em;
+  width: 1.9em;
+  height: 0.3em;
+  margin-left: -0.95em;
+  border-radius: 1px;
+  background: linear-gradient(180deg, #f2f4f5 0%, #b9bfc3 35%, #7d8489 70%, #a9afb3 100%);
+  box-shadow:
+    0 1px 0.5px rgba(0, 0, 0, 0.45),
+    0 0 0 0.5px rgba(40, 44, 48, 0.35);
+  transform: rotate(var(--st, 0deg));
 }
-:root[data-lens="back-page"] .bp-sheet .bp-h1 {
-  font: 1.9em/1.2 var(--bp-type);
+:root[data-lens="back-page"] .bp-staple::before,
+:root[data-lens="back-page"] .bp-staple::after {
+  content: "";
+  position: absolute;
+  top: -0.12em;
+  width: 0.2em;
+  height: 0.54em;
+  border-radius: 1px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(60, 50, 40, 0.38), transparent 70%);
+}
+:root[data-lens="back-page"] .bp-staple::before {
+  left: -0.1em;
+}
+:root[data-lens="back-page"] .bp-staple::after {
+  right: -0.1em;
+}
+/* a ruled index card, written in by hand */
+:root[data-lens="back-page"] .bp-slip[data-stock="index"] {
+  --slip-ink: var(--bp-letter);
+  padding-top: 1.1em;
+  font: 0.9em/1.5em var(--bp-print);
+  background:
+    linear-gradient(transparent 0.95em, rgba(206, 70, 70, 0.6) 0.95em 1.05em, transparent 1.05em) 0 0 / 100% 100% no-repeat,
+    linear-gradient(transparent calc(1.5em - 1px), rgba(92, 140, 196, 0.38) calc(1.5em - 1px)) 0 1.1em / 100% 1.5em,
+    #fffefb;
+}
+:root[data-lens="back-page"] .bp-flow .bp-slip[data-stock="index"] .bp-slip__title {
+  font: 400 1.3em/1.5em var(--bp-brush);
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="index"] .bp-slip__date {
+  font: 700 1.1em/1.5em var(--bp-hand);
+  color: var(--bp-red);
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="index"] ul {
+  list-style: "→ ";
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="index"] :is(p, ul) {
+  margin-bottom: 0 !important;
+}
+/* a typed half-sheet, and the letterhead: white bond, typewriter */
+:root[data-lens="back-page"] .bp-slip[data-stock="typed"],
+:root[data-lens="back-page"] .bp-slip[data-stock="letterhead"] {
+  background:
+    radial-gradient(ellipse at 40% 20%, rgba(255, 255, 255, 0.7), transparent 70%),
+    #fbf9f3;
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="letterhead"] {
+  padding-bottom: 0.7em;
+  border-bottom: 3px double rgba(35, 33, 32, 0.35);
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="letterhead"] .bp-h1 {
+  font: 1.75em/1.25 var(--bp-type);
   color: #111;
   transform: none;
   letter-spacing: 0.02em;
 }
-:root[data-lens="back-page"] .bp-typedhead {
-  margin-bottom: 0.4em;
-  padding-bottom: 0.6em;
-  border-bottom: 1.5px dashed rgba(35, 33, 32, 0.4);
+:root[data-lens="back-page"] .bp-slip__contact {
+  font-size: 0.94em;
 }
-:root[data-lens="back-page"] .bp-typedhead__intro {
-  margin: 0.2em 0 0.3em !important;
+/* a till receipt: narrow thermal paper, torn zigzag at both ends */
+:root[data-lens="back-page"] .bp-slip[data-stock="receipt"] {
+  --slip: #fbfbf7;
+  width: min(86%, 21em);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1.2em 1em 1.1em;
+  font: 0.78em/1.4 "Courier New", var(--bp-type), monospace;
+  letter-spacing: 0.02em;
+  --zig: 0.45em;
+  clip-path: polygon(
+    0 var(--zig), 5% 0, 10% var(--zig), 15% 0, 20% var(--zig), 25% 0, 30% var(--zig), 35% 0, 40% var(--zig), 45% 0, 50% var(--zig), 55% 0, 60% var(--zig), 65% 0, 70% var(--zig), 75% 0, 80% var(--zig), 85% 0, 90% var(--zig), 95% 0, 100% var(--zig),
+    100% calc(100% - var(--zig)), 95% 100%, 90% calc(100% - var(--zig)), 85% 100%, 80% calc(100% - var(--zig)), 75% 100%, 70% calc(100% - var(--zig)), 65% 100%, 60% calc(100% - var(--zig)), 55% 100%, 50% calc(100% - var(--zig)), 45% 100%, 40% calc(100% - var(--zig)), 35% 100%, 30% calc(100% - var(--zig)), 25% 100%, 20% calc(100% - var(--zig)), 15% 100%, 10% calc(100% - var(--zig)), 5% 100%, 0 calc(100% - var(--zig))
+  );
+  filter: drop-shadow(0 6px 6px rgba(60, 40, 20, 0.3));
+  box-shadow: none;
 }
-:root[data-lens="back-page"] .bp-typedhead__contact {
+:root[data-lens="back-page"] .bp-flow .bp-slip[data-stock="receipt"] .bp-slip__title {
+  padding-bottom: 0.35em;
+  margin-bottom: 0.35em;
+  border-bottom: 1.5px dashed rgba(36, 34, 42, 0.5);
+  font: 700 1em/1.35 "Courier New", var(--bp-type), monospace;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 0.08em;
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="receipt"] .bp-slip__date {
+  text-align: center;
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="receipt"] ul {
+  list-style: "* ";
+  border-top: 1.5px dashed rgba(36, 34, 42, 0.5);
+  padding-top: 0.4em;
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="receipt"] .bp-staple {
+  top: 0.8em;
+}
+/* a manila library card: buff, a printed rule down the left */
+:root[data-lens="back-page"] .bp-slip[data-stock="manila"] {
+  --slip: #ead9ad;
+  --slip-ink: #3a301c;
+  padding-left: 1.6em;
+  background:
+    linear-gradient(90deg, transparent 0.9em, rgba(150, 70, 40, 0.45) 0.9em 1.02em, transparent 1.02em),
+    radial-gradient(ellipse at 30% 20%, rgba(255, 245, 215, 0.6), transparent 70%),
+    var(--slip);
+}
+:root[data-lens="back-page"] .bp-flow .bp-slip[data-stock="manila"] .bp-slip__title {
+  font: 700 1.05em/1.3 var(--bp-type);
+  color: #2b2414;
+}
+/* a scrap torn from graph paper, the tools circled on it */
+:root[data-lens="back-page"] .bp-slip[data-stock="scrap"] {
+  --gs: 0.62em;
+  padding: 1.2em 0.8em 0.5em;
+  font: 0.95em/1.5 var(--bp-print);
+  background:
+    linear-gradient(rgba(46, 140, 110, 0.2) 1px, transparent 1px) 0 0 / var(--gs) var(--gs),
+    linear-gradient(90deg, rgba(46, 140, 110, 0.2) 1px, transparent 1px) 0 0 / var(--gs) var(--gs),
+    #fbfbf5;
+  clip-path: polygon(0 1%, 9% 0, 21% 1.6%, 33% 0.2%, 47% 1.4%, 62% 0, 74% 1.5%, 88% 0.3%, 100% 1.2%, 100% 97%, 91% 100%, 78% 98.4%, 64% 100%, 50% 98.6%, 37% 100%, 22% 98.2%, 10% 100%, 0 98.5%);
+  filter: drop-shadow(0 6px 6px rgba(60, 40, 20, 0.3));
+  box-shadow: none;
+}
+:root[data-lens="back-page"] .bp-slip[data-stock="scrap"] .bp-circled {
   margin: 0 !important;
-  font-size: 0.92em;
+}
+/* reaching for a slip lifts it on its staple */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="back-page"] .bp-slip {
+    transition:
+      transform 0.32s cubic-bezier(0.2, 0.8, 0.3, 1.25),
+      box-shadow 0.32s ease;
+  }
+  :root[data-lens="back-page"] .bp-book .bp-slip:is(:hover, :focus-within) {
+    transform: rotate(calc(var(--tilt, 0deg) * -0.6 - 1.4deg)) translateY(-3px);
+    box-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.12),
+      0 14px 22px -6px rgba(60, 40, 20, 0.42),
+      0 26px 26px -18px rgba(60, 40, 20, 0.45);
+    z-index: 1;
+  }
 }
 
 /* ---- entries: projects and lab notes ----------------------------------------------- */
@@ -1049,14 +1342,14 @@
   display: flex;
   align-items: baseline;
   gap: 0.6em;
-  border-bottom: 1.5px solid color-mix(in srgb, var(--bp-label-ink) 45%, transparent);
+  border-bottom: 1.5px solid color-mix(in srgb, var(--bp-type-ink, var(--bp-label-ink)) 45%, transparent);
 }
 :root[data-lens="back-page"] .bp-fields dt {
   flex: none;
   width: 4.6em;
   font: 0.7em/var(--lh) var(--bp-type);
   letter-spacing: 0.08em;
-  color: var(--bp-label-ink);
+  color: var(--bp-type-ink, var(--bp-label-ink));
 }
 :root[data-lens="back-page"] .bp-fields dd {
   margin: 0;
@@ -1128,53 +1421,6 @@
   display: block;
   width: min(46%, 10em);
   margin: 0 auto var(--g);
-}
-
-/* ---- writing: dated essays in the exercise book ------------------------------------ */
-:root[data-lens="back-page"] .bp-writing-list {
-  list-style: none;
-  padding: 0 !important;
-}
-:root[data-lens="back-page"] .bp-writing-list li {
-  margin-bottom: var(--g);
-}
-:root[data-lens="back-page"] .bp-writing-list .bp-h2 {
-  margin-top: 0;
-  font-size: 1.45em;
-  line-height: var(--lh);
-}
-:root[data-lens="back-page"] .bp-writing-list .bp-h2 a {
-  text-decoration: none;
-}
-:root[data-lens="back-page"] .bp-writing-date,
-:root[data-lens="back-page"] .bp-writing-origin {
-  font: 0.7em/1.55 var(--bp-type);
-  color: var(--bp-fine);
-}
-:root[data-lens="back-page"] .bp-writing-date {
-  display: block;
-  margin-bottom: 0.2em;
-}
-:root[data-lens="back-page"] .bp-writing-summary {
-  margin-bottom: 0 !important;
-}
-:root[data-lens="back-page"] .bp-writing-head .bp-h1 {
-  font-size: 2.2em;
-  line-height: calc(var(--lh) * 1.5);
-}
-:root[data-lens="back-page"] .bp-writing-end {
-  margin-top: var(--g);
-  transform: rotate(-0.5deg);
-}
-:root[data-lens="back-page"] .bp-writing-end .bp-h2 {
-  margin: 0 0 0.2em;
-  font-size: 1.4em;
-  line-height: 1.25;
-  color: var(--bp-red);
-}
-:root[data-lens="back-page"] .bp-writing-end .bp-arrows {
-  margin-bottom: 0;
-  font-size: 0.88em;
 }
 
 /* ---- the war on the back page --------------------------------------------------------- */
@@ -1332,102 +1578,6 @@
   transform: rotate(-2deg);
 }
 
-/* ---- sticky index tabs on the edge of the book -------------------------------------------- */
-:root[data-lens="back-page"] .bp-tabs {
-  position: absolute;
-  z-index: 6;
-  left: calc(100% - 6px);
-  top: 6%;
-}
-:root[data-lens="back-page"] .bp-tabs ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-:root[data-lens="back-page"] .bp-tabs li {
-  position: absolute;
-  left: 0;
-  top: calc(var(--i) * 3.35em);
-  font-size: var(--fs);
-}
-:root[data-lens="back-page"] .bp-tabs a {
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-  width: 5.3em;
-  height: 2.75em;
-  padding: 0 0.3em 0 0.9em;
-  border-radius: 0 7px 7px 0;
-  font: 700 1.2em/1 var(--bp-hand);
-  color: var(--bp-pencil);
-  text-decoration: none;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(0, 0, 0, 0.05)),
-    var(--tab);
-  box-shadow:
-    1px 2px 0 rgba(0, 0, 0, 0.12),
-    3px 6px 10px rgba(0, 0, 0, 0.35);
-  transform: translateX(-0.7em);
-  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
-}
-:root[data-lens="back-page"] .bp-tabs li:nth-child(1) a {
-  --tab: #e6d6ad;
-}
-:root[data-lens="back-page"] .bp-tabs li:nth-child(2) a {
-  --tab: #d3ddef;
-}
-:root[data-lens="back-page"] .bp-tabs li:nth-child(3) a {
-  --tab: #fbf8f0;
-}
-:root[data-lens="back-page"] .bp-tabs li:nth-child(4) a {
-  --tab: #d9e5cf;
-}
-:root[data-lens="back-page"] .bp-tabs li:nth-child(5) a {
-  --tab: #e7ddf0;
-}
-:root[data-lens="back-page"] .bp-tabs li:nth-child(6) a {
-  --tab: #f3d0ca;
-}
-:root[data-lens="back-page"] .bp-tabs a[data-state="current"] {
-  color: var(--bp-blue);
-  transform: translateX(0);
-}
-:root[data-lens="back-page"] .bp-tabs a[data-state="near"] {
-  color: var(--bp-blue);
-  transform: translateX(-0.35em);
-}
-:root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs {
-  left: 0;
-  right: 0;
-  top: auto;
-  bottom: 100%;
-  height: 2.4em;
-}
-:root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs li {
-  top: auto;
-  bottom: 0;
-  left: calc(var(--i) * 100% / var(--tabs) + 2px);
-  width: calc(100% / var(--tabs) - 4px);
-}
-:root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a {
-  width: 100%;
-  height: 2.2em;
-  padding: 0 0.2em;
-  justify-content: center;
-  font-size: min(1.1em, calc(var(--pw) / 23));
-  border-radius: 7px 7px 0 0;
-  transform: translateY(0.5em);
-  box-shadow:
-    0 -1px 0 rgba(0, 0, 0, 0.08),
-    0 -3px 8px rgba(0, 0, 0, 0.3);
-}
-:root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a[data-state="current"] {
-  transform: translateY(0);
-}
-:root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-tabs a[data-state="near"] {
-  transform: translateY(0.25em);
-}
-
 /* ---- turning corners ----------------------------------------------------------------------- */
 :root[data-lens="back-page"] .bp-corners {
   position: absolute;
@@ -1471,7 +1621,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0.1em 0.2em;
-  border-bottom: 1.5px solid rgba(27, 56, 153, 0.35);
+  border-bottom: 1.5px solid color-mix(in srgb, currentColor 35%, transparent);
 }
 :root[data-lens="back-page"] .bp-corner__ear {
   position: absolute;
@@ -1481,12 +1631,12 @@
 }
 :root[data-lens="back-page"] .bp-corner--next .bp-corner__ear {
   right: 0;
-  background: linear-gradient(315deg, #2a1810 0 49%, #d8cfbb 50%, #ebe4d4 72%, transparent 72.5%);
+  background: linear-gradient(315deg, #2a1810 0 49%, var(--bp-ear-1) 50%, var(--bp-ear-2) 72%, transparent 72.5%);
   filter: drop-shadow(-2px -2px 2px rgba(40, 24, 10, 0.25));
 }
 :root[data-lens="back-page"] .bp-corner--prev .bp-corner__ear {
   left: 0;
-  background: linear-gradient(45deg, #2a1810 0 49%, #d8cfbb 50%, #ebe4d4 72%, transparent 72.5%);
+  background: linear-gradient(45deg, #2a1810 0 49%, var(--bp-ear-1) 50%, var(--bp-ear-2) 72%, transparent 72.5%);
   filter: drop-shadow(2px -2px 2px rgba(40, 24, 10, 0.25));
 }
 :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-corner {
@@ -1510,11 +1660,6 @@
 }
 
 /* ---- motion: the lamp stays still for those who ask --------------------------------------- */
-@media (prefers-reduced-motion: reduce) {
-  :root[data-lens="back-page"] .bp-tabs a {
-    transition: none;
-  }
-}
 :root[data-lens="back-page"] .bp-desk h1:focus {
   outline: none;
 }
@@ -1539,8 +1684,8 @@
   line-height: 1.2;
   margin-bottom: -0.1em;
 }
-/* the phone's cover holds the label and the whole contents slip: its hand
-   shrinks to fit a short screen rather than lose the return address */
+/* the phone's cover holds the label and the return address: its hand
+   shrinks to fit a short screen rather than lose either */
 :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-page[data-kind="cover"],
 :root[data-lens="back-page"] .bp-stage[data-mode="single"] .bp-page[data-kind="cover"] {
   font-size: min(var(--fs), calc(var(--ph) / 47));
@@ -1552,4 +1697,13 @@
 :root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-page[data-kind="cover"] .bp-flow,
 :root[data-lens="back-page"] .bp-stage[data-mode="single"] .bp-page[data-kind="cover"] .bp-flow {
   bottom: 3.2em;
+}
+/* on a phone the sticky note is stuck across the page, not beside the words */
+:root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-sticky,
+:root[data-lens="back-page"] .bp-stage[data-mode="single"] .bp-sticky {
+  float: none;
+  display: block;
+  width: auto;
+  max-width: 13em;
+  margin: 0 0.4em var(--lh) auto;
 }

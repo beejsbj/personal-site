@@ -41,7 +41,7 @@ test("built writing routes render natively and update without rebuilding", async
       subtitle: undefined,
       description: "Fixture description",
       body_html:
-        '<p>Full native body <strong>with formatting</strong>.</p><h1>Body heading</h1><script>bad()</script><img src="https://substackcdn.com/image.png" onerror="bad()"><pre><code>const value = 1;</code></pre>',
+        '<p>Full native body <strong>with formatting</strong>.<a href="#note-1">1</a> <a href="/about">source about</a> <a href="https://buroojs.substack.com/p/other#part">other</a></p><div class="footnote"><p id="note-1">Footnote</p></div><h1>Body heading</h1><script>bad()</script><img src="https://substackcdn.com/image.png" onerror="bad()"><pre><code>const value = 1;</code></pre>',
       ...extra,
     });
   const fixture = await serveRuntimeFixture({
@@ -99,6 +99,13 @@ test("built writing routes render natively and update without rebuilding", async
     )?.[1];
     assert.ok(body);
     assert.doesNotMatch(body, /<script|onerror|bad\(\)/);
+    assert.match(body, /<a href="#ss-note-1">1<\/a>/);
+    assert.match(body, /<p id="ss-note-1">Footnote<\/p>/);
+    assert.match(
+      body,
+      /href="https:\/\/buroojs\.substack\.com\/about">source about/,
+    );
+    assert.match(body, /href="\/writing\/other#ss-part">other/);
     assert.equal(upstream.length, 2);
     api = await (await get("/prism/content.json?writing=hello")).json();
     assert.equal(api.writing.entry.slug, "hello");

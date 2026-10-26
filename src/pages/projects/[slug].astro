@@ -57,7 +57,7 @@ const { detail } = await getProjectsPage();
     {data.links.length > 0 && (
       <div class="entry-page__links" {...part("project.links", slug)}>
         {data.links.map((link: { label: string; url: string }) => (
-          <Link treatment="action" href={link.url} newTab>
+          <Link treatment="pill" href={link.url} arrow newTab>
             {link.label}
           </Link>
         ))}
@@ -72,7 +72,7 @@ const { detail } = await getProjectsPage();
       <Content />
     </article>
     <div class="entry-page__links">
-      <Link href={detail.back.href} arrow>
+      <Link href={detail.back.href} treatment="pill" arrow>
         {detail.back.label}
       </Link>
     </div>

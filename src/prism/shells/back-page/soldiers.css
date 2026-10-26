@@ -1,0 +1,175 @@
+/* Soldier life in the margins (soldiers.ts). Two layers per page: the ink
+   under the words (flicks and lunge lines, so writing always sits on top of
+   them), and the men and their pencil notes over them, in the empty paper.
+   The boil (each man swapping between three drawings of himself) and his
+   heartbeat are CSS, so they stop with the prism's idle. */
+
+:root[data-lens="back-page"] .bp-life-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+:root[data-lens="back-page"] .bp-life,
+:root[data-lens="back-page"] .bp-life-ink {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+:root[data-lens="back-page"] .bp-life {
+  z-index: 2;
+}
+
+/* ---- the men and their camps ----------------------------------------------------- */
+:root[data-lens="back-page"] .bp-man {
+  --beat: 0.375s;
+}
+:root[data-lens="back-page"] .bp-man__pose,
+:root[data-lens="back-page"] .bp-man__body {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+:root[data-lens="back-page"] .bp-man use,
+:root[data-lens="back-page"] .bp-camp-life__ring path {
+  opacity: 0;
+}
+:root[data-lens="back-page"] .bp-man use.bp-f0,
+:root[data-lens="back-page"] .bp-camp-life__ring path.bp-f0 {
+  opacity: 1;
+}
+:root[data-lens="back-page"] .bp-camp-life__ring path,
+:root[data-lens="back-page"] .bp-camp-life__stand {
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-opacity: 0.9;
+}
+:root[data-lens="back-page"] .bp-camp-life__stand {
+  stroke-width: 2.4;
+}
+:root[data-lens="back-page"] .bp-camp-life__guide {
+  stroke: var(--bp-pencil, #3f3c39);
+  stroke-opacity: 0.22;
+  stroke-width: 1;
+}
+:root[data-lens="back-page"] .bp-man__hit {
+  fill: transparent;
+  pointer-events: all;
+  cursor: grab;
+  touch-action: none;
+}
+:root[data-lens="back-page"] .bp-man[data-side="red"] .bp-man__hit {
+  cursor: pointer;
+}
+:root[data-lens="back-page"] .bp-man[data-dead] .bp-man__hit {
+  cursor: help;
+}
+:root[data-lens="back-page"] .bp-man[data-dead] .bp-man__body {
+  opacity: 0.55;
+}
+:root[data-lens="back-page"] .bp-life-cross {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ---- ink: shots and lunges, under the words ------------------------------------- */
+:root[data-lens="back-page"] .bp-life-flick {
+  stroke-linecap: round;
+  stroke-opacity: 0.72;
+}
+:root[data-lens="back-page"] .bp-life-jab {
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+/* ---- the visitor's pull: pencil, not ink --------------------------------------------- */
+:root[data-lens="back-page"] .bp-life-aim__pull {
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  stroke-opacity: 0.6;
+  stroke-linecap: round;
+}
+:root[data-lens="back-page"] .bp-life-aim__line {
+  stroke-width: 1.2;
+  stroke-dasharray: 1 5;
+  stroke-opacity: 0.7;
+  stroke-linecap: round;
+}
+
+/* ---- pencil notes ------------------------------------------------------------------ */
+:root[data-lens="back-page"] .bp-note__words {
+  font-family: var(--bp-hand);
+  font-weight: 700;
+  fill-opacity: 0.86;
+}
+:root[data-lens="back-page"] .bp-note__words--tiny,
+:root[data-lens="back-page"] .bp-note__words--whisper {
+  font-weight: 400;
+}
+:root[data-lens="back-page"] .bp-note__ring {
+  stroke-width: 1;
+  stroke-opacity: 0.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+:root[data-lens="back-page"] .bp-note--shout .bp-note__ring {
+  stroke-width: 1.2;
+  stroke-opacity: 0.6;
+}
+:root[data-lens="back-page"] .bp-note__tail,
+:root[data-lens="back-page"] .bp-note__who {
+  stroke-width: 1;
+  stroke-opacity: 0.55;
+  stroke-linecap: round;
+}
+:root[data-lens="back-page"] .bp-note__reveal {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* the boil: alive means still being drawn, three drawings round and round */
+  :root[data-lens="back-page"] .bp-life[data-boil] .bp-man:not([data-dead]) use,
+  :root[data-lens="back-page"] .bp-life[data-boil] .bp-camp-life__ring path {
+    animation: back-page-boil var(--beat) step-end infinite;
+    animation-delay: calc(var(--o, 0s) - var(--beat) * var(--k, 0) / 3);
+  }
+  /* his heartbeat: racing when scared, slow when grieving, held when a comrade falls */
+  :root[data-lens="back-page"] .bp-man[data-pulse="race"] {
+    --beat: 0.15s;
+  }
+  :root[data-lens="back-page"] .bp-man[data-pulse="slow"],
+  :root[data-lens="back-page"] .bp-camp-life[data-pulse="slow"] {
+    --beat: 0.8s;
+  }
+  :root[data-lens="back-page"] .bp-life[data-boil] .bp-man[data-pulse="still"] use,
+  :root[data-lens="back-page"] .bp-life[data-boil] .bp-camp-life[data-pulse="still"] .bp-camp-life__ring path {
+    animation-play-state: paused;
+  }
+  /* full pull: he shivers under the finger */
+  :root[data-lens="back-page"] .bp-man[data-shiver] .bp-man__body {
+    animation: back-page-shiver 0.12s steps(2, end) infinite;
+  }
+}
+
+@keyframes back-page-boil {
+  0% {
+    opacity: 1;
+  }
+  33.333% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes back-page-shiver {
+  0% {
+    translate: -0.5px 0.2px;
+  }
+  100% {
+    translate: 0.5px -0.2px;
+  }
+}

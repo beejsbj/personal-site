@@ -16,6 +16,7 @@ import {
 import { concentricStar, h, parseDay, ransom, starPoints, svg } from "./dom";
 import { portrait } from "./portrait";
 import { flashPortrait, slideHelp, tickUp, tickWords } from "./micro";
+import { RESUME_PATH } from "../../routes";
 
 interface Command {
   id: string;
@@ -34,7 +35,7 @@ export function commandsFor(env: Env): Command[] {
     { id: "projects", ...commands.projects, href: "/projects" },
     { id: "lab", ...commands.lab, href: "/lab" },
     { id: "about", ...commands.about, href: "/about" },
-    { id: "status", ...commands.status, href: "/resume" },
+    { id: "status", ...commands.status, href: RESUME_PATH },
     {
       id: "phone",
       label: commands.phone.label,

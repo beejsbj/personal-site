@@ -9,7 +9,8 @@ interface Props {
   intro?: string;
   level?: 1 | 2;
   scale?: "page" | "post";
-  /** Action links under the intro; mail links go without an arrow. */
+  /** Action links under the intro: pills (outbound ones carry the arrow);
+   * a mail link stays plain text. */
   actions?: { label: string; href: string }[];
   /** The page id, when this header is a page's own: marks page.* parts. */
   page?: string;
@@ -48,7 +49,12 @@ const mark = (slot: Slot) =>
     {(actions.length > 0 || Astro.slots.has("actions")) && (
       <div class="page-header__actions" {...mark("actions")}>
         {actions.map((action) => (
-          <Link href={action.href} arrow={!action.href.startsWith("mailto:")}>
+          <Link
+            href={action.href}
+            {...(action.href.startsWith("mailto:")
+              ? {}
+              : { treatment: "pill", arrow: true })}
+          >
             {action.label}
           </Link>
         ))}

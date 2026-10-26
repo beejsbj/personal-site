@@ -1,0 +1,72 @@
+---
+/** Unique: v0's giant B and J, peeking. initial-peeks.ts decides when and
+ * where (rarely, one at a time, never over text) and builds the letter only
+ * for that moment; nothing renders at rest, so no-JS visitors and assistive
+ * technology see nothing. Reduced motion: no peeks. */
+---
+
+<script>
+  import { installInitialPeeks } from "./initial-peeks";
+  installInitialPeeks();
+</script>
+<style is:global>
+  /* The stage clips the letter: to the screen for edge peeks, and to a
+     section rule (--peek-floor) when it rises from behind one. */
+  .initial-peek {
+    --peek-floor: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--layer-peek);
+    width: 100%;
+    height: var(--peek-floor);
+    overflow: hidden;
+    pointer-events: none;
+  }
+  /* Runtime geometry (initial-peeks.ts writes it inline per peek). */
+  .initial-peek__letter {
+    --peek-from: 0 0;
+    --peek-to: 0 0;
+    --peek-tilt: 0deg;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: var(--font-serif);
+    font-size: var(--peek-size);
+    font-weight: var(--weight-black);
+    line-height: var(--leading-display);
+    color: var(--color-surface-strong);
+    translate: var(--peek-from);
+    rotate: var(--peek-tilt);
+    pointer-events: auto;
+    user-select: none;
+  }
+  .initial-peek[data-edge="left"] .initial-peek__letter {
+    --peek-tilt: var(--peek-lean);
+  }
+  .initial-peek[data-edge="right"] .initial-peek__letter {
+    --peek-tilt: calc(-1 * var(--peek-lean));
+  }
+  .initial-peek__letter[data-peek="measure"] {
+    visibility: hidden;
+  }
+  .initial-peek__letter[data-peek="in"] {
+    translate: var(--peek-to);
+    transition: translate var(--duration-peek-in) var(--ease-pop);
+  }
+  .initial-peek__letter[data-peek="out"] {
+    transition: translate var(--duration-peek-out) var(--ease-swell);
+  }
+  /* Caught looking: it blushes burgundy and ducks, fast. */
+  .initial-peek__letter[data-peek="duck"] {
+    color: var(--color-accent);
+    transition:
+      translate var(--duration-peek-duck) var(--ease-swell),
+      color var(--duration-fast) var(--ease-feedback);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .initial-peek {
+      display: none;
+    }
+  }
+</style>

@@ -7,7 +7,7 @@ header:
   intro: Frontend developer. Curious about people, stories, and the places we make on the web.
   actions:
     - label: Experience & resume
-      href: /resume
+      href: /about/resume
 ---
 
 I make places on the web. My journey into web development began with Perpetual Education, learning the whole process from an idea to a working site.

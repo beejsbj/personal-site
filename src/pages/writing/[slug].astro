@@ -83,7 +83,7 @@ const { subtitle, date, canonical, cover } = entry?.data ?? {};
               {...part("writing.links", entry.slug)}
             >
               <Link
-                treatment="action"
+                treatment="pill"
                 tone="wine"
                 href={`${site.writingUrl}/subscribe`}
                 newTab
@@ -91,7 +91,7 @@ const { subtitle, date, canonical, cover } = entry?.data ?? {};
               >
                 {copy.subscribeLabel}
               </Link>
-              <Link treatment="action" href={canonical!} newTab arrow>
+              <Link treatment="pill" href={canonical!} newTab arrow>
                 {copy.originLabel}
               </Link>
             </div>
@@ -100,7 +100,7 @@ const { subtitle, date, canonical, cover } = entry?.data ?? {};
       </aside>
 
       <div class="entry-page__links" {...part("writing.links", entry.slug)}>
-        <Link href="/writing" arrow>
+        <Link href="/writing" treatment="pill">
           {copy.backLabel}
         </Link>
       </div>
@@ -116,13 +116,18 @@ const { subtitle, date, canonical, cover } = entry?.data ?? {};
         }
       />
       <div class="entry-page__links">
-        <Link href="/writing" arrow>
+        <Link href="/writing" treatment="pill">
           {copy.backLabel}
         </Link>
-        <Link href={site.writingUrl} newTab arrow>
+        <Link href={site.writingUrl} treatment="pill" newTab arrow>
           {copy.sourceLabel}
         </Link>
-        <Link href={`${site.writingUrl}/subscribe`} newTab arrow>
+        <Link
+          href={`${site.writingUrl}/subscribe`}
+          treatment="pill"
+          newTab
+          arrow
+        >
           {copy.subscribeLabel}
         </Link>
       </div>

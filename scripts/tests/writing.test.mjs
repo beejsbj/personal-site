@@ -151,7 +151,7 @@ test("body is fetched lazily and sanitised into the shared entry contract", asyn
   assert.equal(full.id, "hello");
   assert.equal(full.data.canonical, `${origin}/p/hello`);
   assert.match(full.body, /<h2>Heading<\/h2>/);
-  assert.match(full.body, /href="\/writing\/other#part"/);
+  assert.match(full.body, /href="\/writing\/other#ss-part"/);
   assert.match(full.body, /href="https:\/\/buroojs\.substack\.com\/p\/absent"/);
   assert.doesNotMatch(full.body, /script|onerror|utm_source/);
 });
@@ -365,6 +365,87 @@ b</code></pre>
     "top-level code keeps its blank line",
   );
   assert.doesNotMatch(html.replace(/<pre[\s\S]*?<\/pre>/, ""), /\n\s*\n\s*\n/);
+});
+
+test("dropped chrome does not take an id from the real target", () => {
+  const { html } = sanitizeSubstackHtml(
+    `<div id="note" class="subscription-widget-wrap"><p>Subscribe!</p></div>
+    <a href="#note">see note</a><p id="note">The real note</p>`,
+  );
+  assert.doesNotMatch(html, /Subscribe!/);
+  assert.match(html, /<p id="ss-note">The real note<\/p>/);
+  assert.match(html, /href="#ss-note"/);
+});
+
+test("fragment links keep namespaced targets, even on unwrapped wrappers", () => {
+  const { html } = sanitizeSubstackHtml(
+    `<p><a href="#toc">Contents</a> <a href="#note-1">1</a> <a class="footnote-anchor" data-component-name="FootnoteAnchorToDOM" id="footnote-anchor-1" href="#footnote-1" target="_self">2</a></p>
+    <h2 id="toc" class="header-anchor-post" style="x">Contents</h2>
+    <p id="note-1" onclick="bad()">A footnote</p>
+    <div class="footnote" data-component-name="FootnoteToDOM"><a id="footnote-1" href="#footnote-anchor-1" class="footnote-number" contenteditable="false" target="_self">2</a><div id="wrapped" class="footnote-content"><p>Second note</p></div></div>
+    <span id="loose">Loose text</span><a href="#loose">back</a><a href="#wrapped">wrapped</a>
+    <p id="note-1">A duplicate id</p><p id="bad&quot; onmouseover=&quot;x()">Hostile id</p><a href="#%C2%A7caf%C3%A9">encoded</a><p id="§café">Unicode id</p><p id="">Empty</p>`,
+  );
+  const ids = [...html.matchAll(/\sid="([^"]*)"/g)].map((m) => m[1]);
+  assert.equal(new Set(ids).size, ids.length, "ids are unique");
+  for (const id of ids)
+    assert.match(id, /^ss-[A-Za-z0-9_-]+$/, "ids are namespaced and inert");
+  for (const [, href] of html.matchAll(/href="#([^"]*)"/g))
+    assert.ok(ids.includes(href), `#${href} has a destination`);
+  assert.match(html, /<a href="#ss-note-1">1<\/a>/);
+  assert.match(html, /<p id="ss-note-1">A footnote<\/p>/);
+  assert.match(html, /<h2 id="ss-toc">Contents<\/h2>/);
+  assert.match(
+    html,
+    /<a id="ss-footnote-anchor-1" href="#ss-footnote-1">2<\/a>/,
+  );
+  assert.match(html, /<a id="ss-footnote-1" href="#ss-footnote-anchor-1">/);
+  assert.match(html, /id="ss-wrapped">Second note/);
+  assert.match(html, /id="ss-loose"/);
+  assert.match(html, /A duplicate id/);
+  assert.match(html, /Hostile id/);
+  assert.doesNotMatch(
+    html,
+    /\s(on\w+|style|class|target|contenteditable|data-[\w-]+)=/,
+  );
+});
+
+test("source-relative links resolve to Substack; local and on-site links stay local", async () => {
+  const body = `<p><a href="/about">about</a> <a href="/subscribe?utm_source=x">subscribe</a> <a href="#note">note</a> <a href="${origin}/p/other#part">other</a> <a href="/p/other">relative other</a> <a href="/p/absent#x">absent</a> <a href="https://example.com/x#frag">external</a> <a href="mailto:a@example.com">mail</a></p><p id="note">Note</p>`;
+  const check = (html) => {
+    assert.match(html, new RegExp(`href="${origin}/about">about`));
+    assert.match(html, new RegExp(`href="${origin}/subscribe">subscribe`));
+    assert.match(html, /href="#ss-note">note/);
+    assert.match(html, /id="ss-note"/);
+    assert.match(html, /href="\/writing\/other#ss-part">other/);
+    assert.match(html, /href="\/writing\/other">relative other/);
+    assert.match(html, new RegExp(`href="${origin}/p/absent#x">absent`));
+    assert.match(html, /href="https:\/\/example\.com\/x#frag">external/);
+    assert.match(html, /href="mailto:a@example\.com">mail/);
+    assert.doesNotMatch(html, /href="\/(about|subscribe|p\/)/);
+  };
+  const api = fixture();
+  api.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? [post(), post("other")]
+      : post("hello", { body_html: body }),
+  );
+  check((await api.source.getPost("hello")).body);
+
+  // The RSS fallback is held to the same link contract as the API body.
+  const feed = fixture();
+  feed.routes((url) =>
+    url.pathname === "/api/v1/archive"
+      ? [post(), post("other")]
+      : url.pathname === "/feed"
+        ? rss("hello", body)
+        : 500,
+  );
+  check((await feed.source.getPost("hello")).body);
+  // Without a known index the fallback cannot claim an on-site route.
+  const parsed = parseFeed(rss("hello", body), origin)[0].body;
+  assert.match(parsed, new RegExp(`href="${origin}/about">about`));
+  assert.match(parsed, /href="#ss-note">note/);
 });
 
 test("RSS absence does not turn a healthy older article into a false 404", async () => {

@@ -1,0 +1,204 @@
+/* The papers. Each book on the desk is one of Dotfight's themes (PR #16), or
+   the composition book's own (composition.css):
+   its paper and ruling, its two pens (and the pencil the soldiers talk in),
+   its cover board and label. A `[data-theme]` element sets them for
+   everything inside it: the desk for the open book and the pens beside it, and
+   each book on the shelf for its own cover. Values are Dotfight's own
+   (src/theme.ts), nudged where a colour has to carry body text. */
+
+:root[data-lens="back-page"] [data-theme="lamplight"] {
+  --bp-paper: #f3efe4;
+  --bp-blue: #1b3899;
+  --bp-red: #c01e2a;
+  --bp-pencil: #3f3c39;
+  --bp-fine: #5e5953;
+  --bp-letter: #22306e;
+  --bp-pencil-a: #3d4f94;
+  --bp-pencil-b: #a8393d;
+  --bp-tape: #e6d6ad;
+  --bp-kraft: #9a6f45;
+  --bp-label: #fbf8f0;
+  --bp-label-ink: #3a5fa8;
+  --bp-title-a: #1b3899;
+  --bp-title-b: #c01e2a;
+  --bp-grid: rgba(84, 128, 168, 0.24);
+  --bp-margin: rgba(200, 64, 64, 0.5);
+  --bp-edge-1: #eee8da;
+  --bp-edge-2: #cfc6b3;
+  --bp-ear-1: #d8cfbb;
+  --bp-ear-2: #ebe4d4;
+  --bp-glow: rgba(255, 251, 238, 0.6);
+  --bp-circle-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M64 5 C 100 3, 117 13, 115 26 C 113 41, 82 47, 56 46 C 26 45, 5 38, 6 24 C 7 11, 33 4, 76 7' fill='none' stroke='%23c01e2a' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+
+/* the quiet notebook: cream, feint ruled, a double red margin */
+:root[data-lens="back-page"] [data-theme="notebook"] {
+  --bp-paper: #f5f0e3;
+  --bp-blue: #1f3a9e;
+  --bp-red: #c2252f;
+  --bp-pencil: #45423f;
+  --bp-fine: #5f5a54;
+  --bp-letter: #1f2f78;
+  --bp-pencil-a: #3f5590;
+  --bp-pencil-b: #a83d42;
+  --bp-tape: #efe8d6;
+  --bp-kraft: #3e5446;
+  --bp-label: #fbf8f0;
+  --bp-label-ink: #3f5f8a;
+  --bp-title-a: #1f3a9e;
+  --bp-title-b: #c2252f;
+  --bp-grid: rgba(92, 140, 196, 0.42);
+  --bp-margin: rgba(206, 70, 70, 0.55);
+  --bp-edge-1: #efe9db;
+  --bp-edge-2: #d2c8b4;
+  --bp-ear-1: #ddd5c2;
+  --bp-ear-2: #ece5d5;
+  --bp-glow: rgba(255, 252, 242, 0.5);
+  --bp-circle-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M64 5 C 100 3, 117 13, 115 26 C 113 41, 82 47, 56 46 C 26 45, 5 38, 6 24 C 7 11, 33 4, 76 7' fill='none' stroke='%23c2252f' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+
+/* the graph book: a pencil fight on 2 mm squares, lead against red */
+:root[data-lens="back-page"] [data-theme="graph"] {
+  --bp-paper: #fafaf4;
+  --bp-blue: #3e3e46;
+  --bp-red: #c0302b;
+  --bp-pencil: #3d3f45;
+  --bp-fine: #5f6166;
+  --bp-letter: #3e3e46;
+  --bp-pencil-a: #55555d;
+  --bp-pencil-b: #b0403b;
+  --bp-tape: #e8dcb8;
+  --bp-kraft: #d4792a;
+  --bp-label: #fcfbf6;
+  --bp-label-ink: #2a7a60;
+  --bp-title-a: #4a4a52;
+  --bp-title-b: #c8352f;
+  --bp-grid: rgba(46, 140, 110, 0.17);
+  --bp-grid-bold: rgba(46, 140, 110, 0.36);
+  --bp-margin: rgba(46, 140, 110, 0.55);
+  --bp-edge-1: #f4f4ec;
+  --bp-edge-2: #d6d6cc;
+  --bp-ear-1: #e6e6dc;
+  --bp-ear-2: #f2f2ea;
+  --bp-glow: rgba(255, 255, 255, 0.5);
+  --bp-circle-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M64 5 C 100 3, 117 13, 115 26 C 113 41, 82 47, 56 46 C 26 45, 5 38, 6 24 C 7 11, 33 4, 76 7' fill='none' stroke='%23c8352f' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+
+/* blueprint: white and yellow chalk pencil on Prussian blue, a drawing frame */
+:root[data-lens="back-page"] [data-theme="blueprint"] {
+  --bp-paper: #1c4c8c;
+  --bp-blue: #f2f6ff;
+  --bp-red: #ffc53d;
+  --bp-pencil: #e6eefc;
+  --bp-fine: #bccde8;
+  --bp-letter: #f2f6ff;
+  --bp-pencil-a: #dfe9fb;
+  --bp-pencil-b: #f6c95a;
+  --bp-tape: #2b4068;
+  --bp-kraft: #56687e;
+  --bp-label: #f7f9fc;
+  --bp-label-ink: #1d4f91;
+  --bp-title-a: #1d4f91;
+  --bp-title-b: #c4800c;
+  /* type printed on the blue itself, rather than on a white label */
+  --bp-type-ink: #bccde8;
+  --bp-grid: rgba(214, 230, 255, 0.11);
+  --bp-grid-bold: rgba(214, 230, 255, 0.24);
+  --bp-margin: rgba(232, 242, 255, 0.6);
+  --bp-edge-1: #5c84b8;
+  --bp-edge-2: #2f5a92;
+  --bp-ear-1: #2b5c9a;
+  --bp-ear-2: #3f6eaa;
+  --bp-glow: rgba(120, 170, 235, 0.22);
+  --bp-circle-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 50' preserveAspectRatio='none'%3E%3Cpath d='M64 5 C 100 3, 117 13, 115 26 C 113 41, 82 47, 56 46 C 26 45, 5 38, 6 24 C 7 11, 33 4, 76 7' fill='none' stroke='%23ffc53d' stroke-width='2' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+
+/* ---- the rulings: each paper's lines under the words -------------------------- */
+:root[data-lens="back-page"] [data-theme] .bp-page:not([data-paper^="kraft"]) {
+  background-color: var(--bp-paper);
+}
+/* feint ruled (the notebook): a line under every line of writing, none
+   across the head of the page */
+:root[data-lens="back-page"] [data-theme="notebook"] .bp-page:not([data-paper^="kraft"]) {
+  background:
+    radial-gradient(ellipse 90% 70% at 38% 28%, var(--bp-glow), transparent 72%),
+    linear-gradient(var(--bp-paper), var(--bp-paper)) 0 0 / 100% calc(var(--lh) * 2.1) no-repeat,
+    linear-gradient(transparent calc(var(--lh) - 1.2px), var(--bp-grid) calc(var(--lh) - 1.2px)) 0 calc(var(--lh) * 0.34) / 100% var(--lh),
+    var(--bp-paper);
+}
+/* two red lines down the margin */
+:root[data-lens="back-page"] [data-theme="notebook"] .bp-page::before {
+  border-left: 5px double var(--bp-margin) !important;
+}
+/* graph paper: fine squares, a bold line every fifth */
+:root[data-lens="back-page"] [data-theme="graph"] .bp-page:not([data-paper^="kraft"]) {
+  --gf: calc(var(--lh) / 4);
+  background:
+    radial-gradient(ellipse 90% 70% at 38% 28%, var(--bp-glow), transparent 72%),
+    linear-gradient(var(--bp-grid-bold) 1px, transparent 1px) 0 0 / calc(var(--gf) * 5) calc(var(--gf) * 5),
+    linear-gradient(90deg, var(--bp-grid-bold) 1px, transparent 1px) 0 0 / calc(var(--gf) * 5) calc(var(--gf) * 5),
+    linear-gradient(var(--bp-grid) 1px, transparent 1px) 0 0 / var(--gf) var(--gf),
+    linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px) 0 0 / var(--gf) var(--gf),
+    var(--bp-paper);
+}
+/* blueprint: a light grid on the blue, a bold one every fourth, the sheet's
+   frame instead of a margin */
+:root[data-lens="back-page"] [data-theme="blueprint"] .bp-page:not([data-paper^="kraft"]) {
+  background:
+    radial-gradient(ellipse 80% 70% at 40% 30%, var(--bp-glow), transparent 75%),
+    radial-gradient(ellipse 140% 110% at 50% 50%, transparent 55%, rgba(5, 20, 50, 0.35)),
+    linear-gradient(var(--bp-grid-bold) 1px, transparent 1px) 0 0 / calc(var(--g) * 4) calc(var(--g) * 4),
+    linear-gradient(90deg, var(--bp-grid-bold) 1px, transparent 1px) 0 0 / calc(var(--g) * 4) calc(var(--g) * 4),
+    linear-gradient(var(--bp-grid) 1px, transparent 1px) 0 0 / var(--g) var(--g),
+    linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px) 0 0 / var(--g) var(--g),
+    var(--bp-paper);
+}
+:root[data-lens="back-page"] [data-theme="blueprint"] .bp-page:not([data-paper^="kraft"])::before {
+  inset: calc(var(--lh) * 1.6) 0.7em 0.7em calc(var(--mx) - 0.9em);
+  border: 1.5px solid var(--bp-margin);
+  border-left-width: 1.5px;
+}
+/* chalk on blue is light on dark: the page's own shadows go the other way */
+:root[data-lens="back-page"] [data-theme="blueprint"] .bp-page__head {
+  color: var(--bp-fine);
+}
+:root[data-lens="back-page"] [data-theme="blueprint"] .bp-page__head b {
+  border-bottom-color: var(--bp-fine);
+}
+:root[data-lens="back-page"] [data-theme="blueprint"] .bp-camp__name {
+  text-shadow:
+    0 0 3px var(--bp-paper),
+    0 0 4px var(--bp-paper),
+    0 0 8px var(--bp-paper);
+}
+
+/* ---- the pens beside the book: the open book's own ----------------------------- */
+:root[data-lens="back-page"] .bp-desk .bp-pen--blue {
+  --ink: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-desk .bp-pen--red {
+  --ink: var(--bp-red);
+}
+/* pencils for the pencil papers: a painted barrel, a sharpened point */
+:root[data-lens="back-page"] :is([data-theme="graph"], [data-theme="blueprint"]) .bp-pen {
+  width: 13px;
+  border-radius: 2px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.35), transparent 30%, transparent 60%, rgba(0, 0, 0, 0.25)),
+    linear-gradient(180deg, #e8b4b0 0 5%, #b9b9b9 5% 9%, transparent 9%),
+    var(--barrel, var(--ink));
+}
+:root[data-lens="back-page"] [data-theme="graph"] .bp-pen--blue {
+  --barrel: #efbd28;
+}
+:root[data-lens="back-page"] [data-theme="blueprint"] .bp-pen--blue {
+  --barrel: #eef2f8;
+}
+:root[data-lens="back-page"] :is([data-theme="graph"], [data-theme="blueprint"]) .bp-pen::after {
+  left: 0;
+  right: 0;
+  bottom: -18px;
+  height: 19px;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  background: linear-gradient(180deg, #e9c99b 0 62%, var(--ink) 62%);
+}

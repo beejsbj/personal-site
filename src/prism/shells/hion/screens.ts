@@ -837,6 +837,7 @@ function groupHead(id: string, title: string) {
 
 function resume(content: SiteContent) {
   const page = content.pages.resume;
+  const copy = content.lenses.hion;
   const { experience, education, tools, ongoing } = content.resume;
 
   const roles = experience.roles.map((entry, i) => {
@@ -931,6 +932,16 @@ function resume(content: SiteContent) {
         )
       : null,
     story(page.html, page.title, "hion-loop--resume", part("page.body", "resume")),
+    // the resume hangs from About's knot: its thread leads back up there
+    h(
+      "nav",
+      { class: "hion-onward", "aria-label": copy.resume.onward },
+      h(
+        "ul",
+        { class: "hion-row hion-row--ends", "data-cord": "branch" },
+        end("hion-end--all", copy.entry.backTo, "/about", copy.about.story, "m"),
+      ),
+    ),
   );
 }
 

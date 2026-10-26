@@ -25,10 +25,6 @@
     {
       "label": "About",
       "href": "/about"
-    },
-    {
-      "label": "Resume",
-      "href": "/resume"
     }
   ],
   "header": {
@@ -39,7 +35,7 @@
   },
   "footer": {
     "links": [
-      { "label": "Resume", "href": "/resume" },
+      { "label": "Resume", "href": "/about/resume" },
       { "label": "Style guide", "href": "/style-guide" }
     ],
     "signoff": "Thanks for stopping by."
