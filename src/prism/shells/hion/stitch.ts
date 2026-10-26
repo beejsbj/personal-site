@@ -26,7 +26,6 @@ const DIRS: readonly Pt[] = [
   [-1, 1],
 ];
 const VARIANTS = 4;
-export const GLOW = 0.25;
 
 export interface Stitches {
   /** Crossing pitch, page px. */
