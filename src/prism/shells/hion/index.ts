@@ -365,7 +365,8 @@ const shell: LensShell = {
   },
 
   async update(route) {
-    if (live && route.path === live.path && !route.refresh) return;
+    // A screen that already let go (leave) is brought back, even for the same path.
+    if (live && route.path === live.path && !route.refresh && live.left === undefined) return;
     const leaving = live;
     // Usually already begun, at the click.
     leave(route.path);
