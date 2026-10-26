@@ -69,7 +69,7 @@ test(
         assert.equal(faceRequests.length, 0, "no face was requested");
 
         await page.hover("#prism-lure");
-        await page.waitForSelector("#prism-stage");
+        await page.waitForSelector("#prism-stage", { state: "attached" });
         await page.waitForFunction(
           () =>
             [...document.querySelectorAll("#prism-stage iframe")].every(
@@ -112,7 +112,7 @@ test(
         // Reaching again builds the stage again.
         await page.mouse.move(10, 10);
         await page.hover("#prism-lure");
-        await page.waitForSelector("#prism-stage");
+        await page.waitForSelector("#prism-stage", { state: "attached" });
         assert.equal((await faces(page)).length, 5);
         assert.deepEqual(errors, []);
         await context.close();
@@ -129,7 +129,7 @@ test(
         assert.equal(faceRequests.length, 0, "no face was requested");
         // Keyboard: focus is intent; Enter always catches.
         await page.focus("#prism-lure");
-        await page.waitForSelector("#prism-stage");
+        await page.waitForSelector("#prism-stage", { state: "attached" });
         await page.keyboard.press("Enter");
         await page.waitForSelector("#prism-stage.is-open", { timeout: 15000 });
         assert.deepEqual(errors, []);
