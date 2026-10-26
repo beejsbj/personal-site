@@ -100,6 +100,12 @@ export function holdPage(): LivePage {
     ...PAPER,
   ]);
   const inert = body.inert;
+  // Holding the page inert takes focus out of it; it goes back on release.
+  const focused =
+    document.activeElement instanceof HTMLElement &&
+    document.activeElement !== body
+      ? document.activeElement
+      : null;
 
   // The face carries its own paper: a body's background only paints its own
   // box once the root has one, so give the root the dark of the room and the
@@ -173,6 +179,8 @@ export function holdPage(): LivePage {
       restore(html, savedHtml);
       body.inert = inert;
       scrollTo({ top: scroll, behavior: "instant" });
+      if (focused?.isConnected && body.contains(focused))
+        focused.focus({ preventScroll: true });
     },
   };
 }
