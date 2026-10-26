@@ -2657,10 +2657,6 @@ export function createSkein(options: SkeinOptions) {
       if (delay) window.setTimeout(go, delay);
       else go();
     },
-    /** Something else to move and paint on the live canvas. */
-    effect(e: Effect) {
-      effects.push({ e, last: [] });
-    },
     /** A word to be written by thread (spun.ts): kept, written now if the
      * screen is ready (at once for a still screen), and written again
      * whenever the page is laid out anew. */
