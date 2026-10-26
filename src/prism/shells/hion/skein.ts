@@ -2,11 +2,11 @@
  * material.
  *
  * A strand is a body grown from its head, a goal that steers the head, a
- * hue, some slack, a glow, a body strength and a lifetime (the width is
+ * hue, some slack, a body strength and a lifetime (the width is
  * every thread's: pastel.ts THREAD). The kinds differ only in those
  * numbers (NATURE) and in what steers them:
  *
- *   hion     the two hions: persistent, over every other. Their ways down the
+ *   hion     the two hions: persistent and brightest. Their ways down the
  *            page are composed from the screen's stations (weave.ts);
  *            here they are grown along those ways as far as the loom has
  *            drawn (scroll), their bodies laid on the ground as their
@@ -20,10 +20,8 @@
  *            you brush (a hion, or one lying on the ground: the branch
  *            takes its hue and leaves at a slant). It seeks the nearest
  *            structure nobody else is going to (a heading, a picture, a
- *            charm, a thread lying on the ground near by; otherwise a
- *            hion), winds round it (through a heading's words, a loose band
- *            round a picture, across a thread lying there once and on along
- *            beside it, stitches across a hion),
+ *            charm; otherwise a hion), winds round it (through a heading's
+ *            words, a loose band round a picture, stitches across a hion),
  *            and then either lets go into fate and runs on to join the
  *            ground's flow, or ends there. Nothing issues from the pointer
  *            merely moving.
@@ -34,18 +32,25 @@
  *            pointer still on their way somewhere near turn to it too.
  *            Left alone a while, the hions now and then tie a small one of
  *            their own (life.ts).
+ *   title    a heading written by one thread (spun.ts measures it,
+ *            trace.ts finds the way): from the knot its weft stops in, or
+ *            off the hion if one runs near, else in from the page's edge
+ *            or from just before the word, along a line under its feet
+ *            and up through each letter in turn, out past the last. At a
+ *            hand's pace for its size, slower into the letters' turns,
+ *            its rope held close. Its way is kept and measured again when
+ *            the page is laid out anew; it never fades. Of the one width,
+ *            like every thread.
  *
  * One material (strokeRun): every run of thread is one smooth line of
  * its hue with a little light added under it, and nothing else (no
- * grain: the colour is the thread). One width and one strength for every
- * thread on the screen (pastel.ts THREAD): the hions, the ground and what
- * comes from the pointer are the same light, so none of it reads as drawn
- * behind the rest. A thread grows rather than being drawn: where it is
- * still growing it is finer, like a tendril, tapering to its tip over a
- * short run (strokeTip), and the tip nods a little to either side as it
- * feels its way; as it stops the tip fills out to the thread's width. No
- * hot nib, no light at the tip: a bright point moving at a pen's pace is a
- * pen laying a line down.
+ * grain: the colour is the thread). One width for every thread on the
+ * screen (pastel.ts THREAD); what differs is how strongly a body lies,
+ * which is the hue dimmed, never see-through. The run behind a
+ * head is the same line drawn hot: it brightens toward the tip, a pale
+ * core comes up inside it, the light grows a little, and a small halo no
+ * bigger than the thread sits on the tip. No bead on a stick: the light
+ * is the thread's own.
  *
  * Every strand is in one index (fate's): the hions are fixed company, so
  * ground threads fall in alongside them; ground threads fall in alongside
@@ -59,7 +64,7 @@
  * has settled: it lags a little on a turn and sways slightly while the
  * head moves, and settles onto the path as it cools, so what is laid
  * down is what you saw. A hion's head rides a rope too, chasing the
- * loom's reach, and its tip half fills out once it has caught up and waits. On a
+ * loom's reach, and dims to half once it has caught up and waits. On a
  * screen travelled to the hions set out from where they come down and
  * run their way at SETOUT, the loom pacing its drawing to them, and the
  * ground is born live behind them: the screen is seen growing from the
@@ -85,17 +90,18 @@
  * it settled, the hions whole, with no heads and nothing from the pointer.
  *
  * What stays its own: what hangs from the hions (wefts, knots, ties and
- * cords, marks laid by the loom above the ground), the woven words and
- * covers (woven.ts: a cellular cloth, a different medium), the menu cord
- * and the loose ends under its names (nav.ts), and the resume track (its
- * own loom, its hions laid as marks). All of it the one thread, of the one
+ * cords, marks laid by the loom above the ground), the woven covers
+ * (woven.ts: a cellular cloth, a different medium), the menu cord and the
+ * loose ends under its names (nav.ts), and the resume track (its own
+ * loom, its hions laid as marks). All of it the one thread, of the one
  * width (pastel.ts THREAD). */
-import { Fate, goalsFor, Ground, type Near, plan, type Gather, type Seed, STEP, type Thread } from "./fate";
-import type { createLoom } from "./loom";
-import { still, unshow } from "./dom";
+import { type Bud, buds, Fate, goalsFor, Ground, leave, type Gather, type Seed, STEP, type Thread } from "./fate";
+import type { createLoom, Limb } from "./loom";
+import { measured, still, unshow } from "./dom";
 import type { Pulse } from "./pulse";
 import { type Hue, type Pt, RGB, rng, THREAD } from "./pastel";
-import { alongside, type Box, encircle as encircle_, ring, stitches, weave, wordBoxes } from "./wind";
+import { type Box, encircle as encircle_, ring, smooth, stitches, weave, wordBoxes } from "./wind";
+import type { Material, Measure, Spun } from "./spun";
 
 type Loom = ReturnType<typeof createLoom>;
 
@@ -109,7 +115,7 @@ export interface Effect {
   paint(ctx: CanvasRenderingContext2D): void;
 }
 
-export type Kind = "hion" | "ground" | "pointer" | "loop";
+export type Kind = "hion" | "ground" | "limb" | "loop" | "title";
 
 interface Nature {
   /** How fast the head goes (px a second). */
@@ -118,22 +124,24 @@ interface Nature {
   tail: number;
   /** The rope's length over the path it spans. */
   slack: number;
-  /** The soft light along its settled body (the fibres being 1). */
-  glow: number;
   /** How strongly its settled body lies (a hion being 1). */
   body: number;
   /** How long it lies once finished, before it fades (ms). */
   hold: number;
 }
 
-/** One material: every thread is the one thread, of the one width
- * (pastel.ts THREAD). What differs is how strongly the body lies and how
- * long. */
+/** One material, one brightness: every thread is one of the two hions or
+ * a branch of one, of the one width (pastel.ts THREAD), and lies as
+ * brightly as they do. What differs is how fast it grows and how long it
+ * lies. */
 const NATURE: Record<Kind, Nature> = {
-  hion: { speed: 700, tail: 130, slack: 1.012, glow: 0.14, body: 1, hold: Infinity },
-  ground: { speed: 150, tail: 110, slack: 1.02, glow: 0.14, body: 1, hold: 55000 },
-  pointer: { speed: 360, tail: 90, slack: 1.025, glow: 0.14, body: 1, hold: 12000 },
-  loop: { speed: 1100, tail: 80, slack: 1.015, glow: 0.14, body: 1, hold: Infinity },
+  hion: { speed: 700, tail: 130, slack: 1.012, body: 1, hold: Infinity },
+  ground: { speed: 150, tail: 110, slack: 1.016, body: 1, hold: 55000 },
+  limb: { speed: 460, tail: 80, slack: 1.012, body: 1, hold: Infinity },
+  loop: { speed: 1100, tail: 80, slack: 1.012, body: 1, hold: Infinity },
+  // Speed and the warm run are set per heading (spun.ts: its size and
+  // length).
+  title: { speed: 900, tail: 70, slack: 1.012, body: 1, hold: Infinity },
 };
 
 interface SkeinOptions {
@@ -189,10 +197,12 @@ interface Aim {
 
 type Drive =
   | { by: "fate" }
-  | { by: "seek"; aim: Aim | null; on: On | null; crept: number; letGo: boolean }
+  | { by: "seek"; aim: Aim | null; on: { hue: Hue; s: number } | null; crept: number; letGo: boolean }
   | { by: "wind"; way: Pt[]; at: number; letGo: boolean }
   | { by: "loop"; el: Element | null; state: "tying" | "held" | "untying"; until: number }
-  | { by: "hion"; keys: Float64Array };
+  | { by: "hion"; keys: Float64Array }
+  | { by: "title"; el: HTMLElement }
+  | { by: "way" };
 
 interface Strand {
   kind: Kind;
@@ -216,8 +226,9 @@ interface Strand {
   bottom: number;
   left: number;
   right: number;
-  /** When it was last baked (performance.now()). */
-  bakedAt: number;
+  /** The extent of the whole body grown so far (page px): a search for
+   * the nearest point skips a strand nowhere near. */
+  ext: Box;
   /** How much its head is moving (eases to 0 when it stops). */
   motion: number;
   /** The head's light: 1 while it grows, cooling to 0 once it has ended. */
@@ -228,14 +239,17 @@ interface Strand {
   dirty: boolean;
   /** Baked whole and off the live canvas. */
   cold: boolean;
-}
-
-/** A thread a thread from the pointer goes to and stitches across: a
- * hion (by hue), or one lying on the ground. */
-interface On {
-  hue: Hue;
-  s: number;
-  strand?: Strand;
+  /** A heading's pace at each point of its way (paceOf). */
+  pace?: Float32Array;
+  /** The thread it is a branch of (null for the two hions), how far along
+   * that thread it leaves (arc length), and its own branches. */
+  parent: Strand | null;
+  root: number;
+  children: Strand[];
+  /** Forks from a hion (a hion 0, a branch of it 1, ...). */
+  depth: number;
+  /** How far along itself it next forks (arc length; Infinity: never). */
+  fork: number;
 }
 
 /** A hion, as company and as somewhere for a thread to go. */
@@ -249,16 +263,14 @@ interface Hion {
 
 const TILE = 512;
 const PANE = 320;
-/** Segments laid onto the ground at once, and the least time between
- * two bakes of one strand (ms). */
-const BATCH = 8;
+/** How often what has cooled is laid onto the ground (ms): every strand
+ * on one shared beat, so a pane many heads cross is re-stilled (a new
+ * bitmap) once a beat, not once for each. */
 const BEAT = 320;
 /** How fast a hion runs down a screen it has just come to (px a second). */
 const SETOUT = 1800;
 /** Rope nodes. */
 const KNOTS = 12;
-/** How long a growing end is fine for (px). */
-const TIP = 34;
 /** Ground heads growing at once near the reader (fewer on a screen seen
  * close, where each is twice the size and its page otherwise very still). */
 const LIVE = 3;
@@ -279,12 +291,9 @@ const BAND = 1.6;
  * every other frame. */
 const SLOW = 6;
 
-/** What threads from the pointer go to. */
+/** What a branch can go to and wind round. */
 const AIMS = "main h1, main h2, main h3, [data-weft], main img, .hion-woven-cover, .hion-tag, .hion-pullcord, .hion-charm";
-/** Pointer threads at once, how far one looks for a thing, and how far it
- * may creep before it gives up (px). */
-const INTENTS = 3;
-const SEEK = 360;
+/** How far a branch seeking something may creep before it gives up (px). */
 const REACH = 520;
 /** What a loop is tied round when you hover it. */
 const HOVER = "[data-ink]:not(.hion-pull), .hion-strung, .hion-tie, .hion-prose a, .hion-foot__mail a";
@@ -296,12 +305,24 @@ const hash = (text: string) => {
 };
 export const seedOf = (path: string) => hash(path) % 100000;
 
-const TAU = Math.PI * 2;
 /** The farthest apart two consecutive points of one thread can be and
  * still be the same stretch (a hion leaves the page for a track). */
 const JUMP = 120;
 
-const gapTo = (b: Box, x: number, y: number) => Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - y, 0, y - b.b));
+/** n + 1 points along a cubic Bezier. */
+function cubicWay(p0: Pt, p1: Pt, p2: Pt, p3: Pt, n: number): Pt[] {
+  const out: Pt[] = [];
+  for (let k = 0; k <= n; k++) {
+    const u = k / n;
+    const v = 1 - u;
+    out.push([
+      v * v * v * p0[0] + 3 * v * v * u * p1[0] + 3 * v * u * u * p2[0] + u * u * u * p3[0],
+      v * v * v * p0[1] + 3 * v * v * u * p1[1] + 3 * v * u * u * p2[1] + u * u * u * p3[1],
+    ]);
+  }
+  return out;
+}
+
 const meets = (a: Box, b: Box) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
 
 export function createSkein(options: SkeinOptions) {
@@ -330,21 +351,42 @@ export function createSkein(options: SkeinOptions) {
   let ground = new Ground(1, 1);
   let fate = new Fate(ground);
   let all: Gather[] = [];
-  let seeds: Seed[] = [];
+  /** Where the ground's branches leave the hions, in the order the drawing
+   * reaches them. */
+  let seeds: Bud[] = [];
+  /** What hangs from the hions (weave.ts limbs), in the order the drawing
+   * reaches them, and how many have been born. */
+  let limbs: Limb[] = [];
+  let limbSown = 0;
+  /** Things hung on drops from a cord: where each drop meets its cord
+   * (page px), so it is shown when the cord's head has grown over it, not
+   * before (shell.css `data-tied`); and when it was lit, for one whose cord
+   * is not grown here (it is tied 1.4s after, whatever). */
+  let hangers: { el: HTMLElement; x: number; y: number; lit: number }[] = [];
   let sown = 0;
   let strands: Strand[] = [];
   let hions: Hion[] = [];
   let hionVersion = -1;
   let aims: Aim[] = [];
+  /** The words written by thread, by element: measured again whenever
+   * the page is laid out anew. */
+  const titles = new Map<HTMLElement, { hue: Hue; measure: Measure }>();
   const tiles = new Map<number, Tile>();
   let width = 0;
   let height = 0;
   let pageTop = 0;
+  /** The viewport on the page (its top in page px, its height), read when
+   * the reader scrolls or the window changes: a frame reads no layout (a
+   * read of scrollY mid-frame lays the page out again for every change
+   * the frame has made). */
+  let viewTop = 0;
+  let viewH = 0;
   let tileRows = 1;
   let dpr = 1;
   let built = false;
   let busy = false;
   let lastTick = 0;
+  let lastBeat = 0;
   let lastBirth = 0;
   let nextTrickle = 0;
   let lastInput = 0;
@@ -365,12 +407,13 @@ export function createSkein(options: SkeinOptions) {
   let skipPaint = false;
   /** Boxes of things gone from the live canvas, to clear. */
   let cleared: Box[] = [];
+  /** Panes broken (a thread went under) since the last beat, to still. */
+  const stale = new Set<HTMLCanvasElement>();
   const effects: { e: Effect; last: Box[] }[] = [];
   // The pointer, in page space.
-  const pointer = { x: -1e4, y: -1e4, at: 0, here: false, lastIssue: 0, hue: "c" as Hue };
-  /** When each thread last sent a branch off under the pointer, by id. */
-  const branched = new Map<number, number>();
-  let lastBranch = 0;
+  const pointer = { x: -1e4, y: -1e4, at: 0, here: false, looked: 0 };
+  /** When each thread last answered a brush. */
+  const brushed = new WeakMap<Strand, number>();
 
   const task = options.pulse.add(tick);
 
@@ -443,10 +486,12 @@ export function createSkein(options: SkeinOptions) {
       fate.fix(tip.hue, tip.points);
     }
     // The hions themselves: strands grown along their composed ways, as
-    // far as the loom has drawn.
+    // far as the loom has drawn. Their branches stay theirs.
+    const was = new Map<Hue, Strand>();
     strands = strands.filter((st) => {
       if (st.kind !== "hion") return true;
       if (st.box) cleared.push(st.box);
+      was.set(st.t.hue, st);
       return false;
     });
     for (const tip of loom.journeys()) {
@@ -459,6 +504,11 @@ export function createSkein(options: SkeinOptions) {
       // them where the drawing is.
       st.s = fresh ? 0 : hionTarget(st);
       st.laid = Math.max(0, indexAt(st, st.s - n.tail) - 1);
+      const old = was.get(tip.hue);
+      if (old) {
+        st.children = old.children;
+        for (const c of st.children) c.parent = st;
+      }
       strands.unshift(st);
     }
   }
@@ -521,24 +571,34 @@ export function createSkein(options: SkeinOptions) {
     return moving;
   }
 
+  /** Where the reader is looking. */
+  function look() {
+    viewTop = scrollY - pageTop;
+    viewH = innerHeight;
+  }
+
   function build() {
     width = page.clientWidth;
     height = page.scrollHeight;
     pageTop = page.getBoundingClientRect().top + scrollY;
+    look();
     dpr = Math.min(devicePixelRatio || 1, 1.5);
     layer.style.height = liveLayer.style.height = `${height}px`;
     tileRows = Math.ceil(height / TILE);
     ground = new Ground(width, height, 8);
-    page.classList.add("hion-measuring");
-    readPage();
-    page.classList.remove("hion-measuring");
+    const spun = measured(page, () => {
+      readPage();
+      return measureTitles();
+    });
     ground.finish();
     fate = new Fate(ground);
     strands = [];
     hionVersion = -1;
     readHions();
+    // The words written by thread, laid again (settled by settle()).
+    for (const [el, s] of spun) title(el, titles.get(el)!.hue, s);
     const origin = options.origin();
-    const planned = plan(ground, {
+    const planned = buds(ground, hions, {
       width,
       height,
       drop: origin?.[0] ?? width * 0.56,
@@ -548,7 +608,10 @@ export function createSkein(options: SkeinOptions) {
       lively,
     });
     all = planned.gathers;
-    seeds = planned.seeds;
+    seeds = planned.buds;
+    limbs = loom.limbs().slice().sort((a, b) => a.key - b.key);
+    limbSown = 0;
+    readHangers();
     sown = 0;
     trickles = 0;
     cleared = [];
@@ -561,10 +624,15 @@ export function createSkein(options: SkeinOptions) {
   function measureBody(st: Strand) {
     const { xs, ys } = st.t;
     const ls = st.ls;
+    const e = st.ext;
     for (let i = ls.length; i < xs.length; i++) {
       const d = i ? Math.hypot(xs[i] - xs[i - 1], ys[i] - ys[i - 1]) : 0;
       // A stretch a hion leaves the page for (a track) is no length.
       ls.push(i ? ls[i - 1] + (d > JUMP ? 0 : d) : 0);
+      if (xs[i] < e.l) e.l = xs[i];
+      if (xs[i] > e.r) e.r = xs[i];
+      if (ys[i] < e.t) e.t = ys[i];
+      if (ys[i] > e.b) e.b = ys[i];
     }
     return ls[ls.length - 1] ?? 0;
   }
@@ -615,11 +683,12 @@ export function createSkein(options: SkeinOptions) {
     const d = st.drive;
     const { t } = st;
     if (d.by === "fate") {
-      fate.step(t);
+      stepGround(st);
       return;
     }
-    // A loop is laid whole when it is tied; a hion, by the loom.
-    if (d.by === "loop" || d.by === "hion") return;
+    // A loop is laid whole when it is tied; a hion, by the loom; a title
+    // when it is measured; a limb when it is born.
+    if (d.by === "loop" || d.by === "hion" || d.by === "title" || d.by === "way") return;
     const n = t.xs.length - 1;
     const x = t.xs[n];
     const y = t.ys[n];
@@ -660,9 +729,9 @@ export function createSkein(options: SkeinOptions) {
 
   function windWay(st: Strand, d: Extract<Drive, { by: "seek" }>, from: Pt): Pt[] {
     if (d.on) {
-      const along = onAt(d.on);
-      if (!along) return [];
-      return d.on.strand ? alongside(along, d.on.s, st.rand) : stitches(along, d.on.s, st.rand);
+      const h = hions.find((h) => h.hue === d.on!.hue);
+      if (!h) return [];
+      return stitches((s) => hionAt(h, s), d.on.s, st.rand);
     }
     const aim = d.aim!;
     if (aim.words) {
@@ -714,148 +783,397 @@ export function createSkein(options: SkeinOptions) {
     return [h.xs[lo] + (h.xs[hi] - h.xs[lo]) * u, h.ys[lo] + (h.ys[hi] - h.ys[lo]) * u, -dy / len, dx / len];
   }
 
-  /** The nearest drawn point of a hion within r of (x, y). */
-  function nearestHion(x: number, y: number, r: number) {
-    const reach = loom.reach();
-    let best: { hue: Hue; s: number; d: number; x: number; y: number } | null = null;
-    for (const h of hions) {
-      for (let i = 0; i < h.xs.length; i += 2) {
-        if (h.keys[i] > reach) break;
-        const d = Math.hypot(h.xs[i] - x, h.ys[i] - y);
-        if (d < r && (!best || d < best.d)) best = { hue: h.hue, s: h.ls[i], d, x: h.xs[i], y: h.ys[i] };
+  /** Where each hung thing's drop meets its cord, read with the page
+   * still (no swing, no reveal offset). */
+  function readHangers() {
+    hangers = [];
+    const tied: HTMLElement[] = [];
+    measured(page, () => {
+      const p = page.getBoundingClientRect();
+      for (const el of page.querySelectorAll<HTMLElement>("[data-reveal][data-ink]")) {
+        if (el.hasAttribute("data-tied")) continue;
+        if (instant || el.closest("[data-cloth-hold]")) {
+          tied.push(el);
+          continue;
+        }
+        const r = el.getBoundingClientRect();
+        const hang = parseFloat(el.style.getPropertyValue("--hion-hang")) || 0;
+        const kx = parseFloat(el.dataset.knot ?? "");
+        hangers.push({ el, x: r.left - p.left + (Number.isNaN(kx) ? r.width / 2 : kx), y: r.top - p.top - hang, lit: 0 });
       }
-    }
-    return best;
+    });
+    for (const el of tied) el.setAttribute("data-tied", "");
   }
 
-  /** Where along a thread to go to is, at arc length s, with its normal;
-   * null once it is gone. */
-  function onAt(on: On): ((s: number) => [number, number, number, number]) | null {
-    if (on.strand) {
-      const st = on.strand;
-      return st.t.gone ? null : (s) => at(st, s);
-    }
-    const h = hions.find((h) => h.hue === on.hue);
-    return h ? (s) => hionAt(h, s) : null;
+  /** Show what hangs once its cord has grown to it. */
+  function tieHangers(now: number) {
+    if (!hangers.length) return false;
+    const heads = strands.filter((st) => st.kind === "limb" && !st.cold).map((st) => at(st, st.s));
+    let waiting = false;
+    hangers = hangers.filter((hg) => {
+      const lit = hg.el.hasAttribute("data-lit");
+      if (lit && !hg.lit) hg.lit = now;
+      // Hung from the thing above it: tied when that is.
+      let above = hg.el.dataset.hangFrom === "prev" ? (hg.el.previousElementSibling as HTMLElement | null) : null;
+      while (above && !above.hasAttribute("data-ink")) above = above.previousElementSibling as HTMLElement | null;
+      const reached = above ? above.hasAttribute("data-tied") : heads.some(([x, y]) => Math.abs(x - hg.x) < 14 && Math.abs(y - hg.y) < 18);
+      if (reached || (lit && now - hg.lit > 1400) || !hg.el.isConnected) {
+        hg.el.setAttribute("data-tied", "");
+        return false;
+      }
+      if (lit) waiting = true;
+      return true;
+    });
+    return waiting;
   }
 
-  /** The nearest point within r of (x, y) on a thread lying on the ground
-   * (grown, or from the pointer and finished), not `not`. */
-  function nearestLying(x: number, y: number, r: number, not = -1) {
-    let best: { st: Strand; s: number; d: number; x: number; y: number } | null = null;
+  /* ---------- Where a branch leaves from ---------- */
+
+  /** Where a branch to `to` leaves the tree, and the way it grows there:
+   * from a point already grown on some thread (a hion, a branch lying on
+   * the ground, a heading's thread), forward along that thread's own way
+   * and bending off it at a slant, arriving going `arrive` (a unit
+   * vector), across as little of the words as it can. Prefers threads of
+   * `hue`. Null if nothing has grown within `far`. */
+  function rootFor(to: Pt, arrive: Pt, hue?: Hue, far = 760, not?: Strand, only = false): { parent: Strand; s: number; way: Pt[] } | null {
+    const [tx, ty] = to;
+    const [ax, ay] = arrive;
+    const now = performance.now();
+    // Every point it could leave from, weighed cheaply first (how far, how
+    // far off forward, its hue, its depth); the way itself (a curve,
+    // sampled against the words) is drawn only for the likeliest, in that
+    // order, until none left could beat the best. With a heading hemmed
+    // in by words every way is across some, and once every point of a
+    // busy screen was drawn to it: a hitch of a few hundred milliseconds
+    // on a hover.
+    const cands: { st: Strand; i: number; d: number; fx: number; fy: number; lb: number }[] = [];
     for (const st of strands) {
-      if ((st.kind !== "ground" && st.kind !== "pointer") || st.t.id === not || st.t.gone || st.alpha < 1) continue;
-      if (x < st.left - r || x > st.right + r || y < st.top - r || y > st.bottom + r) continue;
+      if (st === not || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30 || (only && st.t.hue !== hue)) continue;
+      if (st.kind === "ground" && st.fadeAt - now < 15000) continue;
+      const e = st.ext;
+      if (tx < e.l - far || tx > e.r + far || ty < e.t - far || ty > e.b + far) continue;
+      const prefer = hue && st.t.hue !== hue ? 700 : 0;
       const { xs, ys } = st.t;
-      const end = Math.min(xs.length - 1, indexAt(st, st.s - st.n.tail));
-      for (let i = 12; i < end - 12; i += 3) {
-        const d = Math.hypot(xs[i] - x, ys[i] - y);
-        if (d < r && (!best || d < best.d)) best = { st, s: st.ls[i], d, x: xs[i], y: ys[i] };
+      const end = Math.min(xs.length - 1, indexAt(st, st.s));
+      for (let i = 3; i <= end - 3; i += 4) {
+        const x = xs[i];
+        const y = ys[i];
+        const d = Math.hypot(tx - x, ty - y);
+        if (d < 24 || d > far) continue;
+        // Forward along the thread (the way it grew), never back.
+        const dx = xs[i + 3] - xs[i - 3];
+        const dy = ys[i + 3] - ys[i - 3];
+        const dl = Math.hypot(dx, dy);
+        if (dl < 4 || dl > 60) continue;
+        const fx = dx / dl;
+        const fy = dy / dl;
+        const cos = ((tx - x) * fx + (ty - y) * fy) / d;
+        // Behind it or square to it: it would have to turn back on itself.
+        if (cos < 0.05) continue;
+        cands.push({ st, i, d, fx, fy, lb: d + (1 - cos) * 260 + prefer + st.depth * 30 });
+      }
+    }
+    cands.sort((a, b) => a.lb - b.lb);
+    let best: (typeof cands)[number] | null = null;
+    let bestCost = Infinity;
+    for (let c = 0; c < cands.length && c < 400; c++) {
+      const cand = cands[c];
+      if (cand.lb >= bestCost) break;
+      const { st, i, d, fx, fy } = cand;
+      const x = st.t.xs[i];
+      const y = st.t.ys[i];
+      const k1 = Math.min(140, d * 0.38);
+      const k2 = Math.min(120, d * 0.34);
+      const p1x = x + fx * k1;
+      const p1y = y + fy * k1;
+      const p2x = tx - ax * k2;
+      const p2y = ty - ay * k2;
+      const n = Math.max(22, Math.ceil(d / 8));
+      // Across the words: all but never (the last stretch arrives beside
+      // the words it writes, the first leaves a thread that may run
+      // beside others). Off the page is no way to go.
+      const k0 = Math.ceil(n * 0.06);
+      const k1n = Math.floor(n * 0.84);
+      let blocked = 0;
+      let off = 0;
+      for (let k = 0; k <= n; k++) {
+        const u = k / n;
+        const v = 1 - u;
+        const px = v * v * v * x + 3 * v * v * u * p1x + 3 * v * u * u * p2x + u * u * u * tx;
+        const py = v * v * v * y + 3 * v * v * u * p1y + 3 * v * u * u * p2y + u * u * u * ty;
+        if (k >= k0 && k < k1n && ground.clear(px, py) < 5) blocked++;
+        if (px < 4 || px > width - 4 || py < 0) off++;
+      }
+      const cost = cand.lb + blocked * 900 + off * 400;
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = cand;
+      }
+    }
+    if (!best) return null;
+    const { st, i, d, fx, fy } = best;
+    const x = st.t.xs[i];
+    const y = st.t.ys[i];
+    const k1 = Math.min(140, d * 0.38);
+    const k2 = Math.min(120, d * 0.34);
+    const way = cubicWay([x, y], [x + fx * k1, y + fy * k1], [tx - ax * k2, ty - ay * k2], [tx, ty], Math.max(22, Math.ceil(d / 8)));
+    return { parent: st, s: st.ls[i], way };
+  }
+
+  /* ---------- Words written by thread ---------- */
+
+  /** Measure every registered word where it rests (the page is held
+   * still by the caller). A word that cannot be written stays chalk. */
+  function measureTitles() {
+    const out: [HTMLElement, Spun][] = [];
+    const p = page.getBoundingClientRect();
+    for (const [el, t] of titles) {
+      if (!el.isConnected) {
+        titles.delete(el);
+        continue;
+      }
+      const s = t.measure(() => p);
+      if (s) out.push([el, s]);
+      else el.dataset.spunState = "chalk";
+    }
+    return out;
+  }
+
+  /** A heading's thread, laid whole (its head at the start; the caller
+   * moves it or settles it). Strung on a weft, the weft writes it (the way
+   * already comes from the knot it stops in). Otherwise it comes off the
+   * nearest drawn hion of its own hue if one runs near, otherwise in from
+   * the page's edge when the heading is near it, otherwise from a little
+   * before the word. */
+  function title(el: HTMLElement, hue: Hue, spun: Spun, twist: 0 | 1 | -1 = el.matches(SAID) ? 1 : 0): Strand {
+    let way = spun.way;
+    let from: { parent: Strand; s: number } | undefined;
+    let approach = 0;
+    if (!spun.knotted) {
+      // A branch off the tree: it leaves a thread already grown near the
+      // heading and comes in along the line under its feet, going the way
+      // the line is written. Its hue is the thread's it leaves.
+      const [x0, y0] = way[0];
+      const [x1, y1] = way[Math.min(way.length - 1, 3)];
+      const l = Math.hypot(x1 - x0, y1 - y0) || 1;
+      // A said word's second thread comes off the other tree.
+      const root = rootFor([x0, y0], [(x1 - x0) / l, (y1 - y0) / l], hue, 760, undefined, twist < 0) ?? hionRoot(x0, y0, hue);
+      if (root) {
+        from = { parent: root.parent, s: root.s };
+        hue = root.parent.t.hue;
+        approach = root.way.length;
+        way = [...root.way.slice(0, -1), ...way];
+      }
+    }
+    const n: Nature = { ...nature("title") };
+    let smoothed = smooth(way, 4);
+    let under: number[] = [];
+    if (twist) {
+      // Where the letters begin along the smoothed way.
+      const lead = approach ? approachLength(way, approach) : 0;
+      let at = 0;
+      for (let run = 0; at < smoothed.length - 1 && run < lead; at++) run += Math.hypot(smoothed[at + 1][0] - smoothed[at][0], smoothed[at + 1][1] - smoothed[at][1]);
+      const tw = twisted(smoothed.slice(at), twist, at);
+      smoothed = [...smoothed.slice(0, at), ...tw.out];
+      under = tw.under;
+    }
+    const t = fate.bare(hue, smoothed);
+    for (const i of under) t.under.add(i);
+    const st = make("title", n, t, { by: "title", el }, from);
+    const total = measureBody(st);
+    // Where the letters begin along it: the approach is grown, not written.
+    const letters = approach ? indexAt(st, approachLength(way, approach)) : 0;
+    Object.assign(n, writing(spun, total - st.ls[letters]));
+    st.pace = paceOf(st, letters);
+    strands.push(st);
+    el.dataset.spunState = "spun";
+    // Said: written by both trees at once, the other's thread twisted
+    // round this one.
+    if (twist > 0) twins.set(st, title(el, hue === "c" ? "m" : "c", spun, -1));
+    return st;
+  }
+
+  /** What is said (spun.ts LABELS: the greeting, the role line, the
+   * portrait's word, the foot's call): written by both trees. */
+  const SAID = ".hion-hello, .hion-role, .hion-portrait__link, .hion-foot__call";
+  /** A said word's two threads: how far either side of its letters (in
+   * threads), and how often they cross (px). */
+  const TWIST = 1.3;
+  const TURN = 48;
+
+  /** A said word's second thread, by its first. */
+  const twins = new WeakMap<Strand, Strand>();
+
+  /** A said word's two threads through its letters: along the run under
+   * their feet they twist round each other, each going under the other by
+   * turns; up through a letter they are one, the cyan and the magenta on
+   * top letter by letter, so each letter is one clean stroke (twisted
+   * through the letters themselves, they could not be read). */
+  function twisted(piece: Pt[], sign: 1 | -1, base: number) {
+    const out: Pt[] = [];
+    const under: number[] = [];
+    let run = 0;
+    let letter = 0;
+    let was = 1;
+    piece.forEach(([x, y], i) => {
+      if (i) run += Math.hypot(x - piece[i - 1][0], y - piece[i - 1][1]);
+      // The run is the lowest of the way near by (capitals have no tails).
+      let low = y;
+      for (let k = Math.max(0, i - 24); k < Math.min(piece.length, i + 25); k++) low = Math.max(low, piece[k][1]);
+      const on = Math.max(0, Math.min(1, (y - (low - 7)) / 4));
+      if (was >= 0.5 && on < 0.5) letter++;
+      was = on;
+      const a = piece[Math.max(0, i - 3)];
+      const b = piece[Math.min(piece.length - 1, i + 3)];
+      const d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      const tx = (b[0] - a[0]) / d;
+      const ty = (b[1] - a[1]) / d;
+      const w = Math.sin((run / TURN) * Math.PI * 2) * on;
+      out.push([x - ty * w * TWIST * THREAD * sign, y + tx * w * TWIST * THREAD * sign]);
+      const c = Math.round(run / (TURN / 2));
+      if (on < 0.5 ? letter % 2 === 0 : Math.abs(w) < 0.5 * on && c % 2 === 0) {
+        if (sign > 0) under.push(base + i);
+      } else if (on < 0.5 || Math.abs(w) < 0.5 * on) {
+        if (sign < 0) under.push(base + i);
+      }
+    });
+    return { out, under };
+  }
+
+  /** How long the first `n` points of a way run (px). */
+  function approachLength(way: Pt[], n: number) {
+    let l = 0;
+    for (let k = 1; k < n && k < way.length; k++) l += Math.hypot(way[k][0] - way[k - 1][0], way[k][1] - way[k - 1][1]);
+    return l;
+  }
+
+  /** With nothing grown near yet: off the nearest point of a hion's way
+   * (the hion is coming; it is never far behind a heading it has lit). */
+  function hionRoot(x: number, y: number, hue: Hue) {
+    let best: { parent: Strand; s: number; way: Pt[] } | null = null;
+    let bd = Infinity;
+    for (const st of strands) {
+      if (st.kind !== "hion") continue;
+      const { xs, ys } = st.t;
+      for (let i = 0; i < xs.length; i += 3) {
+        const d = Math.hypot(xs[i] - x, ys[i] - y) + (st.t.hue === hue ? 0 : 120);
+        if (d < bd) {
+          bd = d;
+          const mx = (xs[i] + x) / 2;
+          const my = (ys[i] + y) / 2 + 10;
+          best = { parent: st, s: st.ls[i], way: smooth([[xs[i], ys[i]], [mx, my], [x, y]], 6) };
+        }
       }
     }
     return best;
+  }
+
+  /** How a heading is written: at a hand's pace for letters its size (a
+   * few capitals a second, so larger letters go faster), every heading in
+   * one to three seconds and every label in under two; the warm run
+   * behind the head about a capital long. */
+  function writing(spun: Spun, total: number) {
+    // A label (small, and there are many) is a quick hand: a screen is not
+    // left half written.
+    const small = spun.size < 30;
+    const time = Math.max(small ? 0.6 : 1.1, Math.min(small ? 1.6 : 3, total / (spun.size * (small ? 16 : 11))));
+    return { speed: total / time, tail: Math.max(22, Math.min(70, spun.size * 1.1)) };
+  }
+
+  /** How fast a heading's head goes at each point of its way, as a share
+   * of its speed: a hand slows into the turns of the letters and runs on
+   * along the line between them, and eases out at the start and in at the
+   * end. Averages to 1 over the letters, so the heading takes as long as
+   * `writing` says; the branch that brings it there (points before
+   * `letters`) grows at a branch's pace, easing into the first letter. */
+  function paceOf(st: Strand, letters = 0) {
+    const { xs, ys } = st.t;
+    const n = xs.length;
+    const raw = new Float32Array(n);
+    const k = 3;
+    for (let i = letters; i < n; i++) {
+      const a = Math.max(0, i - k);
+      const b = Math.min(n - 1, i + k);
+      const ax = xs[i] - xs[a];
+      const ay = ys[i] - ys[a];
+      const bx = xs[b] - xs[i];
+      const by = ys[b] - ys[i];
+      const cos = (ax * bx + ay * by) / (Math.hypot(ax, ay) * Math.hypot(bx, by) || 1);
+      raw[i] = 1.3 - 0.75 * Math.sqrt(Math.max(0, (1 - cos) / 2));
+    }
+    const pace = new Float32Array(n);
+    const total = st.ls[n - 1] || 1;
+    const start = st.ls[letters] ?? 0;
+    let sum = 0;
+    for (let i = letters; i < n; i++) {
+      let s = 0;
+      let c = 0;
+      for (let j = Math.max(letters, i - 5); j <= Math.min(n - 1, i + 5); j++, c++) s += raw[j];
+      const at = st.ls[i] - start;
+      pace[i] = (s / c) * Math.min(1, (letters ? 0.6 : 0.3) + at / 60, 0.3 + (total - st.ls[i]) / 90);
+      sum += pace[i];
+    }
+    const mean = sum / (n - letters) || 1;
+    for (let i = letters; i < n; i++) pace[i] /= mean;
+    // The branch on its way: brisk, eased out of the thread it leaves and
+    // into the first letter.
+    const brisk = Math.max(1.4, 520 / st.n.speed);
+    for (let i = 0; i < letters; i++) {
+      const u = start ? st.ls[i] / start : 1;
+      pace[i] = brisk * Math.min(1, 0.35 + u * 3, 0.6 + (1 - u) * 3);
+    }
+    return pace;
+  }
+
+  /** A word's thread, written at once and lying cold. */
+  function whole(st: Strand) {
+    const twin = twins.get(st);
+    if (twin) whole(twin);
+    st.s = measureBody(st);
+    st.heat = 0;
+    st.motion = 0;
+    st.rope = null;
+    finish(st, performance.now());
   }
 
   /* ---------- The thread itself ---------- */
 
-  /** How far segment i is from being the full thread: tapered at its
-   * start, and at its end once it has one (lay draws that finer). */
-  function taper(st: Strand, i: number) {
-    const n = st.t.xs.length - 1;
-    let a = Math.min(1, (i + 1) / 16);
-    if (st.t.done && st.kind !== "hion") a = Math.min(a, (n - i) / 10);
-    return Math.max(0, a) * st.alpha;
-  }
-
   /** The colour of a thread at a strength, over black paper: the hue
    * dimmed, not made see-through, so pieces of one thread meet without a
    * seam and nothing shows through. */
-  function tone(hue: Hue, strength: number) {
+  function tone(hue: Hue, strength: number, pale = 0) {
     const [r, g, b] = RGB[hue];
+    const [lr, lg, lb] = RGB[hue === "c" ? "cl" : "ml"];
     const k = Math.max(0, Math.min(1, strength));
-    return `rgb(${(r * k) | 0} ${(g * k) | 0} ${(b * k) | 0})`;
+    return `rgb(${((r + (lr - r) * pale) * k) | 0} ${((g + (lg - g) * pale) * k) | 0} ${((b + (lb - b) * pale) * k) | 0})`;
   }
 
-  /** One run of thread, the one way every thread is drawn: light, and
-   * nothing else. A soft wide glow added under it, and one smooth line of
-   * the hue at the thread's strength. `pts` are x,y pairs. `erase` instead
-   * takes that fraction of the run off the paper, along the same line (a
-   * fade step that repaints nothing else). */
-  function strokeRun(ctx: CanvasRenderingContext2D, hue: Hue, w: number, glow: number, pts: number[], base: number, erase?: number) {
+  /** One run of thread, the one way every thread is drawn: one smooth
+   * line of the hue at the thread's strength, flat light, no glow and no
+   * taper (a thread is as strong at its ends as along it). `pts` are x,y
+   * pairs. `erase` instead takes that fraction of the run off the paper,
+   * along the same line (a fade step that repaints nothing else). */
+  function strokeRun(ctx: CanvasRenderingContext2D, hue: Hue, w: number, pts: number[], base: number, erase?: number) {
     const n = pts.length / 2;
     if (n < 2 || base <= 0) return;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    const path = () => {
-      ctx.beginPath();
-      ctx.moveTo(pts[0], pts[1]);
-      for (let k = 1; k < n; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
-    };
+    ctx.beginPath();
+    ctx.moveTo(pts[0], pts[1]);
+    for (let k = 1; k < n; k++) ctx.lineTo(pts[k * 2], pts[k * 2 + 1]);
     if (erase !== undefined) {
       ctx.globalCompositeOperation = "destination-out";
       ctx.strokeStyle = "#000";
       ctx.globalAlpha = erase;
       ctx.lineWidth = w + 1.2;
-      path();
       ctx.stroke();
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
       return;
     }
-    // The glow: a little light added under the line. Kept slight: added
-    // light over the line's own colour saturates quickly, and a bright
-    // bar is a blob.
-    if (glow * base > 0.01) {
-      ctx.globalCompositeOperation = "lighter";
-      ctx.strokeStyle = tone(hue, glow * base);
-      ctx.lineWidth = w * 2.4;
-      path();
-      ctx.stroke();
-      ctx.globalCompositeOperation = "source-over";
-    }
     ctx.strokeStyle = tone(hue, base);
     ctx.lineWidth = w;
-    path();
     ctx.stroke();
-  }
-
-  /** A growing end: the same line, drawn finer toward its tip, the way a
-   * tendril is youngest and finest where it is still growing, with no
-   * light of its own (a bright tip is a pen's nib, laying a line down).
-   * `grow` (0 to 1) is how much it is growing: as it stops the tip fills
-   * out to the thread's width. `pts` are x,y pairs, the tip last. */
-  function strokeTip(ctx: CanvasRenderingContext2D, hue: Hue, glow: number, pts: number[], base: number, grow: number) {
-    const n = pts.length / 2;
-    if (n < 2 || base <= 0) return;
-    if (grow < 0.02) {
-      strokeRun(ctx, hue, THREAD, glow, pts, base);
-      return;
-    }
-    // Arc length back from the tip, at each point.
-    const back = new Float32Array(n);
-    for (let k = n - 2; k >= 0; k--) back[k] = back[k + 1] + Math.hypot(pts[k * 2 + 2] - pts[k * 2], pts[k * 2 + 3] - pts[k * 2 + 1]);
-    const fine = (d: number) => {
-      const u = Math.min(1, d / TIP);
-      return 1 - grow * 0.72 * (1 - u * u * (3 - 2 * u));
-    };
-    // What is past the fine part is the plain thread.
-    let k0 = 0;
-    while (k0 < n - 1 && back[k0 + 1] >= TIP) k0++;
-    if (k0 > 0) strokeRun(ctx, hue, THREAD, glow, pts.slice(0, (k0 + 1) * 2), base);
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    // No light of its own along the fine part: a glow wider than a thread
-    // that is narrowing reads as a ghost of it.
-    // The line, piece by piece, each a little finer toward the tip (one
-    // opaque colour, so the pieces meet without a seam).
-    ctx.strokeStyle = tone(hue, base);
-    for (let k = k0; k < n - 1; k++) {
-      ctx.lineWidth = THREAD * fine((back[k] + back[k + 1]) / 2);
-      ctx.beginPath();
-      ctx.moveTo(pts[k * 2], pts[k * 2 + 1]);
-      ctx.lineTo(pts[k * 2 + 2], pts[k * 2 + 3]);
-      ctx.stroke();
-    }
   }
 
   /** Lay segments [i0, i1) of a strand's body on a context, settled.
@@ -874,23 +1192,14 @@ export function createSkein(options: SkeinOptions) {
         Math.min(ys[i], ys[i + 1]) > clip.b + pad);
     let pts: number[] = [];
     const flush = (alpha: number) => {
-      if (pts.length >= 4) strokeRun(ctx, hue, THREAD, st.n.glow, pts, base * alpha, erase);
+      if (pts.length >= 4) strokeRun(ctx, hue, THREAD, pts, base * alpha, erase);
       pts = [];
     };
     for (let i = i0; i < i1; i++) {
-      const a = taper(st, i);
       // Under another thread, across a stretch it leaves the page for, or
       // out of this pane's sight.
-      if (under.has(i) || a <= 0 || ls[i + 1] - ls[i] <= 0 || outside(i)) {
+      if (under.has(i) || st.alpha <= 0 || ls[i + 1] - ls[i] <= 0 || outside(i)) {
         flush(st.alpha);
-        continue;
-      }
-      if (a < st.alpha) {
-        // Its ends come to a point, as a growing tip does: finer, not
-        // fainter, and with no light of their own (piece by piece it would
-        // gather into a haze).
-        flush(st.alpha);
-        strokeRun(ctx, hue, THREAD * (0.28 + (0.72 * a) / st.alpha), 0, [xs[i], ys[i], xs[i + 1], ys[i + 1]], base * st.alpha, erase);
         continue;
       }
       if (!pts.length) pts.push(xs[i], ys[i]);
@@ -950,9 +1259,8 @@ export function createSkein(options: SkeinOptions) {
 
   /** Keep ground near the viewport; drop far panes. */
   function cull() {
-    const top = scrollY - pageTop;
-    const from = Math.max(0, Math.floor((top - innerHeight * 0.3) / TILE));
-    const to = Math.min(tileRows - 1, Math.floor((top + innerHeight * 1.3) / TILE));
+    const from = Math.max(0, Math.floor((viewTop - viewH * 0.3) / TILE));
+    const to = Math.min(tileRows - 1, Math.floor((viewTop + viewH * 1.3) / TILE));
     for (const [index, tile] of tiles) {
       if (index < from - 1 || index > to + 1) {
         for (const pane of tile.panes) unshow(pane.el);
@@ -991,7 +1299,6 @@ export function createSkein(options: SkeinOptions) {
     st.bottom = Math.max(st.bottom, bottom);
     st.left = Math.min(st.left, left);
     st.right = Math.max(st.right, right);
-    st.bakedAt = performance.now();
     const [a, b] = tileRange(top, bottom);
     for (let k = a; k <= b; k++) {
       const tile = tiles.get(k);
@@ -1018,7 +1325,10 @@ export function createSkein(options: SkeinOptions) {
       const tile = tiles.get(k);
       if (!tile) continue;
       for (const { ctx, el } of panesIn(tile, Math.min(x0, x1), Math.max(x0, x1))) {
-        still(el);
+        // Shown on the beat, with the bakes: a crossing a frame would have
+        // the pane stilled (a new bitmap) every frame. The thread going
+        // over lies live on top until then anyway.
+        stale.add(el);
         ctx.save();
         ctx.globalCompositeOperation = "destination-out";
         ctx.lineWidth = THREAD + 2.5;
@@ -1037,10 +1347,10 @@ export function createSkein(options: SkeinOptions) {
   /** Keep the band over the viewport; moved (and repainted whole) only
    * when the reader has scrolled near its edge. */
   function anchor() {
-    const view = scrollY - pageTop;
-    const want = Math.min(height, Math.ceil(innerHeight * BAND));
+    const view = viewTop;
+    const want = Math.min(height, Math.ceil(viewH * BAND));
     const w = width;
-    if (!bandFresh && want === bandH && w === bandW && view >= bandTop - 1 && view + innerHeight <= bandTop + bandH + 1) {
+    if (!bandFresh && want === bandH && w === bandW && view >= bandTop - 1 && view + viewH <= bandTop + bandH + 1) {
       return;
     }
     const d = Math.min(devicePixelRatio || 1, 1.5);
@@ -1053,7 +1363,7 @@ export function createSkein(options: SkeinOptions) {
       band.style.width = `${bandW}px`;
       band.style.height = `${bandH}px`;
     }
-    bandTop = Math.round(Math.max(0, Math.min(height - bandH, view - (bandH - innerHeight) / 2)));
+    bandTop = Math.round(Math.max(0, Math.min(height - bandH, view - (bandH - viewH) / 2)));
     band.style.transform = `translateY(${bandTop}px)`;
     bctx.setTransform(1, 0, 0, 1, 0, 0);
     bctx.clearRect(0, 0, band.width, band.height);
@@ -1120,11 +1430,8 @@ export function createSkein(options: SkeinOptions) {
     for (let k = 0; k <= KNOTS; k++) {
       const [tx, ty, nx, ny] = at(st, st.s - (k * span) / KNOTS);
       if (fresh || k === 0 || k === KNOTS) {
-        // A growing tip feels its way: it nods a little to either side of
-        // where it is going, and the thread settles straight behind it.
-        const nod = k === 0 && !fresh ? st.motion * st.heat * 1.8 * Math.sin(now * 0.0047 + st.t.id * 2.3) : 0;
-        rope.x[k] = rope.ox[k] = tx + nx * nod;
-        rope.y[k] = rope.oy[k] = ty + ny * nod;
+        rope.x[k] = rope.ox[k] = tx;
+        rope.y[k] = rope.oy[k] = ty;
         continue;
       }
       const u = k / KNOTS;
@@ -1136,9 +1443,11 @@ export function createSkein(options: SkeinOptions) {
       rope.oy[k] = y;
       // A slight sway across the thread while the head moves, and a
       // little sag: a thread drawn out taut, not a tail.
-      const sway = st.motion * 420 * Math.sin(now * 0.0031 + k * 0.5 + st.t.id * 1.7) * (1 - u) * u * 4;
+      // A heading's rope is held closer: its letters are small beside it.
+      const calm = st.kind === "title" ? 0.3 : 1;
+      const sway = calm * st.motion * 420 * Math.sin(now * 0.0031 + k * 0.5 + st.t.id * 1.7) * (1 - u) * u * 4;
       x += vx + nx * sway * sec * sec;
-      y += vy + (ny * sway + 220 * st.motion) * sec * sec;
+      y += vy + (ny * sway + calm * 220 * st.motion) * sec * sec;
       const f = 1 - Math.exp(-(3 + 34 * u * u) * sec);
       x += (tx - x) * f;
       y += (ty - y) * f;
@@ -1206,8 +1515,11 @@ export function createSkein(options: SkeinOptions) {
         break;
       }
     }
-    if (pts.length < 4) return;
-    strokeTip(ctx, hue, st.n.glow, pts, st.n.body * st.alpha, st.heat * st.alpha);
+    const count = pts.length / 2;
+    if (count < 2) return;
+    // Growing or being written, it lies as it will lie: one line, no hot
+    // head, no glow.
+    strokeRun(ctx, hue, THREAD, pts, st.n.body * st.alpha);
   }
 
   /** Repaint only where something changed: each changed thing's old box
@@ -1255,8 +1567,10 @@ export function createSkein(options: SkeinOptions) {
 
   /* ---------- Growing ---------- */
 
-  function make(kind: Kind, n: Nature, t: Thread, drive: Drive): Strand {
-    return {
+  /** A strand; with `from`, a branch leaving that thread at arc length s,
+   * of its hue. */
+  function make(kind: Kind, n: Nature, t: Thread, drive: Drive, from?: { parent: Strand; s: number }): Strand {
+    const st: Strand = {
       kind,
       n,
       t,
@@ -1272,31 +1586,172 @@ export function createSkein(options: SkeinOptions) {
       bottom: t.ys[0],
       left: t.xs[0],
       right: t.xs[0],
-      bakedAt: 0,
+      ext: { l: t.xs[0], t: t.ys[0], r: t.xs[0], b: t.ys[0] },
       motion: 1,
       heat: 1,
       resting: false,
       box: null,
       dirty: true,
       cold: false,
+      parent: from?.parent ?? null,
+      root: from?.s ?? 0,
+      children: [],
+      depth: from ? from.parent.depth + 1 : 0,
+      fork: Infinity,
     };
+    from?.parent.children.push(st);
+    return st;
   }
 
-  function spawn(kind: Kind, seed: Seed, drive: Drive): Strand {
-    const st = make(kind, nature(kind), fate.add(seed), drive);
+  /** Off the tree: its parent no longer carries it. */
+  function prune(st: Strand) {
+    const p = st.parent;
+    if (p) p.children = p.children.filter((c) => c !== st);
+  }
+
+  function spawn(kind: Kind, seed: Seed, drive: Drive, from?: { parent: Strand; s: number }): Strand {
+    const st = make(kind, nature(kind), fate.add(seed), drive, from);
     st.rand = rng(seed.seed * 3 + 1);
     strands.push(st);
     return st;
   }
 
-  const born = (seed: Seed) => spawn("ground", seed, { by: "fate" });
+  /** How deep the ground's branches fork (home deepest). */
+  const deepest = close ? 1 : 2;
+
+  /** A ground branch, off a thread: it forks again (a shorter branch, at
+   * a slant) once it has grown a while, down to `deepest`. */
+  function sprout(seed: Seed, parent: Strand, s: number): Strand {
+    const st = spawn("ground", seed, { by: "fate" }, { parent, s });
+    if (st.depth < deepest) st.fork = 200 + st.rand() * 320;
+    return st;
+  }
+
+  /** The hion of a hue, as it is now (they are made again on a new
+   * composition). */
+  const hionOf = (hue: Hue) => strands.find((st) => st.kind === "hion" && st.t.hue === hue) ?? null;
+
+  const ready = (bud: Bud, reach: number) => bud.seed.key <= reach && (hionOf(bud.hue)?.s ?? 0) >= bud.s;
+
+  /** A bud is born when its hion has grown past where it leaves. */
+  function born(bud: Bud) {
+    const parent = hionOf(bud.hue);
+    if (!parent) return null;
+    return sprout(bud.seed, parent, bud.s);
+  }
+
+  /** A limb (weave.ts): a weft, cord, tie or knot, grown as a branch. One
+   * thrown from a hion forks off it a little before where it is tied and
+   * bends into its line; any other grows from whatever thread has grown
+   * nearest its start. It ties itself off at its end. False while the hion
+   * it is thrown from has yet to grow there (unless `force`). */
+  function bear(limb: Limb, force: boolean) {
+    const way = limb.way;
+    if (way.length < 2) return true;
+    const k = Math.min(way.length - 2, 12);
+    const [kx, ky] = way[k];
+    const [nx, ny] = way[k + 1];
+    const dl = Math.hypot(nx - kx, ny - ky) || 1;
+    const D: Pt = [(nx - kx) / dl, (ny - ky) / dl];
+    let from: { parent: Strand; s: number } | undefined;
+    let path: Pt[] | null = null;
+    const hion = hionOf(limb.hue);
+    if (limb.tied && hion) {
+      // Where on the hion it is tied.
+      const [x0, y0] = way[0];
+      const { xs, ys } = hion.t;
+      let best = -1;
+      let bd = 40;
+      for (let i = 0; i < xs.length; i += 2) {
+        const d = Math.abs(xs[i] - x0) + Math.abs(ys[i] - y0);
+        if (d < bd) {
+          bd = d;
+          best = i;
+        }
+      }
+      if (best >= 0) {
+        const tiedAt = hion.ls[best];
+        if (!force && hion.s < tiedAt) return false;
+        const s = Math.max(0, tiedAt - Math.min(44, approachLength(way, k) * 0.9 + 10));
+        const [px, py, qx, qy] = at(hion, s);
+        const F: Pt = [qy, -qx];
+        const d = Math.hypot(kx - px, ky - py);
+        const lead = cubicWay([px, py], [px + F[0] * d * 0.5, py + F[1] * d * 0.5], [kx - D[0] * d * 0.45, ky - D[1] * d * 0.45], [kx, ky], 10);
+        path = [...lead.slice(0, -1), ...way.slice(k)];
+        from = { parent: hion, s };
+      }
+    }
+    if (!path) {
+      // Of its own hue: what hangs from it is already that hue.
+      const root = rootFor([kx, ky], D, limb.hue, 700, undefined, true) ?? hionRoot(kx, ky, limb.hue);
+      if (!root) return true;
+      path = [...root.way.slice(0, -1), ...way.slice(k)];
+      from = { parent: root.parent, s: root.s };
+    }
+    if (limb.knot) path.push(...knotAt(path));
+    const t = fate.bare(from?.parent.t.hue ?? limb.hue, smooth(path, 4));
+    if (limb.under) {
+      for (let i = 0; i < t.xs.length - 1; i++) if (limb.under.some((u) => Math.abs(t.xs[i] - u) < 6)) t.under.add(i);
+    }
+    const st = make("limb", nature("limb"), t, { by: "way" }, from);
+    measureBody(st);
+    strands.push(st);
+    task.wake();
+    return true;
+  }
+
+  /** A small knot at the end of a way: the thread loops round once just
+   * past its end and comes back through itself. */
+  function knotAt(way: Pt[]): Pt[] {
+    const n = way.length - 1;
+    const [ex, ey] = way[n];
+    const [px, py] = way[Math.max(0, n - 3)];
+    const l = Math.hypot(ex - px, ey - py) || 1;
+    const dx = (ex - px) / l;
+    const dy = (ey - py) / l;
+    const r = 3.4;
+    const cx = ex + dx * r;
+    const cy = ey + dy * r;
+    const a0 = Math.atan2(-dy, -dx);
+    const out: Pt[] = [];
+    for (let k = 1; k <= 14; k++) {
+      const a = a0 + (k / 14) * Math.PI * 2.15;
+      out.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+    }
+    return out;
+  }
+
+  /** Grow a ground branch one step; when it has grown to its fork, a
+   * shorter branch leaves it there, at a slant, into open paper. */
+  function stepGround(st: Strand) {
+    const going = fate.step(st.t);
+    const grown = (st.t.xs.length - 1) * STEP;
+    if (grown >= st.fork && !st.t.done) {
+      st.fork = st.depth + 1 < deepest ? grown + 260 + st.rand() * 420 : Infinity;
+      const n = st.t.xs.length - 1;
+      const x = st.t.xs[n];
+      const y = st.t.ys[n];
+      const a = leave(ground, x, y, st.t.a, st.rand() < 0.5 ? 1 : -1, st.rand);
+      if (a !== null) {
+        const seed = Math.floor(st.t.id * 131 + grown);
+        const r = rng(seed);
+        const left = Math.max(0, st.t.len - grown);
+        const lone = r() < 0.3;
+        sprout(
+          { x, y, a, hue: st.t.hue, len: Math.max(260, left * (0.45 + r() * 0.3)), seed, key: y, lone, free: 120, grace: 24, goals: goalsFor(all, x, y, a, lone, r) },
+          st,
+          measureBody(st),
+        );
+      }
+    }
+    return going;
+  }
 
   const growing = (kind?: Kind) => strands.filter((st) => !st.cold && st.heat > 0 && (!kind || st.kind === kind));
 
   /** Is a point near enough the reader to be seen? */
   function seen(y: number, margin = 0.5) {
-    const view = scrollY - pageTop;
-    return y > view - innerHeight * margin && y < view + innerHeight * (1 + margin);
+    return y > viewTop - viewH * margin && y < viewTop + viewH * (1 + margin);
   }
 
   const headY = (st: Strand) => at(st, st.s)[1];
@@ -1313,23 +1768,40 @@ export function createSkein(options: SkeinOptions) {
     if (st.t.xs.length < 14) st.fadeAt = now;
   }
 
-  /** New threads in from the edges near the reader, once the page's own
-   * have been born: the page keeps living without filling up. */
+  /** New branches off the threads near the reader, once the page's own
+   * have been born: the page keeps living without filling up. A branch
+   * leaves a hion or a branch lying in sight (not one fading), forward and
+   * at a slant, into open paper. */
   function trickle(now: number, near: number) {
     if (now < nextTrickle) return;
     const rand = rng(options.seed * 7 + ++trickles * 131);
     // Sooner when nothing near the reader is growing; sooner on home.
     nextTrickle = now + (2500 + near * 3000 + rand() * 3000) * (lively ? 0.45 : 1);
-    const view = scrollY - pageTop;
-    const y = Math.max(0, view) + innerHeight * (0.1 + rand() * 0.6);
-    if (y > height - 80) return;
-    const side = rand() < 0.5 ? 0 : 1;
-    const tilt = (14 + rand() * 40) * (Math.PI / 180);
-    const a = side ? Math.PI - tilt : tilt;
-    const x = side ? width + 6 : -6;
-    const hue: Hue = side ? (rand() < 0.72 ? "m" : "c") : rand() < 0.72 ? "c" : "m";
-    const lone = rand() < 0.25;
-    born({ x, y, a, hue, len: 700 + rand() * 1400, seed: options.seed * 13 + trickles * 71, key: y, lone, goals: goalsFor(all, x, y, a, lone, rand) });
+    const top = Math.max(0, viewTop) + viewH * 0.08;
+    const bottom = viewTop + viewH * 0.8;
+    const from = strands.filter(
+      (st) =>
+        (st.kind === "hion" || (st.kind === "ground" && st.cold && st.alpha === 1 && st.fadeAt - now > 20000)) &&
+        st.top < bottom &&
+        st.bottom > top,
+    );
+    for (let tries = 0; tries < 6 && from.length; tries++) {
+      const parent = from[Math.floor(rand() * from.length)];
+      const grown = parent.kind === "hion" ? parent.s : measureBody(parent);
+      if (grown < 120) continue;
+      const s = 40 + rand() * (grown - 80);
+      const [x, y, nx, ny] = at(parent, s);
+      if (y < top || y > bottom) continue;
+      const a = leave(ground, x, y, Math.atan2(-nx, ny), rand() < 0.5 ? 1 : -1, rand);
+      if (a === null) continue;
+      const lone = rand() < 0.25;
+      sprout(
+        { x, y, a, hue: parent.t.hue, len: 600 + rand() * 1200, seed: options.seed * 13 + trickles * 71, key: y, lone, free: 140, grace: 30, goals: goalsFor(all, x, y, a, lone, rand) },
+        parent,
+        s,
+      );
+      return;
+    }
   }
 
   /** Fade what has lain long enough, a step at a time. Every step falls
@@ -1342,6 +1814,11 @@ export function createSkein(options: SkeinOptions) {
     const tick = Math.floor(now / beat) * beat;
     for (const st of strands) {
       if (tick < st.fadeAt) continue;
+      // Leaves first: a thread that still carries a branch waits for it.
+      if (st.alpha === 1 && st.children.length) {
+        st.fadeAt = Math.ceil((now + 1) / GROUP) * GROUP;
+        continue;
+      }
       const left = Math.max(0, 1 - Math.ceil(((tick - st.fadeAt) / FADE) * FADES) / FADES);
       if (left === st.alpha) continue;
       const before = st.alpha;
@@ -1359,7 +1836,10 @@ export function createSkein(options: SkeinOptions) {
       swept = true;
     }
     if (swept) {
-      strands = strands.filter((st) => !st.t.gone);
+      strands = strands.filter((st) => {
+        if (st.t.gone) prune(st);
+        return !st.t.gone;
+      });
       fate.sweep();
     }
     for (const k of touched) {
@@ -1399,7 +1879,7 @@ export function createSkein(options: SkeinOptions) {
 
   const asleep = () => options.isIdle() || document.hidden;
   /** Someone is reading: they arrived a moment ago or did something lately.
-   * Left alone, the ground holds where it is (its tips fill out) until the
+   * Left alone, the ground holds where it is (its beads dim) until the
    * reader moves again. */
   const present = (now: number) => now - lastInput < attend || now - began < arrive;
 
@@ -1416,8 +1896,12 @@ export function createSkein(options: SkeinOptions) {
       const pace = near ? 1 : 6;
       const by = st.drive.by;
       // Drawn out by hand: pulled, eased, pulled again, never at one rate.
-      const pull = 0.72 + 0.28 * Math.sin(now * 0.0021 + st.t.id * 1.3) + 0.14 * Math.sin(now * 0.0053 + st.t.id * 0.7);
-      const speed = st.n.speed * pull * (by === "wind" ? 1.25 : by === "fate" && st.kind === "pointer" ? 0.55 : 1);
+      // A heading is written at its own pace (slower into the turns of its
+      // letters), barely pulled, so its letters come out even.
+      const pull = st.pace
+        ? st.pace[indexAt(st, st.s)] * (0.94 + 0.06 * Math.sin(now * 0.0021 + st.t.id * 1.3))
+        : 0.72 + 0.28 * Math.sin(now * 0.0021 + st.t.id * 1.3) + 0.14 * Math.sin(now * 0.0053 + st.t.id * 0.7);
+      const speed = st.n.speed * pull * (by === "wind" ? 1.25 : 1);
       st.s += (speed * pace * (near ? Math.min(dt, 64) : dt)) / 1000;
       grow(st, st.s + STEP);
       st.s = Math.min(st.s, measureBody(st));
@@ -1468,19 +1952,24 @@ export function createSkein(options: SkeinOptions) {
     const here = present(performance.now());
     anchor();
     readHions();
+    // What hangs from the hions grows off them as the drawing reaches it,
+    // whether or not anyone is moving: it is what the words hang from.
+    while (limbSown < limbs.length && limbs[limbSown].key <= loom.reach() && bear(limbs[limbSown], false)) limbSown++;
+    const tying = tieHangers(now);
     if (here) {
       // Born as the drawing reaches them, a moment apart; only heads near
       // the reader count (the rest hurry out of sight).
       const reach = loom.reach();
       let growingNear = growing("ground").filter((st) => seen(headY(st))).length;
-      while (sown < seeds.length && seeds[sown].key <= reach && growingNear < live && now - lastBirth > 350) {
+      // Each when its hion's head has passed where it leaves.
+      while (sown < seeds.length && ready(seeds[sown], reach) && growingNear < live && now - lastBirth > 350) {
         born(seeds[sown++]);
         lastBirth = now;
         growingNear++;
       }
-      // Nothing of the page's own left to be born here: new ones come in
-      // from the edges near the reader.
-      if (growingNear < live && (sown >= seeds.length || seeds[sown].key > reach)) trickle(now, growingNear);
+      // Nothing of the page's own left to be born here: new branches leave
+      // the threads near the reader.
+      if (growingNear < live && (sown >= seeds.length || seeds[sown].seed.key > reach)) trickle(now, growingNear);
     }
     let moving = false;
     let offscreen = false;
@@ -1492,6 +1981,9 @@ export function createSkein(options: SkeinOptions) {
       if (alive) moving = true;
     }
     let untied = false;
+    const beat = Math.floor(now / BEAT);
+    const baking = beat !== lastBeat;
+    lastBeat = beat;
     for (const st of strands) {
       if (st.cold) continue;
       if (move(st, now, dt, here)) moving = true;
@@ -1503,21 +1995,28 @@ export function createSkein(options: SkeinOptions) {
         } else if (st.drive.state === "held" && st.drive.until < Infinity) offscreen = true;
         continue;
       }
-      // Lay what has cooled behind the head, a batch at a time.
-      // Lay what has cooled behind the head, a batch at a time, and not
-      // more often than a few times a second: every bake re-stills a pane
-      // (a new bitmap), and a quick head would do that every frame.
-      const settled = st.s - Math.min(st.n.tail, st.s);
-      const to = indexAt(st, settled);
-      if (to - st.laid >= BATCH && now - st.bakedAt > BEAT) bake(st, to);
+      // Lay what has cooled behind the head, on the beat.
+      if (baking) {
+        const to = indexAt(st, st.s - Math.min(st.n.tail, st.s));
+        if (to > st.laid) bake(st, to);
+      }
       // A hion is never finished: its way is drawn as far as the loom has.
       if (st.kind === "hion") continue;
       if (st.t.done && st.heat <= 0 && (!st.rope || st.rope.energy < 0.04)) finish(st, now);
       else if (!st.cold && !st.resting && !seen(headY(st), 0.2)) offscreen = true;
     }
-    if (untied) strands = strands.filter((st) => !st.t.gone);
+    if (untied) {
+      strands = strands.filter((st) => {
+        if (st.t.gone) prune(st);
+        return !st.t.gone;
+      });
+    }
     for (const [t, i] of fate.breaks) breakAt(t, i);
     fate.breaks.length = 0;
+    if (baking && stale.size) {
+      for (const el of stale) still(el);
+      stale.clear();
+    }
     fade(now);
     // Paint, every other frame when frames run long.
     if (!skipPaint || !moving) {
@@ -1532,103 +2031,185 @@ export function createSkein(options: SkeinOptions) {
     lastTick = offscreen ? lastTick : 0;
     let wait = nextFade(now) - now;
     if (offscreen) wait = Math.min(wait, 200);
-    if (here && sown < seeds.length && seeds[sown].key <= loom.reach()) wait = Math.min(wait, 400);
+    if (here && sown < seeds.length && seeds[sown].seed.key <= loom.reach()) wait = Math.min(wait, 400);
     else if (here) wait = Math.min(wait, Math.max(nextTrickle - now, 400));
     if (here) wait = Math.min(wait, attend - (now - lastInput) + 20);
+    if (tying) wait = Math.min(wait, 200);
     if (wait < Infinity) task.wakeIn(Math.max(30, wait));
     return false;
   }
 
-  /* ---------- From a click, and from a touched thread ---------- */
+  /* ---------- Light along the threads (a pluck, a brush) ---------- */
 
-  /** The nearest thing nobody else is going to, within reach of (x, y). */
-  function aimNear(x: number, y: number, reach: number) {
-    let aim: Aim | null = null;
-    let best = reach;
-    for (const a of aims) {
-      const d = gapTo(a.box, x, y);
-      if (d < 18 || d >= best) continue;
-      if (strands.some((st) => st.drive.by === "seek" && st.drive.aim === a)) continue;
-      best = d;
-      aim = a;
-    }
-    return { aim, best };
-  }
-
-  /** Send a thread out from (x, y) to the nearest thing nobody else is
-   * going to (a heading, a picture, a charm; otherwise a hion), winding
-   * round it. With nothing near (and `anywhere`), it runs on with fate.
-   * `from` is a thread it branches off: it takes that thread's hue and
-   * leaves at a slant from the way the thread runs. */
-  function issue(x: number, y: number, now: number, anywhere: boolean, from?: Near) {
-    if (growing("pointer").length >= INTENTS + (anywhere ? 2 : 0)) return false;
-    let { aim, best } = aimNear(x, y, SEEK);
-    let on: On | null = null;
-    let target: Pt | null = null;
-    const seed = Math.floor(now * 7 + x * 13 + y);
-    const rand = rng(seed);
-    // A thread lying on the ground near by is somewhere to go too: across
-    // it in stitches, then on with it, so what you send out tangles with
-    // what is there. Taken over a heading or a picture when it is nearer,
-    // and now and then when it is not.
-    const lying = nearestLying(x, y, Math.min(best, SEEK * 0.7), from?.id);
-    if (lying && lying.d > 24 && (!aim || lying.d < best * 0.6 || rand() < 0.35)) {
-      aim = null;
-      on = { hue: lying.st.t.hue, s: lying.s, strand: lying.st };
-      target = [lying.x, lying.y];
-    } else if (aim) target = [Math.max(aim.box.l, Math.min(aim.box.r, x)), Math.max(aim.box.t, Math.min(aim.box.b, y))];
-    else if (!from?.fixed) {
-      // Nothing near: the hions' own way, if it is.
-      const hit = nearestHion(x, y, best);
-      if (hit && hit.d > 24) {
-        on = { hue: hit.hue, s: hit.s };
-        target = [hit.x, hit.y];
+  /** The nearest grown point of any thread (of `hue`, if given) within r
+   * of (x, y). */
+  function touch(x: number, y: number, r: number, hue?: Hue): { st: Strand; s: number } | null {
+    let best: { st: Strand; s: number } | null = null;
+    let bd = r;
+    for (const st of strands) {
+      if (st.t.gone || st.s < 4 || st.alpha < 1 || (hue && st.t.hue !== hue)) continue;
+      const e = st.ext;
+      if (x < e.l - bd || x > e.r + bd || y < e.t - bd || y > e.b + bd) continue;
+      const { xs, ys } = st.t;
+      const end = Math.min(xs.length - 1, indexAt(st, st.s));
+      for (let i = 0; i <= end; i += 2) {
+        const dx = xs[i] - x;
+        const dy = ys[i] - y;
+        if (Math.abs(dx) > bd || Math.abs(dy) > bd) continue;
+        const d = Math.hypot(dx, dy);
+        if (d < bd) {
+          bd = d;
+          best = { st, s: st.ls[i] };
+        }
       }
     }
-    const hue = from ? from.hue : (pointer.hue = pointer.hue === "c" ? "m" : "c");
-    pointer.lastIssue = now;
-    // Off a thread: along it one way or the other, bending off to the side.
-    const slant = from ? Math.atan2(from.dy, from.dx) + (rand() < 0.5 ? Math.PI : 0) + (rand() < 0.5 ? -1 : 1) * (0.5 + rand() * 0.5) : 0;
-    if (!target) {
-      if (!anywhere || (!from && ground.clear(x, y) < 12)) return false;
-      const a = from ? slant : (rand() - 0.5) * Math.PI * 2;
-      const st = spawn("pointer", { x, y, a, hue, len: 500 + rand() * 700, seed, key: y, free: from ? 160 : 0, grace: from ? 30 : 0, goals: goalsFor(all, x, y, a, false, rand) }, { by: "fate" });
-      st.t.wander = 1.4;
-      task.wake();
-      return true;
-    }
-    // Out at a slant, so it comes round in a drawn curve, not a beeline.
-    const toward = Math.atan2(target[1] - y, target[0] - x);
-    const a = from ? slant + ((((toward - slant + Math.PI) % TAU) + TAU) % TAU - Math.PI) * 0.4 : toward + (rand() < 0.5 ? -1 : 1) * (0.35 + rand() * 0.4);
-    const st = spawn("pointer", { x, y, a, hue, len: 0, seed, key: y, free: from ? 160 : 0, grace: from ? 30 : 0, goals: [] }, { by: "seek", aim, on, crept: 0, letGo: (!!aim && rand() < 0.5) || (!!on?.strand && rand() < 0.75) });
-    st.t.len = Infinity;
+    return best;
+  }
+
+  /** Light on its way along a thread: at arc length s, going v (px a ms),
+   * with this much left of it. It came from `from` (a parent or a branch),
+   * and does not go back into it. */
+  interface Light {
+    st: Strand;
+    s: number;
+    v: number;
+    e: number;
+    from: Strand | null;
+  }
+  /** A thread ringing where it was plucked. */
+  interface Ring {
+    st: Strand;
+    s: number;
+    age: number;
+  }
+  let lights: Light[] = [];
+  let rings: Ring[] = [];
+  /** Lights at once, and the least a light can be and still go on. */
+  const LIGHTS = 56;
+  const FAINT = 0.16;
+  /** How far light goes before it has lost about two thirds (px). */
+  const CARRY = 1300;
+
+  function shine(st: Strand, s: number, v: number, e: number, from: Strand | null) {
+    if (lights.length >= LIGHTS || e < FAINT || st.s < 8) return;
+    lights.push({ st, s, v, e, from });
     task.wake();
-    return true;
   }
 
-  /** The thread under (x, y), if one is drawn there: a hion (as far as it
-   * is drawn) or any strand lying on the ground. */
-  function touching(x: number, y: number): Near | null {
-    const hit = fate.nearest(x, y, 10);
-    if (!hit) return null;
-    if (hit.fixed && !nearestHion(x, y, 12)) return null;
-    return hit;
+  /** Light out from a point on a thread, both ways, and on through the
+   * tree: into every branch it passes the root of, and back into the
+   * thread a branch leaves when it reaches the branch's root. */
+  function light(st: Strand, s: number, e: number, v = 0.9) {
+    shine(st, s, v, e, null);
+    shine(st, s, -v, e, null);
   }
 
-  /** Brushing a thread sends a branch off it: from where it was touched,
-   * off to the nearest thing, or away with fate. Not twice in a moment
-   * from the same thread. */
-  function branch(x: number, y: number, now: number) {
-    if (now - lastBranch < 700) return;
-    const hit = touching(x, y);
-    if (!hit) return;
-    const key = hit.fixed ? -1 - (hit.hue === "c" ? 0 : 1) : hit.id;
-    if (now - (branched.get(key) ?? 0) < 2600) return;
-    if (issue(hit.x, hit.y, now, true, hit)) {
-      branched.set(key, now);
-      lastBranch = now;
+  function stepLights(dt: number) {
+    const born: Light[] = [];
+    for (const l of lights) {
+      const before = l.s;
+      l.s += l.v * dt;
+      l.e *= Math.exp(-Math.abs(l.v * dt) / CARRY);
+      const lo = Math.min(before, l.s);
+      const hi = Math.max(before, l.s);
+      for (const c of l.st.children) {
+        if (c === l.from || c.root < lo || c.root >= hi || c.s < 12) continue;
+        born.push({ st: c, s: 0, v: Math.abs(l.v), e: l.e * 0.82, from: l.st });
+      }
+      const p = l.st.parent;
+      if (l.s <= 0 && l.v < 0 && p && p !== l.from) {
+        born.push({ st: p, s: l.st.root, v: Math.abs(l.v), e: l.e * 0.82, from: l.st });
+        born.push({ st: p, s: l.st.root, v: -Math.abs(l.v), e: l.e * 0.82, from: l.st });
+      }
     }
+    lights = lights.filter((l) => l.e >= FAINT && l.s > 0 && l.s < l.st.s && !l.st.t.gone);
+    for (const l of born) shine(l.st, l.s, l.v, l.e, l.from);
+    for (const r of rings) r.age += dt;
+    rings = rings.filter((r) => r.age < 950 && !r.st.t.gone);
+    return lights.length + rings.length > 0;
   }
+
+  function lightBox(st: Strand, s0: number, s1: number, pad: number): Box | null {
+    let l = Infinity;
+    let t = Infinity;
+    let r = -Infinity;
+    let b = -Infinity;
+    const a = Math.max(0, Math.min(s0, s1));
+    const z = Math.min(st.s, Math.max(s0, s1));
+    for (let s = a; s <= z + 6; s += 6) {
+      const [x, y] = at(st, Math.min(s, z));
+      l = Math.min(l, x);
+      r = Math.max(r, x);
+      t = Math.min(t, y);
+      b = Math.max(b, y);
+    }
+    return l < Infinity ? { l: l - pad, t: t - pad, r: r + pad, b: b + pad } : null;
+  }
+
+  effects.push({
+    last: [],
+    e: {
+      step: (_now, dt) => stepLights(Math.min(dt, 48)),
+      boxes() {
+        const out: Box[] = [];
+        for (const r of rings) {
+          const b = lightBox(r.st, r.s - 90, r.s + 90, 12);
+          if (b) out.push(b);
+        }
+        for (const l of lights) {
+          const b = lightBox(l.st, l.s - 56 * Math.sign(l.v), l.s, 10);
+          if (b) out.push(b);
+        }
+        return out;
+      },
+      paint(ctx) {
+        ctx.lineCap = "round";
+        for (const r of rings) {
+          // It rings where it lies: a standing wave of light along the
+          // thread itself, its bright bellies breathing in and out.
+          const decay = Math.exp(-r.age / 300);
+          const breath = Math.abs(Math.sin(r.age / 52)) * decay;
+          const hue = r.st.t.hue;
+          const step = 0.05;
+          for (let u = -1; u < 1; u += step) {
+            const belly = Math.abs(Math.sin((u + 1) * Math.PI)) * Math.cos((u * Math.PI) / 2);
+            const a = breath * belly;
+            if (a < 0.03) continue;
+            const [x0, y0] = at(r.st, r.s + u * 84);
+            const [x1, y1] = at(r.st, r.s + (u + step) * 84);
+            if (Math.abs(y1 - y0) + Math.abs(x1 - x0) > 60) continue;
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.lineWidth = THREAD;
+            ctx.strokeStyle = tone(hue, 1, 0.85 * a);
+            ctx.stroke();
+          }
+        }
+        for (const l of lights) {
+          // The thread's own light running along it: a short pale run,
+          // brightest at its front, of the thread's own width (no glow).
+          const hue = l.st.t.hue;
+          const trail = 56 * Math.sign(l.v);
+          ctx.lineCap = "round";
+          for (let k = 0; k < 6; k++) {
+            const s0 = l.s - (trail * k) / 6;
+            const s1 = l.s - (trail * (k + 1)) / 6;
+            if (s1 < 0 || s1 > l.st.s) continue;
+            const [x0, y0] = at(l.st, s0);
+            const [x1, y1] = at(l.st, s1);
+            if (Math.abs(y1 - y0) + Math.abs(x1 - x0) > 60) continue;
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.lineWidth = THREAD;
+            ctx.strokeStyle = tone(hue, 1, 0.9 * l.e * (1 - k / 6));
+            ctx.stroke();
+          }
+        }
+      },
+    },
+  });
 
   function seekPoint(d: Extract<Drive, { by: "seek" }>, x: number, y: number): Pt | null {
     if (d.aim) {
@@ -1636,16 +2217,18 @@ export function createSkein(options: SkeinOptions) {
       return [Math.max(b.l - 12, Math.min(b.r + 12, x)), Math.max(b.t - 12, Math.min(b.b + 12, y))];
     }
     if (d.on) {
-      const along = onAt(d.on);
-      if (along) return along(d.on.s).slice(0, 2) as Pt;
+      const h = hions.find((h) => h.hue === d.on!.hue);
+      if (h) return hionAt(h, d.on.s).slice(0, 2) as Pt;
     }
     return null;
   }
 
-  /** A loop for something you hover: through its words if it has any to
-   * speak of, otherwise round it. Threads from the pointer on their way
-   * somewhere near turn to it too. */
-  function encircle(el: Element, from: Pt) {
+  /** A branch to something you hover: it grows from the nearest thread
+   * already grown (forward off it, at a slant), then weaves through its
+   * words if it has any to speak of, otherwise loops round it; when you
+   * leave, it withdraws into the thread it came from. Nothing near to
+   * grow from, nothing grows. */
+  function encircle(el: Element) {
     untie(null);
     const p = page.getBoundingClientRect();
     const r = el.getBoundingClientRect();
@@ -1654,19 +2237,28 @@ export function createSkein(options: SkeinOptions) {
     const rand = rng(seed);
     const pictured = el.querySelector("img, video, canvas.hion-woven-cover, .hion-woven-cover");
     const text = (el.textContent ?? "").trim();
+    // The other hion reaches through it: a heading written in magenta is
+    // woven by a branch of the cyan, and the other way about. It comes in
+    // from the side that tree is on.
+    // Its words' hue: a heading's strand, or a label written on a canvas
+    // of its own (spun.ts notes the hue).
+    const own = strands.find((st) => st.drive.by === "title" && (el === st.drive.el || el.contains(st.drive.el)));
+    const local = (el.matches("[data-spun-hue]") ? el : el.querySelector("[data-spun-hue]")) as HTMLElement | null;
+    const ownHue = own?.t.hue ?? (local?.dataset.spunHue as Hue | undefined);
+    const other: Hue | undefined = ownHue ? (ownHue === "c" ? "m" : "c") : undefined;
+    const centre: Pt = [(box.l + box.r) / 2, (box.t + box.b) / 2];
+    const near = touch(centre[0], centre[1], 700, other) ?? touch(centre[0], centre[1], 700);
+    const toward: Pt = near ? at(near.st, near.s).slice(0, 2) as Pt : [box.l - 40, centre[1]];
     let way: Pt[] = [];
-    if (!pictured && text.length > 0 && text.length < 90) way = weave(wordBoxes(el, p), from, rand);
-    if (way.length < 2) way = encircle_(box, from, padFor(el), seed);
+    if (!pictured && text.length > 0 && text.length < 90) way = weave(wordBoxes(el, p), toward, rand);
+    if (way.length < 2) way = encircle_(box, toward, padFor(el), seed);
     if (way.length < 2) return;
-    loop(el, "c", way, Infinity);
-    // Those still on their way somewhere near come to it instead.
-    const aim: Aim = { box, el, words: !pictured && text.length < 90 };
-    for (const st of strands) {
-      const d = st.drive;
-      if (d.by !== "seek" || d.on) continue;
-      const [hx, hy] = at(st, st.s);
-      if (gapTo(box, hx, hy) < 320) d.aim = aim;
-    }
+    const [x1, y1] = way[Math.min(way.length - 1, 3)];
+    const l = Math.hypot(x1 - way[0][0], y1 - way[0][1]) || 1;
+    const arrive: Pt = [(x1 - way[0][0]) / l, (y1 - way[0][1]) / l];
+    const root = (other && rootFor(way[0], arrive, other, 900, own, true)) || rootFor(way[0], arrive, undefined, 700, own);
+    if (!root) return;
+    loop(el, root.parent.t.hue, smooth([...root.way.slice(0, -1), ...way], 4), Infinity, { parent: root.parent, s: root.s });
   }
 
   function padFor(el: Element) {
@@ -1676,8 +2268,8 @@ export function createSkein(options: SkeinOptions) {
     return 14;
   }
 
-  function loop(el: Element | null, hue: Hue, way: Pt[], until: number) {
-    const st = make("loop", nature("loop"), fate.bare(hue, way), { by: "loop", el, state: "tying", until });
+  function loop(el: Element | null, hue: Hue, way: Pt[], until: number, from?: { parent: Strand; s: number }) {
+    const st = make("loop", nature("loop"), fate.bare(hue, way), { by: "loop", el, state: "tying", until }, from);
     measureBody(st);
     strands.push(st);
     task.wake();
@@ -1700,7 +2292,7 @@ export function createSkein(options: SkeinOptions) {
     if (!target || !page.contains(target) || target === hovered) return;
     if (target.hasAttribute("data-reveal") && !target.hasAttribute("data-lit")) return;
     hovered = target;
-    encircle(target, [event.clientX, event.clientY + scrollY - pageTop]);
+    encircle(target);
   }
 
   function onOut(event: PointerEvent) {
@@ -1726,13 +2318,24 @@ export function createSkein(options: SkeinOptions) {
     pointer.y = y;
     pointer.at = now;
     pointer.here = true;
-    // Brushing a thread (not racing across it) sends a branch off it.
-    if (speed < 2.4) branch(x, y, now);
+    // Brushing a thread (not racing across it) sends light along it, and
+    // on through every branch of it; a thread answers once a second.
+    if (speed < 1.6 && now - pointer.looked > 50) {
+      pointer.looked = now;
+      const hit = touch(x, y, 9);
+      if (hit && now - (brushed.get(hit.st) ?? 0) > 1100) {
+        brushed.set(hit.st, now);
+        light(hit.st, hit.s, 0.62);
+      }
+    }
     task.wake();
   }
 
-  /** A tap on the paper sends a pair out from there; on a thread, a
-   * branch off it too. */
+  /** A tap on a thread plucks it: it rings where it was struck, and light
+   * runs away from there both ways through the whole tree. Anywhere, a tap
+   * sends out a pair: a branch off each tree grows out through where you
+   * tapped and on to a thread of the other near by, and weaves into it
+   * (`sendOut`). */
   function onDown(event: PointerEvent) {
     lastInput = performance.now();
     if (!built || busy || event.button > 0) return;
@@ -1741,15 +2344,95 @@ export function createSkein(options: SkeinOptions) {
     const x = event.clientX;
     const y = event.clientY + scrollY - pageTop;
     if (y < 0 || y > height) return;
-    const now = performance.now();
-    issue(x, y, now, true);
-    issue(x, y, now + 1, true);
-    lastBranch = 0;
-    branch(x, y, now);
-    task.wake();
+    const hit = touch(x, y, 24);
+    if (hit) {
+      rings.push({ st: hit.st, s: hit.s, age: 0 });
+      light(hit.st, hit.s, 1);
+    }
+    sendOut(x, y, performance.now());
+  }
+
+  /** How many of a tap's branches may lie at once (the oldest fade). */
+  const SENT = 8;
+  let sent: Strand[] = [];
+
+  /** A pair from a tap: for each hue, a branch off its own tree out
+   * through the point, and on from there, the way it was going, into the
+   * nearest other branch ahead (of the other tree by preference, never the
+   * one it grew from or anything that one grew from), weaving over and
+   * under along it. It never goes back: it lies as the ground does, and
+   * fades as it does, leaves first. */
+  function sendOut(x: number, y: number, now: number) {
+    sent = sent.filter((st) => !st.t.gone);
+    for (const st of sent.slice(0, Math.max(0, sent.length - SENT + 2))) st.fadeAt = Math.min(st.fadeAt, now);
+    const rand = rng(Math.floor(now * 7 + x * 13 + y));
+    for (const hue of ["c", "m"] as Hue[]) {
+      const other: Hue = hue === "c" ? "m" : "c";
+      // Out to the tap from the nearest grown thread of its tree, going
+      // away from it.
+      const near = touch(x, y, 700, hue) ?? touch(x, y, 700);
+      if (!near) continue;
+      const [nx0, ny0] = at(near.st, near.s);
+      const fl = Math.hypot(x - nx0, y - ny0) || 1;
+      const fwd: Pt = [(x - nx0) / fl, (y - ny0) / fl];
+      const root = rootFor([x, y], fwd, hue, 700, undefined, true) ?? rootFor([x, y], fwd, undefined, 700);
+      if (!root) continue;
+      // Never back into its own line: not the thread it leaves, nor any it
+      // came from.
+      const lineage = new Set<Strand>();
+      for (let p: Strand | null = root.parent; p; p = p.parent) lineage.add(p);
+      const [rx, ry] = at(root.parent, root.s);
+      let into: { st: Strand; s: number; d: number } | null = null;
+      let bestScore = Infinity;
+      for (const st of strands) {
+        if (lineage.has(st) || st.kind === "loop" || st.t.gone || st.alpha < 1 || st.s < 30) continue;
+        const e = st.ext;
+        if (x < e.l - 420 || x > e.r + 420 || y < e.t - 420 || y > e.b + 420) continue;
+        const { xs, ys } = st.t;
+        const end = Math.min(xs.length - 1, indexAt(st, st.s));
+        for (let i = 0; i <= end; i += 3) {
+          const dx = xs[i] - x;
+          const dy = ys[i] - y;
+          if (Math.abs(dx) > 420 || Math.abs(dy) > 420) continue;
+          const d = Math.hypot(dx, dy);
+          if (d < 50 || d > 420 || Math.hypot(xs[i] - rx, ys[i] - ry) < 140) continue;
+          // Ahead, the way it was going (a little to either side).
+          const ahead = (dx * fwd[0] + dy * fwd[1]) / d;
+          if (ahead < 0.1) continue;
+          const score = d * (st.t.hue === other ? 1 : 1.3) - ahead * 60;
+          if (score < bestScore) {
+            bestScore = score;
+            into = { st, s: st.ls[i], d };
+          }
+        }
+      }
+      if (!into) continue;
+      const [tx, ty, nx, ny] = at(into.st, into.s);
+      // Along that thread the way that carries on, not back.
+      const dir = ny * (tx - x) - nx * (ty - y) >= 0 ? 1 : -1;
+      const ax = ny * dir;
+      const ay = -nx * dir;
+      const d = into.d;
+      const reach = cubicWay([x, y], [x + fwd[0] * d * 0.45, y + fwd[1] * d * 0.45], [tx - ax * d * 0.35, ty - ay * d * 0.35], [tx, ty], Math.max(6, Math.ceil(d / 6)));
+      // Over and under it, a good way along.
+      const weaveIn: Pt[] = [];
+      const span = 160 + rand() * 140;
+      for (let k = 0, u = 0; u <= span; k++, u += 22) {
+        const [px, py, qx, qy] = at(into.st, into.s + dir * u);
+        const side = k % 2 ? 8 : -8;
+        weaveIn.push([px + qx * side, py + qy * side]);
+      }
+      const t = fate.bare(root.parent.t.hue, smooth([...root.way.slice(0, -1), ...reach.slice(1), ...weaveIn.slice(1)], 4));
+      const st = make("ground", nature("ground"), t, { by: "way" }, { parent: root.parent, s: root.s });
+      measureBody(st);
+      strands.push(st);
+      sent.push(st);
+      task.wake();
+    }
   }
 
   function onScroll() {
+    look();
     if (!built || busy) return;
     cull();
     lastInput = performance.now();
@@ -1776,19 +2459,19 @@ export function createSkein(options: SkeinOptions) {
       }
       const end = performance.now() + 6;
       while (performance.now() < end) {
-        const st = strands.find((st) => !st.t.done);
+        const st = strands.find((st) => !st.t.done && st.drive.by === "fate");
         if (st) {
           // Interleaved a little, so later threads find earlier ones.
-          for (let k = 0; k < 40 && fate.step(st.t); k++);
+          for (let k = 0; k < 40 && stepGround(st); k++);
           continue;
         }
-        if (sown < seeds.length && seeds[sown].key <= reach) {
+        if (sown < seeds.length && seeds[sown].seed.key <= reach) {
           born(seeds[sown++]);
           continue;
         }
         break;
       }
-      if (strands.some((st) => !st.t.done) || (sown < seeds.length && seeds[sown].key <= reach)) {
+      if (strands.some((st) => !st.t.done && st.drive.by === "fate") || (sown < seeds.length && seeds[sown].seed.key <= reach)) {
         settleTimer = window.setTimeout(slice, 16);
         return;
       }
@@ -1796,6 +2479,7 @@ export function createSkein(options: SkeinOptions) {
       busy = false;
       delete layer.dataset.state;
       fate.breaks.length = 0;
+      while (limbSown < limbs.length && limbs[limbSown].key <= reach) bear(limbs[limbSown++], true);
       const now = performance.now();
       for (const st of strands) {
         if (st.kind === "hion") {
@@ -1817,23 +2501,54 @@ export function createSkein(options: SkeinOptions) {
       tiles.clear();
       cull();
       bandFresh = true;
+      layWaiting();
       task.wake();
     };
     slice();
+  }
+
+  /** Headings begun while the screen was settling (spun.ts): laid now,
+   * written at once on a still screen. */
+  function layWaiting() {
+    const laid = new Set(strands.map((st) => (st.drive.by === "title" ? st.drive.el : null)));
+    const waiting = [...titles.keys()].filter((el) => !laid.has(el));
+    if (!waiting.length) return;
+    const spuns = measured(page, () => {
+      const p = page.getBoundingClientRect();
+      return waiting.map((el) => [el, el.isConnected ? titles.get(el)!.measure(() => p) : null] as const);
+    });
+    for (const [el, spun] of spuns) {
+      if (!spun) {
+        el.dataset.spunState = "chalk";
+        titles.delete(el);
+        continue;
+      }
+      const st = title(el, titles.get(el)!.hue, spun);
+      if (instant) whole(st);
+    }
   }
 
   /** On arrival the first screen is not bare: its threads are already
    * part grown (the first few still growing, their heads live), so the
    * ground is there at once and a few heads are at work in it. */
   function pregrow() {
-    const fold = Math.max(0, scrollY - pageTop) + innerHeight;
+    const fold = Math.max(0, viewTop) + viewH;
     let started = 0;
     const now = performance.now();
-    while (sown < seeds.length && seeds[sown].key <= fold) {
+    // Branches that leave the hions above the fold, as far as the drawing
+    // reaches, and the branches they fork as they grow.
+    const queue: Strand[] = [];
+    while (sown < seeds.length && seeds[sown].seed.key <= fold) {
       const st = born(seeds[sown++]);
+      if (st) queue.push(st);
+    }
+    for (let q = 0; q < queue.length && q < 200; q++) {
+      const st = queue[q];
       const stop = started < live ? st.t.len * (0.3 + st.t.rand() * 0.25) : Infinity;
       if (stop < Infinity) started++;
-      while ((st.t.xs.length - 1) * STEP < stop && fate.step(st.t));
+      const before = st.children.length;
+      while ((st.t.xs.length - 1) * STEP < stop && stepGround(st));
+      queue.push(...st.children.slice(before));
       st.s = measureBody(st);
       if (st.t.done) {
         st.laid = st.t.xs.length - 1;
@@ -1918,17 +2633,60 @@ export function createSkein(options: SkeinOptions) {
         : [{ opacity: 1 }, { opacity: 0 }];
       for (const l of [layer, liveLayer]) l.animate(keyframes, { duration: 420, easing: "cubic-bezier(0.5, 0, 0.75, 0)", fill: "forwards" });
     },
-    /** A small loop of a hion's own, tied round a point and let go after
-     * a while (life.ts: left alone, they amuse themselves). */
-    knot(hue: Hue, x: number, y: number, r: number, hold: number) {
-      if (!built || busy) return false;
-      const way = encircle_({ l: x - r, t: y - r, r: x + r, b: y + r }, [x, y - r], 4, Math.floor(x + y));
-      loop(null, hue, way, performance.now() + hold);
+    /** A small loop of a hion's own, tied off it at arc length s and let
+     * go after a while (life.ts: left alone, they amuse themselves). */
+    knot(hue: Hue, s: number, r: number, hold: number) {
+      const parent = hionOf(hue);
+      if (!built || busy || !parent || s > parent.s) return false;
+      const [x, y, nx, ny] = at(parent, s);
+      // Out to one side of the hion and back through itself.
+      const side = nx > 0 ? 1 : -1;
+      const cx = x + nx * side * r * 1.1;
+      const cy = y + ny * side * r * 1.1;
+      const way = encircle_({ l: cx - r, t: cy - r, r: cx + r, b: cy + r }, [x, y], 4, Math.floor(x + y));
+      loop(null, hue, [[x, y], ...way], performance.now() + hold, { parent, s });
       return true;
+    },
+    /** Light set off along a hion from arc length s (after a delay): it
+     * runs on into every branch it passes. */
+    chase(hue: Hue, s: number, v: number, delay: number) {
+      const go = () => {
+        const st = hionOf(hue);
+        if (st && built) shine(st, s, v, 1, null);
+      };
+      if (delay) window.setTimeout(go, delay);
+      else go();
     },
     /** Something else to move and paint on the live canvas. */
     effect(e: Effect) {
       effects.push({ e, last: [] });
+    },
+    /** A word to be written by thread (spun.ts): kept, written now if the
+     * screen is ready (at once for a still screen), and written again
+     * whenever the page is laid out anew. */
+    inscribe(el: HTMLElement, hue: Hue, measure: Measure) {
+      titles.set(el, { hue, measure });
+      if (!built || busy || signal.aborted) return;
+      // (spun.ts reads the page under one pass for several words at once,
+      // and only when it has to.)
+      const spun = measure(() => page.getBoundingClientRect());
+      if (!spun) {
+        // It gets its chalk back.
+        el.dataset.spunState = "chalk";
+        titles.delete(el);
+        return;
+      }
+      const st = title(el, hue, spun);
+      if (instant) whole(st);
+      task.wake();
+    },
+    /** The one material, lent to a heading written on a canvas of its own
+     * (spun.ts: inside something that slides over the page). */
+    material(): Material {
+      return {
+        run: strokeRun,
+        pace: (spun, total) => ({ w: THREAD, ...writing(spun, total) }),
+      };
     },
     /** The loom drew on: the hions' heads follow. */
     wake: () => task.wake(),

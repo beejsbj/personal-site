@@ -11,28 +11,29 @@
   --hion-ml: rgb(255 216 241);
   --hion-text: rgb(205 240 245);
   /* Fate, not warmth: one inscribed voice in two faces. Display: the
-     woven and hung titles in Aboreto, thin wide capitals cut like a stele;
-     thin, open strokes weave cleanly, and their one weight is the only
+     spun and hung titles in Aboreto, thin wide capitals cut like a stele;
+     thin, open strokes trace cleanly as one thread, and their one weight is the only
      one. Its capitals are for large words only: under about 28px they
      shout, so small titles (head) are set in the reading face. Text:
-     Spectral, wide and calm on black. Hand: the spoken lines, in
-     Spectral's light italic. Label: charms, dates, tags, in Aboreto's
+     Literata, low in contrast and naturally bold, large enough to hold its
+     own beside the threads. Hand: what is said in type, in Literata's
+     italic. Label: charms, dates, tags, in Aboreto's
      capitals, tracked open. Every weight here is in a loaded file, and
      nothing is synthesised. */
-  --hion-serif: "Spectral", Georgia, serif;
+  --hion-serif: "Literata", Georgia, serif;
   --hion-display: "Aboreto", Georgia, serif;
   --hion-display-weight: 400;
   --hion-display-track: 0.02em;
   --hion-display-leading: 1;
   --hion-head: var(--hion-serif);
-  --hion-head-weight: 600;
-  --hion-text-size: 1.125rem;
-  --hion-read-size: 1.2rem;
-  --hion-text-weight: 400;
-  --hion-strong-weight: 600;
+  --hion-head-weight: 700;
+  --hion-text-size: 1.3rem;
+  --hion-read-size: 1.35rem;
+  --hion-text-weight: 600;
+  --hion-strong-weight: 800;
   --hion-hand: var(--hion-serif);
   --hion-hand-style: italic;
-  --hion-hand-weight: 300;
+  --hion-hand-weight: 500;
   --hion-hand-scale: 0.82;
   --hion-label: "Aboreto", Georgia, serif;
   --hion-label-style: normal;
@@ -40,6 +41,10 @@
   --hion-label-scale: 0.72;
   --hion-label-caps: normal;
   --hion-label-track: 0.12em;
+  /* The least a label is set at: a 3px thread writes Aboreto's capitals
+     legibly from about 24px (spun.ts LABELS); smaller, they clog (a U
+     reads as a Y, a D as a P). */
+  --hion-label-least: 1.5rem;
   --hion-gutter: clamp(20px, 6vw, 96px);
   --hion-loop-pad: clamp(40px, 5vw, 72px);
   --hion-ease-swing: cubic-bezier(0.2, 1.55, 0.4, 1);
@@ -48,7 +53,7 @@
   min-height: 100vh;
   color: var(--hion-text);
   background: var(--hion-black);
-  font: var(--hion-text-weight) var(--hion-text-size)/1.7 var(--hion-serif);
+  font: var(--hion-text-weight) var(--hion-text-size)/1.6 var(--hion-serif);
   font-kerning: normal;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -86,7 +91,7 @@
   left: 12px;
   z-index: 60;
   padding: 0.4em 0.9em;
-  font: var(--hion-label-style) var(--hion-label-weight) calc(1.4rem * var(--hion-label-scale))/1 var(--hion-label);
+  font: var(--hion-label-style) var(--hion-label-weight) max(var(--hion-label-least), calc(1.4rem * var(--hion-label-scale)))/1 var(--hion-label);
   font-variant-caps: var(--hion-label-caps);
   letter-spacing: var(--hion-label-track);
   color: var(--hion-black);
@@ -194,16 +199,23 @@
   margin-top: var(--hion-top, 40px);
   padding: 9px 0.25em 0.05em;
   color: var(--hion-c);
-  font: var(--hion-label-style) var(--hion-label-weight) calc(1.6rem * var(--hion-label-scale))/1 var(--hion-label);
+  font: var(--hion-label-style) var(--hion-label-weight) max(var(--hion-label-least), calc(1.6rem * var(--hion-label-scale)))/1 var(--hion-label);
   font-variant-caps: var(--hion-label-caps);
   letter-spacing: var(--hion-label-track);
   text-decoration: none;
   white-space: nowrap;
   pointer-events: auto;
-  transform-origin: 50% calc(-1 * var(--hion-hang, 0px));
+  transform-origin: var(--hion-ink-ox, 50%) calc(-1 * var(--hion-hang, 0px));
   transition:
     margin-top 0.6s var(--hion-ease-swing),
     color 0.2s;
+}
+
+/* The names on the line are written by thread too (spun.ts spinNav), on
+   from the knot each hangs by: nothing shows before the thread. */
+:root[data-lens="hion"] :is(.hion-charm__label, .hion-pull__label):not([data-spun-state="chalk"]) {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 :root[data-lens="hion"] .hion-charm[data-hue="m"] {
@@ -240,11 +252,9 @@
   margin: 4px auto 0;
   border-radius: 2px;
   background: color-mix(in srgb, var(--hion-tail) 55%, var(--hion-black));
-  box-shadow: 0 0 6px color-mix(in srgb, var(--hion-tail) 35%, transparent);
   transition:
     height 0.7s var(--hion-ease-swing),
-    background-color 0.3s,
-    box-shadow 0.3s;
+    background-color 0.3s;
 }
 
 :root[data-lens="hion"] .hion-tail[data-hue="m"] {
@@ -262,7 +272,6 @@
   border-radius: 50%;
   translate: -50% 0;
   background: color-mix(in srgb, var(--hion-tail) 70%, var(--hion-black));
-  box-shadow: 0 0 5px color-mix(in srgb, var(--hion-tail) 45%, transparent);
   transition: background-color 0.3s;
 }
 
@@ -270,13 +279,11 @@
 :root[data-lens="hion"] .hion-charm:focus-visible .hion-tail {
   height: 22px;
   background: var(--hion-tail);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--hion-tail) 55%, transparent);
 }
 
 :root[data-lens="hion"] .hion-charm[data-current] .hion-tail {
   height: 46px;
   background: var(--hion-tail);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--hion-tail) 60%, transparent);
 }
 
 :root[data-lens="hion"] .hion-charm:hover .hion-tail::after,
@@ -288,7 +295,7 @@
   position: absolute;
   left: 50%;
   translate: -50% 0;
-  font: var(--hion-label-weight) 1.15rem/1 var(--hion-label);
+  font: var(--hion-label-weight) var(--hion-label-least)/1 var(--hion-label);
   letter-spacing: 0.08em;
   color: var(--hion-m);
 }
@@ -311,7 +318,7 @@
   border: 0;
   background: none;
   color: var(--hion-c);
-  font: var(--hion-label-style) var(--hion-label-weight) calc(1.35rem * var(--hion-label-scale))/1 var(--hion-label);
+  font: var(--hion-label-style) var(--hion-label-weight) max(var(--hion-label-least), calc(1.35rem * var(--hion-label-scale)))/1 var(--hion-label);
   font-variant-caps: var(--hion-label-caps);
   letter-spacing: var(--hion-label-track);
   cursor: pointer;
@@ -520,14 +527,14 @@
 
 :root[data-lens="hion"] .hion-eyebrow {
   margin: 0 0 0.2em;
-  font-size: calc(1.6rem * var(--hion-label-scale));
+  font-size: max(var(--hion-label-least), calc(1.6rem * var(--hion-label-scale)));
   line-height: 1.1;
   color: var(--hion-c);
 }
 
 :root[data-lens="hion"] .hion-meta {
   margin: 0;
-  font-size: calc(1.2rem * var(--hion-label-scale));
+  font-size: max(var(--hion-label-least), calc(1.2rem * var(--hion-label-scale)));
   line-height: 1.2;
   color: var(--hion-m);
 }
@@ -539,8 +546,8 @@
 :root[data-lens="hion"] .hion-intro {
   max-width: 34em;
   margin: 0.9em 0 0;
-  font-size: 1.2rem;
-  line-height: 1.65;
+  font-size: var(--hion-read-size);
+  line-height: 1.6;
   color: var(--hion-cl);
 }
 
@@ -715,7 +722,7 @@
     }
 
     :root[data-lens="hion"] .hion-head .hion-intro {
-      font-size: 1.08rem;
+      font-size: var(--hion-text-size);
     }
   }
 
@@ -756,27 +763,15 @@
   color: var(--hion-c);
 }
 
-/* Woven type (woven.ts): the word's ink is woven by life on a canvas
-   behind it; the text stays, invisible, for reading and selecting. */
-:root[data-lens="hion"] [data-woven] {
+/* Spun type (spun.ts, skein.ts): every heading is written by one thread
+   on the skein's canvases under it. Its rules are at the end of the
+   sheet. */
+:root[data-lens="hion"] [data-spun] {
   position: relative;
 }
 
-:root[data-lens="hion"] .hion-title__text[data-woven] {
+:root[data-lens="hion"] .hion-title__text[data-spun] {
   display: inline-block;
-}
-
-:root[data-lens="hion"] [data-woven][data-woven-state] {
-  color: transparent;
-  background: none;
-  -webkit-text-fill-color: transparent;
-}
-
-:root[data-lens="hion"] .hion-woven {
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  filter: drop-shadow(0 0 5px rgb(79 233 245 / 0.18)) drop-shadow(0 0 7px rgb(255 92 200 / 0.14));
 }
 
 :root[data-lens="hion"] .hion-display {
@@ -829,8 +824,8 @@
 :root[data-lens="hion"] .hion-welcome {
   max-width: 22em;
   margin: 0.35em 0 0;
-  font-size: 1.25rem;
-  line-height: 1.6;
+  font-size: var(--hion-read-size);
+  line-height: 1.55;
   color: var(--hion-cl);
 }
 
@@ -1056,7 +1051,7 @@
   top: -0.62em;
   left: calc(50% + 22px);
   margin: 0;
-  font-size: calc(2.6rem * var(--hion-label-scale));
+  font-size: max(var(--hion-label-least), calc(2.6rem * var(--hion-label-scale)));
   line-height: 1;
   color: var(--hion-c);
 }
@@ -1077,7 +1072,7 @@
   --hion-drop: 44px;
   position: relative;
   margin-top: var(--hion-drop);
-  transform-origin: 50% calc(-1 * var(--hion-hang, 0px));
+  transform-origin: var(--hion-ink-ox, 50%) calc(-1 * var(--hion-hang, 0px));
 }
 
 /* A pull-cord on its own hangs from a hook of its own. */
@@ -1146,13 +1141,13 @@
 
 :root[data-lens="hion"] .hion-work__summary {
   margin: 0;
-  font-size: 1.06rem;
+  font-size: calc(var(--hion-text-size) * 0.92);
   line-height: 1.65;
 }
 
 /* Swatch and label (wide screens): not a card. A project is a piece of
    its cloth (the woven cover), tilted as it was pinned, with its label
-   hung beside it: big woven title, a tag of when, a few lines, its tools
+   hung beside it: big title written by thread, a tag of when, a few lines, its tools
    on beads. They take turns left and right down the page, so the two
    hions run between them. */
 @media (min-width: 720px) {
@@ -1210,7 +1205,7 @@
   /* The label: when, like a tag tied on; the name woven large. */
   :root[data-lens="hion"] .hion-row--works .hion-meta {
     margin-top: 1.4em;
-    font-size: calc(1.45rem * var(--hion-label-scale));
+    font-size: max(var(--hion-label-least), calc(1.45rem * var(--hion-label-scale)));
     rotate: -3deg;
     transform-origin: 0 50%;
   }
@@ -1220,20 +1215,20 @@
     transform-origin: 100% 50%;
   }
 
-  /* Large enough to be woven: in the inscribed capitals. */
+  /* Large enough to be written by thread: in the inscribed capitals. */
   :root[data-lens="hion"] .hion-row--works .hion-work__title {
     margin: 0.05em 0 0.25em;
     font: var(--hion-display-weight) clamp(2.4rem, 4.6vw, 3.7rem)/1 var(--hion-display);
     letter-spacing: var(--hion-display-track);
   }
 
-  :root[data-lens="hion"] .hion-row--works .hion-work__title a[data-woven] {
+  :root[data-lens="hion"] .hion-row--works .hion-work__title a[data-spun] {
     display: inline-block;
   }
 
   :root[data-lens="hion"] .hion-row--works .hion-work__summary {
     max-width: 24em;
-    font-size: 1.06rem;
+    font-size: calc(var(--hion-text-size) * 0.92);
   }
 
   :root[data-lens="hion"] .hion-row--works .hion-work:nth-child(2n) .hion-work__summary {
@@ -1290,7 +1285,7 @@
 
 :root[data-lens="hion"] .hion-tied__date {
   margin: 0 0 0.15em;
-  font-size: calc(1.2rem * var(--hion-label-scale));
+  font-size: max(var(--hion-label-least), calc(1.2rem * var(--hion-label-scale)));
   line-height: 1.3;
 }
 
@@ -1321,14 +1316,14 @@
 
 :root[data-lens="hion"] .hion-tied__summary {
   margin: 0.4em 0 0;
-  font-size: 1.06rem;
+  font-size: calc(var(--hion-text-size) * 0.92);
   line-height: 1.6;
   color: var(--hion-text);
 }
 
 :root[data-lens="hion"] .hion-tied__title + .hion-meta {
   margin-top: 0.15em;
-  font-size: calc(1.2rem * var(--hion-label-scale));
+  font-size: max(var(--hion-label-least), calc(1.2rem * var(--hion-label-scale)));
 }
 
 /* A writing post's title is set larger: it is the whole entry. */
@@ -1502,7 +1497,7 @@
   margin: 0.5em 0 0;
   padding: 0;
   list-style: none;
-  font: var(--hion-label-style) var(--hion-label-weight) calc(1.2rem * var(--hion-label-scale))/1.3 var(--hion-label);
+  font: var(--hion-label-style) var(--hion-label-weight) max(var(--hion-label-least), calc(1.2rem * var(--hion-label-scale)))/1.3 var(--hion-label);
   font-variant-caps: var(--hion-label-caps);
   letter-spacing: var(--hion-label-track);
   color: var(--hion-c);
@@ -1535,7 +1530,7 @@
 :root[data-lens="hion"] .hion-tag {
   --hion-drop: 26px;
   padding-top: 8px;
-  font: var(--hion-label-style) var(--hion-label-weight) calc(1.45rem * var(--hion-label-scale))/1.1 var(--hion-label);
+  font: var(--hion-label-style) var(--hion-label-weight) max(var(--hion-label-least), calc(1.45rem * var(--hion-label-scale)))/1.1 var(--hion-label);
   font-variant-caps: var(--hion-label-caps);
   letter-spacing: var(--hion-label-track);
   color: var(--hion-c);
@@ -1562,7 +1557,7 @@
 }
 
 :root[data-lens="hion"] .hion-tag--meta dt {
-  font: var(--hion-label-style) var(--hion-label-weight) calc(1.2rem * var(--hion-label-scale))/1.1 var(--hion-label);
+  font: var(--hion-label-style) var(--hion-label-weight) max(var(--hion-label-least), calc(1.2rem * var(--hion-label-scale)))/1.5 var(--hion-label);
   font-variant-caps: var(--hion-label-caps);
   letter-spacing: var(--hion-label-track);
   color: var(--hion-m);
@@ -1873,7 +1868,7 @@
 }
 
 :root[data-lens="hion"] .hion-prose th {
-  font: var(--hion-label-style) var(--hion-label-weight) calc(1.2em * var(--hion-label-scale))/1.3 var(--hion-label);
+  font: var(--hion-label-style) var(--hion-label-weight) max(var(--hion-label-least), calc(1.2em * var(--hion-label-scale)))/1.3 var(--hion-label);
   font-variant-caps: var(--hion-label-caps);
   letter-spacing: var(--hion-label-track);
   color: var(--hion-m);
@@ -1998,12 +1993,25 @@
     transform 1.25s var(--hion-ease-swing);
 }
 
-:root[data-lens="hion"] [data-reveal][data-ink]:not([data-lit]) {
+:root[data-lens="hion"] [data-reveal][data-ink]:not([data-tied]) {
+  opacity: 0;
   transform: translateY(-18px) rotate(4deg);
 }
 
-:root[data-lens="hion"] [data-reveal][data-ink]:nth-child(2n):not([data-lit]) {
+:root[data-lens="hion"] [data-reveal][data-ink]:nth-child(2n):not([data-tied]) {
   transform: translateY(-18px) rotate(-4deg);
+}
+
+/* The thread a hung thing hangs on grows down from its cord as the
+   drawing reaches it (and the words on it are then written on from its
+   end, spun.ts): it does not appear whole. */
+:root[data-lens="hion"] [data-reveal][data-ink] > .hion-ink {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.6s cubic-bezier(0.3, 0.1, 0.4, 1) 0.05s;
+}
+
+:root[data-lens="hion"] [data-reveal][data-ink]:not([data-tied]) > .hion-ink {
+  clip-path: inset(0 0 100% 0);
 }
 
 :root[data-lens="hion"] .hion[data-still] *,
@@ -2014,7 +2022,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   :root[data-lens="hion"] [data-reveal]:not([data-lit]),
-  :root[data-lens="hion"] [data-reveal][data-ink]:not([data-lit]) {
+  :root[data-lens="hion"] [data-reveal][data-ink]:not([data-tied]) {
     transform: none;
   }
 
@@ -2037,8 +2045,8 @@
   :root[data-lens="hion"] .hion {
     --hion-gutter: 20px;
     --hion-loop-pad: 26px;
-    --hion-text-size: 1.0625rem;
-    --hion-read-size: 1.125rem;
+    --hion-text-size: 1.15rem;
+    --hion-read-size: 1.2rem;
     /* Wide capitals on a narrow screen: a little less air between them. */
     --hion-label-track: 0.08em;
     font-size: var(--hion-text-size);
@@ -2052,7 +2060,7 @@
   :root[data-lens="hion"] .hion-charm--home {
     left: 18px;
     translate: none;
-    font-size: 1rem;
+    font-size: var(--hion-label-least);
   }
 
   /* The page's head hangs just under the line here: the loose end under
@@ -2114,7 +2122,7 @@
   }
 
   :root[data-lens="hion"] .hion-top[data-state="dropped"] .hion-nav__list .hion-charm {
-    font-size: calc(2.1rem * var(--hion-label-scale));
+    font-size: max(var(--hion-label-least), calc(2.1rem * var(--hion-label-scale)));
   }
 
   :root[data-lens="hion"] .hion-page {
@@ -2177,7 +2185,7 @@
   }
 
   :root[data-lens="hion"] .hion-year {
-    font-size: calc(2.1rem * var(--hion-label-scale));
+    font-size: max(var(--hion-label-least), calc(2.1rem * var(--hion-label-scale)));
   }
 
   /* The cord comes down the right-hand edge; the head reads down beside
@@ -2232,7 +2240,7 @@
   }
 
   :root[data-lens="hion"] .hion-tag {
-    font-size: calc(1.2rem * var(--hion-label-scale));
+    font-size: max(var(--hion-label-least), calc(1.2rem * var(--hion-label-scale)));
   }
 }
 
@@ -2618,7 +2626,7 @@
   top: -0.6em;
   left: calc(50% + 26px);
   margin: 0;
-  font: var(--hion-label-weight) calc(2.1rem * var(--hion-label-scale))/1 var(--hion-label);
+  font: var(--hion-label-weight) max(var(--hion-label-least), calc(2.1rem * var(--hion-label-scale)))/1 var(--hion-label);
   letter-spacing: var(--hion-label-track);
   color: var(--hion-c);
   white-space: nowrap;
@@ -2660,7 +2668,7 @@
 
 :root[data-lens="hion"] .hion-loop--role .hion-resume__date {
   margin-top: 0.3em;
-  font-size: calc(1.45rem * var(--hion-label-scale));
+  font-size: max(var(--hion-label-least), calc(1.45rem * var(--hion-label-scale)));
   text-align: center;
   /* Wide capitals: a long date breaks in the middle, not at the thread. */
   text-wrap: balance;
@@ -2696,7 +2704,7 @@
 
 :root[data-lens="hion"] .hion-knots--courses .hion-resume__date {
   margin-top: 0.25em;
-  font-size: calc(1.3rem * var(--hion-label-scale));
+  font-size: max(var(--hion-label-least), calc(1.3rem * var(--hion-label-scale)));
   text-wrap: balance;
 }
 
@@ -2759,7 +2767,7 @@
   }
 
   :root[data-lens="hion"] .hion-loop--role .hion-resume__date {
-    font-size: calc(1.25rem * var(--hion-label-scale));
+    font-size: max(var(--hion-label-least), calc(1.25rem * var(--hion-label-scale)));
   }
 
   :root[data-lens="hion"] .hion-resume__org {
@@ -2981,4 +2989,194 @@
 
 :root[data-lens="hion"] .hion-loom--across {
   right: auto;
+}
+
+/* ---------- Headings written by thread (spun.ts, skein.ts) ---------- */
+
+/* Every heading, whatever its size, in the display face: a thread has one
+   weight, and so has Aboreto; its thin capitals trace as one line where
+   the reading face's thicks, thins and serifs would not. Only body text is
+   type. The selector is spun.ts WRITTEN: keep the two in step. */
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title) {
+  font-family: var(--hion-display);
+  font-weight: var(--hion-display-weight);
+  letter-spacing: var(--hion-display-track);
+}
+
+/* Every label is written too (spun.ts LABELS), in the label face: the
+   words of pull-cords and links on, and a tag's value, are set in it
+   rather than the reading face, and none is smaller than a 3px thread can
+   write. */
+:root[data-lens="hion"] .hion-screen .hion-hello {
+  font-size: max(var(--hion-label-least), calc(2rem * var(--hion-hand-scale)));
+  line-height: 1.3;
+}
+
+/* So are the things said: the role line, the portrait's word and the
+   foot's call, in the label face (a thread cannot write the hand's
+   italic legibly). */
+:root[data-lens="hion"] .hion-screen :is(.hion-role, .hion-portrait__link),
+:root[data-lens="hion"] .hion-foot__call {
+  font-size: max(var(--hion-label-least), calc(1.7rem * var(--hion-hand-scale)));
+  line-height: 1.3;
+}
+
+:root[data-lens="hion"] .hion-screen :is(.hion-role, .hion-portrait__link),
+:root[data-lens="hion"] .hion-foot__call,
+:root[data-lens="hion"] .hion-screen :is(.hion-pullcord, .hion-end__link, .hion-tag--meta dd, .hion-hello) {
+  font-family: var(--hion-label);
+  font-style: var(--hion-label-style);
+  font-weight: var(--hion-label-weight);
+  letter-spacing: var(--hion-label-track);
+}
+
+:root[data-lens="hion"] .hion-screen :is(.hion-pullcord, .hion-end__link) {
+  font-size: var(--hion-label-least);
+  line-height: 1.5;
+}
+
+/* Written large, an address is wider than a phone: it may break anywhere
+   (its next line is written back, as a weft goes). */
+:root[data-lens="hion"] :is(.hion-pullcord, .hion-end__link, .hion-foot__mail) {
+  overflow-wrap: anywhere;
+}
+
+/* The foot's labels too: its links hang on drops from a cord, and the
+   address is a link on, in the label face. */
+:root[data-lens="hion"] .hion-foot :is(.hion-tag, .hion-foot__mail, .hion-foot__call):not([data-spun-state="chalk"]),
+:root[data-lens="hion"] .hion-foot :is(.hion-tag, .hion-foot__mail, .hion-foot__call):not([data-spun-state="chalk"]) * {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+:root[data-lens="hion"] .hion-foot__mail {
+  font-family: var(--hion-label);
+  font-size: clamp(var(--hion-label-least), 3vw, 1.9rem);
+  font-weight: var(--hion-label-weight);
+  letter-spacing: var(--hion-label-track);
+}
+
+/* A tag's term and value are two lines of one label: one size, and room
+   between them for the run under the first. */
+:root[data-lens="hion"] .hion-screen .hion-tag--meta dd {
+  margin-top: 0.3em;
+  font-size: var(--hion-label-least);
+  line-height: 1.5;
+}
+
+/* The small ones are a little larger than the reading face had them, and
+   tracked open: a 3px thread needs room inside a capital and between two
+   for its runs down to the line and up again. */
+:root[data-lens="hion"] .hion-screen :is(h3, h4, h5, h6, .hion-tied__title, .hion-fork__title, .hion-work__title):not(.hion-strung) {
+  letter-spacing: 0.06em;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-screen .hion-row--works .hion-work__title {
+    letter-spacing: var(--hion-display-track);
+  }
+}
+
+:root[data-lens="hion"] .hion-screen .hion-tied__title:not(.hion-knots--writing *),
+:root[data-lens="hion"] .hion-screen .hion-prose h3 {
+  font-size: 1.5rem;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-prose :is(h4, h5, h6) {
+  font-size: 1.4rem;
+}
+
+/* The labels (spun.ts LABELS) are written by thread too, so they are set
+   as the small headings are: capitals only (the face's small capitals are
+   too small inside for a 3px thread to run up and down), no smaller than
+   a thread writes them legibly (--hion-label-least), tracked open, and
+   level (a thread writes along a line; a tag still sways on its drop). */
+:root[data-lens="hion"] .hion-screen :is(.hion-eyebrow, .hion-meta, .hion-resume__when, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li) {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+}
+
+:root[data-lens="hion"] .hion-screen :is(.hion-eyebrow, .hion-meta, .hion-tag:not(.hion-tag--meta), .hion-tag--meta dt, .hion-beads > li) {
+  font-size: var(--hion-label-least);
+}
+
+:root[data-lens="hion"] .hion-screen .hion-row--works .hion-meta {
+  rotate: none;
+}
+
+/* Room under a term for the run along its feet, clear of its value. */
+:root[data-lens="hion"] .hion-screen .hion-tag--meta dt {
+  margin-bottom: 0.45em;
+}
+
+/* A run lies under each line of a heading: room between the lines for it,
+   so it reads as the line above's and never strikes through the next. */
+:root[data-lens="hion"] .hion-screen .hion-title {
+  line-height: 1.22;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-row--works .hion-work__title {
+  line-height: 1.18;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-strung:not(.hion-loop--role > *) {
+  line-height: 1.28;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-knots--writing .hion-tied__title {
+  line-height: 1.32;
+}
+
+/* Nothing shows before the thread writes it: a heading's text is
+   transparent from the moment the screen is built (it stays in the
+   accessibility tree, reads, selects and is found, and a link in it keeps
+   its focus ring). A heading the thread cannot write, or that is left in
+   sight unwritten, gets its chalk back (data-spun-state="chalk"). */
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-hello, .hion-role, .hion-portrait__link):not([data-spun-state="chalk"]),
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6, .hion-tied__title, .hion-eyebrow, .hion-meta, .hion-year, .hion-tag, .hion-pullcord, .hion-beads li, .hion-resume__when, .hion-end__link, .hion-prose th, .hion-hello, .hion-role, .hion-portrait__link):not([data-spun-state="chalk"]) :not([data-spun-state="chalk"], [data-spun-state="chalk"] *) {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+/* Nor what paints text with its background (the chalk's tooth), nor the
+   chalk's dust. A strung heading keeps its box, black over the hions and
+   the weft behind it, and is written on a canvas of its own over the box
+   (spun.ts), which its chalk reveal does not clip. */
+:root[data-lens="hion"] .hion-screen :is(h1, h2, h3, h4, h5, h6):not([data-spun-state="chalk"]) :is(.hion-strung__chalk, .hion-title__text, .hion-display__word):not([data-spun-state="chalk"]) {
+  background: none;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-strung:not([data-spun-state="chalk"]) .hion-strung__chalk::after {
+  display: none;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-strung[data-spun-state="spun"] {
+  clip-path: none;
+}
+
+/* A word given its chalk inside a heading still being written. */
+:root[data-lens="hion"] .hion-screen .hion-work__title a[data-spun-state="chalk"] {
+  color: var(--hion-cl);
+  -webkit-text-fill-color: currentColor;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-work[data-hue="m"] .hion-work__title a[data-spun-state="chalk"] {
+  color: var(--hion-ml);
+}
+
+/* A strung heading, any heading or label that slides with the resume's
+   track, and a hung label are written on a canvas of its own inside it,
+   over its box: it is the canvas's containing block, unless it is placed
+   already (a year in its circle is absolute). */
+:root[data-lens="hion"] :where([data-spun-local]) {
+  position: relative;
+}
+
+:root[data-lens="hion"] .hion-spun-local {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
 }

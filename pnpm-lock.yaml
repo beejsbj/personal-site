@@ -38,13 +38,13 @@ importers:
       '@fontsource/lato':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource/literata':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource/patrick-hand':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource/special-elite':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/spectral':
         specifier: ^5.3.0
         version: 5.3.0
       '@vercel/functions':
@@ -572,14 +572,14 @@ packages:
   '@fontsource/lato@5.3.0':
     resolution: {integrity: sha512-0WhF/4rhrw+ErIyneKvhHn2YAl+xf8GDtllgOgOzDmeaSlLQtjpChXaQOpWhG2BchQW0WJy2zLV12Hdg0ndOMw==}
 
+  '@fontsource/literata@5.3.0':
+    resolution: {integrity: sha512-9JGMT5+YfBK49thoMq9ASaMRJErHT4V4QuMhAEwKHRLreOsIMP2xP6ZRLhPJ0e6YlET+kjWTJuN7LAxt9/gWGQ==}
+
   '@fontsource/patrick-hand@5.3.0':
     resolution: {integrity: sha512-V8C38IlIFfdWg0Xtri3F7sLCVpm069rUwn6w4n+oyn38gt7H4arOJmuReg3tAw1Q6jHqZp89wTnAAJagq4Atxw==}
 
   '@fontsource/special-elite@5.3.0':
     resolution: {integrity: sha512-fOQ9XU8m4KnqzcLibAXCxTsKzbxePNDjPqVss5GSMcPVCY1TuCv+Wq8gm1ebqIR6XS1rhMbQ7ECP9ocKVEEpTA==}
-
-  '@fontsource/spectral@5.3.0':
-    resolution: {integrity: sha512-2TL5WWGOZj4SIsBmPFEzKeA60tXXd1Qp1OqaaVEWkJL8IfSGLk6YmiusmC441iFkdJDIuFelu1r8lhCmQUU3mw==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -2856,11 +2856,11 @@ snapshots:
 
   '@fontsource/lato@5.3.0': {}
 
+  '@fontsource/literata@5.3.0': {}
+
   '@fontsource/patrick-hand@5.3.0': {}
 
   '@fontsource/special-elite@5.3.0': {}
-
-  '@fontsource/spectral@5.3.0': {}
 
   '@img/colour@1.1.0':
     optional: true

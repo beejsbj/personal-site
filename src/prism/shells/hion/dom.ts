@@ -89,6 +89,28 @@ export function textExtent(el: HTMLElement): [number, number] | null {
   return l < r ? [l, r] : null;
 }
 
+/* ---------- Measuring at rest ---------- */
+
+/** Read the page with everything at rest (no swing, no reveal offset:
+ * shell.css `.hion-measuring`). The class restyles the whole page going on
+ * and coming off, so it comes off in a microtask, before anything is
+ * painted: every read in the same task shares the one toggle. Read before
+ * writing, inside: a write in between dirties the page for the next read. */
+let measuring: HTMLElement | null = null;
+export function measured<T>(host: HTMLElement | null, read: () => T): T {
+  if (host && measuring !== host) {
+    measuring?.classList.remove("hion-measuring");
+    host.classList.add("hion-measuring");
+    measuring = host;
+    queueMicrotask(() => {
+      if (measuring !== host) return;
+      host.classList.remove("hion-measuring");
+      measuring = null;
+    });
+  }
+  return read();
+}
+
 /* ---------- Still pictures ---------- */
 
 /** A 2D canvas on the page costs every frame the page commits, changed or

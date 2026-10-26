@@ -28,7 +28,8 @@ import { createNav, type Nav } from "./nav";
 import { tooth } from "./pastel";
 import { createPulse } from "./pulse";
 import { createSkein, seedOf } from "./skein";
-import { weaveCovers, weaveType } from "./woven";
+import { spinNav, spinType } from "./spun";
+import { weaveCovers } from "./woven";
 import { buildScreen, footer } from "./screens";
 import { ACROSS, createTrack } from "./track";
 import { compose } from "./weave";
@@ -146,7 +147,10 @@ function show(route: Route, first: boolean) {
     signal: controller.signal,
     instant: still(),
     lookahead: ctx.face ? 0 : 0.6,
-    brisk: !first,
+    // Arrived on or travelled to, a screen grows from where the hions come
+    // down (the current destination's knot on the line): none of it is
+    // ready-made.
+    brisk: true,
     isIdle: ctx.isIdle,
     onIdleChange: ctx.onIdleChange,
     pulse,
@@ -170,7 +174,7 @@ function show(route: Route, first: boolean) {
     instant: still(),
     scale: close(route.path) ? 2 : 1,
     lively: route.kind === "home",
-    travelled: !first,
+    travelled: true,
     origin: () => nav.origin(),
     seed: seedOf(route.path),
     isIdle: ctx.isIdle,
@@ -201,25 +205,24 @@ function show(route: Route, first: boolean) {
     life?.start();
     page.dataset.state = "here";
     // Then every thread (the skein), at once: on a screen travelled to the
-    // hions are seen setting out from the line. The woven things come a
-    // moment later, once the main thread has room: none of it is needed
-    // to read the screen.
+    // hions are seen setting out from the line. The spun words and the
+    // woven covers come a moment later, once the main thread has room:
+    // none of it is needed to read the screen.
     const gone = () => live?.page !== page || live.left !== undefined;
     const ground = () => {
       if (!gone()) skein.start();
     };
     const woven = () => {
       if (gone()) return;
-      const weaving = { instant: still(), signal: controller.signal, isIdle: ctx.isIdle, fabric };
-      weaveType(page, weaving);
-      weaveCovers(page, weaving);
+      spinType(page, { skein, pulse, instant: still(), signal: controller.signal });
+      weaveCovers(page, { signal: controller.signal, fabric });
     };
     if (still()) {
       ground();
       woven();
     } else {
       ground();
-      later(controller.signal, first ? 0 : WOVEN, woven);
+      later(controller.signal, WOVEN, woven);
     }
   });
   // Keyboard travel ahead of the drawing brings the drawing with it.
@@ -349,6 +352,12 @@ const shell: LensShell = {
     // Let the faces arrive before measuring words to hang them.
     await Promise.race([document.fonts?.ready, wait(600)]);
     show(context.route, true);
+    // The names on the line are written once, by threads of their own
+    // frame loop (the line outlives every screen).
+    if (live) {
+      const pulse = createPulse({ signal, isIdle: context.isIdle, onIdleChange: context.onIdleChange });
+      spinNav(nav.el, { skein: live.skein, pulse, instant: still(), signal });
+    }
     signal.addEventListener("abort", () => live?.controller.abort());
   },
 
