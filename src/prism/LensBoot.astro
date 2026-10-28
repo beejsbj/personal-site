@@ -1,7 +1,9 @@
 ---
 /** Applies the visitor's lens before first paint and after every client-side
  * swap. `?lens=` previews a lens and keeps it; `?prism-face=` renders a
- * non-persistent face for the prism stage. */
+ * non-persistent face for the prism stage. A face is already settled
+ * (`data-prism-settled`): it shows the page at rest and never plays an
+ * entrance. The prism sets the same flag when it steps into a new lens. */
 import { LENSES } from "./lenses";
 const ids = LENSES.map((lens) => lens.id);
 const shells = ids.slice(1);
@@ -20,6 +22,7 @@ const shells = ids.slice(1);
       if (ids.includes(face)) {
         root.dataset.lens = face;
         root.setAttribute("data-prism-face", "");
+        root.setAttribute("data-prism-settled", "");
         settle();
         return;
       }

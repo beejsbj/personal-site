@@ -329,11 +329,12 @@ function buildCover(label: string) {
 }
 
 /** Daylight is not the page on show: another lens's shell has replaced it,
- * it is a prism face, or the prism is open over it. */
+ * it is a prism face, or the prism is open (holding it as a face). */
 function offstage(root: HTMLElement) {
   return (
     root.hasAttribute("data-lens-shell") ||
     root.hasAttribute("data-prism-face") ||
-    root.hasAttribute("data-prism-idle")
+    root.hasAttribute("data-prism-idle") ||
+    root.classList.contains("prism-is-open")
   );
 }

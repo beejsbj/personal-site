@@ -185,19 +185,28 @@ const place = (key: string, index: number) => {
     }
   }
   /* Arrival, once, on the homepage: the peach suns rise, the burgundy
-     ball comes up last. */
+     ball comes up last. Not on a page that is already there (a prism face,
+     or stepping in from the prism: data-prism-settled). */
   @media (min-width: 62.501rem) and (prefers-reduced-motion: no-preference) {
     /* Paint only: the face and label rise; the link itself never moves,
        so a click during the arrival still lands. */
-    [data-form="cluster"] li :global(.ds-link--ball .ball-face),
-    [data-form="cluster"] li :global(.ds-link--ball > .ds-link__body) {
+    :global(:root:not([data-prism-settled]))
+      [data-form="cluster"]
+      li
+      :global(.ds-link--ball .ball-face),
+    :global(:root:not([data-prism-settled]))
+      [data-form="cluster"]
+      li
+      :global(.ds-link--ball > .ds-link__body) {
       animation: sunrise var(--duration-settle) var(--ease-pop)
         calc(var(--stagger) * (2 + var(--i))) backwards;
     }
-    [data-form="cluster"]
+    :global(:root:not([data-prism-settled]))
+      [data-form="cluster"]
       li:has([aria-current])
       :global(.ds-link--ball .ball-face),
-    [data-form="cluster"]
+    :global(:root:not([data-prism-settled]))
+      [data-form="cluster"]
       li:has([aria-current])
       :global(.ds-link--ball > .ds-link__body) {
       animation-delay: calc(var(--stagger) * 8);
