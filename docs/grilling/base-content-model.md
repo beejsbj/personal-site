@@ -1,8 +1,8 @@
 # Base Content Model
 
-Status: revised direction for `BJS-39`; first-version content proposal below remains subject to refinement.
+Status: settled. This was the revised direction for the base content model; the first-version proposal below is kept as history.
 
-`BJS-39` defines the base personal-site content model and launch finish line before the prism/theming work resumes.
+This document defined the base personal-site content model and launch finish line before the prism/theming work resumed. Open work on the site is tracked in this repository's GitHub Issues.
 
 ## Current Direction — Resumption After History Review
 
@@ -20,18 +20,17 @@ This section supersedes conflicting recommendations in the historical draft belo
 
 ### Proposed First Version
 
-### Accepted Scope and Live Board Reconciliation
+### Accepted Scope
 
-Read the personal-site project's current and settled issues and their comments, plus referenced BJS-262, BJS-105, and BJS-106. Live board review found:
+A review of the tracked work at the time found:
 
-- [BJS-39](https://linear.app/bjs-projects/issue/BJS-39) records Burooj's September 10 acceptance of Projects (optional case studies), Writing (notes/essays, allowed empty at launch), Lab (experiments/one-offs), and About/Now. The accepted minimum is About/Now plus at least three short project stories and one default lens.
-- [BJS-42](https://linear.app/bjs-projects/issue/BJS-42) routes first-release shaping and implementation to this thread. Its earlier PHP-only constraint was explicitly withdrawn; existing Astro work remains an input to implementation judgment.
+- The content-model decision records Burooj's September 10 acceptance of Projects (optional case studies), Writing (notes/essays, allowed empty at launch), Lab (experiments/one-offs), and About/Now. The accepted minimum is About/Now plus at least three short project stories and one default lens.
+- The first-build task routed first-release shaping and implementation to this thread. Its earlier PHP-only constraint was explicitly withdrawn; existing Astro work remains an input to implementation judgment.
 - Burooj subsequently accepted this thread's three recommendations: select representative projects mixing substantial and smaller distinctive work; focus updates on building, writing, experiments and occasional learning; launch with real content and manually seeded updates before automation.
 - These content collections do not prescribe four top-level navigation items or four separate launch pages. The homepage composition remains the presentation question.
-- [BJS-262](https://linear.app/bjs-projects/issue/BJS-262) adds job-readiness context, meaningful title/meta, and project candidates Conduit, Flo8 (when live), and chat-scrobbler. GitHub pinning is a later external action, not authorized by this read-only review.
-- [BJS-300](https://linear.app/bjs-projects/issue/BJS-300) contains an unresolved historical public HTTP/3-access report. Reverify at release time; do not infer current failure from the old issue.
+- Finishing the site's content (meaningful titles and meta, more projects) and pinning this repo is tracked in #84.
 
-No board state or comments were changed during this review. The historical draft below is not the current approval record.
+The historical draft below is not the current approval record.
 
 ### Homepage Composition
 
@@ -60,7 +59,7 @@ Select actual existing content for these groups and assemble a first homepage fo
 
 Burooj confirmed that the current site's writing can supply rough source language for the introduction and About/Now content. Reuse its themes and phrases where they remain true; do not preserve stale time-relative or novice claims merely because they already exist.
 
-The next phase is implementation under BJS-42. Build one runnable, content-complete homepage preview from the reusable Astro scaffold and migrated content, updating its old homepage framing to match the accepted direction here:
+The next phase was implementation of the first build. Build one runnable, content-complete homepage preview from the reusable Astro scaffold and migrated content, updating its old homepage framing to match the accepted direction here:
 
 - introduction and direct contact/profile paths;
 - at least three short, source-grounded project stories in the main area;
@@ -73,7 +72,7 @@ Completion evidence for this slice is a running preview, fresh build/check resul
 
 ## Historical Provisional Draft
 
-The material below preserves the earlier BJS-39 proposal and its unanswered slots. It is not evidence that Burooj accepted those defaults. In particular, its blanket deferral of labs, one-offs, and self-hosted work is superseded above.
+The material below preserves the earlier content-model proposal and its unanswered slots. It is not evidence that Burooj accepted those defaults. In particular, its blanket deferral of labs, one-offs, and self-hosted work is superseded above.
 
 ### Original Answer Card
 
@@ -90,7 +89,7 @@ Recommended answer:
 - Labs/one-offs/self-hosted work: later unless a specific entry is promoted.
 - Theme/lens UI: hidden for base launch; keep only a future hook.
 
-Burooj can settle `BJS-39` by answering:
+Burooj could settle the content model by answering:
 
 1. Accept the recommended answer, or name what changes.
 2. Promote any of labs, one-offs, self-hosted work, or current thinking into base launch.
@@ -102,7 +101,7 @@ Burooj can settle `BJS-39` by answering:
 - The base site is the normal portfolio surface.
 - The prism is a later outer layer around this same portfolio structure.
 - The prism should not add, remove, or rename base content types.
-- The base model should be strong enough that `BJS-42` can build a first usable slice without waiting for lens, cube, or reveal decisions.
+- The base model should be strong enough that the first build can make a first usable slice without waiting for lens, cube, or reveal decisions.
 - The base model should preserve future lens/theming hooks only where they are cheap and natural.
 
 ## Existing Repo Shape
@@ -330,9 +329,9 @@ The base site is launchable when:
 - Style Guide, Garden, E4P, Goals, and other dev/archive pages are either intentionally public or removed from primary navigation.
 - Prism/lens work remains out of scope except for preserving the base structure it will later wrap.
 
-## BJS-42 Handoff
+## First-build handoff
 
-If Burooj accepts the recommended default, `BJS-42` can build the first base slice with these assumptions:
+If Burooj accepts the recommended default, the first build can make the first base slice with these assumptions:
 
 - Use the normal portfolio as the first screen; do not include prism reveal, lure, face travel, or lens navigation.
 - Treat `Work` as the public label for projects unless Burooj prefers `Projects`.
@@ -346,7 +345,7 @@ This handoff is provisional until the decision slots below are confirmed.
 
 ## Decision Slots
 
-Fill these before treating `BJS-39` as settled.
+Fill these before treating the content model as settled.
 
 ### Site Job
 
