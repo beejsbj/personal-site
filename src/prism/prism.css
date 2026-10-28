@@ -30,8 +30,8 @@ html[data-lens-shell]::view-transition-new(root) {
 /* Off-axis prism faces, every face while the camera moves, and the live page
    while it isn't the face being looked at hold still. The prism's own
    chrome keeps moving. */
-:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-backdrop, #prism-backdrop *, #prism-lure, #prism-lure *),
-:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-backdrop, #prism-backdrop *, #prism-lure, #prism-lure *)::before,
-:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-backdrop, #prism-backdrop *, #prism-lure, #prism-lure *)::after {
+:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-backdrop, #prism-backdrop *, #prism-lure, #prism-lure *, #prism-gather),
+:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-backdrop, #prism-backdrop *, #prism-lure, #prism-lure *, #prism-gather)::before,
+:root[data-prism-idle] :not(#prism-stage, #prism-stage *, #prism-backdrop, #prism-backdrop *, #prism-lure, #prism-lure *, #prism-gather)::after {
   animation-play-state: paused !important;
 }

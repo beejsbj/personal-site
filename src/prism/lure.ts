@@ -12,13 +12,10 @@ const EDGE = 56;
 export interface LureOptions {
   /** Already found on an earlier visit: sits still in its corner. */
   tamed: boolean;
-  /** The visitor reaches for it: a pointer near or on it, focus, a touch.
-   * Fires on every reach, so it must be cheap to repeat. */
-  onIntent?: () => void;
   onCatch: (from: DOMRect) => void;
 }
 
-export function mountLure({ tamed, onIntent, onCatch }: LureOptions) {
+export function mountLure({ tamed, onCatch }: LureOptions) {
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lure = document.createElement("button");
   lure.type = "button";
@@ -27,7 +24,9 @@ export function mountLure({ tamed, onIntent, onCatch }: LureOptions) {
   lure.dataset.state = tamed ? "tamed" : "wild";
   lure.setAttribute(
     "aria-label",
-    tamed ? "Step out into the prism" : "Something is refracting here. Catch it",
+    tamed
+      ? "Step out into the prism"
+      : "Something is refracting here. Catch it",
   );
   lure.innerHTML =
     '<span class="prism-lure__tail" aria-hidden="true"></span>' +
@@ -39,12 +38,10 @@ export function mountLure({ tamed, onIntent, onCatch }: LureOptions) {
   let y = 0;
   let dodges = 0;
   let hopped = false;
+  let caught = false;
   let lastMove = { x: 0, y: 0, t: 0 };
   const controller = new AbortController();
   const { signal } = controller;
-  const reach = () => onIntent?.();
-  for (const type of ["pointerenter", "pointerdown", "focus"])
-    lure.addEventListener(type, reach, { signal });
 
   const place = (nextX: number, nextY: number) => {
     x = Math.min(Math.max(nextX, EDGE), innerWidth - EDGE);
@@ -89,11 +86,9 @@ export function mountLure({ tamed, onIntent, onCatch }: LureOptions) {
           Math.hypot(event.clientX - lastMove.x, event.clientY - lastMove.y) /
           dt;
         lastMove = { x: event.clientX, y: event.clientY, t: now };
-        if (dodges >= MAX_DODGES || lure.classList.contains("is-caught"))
-          return;
+        if (dodges >= MAX_DODGES || caught) return;
         const near =
           Math.hypot(event.clientX - x, event.clientY - y) < DODGE_RADIUS;
-        if (near && lure.dataset.state === "wild") reach();
         if (near && speed > GRAB_SPEED) dodge(event.clientX, event.clientY);
       },
       { signal, passive: true },
@@ -122,17 +117,59 @@ export function mountLure({ tamed, onIntent, onCatch }: LureOptions) {
         hopped = false;
         return;
       }
-      if (lure.classList.contains("is-caught")) return;
-      lure.classList.add("is-caught");
+      if (caught) return;
+      caught = true;
+      gather();
       onCatch(lure.getBoundingClientRect());
     },
     { signal },
   );
 
+  // Caught, the lure gathers light while the prism readies its faces: rings
+  // of spectrum close in on it from the edges of the screen and the glass
+  // swells as each arrives. Transforms and opacity only, so the compositor
+  // keeps it smooth while the main thread loads the faces.
+  let veil: HTMLElement | undefined;
+  const gather = () => {
+    lure.classList.add("is-gathering");
+    lure.setAttribute("aria-busy", "true");
+    const { left, top, width, height } = lure.getBoundingClientRect();
+    const cx = left + width / 2;
+    const cy = top + height / 2;
+    const reach = Math.hypot(
+      Math.max(cx, innerWidth - cx),
+      Math.max(cy, innerHeight - cy),
+    );
+    veil = document.createElement("div");
+    veil.id = "prism-gather";
+    veil.setAttribute("aria-hidden", "true");
+    veil.style.setProperty("--gx", `${cx}px`);
+    veil.style.setProperty("--gy", `${cy}px`);
+    veil.style.setProperty("--reach", `${reach * 2}px`);
+    // Outside <body>: the prism holds the body as its live face.
+    document.documentElement.append(veil);
+  };
+  const clearVeil = () => {
+    const done = veil;
+    veil = undefined;
+    if (!done) return;
+    done.classList.add("is-done");
+    setTimeout(() => done.remove(), 300);
+  };
+
   return {
     element: lure,
+    /** The prism is ready: the gathered light breaks out of the glass. */
+    burst() {
+      lure.classList.replace("is-gathering", "is-caught");
+      lure.removeAttribute("aria-busy");
+      clearVeil();
+    },
     release() {
-      lure.classList.remove("is-caught");
+      caught = false;
+      lure.classList.remove("is-caught", "is-gathering");
+      lure.removeAttribute("aria-busy");
+      clearVeil();
     },
     tame() {
       lure.dataset.state = "tamed";
@@ -142,6 +179,7 @@ export function mountLure({ tamed, onIntent, onCatch }: LureOptions) {
     },
     destroy() {
       controller.abort();
+      veil?.remove();
       lure.remove();
     },
   };

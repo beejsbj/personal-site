@@ -50,7 +50,6 @@ function mountPage() {
   store(sessionStorage, VIEWS_KEY, String(views));
   let lure: ReturnType<typeof mountLure> | undefined;
   let timer = 0;
-  let resting = false;
 
   const summon = (tamed: boolean) => {
     if (lure || signal.aborted) return;
@@ -58,38 +57,16 @@ function mountPage() {
     if (!tamed) glint();
     lure = mountLure({
       tamed,
-      // Nothing of the prism loads until the visitor reaches for the lure.
-      onIntent: () => {
-        if (!resting) prism.preload();
-      },
+      // Nothing of the prism loads until the lure is caught; it gathers
+      // light while the faces load, and bursts once they are ready.
       onCatch: async () => {
         store(localStorage, FOUND_KEY, "1");
         await prism.open({
+          onReady: () => lure?.burst(),
           onClose: () => {
             lure?.tame();
             lure?.release();
-            // Coming back is not reaching again: neither the focus handed
-            // back nor the stage leaving from under a resting pointer. A
-            // reach counts once the pointer moves off the lure or focus
-            // leaves it.
-            resting = true;
-            const element = lure?.element;
-            element?.focus({ preventScroll: true });
-            const woken = new AbortController();
-            const wake = (event: Event) => {
-              if (
-                event.type === "pointermove" &&
-                element?.contains(event.target as Node)
-              )
-                return;
-              resting = false;
-              woken.abort();
-            };
-            signal.addEventListener("abort", () => woken.abort(), {
-              signal: woken.signal,
-            });
-            for (const type of ["pointermove", "focusout"])
-              document.addEventListener(type, wake, { signal: woken.signal });
+            lure?.element.focus({ preventScroll: true });
           },
         });
       },

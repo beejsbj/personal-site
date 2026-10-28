@@ -172,6 +172,12 @@
   #prism-lure.is-tired .prism-lure__glass {
     animation: prism-bob 4.5s ease-in-out infinite;
   }
+  #prism-lure.is-gathering .prism-lure__glass {
+    animation: prism-drink 0.6s cubic-bezier(0.55, 0, 0.85, 0.35) infinite;
+  }
+  #prism-lure.is-gathering .prism-lure__tail {
+    animation: prism-shimmer 0.6s ease-in-out infinite alternate;
+  }
   #prism-lure.is-caught .prism-lure__glass {
     animation: prism-caught 0.7s cubic-bezier(0.5, 0, 0.2, 1) forwards;
   }
@@ -205,6 +211,95 @@
   }
   100% {
     transform: scale(1) rotate(0);
+  }
+}
+/* Each ring of light arrives as the glass swells to take it in. */
+@keyframes prism-drink {
+  0% {
+    transform: scale(1.12) rotate(-4deg);
+  }
+  85% {
+    transform: scale(1.34) rotate(10deg);
+  }
+  100% {
+    transform: scale(1.12) rotate(-4deg);
+  }
+}
+/* Caught: brighter glass, the whole spectrum in its tail. */
+#prism-lure.is-gathering .prism-lure__glass {
+  filter: drop-shadow(0 0 8px rgb(255 255 255 / 1))
+    drop-shadow(0 0 24px rgb(140 200 255 / 0.8));
+}
+#prism-lure.is-gathering .prism-lure__tail {
+  opacity: 0.95;
+}
+/* The light of the page drawn into the glass while the faces load: two
+   rings of spectrum, half a beat apart, closing on the lure from beyond the
+   farthest corner. Over the page, under the lure; gone in reduced motion. */
+#prism-gather {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--prism-layer) - 2);
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+  transition: opacity 0.25s ease-out;
+}
+#prism-gather.is-done {
+  opacity: 0;
+}
+#prism-gather::before,
+#prism-gather::after {
+  content: "";
+  position: absolute;
+  left: var(--gx);
+  top: var(--gy);
+  width: var(--reach);
+  height: var(--reach);
+  margin: calc(var(--reach) / -2) 0 0 calc(var(--reach) / -2);
+  border-radius: 50%;
+  background: conic-gradient(
+    #ff3b3b,
+    #ffb13b,
+    #fff36b,
+    #4dff9a,
+    #3bc9ff,
+    #7b5bff,
+    #ff4fd8,
+    #ff3b3b
+  );
+  mask: radial-gradient(
+    closest-side,
+    transparent 89%,
+    #000 96%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: prism-gather 1.2s cubic-bezier(0.55, 0, 0.85, 0.35) infinite;
+}
+#prism-gather::after {
+  animation-delay: -0.6s;
+}
+@keyframes prism-gather {
+  from {
+    transform: scale(1);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.32;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(0.015);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #prism-gather {
+    display: none;
   }
 }
 @keyframes prism-caught {
