@@ -73,9 +73,10 @@ const CAP_TOP =
   "polygon(50% 0%, 97.55% 34.55%, 79.39% 90.45%, 20.61% 90.45%, 2.45% 34.55%)";
 
 export interface Prism {
-  /** Warm the faces while the visitor is still deciding to catch the lure. */
-  preload(): void;
-  open(options?: { onClose?: () => void }): Promise<void>;
+  /** Build the faces (idle from their first frame) and open once they are
+   * ready. `onReady` runs when the faces have loaded, just before the camera
+   * pulls back; the lure's gathering light covers the wait until then. */
+  open(options?: { onReady?: () => void; onClose?: () => void }): Promise<void>;
   destroy(): void;
 }
 
@@ -110,7 +111,7 @@ export function createPrism(): Prism {
     stage.id = "prism-stage";
     stage.className = "prism-stage";
     // Dormant, not display:none: the faces lay out at full viewport size
-    // while the visitor is still deciding, so showing them costs no relayout.
+    // while the lure gathers light, so showing them costs no relayout.
     stage.dataset.dormant = "";
     stage.dataset.outside = backdrop.dataset.outside = "false";
     stage.inert = true;
@@ -163,14 +164,8 @@ export function createPrism(): Prism {
       frames.flatMap((frame) =>
         frame
           ? new Promise((resolve) => {
-              frame.addEventListener(
-                "load",
-                (event) => {
-                  setIdle(frame, true);
-                  resolve(event);
-                },
-                { once: true },
-              );
+              // Faces boot idle (LensBoot), so they hold still while loading.
+              frame.addEventListener("load", resolve, { once: true });
               setTimeout(resolve, 4000);
             })
           : [],
@@ -196,11 +191,10 @@ export function createPrism(): Prism {
     backdrop = null;
   }
 
-  function preload() {
-    build();
-  }
-
-  async function open({ onClose }: { onClose?: () => void } = {}) {
+  async function open({
+    onReady,
+    onClose,
+  }: { onReady?: () => void; onClose?: () => void } = {}) {
     const root = build();
     const room = backdrop!;
     const html = document.documentElement;
@@ -225,6 +219,7 @@ export function createPrism(): Prism {
     // Torn down while the faces loaded (a navigation, a lens change): leave
     // the page as it is, not held and inert under a prism that is gone.
     if (stage !== root) return;
+    onReady?.();
 
     const layout = () => {
       geometry = measure();
@@ -553,7 +548,6 @@ export function createPrism(): Prism {
   }
 
   return {
-    preload,
     open,
     destroy: teardown,
   };

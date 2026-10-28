@@ -55,12 +55,14 @@ function mountPage() {
     if (lure || signal.aborted) return;
     clearTimeout(timer);
     if (!tamed) glint();
-    prism.preload();
     lure = mountLure({
       tamed,
+      // Nothing of the prism loads until the lure is caught; it gathers
+      // light while the faces load, and bursts once they are ready.
       onCatch: async () => {
         store(localStorage, FOUND_KEY, "1");
         await prism.open({
+          onReady: () => lure?.burst(),
           onClose: () => {
             lure?.tame();
             lure?.release();

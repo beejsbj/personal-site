@@ -10,10 +10,9 @@
  * shell; the test skips, saying so, when neither exists. Only these:
  * PRISM_LENSES=hion,cut-paper  PRISM_ONLY=routes|fixtures. */
 import assert from "node:assert/strict";
-import { existsSync, readdirSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { existsSync } from "node:fs";
 import test from "node:test";
+import { chromium } from "./lib/chromium.mjs";
 import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
 import {
   expectedParts,
@@ -27,24 +26,6 @@ const LENSES = (
 ).split(",");
 const SHELLS = LENSES.filter((lens) => lens !== "daylight");
 const ONLY = process.env.PRISM_ONLY ?? "";
-
-function chromium() {
-  if (process.env.PRISM_CHROMIUM) return process.env.PRISM_CHROMIUM;
-  const cache = join(homedir(), "Library/Caches/ms-playwright");
-  if (!existsSync(cache)) return null;
-  const found = readdirSync(cache)
-    .filter((name) => name.startsWith("chromium_headless_shell-"))
-    .sort((a, b) => Number(b.split("-")[1]) - Number(a.split("-")[1]))
-    .map((name) =>
-      join(
-        cache,
-        name,
-        "chrome-headless-shell-mac-arm64/chrome-headless-shell",
-      ),
-    )
-    .find((path) => existsSync(path));
-  return found ?? null;
-}
 
 /** Everything a page shows: its parts (inside the active lens's own root),
  * its visible h1 count. Back Page turns its pages and keeps looking. */

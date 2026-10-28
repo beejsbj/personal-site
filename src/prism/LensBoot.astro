@@ -36,6 +36,13 @@ const shells = ids.slice(1);
     };
     apply();
     document.addEventListener("astro:after-swap", apply);
+    // A face inside the prism is born still, from its first frame; the
+    // stage wakes only the face in front once the camera settles.
+    if (
+      document.documentElement.hasAttribute("data-prism-face") &&
+      window.parent !== window
+    )
+      document.documentElement.setAttribute("data-prism-idle", "");
 
     // Carry the lens onto the incoming page before the router swaps <html>
     // attributes, so lens CSS never stops matching mid-navigation.

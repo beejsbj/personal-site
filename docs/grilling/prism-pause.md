@@ -37,7 +37,8 @@ first, and the prism must not add, remove, or rename base content types.
     - Hion: Kilahito, strung with hion.
   - **Styling rule:** every lens stylesheet (the lens file and its shell CSS) is scoped to its own `:root[data-lens]` and uses prefixed keyframes, because it stays loaded after the shell unmounts.
 - **Faces are live same-origin iframes** of the current page. What you see from outside is exactly what you step into.
-- **Idle faces:** the faces share the host's main thread, so every face holds still (`data-prism-idle`) except the one in front once the camera settles.
+- **Faces load on the catch, not on summons (issue #46).** Summoning the lure, wild or docked, loads nothing of the prism, and neither does hovering or focusing it. Catching it builds the stage and its framed faces, and the lure gathers light while they load: rings of spectrum close in on it from beyond the farthest corner and the glass swells as each arrives (`#prism-gather`, transforms and opacity only, so a main thread busy loading faces cannot stall it). Once the faces are ready (each up to 4s, then up to 1.5s for their shells) the lure bursts and the camera pulls back. The gather lasts exactly as long as the load; nothing is added on a fast one. Reduced motion keeps the lure lit and still, with no rings. Closing the prism removes the stage; the next catch builds it again for the page the visitor is on.
+- **Idle faces:** the faces share the host's main thread, so every face holds still (`data-prism-idle`) except the one in front once the camera settles. A face is idle from its first frame: `LensBoot.astro` sets the attribute before paint on any `?prism-face=` page inside a frame, so shells mount idle and CSS animations start paused. A `?prism-face=` page opened on its own is not idled.
 - **Curiosity triggers:** 20s of lingering, reading past 85% of the page, or a second page view.
 - **The lure:**
   - It flinches from fast grabs but never from slow approaches.
