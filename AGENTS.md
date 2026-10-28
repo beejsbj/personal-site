@@ -21,7 +21,9 @@ is not. When in doubt, leave it out.
 
 ## Rules that tests enforce
 
-- All copy lives in `src/content`. Lenses read only `/prism/content.json`.
+- All authored copy lives in `src/content`. Lenses read `/prism/content.json`;
+  the one exception is `fallbackBody(route)`, which reads the page's own
+  `<main>` for `other` routes (the 404 page, for instance).
 - Lens voice copy goes in `src/content/lenses/<id>.json` and must not repeat
   portfolio content (the drift test).
 - Lens CSS is scoped to `:root[data-lens="<id>"]`; keyframes are prefixed
@@ -39,8 +41,9 @@ corepack pnpm test
 PRISM_CHROMIUM=<path to a Chromium binary> corepack pnpm test:prism
 ```
 
-`test:prism` silently reports "pass 0" without `PRISM_CHROMIUM`; that is not a
-pass. Expect "75 lens × route pages" and "72 lens × fixture pages".
+`test:prism` uses `PRISM_CHROMIUM`, else the newest cached Playwright headless
+shell, and skips when it finds neither: "pass 0" is not a pass. Expect
+"75 lens × route pages" and "72 lens × fixture pages".
 `astro preview` doesn't work with the Vercel adapter: serve the built handler
 the way `scripts/tests/prism-parity.browser.mjs` does.
 
