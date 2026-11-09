@@ -70,19 +70,6 @@
       ]
     },
     {
-      "name": "Perpetual Education",
-      "position": "Web Designer Intern",
-      "startDate": "2022-02",
-      "endDate": "2023-05",
-      "highlights": [
-        "Developed full-stack applications utilizing Node.js and Express for backend development",
-        "Designed and implemented RESTful APIs and CRUD functionality",
-        "Created e-commerce product grid systems with dynamic filtering capabilities",
-        "Built custom content management systems utilizing PHP and JSON data structures",
-        "Applied design thinking methodologies to solve complex user experience problems"
-      ]
-    },
-    {
       "name": "API3",
       "position": "Frontend Developer & Technical Lead",
       "startDate": "2022-01",
@@ -93,6 +80,19 @@
         "Developed a responsive single-page application (SPA) with optimized performance and SEO considerations",
         "Integrated with Web3 technologies for blockchain connectivity using ethers.js and web3modal",
         "Created an intuitive and visually appealing user interface with responsive design principles"
+      ]
+    },
+    {
+      "name": "Perpetual Education",
+      "position": "Web Designer Intern",
+      "startDate": "2021-09",
+      "endDate": "2022-02",
+      "highlights": [
+        "Developed full-stack applications utilizing Node.js and Express for backend development",
+        "Designed and implemented RESTful APIs and CRUD functionality",
+        "Created e-commerce product grid systems with dynamic filtering capabilities",
+        "Built custom content management systems utilizing PHP and JSON data structures",
+        "Applied design thinking methodologies to solve complex user experience problems"
       ]
     }
   ],
