@@ -1,40 +1,175 @@
 ---
-import { getEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHeader from "../components/PageHeader.astro";
 import Link from "../design/primitives/Link.astro";
+// Synced from burooj-inc by `bun run sync:resume`; do not hand-edit.
+import resume from "../data/resume.json";
 
-const entry = await getEntry("pages", "resume");
-if (!entry) {
-  throw new Error("Missing resume content entry.");
-}
-const { Content } = await entry.render();
+const { basics, work, projects, education, skills } = resume;
+
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+const formatDate = (value?: string) => {
+  if (!value) return "";
+  const [year, month] = value.split("-");
+  return month ? `${MONTHS[Number(month) - 1]} ${year}` : year;
+};
+const formatRange = (start?: string, end?: string) =>
+  end
+    ? `${formatDate(start)} - ${formatDate(end)}`
+    : `${formatDate(start)} - Present`;
+
+const normalize = (value: string) =>
+  value.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+// Link to the site's own /projects/<slug> page when the name matches.
+const projectEntries = (await getCollection("projects")).filter(
+  (entry: CollectionEntry<"projects">) => !entry.data.hidden,
+);
+const projectHref = (name: string): string | undefined => {
+  const key = normalize(name);
+  if (key.length < 4) return undefined;
+  const match = projectEntries.find((entry: CollectionEntry<"projects">) => {
+    const title = normalize(entry.data.title);
+    return title === key || title.startsWith(key);
+  });
+  return match ? `/projects/${match.slug}` : undefined;
+};
+const hrefFor = (name: string, url?: string) => projectHref(name) ?? url;
+const isExternal = (href: string) => /^https?:/.test(href);
+
+const SELECTED_PROJECTS = 6;
+const selectedProjects = projects.slice(0, SELECTED_PROJECTS);
+const linkedIn = basics.profiles.find((p) => p.network === "LinkedIn");
+const gitHub = basics.profiles.find((p) => p.network === "GitHub");
+const substack = basics.profiles.find((p) => p.network === "Substack");
+const description = `${basics.name}'s resume: ${basics.label} experience, selected projects, education, and contact details.`;
 ---
 
-<BaseLayout
-  title={entry.data.title}
-  description={entry.data.description}
-  pageClass="page-copy"
->
+<BaseLayout title="Resume" description={description} pageClass="page-copy">
   <section class="shell page-section page-section--copy">
-    <PageHeader
-      eyebrow="Resume"
-      title="Burooj Rashid"
-      intro="Frontend developer · web design & development"
-    >
+    <PageHeader eyebrow="Resume" title={basics.name} intro={basics.label}>
       <Fragment slot="actions">
-        <Link href="mailto:burooj.bj@gmail.com">burooj.bj@gmail.com</Link>
-        <Link href="https://www.linkedin.com/in/boroujrashid/" arrow>
-          LinkedIn
-        </Link>
-        <Link href="https://github.com/beejsbj/" arrow>
-          GitHub
-        </Link>
+        <Link href={`mailto:${basics.email}`}>{basics.email}</Link>
+        {linkedIn && (
+          <Link href={linkedIn.url} arrow>
+            LinkedIn
+          </Link>
+        )}
+        {gitHub && (
+          <Link href={gitHub.url} arrow>
+            GitHub
+          </Link>
+        )}
       </Fragment>
     </PageHeader>
 
     <article class="prose prose--copy">
-      <Content />
+      <p>{basics.summary}</p>
+
+      <h2>Experience</h2>
+      {work.map((job) => {
+        const href = hrefFor(job.name, job.url);
+        return (
+          <>
+            <h3>
+              {job.position} ·{" "}
+              {href ? (
+                <a
+                  href={href}
+                  target={isExternal(href) ? "_blank" : undefined}
+                  rel={isExternal(href) ? "noreferrer" : undefined}
+                >
+                  {job.name}
+                </a>
+              ) : (
+                job.name
+              )}
+            </h3>
+            <p>
+              <em>{formatRange(job.startDate, job.endDate)}</em>
+            </p>
+            <ul>
+              {job.highlights.map((highlight) => (
+                <li>{highlight}</li>
+              ))}
+            </ul>
+          </>
+        );
+      })}
+
+      <h2>Selected projects</h2>
+      {selectedProjects.map((project) => {
+        const href = hrefFor(project.name, project.url);
+        return (
+          <>
+            <h3>
+              {href ? (
+                <a
+                  href={href}
+                  target={isExternal(href) ? "_blank" : undefined}
+                  rel={isExternal(href) ? "noreferrer" : undefined}
+                >
+                  {project.name}
+                </a>
+              ) : (
+                project.name
+              )}
+            </h3>
+            <p>
+              <em>{formatDate(project.startDate)}</em>
+              {project.keywords?.length
+                ? ` · ${project.keywords.join(", ")}`
+                : ""}
+            </p>
+            <p>{project.description}</p>
+          </>
+        );
+      })}
+
+      <h2>Education</h2>
+      {education.map((entry) => (
+        <>
+          <h3>{entry.institution}</h3>
+          <p>
+            {entry.studyType} · {entry.area}
+            {entry.endDate ? ` · ${entry.endDate}` : ""}
+          </p>
+        </>
+      ))}
+
+      <h2>Tools</h2>
+      {skills.map((group) => (
+        <p>
+          <strong>{group.name}:</strong> {group.keywords.join(", ")}
+        </p>
+      ))}
+
+      <h2>See the work</h2>
+      <p>
+        The <a href="/projects">projects timeline</a> connects professional work
+        with the smaller projects I learned through.
+        {substack && (
+          <>
+            {" "}
+            I also write on <a href={substack.url}>Substack</a>.
+          </>
+        )}
+      </p>
     </article>
   </section>
 </BaseLayout>

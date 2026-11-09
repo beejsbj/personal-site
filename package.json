@@ -9,6 +9,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "sync:resume": "node scripts/sync-resume.mjs",
     "test:homepage": "node --test scripts/tests/homepage-base.test.mjs",
     "test": "node --test scripts/tests/*.test.mjs",
     "format": "prettier --write src astro.config.mjs tsconfig.json scripts/tests"

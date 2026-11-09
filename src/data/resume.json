@@ -1,0 +1,343 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Burooj Rashid",
+    "label": "Product Engineer",
+    "email": "burooj.bj@gmail.com",
+    "url": "https://burooj.dev",
+    "summary": "Product engineer who takes ideas to shipped, tested, documented products. Four years of frontend leadership: nearly three years as sole frontend lead at API3, then contract builds including the workflow editor for an AI-automation startup. Since late 2025 I have built AI-native tools end to end: a browser extension and MCP server that archives AI conversations, a model-comparison harness, and an agent-orchestration control plane. I build with Claude Code and Codex agent teams; I set architecture, review, and merge.",
+    "location": {
+      "city": "Toronto",
+      "countryCode": "CA"
+    },
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "beejsbj",
+        "url": "https://github.com/beejsbj/"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "boroujrashid",
+        "url": "https://www.linkedin.com/in/boroujrashid/"
+      },
+      {
+        "network": "Substack",
+        "username": "buroojs",
+        "url": "https://buroojs.substack.com"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "Paper Company",
+      "position": "Full-Stack Developer",
+      "startDate": "2025-08",
+      "endDate": "2025-09",
+      "highlights": [
+        "Architected and developed custom Next.js 13 e-commerce frontend integrating with Wix Headless APIs, replacing limited Wix UI while leveraging enterprise backend infrastructure",
+        "Implemented OAuth 2.0 authentication flow with Wix backend, creating middleware-based session management and automatic visitor token generation for guest checkout",
+        "Designed dual-client architecture with server-side and client-side Wix SDK clients for optimal data fetching and session persistence",
+        "Built type-safe API wrappers around Wix SDK methods with automatic token refresh handling and 30-day cookie expiration management",
+        "Developed comprehensive dynamic CMS page builder system with 8+ modular section types enabling non-technical content management"
+      ]
+    },
+    {
+      "name": "Conduit Market",
+      "position": "Frontend Engineer & Design System Architect",
+      "url": "https://conduit-market-showcase.vercel.app/",
+      "startDate": "2025-04",
+      "endDate": "2025-07",
+      "highlights": [
+        "Designed and implemented a complete design system and frontend application for a decentralized e-commerce marketplace leveraging Nostr protocol and Bitcoin Lightning Network",
+        "Built an innovative gaming-style Heads-Up Display (HUD) system with floating interactive cart overlay and animated expand/collapse states",
+        "Developed a multi-merchant cart management system with tabbed navigation and real-time calculations in Satoshis and USD",
+        "Engineered a sophisticated touch gesture system with custom React hooks for mobile interactions including vertical drag-to-close/open and horizontal swipe navigation",
+        "Implemented intelligent gesture detection with configurable thresholds distinguishing vertical vs horizontal intent and dampened visual feedback"
+      ]
+    },
+    {
+      "name": "Flo8",
+      "position": "Frontend Lead",
+      "startDate": "2025-01",
+      "endDate": "2025-04",
+      "highlights": [
+        "Led and solo-built the product frontend (~131 commits) for an AI workflow-automation product using Next.js 15, React 19, and TypeScript",
+        "Built a node-based visual workflow editor using React Flow (@xyflow/react) — the product's core canvas interaction",
+        "Developed an accessible component library on Radix UI primitives with Tailwind CSS v4, dark/light theming (next-themes), and Framer Motion animation",
+        "Managed application state with Zustand and built complex forms with react-hook-form",
+        "Read and extended the large open-source n8n codebase to integrate custom product functionality (credentials, in-app chat)"
+      ]
+    },
+    {
+      "name": "API3",
+      "position": "Frontend Developer & Technical Lead",
+      "startDate": "2022-01",
+      "endDate": "2024-11",
+      "highlights": [
+        "Designed and implemented the front-end of the API3 Ecosystem website, a comprehensive platform showcasing dApps built on the API3 technology stack",
+        "Architected a modern web application using Nuxt 3 and Vue.js, implementing a robust component structure and state management system using Pinia",
+        "Developed a responsive single-page application (SPA) with optimized performance and SEO considerations",
+        "Integrated with Web3 technologies for blockchain connectivity using ethers.js and web3modal",
+        "Created an intuitive and visually appealing user interface with responsive design principles"
+      ]
+    },
+    {
+      "name": "Perpetual Education",
+      "position": "Web Designer Intern",
+      "startDate": "2021-09",
+      "endDate": "2022-02",
+      "highlights": [
+        "Developed full-stack applications utilizing Node.js and Express for backend development",
+        "Designed and implemented RESTful APIs and CRUD functionality",
+        "Created e-commerce product grid systems with dynamic filtering capabilities",
+        "Built custom content management systems utilizing PHP and JSON data structures",
+        "Applied design thinking methodologies to solve complex user experience problems"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "chat-scrobbler",
+      "description": "A self-built system that captures every conversation across ChatGPT, Claude, and Gemini into one canonical, self-owned local store: a browser extension pulls each conversation through the provider's own API into a local ingest server, indexes it in SQLite FTS5 (with optional semantic embeddings), and exposes read-only search/get/list over a Model Context Protocol (MCP) server so AI agents and MCP clients can recall history directly. Includes multi-target backup fanout and a per-provider parser architecture designed so adding a new AI provider only requires one new parser.",
+      "startDate": "2026",
+      "url": "https://github.com/beejsbj/chat-scrobbler",
+      "keywords": [
+        "TypeScript",
+        "Bun",
+        "SQLite/FTS5",
+        "MCP (Model Context Protocol)",
+        "Browser Extension (Manifest V3)"
+      ]
+    },
+    {
+      "name": "Conduit Market",
+      "description": "A Bitcoin-native marketplace client I helped build in 2025, spanning the design system, storefront UI, multi-merchant cart and checkout flows, responsive interactions, and Nostr application infrastructure.",
+      "startDate": "2025-07",
+      "url": "https://conduit-market-showcase.vercel.app/",
+      "keywords": [
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Zustand",
+        "Nostr"
+      ]
+    },
+    {
+      "name": "xPay2 — ETHGlobal New Delhi 2025 Hackathon",
+      "description": "Frontend for xPay2, a proxy service that turns any existing API into a paid endpoint with zero backend changes: developers paste a backend URL, set a price, and get a paid public endpoint powered by the HTTP 402 / x402 protocol with USDC payments on Base. Features a prepaid credit system for instant gasless requests and EIP-712 signature auth.",
+      "startDate": "2025",
+      "url": "https://github.com/Ashar2shahid/xPay2",
+      "keywords": [
+        "TypeScript",
+        "Next.js",
+        "viem",
+        "x402 Protocol",
+        "USDC on Base"
+      ]
+    },
+    {
+      "name": "API3 Ecosystem",
+      "description": "An Ecosystem website for API3, where dApp Developers can showcase their dApps to the community",
+      "startDate": "2024-11",
+      "url": "https://ecosystem.api3.org/",
+      "keywords": [
+        "Nuxt3"
+      ]
+    },
+    {
+      "name": "Pizza Nano",
+      "description": "A website designed and built for a local, family-owned pizzeria, focused on showcasing their brand and menu in a simple, elegant way.",
+      "startDate": "2024-09",
+      "url": "https://pizzanano.ca",
+      "keywords": [
+        "HTML",
+        "CSS"
+      ]
+    },
+    {
+      "name": "Bengaluru DeSci World",
+      "description": "A visually engaging website for the DeSci World event in Bengaluru, blending the aesthetics of DeSci World with Indian cultural elements.",
+      "startDate": "2024-02",
+      "url": "https://desci-bangalore.netlify.app/",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ]
+    },
+    {
+      "name": "Swap Interface — DeFi",
+      "description": "Token-swap DeFi interface frontend; 30 authored commits over an intensive sprint (Oct 2023). Public repo with live deployment.",
+      "startDate": "2023-10",
+      "url": "https://github.com/AamirAlam/swap-interface",
+      "keywords": [
+        "TypeScript",
+        "React",
+        "Web3"
+      ]
+    },
+    {
+      "name": "Flash Cards",
+      "description": "A JavaScript flashcard application with a spaced repetition system, built to help students learn and retain information effectively.",
+      "startDate": "2022-11",
+      "url": "https://github.com/beejsbj/pe-projects/tree/main/projects/flashcards",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "JS"
+      ]
+    },
+    {
+      "name": "QRNG Demo Apps",
+      "description": "The Lottery App and Roulette App were demo projects developed to showcase the true randomness of QRNG (Quantum Random Number Generation).",
+      "startDate": "2022-09",
+      "url": "https://demo-lottery.netlify.app/",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "JS",
+        "React"
+      ]
+    },
+    {
+      "name": "Exercises for Programmers",
+      "description": "Exercises for Programmers was a project inspired by the book Exercises for Programmers by Brian P. Hogan—a classic resource for learning and reinforcing core programming fundamentals.",
+      "startDate": "2021-08",
+      "url": "https://github.com/beejsbj/pe-projects/tree/main/projects/e4p",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "PHP",
+        "JS",
+        "Vue"
+      ]
+    },
+    {
+      "name": "Layout Garden",
+      "description": "Layout Garden is a responsive layout showcase project developed during my time at Perpetual Education. The project was a hands-on exercise in building adaptive, flexible layouts that respond smoothly to different viewport sizes—all within a single-page application.",
+      "startDate": "2021-05",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "PHP"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Thompson Rivers University",
+      "area": "Computer Science and Psychology",
+      "studyType": "Bachelor's Degree (in progress)"
+    },
+    {
+      "institution": "NPower Canada",
+      "area": "Junior IT Analyst Program",
+      "studyType": "Certification",
+      "endDate": "2020"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Frontend",
+      "keywords": [
+        "HTML5/CSS3",
+        "JavaScript",
+        "TypeScript",
+        "Vue.js/Nuxt.js",
+        "React.js/Next.js",
+        "Responsive Design",
+        "SCSS/PostCSS",
+        "Component-based Architecture",
+        "Animations (GSAP)",
+        "SVG Development/Animation",
+        "Accessibility (WCAG)"
+      ]
+    },
+    {
+      "name": "Backend",
+      "keywords": [
+        "PHP",
+        "Node.js",
+        "Express",
+        "MySQL/PostgreSQL",
+        "RESTful APIs",
+        "Firebase/Supabase",
+        "WordPress",
+        "Custom Templating Systems",
+        "MVC Architecture"
+      ]
+    },
+    {
+      "name": "Web3",
+      "keywords": [
+        "ethers.js",
+        "web3modal",
+        "viem",
+        "Metamask Integration",
+        "Smart Contract Interaction",
+        "Blockchain Connectivity",
+        "Nostr Protocol (NIPs 01, 07, 17)",
+        "Bitcoin Lightning Network"
+      ]
+    },
+    {
+      "name": "AI-native tooling",
+      "keywords": [
+        "MCP (Model Context Protocol) Server Development",
+        "Agent/LLM Tool Pipelines",
+        "Browser Extension Development",
+        "SQLite FTS5 Search",
+        "Claude Code / Codex / Agent Orchestration"
+      ]
+    },
+    {
+      "name": "Design",
+      "keywords": [
+        "UI/UX Design",
+        "Figma",
+        "Design Systems",
+        "Design Tokens",
+        "Typography",
+        "Color Theory",
+        "Wireframing & Prototyping",
+        "Information Architecture",
+        "User Research & Testing",
+        "Content Strategy"
+      ]
+    },
+    {
+      "name": "Data visualization",
+      "keywords": [
+        "Chart.js",
+        "vue-chartjs",
+        "Data Visualization",
+        "Interactive Dashboards"
+      ]
+    },
+    {
+      "name": "State management",
+      "keywords": [
+        "Pinia",
+        "Vuex",
+        "Zustand",
+        "Reactive Data Flow",
+        "Computed Properties",
+        "Watchers"
+      ]
+    },
+    {
+      "name": "Tooling",
+      "keywords": [
+        "Git",
+        "FormKit",
+        "Vitest",
+        "Vite/Webpack",
+        "CI/CD Workflows",
+        "Test-Driven Development",
+        "SEO Optimization",
+        "Performance Optimization"
+      ]
+    }
+  ]
+}
