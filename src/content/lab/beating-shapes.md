@@ -6,7 +6,7 @@ type: "Audio + interaction"
 sourceEra: "CodePen"
 href: "https://codepen.io/beejsbj/pen/BaeoNPG"
 cover: "/images/lab/beating-shapes.png"
-order: 2
+order: 22
 ---
 
 A music-and-motion experiment with a choice of tracks, a play control, and geometric forms animated at multiples of the beat.
