@@ -147,6 +147,10 @@ export function expectedParts(
     ref,
     texts: texts.filter((t): t is string => !!t),
   });
+  // the ticker, wherever it runs
+  const ticker = content.headlines.map((headline) =>
+    page("ticker.headline", headline.id, headline.text),
+  );
   switch (route.kind) {
     case "home": {
       const home = pages.home;
@@ -162,6 +166,7 @@ export function expectedParts(
         ...content.updates
           .slice(0, home.updates.limit)
           .map((u) => page("update.item", u.id, u.title)),
+        ...ticker,
         { part: "home.currently", texts: [words(home.currently.body)] },
         ...home.elsewhere.items.map((item, i) =>
           page("home.elsewhere", String(i), item.title),
@@ -200,6 +205,13 @@ export function expectedParts(
           page("lab.title", entry.slug, entry.title),
           page("lab.summary", entry.slug, entry.summary),
         ]),
+        ...ticker,
+        // the Labbook: every update, a redacted one by its place alone
+        ...content.labbook.map((u) =>
+          u.visibility === "open"
+            ? page("update.item", u.id, u.title)
+            : page("update.redacted", u.id),
+        ),
         { part: "lab.more", texts: [pages.lab.more.label] },
         { part: "lab.aside", texts: [words(pages.lab.aside)] },
       ];
@@ -314,8 +326,13 @@ export const GAPS: Partial<
         "No Currently note on the pause menu: its corner is the calendar, which names the latest update instead.",
       "home.elsewhere":
         "No Elsewhere list on the pause menu: Writing is a command and the socials are on the Calling Card dialog, without blurbs.",
+      "ticker.headline": "Not built yet (#96): the home page has no ticker.",
     },
     lab: {
+      "ticker.headline": "Not built yet (#96): the Lab has no ticker.",
+      "update.item": "Not built yet (#96): the Lab has no Labbook.",
+      "update.redacted":
+        "Not built yet (#96): the Lab has no Labbook, so no redacted updates.",
       "lab.more":
         "The request board shows only the experiments; it has no link out to more sketches on CodePen.",
       "lab.aside":
@@ -332,6 +349,13 @@ export const GAPS: Partial<
     home: {
       "home.elsewhere":
         "No Elsewhere section: Lab and Writing are keys on the keyboard, without their blurbs.",
+      "ticker.headline": "Not built yet (#97): the home page has no ticker.",
+    },
+    lab: {
+      "ticker.headline": "Not built yet (#97): the Lab has no ticker.",
+      "update.item": "Not built yet (#97): the Lab has no Labbook.",
+      "update.redacted":
+        "Not built yet (#97): the Lab has no Labbook, so no redacted updates.",
     },
     "lab-entry": {
       "lab.graduation":
@@ -344,12 +368,17 @@ export const GAPS: Partial<
     home: {
       "home.elsewhere":
         "The books have no Elsewhere page: the lab is a book of its own on the pile, and so is Writings, the marbled composition book the essays are written in.",
+      "ticker.headline": "Not built yet (#98): the home page has no ticker.",
     },
     projects: {
       "project.summary":
         "The war book's first pages are a roll call of names and dates and the war map; each project's summary is on its own page.",
     },
     lab: {
+      "ticker.headline": "Not built yet (#98): the Lab has no ticker.",
+      "update.item": "Not built yet (#98): the Lab has no Labbook.",
+      "update.redacted":
+        "Not built yet (#98): the Lab has no Labbook, so no redacted updates.",
       "lab.more":
         "The lab chapter is the doodles only; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
@@ -363,6 +392,15 @@ export const GAPS: Partial<
     },
   },
   hion: {
+    home: {
+      "ticker.headline": "Not built yet (#99): the home page has no ticker.",
+    },
+    lab: {
+      "ticker.headline": "Not built yet (#99): the Lab has no ticker.",
+      "update.item": "Not built yet (#99): the Lab has no Labbook.",
+      "update.redacted":
+        "Not built yet (#99): the Lab has no Labbook, so no redacted updates.",
+    },
     "lab-entry": {
       "lab.graduation":
         "Not built yet (#99): an experiment's page does not name the project it graduated into.",
