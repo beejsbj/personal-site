@@ -196,7 +196,7 @@ export function labbook(env: Env, updates: Update[], { whole }: { whole: boolean
  * button is pressed, and a link to an update lands on its line. Returns
  * the landing, for when the view arrives. */
 export function tendLog(env: Env, view: HTMLElement) {
-  const { signal, transport, face, reducedMotion } = env;
+  const { signal, transport, face, reducedMotion, scroller } = env;
   view.addEventListener(
     "click",
     (event) => {
@@ -243,5 +243,13 @@ export function tendLog(env: Env, view: HTMLElement) {
     },
     { signal },
   );
-  return () => land();
+  return () => {
+    land();
+    // the display face arriving late moves every line under it: land again,
+    // unless the visitor has moved on meanwhile
+    const at = scroller.scrollTop;
+    void document.fonts?.ready.then(() => {
+      if (!signal.aborted && Math.abs(scroller.scrollTop - at) < 2) view.querySelector("[data-landed]")?.scrollIntoView({ block: "center", behavior: "instant" });
+    });
+  };
 }
