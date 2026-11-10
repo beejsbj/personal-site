@@ -82,8 +82,12 @@ function request(copy: Copy, entry: Experiment, n: number) {
       { class: "cc-request__accept" },
       h("kbd", { "aria-hidden": "true" }, "⏎"),
       " ",
-      external ? copy.lab.accept.external : copy.lab.accept.page,
-      external ? h("span", { "aria-hidden": "true" }, " ↗") : null,
+      h(
+        "span",
+        {},
+        external ? copy.lab.accept.external : copy.lab.accept.page,
+        external ? h("span", { "aria-hidden": "true" }, " ↗") : null,
+      ),
     ),
     tapCue(copy.lab.accept.tap),
   );

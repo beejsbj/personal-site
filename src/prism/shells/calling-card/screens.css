@@ -672,17 +672,24 @@
   font-size: 0.98rem;
   line-height: 1.5;
 }
+/* The key cap, then the words: when a narrow slip breaks them over two
+   lines, the second starts under the first, not under the key. */
 :root[data-lens="calling-card"] .cc-request__accept {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
   margin: 0.4rem -1.3rem 0;
-  padding: 0.6rem 1.3rem;
+  padding: 0.6rem 1rem;
   background: var(--cc-black);
   color: var(--cc-white);
   font-family: var(--cc-display);
-  font-size: 1rem;
-  letter-spacing: 0.08em;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 :root[data-lens="calling-card"] .cc-request__accept kbd {
+  flex: none;
   display: inline-grid;
   place-items: center;
   width: 1.6rem;
@@ -759,6 +766,8 @@
 :root[data-lens="calling-card"] li[data-lab-featured] .cc-request__accept {
   margin-inline: -1.8rem;
   padding-inline: 1.8rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
 }
 :root[data-lens="calling-card"] li[data-lab-featured] > .cc-request[data-state="selected"] {
   box-shadow: 12px 12px 0 var(--cc-white), 12px 12px 0 3px var(--cc-black);
