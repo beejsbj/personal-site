@@ -1136,8 +1136,10 @@ test(
               };
             });
             const { labels } = content.pages.lab.detail;
-            for (const label of [labels.type, labels.era, labels.graduated])
-              assert.ok(!shown.text.includes(label), `no "${label}" label`);
+            assert.ok(
+              !shown.text.includes(labels.graduated),
+              `no "${labels.graduated}" label`,
+            );
             assert.equal(shown.tags, 0, "no empty tag hangs in its head");
             assert.equal(shown.record, 0, "no updates, no strand");
             assert.equal(shown.graduation, 0);

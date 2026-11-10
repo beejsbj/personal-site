@@ -443,9 +443,8 @@ test(
         await t.test(
           `${size}: what an experiment need not say is not asked of it`,
           async () => {
-            // This fixture's experiment does say a type and an era; the
-            // board and its brief show neither, nor a label for them.
-            const { labels } = content.pages.lab.detail;
+            // No experiment says a type or an era any more; the board and
+            // its brief are handed neither, and show no label for them.
             for (const route of ["/lab", "/lab/fixture-sketch"]) {
               const { context, page, errors } = await open(
                 size,
@@ -466,14 +465,10 @@ test(
                   ),
                 };
               });
-              assert.ok(shown.entry.type && shown.entry.sourceEra);
+              for (const gone of ["type", "sourceEra"])
+                assert.ok(!(gone in shown.entry), `${route} is handed ${gone}`);
               assert.ok(shown.text.includes(shown.entry.summary), route);
-              for (const unsaid of [shown.entry.type, shown.entry.sourceEra])
-                assert.ok(
-                  !shown.text.includes(unsaid),
-                  `${route} does not show "${unsaid}"`,
-                );
-              for (const label of [labels.type, labels.era])
+              for (const label of ["Type", "Era"])
                 assert.equal(
                   await page
                     .locator("#lens-shell main")
@@ -1390,8 +1385,10 @@ test(
               };
             });
             const { labels } = content.pages.lab.detail;
-            for (const label of [labels.type, labels.era, labels.graduated])
-              assert.ok(!shown.text.includes(label), `no "${label}" label`);
+            assert.ok(
+              !shown.text.includes(labels.graduated),
+              `no "${labels.graduated}" label`,
+            );
             assert.deepEqual(shown.hollow, [], "nothing on the brief is empty");
             assert.equal(shown.record, 0, "no updates, no record");
             assert.equal(shown.graduation, 0);

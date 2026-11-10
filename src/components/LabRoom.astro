@@ -24,8 +24,6 @@ interface Props {
     | "summary"
     | "place"
     | "featured"
-    | "type"
-    | "sourceEra"
     | "cover"
     | "order"
   >[];
@@ -56,8 +54,6 @@ const places = labPlaces(entries);
             href={entry.detail}
             title={entry.title}
             summary={entry.summary}
-            type={entry.type}
-            sourceEra={entry.sourceEra}
             cover={entry.cover}
             layout={
               entry.featured ? "feature" : place === "bench" ? "card" : "row"

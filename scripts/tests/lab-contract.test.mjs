@@ -14,12 +14,21 @@ const experiment = (over = {}) => ({
   ...over,
 });
 
-test("an experiment needs no type or era of its own", () => {
+test("an experiment that still says its type or era is refused, by name", () => {
   assert.deepEqual(problems("lab", experiment()), []);
-  assert.deepEqual(
-    problems("lab", experiment({ type: "SVG + motion", sourceEra: "CodePen" })),
-    [],
-  );
+  assert.deepEqual(problems("lab", experiment({ type: "SVG + motion" })), [
+    "type: An experiment no longer says its type or era.",
+  ]);
+  assert.deepEqual(problems("lab", experiment({ sourceEra: "CodePen" })), [
+    "sourceEra: An experiment no longer says its type or era.",
+  ]);
+  // Even said emptily, the way the old default left them.
+  assert.deepEqual(problems("lab", experiment({ type: "", sourceEra: "" })), [
+    "type: An experiment no longer says its type or era.",
+    "sourceEra: An experiment no longer says its type or era.",
+  ]);
+  const parsed = parse("lab", experiment());
+  assert.ok(!("type" in parsed) && !("sourceEra" in parsed));
 });
 
 test("an experiment says where it sits: on the Bench or on the Shelf", () => {

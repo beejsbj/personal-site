@@ -225,6 +225,16 @@ const projectSchema = z.object({
   hidden: z.boolean().default(false),
 });
 
+/** A field an entry must not have. An unknown key would only be dropped;
+ * these are refused, so a mistake is loud. */
+const refused = (message: string) =>
+  z.custom<undefined>((value) => value === undefined, message);
+
+/** What every experiment used to say, and none does now. */
+const noTypeOrEra = refused(
+  "An experiment no longer says its type or era.",
+);
+
 const labSchema = z.object({
   title: z.string(),
   summary: z.string(),
@@ -235,10 +245,8 @@ const labSchema = z.object({
   graduatedTo: z.string().optional(),
   /** The one entry given pride of place. */
   featured: z.boolean().optional(),
-  /** Optional, and on their way out: every lens still prints them, so an
-   * entry without them reads as empty rather than missing. */
-  type: z.string().default(""),
-  sourceEra: z.string().default(""),
+  type: noTypeOrEra,
+  sourceEra: noTypeOrEra,
   cover: z.string().optional(),
   /** The live experiment, when it lives elsewhere: the entry links straight
    * out and has no page here. */
@@ -279,11 +287,6 @@ const artifactSchema = z.object({
 
 /** "2026-07-01". */
 const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
-
-/** A field one kind of update must not have. An unknown key would only be
- * dropped; these are refused, so a mistake is loud. */
-const refused = (message: string) =>
-  z.custom<undefined>((value) => value === undefined, message);
 
 const updateFields = {
   // Events describe things that happened, not another project/writing collection.

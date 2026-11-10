@@ -283,9 +283,15 @@ test("content.json carries the Labbook, the headlines and where each experiment 
     assert.equal(update.linkLabel, "Read the project");
     assert.equal(update.kindLabel, "Project");
     assert.equal(update.sourceLabel, "This site");
-    const lotus = data.lab.find((entry) => entry.slug === "motion-path-graph");
-    assert.equal(lotus.type, "SVG + motion");
-    assert.equal(lotus.sourceEra, "CodePen");
+
+    // What every experiment used to say is gone, and so are its labels.
+    for (const entry of data.lab)
+      for (const field of ["type", "sourceEra"])
+        assert.ok(!(field in entry), `${entry.slug} still has ${field}`);
+    assert.deepEqual(Object.keys(data.pages.lab.detail.labels).sort(), [
+      "graduated",
+      "updates",
+    ]);
   } finally {
     await fixture.close();
   }

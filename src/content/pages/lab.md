@@ -46,8 +46,6 @@ entry:
     label: Back to the Lab
     href: /lab
   labels:
-    type: Type
-    era: Era
     graduated: Graduated into
     updates: From the Labbook
 ---

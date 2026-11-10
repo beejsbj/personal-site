@@ -4,8 +4,8 @@ import Link from "../design/primitives/Link.astro";
 import MediaFrame from "../design/primitives/MediaFrame.astro";
 import Note from "../design/primitives/Note.astro";
 import { part } from "../prism/parts";
-/** Compound: one experiment. cover + metadata + linked heading + summary;
- * cover, type and era are each optional and leave nothing behind.
+/** Compound: one experiment. cover + linked heading + summary; the cover
+ * is optional and leaves nothing behind.
  * layout=card: lying on the Bench, a picture or (with no cover) a paper slip.
  * layout=feature: the featured experiment, across the width of its place.
  * layout=row: standing on the Shelf, a quiet line with a small picture.
@@ -18,8 +18,6 @@ interface Props {
   href: string;
   title: string;
   summary: string;
-  type?: string;
-  sourceEra?: string;
   cover?: string;
   layout?: "card" | "feature" | "row";
   lean?: "left" | "right";
@@ -29,15 +27,12 @@ const {
   href,
   title,
   summary,
-  type,
-  sourceEra,
   cover,
   layout = "card",
   lean,
 } = Astro.props;
 const mark = (name: Parameters<typeof part>[0]) =>
   slug === undefined ? {} : part(name, slug);
-const meta = [type, sourceEra].filter(Boolean).join(" · ");
 // With no picture, a card or a feature is written on a slip of paper.
 const Slip = cover || layout === "row" ? Fragment : Note;
 ---
@@ -53,11 +48,6 @@ const Slip = cover || layout === "row" ? Fragment : Note;
   {cover && <MediaFrame src={cover} alt="" fit="cover" href={href} />}
   <Slip>
     <div class="lab-copy">
-      {meta && (
-        <p class="meta" {...mark("lab.meta")}>
-          {meta}
-        </p>
-      )}
       <Heading
         level={3}
         scale={layout === "feature" ? "post" : "card"}
@@ -85,10 +75,6 @@ const Slip = cover || layout === "row" ? Fragment : Note;
     align-content: start;
     gap: var(--space-xs);
     min-width: 0;
-  }
-  .meta {
-    font-size: var(--text-xs);
-    color: var(--color-text-soft);
   }
   /* Even lines, so a long title never leaves its arrow alone on the last. */
   .lab-copy :global(.ds-heading) {
