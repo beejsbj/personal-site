@@ -371,27 +371,16 @@ export const GAPS: Partial<
     home: {
       "home.elsewhere":
         "The books have no Elsewhere page: the lab is a book of its own on the pile, and so is Writings, the marbled composition book the essays are written in.",
-      "ticker.headline": "Not built yet (#98): the home page has no ticker.",
     },
     projects: {
       "project.summary":
         "The war book's first pages are a roll call of names and dates and the war map; each project's summary is on its own page.",
     },
     lab: {
-      "ticker.headline": "Not built yet (#98): the Lab has no ticker.",
-      "update.item": "Not built yet (#98): the Lab has no Labbook.",
-      "update.redacted":
-        "Not built yet (#98): the Lab has no Labbook, so no redacted updates.",
       "lab.more":
-        "The lab chapter is the doodles only; CodePen is among the places on the cover's return-to label.",
+        "The lab book has no link out to more sketches; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
-        "The lab chapter is the doodles only; Projects is a book of its own on the pile, and the style guide is not in any book.",
-    },
-    "lab-entry": {
-      "lab.graduation":
-        "Not built yet (#98): an experiment's page does not name the project it graduated into.",
-      "update.item":
-        "Not built yet (#98): an experiment's page does not list its updates.",
+        "The lab book has no aside; Projects is a book of its own on the pile, and the style guide is not in any book.",
     },
   },
 };

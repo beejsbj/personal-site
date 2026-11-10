@@ -29,6 +29,7 @@ import "./shell.css";
 import "./themes.css";
 import "./books.css";
 import "./composition.css";
+import "./lab.css";
 import "./micro.css";
 import "./soldiers.css";
 
@@ -124,9 +125,10 @@ class App {
       this.paged = first;
       this.pagedRoute = this.route;
     }
-    this.view = 0;
+    this.view = this.viewOf(this.paged, 0);
     this.setBook(this.paged.book);
-    const pages = this.pagesAt(this.paged, 0);
+    const pages = this.pagesAt(this.paged, this.view);
+    this.mark();
     if (this.sheet) this.book.setLoose(this.sheet.loose!, false);
     this.book.setDepth(this.depth());
     this.book.main.setAttribute("aria-label", this.current().label);
@@ -223,7 +225,7 @@ class App {
       this.sheet = null;
       this.book.setLoose(null, true);
     }
-    let view = land ? this.views(ch) - 1 : 0;
+    let view = land ? this.views(ch) - 1 : this.viewOf(ch, 0);
     if (ch.book !== this.bookKey) {
       // on a phone the book opens by swinging its own cover away, so Hello's
       // printed cover (its first page there) is skipped rather than shown twice
@@ -288,12 +290,66 @@ class App {
     this.book.setDepth(this.depth());
     this.renderCorners();
     this.announce();
+    this.mark();
     if (focus && !this.ctx.face) this.focusPage();
+  }
+
+  // ---- a place on a page: where a link to an update lands -------------------------
+
+  /** What the address points at in a chapter (an update in the Labbook),
+   * if it is written there. */
+  marked(ch: Chapter) {
+    let id = "";
+    try {
+      id = decodeURIComponent(location.hash.slice(1));
+    } catch {}
+    if (!id || this.sheet) return null;
+    for (const [at, page] of ch.pages.entries()) {
+      const el = page.querySelector<HTMLElement>(`[id="${CSS.escape(id)}"]`);
+      if (el) return { el, view: this.book.geo.spread ? Math.floor(at / 2) : at };
+    }
+    return null;
+  }
+
+  /** The view a chapter opens at: the one the address points into, or `otherwise`. */
+  viewOf(ch: Chapter, otherwise: number) {
+    return this.marked(ch)?.view ?? otherwise;
+  }
+
+  /** The pen marks the place the address points at, and no other. */
+  mark() {
+    const here = this.marked(this.paged)?.el;
+    for (const page of this.paged.pages)
+      for (const el of page.querySelectorAll("[data-here]")) if (el !== here) el.removeAttribute("data-here");
+    here?.setAttribute("data-here", "");
+    return here;
+  }
+
+  /** The address now points somewhere else in the open chapter (a headline
+   * followed from the Lab's own ticker, or Back and Forward between two
+   * updates): turn to it. */
+  async toMark() {
+    const to = this.marked(this.paged);
+    if (!to || to.view === this.view) {
+      this.mark();
+      return;
+    }
+    const step: 1 | -1 = to.view > this.view ? 1 : -1;
+    const flurry = Math.max(0, Math.min(4, Math.abs(to.view - this.view) - 1));
+    this.busy = true;
+    this.book.corners.replaceChildren();
+    try {
+      await this.book.turn(this.pagesAt(this.paged, to.view), step, flurry).done;
+    } finally {
+      this.busy = false;
+    }
+    this.view = to.view;
+    this.settle();
   }
 
   focusPage() {
     const scope = this.sheet?.loose ?? this.book.main;
-    const heading = scope.querySelector<HTMLElement>("h1");
+    const heading = this.marked(this.paged)?.el ?? scope.querySelector<HTMLElement>("h1");
     const target = heading && heading.getClientRects().length ? heading : this.book.main;
     if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
     target.focus({ preventScroll: true });
@@ -456,7 +512,7 @@ class App {
       (event) => {
         if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
         const target = event.target as HTMLElement | null;
-        if (target?.closest("input, textarea, select, [contenteditable], video")) return;
+        if (target?.closest("input, textarea, select, [contenteditable], video, audio")) return;
         const menu = target?.closest<HTMLElement>(".bp-shelf");
         const arrows = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
         if (menu && arrows.includes(event.key)) {
@@ -474,6 +530,42 @@ class App {
           this.turn(-1);
           event.preventDefault();
         }
+      },
+      { signal },
+    );
+
+    // a link to somewhere else in the open chapter changes only the address:
+    // the router has nothing to tell us, so look once it has had its say
+    const follow = () => {
+      this.queue = this.queue.then(() => this.toMark()).catch((error) => console.error(error));
+    };
+    this.desk.addEventListener(
+      "click",
+      (event) => {
+        if ((event.target as Element).closest?.("a[href*='#']")) setTimeout(follow);
+      },
+      { signal },
+    );
+    addEventListener("hashchange", follow, { signal });
+    addEventListener("popstate", follow, { signal });
+
+    // a Pen or a demo waits until it is asked for: pressing its note makes
+    // the frame, in the card's own room. A modified click opens the link.
+    this.desk.addEventListener(
+      "click",
+      (event) => {
+        const ask = (event.target as Element).closest?.("[data-artifact-load]");
+        const stage = ask?.closest<HTMLElement>("[data-artifact-frame]");
+        if (!stage?.dataset.artifactFrame) return;
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        const frame = h("iframe", {
+          src: stage.dataset.artifactFrame,
+          title: stage.dataset.artifactTitle ?? "",
+          allow: "fullscreen",
+        });
+        stage.replaceChildren(frame);
+        frame.focus();
       },
       { signal },
     );
