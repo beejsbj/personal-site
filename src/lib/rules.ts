@@ -76,6 +76,33 @@ export function orderLab<T extends { order: number; title: string }>(
   );
 }
 
+export type LabPlace = "bench" | "shelf";
+const LAB_PLACES: LabPlace[] = ["bench", "shelf"];
+
+/** The Lab's places in page order, the Bench then the Shelf, leaving out a
+ * place nothing sits in. In each, the featured entry leads and the rest
+ * follow `orderLab`. */
+export function labPlaces<
+  T extends {
+    place: LabPlace;
+    featured?: boolean;
+    order: number;
+    title: string;
+  },
+>(entries: T[]): { place: LabPlace; entries: T[] }[] {
+  const ordered = orderLab(entries);
+  return LAB_PLACES.map((place) => {
+    const here = ordered.filter((entry) => entry.place === place);
+    return {
+      place,
+      entries: [
+        ...here.filter((entry) => entry.featured),
+        ...here.filter((entry) => !entry.featured),
+      ],
+    };
+  }).filter((group) => group.entries.length > 0);
+}
+
 // ---- resume -------------------------------------------------------------------
 
 const MONTHS = [
