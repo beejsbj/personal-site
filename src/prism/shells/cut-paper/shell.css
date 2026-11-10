@@ -2336,13 +2336,86 @@
 
 /* ── the lab: the rack ─────────────────────────────────────── */
 
+/* a place in the rack: the Bench is armed, the Shelf is muted */
+:root[data-lens="cut-paper"] .cp-place {
+  margin-top: 34px;
+}
+
+:root[data-lens="cut-paper"] .cp-place__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-place__tag--armed {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--cp-tomato);
+  color: var(--cp-ivory);
+}
+
+/* the record light */
+:root[data-lens="cut-paper"] .cp-place__tag--armed::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-place__tag--muted {
+  background: var(--cp-mustard);
+}
+
+:root[data-lens="cut-paper"] .cp-place__title {
+  margin: 0;
+  font: 400 34px/1 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-place__note {
+  margin: 0;
+  color: var(--cp-ivory-3);
+  font-size: 12.5px;
+}
+
 :root[data-lens="cut-paper"] .cp-rack {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 22px;
-  margin: 18px 0 26px;
+  margin: 22px 0 0;
   padding: 0;
   list-style: none;
+}
+
+/* pride of place: a pad two wide, as tall as the rest, and a bigger name */
+:root[data-lens="cut-paper"] .cp-rack__slot[data-lab-featured] {
+  grid-column: span 2;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit.cp-pad__hit--wide {
+  aspect-ratio: 2.09;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit.cp-pad__hit--wide .cp-roll {
+  right: 9%;
+  left: 9%;
+  width: 82%;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__slot[data-lab-featured] .cp-rack__title {
+  font-size: 44px;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__slot[data-lab-featured] .cp-rack__sum {
+  max-width: 52ch;
+  font-size: 14.5px;
 }
 
 :root[data-lens="cut-paper"] .cp-rack__slot {
@@ -2456,10 +2529,91 @@
   font-size: 13px;
 }
 
+/* the Shelf: muted pads lying in rows, each on its board. A muted pad is
+   ink with its colour at the edge; pressed, it lights as an armed one. */
+:root[data-lens="cut-paper"] .cp-shelf {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 34px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-shelf__item {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0 12px;
+  border-bottom: 4px solid var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-shelf__copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-shelf .cp-rack__title {
+  font-size: 23px;
+}
+
+:root[data-lens="cut-paper"] .cp-shelf .cp-rack__sum {
+  color: var(--cp-ivory-3);
+  font-size: 12.5px;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small {
+  border-radius: 6px;
+  background: var(--cp-ink-3);
+  box-shadow: inset 0 -5px 0 var(--note), var(--cp-ring);
+  transition: transform var(--cp-dur-tap) var(--cp-ease-stab), background var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small .cp-roll {
+  top: 20%;
+  bottom: 26%;
+  height: 54%;
+  fill: var(--note);
+  transition: fill var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small:hover,
+:root[data-lens="cut-paper"] .cp-pad__hit--small[data-hearing] {
+  background: var(--note);
+  filter: none;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small:hover .cp-roll,
+:root[data-lens="cut-paper"] .cp-pad__hit--small[data-hearing] .cp-roll {
+  fill: rgba(10, 9, 8, 0.62);
+}
+
+/* with a picture: the picture, greyed until the pad is pressed */
+:root[data-lens="cut-paper"] .cp-pad__hit--small .cp-pad__art {
+  inset: 4px 4px 9px;
+  width: calc(100% - 8px);
+  height: calc(100% - 13px);
+  border-radius: 3px;
+  filter: grayscale(1) brightness(0.8);
+  transition: filter var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small:hover .cp-pad__art,
+:root[data-lens="cut-paper"] .cp-pad__hit--small[data-hearing] .cp-pad__art {
+  filter: none;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small .cp-pad__band {
+  display: none;
+}
+
 :root[data-lens="cut-paper"] .cp-lab__more {
   display: grid;
   gap: 10px;
   max-width: 66ch;
+  margin-top: 40px;
 }
 
 :root[data-lens="cut-paper"] .cp-lab__more p {
@@ -3816,6 +3970,22 @@
     font-size: 21px;
   }
 
+  :root[data-lens="cut-paper"] .cp-rack__slot[data-lab-featured] .cp-rack__title {
+    font-size: 34px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-place__title {
+    font-size: 28px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-place__note {
+    flex-basis: 100%;
+  }
+
+  :root[data-lens="cut-paper"] .cp-shelf {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   :root[data-lens="cut-paper"] .cp-clipview__side .cp-pad {
     max-width: 220px;
   }
@@ -3901,6 +4071,12 @@
   :root[data-lens="cut-paper"] .cp-send .cp-send__pin,
   :root[data-lens="cut-paper"] .cp-bounce__hit[data-hearing] {
     transform: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-pad__hit--small,
+  :root[data-lens="cut-paper"] .cp-pad__hit--small .cp-roll,
+  :root[data-lens="cut-paper"] .cp-pad__hit--small .cp-pad__art {
+    transition: none;
   }
 }
 

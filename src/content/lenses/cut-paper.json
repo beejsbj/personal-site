@@ -87,7 +87,9 @@
   },
   "lab": {
     "rack": "Rack",
-    "undated": "Sketches carry no date, so they sit in the rack, off the timeline. Each one has a motif of its own.",
+    "armed": "Armed",
+    "muted": "Muted",
+    "undated": "Experiments carry no date, so they sit in the rack, off the timeline. Each one has a motif of its own: press its pad.",
     "hear": "Hear {name}",
     "open": "Open the sketch",
     "back": "Back to the rack"

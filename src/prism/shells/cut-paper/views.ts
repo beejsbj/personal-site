@@ -1,15 +1,14 @@
 /** A view of the session for each route. Home is the set info beside a
  * turntable and the crate (./home), with the locators underneath. Projects is the
  * arrangement in full. A project opens as its clip, zoomed into the
- * arrangement, with its story as clip notes. The lab is a rack of undated
- * sketches; about is the set notes; the resume is the Roles track drawn
+ * arrangement, with its story as clip notes. The lab is the rack, its pads
+ * armed or muted, over the Labbook (./lab); about is the set notes; the resume is the Roles track drawn
  * out; writing is the Send, its posts bounced out of the session
  * (./writing); anything else is a text view. Phones get the tape (./tape)
  * wherever the arrangement runs left to right. */
 import { part } from "../../parts";
 import { fallbackBody, fill } from "../rich";
-import type { LabEntry, Project, ResumeEntry, Route } from "../types";
-import { audition, soundLive } from "./audio";
+import type { Project, ResumeEntry, Route } from "../types";
 import {
   adopt,
   bar,
@@ -21,7 +20,6 @@ import {
   pageHead,
   playButton,
   prose,
-  roll,
   scrap,
   screen,
   trackControls,
@@ -30,9 +28,10 @@ import {
 } from "./bits";
 import { arrangement, changesLane, markersLane, overlay, rolesLane, ruler, span } from "./arrangement";
 import { h, link } from "./dom";
-import { chord, noteName, voicing } from "./music";
-import { MONTH, sketchNotes, type Clip } from "./score";
+import { noteName } from "./music";
+import { MONTH, type Clip } from "./score";
 import { home } from "./home";
+import { lab, labEntry } from "./lab";
 import { tape } from "./tape";
 import { writing, writingEntry } from "./writing";
 
@@ -192,14 +191,14 @@ function project(env: Env, item: Project): Screen {
       ? h(
           "div",
           { class: "cp-inserts", ...part("project.media", item.slug) },
-          media.map((entry) =>
+          media.map((shown) =>
             h(
               "figure",
               { class: "cp-insert" },
-              entry.type === "video"
-                ? h("video", { src: entry.src, controls: true, muted: true, playsinline: true, preload: "metadata", "aria-label": entry.alt ?? item.title })
-                : h("img", { src: entry.src, alt: entry.alt ?? "", loading: "lazy", decoding: "async" }),
-              entry.caption ? h("figcaption", null, entry.caption) : null,
+              shown.type === "video"
+                ? h("video", { src: shown.src, controls: true, muted: true, playsinline: true, preload: "metadata", "aria-label": shown.alt ?? item.title })
+                : h("img", { src: shown.src, alt: shown.alt ?? "", loading: "lazy", decoding: "async" }),
+              shown.caption ? h("figcaption", null, shown.caption) : null,
             ),
           ),
         )
@@ -207,114 +206,6 @@ function project(env: Env, item: Project): Screen {
   );
   bar(side, 1);
   return { el: screen("project", h("div", { class: "cp-clipview", style: `--note:${noteVar(index)}` }, side, main)), heading: h1 };
-}
-
-/* ── the lab: a rack of sketches ─────────────────────────── */
-
-/** Hear a sketch: its motif on the kalimba over the home chord. */
-function hearSketch(env: Env, slug: string, el: HTMLElement) {
-  if (env.face || env.signal.aborted) return;
-  const notes = sketchNotes(slug);
-  if (soundLive())
-    audition([
-      ...voicing(chord(0)).map((degree) => ({ offset: 0, seconds: 1.4, degree, voice: "keys" as const, velocity: 0.35 })),
-      ...notes.map((n) => ({ offset: n.at * 0.25, seconds: n.length * 0.25, degree: n.degree, voice: "sketch" as const, velocity: n.at % 3 === 0 ? 0.85 : 0.65 })),
-    ]);
-  el.style.setProperty("--hear", "1.5s");
-  el.removeAttribute("data-hearing");
-  void el.offsetWidth;
-  el.setAttribute("data-hearing", "");
-  window.setTimeout(() => el.removeAttribute("data-hearing"), 1580);
-}
-
-function pad(env: Env, item: LabEntry, index: number, big = false) {
-  const label = fill(env.copy.lab.hear, { name: item.title });
-  const hit = h(
-    "button",
-    { type: "button", class: big ? "cp-pad__hit cp-pad__hit--big" : "cp-pad__hit", "aria-label": label, title: label, disabled: env.face, "data-art": item.cover ? "" : null },
-    // with a thumbnail, the sketch fills the pad and its motif rides a band
-    // along the bottom; without one, the motif fills the pad
-    item.cover
-      ? [
-          h("img", { class: "cp-pad__art", src: item.cover, alt: "", loading: "lazy", decoding: "async" }),
-          h("span", { class: "cp-pad__band" }, roll(sketchNotes(item.slug)), h("span", { class: "cp-clip__run", "aria-hidden": "true" })),
-        ]
-      : [roll(sketchNotes(item.slug)), h("span", { class: "cp-clip__run", "aria-hidden": "true" })],
-  );
-  hit.addEventListener("click", () => hearSketch(env, item.slug, hit), { signal: env.signal });
-  let timer = 0;
-  hit.addEventListener("pointerenter", (e) => {
-    if (e.pointerType !== "mouse") return;
-    timer = window.setTimeout(() => hearSketch(env, item.slug, hit), 110);
-  }, { signal: env.signal });
-  hit.addEventListener("pointerleave", () => window.clearTimeout(timer), { signal: env.signal });
-  env.signal.addEventListener("abort", () => window.clearTimeout(timer), { once: true });
-  return h("div", { class: "cp-pad", style: `--note:${noteVar(index + 2)}` }, hit);
-}
-
-function lab(env: Env): Screen {
-  const { content, copy } = env;
-  const page = content.pages.lab;
-  const { h1, head } = pageHead(page.header, "lab", copy.lab.rack);
-  const rack = h(
-    "ul",
-    { class: "cp-rack", "aria-label": page.listLabel },
-    content.lab.map((item, index) =>
-      h(
-        "li",
-        { class: "cp-rack__slot" },
-        pad(env, item, index),
-        h("p", { class: "cp-rack__meta", ...part("lab.meta", item.slug) }, `${item.type} · ${item.sourceEra}`),
-        h("h2", { class: "cp-rack__title" }, link(item.detail, part("lab.title", item.slug), item.title)),
-        h("p", { class: "cp-rack__sum", ...part("lab.summary", item.slug) }, item.summary),
-      ),
-    ),
-  );
-  return {
-    el: screen(
-      "lab",
-      h(
-        "div",
-        { class: "cp-page" },
-        bar(head, 2),
-        h("p", { class: "cp-session__legend" }, copy.lab.undated),
-        bar(rack, 2, 3),
-        h(
-          "div",
-          { class: "cp-lab__more" },
-          h("p", { class: "cp-lab__link", ...part("lab.more") }, link(page.more.href, { class: "cp-btn" }, page.more.label)),
-          h("p", { class: "cp-lab__aside", ...part("lab.aside") }, inlineCopy(page.aside)),
-        ),
-      ),
-    ),
-    heading: h1,
-  };
-}
-
-function labEntry(env: Env, item: LabEntry): Screen {
-  const { content, copy } = env;
-  const labels = content.pages.lab.detail.labels;
-  const index = content.lab.indexOf(item);
-  const h1 = heading(item.title, "cp-clipview__title", "lab.title", item.slug);
-  const links = [...(item.href ? [{ label: copy.lab.open, url: item.href }] : []), ...item.links];
-  const side = h(
-    "div",
-    { class: "cp-clipview__side" },
-    pad(env, item, index, true),
-    h("p", { class: "cp-head__kicker" }, h("span", { class: "cp-tag" }, copy.lab.rack), link("/lab", {}, content.pages.lab.detail.eyebrow)),
-    h1,
-    h("p", { class: "cp-clipview__lede", ...part("lab.summary", item.slug) }, item.summary),
-    h("dl", { class: "cp-props", ...part("lab.meta", item.slug) }, h("div", null, h("dt", null, labels.type), h("dd", null, item.type)), h("div", null, h("dt", null, labels.era), h("dd", null, item.sourceEra))),
-    buttons(links, part("lab.links", item.slug)),
-    link("/lab", { class: "cp-back" }, h("span", { "aria-hidden": "true" }, "← "), copy.lab.back),
-  );
-  return {
-    el: screen(
-      "lab-entry",
-      h("div", { class: "cp-clipview", style: `--note:${noteVar(index + 2)}` }, bar(side, 1), h("div", { class: "cp-clipview__main" }, prose(item.html, part("lab.body", item.slug)))),
-    ),
-    heading: h1,
-  };
 }
 
 /* ── about: the set notes, pasted up as a torn jazz poster ── */
