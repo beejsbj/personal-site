@@ -26,6 +26,9 @@ export interface Env {
 export interface Screen {
   el: HTMLElement;
   heading: HTMLElement;
+  /** Called once the view is in the scroller, at the top: somewhere on it
+   * to go to, if the address names one. */
+  arrive?: () => void;
 }
 
 /** Solfège colours, one per scale degree, used for whatever is musical. */

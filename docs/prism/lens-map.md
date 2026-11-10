@@ -175,7 +175,7 @@ Each cell: how the lens presents the part, then `file:function`. Hion cells are 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
 | LI1 Header | Eyebrow "Lab", h1, intro | Constant "Lab", eyebrow "Requests", subtitle = Daylight h1, intro in a "The Lab" dialogue box, `CC/lab.ts:lab` | `pageHead` from `pages.lab.header` | h1/intro from main; eyebrow replaced by "Lab · in the margins" | `pageHead` from main |
-| LI2 Entry | Card: cover, `type · sourceEra`, title link, summary | Request card: No.NN, constant "Open" stamp, "Client" (=`sourceEra`) and "Type", title, summary, "Accept" prompt; cover — MISSING, `CC/lab.ts:lab` | Rack slot: a pad (button) that plays the sketch's motif, `type · sourceEra`, title link to `detail`, summary; `cover` fills the top of the pad above the motif, `CP/views.ts:lab` | Article with doodle, h2, summary, `type · sourceEra`; cover — MISSING, `ch:lab`, `ch:labCard` | Hanging charm: `type · sourceEra`, title, summary; cover — MISSING, `HI/screens.ts:lab` |
+| LI2 Entry | Card: cover, `type · sourceEra`, title link, summary | Request card: No.NN, constant "Open" stamp, "Client" (=`sourceEra`) and "Type", title, summary, "Accept" prompt; cover — MISSING, `CC/lab.ts:lab` | Rack slot, armed (Bench) or muted (Shelf): a pad (button) that plays the experiment's motif, title link to `detail`, summary; `cover` fills the top of the pad above the motif, `CP/lab.ts:lab` | Article with doodle, h2, summary, `type · sourceEra`; cover — MISSING, `ch:lab`, `ch:labCard` | Hanging charm: `type · sourceEra`, title, summary; cover — MISSING, `HI/screens.ts:lab` |
 | LI3 "More sketches on CodePen" | Link | — MISSING | `pages.lab.more` button | — MISSING | Hard-coded pull-cord + URL |
 | LI4 Aside | Paragraph with Projects + Style Guide links | — MISSING | `pages.lab.aside` (inline markdown) | — MISSING | Cloned from `.lab-aside`, links kept |
 
@@ -183,8 +183,8 @@ Each cell: how the lens presents the part, then `file:function`. Hion cells are 
 
 | Part | Daylight | Calling Card | Cut Paper | Back Page | Hion (provisional) |
 |---|---|---|---|---|---|
-| LE1 Eyebrow/title/summary | "Lab", h1, intro | "Request No.NN" + "Open" stamp, title, summary, `CC/lab.ts:labEntry` | Kicker "Rack" + `detail.eyebrow` link, h1, lede, `CP/views.ts:labEntry` | Hard-coded "Lab", title/summary from main, `ch:labEntry` | Hard-coded "Lab", title/intro from main, `HI/screens.ts:labEntry` |
-| LE2 Type/Era | Labelled blocks | "Type" and "Client" (renamed) | `<dl>` with `detail.labels` | `<dl>` Type/Era | Tags Type/Era |
+| LE1 Eyebrow/title/summary | "Lab", h1, intro | "Request No.NN" + "Open" stamp, title, summary, `CC/lab.ts:labEntry` | Kicker "Rack" + `detail.eyebrow` link, h1, lede, `CP/lab.ts:labEntry` | Hard-coded "Lab", title/summary from main, `ch:labEntry` | Hard-coded "Lab", title/intro from main, `HI/screens.ts:labEntry` |
+| LE2 Type/Era | Labelled blocks | "Type" and "Client" (renamed) | Not shown (#97): the `<dl>` holds the pad's voice and motif | `<dl>` Type/Era | Tags Type/Era |
 | LE3 Links | Action buttons | Shop cards "Accept"/"Get" (+ dead "Open the experiment") | Buttons; `href` first as lens copy "Open the sketch" | Arrow list (+ synthesised "Try it on {sourceEra}") | Pull-cords (+ dead "Open the live experiment") |
 | LE4 Media | Rail | — MISSING | — MISSING (not in content.json) | — MISSING | Gallery from `.media-rail figure` (shown) |
 | LE5 Prose | `.prose` | Cloned | Rendered `html` | Moved | Story loop |
@@ -329,16 +329,31 @@ Derived "content": odometer counts (`home.ts` `projects.length`, `lab.length`; A
 | `writing`: status, posts (slug, href, title, subtitle, description, date, dateLabel, canonical), entry (+ html), entryStatus | `writing.ts`; a post's date places its flag and picks its chord, its slug seeds its motif |
 | `pages.home` (hero, work.link, currently, updates copy and `limit`) | `home.ts` |
 | `pages.projects` (header, listLabel, detail.back, detail.labels) | `views.ts:projects`, `project` |
-| `pages.lab` (header, listLabel, more, aside, detail) | `views.ts:lab`, `labEntry` |
+| `pages.lab` (header, more, aside, places, labbook, detail.eyebrow, detail.labels.graduated/updates) | `lab.ts:lab`, `labEntry`, `labbook.ts` |
 | `pages.about` (header, html), `pages.resume` (header, html) | `views.ts:about`, `resume` |
 | `projects[]`: slug, href, title, summary, kind, year, dateLabel, role, location, tools, cover, links, media, html | `score.ts` (date, kind to voice), `arrangement.ts`, `tape.ts`, `views.ts:project`, `home.ts` (records) |
-| `lab[]`: slug, detail, href, hasPage, title, summary, type, sourceEra, cover, links, html | `views.ts:lab`, `labEntry`; slug seeds the sketch's motif; `cover` is the pad's picture |
+| `lab[]`: slug, detail, href, hasPage, title, summary, place, featured, graduatedTo, cover, media, links, html (never `type` or `sourceEra`) | `lab.ts:lab`, `labEntry`; slug seeds the experiment's motif; `cover` is the pad's picture |
+| `labbook[]` (narrowed on `visibility`: an open update's title, summary, href, artifact, relatedExperiment, relatedProject; a redacted one's `shape` and `date` only), `headlines[]`, `site.ticker.label`, `site.updateKinds`/`updateSources` | `labbook.ts`, `ribbon.ts` |
 | `updates[]`: id, kind, kindLabel, sourceLabel, title, date, dateLabel, href | `score.ts` (date and kind to a bell), `arrangement.ts:markersLane`, `tape.ts`, `home.ts` |
 | `resume.experience`, `resume.education` (id, title, org, start, end, current, dateLine, summary, bullets), `resume.tools` | `score.ts` (start/end become the Roles track), `views.ts:resume` |
 | `featured`, `derived.counts.projects` | `home.ts` (the crate, and the count on its link) |
 | `lenses["cut-paper"]` | everywhere: DAW words, track legends, voice names |
 
-Never read: `site.nav`, `pages.home.elsewhere` (declared gap), `projects[].status/tags/order`, `lab[].media`, `updates[].summary/linkLabel/relatedProject`.
+Never read: `site.nav`, `pages.home.elsewhere` (declared gap), `projects[].status/tags/order`, `lab[].type/sourceEra`, `updates[].summary/linkLabel/relatedProject`.
+
+**The Lab (`lab/97-cut-paper`, issue #97).** The Lab is the rack and, under it, the one part of the Lab that is on the timeline. Nothing new in the palette or the type: pads, clips, flags, locators, bone paper and tape were all in the session already.
+
+| What | How | Where |
+|---|---|---|
+| The Bench | The pads that are armed (`data-lab-place="bench"`, a tomato tab with a record light): full colour, each playing its motif when pressed. The featured experiment is a pad two wide at the head of the rack, as tall as the rest, with a bigger name (`data-lab-featured`) | `CP/lab.ts:lab`, `pad` |
+| The Shelf | The pads that are muted (`data-lab-place="shelf"`, a mustard tab, the colour of a pressed mute): small, ink, their colour at the edge and in the motif, lying in rows on boards, two across on a wide window. Pressed, a muted pad lights as an armed one; a cover is grey until then | `CP/lab.ts:lab` |
+| Order and headings | `labPlaces(content.lab)` and `pages.lab.places` (shared rule and copy) | `CP/lab.ts:lab` |
+| The Labbook | The Markers track, written out (`data-log="labbook"`). A lane zoomed to the years it covers, a flag at each update's date; under it the log, a punched page of bone paper with a line for every update, newest first, each `li` `id="u-<id>"`. A line is its date, source and kind (`site.updateSources`/`updateKinds`), title (a link when the update has an `href`), summary, the experiment or project it is about (`relatedLinks`), and its artifact beside the words. The date is a locator: pressing it moves the playhead there and rings the update's bell, and the line lights while the playhead is on it. "Play the Labbook" plays that stretch of the session | `CP/labbook.ts` |
+| Artifacts | A picture is taped on in a paper mount. A film and a sound keep their own controls. A Pen or a demo is a dark stage (`data-embed`), the frame's own room from the start, with its poster dimmed behind a play button (`data-embed-load`): pressing it makes the frame there and focuses it. Before that nothing is asked of another site; a poster kept elsewhere is not shown; a frame is made only for an `https://` address or a path on this site | `CP/labbook.ts:artifact`, `tendLog` |
+| A redacted update | A rest: its date (no locator), its kind of work, and where its words would be, strips of black paper pasted over them (`data-strip`), one for each number in `shape.bars`, a longer number a longer strip. Hidden from assistive technology, which is told `labbook.redacted.label`. Only `shape` and `date` are read. Its flag on the lane is blank | `CP/labbook.ts:line` |
+| The ribbon (the ticker) | A ribbon of bone paper across the top of the view, on the home page and in the Lab (`data-ribbon`), under a plum tab that names it: a scrap of cut paper, a day and the words for each headline, each a link to its first update's line. It runs left at ten pixels an eighth note; the lap is set from the run's measured length. A pointer holds it; keyboard focus rests it at its start and the strip scrolls to the headline in focus, its words whole when they fit (`data-ribbon-rest`); the second run is for the eye only. Still (reduced motion, a face): a slip, the headlines in rows, told once. No headlines, no element | `CP/ribbon.ts` |
+| Landing on an update | `/lab#u-<id>` (from a headline, a flag, or an experiment's page) lands on its line: it is brought to the top of the view under a margin (where the browser's own jump to a fragment would put it), marked with a stroke of highlighter (`data-landed`), and the playhead goes to its date. Done by the shell (`Screen.arrive`, `hashchange`, `popstate`, a same-page click): Daylight's page under it holds the same ids, hidden, and the router changes a same-page hash without a `hashchange` | `CP/labbook.ts:tendLog`, `CP/index.ts` |
+| An experiment's page | Type and Era are gone; its voice and its motif are in their place. The project it became (`graduatedProject`) is a clip in the project's colour, drawing the project's motif, that opens the project. Its pictures and films follow its story. Its part of the Labbook (`experimentUpdates`, `data-log="experiment"`) is the same punched page: no artifacts, redacted updates shown in their place, and a title with nowhere else to go leads to its line in the Labbook | `CP/lab.ts:labEntry` |
 
 **The music (derived, deterministic).**
 
@@ -346,7 +361,7 @@ Never read: `site.nav`, `pages.home.elsewhere` (declared gap), `projects[].statu
 - **Projects.** Each sings a six-eighth motif seeded by its slug: a 12/8 rhythm cell and a contour. Realised over the chords at its date, strong beats take chord tones, the notes between step through the scale, and the last note settles on a chord tone. Arcade projects play an 8-bit voice; the rest a felt piano. The clip draws exactly the notes it plays.
 - **Roles.** Every dated role or course is a clip on one Roles track. The bass walks (root, fifth, approach) only while one runs. Undated entries stay off the timeline.
 - **Markers.** Each update rings a bell on a tone of the chord it lands on (by kind); same-day updates strum.
-- **Lab sketches.** They carry no date, so they sit in a rack, not on the timeline; each has a motif over the home chord.
+- **Lab experiments.** They carry no date, so they sit in a rack, not on the timeline; each has a motif over the home chord. Their updates do carry dates: those are the markers.
 - **Home turntable.** The record on the platter is a project's clip: pressing it auditions the clip in place, and the record turns (arm down, lamp lit) only while it sounds. A crate record (click, or a mouse resting 110ms) lifts the arm, swaps onto the platter and plays. While the transport plays, the turntable follows the playhead and puts on each project's record as its clip comes round. Reduced motion keeps the record still; the arm and lamp still show it playing.
 - **Range.** The session runs from the half bar before the first dated clip to the later of today and the last clip's end, so a new year (fixture `new-year`) always fits.
 

@@ -273,9 +273,8 @@ test("the home page and the Lab owe every headline on the ticker", () => {
 });
 
 test("each lens that has no Labbook or ticker yet says so, naming its ticket", () => {
-  const tickets = {
-    "cut-paper": "#97",
-  };
+  // No lens is waiting any more: #96 to #99 are all in.
+  const tickets = {};
   const owed = [
     ["lab", "update.item"],
     ["lab", "update.redacted"],
@@ -291,9 +290,9 @@ test("each lens that has no Labbook or ticker yet says so, naming its ticket", (
       );
     }
   }
-  // Back Page (#98) and Hion (#99) have both now: they owe them like
-  // Daylight does.
-  for (const lens of ["back-page", "hion"])
+  // Calling Card (#96), Cut Paper (#97), Back Page (#98) and Hion (#99)
+  // have both now: they owe them like Daylight does.
+  for (const lens of ["calling-card", "cut-paper", "back-page", "hion"])
     for (const [kind, part] of owed)
       assert.equal(isGap(lens, kind, part), false, `${lens} ${kind} ${part}`);
   assert.equal(isGap("daylight", "lab", "update.item"), false);

@@ -132,6 +132,7 @@ async function transition(route: Route) {
     scroller.append(next.el);
     scroller.scrollTop = 0;
     current = next;
+    if (!refresh) next.arrive?.();
   };
 
   // a refresh swaps in place: no sweep, no confetti, focus stays put
@@ -197,6 +198,7 @@ const shell: LensShell = {
     frame.scroller.append(first.el);
     current = first;
     currentPath = context.route.path;
+    first.arrive?.();
     // Already on screen (a face, or stepping in from the prism): the view
     // is printed, not entering on successive sixteenths.
     if (context.settled) land(first.el);
