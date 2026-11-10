@@ -27,12 +27,12 @@ export function tendLab(page: HTMLElement, { signal, catchUp, instant }: Options
   page.addEventListener(
     "click",
     (event) => {
-      const cord = (event.target as Element | null)?.closest?.("[data-artifact-load]");
-      const kept = cord?.closest<HTMLElement>("[data-artifact-frame]");
-      if (!kept?.dataset.artifactFrame) return;
+      const cord = (event.target as Element | null)?.closest?.("[data-kept-pull]");
+      const kept = cord?.closest<HTMLElement>("[data-kept-frame]");
+      if (!kept?.dataset.keptFrame) return;
       const frame = h("iframe", {
-        src: kept.dataset.artifactFrame,
-        title: kept.dataset.artifactTitle ?? "",
+        src: kept.dataset.keptFrame,
+        title: kept.dataset.keptTitle ?? "",
         allow: "fullscreen",
       });
       kept.replaceChildren(frame);
@@ -45,9 +45,9 @@ export function tendLab(page: HTMLElement, { signal, catchUp, instant }: Options
     "focusin",
     (event) => {
       const link = event.target as Element | null;
-      const strip = link?.closest?.<HTMLElement>("[data-ticker-strip]");
+      const strip = link?.closest?.<HTMLElement>("[data-reel-strip]");
       if (!link || !strip || !link.matches(":focus-visible")) return;
-      strip.dataset.tickerRest = "";
+      strip.dataset.reelRest = "";
       // The whole headline, from its beginning.
       (link.parentElement ?? link).scrollIntoView({ block: "nearest", inline: "start" });
     },
@@ -56,17 +56,17 @@ export function tendLab(page: HTMLElement, { signal, catchUp, instant }: Options
   page.addEventListener(
     "focusout",
     (event) => {
-      const strip = (event.target as Element | null)?.closest?.<HTMLElement>("[data-ticker-rest]");
+      const strip = (event.target as Element | null)?.closest?.<HTMLElement>("[data-reel-rest]");
       if (!strip || strip.contains(event.relatedTarget as Node | null)) return;
       strip.scrollLeft = 0;
-      delete strip.dataset.tickerRest;
+      delete strip.dataset.reelRest;
     },
     { signal },
   );
 
-  const land = () => {
+  const land = (hash = location.hash) => {
     for (const el of page.querySelectorAll("[data-landed]")) el.removeAttribute("data-landed");
-    let id = location.hash.slice(1);
+    let id = hash.slice(1);
     try {
       id = decodeURIComponent(id);
     } catch {}
@@ -77,6 +77,22 @@ export function tendLab(page: HTMLElement, { signal, catchUp, instant }: Options
     catchUp(top + target.offsetHeight + innerHeight * 0.3);
     target.scrollIntoView({ block: "center", behavior: instant ? "instant" : "smooth" });
   };
-  addEventListener("hashchange", land, { signal });
+  // Back and forward, and an address typed in.
+  addEventListener("hashchange", () => land(), { signal });
+  addEventListener("popstate", () => land(), { signal });
+  // A link on this page to an update on this page (a headline in the Lab's
+  // own reel): the router moves the address without a word to anyone.
+  page.addEventListener(
+    "click",
+    (event) => {
+      const link = (event.target as Element | null)?.closest?.<HTMLAnchorElement>("a[href*='#']");
+      if (!link || link.target || link.pathname !== location.pathname) return;
+      const { hash } = link;
+      requestAnimationFrame(() => {
+        if (!signal.aborted && location.hash === hash) land(hash);
+      });
+    },
+    { signal },
+  );
   return { land };
 }

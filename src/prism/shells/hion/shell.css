@@ -3278,7 +3278,9 @@
   margin-top: 0.5em;
 }
 
-/* What it is about: said, with the way there. */
+/* What it is about: said, with the way there. Its link, an artifact's
+   way out and the links in the Lab's closing aside are underlined in
+   chalk, as links in prose are. */
 :root[data-lens="hion"] .hion-logged__about {
   margin: 0.5em 0 0;
   font-size: calc(var(--hion-text-size) * 0.92);
@@ -3294,7 +3296,7 @@
   color: var(--hion-c);
 }
 
-:root[data-lens="hion"] :is(.hion-logged__about, .hion-artifact__home) a {
+:root[data-lens="hion"] :is(.hion-logged__about, .hion-artifact__home, .hion-loop--more .hion-aside) a {
   color: var(--hion-cl);
   text-decoration: none;
   background: var(--hion-tooth-c) 0 100% / 64px 2px repeat-x;
@@ -3302,7 +3304,7 @@
   transition: color 0.2s;
 }
 
-:root[data-lens="hion"] :is(.hion-logged__about, .hion-artifact__home) a:hover {
+:root[data-lens="hion"] :is(.hion-logged__about, .hion-artifact__home, .hion-loop--more .hion-aside) a:hover {
   color: var(--hion-c);
 }
 
@@ -3601,16 +3603,16 @@
 
   /* At rest for the keyboard: the thread back at its start, unfaded; the
      strip may scroll to the headline in focus (lab.ts). */
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip:is(:has(:focus-visible), [data-ticker-rest]) {
+  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip:is(:has(:focus-visible), [data-reel-rest]) {
     -webkit-mask-image: none;
     mask-image: none;
   }
 
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip:is(:has(:focus-visible), [data-ticker-rest]) .hion-reel__run {
+  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip:is(:has(:focus-visible), [data-reel-rest]) .hion-reel__run {
     animation: none;
   }
 
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip[data-ticker-rest] {
+  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip[data-reel-rest] {
     overflow-x: auto;
     scrollbar-width: none;
     scroll-padding-inline: 0.4em;
