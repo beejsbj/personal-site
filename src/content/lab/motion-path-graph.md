@@ -6,7 +6,7 @@ type: "SVG + motion"
 sourceEra: "CodePen"
 href: "https://codepen.io/beejsbj/pen/abXZWLQ"
 cover: "/images/lab/motion-path-graph.svg"
-order: 1
+order: 21
 ---
 
 An SVG line-drawing experiment, with a GSAP timeline following the lengths of the paths.
