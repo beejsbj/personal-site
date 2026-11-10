@@ -194,15 +194,6 @@ export async function getHeadlines(): Promise<Headline[]> {
   );
 }
 
-/** Whose the site's Pens are: the name in its CodePen address. */
-export const penUser = (site: SiteData) =>
-  site.social
-    .map(
-      (entry: { href: string }) =>
-        entry.href.match(/^https:\/\/codepen\.io\/([\w-]+)/)?.[1],
-    )
-    .find(Boolean);
-
 /** What an update in the Labbook may link to: the experiments and projects
  * that are shown, each where it lives. */
 export async function getRelatable() {

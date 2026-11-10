@@ -210,6 +210,12 @@ export function penEmbedSrc(src: string, user?: string): string | undefined {
     : undefined;
 }
 
+/** Whose the site's Pens are: the name in its CodePen address. */
+export const penUser = (site: { social: { href: string }[] }) =>
+  site.social
+    .map((entry) => entry.href.match(/^https:\/\/codepen\.io\/([\w-]+)/)?.[1])
+    .find(Boolean);
+
 /** What an artifact's frame loads, once the visitor asks for it: a Pen's
  * embed or a demo's own address. Nothing for an artifact shown in place
  * (a picture, a film, a sound). `penUser` owns a Pen named by id alone. */
