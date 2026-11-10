@@ -298,5 +298,5 @@ redirects, source content, and archival imports remain intact. Do not treat them
 as dead files just because Astro does not import them. Deleted implementation
 files remain recoverable in Git.
 
-Tracking: [BJS-427](https://linear.app/bjs-projects/issue/BJS-427/refine-personal-site-base-design-from-original-styling).
-Deployment and broader legacy cleanup (BJS-423) are separate work.
+This was the base-design refinement from the original styling, now settled.
+Deployment and the broader legacy cleanup were separate work.

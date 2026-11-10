@@ -18,7 +18,7 @@ only the Astro system is a Vercel deployment input.
 | `docker-compose.yaml`                                                                                       | Local PHP archive runtime                                            | Keep for recovery and inspection; it is not part of the Vercel runtime.                                                            |
 
 `ProjectCard`/`ProjectRow` and the Vue, MDX, and GSAP dependency cleanup belong
-to BJS-427 and are already settled. This boundary does not reopen the deferred
+to the base-design refinement and are already settled. This boundary does not reopen the deferred
 prism work or redesign the active portfolio.
 
 ## Media strategy
