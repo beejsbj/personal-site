@@ -32,6 +32,7 @@ const project = (await getCollection("projects")).find(
 const lab = (await getCollection("lab")).find(
   (entry: CollectionEntry<"lab">) => !entry.data.hidden,
 )!;
+const experiment = { ...lab.data, href: lab.data.href ?? `/lab/${lab.slug}` };
 const updates = (await getCollection("updates")).flatMap(
   (entry: CollectionEntry<"updates">) =>
     streamUpdate(updateId(entry), entry.data) ?? [],
@@ -103,9 +104,9 @@ const anatomy = [
   ],
   [
     "LabCard / MediaRail",
-    "MediaFrame + Heading/Link / image-video sequence",
-    "Lab listing / detail media",
-    "Video has native controls, no autoplay.",
+    "MediaFrame or Note + Heading/Link / image-video sequence",
+    "Card, feature or row, each with or without a cover / detail media",
+    "The title link wears the arrow only when the experiment lives elsewhere. Video has native controls, no autoplay.",
   ],
   [
     "SiteHeader / SiteFooter",
@@ -313,7 +314,7 @@ const anatomy = [
         </div>
       </div>
       <div class="assembly-grid spaced">
-        <LabCard {...lab.data} href={lab.data.href ?? `/lab/${lab.slug}`} />
+        <LabCard {...experiment} />
         <div>
           <MediaFrame src={project.data.cover} alt="Project art specimen" />
           <SectionIntro
@@ -324,6 +325,24 @@ const anatomy = [
           <MediaRail media={project.data.media.slice(0, 1)} />
         </div>
       </div>
+    </section>
+
+    <section class="specimen" aria-labelledby="lab-specimen">
+      <SectionHeading id="lab-specimen" title="Experiments in the Lab" />
+      <LabCard {...experiment} layout="feature" />
+      <div class="lab-specimens spaced">
+        <LabCard {...experiment} lean="left" />
+        <LabCard {...experiment} cover={undefined} lean="right" />
+      </div>
+      <div class="spaced">
+        <LabCard {...experiment} layout="row" />
+      </div>
+      <p class="annotation">
+        One card, three layouts. The featured experiment takes the width of its
+        place. On the Bench a card is a picture or, with no cover, a slip of
+        paper; on the Shelf it is a quiet row standing on its board. Type and
+        era are optional and leave no separator behind.
+      </p>
     </section>
 
     <section class="specimen" aria-labelledby="timeline-specimen">
@@ -455,6 +474,15 @@ const anatomy = [
   }
   .spaced {
     margin-top: var(--space-xl);
+  }
+  .lab-specimens {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--rail-width)), 1fr)
+    );
+    align-items: start;
+    gap: var(--space-xl);
   }
   .table-scroll {
     overflow-x: auto;

@@ -1,11 +1,18 @@
 ---
 title: Lab
-description: Little experiments in SVG, motion, sound, and interaction by Burooj Rashid.
+description: Burooj Rashid's workshop, seen through a window. Experiments on the bench, and the ones that have gone quiet on the shelf.
 header:
   eyebrow: Lab
   title: Small things. Room to play.
-  intro: A line that draws itself. Shapes that keep a beat. Little experiments in how the web can look, move, and feel.
+  intro: My workshop, seen through a window. I try things here. Some graduate into projects, some go quiet.
 listLabel: Selected experiments
+places:
+  bench:
+    title: On the bench
+    note: What I'm working on now.
+  shelf:
+    title: On the shelf
+    note: Things that have gone quiet, and the older archive.
 more:
   label: More sketches on CodePen
   href: "social:CodePen"

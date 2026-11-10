@@ -2,44 +2,190 @@
 import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
 import MediaFrame from "../design/primitives/MediaFrame.astro";
+import Note from "../design/primitives/Note.astro";
 import { part } from "../prism/parts";
+/** Compound: one experiment. cover + metadata + linked heading + summary;
+ * cover, type and era are each optional and leave nothing behind.
+ * layout=card: lying on the Bench, a picture or (with no cover) a paper slip.
+ * layout=feature: the featured experiment, across the width of its place.
+ * layout=row: standing on the Shelf, a quiet line with a small picture.
+ * lean=left|right: lying as it was put down, a touch off the straight.
+ * The title's link says where it goes: the arrow only when it leaves the site.
+ */
 interface Props {
   /** The entry's slug, marking its parts. */
   slug?: string;
   href: string;
   title: string;
   summary: string;
-  type: string;
-  sourceEra: string;
+  type?: string;
+  sourceEra?: string;
   cover?: string;
+  layout?: "card" | "feature" | "row";
+  lean?: "left" | "right";
 }
-const { slug, href, title, summary, type, sourceEra, cover } = Astro.props;
+const {
+  slug,
+  href,
+  title,
+  summary,
+  type,
+  sourceEra,
+  cover,
+  layout = "card",
+  lean,
+} = Astro.props;
 const mark = (name: Parameters<typeof part>[0]) =>
   slug === undefined ? {} : part(name, slug);
+const meta = [type, sourceEra].filter(Boolean).join(" · ");
+// With no picture, a card or a feature is written on a slip of paper.
+const Slip = cover || layout === "row" ? Fragment : Note;
 ---
 
-<article class="lab-card">
-  {cover && <MediaFrame src={cover} alt="" fit="cover" />}
-  <p class="meta" {...mark("lab.meta")}>
-    {type} · {sourceEra}
-  </p>
-  <Heading level={2} scale="card" {...mark("lab.title")}>
-    <Link href={href} arrow>
-      {title}
-    </Link>
-  </Heading>
-  <p {...mark("lab.summary")}>{summary}</p>
+<article
+  class:list={[
+    "lab-card",
+    `lab-card--${layout}`,
+    lean && `lab-card--lean-${lean}`,
+    { "lab-card--bare": !cover },
+  ]}
+>
+  {cover && <MediaFrame src={cover} alt="" fit="cover" href={href} />}
+  <Slip>
+    <div class="lab-copy">
+      {meta && (
+        <p class="meta" {...mark("lab.meta")}>
+          {meta}
+        </p>
+      )}
+      <Heading
+        level={3}
+        scale={layout === "feature" ? "post" : "card"}
+        {...mark("lab.title")}
+      >
+        <Link href={href} arrow>
+          {title}
+        </Link>
+      </Heading>
+      <p class="summary" {...mark("lab.summary")}>
+        {summary}
+      </p>
+    </div>
+  </Slip>
 </article>
 <style>
   .lab-card {
     display: grid;
     align-content: start;
-    gap: var(--space-s);
-    border-top: var(--rule-width) solid var(--color-border);
-    padding-top: var(--space-l);
+    gap: var(--space-m);
+    min-width: 0;
+  }
+  .lab-copy {
+    display: grid;
+    align-content: start;
+    gap: var(--space-xs);
+    min-width: 0;
   }
   .meta {
     font-size: var(--text-xs);
     color: var(--color-text-soft);
+  }
+  /* Even lines, so a long title never leaves its arrow alone on the last. */
+  .lab-copy :global(.ds-heading) {
+    text-wrap: balance;
+  }
+  .summary {
+    font-size: var(--text-copy);
+  }
+  /* On the Bench things lie as they were put down: a picture or a slip
+     leans a touch, and straightens when picked up. */
+  .lab-card {
+    --lab-lean: 0deg;
+  }
+  .lab-card--lean-left {
+    --lab-lean: var(--settle-angle);
+  }
+  .lab-card--lean-right {
+    --lab-lean: calc(-1 * var(--settle-angle));
+  }
+  .lab-card :global(.ds-media),
+  .lab-card :global(.ds-note) {
+    rotate: var(--lab-lean);
+  }
+  .lab-card--feature {
+    grid-template-columns: var(--feature-media-width) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-xl);
+  }
+  .lab-card--feature .lab-copy {
+    gap: var(--space-s);
+  }
+  .lab-card--feature .summary {
+    max-width: var(--reading-width);
+    font-size: var(--text-lead);
+  }
+  .lab-card--feature.lab-card--bare {
+    grid-template-columns: minmax(0, var(--title-width));
+  }
+  /* On the Shelf an experiment stands on its board: words to the left, a
+     small picture at the right end, the board's edge hatched beneath. */
+  .lab-card--row {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) var(--media-width);
+    align-items: end;
+    gap: var(--space-l);
+    border-bottom: var(--focus-width) solid var(--color-border);
+  }
+  .lab-card--row::after {
+    content: "";
+    position: absolute;
+    inset: 100% 0 auto;
+    height: var(--space-xs);
+    margin-top: var(--focus-width);
+    background: var(--texture);
+  }
+  .lab-card--row.lab-card--bare {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lab-card--row .lab-copy {
+    order: -1;
+    align-self: start;
+    padding-bottom: var(--space-l);
+  }
+  .lab-card--row .summary {
+    max-width: var(--reading-width);
+    color: var(--color-text-soft);
+  }
+  .lab-card--row :global(.ds-media) {
+    align-self: end;
+    margin-bottom: var(--space-2xs);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .lab-card :global(.ds-media),
+    .lab-card :global(.ds-note) {
+      transition:
+        rotate var(--duration-hover) var(--ease-settle),
+        translate var(--duration-hover) var(--ease-settle);
+    }
+    .lab-card:is(:hover, :has(:focus-visible)) :global(.ds-media),
+    .lab-card:is(:hover, :has(:focus-visible)) :global(.ds-note) {
+      rotate: 0deg;
+      translate: 0 calc(-1 * var(--motion-lift));
+    }
+  }
+  @media (max-width: 62.5rem) {
+    .lab-card--feature {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-m);
+    }
+  }
+  @media (max-width: 40.625rem) {
+    .lab-card--row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+    .lab-card--row :global(.ds-media) {
+      width: var(--media-width);
+    }
   }
 </style>

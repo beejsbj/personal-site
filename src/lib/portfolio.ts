@@ -263,6 +263,7 @@ export async function getLabPage() {
     listLabel: need(data.listLabel, "listLabel in pages/lab.md"),
     more: resolveLink(site, need(data.more, "more in pages/lab.md")),
     aside: need(data.aside, "aside in pages/lab.md"),
+    places: need(data.places, "places in pages/lab.md"),
     detail: {
       eyebrow: need(detail.eyebrow, "entry.eyebrow in pages/lab.md"),
       back: resolveLink(site, need(detail.back, "entry.back in pages/lab.md")),

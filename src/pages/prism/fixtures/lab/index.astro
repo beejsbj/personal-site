@@ -1,0 +1,106 @@
+---
+/** Daylight's side of the fuzz harness for the Lab itself: the room on
+ * fixture experiments, so every state can be seen and tested whatever
+ * src/content/lab holds. /prism/fixtures/lab is a full room;
+ * ?fixture=shelf-only has nothing on the Bench and ?fixture=no-covers has
+ * no pictures. scripts/tests/lab-daylight.browser.mjs reads it. Rendered on
+ * demand: its page entries point at /lab/<slug>, where nothing is built. */
+import type { ComponentProps } from "astro/types";
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import LabRoom from "../../../../components/LabRoom.astro";
+import { getLabPage } from "../../../../lib/portfolio";
+
+export const prerender = false;
+
+const page = await getLabPage();
+type Entries = ComponentProps<typeof LabRoom>["entries"];
+const room: Entries = [
+  {
+    slug: "fixture-linkout",
+    detail: "https://example.com/fixture-linkout",
+    title: "A sketch that lives elsewhere",
+    summary: "It opens where it lives, in another place on the web.",
+    place: "bench",
+    type: "Canvas + sound",
+    sourceEra: "CodePen",
+    cover: "/images/lab/motion-path-graph.svg",
+    order: 1,
+  },
+  {
+    slug: "fixture-bare",
+    detail: "/lab/fixture-bare",
+    title: "A try with nothing to show yet",
+    summary: "No picture, no type and no era: only what it is about.",
+    place: "bench",
+    type: "",
+    sourceEra: "",
+    order: 2,
+  },
+  {
+    slug: "fixture-featured",
+    detail: "/lab/fixture-featured",
+    title: "The one with pride of place",
+    summary:
+      "The featured experiment leads the Bench and gets more room, though its order comes last. It has a page of its own telling how it was made.",
+    place: "bench",
+    featured: true,
+    type: "Tools",
+    sourceEra: "",
+    cover: "/images/lab/beating-shapes.png",
+    order: 9,
+  },
+  {
+    slug: "fixture-note",
+    detail: "https://example.com/fixture-note",
+    title: "A link out with no picture",
+    summary: "It lives elsewhere too, and has only its words here.",
+    place: "bench",
+    type: "",
+    sourceEra: "A deck",
+    order: 3,
+  },
+  {
+    slug: "fixture-quiet",
+    detail: "https://example.com/fixture-quiet",
+    title: "An old sketch, gone quiet",
+    summary: "On the Shelf, and still opening where it always lived.",
+    place: "shelf",
+    type: "SVG + motion",
+    sourceEra: "CodePen",
+    cover: "/images/lab/beating-shapes.png",
+    order: 2,
+  },
+  {
+    slug: "fixture-archive",
+    detail: "/lab/fixture-archive",
+    title: "An archive piece with a page",
+    summary: "On the Shelf, with its making told on a page here.",
+    place: "shelf",
+    type: "Client archive",
+    sourceEra: "",
+    cover: "/images/lab/motion-path-graph.svg",
+    order: 1,
+  },
+  {
+    slug: "fixture-plain",
+    detail: "/lab/fixture-plain",
+    title: "A shelf piece with only words",
+    summary: "No picture here either.",
+    place: "shelf",
+    type: "",
+    sourceEra: "",
+    order: 3,
+  },
+];
+const fixtures: Record<string, Entries> = {
+  room,
+  "shelf-only": room.filter((entry) => entry.place === "shelf"),
+  "no-covers": room.map((entry) => ({ ...entry, cover: undefined })),
+};
+const entries = fixtures[Astro.url.searchParams.get("fixture") ?? "room"];
+if (!entries) return new Response("No such fixture.", { status: 404 });
+---
+
+<BaseLayout title="Lab fixture" pageClass="page-lab" tool>
+  <LabRoom page={page} entries={entries} />
+</BaseLayout>

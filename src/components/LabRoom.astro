@@ -1,0 +1,136 @@
+---
+import PageHeader from "./PageHeader.astro";
+import LabCard from "./LabCard.astro";
+import Heading from "../design/primitives/Heading.astro";
+import Inline from "../design/primitives/Inline.astro";
+import Link from "../design/primitives/Link.astro";
+import type { getLabPage } from "../lib/portfolio";
+import { labPlaces } from "../lib/rules";
+import { part } from "../prism/parts";
+import type { LabEntry } from "../prism/shells/types";
+/** Composition: the Lab as a room. The page's opening, then each place that
+ * holds something (the Bench, then the Shelf) under its own heading, then
+ * the `labbook` slot, then the way out to more.
+ * On the Bench experiments lie spread out, the featured one across the
+ * whole width; on the Shelf they stand in quiet rows.
+ */
+interface Props {
+  page: Awaited<ReturnType<typeof getLabPage>>;
+  entries: Pick<
+    LabEntry,
+    | "slug"
+    | "detail"
+    | "title"
+    | "summary"
+    | "place"
+    | "featured"
+    | "type"
+    | "sourceEra"
+    | "cover"
+    | "order"
+  >[];
+}
+const { page, entries } = Astro.props;
+const places = labPlaces(entries);
+---
+
+<section class="shell page-section page-section--header">
+  <PageHeader {...page.header} page="lab" />
+</section>
+{places.map(({ place, entries }) => (
+  <section
+    class:list={["shell", "page-section", "lab-place", `lab-place--${place}`]}
+    data-lab-place={place}
+    aria-labelledby={`lab-${place}`}
+  >
+    <header class="lab-place__head">
+      <Heading id={`lab-${place}`}>{page.places[place].title}</Heading>
+      <p class="lab-place__note">{page.places[place].note}</p>
+    </header>
+    <ul class="lab-place__entries" role="list">
+      {entries.map((entry, index) => (
+        <li class:list={{ "lab-place__featured": entry.featured }}>
+          <LabCard
+            slug={entry.slug}
+            href={entry.detail}
+            title={entry.title}
+            summary={entry.summary}
+            type={entry.type}
+            sourceEra={entry.sourceEra}
+            cover={entry.cover}
+            layout={
+              entry.featured ? "feature" : place === "bench" ? "card" : "row"
+            }
+            lean={
+              place === "bench" ? (index % 2 ? "right" : "left") : undefined
+            }
+          />
+        </li>
+      ))}
+    </ul>
+  </section>
+))}
+<slot name="labbook" />
+<section class="shell page-section lab-out">
+  <p {...part("lab.more")}>
+    <Link href={page.more.href} treatment="pill" arrow>
+      {page.more.label}
+    </Link>
+  </p>
+  <p class="lab-aside" {...part("lab.aside")}>
+    <Inline text={page.aside} />
+  </p>
+</section>
+<style>
+  .lab-place__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-m);
+    margin-bottom: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .lab-place__note {
+    color: var(--color-text-soft);
+  }
+  .lab-place__entries {
+    display: grid;
+    gap: var(--space-2xl) var(--space-xl);
+    list-style: none;
+  }
+  .lab-place__entries > li {
+    display: grid;
+    min-width: 0;
+  }
+  .lab-place__featured {
+    grid-column: 1 / -1;
+  }
+  .lab-out {
+    display: grid;
+    gap: var(--space-m);
+  }
+  .lab-aside {
+    max-width: var(--reading-width);
+    font-size: var(--text-copy);
+    color: var(--color-text-soft);
+  }
+  /* A Shelf row needs room for its words beside its picture: two boards
+     abreast only where each is two rails wide. */
+  .lab-place--shelf .lab-place__entries {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(100%, calc(var(--rail-width) * 2)), 1fr)
+    );
+  }
+  @media (min-width: 40.626rem) {
+    .lab-place--bench .lab-place__entries {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 62.501rem) {
+    .lab-place--bench .lab-place__entries {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

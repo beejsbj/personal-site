@@ -145,6 +145,13 @@ const pageSchema = z.object({
   listLabel: z.string().optional(),
   more: linkRefSchema.optional(),
   aside: z.string().optional(),
+  /** The Lab's two places: what each is called, and a line about it. */
+  places: z
+    .object({
+      bench: z.object({ title: z.string(), note: z.string() }),
+      shelf: z.object({ title: z.string(), note: z.string() }),
+    })
+    .optional(),
   /** Copy for each entry's own page. */
   entry: z
     .object({

@@ -250,6 +250,8 @@ export interface SiteContent {
       more: Link;
       /** Inline markdown. */
       aside: string;
+      /** What the Bench and the Shelf are called, and a line about each. */
+      places: Record<"bench" | "shelf", { title: string; note: string }>;
       /** Copy for each experiment's own page. `graduated` introduces the
        * project it became; `updates` heads its part of the Labbook. */
       detail: {
