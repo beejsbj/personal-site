@@ -1125,6 +1125,10 @@ test(
               "its date, what it is, its kind of work: no other word",
             );
             assert.ok(
+              !(await page.content()).includes(REDACTION_MARKER),
+              "nothing it hides is in the page",
+            );
+            assert.ok(
               book.entries.every((item) => !item.anchored),
               "its links land in the Labbook, not here",
             );
