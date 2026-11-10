@@ -4,14 +4,13 @@
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
- * Checked twice: on /prism/lab-fixture, whose fixture experiments cover
+ * Checked twice: on /prism/fixtures/lab, whose fixture experiments cover
  * every state whatever src/content/lab holds, and on /lab itself against
  * /prism/content.json. Same server and Chromium as prism-parity.browser.mjs. */
 import assert from "node:assert/strict";
-import { existsSync, readdirSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { existsSync } from "node:fs";
 import test from "node:test";
+import { chromium } from "./lib/chromium.mjs";
 import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
 
 const SIZES = {
@@ -22,24 +21,6 @@ const SIZES = {
     hasTouch: true,
   },
 };
-
-function chromium() {
-  if (process.env.PRISM_CHROMIUM) return process.env.PRISM_CHROMIUM;
-  const cache = join(homedir(), "Library/Caches/ms-playwright");
-  if (!existsSync(cache)) return null;
-  const found = readdirSync(cache)
-    .filter((name) => name.startsWith("chromium_headless_shell-"))
-    .sort((a, b) => Number(b.split("-")[1]) - Number(a.split("-")[1]))
-    .map((name) =>
-      join(
-        cache,
-        name,
-        "chrome-headless-shell-mac-arm64/chrome-headless-shell",
-      ),
-    )
-    .find((path) => existsSync(path));
-  return found ?? null;
-}
 
 /** The room as a visitor meets it: each place with its heading and, in
  * reading order, each experiment's link, mark and card. */
@@ -144,7 +125,7 @@ test(
         await t.test(
           `${size}: the fixture room has both places, the featured entry first on the Bench`,
           async () => {
-            const { context, page } = await open(size, "/prism/lab-fixture");
+            const { context, page } = await open(size, "/prism/fixtures/lab");
             const room = await survey(page);
             await context.close();
             assert.equal(room.h1, 1, "one h1");
@@ -183,7 +164,7 @@ test(
         await t.test(
           `${size}: a link-out entry is marked as leaving, a page entry is not`,
           async () => {
-            const { context, page } = await open(size, "/prism/lab-fixture");
+            const { context, page } = await open(size, "/prism/fixtures/lab");
             const room = await survey(page);
             await context.close();
             for (const slug of [
@@ -214,11 +195,11 @@ test(
           `${size}: a link-out entry opens its href, a page entry opens /lab/<slug>`,
           async () => {
             assert.equal(
-              await follow(size, "/prism/lab-fixture", "fixture-linkout"),
+              await follow(size, "/prism/fixtures/lab", "fixture-linkout"),
               "https://example.com/fixture-linkout",
             );
             assert.equal(
-              await follow(size, "/prism/lab-fixture", "fixture-bare"),
+              await follow(size, "/prism/fixtures/lab", "fixture-bare"),
               `${base}/lab/fixture-bare`,
             );
           },
@@ -227,7 +208,7 @@ test(
         await t.test(
           `${size}: an entry with no cover, type or era leaves no gap behind`,
           async () => {
-            const { context, page } = await open(size, "/prism/lab-fixture");
+            const { context, page } = await open(size, "/prism/fixtures/lab");
             const room = await survey(page);
             await context.close();
             const metas = Object.fromEntries(
@@ -264,7 +245,7 @@ test(
           async () => {
             const { context, page } = await open(
               size,
-              "/prism/lab-fixture?fixture=shelf-only",
+              "/prism/fixtures/lab?fixture=shelf-only",
             );
             const room = await survey(page);
             await context.close();

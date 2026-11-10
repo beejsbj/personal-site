@@ -21,7 +21,7 @@ it still needs Burooj's eye.
   only when the experiment lives elsewhere. A page entry has none.
 - Type and era are optional; the meta line shows what there is and
   disappears when there is nothing.
-- `/prism/lab-fixture` renders the same room on fixture experiments
+- `/prism/fixtures/lab` renders the same room on fixture experiments
   (`?fixture=shelf-only`, `?fixture=no-covers`), for the browser test and
   for looking at states the content does not hold yet.
 

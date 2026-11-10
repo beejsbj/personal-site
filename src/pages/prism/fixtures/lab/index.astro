@@ -1,13 +1,14 @@
 ---
-/** Daylight's Lab on fixture experiments, so every state of the room can be
- * seen and tested whatever src/content/lab holds. /prism/lab-fixture is a
- * full room; ?fixture=shelf-only has nothing on the Bench and
- * ?fixture=no-covers has no pictures. The Lab's browser test drives it.
- * Rendered on demand: its page entries have no page. */
+/** Daylight's side of the fuzz harness for the Lab itself: the room on
+ * fixture experiments, so every state can be seen and tested whatever
+ * src/content/lab holds. /prism/fixtures/lab is a full room;
+ * ?fixture=shelf-only has nothing on the Bench and ?fixture=no-covers has
+ * no pictures. scripts/tests/lab-daylight.browser.mjs reads it. Rendered on
+ * demand: its page entries point at /lab/<slug>, where nothing is built. */
 import type { ComponentProps } from "astro/types";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import LabRoom from "../../components/LabRoom.astro";
-import { getLabPage } from "../../lib/portfolio";
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import LabRoom from "../../../../components/LabRoom.astro";
+import { getLabPage } from "../../../../lib/portfolio";
 
 export const prerender = false;
 
