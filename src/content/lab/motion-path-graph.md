@@ -1,6 +1,7 @@
 ---
 title: "Motion Path Graph"
 summary: "Drawing a lotus one line at a time. An SVG path study using GSAP, stroke lengths, and a little orange and blue."
+place: "shelf"
 type: "SVG + motion"
 sourceEra: "CodePen"
 href: "https://codepen.io/beejsbj/pen/abXZWLQ"

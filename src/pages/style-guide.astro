@@ -20,7 +20,8 @@ import LabCard from "../components/LabCard.astro";
 import PageHeader from "../components/PageHeader.astro";
 import SectionIntro from "../components/SectionIntro.astro";
 import MediaRail from "../components/MediaRail.astro";
-import { getHome } from "../lib/portfolio";
+import { getHome, updateId } from "../lib/portfolio";
+import { streamUpdate } from "../lib/labbook";
 const site = (await getEntry("site", "config"))!.data;
 const home = await getHome();
 const labels = { kinds: site.updateKinds, sources: site.updateSources };
@@ -31,10 +32,11 @@ const project = (await getCollection("projects")).find(
 const lab = (await getCollection("lab")).find(
   (entry: CollectionEntry<"lab">) => !entry.data.hidden,
 )!;
-const update = (await getCollection("updates"))[0];
-const updates = (await getCollection("updates")).map(
-  (entry: CollectionEntry<"updates">) => entry.data,
+const updates = (await getCollection("updates")).flatMap(
+  (entry: CollectionEntry<"updates">) =>
+    streamUpdate(updateId(entry), entry.data) ?? [],
 );
+const update = updates[0];
 const colors = [
   ["Paper", "--color-page"],
   ["Burgundy", "--color-accent"],
@@ -299,7 +301,7 @@ const anatomy = [
         <div>
           <CurrentNote note={home.currently} id="guide-currently" variant="plain" />
           <div class="spaced">
-            <UpdateEntry {...update.data} labels={labels} detailed />
+            <UpdateEntry {...update} labels={labels} detailed />
           </div>
           <ActivityStream updates={updates} copy={home.updates} labels={labels} />
           <Note>

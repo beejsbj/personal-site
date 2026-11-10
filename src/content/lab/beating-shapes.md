@@ -1,6 +1,7 @@
 ---
 title: "Beating Shapes"
 summary: "What if shapes could keep time? A black-and-white rhythm experiment that moves geometric forms to the tempo of a track."
+place: "shelf"
 type: "Audio + interaction"
 sourceEra: "CodePen"
 href: "https://codepen.io/beejsbj/pen/BaeoNPG"

@@ -1,4 +1,6 @@
+import { readdirSync } from "node:fs";
 import { defineCollection, z } from "astro:content";
+import { file } from "astro/loaders";
 
 /* Every word a visitor reads lives in src/content. Daylight renders it and
  * /prism/content.json hands the same words to every lens. Short copy fields
@@ -190,9 +192,20 @@ const projectSchema = z.object({
 const labSchema = z.object({
   title: z.string(),
   summary: z.string(),
-  type: z.string(),
-  sourceEra: z.string(),
+  /** The Bench holds what is being worked on now; the Shelf what has gone
+   * quiet, and the archive. */
+  place: z.enum(["bench", "shelf"]),
+  /** The slug of the project this experiment graduated into. */
+  graduatedTo: z.string().optional(),
+  /** The one entry given pride of place. */
+  featured: z.boolean().optional(),
+  /** Optional, and on their way out: every lens still prints them, so an
+   * entry without them reads as empty rather than missing. */
+  type: z.string().default(""),
+  sourceEra: z.string().default(""),
   cover: z.string().optional(),
+  /** The live experiment, when it lives elsewhere: the entry links straight
+   * out and has no page here. */
   href: z.string().url().optional(),
   links: z.array(linkSchema).default([]),
   media: z.array(mediaSchema).default([]),
@@ -217,28 +230,89 @@ const UPDATE_SOURCES = [
   "substack",
   "bjslab",
   "manual",
+  "codepen",
 ] as const;
 
+/** The thing an update shows for itself. */
+const artifactSchema = z.object({
+  kind: z.enum(["image", "video", "pen", "demo", "sound"]),
+  src: z.string().min(1),
+  alt: z.string(),
+  poster: z.string().optional(),
+});
+
+/** "2026-07-01". */
+const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+/** A field one kind of update must not have. An unknown key would only be
+ * dropped; these are refused, so a mistake is loud. */
+const refused = (message: string) =>
+  z.custom<undefined>((value) => value === undefined, message);
+
+const updateFields = {
+  // Events describe things that happened, not another project/writing collection.
+  kind: z.enum(UPDATE_KINDS).default("project"),
+  source: z.enum(UPDATE_SOURCES).default("site"),
+  evidence: z
+    .object({
+      url: z.string().url(),
+      observedAt: z.string().datetime({ offset: true }),
+    })
+    .optional(),
+  date: day,
+  /** The date said in other words; without it the site writes
+   * "01 Jul 2026" from `date`. */
+  dateLabel: z.string().optional(),
+  relatedProject: z.string().optional(),
+  /** A lab slug. */
+  relatedExperiment: z.string().optional(),
+  expiresAt: z.string().datetime({ offset: true }).optional(),
+};
+
+const openUpdateSchema = z.object({
+  ...updateFields,
+  visibility: z.literal("open"),
+  title: z.string(),
+  summary: z.string(),
+  href: z.string().min(1).optional(),
+  linkLabel: z.string().optional(),
+  artifact: artifactSchema.optional(),
+  shape: refused("Only a redacted update has a shape."),
+});
+
+/** Something made that stays private: the site is told that it happened
+ * and what shape it has, and never what it says. */
+const noWords = refused("A redacted update shows its shape and no words.");
+const redactedUpdateSchema = z.object({
+  ...updateFields,
+  visibility: z.literal("redacted"),
+  shape: z.object({
+    work: z.enum(["code", "design", "writing", "research", "other"]),
+    /** The lengths of the black bars. Chosen, not measured from the
+     * hidden text. */
+    bars: z.array(z.number().positive()).min(1),
+  }),
+  title: noWords,
+  summary: noWords,
+  href: noWords,
+  linkLabel: noWords,
+  dateLabel: noWords,
+  artifact: noWords,
+  evidence: noWords,
+});
+
 const updateSchema = z
-  .object({
-    // Events describe things that happened, not another project/writing collection.
-    kind: z.enum(UPDATE_KINDS).default("project"),
-    source: z.enum(UPDATE_SOURCES).default("site"),
-    evidence: z
-      .object({
-        url: z.string().url(),
-        observedAt: z.string().datetime({ offset: true }),
-      })
-      .optional(),
-    title: z.string(),
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    dateLabel: z.string(),
-    summary: z.string(),
-    href: z.string().min(1),
-    linkLabel: z.string(),
-    relatedProject: z.string().optional(),
-    expiresAt: z.string().datetime({ offset: true }).optional(),
-  })
+  .preprocess(
+    // Open unless it says otherwise.
+    (update) =>
+      update && typeof update === "object" && !("visibility" in update)
+        ? { ...update, visibility: "open" }
+        : update,
+    z.discriminatedUnion("visibility", [
+      openUpdateSchema,
+      redactedUpdateSchema,
+    ]),
+  )
   .superRefine((update, context) => {
     if (
       ["status", "location", "agents"].includes(update.kind) &&
@@ -254,6 +328,35 @@ const updateSchema = z
   });
 
 export type UpdateData = z.infer<typeof updateSchema>;
+export type UpdateKind = (typeof UPDATE_KINDS)[number];
+export type UpdateSource = (typeof UPDATE_SOURCES)[number];
+
+/** An update's id is its file name (`updateId` in src/lib/portfolio.ts). */
+const updateIds = () =>
+  readdirSync(new URL("./content/updates/", import.meta.url))
+    .filter((name) => name.endsWith(".md"))
+    .map((name) => name.slice(0, -".md".length));
+
+/** A line written about one or more updates, for the ticker. Naming an
+ * update that is not there fails the build. */
+const headlineSchema = z
+  .object({
+    date: day,
+    text: z.string().min(1),
+    /** The ids of the updates it is about; it links to the first. */
+    updates: z.array(z.string()).min(1),
+  })
+  .superRefine((headline, context) => {
+    const known = new Set(updateIds());
+    headline.updates.forEach((id, index) => {
+      if (known.has(id)) return;
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["updates", index],
+        message: `No update has the id "${id}".`,
+      });
+    });
+  });
 
 const siteSchema = z.object({
   name: z.string(),
@@ -316,6 +419,12 @@ const updates = defineCollection({
   schema: updateSchema,
 });
 
+/** Every headline, in one file: a list of `{ id, date, text, updates }`. */
+const headlines = defineCollection({
+  loader: file("src/content/headlines.json"),
+  schema: headlineSchema,
+});
+
 const site = defineCollection({
   type: "data",
   schema: siteSchema,
@@ -335,6 +444,7 @@ export const collections = {
   projects,
   lab,
   updates,
+  headlines,
   site,
   lenses,
 };

@@ -4,8 +4,21 @@
  * the same in every lens. */
 import { getCollection, getEntry } from "astro:content";
 import type { CollectionEntry } from "astro:content";
-import type { PageData, ResumeEntryData, SiteData } from "../content.config";
+import type {
+  PageData,
+  ResumeEntryData,
+  SiteData,
+  UpdateData,
+} from "../content.config";
 import { selectActivitySnapshot } from "./activity.mjs";
+import {
+  labbookUpdate,
+  publishedHeadlines,
+  streamUpdate,
+  type Headline,
+  type InStream,
+  type Update,
+} from "./labbook";
 import {
   dateLine,
   derive,
@@ -26,6 +39,8 @@ export type PageId =
 export type ProjectEntry = CollectionEntry<"projects">;
 export type LabEntry = CollectionEntry<"lab">;
 export type UpdateEntry = CollectionEntry<"updates">;
+/** An update as the home stream shows it (`streamUpdate` in ./labbook). */
+export type StreamUpdate = InStream<UpdateData>;
 
 export interface Header {
   eyebrow?: string;
@@ -126,13 +141,48 @@ export const labDetail = (entry: LabEntry) =>
 export const updateId = (entry: UpdateEntry) => entry.id.replace(/\.md$/, "");
 
 /** Updates that are due and not expired, newest first (all of them). */
-export async function getUpdates(): Promise<UpdateEntry[]> {
+async function dueUpdates(): Promise<UpdateEntry[]> {
   const entries: UpdateEntry[] = await getCollection("updates");
   const byId = new Map(entries.map((entry) => [updateId(entry), entry]));
   return selectActivitySnapshot(
     entries.map((entry) => ({ ...entry.data, id: updateId(entry) })),
     new Date(__PORTFOLIO_BUILD_TIME__),
   ).map((data: { id: string }) => byId.get(data.id)!);
+}
+
+/** Updates as the home stream shows them, each with its id. The stream
+ * itself decides which are due (src/lib/activity.mjs). */
+export const streamUpdates = (
+  entries: UpdateEntry[],
+): (StreamUpdate & { id: string })[] =>
+  entries.flatMap((entry) => {
+    const id = updateId(entry);
+    const update = streamUpdate(id, entry.data);
+    return update ? [{ ...update, id }] : [];
+  });
+
+/** The home stream: the open updates that are due and not expired, newest
+ * first. */
+export async function getUpdates() {
+  return streamUpdates(await dueUpdates());
+}
+
+/** The Labbook: every update that is due and not expired, newest first,
+ * the redacted ones as their shape alone. */
+export async function getLabbook(): Promise<Update[]> {
+  return (await dueUpdates()).map((entry) =>
+    labbookUpdate(updateId(entry), entry.data),
+  );
+}
+
+/** The headlines whose updates are all in the Labbook, newest first. */
+export async function getHeadlines(): Promise<Headline[]> {
+  const entries: CollectionEntry<"headlines">[] =
+    await getCollection("headlines");
+  return publishedHeadlines(
+    entries.map((entry) => ({ id: entry.id, ...entry.data })),
+    await getLabbook(),
+  );
 }
 
 export async function getHome() {
@@ -278,7 +328,7 @@ export async function getDerived() {
       slug: entry.slug,
     })),
     lab,
-    updates: updates.map((entry) => entry.data),
+    updates,
     featured,
   });
 }

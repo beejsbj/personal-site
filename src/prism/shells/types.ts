@@ -15,6 +15,7 @@ import type CallingCardCopy from "../../content/lenses/calling-card.json";
 import type CutPaperCopy from "../../content/lenses/cut-paper.json";
 import type BackPageCopy from "../../content/lenses/back-page.json";
 import type HionCopy from "../../content/lenses/hion.json";
+import type { Headline, Update as LabbookUpdate } from "../../lib/labbook";
 
 export interface Link {
   label: string;
@@ -95,6 +96,14 @@ export interface LabEntry {
   hasPage: boolean;
   title: string;
   summary: string;
+  /** On the Bench (being worked on now) or on the Shelf (gone quiet, and
+   * the archive). */
+  place: "bench" | "shelf";
+  /** The slug of the project this experiment graduated into. */
+  graduatedTo?: string;
+  /** The one entry given pride of place. */
+  featured?: boolean;
+  /** May be empty, like `sourceEra`: an entry no longer has to say. */
   type: string;
   sourceEra: string;
   cover?: string;
@@ -104,6 +113,9 @@ export interface LabEntry {
   html: string;
 }
 
+/** An update as the home stream shows it: open, with a date label and
+ * somewhere to go. The Labbook's own `Update`, which may be redacted, is in
+ * src/lib/labbook.ts. */
 export interface Update {
   /** The file name, the `data-ref` of its `update.item` part. */
   id: string;
@@ -258,8 +270,13 @@ export interface SiteContent {
   projects: Project[];
   /** Every visible lab entry, by `order`. */
   lab: LabEntry[];
-  /** Every due, unexpired update, newest first. */
+  /** Every due, unexpired open update, newest first: the home stream. */
   updates: Update[];
+  /** The Labbook: every due, unexpired update, newest first. A redacted
+   * one is its shape alone. */
+  labbook: LabbookUpdate[];
+  /** The headlines written about updates in the Labbook, newest first. */
+  headlines: Headline[];
   /** Slugs of the featured projects, in project order (shared rule; never
    * empty while there are projects). */
   featured: string[];
