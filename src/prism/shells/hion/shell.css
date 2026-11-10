@@ -3205,6 +3205,11 @@
 
 /* ---------- The Bench ---------- */
 
+/* The first cord hangs clear of the note above it. */
+:root[data-lens="hion"] .hion-loop--bench .hion-row--lab {
+  margin-top: 1.1rem;
+}
+
 :root[data-lens="hion"] .hion-work--featured {
   --hion-drop: 62px;
   grid-column: 1 / -1;
