@@ -42,6 +42,7 @@ export const PARTS = [
   "lab.links",
   "lab.media",
   "lab.body",
+  "lab.graduation",
   "lab.more",
   "lab.aside",
   // public writing entries from the runtime source

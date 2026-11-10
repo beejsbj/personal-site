@@ -1,0 +1,146 @@
+---
+/** An experiment's own page: its words, links and pictures, the project it
+ * graduated into and its part of the Labbook. The slot is its body.
+ * /lab/<slug> renders it for an entry in src/content, and
+ * /prism/fixtures/lab/<slug> for a fixture. */
+import PageHeader from "./PageHeader.astro";
+import MediaRail from "./MediaRail.astro";
+import SectionHeading from "../design/compounds/SectionHeading.astro";
+import UpdateEntry from "../design/compounds/UpdateEntry.astro";
+import Link from "../design/primitives/Link.astro";
+import { streamUpdate, type Update } from "../lib/labbook";
+import { part } from "../prism/parts";
+import type { Link as LinkTo, Media } from "../prism/shells/types";
+
+interface Props {
+  slug: string;
+  experiment: {
+    title: string;
+    summary: string;
+    type: string;
+    sourceEra: string;
+    cover?: string;
+    links: { label: string; url: string }[];
+    media: Media[];
+  };
+  /** Its part of the Labbook, newest first (`experimentUpdates`). */
+  updates: Update[];
+  /** The project it graduated into. */
+  graduatedTo?: { title: string; href: string };
+  /** `entry` in pages/lab.md. */
+  copy: {
+    eyebrow: string;
+    back: LinkTo;
+    labels: { type: string; era: string; graduated: string; updates: string };
+  };
+  /** How each kind and source of update is named. */
+  updateLabels: {
+    kinds: Record<string, string>;
+    sources: Record<string, string>;
+  };
+}
+const { slug, experiment, updates, graduatedTo, copy, updateLabels } =
+  Astro.props;
+
+// An entry no longer has to say its type or era.
+const facts = [
+  { label: copy.labels.type, value: experiment.type },
+  { label: copy.labels.era, value: experiment.sourceEra },
+].filter((fact) => fact.value);
+// With no pictures of its own, the page shows the cover.
+const { cover } = experiment;
+const media: Media[] =
+  experiment.media.length === 0 && cover
+    ? [{ type: "image", src: cover }]
+    : experiment.media;
+// The open updates, as the home stream shows one. A redacted update has a
+// shape and no words; drawing it belongs to the Labbook.
+const shown = updates.flatMap((update) => {
+  const open = streamUpdate(update.id, update);
+  return open ? [open] : [];
+});
+---
+
+<section class="shell entry-page">
+  <PageHeader
+    eyebrow={copy.eyebrow}
+    title={experiment.title}
+    intro={experiment.summary}
+    marks={{
+      title: part("lab.title", slug),
+      intro: part("lab.summary", slug),
+    }}
+  />
+
+  {(facts.length > 0 || graduatedTo) && (
+    <div class="entry-page__meta" {...part("lab.meta", slug)}>
+      {facts.map((fact) => (
+        <div>
+          <span class="entry-page__label">{fact.label}</span>
+          <p>{fact.value}</p>
+        </div>
+      ))}
+      {graduatedTo && (
+        <div {...part("lab.graduation", slug)}>
+          <span class="entry-page__label">{copy.labels.graduated}</span>
+          <p>
+            <Link href={graduatedTo.href}>{graduatedTo.title}</Link>
+          </p>
+        </div>
+      )}
+    </div>
+  )}
+
+  {experiment.links.length > 0 && (
+    <div class="entry-page__links" {...part("lab.links", slug)}>
+      {experiment.links.map((link) => (
+        <Link treatment="pill" href={link.url} arrow newTab>
+          {link.label}
+        </Link>
+      ))}
+    </div>
+  )}
+
+  <MediaRail media={media} {...part("lab.media", slug)} />
+
+  <article class="prose" {...part("lab.body", slug)}>
+    <slot />
+  </article>
+
+  {shown.length > 0 && (
+    <section class="entry-updates" aria-labelledby="entry-updates">
+      <SectionHeading id="entry-updates" title={copy.labels.updates} />
+      <ol class="entry-updates__list">
+        {shown.map((update, index) => (
+          <li>
+            <UpdateEntry
+              {...update}
+              labels={updateLabels}
+              connected={index < shown.length - 1}
+              detailed
+            />
+          </li>
+        ))}
+      </ol>
+    </section>
+  )}
+
+  <div class="entry-page__links">
+    <Link href={copy.back.href} treatment="pill" arrow>
+      {copy.back.label}
+    </Link>
+  </div>
+</section>
+<style>
+  /* Ruled off from the body, as the facts are from the header. */
+  .entry-updates {
+    padding-top: var(--space-l);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .entry-updates__list {
+    max-width: var(--reading-width);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

@@ -252,7 +252,18 @@ export interface SiteContent {
       aside: string;
       /** What the Bench and the Shelf are called, and a line about each. */
       places: Record<"bench" | "shelf", { title: string; note: string }>;
-      detail: { eyebrow: string; labels: { type: string; era: string } };
+      /** Copy for each experiment's own page. `graduated` introduces the
+       * project it became; `updates` heads its part of the Labbook. */
+      detail: {
+        eyebrow: string;
+        back: Link;
+        labels: {
+          type: string;
+          era: string;
+          graduated: string;
+          updates: string;
+        };
+      };
     };
     notFound: { title: string; description: string; header: Header };
   };

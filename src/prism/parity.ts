@@ -215,6 +215,15 @@ export function expectedParts(
         ...(entry.links.length
           ? [page("lab.links", entry.slug, ...entry.links.map((l) => l.label))]
           : []),
+        // the project it graduated into, and its open updates
+        ...content.projects
+          .filter((p) => p.slug === entry.graduatedTo)
+          .map((p) => page("lab.graduation", entry.slug, p.title)),
+        ...content.labbook.flatMap((u) =>
+          u.relatedExperiment === entry.slug && u.visibility === "open"
+            ? [page("update.item", u.id, u.title)]
+            : [],
+        ),
       ];
     }
     case "writing":
@@ -312,11 +321,23 @@ export const GAPS: Partial<
       "lab.aside":
         "The request board has no aside pointing to Projects and the Style Guide; Projects is a tab.",
     },
+    "lab-entry": {
+      "lab.graduation":
+        "Not built yet (#96): an experiment's page does not name the project it graduated into.",
+      "update.item":
+        "Not built yet (#96): an experiment's page does not list its updates.",
+    },
   },
   "cut-paper": {
     home: {
       "home.elsewhere":
         "No Elsewhere section: Lab and Writing are keys on the keyboard, without their blurbs.",
+    },
+    "lab-entry": {
+      "lab.graduation":
+        "Not built yet (#97): an experiment's page does not name the project it graduated into.",
+      "update.item":
+        "Not built yet (#97): an experiment's page does not list its updates.",
     },
   },
   "back-page": {
@@ -334,8 +355,21 @@ export const GAPS: Partial<
       "lab.aside":
         "The lab chapter is the doodles only; Projects is a book of its own on the pile, and the style guide is not in any book.",
     },
+    "lab-entry": {
+      "lab.graduation":
+        "Not built yet (#98): an experiment's page does not name the project it graduated into.",
+      "update.item":
+        "Not built yet (#98): an experiment's page does not list its updates.",
+    },
   },
-  hion: {},
+  hion: {
+    "lab-entry": {
+      "lab.graduation":
+        "Not built yet (#99): an experiment's page does not name the project it graduated into.",
+      "update.item":
+        "Not built yet (#99): an experiment's page does not list its updates.",
+    },
+  },
 };
 
 export const isGap = (lens: LensId, kind: RouteKind, part: Part) =>
