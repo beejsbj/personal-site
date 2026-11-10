@@ -255,11 +255,16 @@ test(
       return { context, page, asked, errors };
     };
     const next = (page) => page.locator("#lens-shell [data-prism-turn='next']");
+    const shot = async (page, name) => {
+      if (SHOTS) await page.screenshot({ path: join(SHOTS, `${name}.png`) });
+    };
     /** Read every view of the open chapter, turning its pages: what
-     * `read` says of each or, given several, what each says. */
-    const leaf = async (page, read) => {
+     * `read` says of each or, given several, what each says. `picture`
+     * names a picture of each view. */
+    const leaf = async (page, read, picture) => {
       const views = [];
       for (let i = 0; i < 60; i += 1) {
+        if (picture) await shot(page, `${picture}-${i + 1}`);
         if (Array.isArray(read)) {
           const view = [];
           for (const one of read) view.push(await page.evaluate(one));
@@ -280,9 +285,6 @@ test(
         await page.waitForTimeout(450);
       }
     };
-    const shot = async (page, name) => {
-      if (SHOTS) await page.screenshot({ path: join(SHOTS, `${name}.png`) });
-    };
     /** The harness's own content: the real one, bent by its fixture. */
     const fixtureContent = (page) =>
       page.evaluate(() => window.prismHarness.content);
@@ -293,8 +295,7 @@ test(
           `${size}: the lab book has a Bench and a Shelf, the featured experiment leading`,
           async () => {
             const { context, page, errors } = await open(size, real("/lab"));
-            await shot(page, `lab-open-${size}`);
-            const views = await leaf(page, places);
+            const views = await leaf(page, places, `lab-${size}`);
             const seen = views.flat();
             const groups = labPlaces(content.lab);
             assert.deepEqual(

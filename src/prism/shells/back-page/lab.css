@@ -27,6 +27,10 @@
 :root[data-lens="back-page"] .bp-labitem[data-featured] .bp-doodle {
   width: 9em;
 }
+:root[data-lens="back-page"] .bp-book[data-mode="single"] .bp-labitem[data-featured] .bp-doodle,
+:root[data-lens="back-page"] .bp-stage[data-mode="single"] .bp-labitem[data-featured] .bp-doodle {
+  width: 7em;
+}
 /* the name keeps to its own side of the drawing, so its ruling does too */
 :root[data-lens="back-page"] .bp-flow .bp-labitem[data-featured] .bp-labitem__title {
   display: flow-root;

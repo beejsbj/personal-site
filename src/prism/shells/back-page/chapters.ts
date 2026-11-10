@@ -2,7 +2,8 @@
  * of pages written in that book's pens. There's a book for each section,
  * each on its own paper (themes.ts): hello in the squared maths copy, study
  * notes in the quiet notebook with the resume stapled in after them, slip by
- * slip, doodles in the graph book, the war on blueprint, its map first
+ * slip, the lab in the graph book (a bench of doodles, a shelf, and the
+ * Labbook kept as dated lines), the war on blueprint, its map first
  * and a page for each project after, and the essays written out in a marbled
  * composition book, its contents first and each essay after.
  *
@@ -24,6 +25,7 @@ import type { Route, SiteContent, WritingPost } from "../types";
 import { h, handDate, link, shortDate, svg } from "./dom";
 import {
   BLUE,
+  DOODLES,
   RED,
   arrow,
   camp,
@@ -787,6 +789,21 @@ const experimentLink = (b: Build, item: LabItem) =>
     item.hasPage ? null : h("span", { class: "bp-out", "aria-hidden": "true" }, " ↗"),
   );
 
+/** The doodle each experiment is given: one picked by its name, and while
+ * there are doodles to spare, one no other experiment has. */
+function doodleKinds(lab: LabItem[]) {
+  const kinds = new Map<string, number>();
+  const used = new Set<number>();
+  for (const { entries } of labPlaces(lab))
+    for (const item of entries) {
+      let kind = Math.floor(seed(`doodle-${item.slug}`)() * DOODLES);
+      if (used.size < DOODLES) while (used.has(kind)) kind = (kind + 1) % DOODLES;
+      used.add(kind);
+      kinds.set(item.slug, kind);
+    }
+  return kinds;
+}
+
 /** A place in the lab, written across the page: what it's called, ruled
  * under, and a line about it. It stays with whatever comes under it. */
 function placeHead(words: { title: string; note?: string }, key: string, place?: string) {
@@ -801,12 +818,12 @@ function placeHead(words: { title: string; note?: string }, key: string, place?:
 /** An experiment on the bench: a doodle in the margin, its name and what it
  * is. The one given pride of place is drawn larger, starred, and ruled
  * under twice. */
-function benchEntry(b: Build, item: LabItem, i: number) {
+function benchEntry(b: Build, item: LabItem, i: number, kind: number) {
   const title = h("h3", { class: "bp-labitem__title", ...part("lab.title", item.slug) }, experimentLink(b, item));
   return h(
     "article",
     { class: "bp-labitem", "data-side": i % 2 ? "right" : "left", "data-featured": !!item.featured },
-    svg(doodle(i, seed(item.slug))),
+    svg(doodle(kind, seed(item.slug))),
     item.featured ? withUnderline(title, RED, `lab-${item.slug}`, true) : title,
     h("p", { ...part("lab.summary", item.slug) }, item.summary),
   );
@@ -1024,10 +1041,12 @@ function lab(b: Build) {
     ),
     ticker(b),
   ];
+  const kinds = doodleKinds(content.lab);
   let n = 0;
   for (const { place, entries } of labPlaces(content.lab)) {
     blocks.push(placeHead(places[place], `lab-${place}`, place));
-    if (place === "bench") for (const item of entries) blocks.push(benchEntry(b, item, n++));
+    if (place === "bench")
+      for (const item of entries) blocks.push(benchEntry(b, item, n++, kinds.get(item.slug) ?? n));
     else blocks.push(shelfCard(b, entries, places[place].title));
   }
   if (content.labbook.length)
@@ -1046,7 +1065,7 @@ function labEntry(b: Build): HTMLElement[] | null {
   const item = content.lab.find((l) => l.slug === route.slug && l.hasPage);
   if (!item) return null;
   const { detail } = content.pages.lab;
-  const i = content.lab.indexOf(item);
+  const kind = doodleKinds(content.lab).get(item.slug) ?? 0;
   const links = item.href ? [{ label: copy.lab.tryIt, url: item.href }, ...item.links] : item.links;
   const became = graduatedProject(item, content.projects);
   const updates = experimentUpdates(content.labbook, item.slug);
@@ -1067,7 +1086,7 @@ function labEntry(b: Build): HTMLElement[] | null {
           h("span", { class: "bp-sticky__label" }, `${became.title} →`),
         )
       : null,
-    h("div", { class: "bp-bigdoodle" }, svg(doodle(i, seed(item.slug)))),
+    h("div", { class: "bp-bigdoodle" }, svg(doodle(kind, seed(item.slug)))),
     arrows(b, links, part("lab.links", item.slug)),
     ...prose(item.html, "lab.body", item.slug),
   ];

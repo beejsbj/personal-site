@@ -218,9 +218,63 @@ export function doodle(kind: number, rng: Rng) {
     // a spiral, the kind you draw when you should be listening
     `<path ${s} d="M60 60 m0 -4 a4 4 0 1 1 -4 4 a8 8 0 1 1 8 8 a14 14 0 1 1 -14 -14 a22 22 0 1 1 22 22 a32 32 0 1 1 -32 -32"/>
      <path ${r} d="M96 20 l6 10 l-12 0 z"/>`,
-  ][kind % 3];
-  return `<svg class="bp-doodle" data-doodle="${kind % 3}" viewBox="0 0 120 110" aria-hidden="true">${body}</svg>`;
+    // a flask with something in it
+    `<path ${s} d="M48 12 L72 13"/>
+     <path ${s} d="M53 13 L54 44 L27 91 C 22 100, 28 105, 38 105 L83 104 C 93 104, 98 99, 93 91 L66 44 L67 13"/>
+     <path ${r} d="M38 78 C 48 71, 58 84, 68 77 S 80 74, 84 78"/>
+     <path ${r} d="M57 62 m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0"/>
+     <path ${r} d="M66 52 m-2 0 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0"/>
+     <path ${r} d="M60 34 m-1.5 0 a1.5 1.5 0 1 0 3 0 a1.5 1.5 0 1 0 -3 0"/>`,
+    // a box drawn the way everyone learns to, one face shaded
+    `<path ${s} d="M28 42 L60 27 L94 39 L63 56 Z"/>
+     <path ${s} d="M28 42 L29 78 L63 95 L63 56"/>
+     <path ${s} d="M63 95 L93 76 L94 39"/>
+     <path ${r} d="M70 60 l17 -10 M70 69 l18 -11 M70 78 l18 -11 M71 86 l15 -9"/>`,
+    // a light bulb: an idea
+    `<path ${s} d="M60 16 C 37 15, 27 36, 38 53 C 44 62, 46 67, 46 75 L74 75 C 74 67, 77 62, 83 53 C 93 36, 83 16, 60 16 Z"/>
+     <path ${s} d="M48 83 L72 82 M50 91 L70 90 M56 99 L65 98"/>
+     <path ${s} d="M52 74 L56 50 L60 58 L64 50 L68 74"/>
+     <path ${r} d="M60 2 l0 7 M25 19 l6 6 M95 19 l-6 6 M11 47 l9 0 M109 47 l-9 0"/>`,
+    // a paper plane, and where it has been
+    `<path ${s} d="M12 58 L108 20 L76 97 L60 66 Z"/>
+     <path ${s} d="M60 66 L108 20"/>
+     <path ${s} d="M60 66 L62 88 L70 78"/>
+     <path ${r} d="M8 96 C 20 86, 32 100, 46 88" stroke-dasharray=".12 .08"/>`,
+    // a planet with a ring, and two stars
+    `<path ${s} d="M60 56 m-25 0 a25 25 0 1 0 50 0 a25 25 0 1 0 -50 0"/>
+     <path ${r} d="M37 65 C 14 72, 10 62, 30 50 M88 44 C 110 38, 112 50, 92 62 C 84 67, 74 70, 62 72"/>
+     <path ${r} d="M100 14 l0 10 M95 19 l10 0"/>
+     <path ${r} d="M18 88 l0 8 M14 92 l8 0"/>`,
+    // noughts and crosses, played against yourself
+    `<path ${s} d="M45 18 L43 98 M77 16 L79 99"/>
+     <path ${s} d="M14 44 L106 42 M13 74 L107 76"/>
+     <path ${r} d="M20 20 l15 15 M35 20 l-15 15"/>
+     <path ${s} d="M61 59 m-10 0 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0"/>
+     <path ${r} d="M86 82 l14 14 M100 82 l-14 14"/>
+     <path ${s} d="M93 29 m-9 0 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0"/>`,
+    // a star in one go, without lifting the pen
+    `<path ${s} d="M60 12 L79 100 L13 45 L107 44 L41 101 Z"/>
+     <path ${r} d="M100 82 l0 12 M94 88 l12 0"/>
+     <path ${r} d="M20 16 l0 9 M15.5 20.5 l9 0"/>`,
+    // a bolt of lightning
+    `<path ${s} d="M70 8 L34 58 L57 58 L46 103 L88 46 L64 47 Z"/>
+     <path ${r} d="M96 18 l9 -7 M100 31 l11 -2 M22 78 l-9 6 M24 90 l-10 1"/>`,
+    // a rocket, going
+    `<path ${s} d="M60 8 C 45 28, 42 54, 46 78 L74 78 C 78 54, 75 28, 60 8 Z"/>
+     <path ${s} d="M60 40 m-7 0 a7 7 0 1 0 14 0 a7 7 0 1 0 -14 0"/>
+     <path ${s} d="M46 60 L30 87 L46 78 M74 60 L90 87 L74 78"/>
+     <path ${r} d="M52 82 C 53 94, 58 97, 60 106 C 62 97, 67 94, 68 82"/>`,
+    // hills, and the sun over them
+    `<path ${s} d="M6 96 L40 42 L58 70 L78 30 L114 96"/>
+     <path ${s} d="M30 58 L38 62 L46 54 M68 48 L77 54 L86 46"/>
+     <path ${r} d="M22 22 m-9 0 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0"/>
+     <path ${r} d="M22 6 l0 4 M6 22 l4 0 M38 22 l-4 0 M11 11 l3 3 M33 11 l-3 3 M11 33 l3 -3 M33 33 l-3 -3"/>`,
+  ];
+  const at = kind % body.length;
+  return `<svg class="bp-doodle" data-doodle="${at}" viewBox="0 0 120 110" aria-hidden="true">${body[at]}</svg>`;
 }
+/** How many doodles there are to choose from. */
+export const DOODLES = 13;
 
 /** A strip of masking tape, torn at both ends. */
 export function tapeClip(rng: Rng) {

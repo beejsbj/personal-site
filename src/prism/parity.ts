@@ -375,9 +375,9 @@ export const GAPS: Partial<
     },
     lab: {
       "lab.more":
-        "The lab chapter is the doodles only; CodePen is among the places on the cover's return-to label.",
+        "The lab book has no link out to more sketches; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
-        "The lab chapter is the doodles only; Projects is a book of its own on the pile, and the style guide is not in any book.",
+        "The lab book has no aside; Projects is a book of its own on the pile, and the style guide is not in any book.",
     },
   },
   hion: {
