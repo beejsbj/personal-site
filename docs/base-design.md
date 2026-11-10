@@ -1,5 +1,30 @@
 # Base homepage: warm welcome
 
+## Lab: the Bench and the Shelf (November, issue #93)
+
+`/lab` is a room with two places (vocabulary in `CONTEXT.md`), built from
+the existing grammar with no new tokens. Chosen under delegated authority;
+it still needs Burooj's eye.
+
+- **`LabRoom`** is the page: opening, each place that holds something under
+  its own heading (`pages/lab.md` `places`), a `labbook` slot below the Shelf,
+  then the way out. `labPlaces` (`src/lib/rules.ts`) decides the groups and
+  their order for every lens: featured first, then `order`. An empty place
+  renders nothing.
+- **`LabCard`** has three layouts. On the Bench things lie spread out and a
+  touch off the straight (`--settle-angle`), straightening when picked up: a
+  framed picture, or, with no cover, a slip of `Note` paper. The featured
+  experiment takes the width of its place. On the Shelf an experiment is a
+  quiet row standing on its board (a rule with the hatch beneath), words to
+  the left and a small picture at the right end.
+- **Where a title goes** is the Link family's own rule: the satellite arrow
+  only when the experiment lives elsewhere. A page entry has none.
+- Type and era are optional; the meta line shows what there is and
+  disappears when there is nothing.
+- `/prism/lab-fixture` renders the same room on fixture experiments
+  (`?fixture=shelf-only`, `?fixture=no-covers`), for the browser test and
+  for looking at states the content does not hold yet.
+
 ## Current decision: one ball nav, one link family, peeking initials (October, PR #10 round 4)
 
 This supersedes "normal navigation" and "decorative circles" below. Burooj
