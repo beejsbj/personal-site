@@ -14,12 +14,14 @@
  *   sign   two threads to the ends of its words (hung headings)
  *   pull   a pull-cord: a thread down to a knot beside its label
  *   tassel the two hions falling from a knot and parting in two curls
+ *   bound  thread wound tight round each word of a redacted update
+ *          (`[data-redaction-bar]`, as long as its number): nothing hangs
  *
  * The hang length is `--hion-hang` on the element (px). */
 import { curl, pendant } from "./dance";
-import { drawnOn, still, textExtent } from "./dom";
+import { drawnOn, signExtent, still, textExtent } from "./dom";
 import { LABELS } from "./spun";
-import { type Mark, Path, knot, paint, rng, thread, wraps, type Hue } from "./pastel";
+import { type Mark, Path, knot, paint, rng, thread, winding, wraps, type Hue } from "./pastel";
 
 const PAD = 26;
 
@@ -76,7 +78,7 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
     out.push(...knot(xl, top + 1, 3.5, seed + 1), ...knot(xr, top + 1, 3.5, seed + 2));
     out.push(...wraps(PAD + 2, at + 2, 1, seed + 3), ...wraps(PAD + w - 2, at + 2, -1, seed + 4));
   } else if (type === "sign") {
-    const [l, r] = textExtent(el) ?? [0, w];
+    const [l, r] = signExtent(el) ?? [0, w];
     const inset = Math.min(28, (r - l) * 0.12);
     const xl = PAD + l + inset;
     const xr = PAD + r - inset;
@@ -104,6 +106,11 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
       const end = curl(x, at, -1, length * 0.85, seed + 2, 1.8).at(-1);
       if (end) el.dataset.knot = `${(end[0] - PAD).toFixed(1)},${(end[1] - at).toFixed(1)}`;
     }
+  } else if (type === "bound") {
+    let s = seed;
+    for (const bar of el.querySelectorAll<HTMLElement>(":scope > [data-redaction-bar]")) {
+      out.push(...winding(PAD + bar.offsetLeft, at + bar.offsetTop, bar.offsetWidth, bar.offsetHeight, hue, s++));
+    }
   }
   return out;
 }
@@ -116,7 +123,7 @@ function inkOne(el: HTMLElement) {
   if (!w || !h) return;
   const drop = hangOf(el);
   const type = el.dataset.ink;
-  const tall = type === "tassel" ? h + 40 : type === "pull" ? h : 28;
+  const tall = type === "tassel" ? h + 40 : type === "pull" || type === "bound" ? h : 28;
   const signature = `${w}x${h}:${drop}:${getComputedStyle(el).getPropertyValue("--hion-tassel-x")}`;
   if (drawn.get(el) === signature) return;
   drawn.set(el, signature);
