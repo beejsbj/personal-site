@@ -184,6 +184,8 @@ export interface SiteContent {
     header: { label: string; home: string; hello: string; items: string[] };
     footer: { links: Link[]; signoff: string };
     social: { label: string; href: string }[];
+    /** The ticker: what the strip of headlines is called. */
+    ticker: { label: string };
   };
   pages: {
     home: {
@@ -252,6 +254,28 @@ export interface SiteContent {
       aside: string;
       /** What the Bench and the Shelf are called, and a line about each. */
       places: Record<"bench" | "shelf", { title: string; note: string }>;
+      /** The Labbook: its heading and a line about it; what introduces the
+       * experiment or project an update is about; what an artifact's frame
+       * says before it loads (`load`), where it lives instead (`open`); and
+       * how a redacted update, and each kind of work it may be, is named. */
+      labbook: {
+        title: string;
+        note: string;
+        listLabel: string;
+        related: { experiment: string; project: string };
+        artifact: {
+          load: { pen: string; demo: string };
+          open: { pen: string; demo: string };
+          note: string;
+        };
+        redacted: {
+          label: string;
+          works: Record<
+            "code" | "design" | "writing" | "research" | "other",
+            string
+          >;
+        };
+      };
       /** Copy for each experiment's own page. `graduated` introduces the
        * project it became; `updates` heads its part of the Labbook. */
       detail: {

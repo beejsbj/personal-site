@@ -130,9 +130,12 @@ export function labbookUpdate(id: string, update: UpdateData): Update {
   });
 }
 
+/** The id of the element that holds an update in the Labbook. */
+export const labbookAnchor = (id: string) => `u-${id}`;
+
 /** Where an update sits in the Labbook. A headline links to the first of
  * its updates this way. */
-export const labbookHref = (id: string) => `/lab#u-${id}`;
+export const labbookHref = (id: string) => `/lab#${labbookAnchor(id)}`;
 
 /** The Labbook's one order: newest first and, on one day, by id. */
 export const newestFirst = <T extends { id: string; date: string }>(
