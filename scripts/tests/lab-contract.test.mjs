@@ -183,3 +183,38 @@ test("a redacted update carries nothing that could say what it hides", () => {
       `a redacted update with ${field}`,
     );
 });
+
+const headline = (over = {}) => ({
+  date: "2026-09-26",
+  text: "A day now fits on a ring",
+  updates: ["dayshaper"],
+  ...over,
+});
+
+test("a headline is a dated line about one or more updates", () => {
+  assert.deepEqual(problems("headlines", headline()), []);
+  assert.deepEqual(
+    problems("headlines", headline({ updates: ["dayshaper", "qrng-demos"] })),
+    [],
+  );
+  const { text, ...wordless } = headline();
+  assert.deepEqual(problems("headlines", wordless), ["text: Required"]);
+  assert.match(
+    problems("headlines", headline({ updates: [] })).join("\n"),
+    /^updates: /,
+  );
+  assert.match(
+    problems("headlines", headline({ date: "26 Sep 2026" })).join("\n"),
+    /^date: /,
+  );
+});
+
+test("a headline naming an update that does not exist is rejected", () => {
+  assert.deepEqual(
+    problems(
+      "headlines",
+      headline({ updates: ["dayshaper", "an-update-nobody-wrote"] }),
+    ),
+    ['updates.1: No update has the id "an-update-nobody-wrote".'],
+  );
+});

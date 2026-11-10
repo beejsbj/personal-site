@@ -13,7 +13,9 @@ import type {
 import { selectActivitySnapshot } from "./activity.mjs";
 import {
   labbookUpdate,
+  publishedHeadlines,
   streamUpdate,
+  type Headline,
   type InStream,
   type Update,
 } from "./labbook";
@@ -170,6 +172,16 @@ export async function getUpdates() {
 export async function getLabbook(): Promise<Update[]> {
   return (await dueUpdates()).map((entry) =>
     labbookUpdate(updateId(entry), entry.data),
+  );
+}
+
+/** The headlines whose updates are all in the Labbook, newest first. */
+export async function getHeadlines(): Promise<Headline[]> {
+  const entries: CollectionEntry<"headlines">[] =
+    await getCollection("headlines");
+  return publishedHeadlines(
+    entries.map((entry) => ({ id: entry.id, ...entry.data })),
+    await getLabbook(),
   );
 }
 

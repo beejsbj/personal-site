@@ -5,6 +5,7 @@ import ResumeProse from "../../components/ResumeProse.astro";
 import {
   getDerived,
   getFeatured,
+  getHeadlines,
   getHome,
   getLab,
   getLabbook,
@@ -68,12 +69,13 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
       getLabPage(),
       getWritingPage(),
     ]);
-  const [projects, lab, updates, labbook, featured, derived] =
+  const [projects, lab, updates, labbook, headlines, featured, derived] =
     await Promise.all([
       getProjects(),
       getLab(),
       getUpdates(),
       getLabbook(),
+      getHeadlines(),
       getFeatured(),
       getDerived(),
     ]);
@@ -160,6 +162,7 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
       };
     }),
     labbook,
+    headlines,
     featured: featured.map((entry) => entry.slug),
     derived,
     lenses,

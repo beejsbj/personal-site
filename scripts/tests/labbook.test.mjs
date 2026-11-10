@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   labbookHref,
   labbookUpdate,
+  publishedHeadlines,
   streamUpdate,
   updateDateLabel,
 } from "../../src/lib/labbook.ts";
@@ -157,7 +158,35 @@ test("the home stream has no redacted updates", () => {
   assert.equal(streamUpdate("something-private", redacted()), undefined);
 });
 
-test("content.json carries the Labbook and where each experiment sits", async () => {
+test("a headline is published only while every update it names is in the Labbook", () => {
+  const labbook = [
+    labbookUpdate("lotus-replay", open()),
+    labbookUpdate("something-private", redacted()),
+  ];
+  const headline = (id, date, updates) => ({
+    id,
+    date,
+    text: `Headline ${id}`,
+    updates,
+  });
+  const about = {
+    one: headline("one", "2026-09-26", ["lotus-replay"]),
+    both: headline("both", "2026-09-27", ["something-private", "lotus-replay"]),
+    withdrawn: headline("withdrawn", "2026-09-28", ["taken-down"]),
+    partly: headline("partly", "2026-09-28", ["lotus-replay", "taken-down"]),
+    sameDay: headline("a-same-day", "2026-09-26", ["lotus-replay"]),
+  };
+  const before = structuredClone(about);
+  assert.deepEqual(
+    publishedHeadlines(Object.values(about), labbook),
+    // Newest first; on one day, in id order.
+    [about.both, about.sameDay, about.one],
+  );
+  assert.deepEqual(about, before);
+  assert.deepEqual(publishedHeadlines(Object.values(about), []), []);
+});
+
+test("content.json carries the Labbook, the headlines and where each experiment sits", async () => {
   const fixture = await serveRuntimeFixture();
   try {
     const data = await (await fixture.fetch("/prism/content.json")).json();
@@ -192,6 +221,15 @@ test("content.json carries the Labbook and where each experiment sits", async ()
         .reverse(),
     );
     assert.ok(data.labbook.length >= 7, "the seeded updates are all here");
+
+    assert.deepEqual(data.headlines, [
+      {
+        id: "dayshaper-is-out",
+        date: "2026-09-26",
+        text: "Dayshaper is out: a day planned around a 24-hour ring",
+        updates: ["dayshaper"],
+      },
+    ]);
 
     assert.deepEqual(
       data.lab.map((entry) => [entry.slug, entry.place]),

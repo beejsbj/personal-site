@@ -159,3 +159,19 @@ export function streamUpdate<T extends UpdateData>(
     linkLabel: update.linkLabel ?? update.title,
   } as InStream<T>;
 }
+
+/** The headlines the ticker may show, newest first. A headline goes with
+ * its updates: when one it names is not in the Labbook (withdrawn, expired
+ * or not yet due), the headline is not published either. */
+export function publishedHeadlines(
+  headlines: Headline[],
+  labbook: Update[],
+): Headline[] {
+  const published = new Set(labbook.map((update) => update.id));
+  return headlines
+    .filter((headline) => headline.updates.every((id) => published.has(id)))
+    .sort(
+      (left, right) =>
+        right.date.localeCompare(left.date) || left.id.localeCompare(right.id),
+    );
+}

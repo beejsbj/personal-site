@@ -15,7 +15,7 @@ import type CallingCardCopy from "../../content/lenses/calling-card.json";
 import type CutPaperCopy from "../../content/lenses/cut-paper.json";
 import type BackPageCopy from "../../content/lenses/back-page.json";
 import type HionCopy from "../../content/lenses/hion.json";
-import type { Update as LabbookUpdate } from "../../lib/labbook";
+import type { Headline, Update as LabbookUpdate } from "../../lib/labbook";
 
 export interface Link {
   label: string;
@@ -275,6 +275,8 @@ export interface SiteContent {
   /** The Labbook: every due, unexpired update, newest first. A redacted
    * one is its shape alone. */
   labbook: LabbookUpdate[];
+  /** The headlines written about updates in the Labbook, newest first. */
+  headlines: Headline[];
   /** Slugs of the featured projects, in project order (shared rule; never
    * empty while there are projects). */
   featured: string[];
