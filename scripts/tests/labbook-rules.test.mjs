@@ -242,7 +242,6 @@ test("each lens that has no Labbook or ticker yet says so, naming its ticket", (
     "calling-card": "#96",
     "cut-paper": "#97",
     "back-page": "#98",
-    hion: "#99",
   };
   for (const [lens, ticket] of Object.entries(tickets)) {
     for (const [kind, part] of [
