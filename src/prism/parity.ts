@@ -380,23 +380,6 @@ export const GAPS: Partial<
         "The lab book has no aside; Projects is a book of its own on the pile, and the style guide is not in any book.",
     },
   },
-  hion: {
-    home: {
-      "ticker.headline": "Not built yet (#99): the home page has no ticker.",
-    },
-    lab: {
-      "ticker.headline": "Not built yet (#99): the Lab has no ticker.",
-      "update.item": "Not built yet (#99): the Lab has no Labbook.",
-      "update.redacted":
-        "Not built yet (#99): the Lab has no Labbook, so no redacted updates.",
-    },
-    "lab-entry": {
-      "lab.graduation":
-        "Not built yet (#99): an experiment's page does not name the project it graduated into.",
-      "update.item":
-        "Not built yet (#99): an experiment's page does not list its updates.",
-    },
-  },
 };
 
 export const isGap = (lens: LensId, kind: RouteKind, part: Part) =>

@@ -67,7 +67,7 @@ import {
   acrossX,
 } from "./pastel";
 import type { Composition, Limb } from "./loom";
-import { textExtent } from "./dom";
+import { signExtent } from "./dom";
 import { WEFT_GAP } from "./spun";
 
 interface Box {
@@ -133,7 +133,7 @@ export function compose(
   const inkBox = (el: HTMLElement): Box => {
     const b = box(el);
     if (el.dataset.ink !== "sign") return b;
-    const extent = textExtent(el);
+    const extent = signExtent(el);
     return extent ? { ...b, l: b.l + extent[0], r: b.l + extent[1] } : b;
   };
   const firstLineMiddle = (el: HTMLElement) => {

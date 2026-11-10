@@ -22,6 +22,7 @@ import type { LensShell, Route, ShellContext } from "../types";
 import { h, setNewTabNote, still as showStill, wait } from "./dom";
 import { ink } from "./ink";
 import { fabricOf } from "./fabric";
+import { tendLab } from "./lab";
 import { createLife } from "./life";
 import { createLoom } from "./loom";
 import { createNav, type Nav } from "./nav";
@@ -202,6 +203,12 @@ function show(route: Route, first: boolean) {
         onIdleChange: ctx.onIdleChange,
       });
   drew = () => (life ? life.wake() : skein.wake());
+  // The Labbook's cords and the reel answer; a link to an update lands.
+  const tended = tendLab(page, {
+    signal: controller.signal,
+    catchUp: (to) => loom.catchUp(to),
+    instant: still(),
+  });
   live = { path: route.path, page, loom, skein, life, track, controller };
   // For a look from the console while developing.
   if (import.meta.env.DEV) Object.assign(window, { __hion: live });
@@ -232,6 +239,7 @@ function show(route: Route, first: boolean) {
       ground();
       later(controller.signal, WOVEN, woven);
     }
+    if (!ctx.face) tended.land();
   };
   // Settled: drawn before it is first painted, so nothing is seen arriving.
   if (settled) begin();
