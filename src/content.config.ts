@@ -228,28 +228,89 @@ const UPDATE_SOURCES = [
   "substack",
   "bjslab",
   "manual",
+  "codepen",
 ] as const;
 
+/** The thing an update shows for itself. */
+const artifactSchema = z.object({
+  kind: z.enum(["image", "video", "pen", "demo", "sound"]),
+  src: z.string().min(1),
+  alt: z.string(),
+  poster: z.string().optional(),
+});
+
+/** "2026-07-01". */
+const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+/** A field one kind of update must not have. An unknown key would only be
+ * dropped; these are refused, so a mistake is loud. */
+const refused = (message: string) =>
+  z.undefined({ invalid_type_error: message }).optional();
+
+const updateFields = {
+  // Events describe things that happened, not another project/writing collection.
+  kind: z.enum(UPDATE_KINDS).default("project"),
+  source: z.enum(UPDATE_SOURCES).default("site"),
+  evidence: z
+    .object({
+      url: z.string().url(),
+      observedAt: z.string().datetime({ offset: true }),
+    })
+    .optional(),
+  date: day,
+  /** The date said in other words; without it the site writes
+   * "01 Jul 2026" from `date`. */
+  dateLabel: z.string().optional(),
+  relatedProject: z.string().optional(),
+  /** A lab slug. */
+  relatedExperiment: z.string().optional(),
+  expiresAt: z.string().datetime({ offset: true }).optional(),
+};
+
+const openUpdateSchema = z.object({
+  ...updateFields,
+  visibility: z.literal("open"),
+  title: z.string(),
+  summary: z.string(),
+  href: z.string().min(1).optional(),
+  linkLabel: z.string().optional(),
+  artifact: artifactSchema.optional(),
+  shape: refused("Only a redacted update has a shape."),
+});
+
+/** Something made that stays private: the site is told that it happened
+ * and what shape it has, and never what it says. */
+const noWords = refused("A redacted update shows its shape and no words.");
+const redactedUpdateSchema = z.object({
+  ...updateFields,
+  visibility: z.literal("redacted"),
+  shape: z.object({
+    work: z.enum(["code", "design", "writing", "research", "other"]),
+    /** The lengths of the black bars. Chosen, not measured from the
+     * hidden text. */
+    bars: z.array(z.number().positive()).min(1),
+  }),
+  title: noWords,
+  summary: noWords,
+  href: noWords,
+  linkLabel: noWords,
+  dateLabel: noWords,
+  artifact: noWords,
+  evidence: noWords,
+});
+
 const updateSchema = z
-  .object({
-    // Events describe things that happened, not another project/writing collection.
-    kind: z.enum(UPDATE_KINDS).default("project"),
-    source: z.enum(UPDATE_SOURCES).default("site"),
-    evidence: z
-      .object({
-        url: z.string().url(),
-        observedAt: z.string().datetime({ offset: true }),
-      })
-      .optional(),
-    title: z.string(),
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    dateLabel: z.string(),
-    summary: z.string(),
-    href: z.string().min(1),
-    linkLabel: z.string(),
-    relatedProject: z.string().optional(),
-    expiresAt: z.string().datetime({ offset: true }).optional(),
-  })
+  .preprocess(
+    // Open unless it says otherwise.
+    (update) =>
+      update && typeof update === "object" && !("visibility" in update)
+        ? { ...update, visibility: "open" }
+        : update,
+    z.discriminatedUnion("visibility", [
+      openUpdateSchema,
+      redactedUpdateSchema,
+    ]),
+  )
   .superRefine((update, context) => {
     if (
       ["status", "location", "agents"].includes(update.kind) &&
@@ -265,6 +326,8 @@ const updateSchema = z
   });
 
 export type UpdateData = z.infer<typeof updateSchema>;
+export type UpdateKind = (typeof UPDATE_KINDS)[number];
+export type UpdateSource = (typeof UPDATE_SOURCES)[number];
 
 const siteSchema = z.object({
   name: z.string(),

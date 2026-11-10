@@ -1,10 +1,10 @@
 ---
-import type { UpdateData } from "../../content.config";
+import type { StreamUpdate } from "../../lib/portfolio";
 import { selectActivitySnapshot } from "../../lib/activity.mjs";
 import UpdateEntry from "./UpdateEntry.astro";
 
 interface Props {
-  updates: (UpdateData & { id?: string })[];
+  updates: (StreamUpdate & { id?: string })[];
   copy: {
     intro: string;
     listLabel: string;

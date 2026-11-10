@@ -324,6 +324,7 @@ export const FIXTURES: Record<string, Fixture> = {
           hasPage: true,
           title: "A sketch with no cover",
           summary: "An experiment that lives here, with words but no picture.",
+          place: "bench" as const,
           type: "Canvas + sound",
           sourceEra: "This site",
           links: [{ label: "Source", url: "https://example.com/source" }],

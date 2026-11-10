@@ -7,6 +7,7 @@ import {
   getFeatured,
   getHome,
   getLab,
+  getLabbook,
   getLabPage,
   getProjects,
   getProjectsPage,
@@ -19,7 +20,6 @@ import {
   getPost,
   labDetail,
   labHasPage,
-  updateId,
 } from "../../lib/portfolio";
 import { resolveLink } from "../../lib/rules";
 import { formatDate, writingHeaders } from "../../lib/writing";
@@ -68,13 +68,15 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
       getLabPage(),
       getWritingPage(),
     ]);
-  const [projects, lab, updates, featured, derived] = await Promise.all([
-    getProjects(),
-    getLab(),
-    getUpdates(),
-    getFeatured(),
-    getDerived(),
-  ]);
+  const [projects, lab, updates, labbook, featured, derived] =
+    await Promise.all([
+      getProjects(),
+      getLab(),
+      getUpdates(),
+      getLabbook(),
+      getFeatured(),
+      getDerived(),
+    ]);
   const resumeBody = await html(resume.entry);
   const resumeStructure = await container.renderToString(ResumeProse, {
     props: { resume },
@@ -145,13 +147,11 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
         };
       }),
     ),
-    updates: updates.map((entry) => {
-      const { evidence, expiresAt, ...data } = entry.data;
+    updates: updates.map(({ evidence, expiresAt, ...data }) => {
       void evidence;
       void expiresAt;
       return {
         ...data,
-        id: updateId(entry),
         kindLabel:
           updateKinds[data.kind as keyof typeof updateKinds] ?? data.kind,
         sourceLabel:
@@ -159,6 +159,7 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
           data.source,
       };
     }),
+    labbook,
     featured: featured.map((entry) => entry.slug),
     derived,
     lenses,

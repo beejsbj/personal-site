@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { parse, problems } from "./lib/content-config.mjs";
 
@@ -16,10 +17,7 @@ const experiment = (over = {}) => ({
 test("an experiment needs no type or era of its own", () => {
   assert.deepEqual(problems("lab", experiment()), []);
   assert.deepEqual(
-    problems(
-      "lab",
-      experiment({ type: "SVG + motion", sourceEra: "CodePen" }),
-    ),
+    problems("lab", experiment({ type: "SVG + motion", sourceEra: "CodePen" })),
     [],
   );
 });
@@ -46,4 +44,142 @@ test("an experiment may graduate into a project, and one may take pride of place
   const plain = parse("lab", experiment());
   assert.equal(plain.graduatedTo, undefined);
   assert.equal(plain.featured, undefined);
+});
+
+const update = (over = {}) => ({
+  title: "A fixture update",
+  date: "2026-09-26",
+  summary: "Something small happened, worth a note.",
+  ...over,
+});
+
+test("an update is open unless it says otherwise", () => {
+  const asWrittenBefore = update({
+    dateLabel: "26 Sep 2026",
+    href: "/projects/dayshaper",
+    linkLabel: "Read the project",
+  });
+  assert.equal(parse("updates", asWrittenBefore).visibility, "open");
+});
+
+test("an update needs no link and no date label", () => {
+  assert.deepEqual(problems("updates", update()), []);
+});
+
+test("an update may come from CodePen, and the site has a name for that", () => {
+  assert.deepEqual(problems("updates", update({ source: "codepen" })), []);
+  const site = JSON.parse(readFileSync("src/content/site/config.json", "utf8"));
+  assert.equal(site.updateSources.codepen, "CodePen");
+});
+
+test("an open update may belong to an experiment and carry an artifact", () => {
+  const artifact = {
+    kind: "pen",
+    src: "https://codepen.io/beejsbj/pen/abXZWLQ",
+    alt: "A lotus drawing itself one line at a time",
+    poster: "/images/lab/motion-path-graph.svg",
+  };
+  const parsed = parse(
+    "updates",
+    update({ relatedExperiment: "motion-path-graph", artifact }),
+  );
+  assert.equal(parsed.relatedExperiment, "motion-path-graph");
+  assert.deepEqual(parsed.artifact, artifact);
+
+  for (const kind of ["image", "video", "pen", "demo", "sound"])
+    assert.deepEqual(
+      problems("updates", update({ artifact: { ...artifact, kind } })),
+      [],
+    );
+  assert.match(
+    problems(
+      "updates",
+      update({ artifact: { ...artifact, kind: "hologram" } }),
+    ).join("\n"),
+    /^artifact\.kind: /,
+  );
+  const { alt, ...unlabelled } = artifact;
+  assert.deepEqual(problems("updates", update({ artifact: unlabelled })), [
+    "artifact.alt: Required",
+  ]);
+});
+
+const shape = { work: "code", bars: [4, 2, 3] };
+const redacted = (over = {}) => ({
+  date: "2026-09-26",
+  visibility: "redacted",
+  shape,
+  ...over,
+});
+
+test("a redacted update with a title or a summary is rejected", () => {
+  assert.deepEqual(
+    problems(
+      "updates",
+      redacted({ title: "The hidden thing", summary: "What it was." }),
+    ),
+    [
+      "title: A redacted update shows its shape and no words.",
+      "summary: A redacted update shows its shape and no words.",
+    ],
+  );
+});
+
+test("an open update with a shape is rejected", () => {
+  assert.deepEqual(problems("updates", update({ shape })), [
+    "shape: Only a redacted update has a shape.",
+  ]);
+});
+
+test("a redacted update is a date, a kind of work and some black bars", () => {
+  assert.deepEqual(parse("updates", redacted({ source: "bjslab" })), {
+    kind: "project",
+    source: "bjslab",
+    date: "2026-09-26",
+    visibility: "redacted",
+    shape,
+  });
+  for (const work of ["code", "design", "writing", "research", "other"])
+    assert.deepEqual(
+      problems("updates", redacted({ shape: { ...shape, work } })),
+      [],
+    );
+
+  const { shape: _, ...shapeless } = redacted();
+  assert.deepEqual(problems("updates", shapeless), ["shape: Required"]);
+  assert.match(
+    problems(
+      "updates",
+      redacted({ shape: { ...shape, work: "plotting" } }),
+    ).join("\n"),
+    /^shape\.work: /,
+  );
+});
+
+test("a redacted update always has something to show: at least one bar, each with a length", () => {
+  for (const bars of [[], [4, 0], [4, -2]])
+    assert.match(
+      problems("updates", redacted({ shape: { ...shape, bars } })).join("\n"),
+      /^shape\.bars/,
+      `bars ${JSON.stringify(bars)} should be refused`,
+    );
+});
+
+test("a redacted update carries nothing that could say what it hides", () => {
+  const words = {
+    href: "https://example.com/the-hidden-thing",
+    linkLabel: "See the hidden thing",
+    dateLabel: "The day of the hidden thing",
+    artifact: { kind: "image", src: "/images/hidden.png", alt: "Hidden" },
+    evidence: {
+      url: "https://example.com/the-hidden-thing",
+      observedAt: "2026-09-26T08:00:00Z",
+    },
+  };
+  for (const [field, value] of Object.entries(words))
+    assert.deepEqual(
+      problems("updates", redacted({ [field]: value })),
+      [`${field}: A redacted update shows its shape and no words.`],
+      `a redacted update with ${field}`,
+    );
 });

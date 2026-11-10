@@ -1,9 +1,9 @@
 ---
-import type { UpdateData } from "../../content.config";
+import type { StreamUpdate } from "../../lib/portfolio";
 import Link from "../primitives/Link.astro";
 import { part } from "../../prism/parts";
 
-type Props = UpdateData & {
+type Props = StreamUpdate & {
   /** The update's id, marking it as an update.item part. */
   id?: string;
   labels: { kinds: Record<string, string>; sources: Record<string, string> };
