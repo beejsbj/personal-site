@@ -265,9 +265,12 @@ export async function getLabPage() {
     aside: need(data.aside, "aside in pages/lab.md"),
     detail: {
       eyebrow: need(detail.eyebrow, "entry.eyebrow in pages/lab.md"),
+      back: resolveLink(site, need(detail.back, "entry.back in pages/lab.md")),
       labels: {
         type: need(detail.labels.type, "entry.labels.type"),
         era: need(detail.labels.era, "entry.labels.era"),
+        graduated: need(detail.labels.graduated, "entry.labels.graduated"),
+        updates: need(detail.labels.updates, "entry.labels.updates"),
       },
     },
   };

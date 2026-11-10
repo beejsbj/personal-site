@@ -250,7 +250,18 @@ export interface SiteContent {
       more: Link;
       /** Inline markdown. */
       aside: string;
-      detail: { eyebrow: string; labels: { type: string; era: string } };
+      /** Copy for each experiment's own page. `graduated` introduces the
+       * project it became; `updates` heads its part of the Labbook. */
+      detail: {
+        eyebrow: string;
+        back: Link;
+        labels: {
+          type: string;
+          era: string;
+          graduated: string;
+          updates: string;
+        };
+      };
     };
     notFound: { title: string; description: string; header: Header };
   };

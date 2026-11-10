@@ -1,0 +1,35 @@
+---
+/** Daylight's side of the fuzz harness: an experiment's own page, on a
+ * fixture experiment (src/prism/fixtures.ts). /prism/harness shows the same
+ * fixtures to the shells; Daylight is rendered on the server, so its page
+ * is built here. scripts/tests/lab-entry.browser.mjs reads it. */
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import ExperimentPage from "../../../../components/ExperimentPage.astro";
+import { getLabPage, getProjects } from "../../../../lib/portfolio";
+import {
+  experimentFixtures,
+  type ExperimentFixture,
+} from "../../../../prism/fixtures";
+
+export async function getStaticPaths() {
+  return experimentFixtures(await getProjects()).map((fixture) => ({
+    params: { slug: fixture.entry.slug },
+    props: { fixture },
+  }));
+}
+
+const { entry } = (Astro.props as { fixture: ExperimentFixture }).fixture;
+const { detail } = await getLabPage();
+---
+
+<BaseLayout
+  title={entry.title}
+  description={entry.summary}
+  image={entry.cover}
+  pageClass="page-entry"
+  tool
+>
+  <ExperimentPage slug={entry.slug} experiment={entry} copy={detail}>
+    <Fragment set:html={entry.html} />
+  </ExperimentPage>
+</BaseLayout>

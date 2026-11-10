@@ -1,0 +1,69 @@
+---
+/** An experiment's own page: its words, links and pictures. The slot is its
+ * body. /lab/<slug> renders it for an entry in src/content, and
+ * /prism/fixtures/lab/<slug> for a fixture. */
+import PageHeader from "./PageHeader.astro";
+import MediaRail from "./MediaRail.astro";
+import Link from "../design/primitives/Link.astro";
+import { part } from "../prism/parts";
+import type { Link as LinkTo, Media } from "../prism/shells/types";
+
+interface Props {
+  slug: string;
+  experiment: {
+    title: string;
+    summary: string;
+    type: string;
+    sourceEra: string;
+    cover?: string;
+    links: { label: string; url: string }[];
+    media: Media[];
+  };
+  /** `entry` in pages/lab.md. */
+  copy: {
+    eyebrow: string;
+    back: LinkTo;
+    labels: { type: string; era: string; graduated: string; updates: string };
+  };
+}
+const { slug, experiment, copy } = Astro.props;
+---
+
+<section class="shell entry-page">
+  <PageHeader
+    eyebrow={copy.eyebrow}
+    title={experiment.title}
+    intro={experiment.summary}
+    marks={{
+      title: part("lab.title", slug),
+      intro: part("lab.summary", slug),
+    }}
+  />
+
+  <div class="entry-page__meta" {...part("lab.meta", slug)}>
+    <div>
+      <span class="entry-page__label">{copy.labels.type}</span>
+      <p>{experiment.type}</p>
+    </div>
+    <div>
+      <span class="entry-page__label">{copy.labels.era}</span>
+      <p>{experiment.sourceEra}</p>
+    </div>
+  </div>
+
+  {experiment.links.length > 0 && (
+    <div class="entry-page__links" {...part("lab.links", slug)}>
+      {experiment.links.map((link) => (
+        <Link treatment="pill" href={link.url} arrow newTab>
+          {link.label}
+        </Link>
+      ))}
+    </div>
+  )}
+
+  <MediaRail media={experiment.media} {...part("lab.media", slug)} />
+
+  <article class="prose" {...part("lab.body", slug)}>
+    <slot />
+  </article>
+</section>

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { experimentUpdates } from "../../src/lib/labbook.ts";
 import { checkGraduations, graduatedProject } from "../../src/lib/rules.ts";
@@ -89,4 +90,18 @@ test("an experiment's updates are the ones about it, newest first", () => {
   assert.deepEqual(experimentUpdates(labbook, "lotus-studies")[1], redacted);
   assert.deepEqual(experimentUpdates(labbook, "motion-path-graph"), []);
   assert.deepEqual(labbook, before);
+});
+
+test("the fixture experiments' pages are built for the tests, and kept out of search", () => {
+  for (const slug of ["fixture-sketch", "fixture-poster", "fixture-study"]) {
+    const page = readFileSync(
+      `dist/client/prism/fixtures/lab/${slug}/index.html`,
+      "utf8",
+    );
+    assert.match(page, /noindex, follow/, `${slug} is not indexed`);
+  }
+  assert.doesNotMatch(
+    readFileSync("dist/client/sitemap-0.xml", "utf8"),
+    /\/prism\/fixtures\//,
+  );
 });
