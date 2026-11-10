@@ -629,7 +629,10 @@ test(
             for (const path of ["/", "/lab"]) {
               const { context, page, errors } = await open(size, real(path));
               await turnTo(page, "[data-ticker]");
-              await shot(page, `ticker${path.replace("/", "-")}-${size}`);
+              await shot(
+                page,
+                `ticker-still-${path === "/" ? "home" : "lab"}-${size}`,
+              );
               const strip = await page.evaluate(ticker);
               assert.equal(strip.name, content.site.ticker.label);
               assert.equal(strip.tag, content.site.ticker.label);
@@ -674,6 +677,14 @@ test(
             await page.waitForTimeout(2500);
             const first = await page.evaluate(ticker);
             assert.equal(first.running, 2, "the strip is being pulled");
+            await shot(page, `ticker-lab-${size}`);
+            if (SHOTS) {
+              const home = await open(size, real("/"), { motion: true });
+              await turnTo(home.page, "[data-ticker]");
+              await home.page.waitForTimeout(2500);
+              await shot(home.page, `ticker-home-${size}`);
+              await home.context.close();
+            }
             const ids = content.headlines.map((headline) => headline.id);
             // Within two pulls a different headline is in the window, and
             // the strip has not moved the page around it.
