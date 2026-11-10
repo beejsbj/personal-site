@@ -76,6 +76,27 @@ export function orderLab<T extends { order: number; title: string }>(
   );
 }
 
+/** The project an experiment graduated into, when it says it did. */
+export function graduatedProject<P extends { slug: string }>(
+  entry: { graduatedTo?: string },
+  projects: P[],
+): P | undefined {
+  return projects.find((project) => project.slug === entry.graduatedTo);
+}
+
+/** Every experiment that graduated names a project that is there. Naming
+ * one nobody wrote is a mistake in the content, and stops the build. */
+export function checkGraduations(
+  lab: { slug: string; graduatedTo?: string }[],
+  projects: { slug: string }[],
+): void {
+  for (const entry of lab)
+    if (entry.graduatedTo && !graduatedProject(entry, projects))
+      throw new Error(
+        `No project has the slug "${entry.graduatedTo}" (graduatedTo in lab/${entry.slug}.md).`,
+      );
+}
+
 // ---- resume -------------------------------------------------------------------
 
 const MONTHS = [

@@ -20,6 +20,7 @@ import {
   type Update,
 } from "./labbook";
 import {
+  checkGraduations,
   dateLine,
   derive,
   entryHeading,
@@ -118,10 +119,18 @@ export async function getProjects(): Promise<ProjectEntry[]> {
   return orderProjects(visible.map(sortable)).map((item) => item.entry);
 }
 
-/** Lab entries that are not hidden, by `order`. */
+/** Lab entries that are not hidden, by `order`. One that graduated into a
+ * project that is not there stops the build. */
 export async function getLab(): Promise<LabEntry[]> {
   const visible: LabEntry[] = (await getCollection("lab")).filter(
     (entry: LabEntry) => !entry.data.hidden,
+  );
+  checkGraduations(
+    visible.map((entry) => ({
+      slug: entry.slug,
+      graduatedTo: entry.data.graduatedTo,
+    })),
+    await getProjects(),
   );
   return orderLab(
     visible.map((entry: LabEntry) => ({

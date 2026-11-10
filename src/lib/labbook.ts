@@ -134,6 +134,17 @@ export function labbookUpdate(id: string, update: UpdateData): Update {
  * its updates this way. */
 export const labbookHref = (id: string) => `/lab#u-${id}`;
 
+/** An experiment's part of the Labbook: the updates about it, newest
+ * first, the redacted ones among them. Its page and every lens list these. */
+export function experimentUpdates(labbook: Update[], slug: string): Update[] {
+  return labbook
+    .filter((update) => update.relatedExperiment === slug)
+    .sort(
+      (left, right) =>
+        right.date.localeCompare(left.date) || left.id.localeCompare(right.id),
+    );
+}
+
 type Open<T> = Extract<T, { visibility: "open" }>;
 /** An update the home stream can show: its words, a label for its date and
  * somewhere to go. */
