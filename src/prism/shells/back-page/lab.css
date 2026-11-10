@@ -1,0 +1,431 @@
+/* The lab book: experiments on the bench (a doodle each, in the margin) and
+   on the shelf (a library card stapled in), the Labbook kept as dated lines
+   with what it made taped beside them, an update scribbled out, and the
+   ticker: a strip of paper pulled through two slits in the page. */
+
+/* ---- the bench ------------------------------------------------------------------- */
+:root[data-lens="back-page"] .bp-flow .bp-labitem__title {
+  margin: 0;
+  padding: calc(var(--lh) * 0.25) 0;
+  font: 700 1.5em/var(--lh) var(--bp-hand);
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-labitem__title a,
+:root[data-lens="back-page"] .bp-shelfcard__title a {
+  text-decoration: none;
+}
+:root[data-lens="back-page"] .bp-out {
+  font-weight: 400;
+  opacity: 0.6;
+}
+/* pride of place: a bigger drawing, a bigger name ruled under twice, and a
+   star in the margin, the way the notes mark what matters */
+:root[data-lens="back-page"] .bp-labitem[data-featured] {
+  position: relative;
+  margin-bottom: var(--lh);
+}
+:root[data-lens="back-page"] .bp-labitem[data-featured] .bp-doodle {
+  width: 9em;
+}
+/* the name keeps to its own side of the drawing, so its ruling does too */
+:root[data-lens="back-page"] .bp-flow .bp-labitem[data-featured] .bp-labitem__title {
+  display: flow-root;
+  padding: 0;
+  font-size: 2.1em;
+  line-height: calc(var(--lh) * 1.5);
+}
+:root[data-lens="back-page"] .bp-labitem[data-featured] .bp-underline {
+  width: min(100%, 5.5em);
+  height: 0.4em;
+  margin: -0.25em 0 0.15em;
+}
+:root[data-lens="back-page"] .bp-labitem[data-featured]::before {
+  content: "★";
+  position: absolute;
+  left: calc(-1 * var(--mx) + 0.75em);
+  top: 0.35em;
+  font: 1em/1 var(--bp-print);
+  color: var(--bp-red);
+  transform: rotate(-12deg) scale(1.5);
+}
+:root[data-lens="back-page"] .bp-labitem[data-featured] > p {
+  font: 400 1.32em/var(--lh) var(--bp-hand);
+}
+
+/* ---- the shelf: a library card ---------------------------------------------------- */
+:root[data-lens="back-page"] .bp-flow .bp-shelfcard {
+  --card: #ead9ad;
+  --card-ink: #3a301c;
+  --card-rule: rgba(150, 70, 40, 0.42);
+  position: relative;
+  list-style: none;
+  margin: calc(var(--g) * 0.9) 0.5em calc(var(--g) * 1.6) 0.1em;
+  padding: 1.5em 0.9em 0.5em 1.7em;
+  color: var(--card-ink);
+  background:
+    linear-gradient(90deg, transparent 0.95em, var(--card-rule) 0.95em 1.07em, transparent 1.07em),
+    radial-gradient(ellipse at 30% 20%, rgba(255, 245, 215, 0.6), transparent 70%),
+    var(--card);
+  border-radius: 3px;
+  transform: rotate(-0.7deg);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.16),
+    0 7px 14px -4px rgba(60, 40, 20, 0.34),
+    0 16px 18px -14px rgba(60, 40, 20, 0.4);
+}
+:root[data-lens="back-page"] .bp-flow .bp-shelfcard[data-bp-cont] {
+  transform: rotate(0.5deg);
+}
+/* its staple */
+:root[data-lens="back-page"] .bp-shelfcard::before {
+  content: "";
+  position: absolute;
+  top: 0.5em;
+  left: 46%;
+  width: 1.9em;
+  height: 0.3em;
+  border-radius: 1px;
+  background: linear-gradient(180deg, #f2f4f5 0%, #b9bfc3 35%, #7d8489 70%, #a9afb3 100%);
+  box-shadow:
+    0 1px 0.5px rgba(0, 0, 0, 0.45),
+    0 0 0 0.5px rgba(40, 44, 48, 0.35);
+  transform: rotate(-4deg);
+}
+:root[data-lens="back-page"] .bp-shelfcard li {
+  padding: 0.25em 0 0.3em;
+  border-bottom: 1px solid var(--card-rule);
+}
+:root[data-lens="back-page"] .bp-shelfcard li:last-child {
+  border-bottom: 0;
+}
+:root[data-lens="back-page"] .bp-flow .bp-shelfcard__title {
+  margin: 0;
+  font: 0.86em/1.5 var(--bp-type);
+  letter-spacing: 0.02em;
+  color: #2b2414;
+}
+:root[data-lens="back-page"] .bp-flow .bp-shelfcard__title a {
+  color: inherit;
+  text-decoration: underline 1px var(--card-rule);
+  text-underline-offset: 0.22em;
+}
+:root[data-lens="back-page"] .bp-flow .bp-shelfcard p {
+  margin: 0;
+  font: 400 1.08em/1.25 var(--bp-hand);
+  color: color-mix(in srgb, var(--card-ink) 82%, transparent);
+}
+
+/* ---- the Labbook -------------------------------------------------------------------- */
+:root[data-lens="back-page"] .bp-flow .bp-log__year {
+  margin: 0;
+  font: 400 1.35em/var(--lh) var(--bp-brush);
+  color: var(--bp-red);
+  letter-spacing: 0.04em;
+}
+:root[data-lens="back-page"] .bp-log li[data-year] .bp-mnote {
+  top: var(--lh);
+}
+:root[data-lens="back-page"] .bp-flow .bp-log__about {
+  margin: 0;
+  font: 400 1.1em/var(--lh) var(--bp-hand);
+  color: var(--bp-fine);
+}
+:root[data-lens="back-page"] .bp-flow .bp-log__about::before {
+  content: "→ ";
+  color: var(--bp-red);
+}
+/* where a link to an update lands: the pen marks the place in the margin */
+:root[data-lens="back-page"] .bp-log li[data-here]::after {
+  content: "";
+  position: absolute;
+  left: -0.5em;
+  top: 0.1em;
+  bottom: 0.2em;
+  border-left: 2.5px solid var(--bp-red);
+  border-radius: 2px 40% 30% 2px;
+  transform: rotate(0.8deg);
+}
+:root[data-lens="back-page"] .bp-log li[data-here] .bp-diary__title {
+  background: linear-gradient(100deg, transparent 0.1em, var(--bp-hl-yellow) 0.3em, var(--bp-hl-yellow) calc(100% - 0.5em), transparent calc(100% - 0.1em)) 0 70% / 100% 62% no-repeat;
+}
+:root[data-lens="back-page"] .bp-log li:focus {
+  outline: none;
+}
+
+/* an update scribbled out: each word gone under the pen */
+:root[data-lens="back-page"] .bp-flow .bp-log__struck {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--lh) * 0.3) 0.85em;
+  margin: calc(var(--lh) * 0.1) 0 calc(var(--lh) * 0.16);
+  padding: 0 0.4em 0 0.1em;
+}
+:root[data-lens="back-page"] .bp-log__struck [data-redaction-bar] {
+  position: relative;
+  flex: none;
+  width: calc(var(--len) * 0.8em);
+  max-width: 100%;
+  height: calc(var(--lh) * 0.8);
+}
+:root[data-lens="back-page"] .bp-struck {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+:root[data-lens="back-page"] .bp-log__struck [data-redaction-bar]:nth-child(odd) .bp-struck {
+  transform: rotate(-1.2deg);
+}
+:root[data-lens="back-page"] .bp-log__struck [data-redaction-bar]:nth-child(even) .bp-struck {
+  transform: rotate(0.9deg) translateY(5%);
+}
+
+/* what an update made, taped in beside it */
+:root[data-lens="back-page"] .bp-log .bp-artifact {
+  width: min(100%, 17em);
+  margin: calc(var(--g) * 1.6) 0.4em calc(var(--g) * 0.6) 0.2em;
+}
+:root[data-lens="back-page"] .bp-artifact img,
+:root[data-lens="back-page"] .bp-artifact video {
+  object-fit: contain;
+  background: #fdfbf5;
+}
+:root[data-lens="back-page"] .bp-artifact audio {
+  display: block;
+  width: 100%;
+  height: 2.4em;
+}
+/* a Pen or a demo: a blank card (or its poster) that says how to start it */
+:root[data-lens="back-page"] .bp-ask {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--bp-pencil) 12%, transparent) 0 1px, transparent 1px 7px),
+    #f4efe2;
+}
+:root[data-lens="back-page"] .bp-ask > img,
+:root[data-lens="back-page"] .bp-ask > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+:root[data-lens="back-page"] .bp-ask > img {
+  opacity: 0.55;
+}
+:root[data-lens="back-page"] .bp-ask > iframe {
+  border: 0;
+  background: #fdfbf5;
+}
+:root[data-lens="back-page"] .bp-ask__note {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.15em;
+  max-width: 88%;
+  padding: 0.45em 0.8em 0.5em;
+  background: var(--bp-sticky);
+  color: #3a3420;
+  text-align: center;
+  transform: rotate(-1.6deg);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.12),
+    5px 9px 10px -7px rgba(60, 40, 0, 0.45);
+}
+:root[data-lens="back-page"] .bp-ask__what {
+  font: 400 1.05em/1.15 var(--bp-hand);
+  color: #5d5432;
+}
+:root[data-lens="back-page"] .bp-flow .bp-ask__load {
+  padding: 0.05em 0.6em 0.1em;
+  font: 700 1.3em/1.2 var(--bp-hand);
+  color: #b3202b;
+  text-decoration: none;
+  background: var(--bp-circle-red) center / 100% 100% no-repeat;
+}
+:root[data-lens="back-page"] .bp-ask__small {
+  font: 0.6em/1.5 var(--bp-type);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5d5432;
+}
+
+/* ---- an experiment that became a project: the sticky note says which ----------------- */
+:root[data-lens="back-page"] .bp-grad .bp-scrawl--tick {
+  position: absolute;
+  right: 0.5em;
+  top: 0.45em;
+  left: auto;
+  width: 1.5em;
+  height: 1.2em;
+  translate: none;
+}
+:root[data-lens="back-page"] .bp-sticky.bp-grad {
+  width: min(50%, 11.5em);
+}
+:root[data-lens="back-page"] .bp-grad .bp-sticky__where {
+  margin: 0 1.8em 0.15em 0;
+}
+
+/* ---- the ticker: a strip of paper through two slits ----------------------------------- */
+:root[data-lens="back-page"] .bp-ticker {
+  --beat: 5.5s;
+  position: relative;
+  clear: both;
+  margin: var(--lh) 0.5em calc(var(--g) * 1.5) 0.15em;
+  transform: rotate(-0.5deg);
+}
+/* what the strip is, typed on a tab that sits on its edge */
+:root[data-lens="back-page"] .bp-flow .bp-ticker__tag {
+  position: absolute;
+  z-index: 2;
+  left: 1.1em;
+  top: -1.05em;
+  margin: 0;
+  padding: 0 0.5em;
+  font: 0.6em/1.7 var(--bp-type);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bp-red);
+  background: var(--bp-paper);
+  border: 1.5px solid currentColor;
+  border-radius: var(--bp-hand-box);
+  transform: rotate(-1.5deg);
+}
+/* the paper between the slits. It is cut off square where it goes under the
+   page, and its shadow shows above and below */
+:root[data-lens="back-page"] .bp-ticker__window {
+  position: relative;
+  clip-path: inset(-0.7em 0);
+  background:
+    linear-gradient(90deg, rgba(40, 24, 10, 0.3), rgba(40, 24, 10, 0.07) 0.45em, transparent 1.3em, transparent calc(100% - 1.3em), rgba(40, 24, 10, 0.07) calc(100% - 0.45em), rgba(40, 24, 10, 0.3)),
+    repeating-linear-gradient(90deg, rgba(120, 90, 40, 0.03) 0 2px, transparent 2px 5px),
+    var(--bp-label);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.16),
+    0 5px 9px -3px rgba(60, 40, 20, 0.32);
+}
+/* the slits: a cut a little longer than the strip is wide */
+:root[data-lens="back-page"] .bp-ticker::before,
+:root[data-lens="back-page"] .bp-ticker::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: -0.35em;
+  bottom: -0.35em;
+  width: 2.5px;
+  border-radius: 2px;
+  background: rgba(40, 24, 10, 0.62);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+:root[data-lens="back-page"] .bp-ticker::before {
+  left: -1px;
+}
+:root[data-lens="back-page"] .bp-ticker::after {
+  right: -1px;
+}
+:root[data-lens="back-page"] .bp-flow .bp-ticker__strip {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0.3em 1.4em 0.35em 1.6em;
+}
+/* standing still, the headlines run on along the strip, a day before each */
+:root[data-lens="back-page"] .bp-flow .bp-ticker__frame {
+  display: inline;
+  margin-right: 1.1em;
+  font: 700 1.3em/1.25 var(--bp-hand);
+  color: #2b2724;
+}
+:root[data-lens="back-page"] .bp-flow .bp-ticker__frame--again {
+  display: none;
+}
+:root[data-lens="back-page"] .bp-ticker__frame time,
+:root[data-lens="back-page"] .bp-ticker__day {
+  margin-right: 0.45em;
+  font-size: 0.82em;
+  color: #c01e2a;
+  white-space: nowrap;
+}
+:root[data-lens="back-page"] .bp-flow .bp-ticker__frame a {
+  color: #1b3899;
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Pulled through a headline at a time. Two animations make one pull: the
+     strip steps on by a frame each beat, and at each step it is set a frame
+     back and drawn through by hand, a tug and then the rest, so the step is
+     never seen. The frame before the first is the last one, written again. */
+  :root[data-lens="back-page"] .bp-flow .bp-ticker[data-moving] .bp-ticker__strip {
+    display: flex;
+    padding: 0;
+    animation:
+      back-page-ticker-step calc(var(--n) * var(--beat)) steps(var(--n)) infinite,
+      back-page-ticker-pull var(--beat) infinite;
+    /* it starts at rest, on the first headline */
+    animation-delay: calc(var(--beat) * -0.2);
+    will-change: transform;
+  }
+  /* a frame for each headline, as wide as the window, a fold between them */
+  :root[data-lens="back-page"] .bp-flow .bp-ticker[data-moving] .bp-ticker__frame {
+    display: block;
+    box-sizing: border-box;
+    flex: none;
+    width: 100%;
+    margin: 0;
+    padding: 0.3em 1.4em 0.35em 1.6em;
+    border-left: 1.5px dashed rgba(36, 34, 42, 0.32);
+  }
+  :root[data-lens="back-page"] .bp-flow .bp-ticker[data-moving] .bp-ticker__frame--again {
+    position: absolute;
+    right: 100%;
+    top: 0;
+    height: 100%;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    :root[data-lens="back-page"] .bp-flow .bp-ticker[data-moving] .bp-ticker__window:hover .bp-ticker__strip {
+      animation-play-state: paused;
+    }
+  }
+  /* For the keyboard the strip lies still: the headline in focus is the one
+     in the window, and Tab goes on to the next. */
+  :root[data-lens="back-page"] .bp-flow .bp-ticker[data-moving]:focus-within .bp-ticker__strip {
+    display: grid;
+    animation: none;
+  }
+  :root[data-lens="back-page"] .bp-flow .bp-ticker[data-moving]:focus-within .bp-ticker__frame {
+    grid-area: 1 / 1;
+    opacity: 0;
+  }
+  :root[data-lens="back-page"] .bp-flow .bp-ticker[data-moving]:focus-within .bp-ticker__frame:focus-within {
+    opacity: 1;
+  }
+  :root[data-lens="back-page"] .bp-flow .bp-ticker[data-moving]:focus-within .bp-ticker__frame--again {
+    display: none;
+  }
+  @keyframes back-page-ticker-step {
+    to {
+      translate: calc(var(--n) * -100%) 0;
+    }
+  }
+  @keyframes back-page-ticker-pull {
+    0% {
+      transform: translateX(100%);
+      animation-timing-function: cubic-bezier(0.3, 0.6, 0.4, 1);
+    }
+    5% {
+      transform: translateX(42%);
+      animation-timing-function: cubic-bezier(0.5, 0, 0.3, 1);
+    }
+    13%,
+    100% {
+      transform: translateX(0);
+    }
+  }
+}

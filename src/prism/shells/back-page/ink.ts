@@ -282,6 +282,29 @@ export function strike(ink: string, rng: Rng) {
   );
 }
 
+/** A word scribbled out, `letters` long: the pen run back and forth along
+ * it, close, then dragged through it twice more. There was never a word
+ * under it: the scribble is all the page is given. */
+export function scribbledOut(letters: number, ink: string, rng: Rng) {
+  const W = Math.max(1, letters) * 10;
+  const zigzag = (step: number, top: number, foot: number) => {
+    let x = -between(rng, 0, 2);
+    let d = `M${f(x)} ${f(foot + between(rng, -1, 1))}`;
+    while (x < W) {
+      x += step * between(rng, 0.7, 1.3);
+      d += `L${f(x + between(rng, 0.5, 2))} ${f(top + between(rng, -1, 1.5))}`;
+      x += step * between(rng, 0.5, 1);
+      d += `L${f(Math.min(x, W + 2))} ${f(foot + between(rng, -1.5, 1))}`;
+    }
+    return d;
+  };
+  const through = (y: number) =>
+    `M${f(W + between(rng, 0, 3))} ${f(y + between(rng, -1, 1))}Q${f(W / 2)} ${f(y + between(rng, -2.5, 2.5))} ${f(-between(rng, 0, 3))} ${f(y + between(rng, -1, 1))}`;
+  const stroke = (d: string, width: number) =>
+    `<path d="${d}" stroke="${ink}" stroke-width="${width}" pathLength="1" ${NS}/>`;
+  return `<svg class="bp-struck" viewBox="0 0 ${W} 16" preserveAspectRatio="none" aria-hidden="true">${stroke(zigzag(1.7, 2.5, 13.5), 2.4)}${stroke(zigzag(2.3, 4, 12), 2.2)}${stroke(`${through(6)}${through(10.5)}`, 2.6)}</svg>`;
+}
+
 /** A curling arrow from a note to what it's about, pointing right. */
 export function arrow(ink: string, rng: Rng) {
   const lift = between(rng, 6, 10);
