@@ -83,6 +83,10 @@ const letters = headlines.reduce((sum, { text }) => sum + text.length, 0);
       block: "nearest",
       inline: "start",
     });
+    // Where that is longer than the strip and the words alone are not, the
+    // words are shown whole and the day gives way.
+    if (link.getBoundingClientRect().width <= strip.clientWidth)
+      link.scrollIntoView({ block: "nearest", inline: "nearest" });
   });
   document.addEventListener("focusout", (event) => {
     const strip = (event.target as Element | null)?.closest?.<HTMLElement>(
