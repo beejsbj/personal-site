@@ -179,9 +179,20 @@
   --page-ball-max: 12rem;
   --page-reach: 150vmax;
   --skip-hidden: translateY(calc(-100% - var(--space-l)));
+  /* The ticker: a lap of its tape lasts as long as its words take to read
+     (a pace per letter, each headline counting a few more for its date and
+     its gap), and never less than --ticker-lap. */
+  --ticker-lap: 28s;
+  --ticker-pace: 200ms;
+  --ticker-item-letters: 12;
+  /* A redaction bar: what one unit of its length is, and how tall it is,
+     against the words it stands in for. */
+  --redaction-unit: 0.9em;
+  --redaction-height: 1.2em;
 }
 @media (max-width: 40.625rem) {
   :root {
     --shell-gutter: 1.25rem;
+    --ticker-lap: 14s;
   }
 }

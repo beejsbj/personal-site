@@ -6,9 +6,10 @@ import CurrentNote from "../design/compounds/CurrentNote.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
 import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
+import Ticker from "../design/unique/Ticker.astro";
 import ProjectRow from "./ProjectRow.astro";
 import { part } from "../prism/parts";
-import type { getHome, StreamUpdate } from "../lib/portfolio";
+import type { getHome, getTicker, StreamUpdate } from "../lib/portfolio";
 interface Props {
   home: Awaited<ReturnType<typeof getHome>>;
   projects: (CollectionEntry<"projects">["data"] & {
@@ -17,8 +18,9 @@ interface Props {
   })[];
   updates: (StreamUpdate & { id: string })[];
   labels: { kinds: Record<string, string>; sources: Record<string, string> };
+  ticker: Awaited<ReturnType<typeof getTicker>>;
 }
-const { home, projects, updates, labels } = Astro.props;
+const { home, projects, updates, labels, ticker } = Astro.props;
 ---
 
 <div class="home-composition shell" data-home-motion>
@@ -26,6 +28,7 @@ const { home, projects, updates, labels } = Astro.props;
     <WelcomeHero hero={home.hero} />
     <div class="welcome-art"></div>
   </div>
+  <Ticker class="home-ticker" headlines={ticker.headlines} copy={ticker.copy} />
   <div class="below" data-peek-horizon>
     <section class="selected-work" aria-labelledby="home-projects">
       <SectionHeading
@@ -117,13 +120,14 @@ const { home, projects, updates, labels } = Astro.props;
     margin-top: var(--space-s);
     color: var(--color-text-soft);
   }
-  /* Arrival: the work block follows the welcome (not on a page that is
-     already there: data-prism-settled). Scroll reveals hide an
+  /* Arrival: the ticker and the work block under it follow the welcome
+     (not on a page that is already there: data-prism-settled). Scroll reveals hide an
      element only once the script marks it (data-reveal) and show it when it
      enters the viewport (data-in); --i staggers a batch. Event marks pop in
      after their row; the current note settles like a sheet of paper. */
   @media (prefers-reduced-motion: no-preference) {
-    :global(:root:not([data-prism-settled])) .below {
+    :global(:root:not([data-prism-settled])) .below,
+    :global(:root:not([data-prism-settled])) :global(.home-ticker) {
       animation: below-in var(--duration-settle) var(--ease-settle)
         calc(var(--stagger) * 6) backwards;
     }

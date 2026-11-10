@@ -1,0 +1,137 @@
+---
+import Heading from "../design/primitives/Heading.astro";
+import Link from "../design/primitives/Link.astro";
+import Artifact from "../design/compounds/Artifact.astro";
+import UpdateEntry from "../design/compounds/UpdateEntry.astro";
+import {
+  labbookAnchor,
+  newestFirst,
+  relatedLinks,
+  updateDateLabel,
+  type Update,
+} from "../lib/labbook";
+import type { getLabPage } from "../lib/portfolio";
+/** Composition: the Labbook, the complete dated record of updates, newest
+ * first. Each update sits in an element whose id is where its links land
+ * (`labbookHref`): the home stream's own entry with its summary, its
+ * artifact and what it is about, or, redacted, its shape and nothing else.
+ * With no updates there is no section.
+ */
+interface Props {
+  /** Every update, in any order. */
+  updates: Update[];
+  /** `labbook` in pages/lab.md. */
+  copy: Awaited<ReturnType<typeof getLabPage>>["labbook"];
+  /** How each kind and source of update is named. */
+  labels: { kinds: Record<string, string>; sources: Record<string, string> };
+  /** The experiments and projects an update may link to: the ones shown. */
+  shown: Parameters<typeof relatedLinks>[1];
+  /** Whose a Pen named by its id alone is. */
+  penUser?: string;
+  class?: string;
+}
+const { copy, labels, shown, penUser, class: className } = Astro.props;
+const updates = newestFirst(Astro.props.updates);
+---
+
+{updates.length > 0 && (
+  <section
+    class:list={["labbook", className]}
+    id="labbook"
+    aria-labelledby="labbook-title"
+  >
+    <header class="labbook-head">
+      <Heading id="labbook-title">{copy.title}</Heading>
+      <p class="labbook-note">{copy.note}</p>
+    </header>
+    <ol class="labbook-list" aria-label={copy.listLabel}>
+      {updates.map((update, index) => (
+        <li id={labbookAnchor(update.id)}>
+          {update.visibility === "open" ? (
+            <UpdateEntry
+              id={update.id}
+              title={update.title}
+              summary={update.summary}
+              href={update.href}
+              kind={update.kind}
+              source={update.source}
+              date={update.date}
+              dateLabel={updateDateLabel(update.date)}
+              labels={labels}
+              connected={index < updates.length - 1}
+              detailed
+            >
+              {update.artifact && (
+                <Artifact
+                  slot="artifact"
+                  artifact={update.artifact}
+                  copy={copy.artifact}
+                  penUser={penUser}
+                />
+              )}
+              {relatedLinks(update, shown).map((related) => (
+                <p class="labbook-related" data-related={related.kind}>
+                  <span>{copy.related[related.kind]}</span>{" "}
+                  <Link href={related.href} arrow>
+                    {related.title}
+                  </Link>
+                </p>
+              ))}
+            </UpdateEntry>
+          ) : (
+            <UpdateEntry
+              id={update.id}
+              date={update.date}
+              dateLabel={updateDateLabel(update.date)}
+              redacted={{
+                bars: update.shape.bars,
+                work: copy.redacted.works[update.shape.work],
+                label: copy.redacted.label,
+              }}
+              connected={index < updates.length - 1}
+            />
+          )}
+        </li>
+      ))}
+    </ol>
+  </section>
+)}
+<style>
+  /* Headed as a place in the room is (LabRoom). */
+  .labbook-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-m);
+    margin-bottom: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .labbook-note {
+    color: var(--color-text-soft);
+  }
+  .labbook-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* A link to an update lands with a little air above it. */
+  .labbook-list > li {
+    scroll-margin-top: var(--space-xl);
+  }
+  /* The update a link landed on wears the nav's current ball. */
+  .labbook-list > li:target :global(.event-mark) {
+    background: var(--ball-fill-current);
+    color: var(--ball-ink-current);
+  }
+  .labbook-list :global(.event-detail) {
+    max-width: var(--reading-width);
+  }
+  .labbook-related {
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+  }
+  .labbook-related > span {
+    color: var(--color-text-soft);
+  }
+</style>

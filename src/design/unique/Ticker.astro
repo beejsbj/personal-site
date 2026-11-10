@@ -1,0 +1,239 @@
+---
+import Link from "../primitives/Link.astro";
+import { labbookHref, updateDateLabel, type Headline } from "../../lib/labbook";
+import { part } from "../../prism/parts";
+/** Unique: the ticker. An ambient strip of headlines, each a link to the
+ * first update it is about, in the Labbook. Glanceable, never demanding.
+ * With no headlines there is no strip.
+ * Motion: the tape drifts left at a reading pace and has no end. The run
+ * of headlines is laid twice, the second time for the eye only (hidden from
+ * assistive technology and out of the tab order), and a run is never
+ * narrower than the strip, so one headline crosses the whole of it alone.
+ * States: a pointer over the strip holds the tape where it is. Keyboard
+ * focus on a headline rests the tape at its start; the script then scrolls
+ * the strip to a headline that lies beyond its end, and gives the scroll
+ * back when focus leaves. Neither changes the strip's size.
+ * Reduced motion: no tape. The headlines stand in a wrapped row, said once.
+ * Slot `presence`: who is in the room right now, beside the label. Empty
+ * until the lab reports it.
+ */
+interface Props {
+  headlines: Headline[];
+  /** `ticker` in site/config.json. */
+  copy: { label: string };
+  class?: string;
+}
+const { headlines, copy, class: className } = Astro.props;
+// "26 Sep": the year is the Labbook's to say.
+const day = (date: string) => updateDateLabel(date).slice(0, 6);
+const letters = headlines.reduce((sum, { text }) => sum + text.length, 0);
+---
+
+{headlines.length > 0 && (
+  <aside
+    class:list={["ticker", className]}
+    aria-labelledby="ticker-label"
+    data-ticker
+    style={`--ticker-letters:${letters};--ticker-items:${headlines.length}`}
+  >
+    <div class="ticker-cap">
+      <p id="ticker-label">{copy.label}</p>
+      <slot name="presence" />
+    </div>
+    <div class="ticker-strip" data-ticker-strip>
+      <ul class="ticker-run" data-ticker-run>
+        {headlines.map((headline) => (
+          <li class="ticker-item" {...part("ticker.headline", headline.id)}>
+            <time datetime={headline.date}>{day(headline.date)}</time>
+            <Link href={labbookHref(headline.updates[0])}>{headline.text}</Link>
+          </li>
+        ))}
+      </ul>
+      <div class="ticker-run ticker-run--again" data-ticker-run>
+        {headlines.map((headline) => (
+          <span class="ticker-item">
+            <span class="ticker-day" aria-hidden="true">
+              {day(headline.date)}
+            </span>
+            <Link
+              href={labbookHref(headline.updates[0])}
+              aria-hidden="true"
+              tabindex={-1}
+            >
+              {headline.text}
+            </Link>
+          </span>
+        ))}
+      </div>
+    </div>
+  </aside>
+)}
+<script>
+  // The tape rests for the keyboard in CSS. Resting, the strip may scroll,
+  // so the headline in focus can be brought into view wherever it lies;
+  // when focus leaves, the strip goes back to its start before the tape
+  // runs again. One pair of listeners for every page.
+  document.addEventListener("focusin", (event) => {
+    const link = event.target as Element | null;
+    const strip = link?.closest?.<HTMLElement>("[data-ticker-strip]");
+    if (!link || !strip || !link.matches(":focus-visible")) return;
+    strip.dataset.tickerRest = "";
+    // The whole headline, its day included, from its beginning.
+    (link.parentElement ?? link).scrollIntoView({
+      block: "nearest",
+      inline: "start",
+    });
+  });
+  document.addEventListener("focusout", (event) => {
+    const strip = (event.target as Element | null)?.closest?.<HTMLElement>(
+      "[data-ticker-rest]",
+    );
+    if (!strip || strip.contains(event.relatedTarget as Node | null)) return;
+    strip.scrollLeft = 0;
+    delete strip.dataset.tickerRest;
+  });
+</script>
+<style>
+  /* How much there is to read, counted in the markup: it sets the lap. */
+  .ticker {
+    --ticker-letters: 0;
+    --ticker-items: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-m);
+    padding-block: var(--space-xs);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  /* The label, behind the nav's current ball made small: the strip's lamp. */
+  .ticker-cap {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    line-height: var(--leading-tight);
+    color: var(--color-text-soft);
+    white-space: nowrap;
+  }
+  .ticker-cap::before {
+    content: "";
+    width: var(--space-xs);
+    height: var(--space-xs);
+    border-radius: var(--radius-round);
+    background: var(--ball-fill-current);
+  }
+  /* Room above and below for a headline's focus ring. */
+  .ticker-strip {
+    display: flex;
+    flex: 1 1 var(--rail-width);
+    min-width: 0;
+    padding-block: var(--space-xs);
+  }
+  .ticker-run {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-xl);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ticker-run--again {
+    display: none;
+  }
+  /* A headline: a peach ball between it and the last, its day, its words. */
+  .ticker-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+    min-width: 0;
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+    line-height: var(--leading-tight);
+  }
+  .ticker-item::before {
+    content: "";
+    flex: none;
+    width: var(--space-2xs);
+    height: var(--space-2xs);
+    border-radius: var(--radius-round);
+    background: var(--ball-fill);
+    translate: 0 calc(var(--underline-pad) * -1);
+  }
+  .ticker-item time,
+  .ticker-day {
+    flex: none;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    color: var(--color-text-soft);
+  }
+  @media (forced-colors: active) {
+    .ticker-cap::before,
+    .ticker-item::before {
+      border: var(--rule-width) solid CanvasText;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ticker-strip {
+      overflow-x: clip;
+      mask-image: linear-gradient(
+        to right,
+        transparent,
+        black var(--space-l),
+        black calc(100% - var(--space-l)),
+        transparent
+      );
+    }
+    /* Constant speed: the one place linear is right. Both runs travel one
+       run's length, so the second arrives where the first began. */
+    .ticker-run {
+      flex: none;
+      flex-wrap: nowrap;
+      justify-content: space-around;
+      min-width: 100%;
+      padding-inline: calc(var(--space-xl) / 2);
+      white-space: nowrap;
+      animation: ticker-lap
+        max(
+          var(--ticker-lap),
+          (
+              var(--ticker-letters) + var(--ticker-items) *
+                var(--ticker-item-letters)
+            ) *
+            var(--ticker-pace)
+        )
+        linear infinite;
+    }
+    .ticker-run--again {
+      display: flex;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .ticker-strip:hover .ticker-run {
+        animation-play-state: paused;
+      }
+    }
+    .ticker-strip:focus-within .ticker-run {
+      animation-play-state: paused;
+    }
+    /* At rest for the keyboard: the tape back at its start, unfaded. The
+       script marks the strip while it may scroll to the headline in focus. */
+    .ticker-strip:has(:focus-visible) {
+      mask-image: none;
+    }
+    .ticker-strip:has(:focus-visible) .ticker-run,
+    .ticker-strip[data-ticker-rest] .ticker-run {
+      animation: none;
+    }
+    .ticker-strip[data-ticker-rest] {
+      overflow-x: auto;
+      scrollbar-width: none;
+      scroll-padding-inline: var(--space-2xs);
+      mask-image: none;
+    }
+  }
+  @keyframes ticker-lap {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+</style>
