@@ -17,15 +17,14 @@ const experiment = (over = {}) => ({
 test("an experiment that still says its type or era is refused, by name", () => {
   assert.deepEqual(problems("lab", experiment()), []);
   assert.deepEqual(problems("lab", experiment({ type: "SVG + motion" })), [
-    "type: An experiment no longer says its type or era.",
+    ": Unrecognized key(s) in object: 'type'",
   ]);
   assert.deepEqual(problems("lab", experiment({ sourceEra: "CodePen" })), [
-    "sourceEra: An experiment no longer says its type or era.",
+    ": Unrecognized key(s) in object: 'sourceEra'",
   ]);
   // Even said emptily, the way the old default left them.
   assert.deepEqual(problems("lab", experiment({ type: "", sourceEra: "" })), [
-    "type: An experiment no longer says its type or era.",
-    "sourceEra: An experiment no longer says its type or era.",
+    ": Unrecognized key(s) in object: 'type', 'sourceEra'",
   ]);
   const parsed = parse("lab", experiment());
   assert.ok(!("type" in parsed) && !("sourceEra" in parsed));

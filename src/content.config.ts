@@ -225,37 +225,29 @@ const projectSchema = z.object({
   hidden: z.boolean().default(false),
 });
 
-/** A field an entry must not have. An unknown key would only be dropped;
- * these are refused, so a mistake is loud. */
-const refused = (message: string) =>
-  z.custom<undefined>((value) => value === undefined, message);
-
-/** What every experiment used to say, and none does now. */
-const noTypeOrEra = refused(
-  "An experiment no longer says its type or era.",
-);
-
-const labSchema = z.object({
-  title: z.string(),
-  summary: z.string(),
-  /** The Bench holds what is being worked on now; the Shelf what has gone
-   * quiet, and the archive. */
-  place: z.enum(["bench", "shelf"]),
-  /** The slug of the project this experiment graduated into. */
-  graduatedTo: z.string().optional(),
-  /** The one entry given pride of place. */
-  featured: z.boolean().optional(),
-  type: noTypeOrEra,
-  sourceEra: noTypeOrEra,
-  cover: z.string().optional(),
-  /** The live experiment, when it lives elsewhere: the entry links straight
-   * out and has no page here. */
-  href: z.string().url().optional(),
-  links: z.array(linkSchema).default([]),
-  media: z.array(mediaSchema).default([]),
-  order: z.number().default(100),
-  hidden: z.boolean().default(false),
-});
+/** Strict: a field an experiment does not have would only be dropped;
+ * here it is refused by name, so one left over from before is loud. */
+const labSchema = z
+  .object({
+    title: z.string(),
+    summary: z.string(),
+    /** The Bench holds what is being worked on now; the Shelf what has gone
+     * quiet, and the archive. */
+    place: z.enum(["bench", "shelf"]),
+    /** The slug of the project this experiment graduated into. */
+    graduatedTo: z.string().optional(),
+    /** The one entry given pride of place. */
+    featured: z.boolean().optional(),
+    cover: z.string().optional(),
+    /** The live experiment, when it lives elsewhere: the entry links straight
+     * out and has no page here. */
+    href: z.string().url().optional(),
+    links: z.array(linkSchema).default([]),
+    media: z.array(mediaSchema).default([]),
+    order: z.number().default(100),
+    hidden: z.boolean().default(false),
+  })
+  .strict();
 
 const UPDATE_KINDS = [
   "project",
@@ -287,6 +279,11 @@ const artifactSchema = z.object({
 
 /** "2026-07-01". */
 const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+/** A field one kind of update must not have. An unknown key would only be
+ * dropped; these are refused, so a mistake is loud. */
+const refused = (message: string) =>
+  z.custom<undefined>((value) => value === undefined, message);
 
 const updateFields = {
   // Events describe things that happened, not another project/writing collection.
