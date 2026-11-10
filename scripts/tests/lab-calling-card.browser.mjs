@@ -216,6 +216,9 @@ const sideways = (page) =>
       if (el.closest(".cc-sr, .cc-screen__bg, .cc-wipe, [data-cc-wire-strip]"))
         continue;
       if (el.scrollLeft !== 0) out.push(`${name(el)} is at ${el.scrollLeft}`);
+      // The screen itself is fixed: only its columns turn.
+      if (el.scrollTop !== 0 && el.matches(".cc-stage, .cc-screen"))
+        out.push(`${name(el)} has slid up ${el.scrollTop}`);
       const { overflowX } = getComputedStyle(el);
       if (
         overflowX !== "visible" &&
@@ -406,12 +409,21 @@ test(
                 size,
                 harness("lab-no-cover", route),
               );
-              const shown = await page.evaluate(() => ({
-                text: document.querySelector("#lens-shell main").textContent,
-                entry: window.prismHarness.content.lab.find(
-                  (entry) => entry.slug === "fixture-sketch",
-                ),
-              }));
+              // On the board, its own card; on its brief, the whole page.
+              const shown = await page.evaluate(() => {
+                const card = document
+                  .querySelector(
+                    "#lens-shell [data-lab-place] [data-ref='fixture-sketch']",
+                  )
+                  ?.closest("li");
+                return {
+                  text: (card ?? document.querySelector("#lens-shell main"))
+                    .textContent,
+                  entry: window.prismHarness.content.lab.find(
+                    (entry) => entry.slug === "fixture-sketch",
+                  ),
+                };
+              });
               assert.ok(shown.entry.type && shown.entry.sourceEra);
               assert.ok(shown.text.includes(shown.entry.summary), route);
               for (const unsaid of [shown.entry.type, shown.entry.sourceEra])
@@ -658,7 +670,12 @@ test(
                 const ask = place.querySelector("[data-cc-load]");
                 return {
                   height: Math.round(height),
-                  ask: ask?.textContent.replace(/\s+/g, " ").trim() ?? null,
+                  // What the prompt says; its key cap is for the eye.
+                  ask:
+                    ask
+                      ?.querySelector(":scope > span")
+                      ?.textContent.replace(/\s+/g, " ")
+                      .trim() ?? null,
                   poster:
                     place.querySelector("img")?.getAttribute("src") ?? null,
                   says: place.textContent.replace(/\s+/g, " ").trim(),
@@ -855,11 +872,7 @@ test(
               assert.equal(strip.reachable, content.headlines.length);
               assert.deepEqual(await sideways(page), [], "nothing slides");
               const name = path === "/" ? "home" : "lab";
-              await shot(
-                page,
-                "#lens-shell [data-cc-wire]",
-                `calling-card-wire-${name}-still-${size}`,
-              );
+              await shot(page, null, `calling-card-wire-${name}-still-${size}`);
               // And as most visitors meet it, running: one long line that
               // widens nothing it sits in.
               const live = await open(size, `${path}?lens=calling-card`, {
@@ -876,11 +889,7 @@ test(
                 [],
                 "and gives nothing a way to slide",
               );
-              await shot(
-                live.page,
-                "#lens-shell [data-cc-wire]",
-                `calling-card-wire-${name}-${size}`,
-              );
+              await shot(live.page, null, `calling-card-wire-${name}-${size}`);
               await live.context.close();
               // Following one lands on its update, whichever screen it was
               // on, and the update takes the focus.
@@ -950,11 +959,7 @@ test(
               );
             }
             assert.deepEqual(await sideways(page), [], "nothing slides");
-            await shot(
-              page,
-              "#lens-shell [data-cc-wire]",
-              `calling-card-wire-still-${size}`,
-            );
+            await shot(page, null, `calling-card-wire-still-${size}`);
             await context.close();
 
             // The pause menu does not scroll on a wide screen, so there a

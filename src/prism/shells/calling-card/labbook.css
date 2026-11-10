@@ -259,6 +259,8 @@
   font-family: var(--cc-didone);
   font-weight: 700;
   font-style: italic;
+  font-size: 1rem;
+  line-height: 1.3;
 }
 /* A Pen or a demo before it is asked for: a dark screen, its poster dim
    behind the prompt. The frame takes the same room when it comes. */

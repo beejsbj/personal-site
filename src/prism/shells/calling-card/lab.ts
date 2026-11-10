@@ -162,7 +162,21 @@ export function lab(route: Route, env: Env): Screen {
   // Arriving by a link to an update: the board is already turned to it
   // when the screen is seen, and it takes the focus the title would.
   const landed = find();
-  if (landed) requestAnimationFrame(() => land(undefined, false));
+  if (landed) {
+    requestAnimationFrame(() => land(undefined, false));
+    // The pointer is still where the link was pressed. Until it moves, a
+    // card that turns up under it has not been reached for, and does not
+    // take the cursor or the focus from the update.
+    let resting = true;
+    el.addEventListener("pointermove", () => (resting = false), { signal: env.signal, once: true });
+    scroller.addEventListener(
+      "pointerenter",
+      (event) => {
+        if (resting) event.stopPropagation();
+      },
+      { signal: env.signal, capture: true },
+    );
+  }
 
   /** Page keys turn the board when focus sits outside it. */
   const page = (event: KeyboardEvent) => {

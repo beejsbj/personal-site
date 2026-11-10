@@ -8,8 +8,8 @@
  * cut-out for each bar of its shape, a stamp, and its kind of work.
  *
  * The wire is the news crawl: the headlines run right to left along a
- * black band, a star between each, under a red plate that says whose news
- * it is. It holds under a pointer, rests for the keyboard, and stands as a
+ * black band, a star between each, under a red tab that says whose news it
+ * is. It holds under a pointer, rests for the keyboard, and stands as a
  * list where nothing moves. */
 import type { SiteContent } from "../types";
 import { part } from "../../parts";
@@ -19,6 +19,7 @@ import {
   embedSrc,
   labbookAnchor,
   labbookHref,
+  penUser,
   relatedLinks,
   updateDateLabel,
 } from "../../../lib/labbook";
@@ -26,16 +27,6 @@ import { copyOf } from "./chrome";
 import { h, parseDay } from "./dom";
 
 type Hidden = Extract<Update, { visibility: "redacted" }>;
-
-/** How the site names an update's kind and source: content.json carries
- * them in `site`, for a Labbook update says only which it is. */
-type Named = { updateKinds: Record<string, string>; updateSources: Record<string, string> };
-const namesOf = (content: SiteContent) => content.site as SiteContent["site"] & Named;
-
-/** Whose the site's Pens are (a Pen may be named by its id alone): the name
- * in the site's own CodePen address. */
-const penUser = (content: SiteContent) =>
-  content.site.social.map((item) => item.href.match(/^https:\/\/codepen\.io\/([\w-]+)/)?.[1]).find(Boolean);
 
 /** A path on this site, and nothing that only looks like one. */
 const isLocal = (url: string) => /^\/(?!\/)/.test(url);
@@ -192,7 +183,7 @@ function artifact(content: SiteContent, shown: Artifact) {
       h("figcaption", {}, alt),
     );
   // A frame is another site's page, or one of this site's own: nothing else.
-  const frame = embedSrc(shown, penUser(content));
+  const frame = embedSrc(shown, penUser(content.site));
   if (!frame || !(frame.startsWith("https://") || isLocal(frame))) return null;
   // Where it lives: the Pen's own page, or the demo itself.
   const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
@@ -264,7 +255,7 @@ function logged(content: SiteContent, update: Update, i: number, whole: boolean)
     style: `--i:${i}`,
   };
   if (update.visibility !== "open") return censored(content, update, attrs);
-  const { updateKinds, updateSources } = namesOf(content);
+  const { updateKinds, updateSources } = content.site;
   const href = update.href ?? (whole ? undefined : labbookHref(update.id));
   const external = !!href && isExternal(href);
   return h(
