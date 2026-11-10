@@ -14,6 +14,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { chromium } from "./lib/chromium.mjs";
 import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
+import { REDACTION_MARKER } from "../../src/prism/labbook-fixture.ts";
 
 const SIZES = {
   desktop: { viewport: { width: 1280, height: 800 } },
@@ -89,6 +90,21 @@ const read = (page) =>
         dateLabel: text(el.querySelector("time")),
         shown: el.checkVisibility(),
       })),
+      // Its part of the Labbook as listed: open and redacted, in order.
+      listed: all(".entry-updates__list > li").map((item) => {
+        const el = item.querySelector("[data-part]");
+        return {
+          part: el?.getAttribute("data-part"),
+          id: el?.getAttribute("data-ref"),
+          date: item.querySelector("time")?.getAttribute("datetime"),
+          text: text(item),
+          bars: all("[data-redaction-bar]", item).map((bar) => ({
+            width: bar.getBoundingClientRect().width,
+            shown: bar.checkVisibility(),
+          })),
+          controls: all("a, button, img, iframe, video, audio", item).length,
+        };
+      }),
       headings: all("h2").map(text),
       graduation: all('[data-part="lab.graduation"]').map((el) => ({
         text: text(el),
@@ -276,9 +292,62 @@ test(
                 seen.headings.includes(labels.updates),
                 `the list is headed "${labels.updates}"`,
               );
-              // The fixture's fourth update is redacted: not drawn here yet,
-              // and nothing of it reaches the page.
-              assert.doesNotMatch(seen.html, /fixture-study-kept-back/);
+            }),
+        );
+
+        await t.test(
+          `a redacted update is listed in its place, as its shape and its date (${size})`,
+          () =>
+            visit(STUDY, size, async (seen, page) => {
+              assert.deepEqual(
+                seen.listed.map(({ part, id, date }) => ({ part, id, date })),
+                [
+                  {
+                    part: "update.item",
+                    id: "fixture-study-graduated",
+                    date: "2026-09-30",
+                  },
+                  {
+                    part: "update.item",
+                    id: "fixture-study-replay",
+                    date: "2026-09-12",
+                  },
+                  {
+                    part: "update.redacted",
+                    id: "fixture-study-kept-back",
+                    date: "2026-08-20",
+                  },
+                  {
+                    part: "update.item",
+                    id: "fixture-study-first-line",
+                    date: "2026-08-02",
+                  },
+                ],
+              );
+              const kept = seen.listed[2];
+              const { redacted } = content.pages.lab.labbook;
+              assert.equal(
+                kept.text,
+                `${redacted.label} ${redacted.works.code} 20 Aug 2026`,
+                "its name, its kind of work and its date are all it says",
+              );
+              assert.equal(kept.controls, 0, "nothing to follow or play");
+              // The fixture's shape is 4, 2, 3: a bar for each, a longer
+              // number a longer bar.
+              assert.equal(kept.bars.length, 3);
+              assert.ok(kept.bars.every((bar) => bar.shown && bar.width > 0));
+              const [first, second, third] = kept.bars.map((bar) => bar.width);
+              assert.ok(
+                first > third && third > second,
+                `the bars keep their order (${first}, ${second}, ${third})`,
+              );
+              // The fixture writes the marker into every field a redacted
+              // update must not have.
+              assert.ok(
+                !(await page.content()).includes(REDACTION_MARKER),
+                "nothing it hides is in the page",
+              );
+              assert.deepEqual(seen.tooWide, [], "nothing runs off the side");
             }),
         );
 
