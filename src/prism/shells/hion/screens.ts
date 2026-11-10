@@ -12,13 +12,32 @@
  * threads, wound round their corners; links are pull-cords and knots;
  * `data-orbit` marks something one hion goes out of its way to circle. The
  * markup only says what is what (see weave.ts for the attributes); the
- * loom and the ink draw it. */
-import { part, type PartAttrs } from "../../parts";
+ * loom and the ink draw it.
+ *
+ * The Lab is three of these. The Bench is a loop its experiments hang in,
+ * still in play, the featured one hung like a sign; the Shelf is a loop of
+ * wefts, an experiment laid on each, gone quiet; the Labbook is a strand,
+ * a knot for every update, and a redacted update is its words bound up in
+ * thread. The ticker is a reel: the headlines strung on one thread that is
+ * drawn slowly through. */
+import {
+  embedSrc,
+  experimentUpdates,
+  labbookAnchor,
+  labbookHref,
+  relatedLinks,
+  updateDateLabel,
+  type Artifact,
+  type Update as LabbookUpdate,
+} from "../../../lib/labbook";
+import { graduatedProject, labPlaces } from "../../../lib/rules";
+import { markPart, part, type PartAttrs } from "../../parts";
 import { fallbackBody, featured, fill, inline, rich, type LinkMaker } from "../rich";
 import type { Header, Media, ResumeEntry, Route, SiteContent } from "../types";
 import { h, link, scrub, text } from "./dom";
 
 type Project = SiteContent["projects"][number];
+type Experiment = SiteContent["lab"][number];
 type Child = Node | string | null | false | undefined;
 type Attrs = Record<string, string | undefined>;
 type Copy = SiteContent["lenses"]["hion"];
@@ -261,6 +280,50 @@ function beads(items: string[], label: string, attrs: Attrs = {}) {
   );
 }
 
+/* ---------- The reel: the ticker ---------- */
+
+/** The headlines, strung like beads on one thread that is drawn slowly
+ * through, each a link to the first update it is about, in the Labbook.
+ * The thread comes round again in a second run, for the eye only. It holds
+ * under a pointer and rests for the keyboard (lab.ts); where nothing moves
+ * (shell.css) the headlines are told once, one under another. No
+ * headlines, no reel. */
+function reel(content: SiteContent) {
+  const { headlines } = content;
+  if (!headlines.length) return null;
+  // How long the thread takes to come round: by how much there is to read.
+  const letters = headlines.reduce((sum, { text }) => sum + text.length, 0);
+  const lap = Math.round(letters * 0.3 + headlines.length * 2.4);
+  const run = (again: boolean) =>
+    h(
+      again ? "div" : "ul",
+      { class: "hion-reel__run", "data-reel-run": "", "aria-hidden": again ? "true" : undefined },
+      headlines.map((headline) =>
+        h(
+          again ? "span" : "li",
+          { ...(again ? {} : part("ticker.headline", headline.id)), class: "hion-reel__bead" },
+          h(
+            "a",
+            { href: labbookHref(headline.updates[0]), tabindex: again ? "-1" : undefined },
+            headline.text,
+          ),
+        ),
+      ),
+    );
+  return h(
+    "aside",
+    {
+      class: "hion-reel",
+      "aria-labelledby": "hion-reel-label",
+      "data-reel": "",
+      "data-reveal": "",
+      style: `--hion-reel-lap:${lap}s`,
+    },
+    h("p", { class: "hion-meta hion-reel__label", id: "hion-reel-label" }, content.site.ticker.label),
+    h("div", { class: "hion-reel__strip", "data-reel-strip": "" }, run(false), run(true)),
+  );
+}
+
 /* ---------- Home ---------- */
 
 function workCharm(copy: Copy, project: Project, level: "h2" | "h3", i: number) {
@@ -373,6 +436,7 @@ function home(content: SiteContent) {
           ),
         ),
       ),
+      reel(content),
     ),
     h("span", { class: "hion-lane", "data-spine": "via", "aria-hidden": "true" }),
     h(
@@ -520,7 +584,7 @@ function story(html: string, label: string, cls = "", attrs: Attrs = {}) {
   return loop({ class: `hion-loop--story ${cls}`.trim(), "aria-label": label }, body);
 }
 
-function tagsRow(pairs: [string, string][], attrs: Attrs = {}) {
+function tagsRow(pairs: [string, Child][], attrs: Attrs = {}) {
   if (!pairs.length) return null;
   return h(
     "dl",
@@ -646,7 +710,183 @@ function project(content: SiteContent, data: Project) {
   );
 }
 
-function labEntry(content: SiteContent, data: SiteContent["lab"][number]) {
+/* ---------- The Labbook ---------- */
+
+/** How the site names an update's kind and source: content.json carries
+ * them in `site`, for a Labbook update says only which it is. */
+type Named = { updateKinds: Record<string, string>; updateSources: Record<string, string> };
+const namesOf = (content: SiteContent) => content.site as SiteContent["site"] & Named;
+
+/** Whose the site's Pens are (a Pen may be named by its id alone): the name
+ * in the site's own CodePen address. */
+const penUser = (content: SiteContent) =>
+  content.site.social.map((item) => item.href.match(/^https:\/\/codepen\.io\/([\w-]+)/)?.[1]).find(Boolean);
+
+/** What an update shows for itself. A picture, a film and a sound are
+ * shown where they are tied on. A Pen or a demo is a place kept for it,
+ * tacked out in stitches, with a pull-cord hanging in it: nothing is asked
+ * of another site until the cord is pulled (lab.ts), when its frame takes
+ * the place whole. Its poster is shown only if it is the site's own: one
+ * kept elsewhere would be asked for before the pull. */
+function artifact(content: SiteContent, shown: Artifact, hue: "c" | "m") {
+  const copy = content.pages.lab.labbook.artifact;
+  const { kind, src, alt } = shown;
+  const poster = shown.poster && /^\/(?!\/)/.test(shown.poster) ? shown.poster : undefined;
+  if (kind === "image") return picture(image(src, alt), hue, { class: "hion-artifact" }, null, false);
+  if (kind === "video") {
+    return h(
+      "figure",
+      { class: "hion-picture hion-artifact", "data-hue": hue },
+      h(
+        "span",
+        { class: "hion-picture__frame" },
+        h(
+          "video",
+          { controls: true, muted: true, playsinline: true, preload: "metadata", poster, "aria-label": alt },
+          h("source", { src }),
+        ),
+      ),
+    );
+  }
+  if (kind === "sound") {
+    return h(
+      "figure",
+      { class: "hion-artifact hion-artifact--sound", "data-hue": hue },
+      h("audio", { controls: true, preload: "none", src, "aria-label": alt }),
+      h("figcaption", { class: "hion-picture__caption" }, alt),
+    );
+  }
+  // A frame is another site's page, or one of this site's own: nothing else.
+  const frame = embedSrc(shown, penUser(content));
+  if (!frame || !/^(https:\/\/|\/(?!\/))/.test(frame)) return null;
+  // Where it lives: the Pen's own page, or the demo itself.
+  const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
+  return h(
+    "figure",
+    { class: "hion-artifact hion-artifact--kept", "data-hue": hue },
+    h(
+      "div",
+      { class: "hion-kept", "data-kept-frame": frame, "data-kept-title": alt },
+      poster ? picture(image(poster, alt), hue, { class: "hion-kept__poster" }, null, false) : null,
+      h(
+        "div",
+        { class: "hion-kept__ask" },
+        poster ? null : h("p", { class: "hion-kept__label" }, alt),
+        hung(
+          "p",
+          "pull",
+          { class: "hion-pullcord", "data-hue": hue },
+          h("button", { class: "hion-pullcord__link", type: "button", "data-kept-pull": "" }, copy.load[kind]),
+        ),
+        h("p", { class: "hion-kept__note" }, copy.note),
+      ),
+    ),
+    h("figcaption", { class: "hion-artifact__home" }, link(home, {}, copy.open[kind])),
+  );
+}
+
+/** A redacted update's words, bound: thread wound tight round each one, a
+ * longer number a longer binding (ink.ts `bound`). The site is given the
+ * lengths and never the words; the bindings say nothing aloud. */
+function bound(bars: number[], hue: "c" | "m") {
+  return h(
+    "p",
+    { class: "hion-bound", "aria-hidden": "true", "data-ink": "bound", "data-seed": nextSeed(), "data-hue": hue },
+    bars.map((bar) => h("span", { "data-redaction-bar": "", style: `--hion-bar:${Number(bar) || 1}` })),
+  );
+}
+
+/** One update, knotted on the strand: its date level with the knot, then
+ * its title, where it came from and its summary, and in the Labbook
+ * (`whole`) what it shows for itself and what it is about. A redacted one
+ * is its date, its bindings and its kind of work: nothing else of it is
+ * read. On an experiment's own page a title with nowhere else to go leads
+ * to the update's place in the Labbook. */
+function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: boolean) {
+  const copy = content.pages.lab.labbook;
+  const hue = i % 2 ? "m" : "c";
+  const attrs = {
+    id: whole ? labbookAnchor(update.id) : undefined,
+    "data-reveal": "",
+    ...side(i),
+  };
+  const when = h("time", { datetime: update.date }, updateDateLabel(update.date));
+  if (update.visibility !== "open") {
+    const { shape } = update;
+    return h(
+      "li",
+      { ...part("update.redacted", update.id), ...attrs, class: "hion-tied hion-logged hion-logged--bound" },
+      knotted(
+        when,
+        {},
+        h("p", { class: "hion-sr" }, copy.redacted.label),
+        bound(shape.bars, hue),
+        h("p", { class: "hion-meta" }, copy.redacted.works[shape.work]),
+      ),
+    );
+  }
+  const { updateKinds, updateSources } = namesOf(content);
+  const href = update.href ?? (whole ? undefined : labbookHref(update.id));
+  return h(
+    "li",
+    { ...part("update.item", update.id), ...attrs, class: "hion-tied hion-logged" },
+    knotted(
+      when,
+      {},
+      h("h3", { class: "hion-tied__title" }, href ? link(href, {}, update.title) : update.title),
+      h(
+        "p",
+        { class: "hion-meta" },
+        `${updateSources[update.source] ?? update.source} · ${updateKinds[update.kind] ?? update.kind}`,
+      ),
+      h("p", { class: "hion-tied__summary" }, update.summary),
+      whole && update.artifact ? artifact(content, update.artifact, hue) : null,
+      ...(whole ? relatedLinks(update, content) : []).map((about) =>
+        h(
+          "p",
+          { class: "hion-logged__about", "data-related": about.kind },
+          h("span", {}, copy.related[about.kind]),
+          " ",
+          link(about.href, {}, about.title),
+        ),
+      ),
+    ),
+  );
+}
+
+/** A stretch of the Labbook, newest first: a strand, its heading strung out
+ * to one side of the hions and a knot for every update. With a `note` it
+ * is the Labbook itself (`whole`): the note is tied on at a knot on the
+ * hions' other side, and each update is where its links land. No updates,
+ * no strand. */
+function logbook(
+  content: SiteContent,
+  updates: LabbookUpdate[],
+  id: string,
+  title: string,
+  note?: string,
+) {
+  if (!updates.length) return null;
+  const whole = note !== undefined;
+  return h(
+    "section",
+    { class: "hion-strand hion-strand--labbook", "aria-labelledby": id, "data-labbook": whole ? "" : undefined },
+    h(
+      "div",
+      { class: "hion-strand__head" },
+      strung("h2", id, title),
+      knotPoint("hion-strand__knot"),
+      note ? h("p", { class: "hion-aside", "data-tie": "", "data-reveal": "" }, note) : null,
+    ),
+    h(
+      "ol",
+      { class: "hion-knots hion-knots--labbook", "aria-label": content.pages.lab.labbook.listLabel },
+      updates.map((update, i) => logged(content, update, i, whole)),
+    ),
+  );
+}
+
+function labEntry(content: SiteContent, data: Experiment) {
   const copy = content.lenses.hion;
   const { detail } = content.pages.lab;
   const ref = data.slug;
@@ -654,6 +894,13 @@ function labEntry(content: SiteContent, data: SiteContent["lab"][number]) {
     ...(data.href ? [{ label: copy.labEntry.live, url: data.href }] : []),
     ...data.links,
   ];
+  const media: Media[] = data.media.length
+    ? data.media
+    : data.cover
+      ? [{ type: "image", src: data.cover, alt: "" }]
+      : [];
+  // The project it became: a tag in its head, and the way on at its end.
+  const became = graduatedProject(data, content.projects);
   return screen(
     "lab-entry",
     "hion-page-title",
@@ -664,23 +911,24 @@ function labEntry(content: SiteContent, data: SiteContent["lab"][number]) {
       data.summary,
       { title: part("lab.title", ref), intro: part("lab.summary", ref) },
       { class: "hion-entry-head", "data-frame": data.slug },
-      tagsRow(
-        [
-          [detail.labels.type, data.type],
-          [detail.labels.era, data.sourceEra],
-        ],
-        part("lab.meta", ref),
-      ),
+      became
+        ? tagsRow(
+            [[detail.labels.graduated, link(became.href, {}, became.title)]],
+            part("lab.graduation", ref),
+          )
+        : null,
       pulls(links, copy.entry.links, part("lab.links", ref)),
     ),
-    gallery(data.media, copy.entry.pictures, part("lab.media", ref)),
+    gallery(media, copy.entry.pictures, part("lab.media", ref)),
     story(data.html, data.title, "", part("lab.body", ref)),
+    logbook(content, experimentUpdates(content.labbook, data.slug), "hion-lab-record", detail.labels.updates),
     h(
       "nav",
       { class: "hion-onward", "aria-label": copy.labEntry.onward },
       h(
         "ul",
         { class: "hion-row hion-row--ends", "data-cord": "branch" },
+        became ? end("hion-end--newer", detail.labels.graduated, became.href, became.title, "c") : null,
         end("hion-end--all", copy.entry.backTo, "/lab", copy.labEntry.all, "m"),
       ),
     ),
@@ -689,56 +937,91 @@ function labEntry(content: SiteContent, data: SiteContent["lab"][number]) {
 
 /* ---------- Lab ---------- */
 
+/** An experiment on the bench: a charm on a drop, swinging; the featured
+ * one hung like a sign on two threads across the row, its name large. */
+function benched(entry: Experiment, i: number) {
+  const id = `hion-lab-${entry.slug}`;
+  return hung(
+    "li",
+    entry.featured ? "sign" : "drop",
+    {
+      class: `hion-work hion-work--lab ${entry.featured ? "hion-work--featured" : ""}`.trim(),
+      "data-hang": "",
+      "data-hue": i % 2 ? "m" : "c",
+      "data-frame": entry.slug,
+      "data-lab-featured": entry.featured ? "" : undefined,
+    },
+    h(
+      "article",
+      { "aria-labelledby": id },
+      h(
+        "h3",
+        {
+          ...part("lab.title", entry.slug),
+          class: "hion-work__title",
+          id,
+          "data-sign": entry.featured ? "" : undefined,
+        },
+        link(entry.detail, {}, entry.title),
+      ),
+      h("p", { ...part("lab.summary", entry.slug), class: "hion-work__summary" }, entry.summary),
+    ),
+  );
+}
+
+/** An experiment on the shelf: its name strung on a weft of its own across
+ * the loop, a shelf of thread, what it was beneath; by turns to the left
+ * and the right. */
+function shelved(entry: Experiment, i: number) {
+  const id = `hion-lab-${entry.slug}`;
+  return h(
+    "li",
+    { class: "hion-shelved", "data-frame": entry.slug, "data-hue": i % 2 ? "m" : "c" },
+    h(
+      "article",
+      { "aria-labelledby": id },
+      markPart(strung("h3", id, link(entry.detail, {}, entry.title)), "lab.title", entry.slug),
+      h(
+        "p",
+        { ...part("lab.summary", entry.slug), class: "hion-shelved__summary", "data-reveal": "" },
+        entry.summary,
+      ),
+    ),
+  );
+}
+
 function lab(content: SiteContent) {
   const page = content.pages.lab;
+  const places = labPlaces(content.lab).map(({ place, entries }, i) => {
+    const copy = page.places[place];
+    const id = `hion-place-${place}`;
+    return loop(
+      {
+        class: `hion-loop--lab hion-loop--${place} ${i % 2 ? "hion-loop--right" : "hion-loop--left"}`,
+        "aria-labelledby": id,
+        "data-lab-place": place,
+      },
+      strung("h2", id, copy.title),
+      h("p", { class: "hion-aside hion-place__note", "data-reveal": "" }, copy.note),
+      place === "bench"
+        ? h("ol", { class: "hion-row hion-row--lab", "data-cord": "" }, entries.map(benched))
+        : h("ol", { class: "hion-shelf" }, entries.map(shelved)),
+    );
+  });
   return screen(
     "lab",
     "hion-page-title",
-    pageTitle(page.header, "lab"),
+    pageTitle(page.header, "lab", {}, reel(content)),
+    ...places,
+    logbook(content, content.labbook, "hion-labbook-title", page.labbook.title, page.labbook.note),
     loop(
-      { class: "hion-loop--lab", "aria-label": page.listLabel },
-      h(
-        "ol",
-        { class: "hion-row hion-row--lab", "data-cord": "" },
-        content.lab.map((entry, i) => {
-          const id = `hion-lab-${entry.slug}`;
-          return hung(
-            "li",
-            "drop",
-            {
-              class: "hion-work hion-work--lab",
-              "data-hang": "",
-              "data-hue": i % 2 ? "m" : "c",
-              "data-frame": entry.slug,
-            },
-            h(
-              "article",
-              { "aria-labelledby": id },
-              h(
-                "p",
-                { ...part("lab.meta", entry.slug), class: "hion-meta" },
-                `${entry.type} · ${entry.sourceEra}`,
-              ),
-              h(
-                "h2",
-                { ...part("lab.title", entry.slug), class: "hion-work__title", id },
-                link(entry.detail, {}, entry.title),
-              ),
-              h(
-                "p",
-                { ...part("lab.summary", entry.slug), class: "hion-work__summary" },
-                entry.summary,
-              ),
-            ),
-          );
-        }),
-      ),
-      pullLink(page.more.href, page.more.label, "m", part("lab.more")),
+      { class: "hion-loop--note hion-loop--more" },
       h(
         "p",
         { ...part("lab.aside"), class: "hion-aside", "data-reveal": "" },
         inline(page.aside, hionLink),
       ),
+      pullLink(page.more.href, page.more.label, "m", part("lab.more")),
     ),
   );
 }
