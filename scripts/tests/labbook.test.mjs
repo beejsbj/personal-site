@@ -234,8 +234,26 @@ test("content.json carries the Labbook, the headlines and where each experiment 
     assert.deepEqual(
       data.lab.map((entry) => [entry.slug, entry.place]),
       [
+        ["cockpit", "bench"],
+        ["strudel-tools", "bench"],
+        ["clockwork-observatory", "bench"],
+        ["films-from-code", "bench"],
+        ["undertext", "bench"],
+        ["house-making", "bench"],
+        ["gaussian-splatting", "bench"],
+        ["journal-engine", "bench"],
+        ["meditejo", "bench"],
+        ["path-under-strain", "bench"],
+        ["resonance", "bench"],
+        ["kitchen", "bench"],
+        ["two-birds", "bench"],
         ["motion-path-graph", "shelf"],
         ["beating-shapes", "shelf"],
+        ["persona-5-stars", "shelf"],
+        ["game-of-life", "shelf"],
+        ["13black-spade", "shelf"],
+        ["design-trampoline-logo", "shelf"],
+        ["css-notebook", "shelf"],
       ],
     );
 
