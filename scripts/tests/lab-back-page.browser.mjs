@@ -256,7 +256,8 @@ test(
     };
     const next = (page) => page.locator("#lens-shell [data-prism-turn='next']");
     const shot = async (page, name) => {
-      if (SHOTS) await page.screenshot({ path: join(SHOTS, `${name}.png`) });
+      if (SHOTS)
+        await page.screenshot({ path: join(SHOTS, `back-page-${name}.png`) });
     };
     /** Read every view of the open chapter, turning its pages: what
      * `read` says of each or, given several, what each says. `picture`

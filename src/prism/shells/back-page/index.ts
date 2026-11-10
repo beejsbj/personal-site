@@ -512,7 +512,7 @@ class App {
       (event) => {
         if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
         const target = event.target as HTMLElement | null;
-        if (target?.closest("input, textarea, select, [contenteditable], video")) return;
+        if (target?.closest("input, textarea, select, [contenteditable], video, audio")) return;
         const menu = target?.closest<HTMLElement>(".bp-shelf");
         const arrows = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
         if (menu && arrows.includes(event.key)) {
