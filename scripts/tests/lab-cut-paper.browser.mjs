@@ -276,6 +276,9 @@ test(
     /** A picture of the screen with `selector` near the top of it. */
     const shot = async (page, selector, name, block = "start") => {
       if (!SHOTS) return;
+      await page.evaluate(() => {
+        document.querySelector("#lens-shell .cp-scroll").scrollTop = 0;
+      });
       if (selector)
         await page
           .locator(selector)
@@ -1037,6 +1040,204 @@ test(
               assert.deepEqual(none.errors, []);
               await none.context.close();
             }
+          },
+        );
+
+        await t.test(
+          `${size}: an experiment's page tells its part of the Labbook and the project it became`,
+          async () => {
+            const { context, page, errors } = await open(
+              size,
+              harness("lab-full-page", "/lab/fixture-study"),
+            );
+            const book = await labbook(page);
+            assert.ok(book, "the page has its stretch of the Labbook");
+            assert.equal(book.whole, false);
+            assert.equal(book.heading, content.pages.lab.detail.labels.updates);
+            assert.deepEqual(
+              book.entries.map(({ ref, part, dateLabel }) => ({
+                ref,
+                part,
+                dateLabel,
+              })),
+              [
+                {
+                  ref: "fixture-study-graduated",
+                  part: "update.item",
+                  dateLabel: "30 Sep 2026",
+                },
+                {
+                  ref: "fixture-study-replay",
+                  part: "update.item",
+                  dateLabel: "12 Sep 2026",
+                },
+                {
+                  ref: "fixture-study-kept-back",
+                  part: "update.redacted",
+                  dateLabel: "20 Aug 2026",
+                },
+                {
+                  ref: "fixture-study-first-line",
+                  part: "update.item",
+                  dateLabel: "02 Aug 2026",
+                },
+              ],
+              "newest first, the redacted one in its place",
+            );
+            const entry = (ref) =>
+              book.entries.find((item) => item.ref === ref);
+            // With somewhere to go it goes there; with nowhere, to its
+            // line in the Labbook.
+            assert.equal(
+              entry("fixture-study-replay").href,
+              "https://codepen.io/beejsbj/pen/abXZWLQ",
+            );
+            assert.equal(
+              entry("fixture-study-first-line").href,
+              "/lab#u-fixture-study-first-line",
+            );
+            const hidden = entry("fixture-study-kept-back");
+            assert.equal(hidden.strips, 3);
+            assert.equal(hidden.controls, 0);
+            assert.equal(
+              hidden.text,
+              `20 Aug 2026 ${copy.redacted.label} ${copy.redacted.works.code}`,
+              "its date, what it is, its kind of work: no other word",
+            );
+            assert.ok(
+              book.entries.every((item) => !item.anchored),
+              "its links land in the Labbook, not here",
+            );
+            // Its own name goes without saying; the project it is about is said.
+            const project = await page.evaluate(
+              () => window.prismHarness.content.projects[0],
+            );
+            assert.deepEqual(
+              entry("fixture-study-graduated").related.map(
+                ({ kind, href }) => ({ kind, href }),
+              ),
+              [{ kind: "project", href: project.href }],
+            );
+
+            const graduation = page.locator(
+              "#lens-shell [data-part='lab.graduation']",
+            );
+            assert.equal(await graduation.count(), 1);
+            assert.equal(await graduation.getAttribute("data-ref"), "fixture-study");
+            assert.equal(
+              words(await graduation.locator("span").first().textContent()),
+              content.pages.lab.detail.labels.graduated,
+            );
+            assert.equal(
+              words(
+                await graduation
+                  .locator("a")
+                  .evaluate((a) => a.firstChild.textContent),
+              ),
+              project.title,
+            );
+            assert.equal(
+              await graduation.locator("a").getAttribute("href"),
+              project.href,
+            );
+            // Its pictures and its film, after the cover its pad wears.
+            const shown = await page.evaluate(async () => {
+              const media = document.querySelector(
+                "#lens-shell [data-part='lab.media']",
+              );
+              const out = [];
+              for (const el of media.querySelectorAll("img, video")) {
+                el.scrollIntoView();
+                for (
+                  let i = 0;
+                  i < 50 && !(el.complete ?? el.readyState >= 1);
+                  i += 1
+                )
+                  await new Promise((done) => setTimeout(done, 100));
+                out.push({
+                  src: el.getAttribute("src"),
+                  painted:
+                    (el.naturalWidth ?? el.videoWidth) > 0 &&
+                    el.checkVisibility(),
+                });
+              }
+              return {
+                media: out,
+                pad:
+                  document
+                    .querySelector("#lens-shell .cp-clipview__side .cp-pad img")
+                    ?.getAttribute("src") ?? null,
+              };
+            });
+            assert.deepEqual(shown, {
+              media: [
+                { src: "/images/lab/beating-shapes.png", painted: true },
+                { src: "/prism/fixtures/film.webm", painted: true },
+              ],
+              pad: "/images/lab/motion-path-graph.svg",
+            });
+            assert.equal(
+              await overflow(page),
+              0,
+              "nothing wider than the screen",
+            );
+            assert.deepEqual(errors, []);
+            await shot(page, null, `cut-paper-experiment-${size}`);
+            await shot(
+              page,
+              "#lens-shell [data-part='lab.graduation']",
+              `cut-paper-experiment-graduation-${size}`,
+              "center",
+            );
+            await shot(
+              page,
+              "#lens-shell [data-log]",
+              `cut-paper-experiment-updates-${size}`,
+            );
+            await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: an experiment that says little leaves no empty label, and no record`,
+          async () => {
+            const { context, page, errors } = await open(
+              size,
+              harness("lab-bare-entry", "/lab/fixture-poster"),
+            );
+            const shown = await page.evaluate(() => {
+              const main = document.querySelector("#lens-shell .cp-screen");
+              return {
+                text: main.textContent.replace(/\s+/g, " ").trim(),
+                hollow: [
+                  ...main.querySelectorAll("p, h2, h3, li, dt, dd, dl, ul"),
+                ].filter((el) => !/[\p{L}\p{N}]/u.test(el.textContent)).length,
+                record: main.querySelectorAll("[data-log]").length,
+                graduation: main.querySelectorAll(
+                  "[data-part='lab.graduation']",
+                ).length,
+                meta: main.querySelectorAll("[data-part='lab.meta']").length,
+                cover: [...main.querySelectorAll(".cp-pad img")].map((img) =>
+                  img.getAttribute("src"),
+                ),
+              };
+            });
+            const { labels } = content.pages.lab.detail;
+            for (const label of [labels.type, labels.era, labels.graduated])
+              assert.ok(!shown.text.includes(label), `no "${label}" label`);
+            assert.equal(shown.hollow, 0, "nothing on the page is empty");
+            assert.equal(shown.meta, 0);
+            assert.equal(shown.record, 0, "no updates, no log");
+            assert.equal(shown.graduation, 0);
+            assert.deepEqual(
+              shown.cover,
+              ["/images/lab/beating-shapes.png"],
+              "its cover is on its pad",
+            );
+            assert.equal(await overflow(page), 0);
+            assert.deepEqual(errors, []);
+            await shot(page, null, `cut-paper-experiment-bare-${size}`);
+            await context.close();
           },
         );
       }

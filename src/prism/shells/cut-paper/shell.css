@@ -2784,6 +2784,59 @@
   display: none;
 }
 
+/* an experiment that graduated: the clip it became on the arrangement, in
+   the project's colour, singing the project's motif */
+:root[data-lens="cut-paper"] .cp-grad {
+  display: grid;
+  gap: 8px;
+  margin: 6px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-grad__label {
+  color: var(--cp-ivory-3);
+  font: 400 15px/1.2 var(--cp-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-grad__clip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px 12px;
+  border-radius: 4px;
+  background: var(--note);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22);
+  color: var(--cp-ink);
+  font: 400 26px/1 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: filter var(--cp-dur-ui) var(--cp-ease-brush), box-shadow var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] .cp-grad__clip:hover {
+  filter: brightness(1.12);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22), 0 0 0 2px var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-grad__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-grad__roll {
+  position: relative;
+  height: 30px;
+}
+
+:root[data-lens="cut-paper"] .cp-grad__roll .cp-roll {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 /* ── the Labbook: the Markers track, written out ───────────── */
 
 :root[data-lens="cut-paper"] .cp-log {
@@ -2913,6 +2966,11 @@
   text-decoration-color: var(--cp-tomato);
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
+}
+
+/* the arrow out keeps to the last word's line */
+:root[data-lens="cut-paper"] .cp-log__title .cp-out {
+  display: inline;
 }
 
 :root[data-lens="cut-paper"] .cp-log__title a:hover,
@@ -4614,7 +4672,8 @@
   :root[data-lens="cut-paper"] .cp-pad__hit--small,
   :root[data-lens="cut-paper"] .cp-pad__hit--small .cp-roll,
   :root[data-lens="cut-paper"] .cp-pad__hit--small .cp-pad__art,
-  :root[data-lens="cut-paper"] .cp-log__date {
+  :root[data-lens="cut-paper"] .cp-log__date,
+  :root[data-lens="cut-paper"] .cp-grad__clip {
     transition: none;
   }
 

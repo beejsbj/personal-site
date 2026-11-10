@@ -157,12 +157,12 @@ export function labEntry(env: Env, item: LabEntry): Screen {
           project.href,
           { class: "cp-grad__clip", style: `--note:${noteVar(content.projects.indexOf(project))}` },
           h("span", { class: "cp-grad__name" }, project.title),
-          clip ? h("span", { class: "cp-grad__roll", "aria-hidden": "true" }, roll(clip.notes)) : null,
+          clip ? h("span", { class: "cp-grad__roll" }, roll(clip.notes)) : null,
         ),
       )
     : null;
   // its cover is on its pad; the pictures that are its own follow its story
-  const media = item.media.filter((shown) => shown.src !== item.cover);
+  const media = item.media.filter((shown, i) => !(i === 0 && shown.src === item.cover));
   const updates = experimentUpdates(content.labbook, item.slug);
   const side = h(
     "div",
