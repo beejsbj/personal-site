@@ -399,6 +399,48 @@ test(
         );
 
         await t.test(
+          `${size}: back from a brief, the board is turned to the request it was opened from`,
+          async () => {
+            // A request far enough down the board to be out of sight.
+            const order = labPlaces(content.lab).flatMap(
+              ({ entries }) => entries,
+            );
+            const far = order.findLast(
+              (entry) => entry.hasPage && order.indexOf(entry) >= 6,
+            );
+            assert.ok(far, "an experiment with a page, well down the board");
+            const { context, page, errors } = await open(
+              size,
+              "/lab?lens=calling-card",
+            );
+            await page
+              .locator(`#lens-shell a.cc-request[href="${far.detail}"]`)
+              .focus();
+            await page.keyboard.press("Enter");
+            await page.waitForURL((url) => url.pathname === far.detail);
+            await page.waitForSelector("#lens-shell .cc-brief");
+            await page.keyboard.press("Escape");
+            await page.waitForURL((url) => url.pathname === "/lab");
+            await page.waitForSelector("#lens-shell .cc-requests");
+            await page.waitForTimeout(700);
+            const card = await page
+              .locator("#lens-shell .cc-request[data-state='selected']")
+              .evaluate((el) => {
+                const { top, bottom } = el.getBoundingClientRect();
+                return { href: el.getAttribute("href"), top, bottom };
+              });
+            assert.equal(card.href, far.detail, "the cursor is on it");
+            assert.ok(
+              card.top >= 0 && card.bottom <= height,
+              `and it is on screen (${card.top} to ${card.bottom} of ${height})`,
+            );
+            assert.deepEqual(await sideways(page), [], "nothing slides");
+            assert.deepEqual(errors, []);
+            await context.close();
+          },
+        );
+
+        await t.test(
           `${size}: what an experiment need not say is not asked of it`,
           async () => {
             // This fixture's experiment does say a type and an era; the

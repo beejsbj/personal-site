@@ -30,6 +30,9 @@ import { other } from "./other";
 type Experiment = SiteContent["lab"][number];
 
 let rememberedLab = 0;
+/** A brief was the last thing open: going back, the board is turned to
+ * the request it was opened from. */
+let fromBrief = false;
 
 /** Where a request card goes: the entry's own page when it has one, else
  * the live experiment. */
@@ -176,7 +179,11 @@ export function lab(route: Route, env: Env): Screen {
       },
       { signal: env.signal, capture: true },
     );
+  } else if (fromBrief && menu) {
+    const card = cards[menu.index];
+    requestAnimationFrame(() => card.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
   }
+  fromBrief = false;
 
   /** Page keys turn the board when focus sits outside it. */
   const page = (event: KeyboardEvent) => {
@@ -212,6 +219,7 @@ export function labEntry(route: Route, env: Env): Screen {
   const index = entries.findIndex((entry) => entry.slug === route.slug && entry.hasPage);
   if (index < 0) return other(route, env);
   const entry = entries[index];
+  fromBrief = true;
   const { el, main } = frame(route.kind, "cc-brief");
   el.querySelector(".cc-screen__bg")!.append(
     h("span", { class: "cc-requests__curtain" }),
