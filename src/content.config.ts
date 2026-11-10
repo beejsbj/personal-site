@@ -190,9 +190,20 @@ const projectSchema = z.object({
 const labSchema = z.object({
   title: z.string(),
   summary: z.string(),
-  type: z.string(),
-  sourceEra: z.string(),
+  /** The Bench holds what is being worked on now; the Shelf what has gone
+   * quiet, and the archive. */
+  place: z.enum(["bench", "shelf"]),
+  /** The slug of the project this experiment graduated into. */
+  graduatedTo: z.string().optional(),
+  /** The one entry given pride of place. */
+  featured: z.boolean().optional(),
+  /** Optional, and on their way out: every lens still prints them, so an
+   * entry without them reads as empty rather than missing. */
+  type: z.string().default(""),
+  sourceEra: z.string().default(""),
   cover: z.string().optional(),
+  /** The live experiment, when it lives elsewhere: the entry links straight
+   * out and has no page here. */
   href: z.string().url().optional(),
   links: z.array(linkSchema).default([]),
   media: z.array(mediaSchema).default([]),
