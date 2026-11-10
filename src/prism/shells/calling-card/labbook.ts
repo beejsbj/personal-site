@@ -135,7 +135,13 @@ export function tendWire(screen: HTMLElement, signal: AbortSignal) {
       // The whole headline, its star and its day included, from its
       // beginning; the list that stands still has nowhere to go.
       const item = link.closest<HTMLElement>(".cc-wire__item");
-      if (item && strip.scrollWidth > strip.clientWidth) strip.scrollLeft = item.offsetLeft;
+      if (!item || !(link instanceof HTMLElement) || strip.scrollWidth <= strip.clientWidth) return;
+      strip.scrollLeft = item.offsetLeft;
+      // Where that is longer than the strip and the words alone are not,
+      // the words are shown whole and the day gives way.
+      const end = link.offsetLeft + link.offsetWidth;
+      if (link.offsetWidth <= strip.clientWidth && end > strip.scrollLeft + strip.clientWidth)
+        strip.scrollLeft = end - strip.clientWidth;
     },
     { signal },
   );

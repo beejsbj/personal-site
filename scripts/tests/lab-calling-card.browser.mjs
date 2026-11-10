@@ -1295,6 +1295,16 @@ test(
             );
             assert.equal(entry("fixture-study-kept-back").bars, 3);
             assert.equal(entry("fixture-study-kept-back").controls, 0);
+            // This one arrives with words it must not have; none are shown.
+            assert.deepEqual(entry("fixture-study-kept-back").said, [
+              "20 Aug 2026",
+              copy.redacted.label,
+              copy.redacted.works.code,
+            ]);
+            assert.ok(
+              !(await page.content()).includes(REDACTION_MARKER),
+              "nothing it hides is in the page",
+            );
             assert.ok(
               book.entries.every((item) => !item.anchored),
               "its links land in the Labbook, not here",
