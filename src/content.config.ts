@@ -245,7 +245,7 @@ const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 /** A field one kind of update must not have. An unknown key would only be
  * dropped; these are refused, so a mistake is loud. */
 const refused = (message: string) =>
-  z.undefined({ invalid_type_error: message }).optional();
+  z.custom<undefined>((value) => value === undefined, message);
 
 const updateFields = {
   // Events describe things that happened, not another project/writing collection.
