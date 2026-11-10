@@ -923,6 +923,7 @@ test(
                 meta: document.querySelectorAll(
                   "#lens-shell .bp-spread [data-part='lab.meta']",
                 ).length,
+                html: document.documentElement.outerHTML,
               };
             });
             const graduation = views.find((view) => view.graduation).graduation;
@@ -942,6 +943,11 @@ test(
               views.reduce((sum, view) => sum + view.meta, 0),
               0,
               "no type or era",
+            );
+            // Its redacted update arrives with words it must not have.
+            assert.ok(
+              !views.some((view) => view.html.includes(REDACTION_MARKER)),
+              "none of the hidden words is on the experiment's page",
             );
 
             const again = await open(
