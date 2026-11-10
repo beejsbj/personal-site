@@ -250,6 +250,8 @@ export interface SiteContent {
       more: Link;
       /** Inline markdown. */
       aside: string;
+      /** What the Bench and the Shelf are called, and a line about each. */
+      places: Record<"bench" | "shelf", { title: string; note: string }>;
       detail: { eyebrow: string; labels: { type: string; era: string } };
     };
     notFound: { title: string; description: string; header: Header };
