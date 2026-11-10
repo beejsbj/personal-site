@@ -1,0 +1,185 @@
+---
+import Link from "../primitives/Link.astro";
+import MediaFrame from "../primitives/MediaFrame.astro";
+import { embedSrc, type Artifact } from "../../lib/labbook";
+/** Compound: the thing an update shows for itself.
+ * image, video, sound: shown where they stand, with their `alt`.
+ * pen, demo: a stage that holds the poster, or with none a plain placeholder
+ * saying what it is, and a pill that asks for it. Nothing is asked of
+ * another site until that click: the frame is made then, in the stage's
+ * own room, and takes the focus. Without scripts the pill is an ordinary
+ * link to where the thing lives, as the link under the stage always is.
+ * A poster kept on another site would be a request before the click, so
+ * only one of the site's own is shown.
+ */
+interface Props {
+  artifact: Artifact;
+  /** `labbook.artifact` in pages/lab.md. */
+  copy: {
+    load: { pen: string; demo: string };
+    open: { pen: string; demo: string };
+    note: string;
+  };
+  /** Whose a Pen named by its id alone is. */
+  penUser?: string;
+}
+const { artifact, copy, penUser } = Astro.props;
+const { kind, src, alt } = artifact;
+const frame = embedSrc(artifact, penUser);
+const poster = artifact.poster?.startsWith("/") ? artifact.poster : undefined;
+// Where it lives: the Pen's own page, or the demo itself.
+const home =
+  kind === "pen" ? frame?.replace("/embed/", "/pen/").split("?")[0] : src;
+---
+
+{kind === "image" && (
+  <figure class="artifact">
+    <MediaFrame src={src} alt={alt} />
+  </figure>
+)}
+{kind === "video" && (
+  <figure class="artifact">
+    <video
+      controls
+      muted
+      playsinline
+      preload="metadata"
+      poster={poster}
+      aria-label={alt}
+    >
+      <source src={src} />
+    </video>
+  </figure>
+)}
+{kind === "sound" && (
+  <figure class="artifact">
+    <audio controls preload="none" src={src} aria-label={alt} />
+    <figcaption>{alt}</figcaption>
+  </figure>
+)}
+{(kind === "pen" || kind === "demo") && frame && home && (
+  <figure class="artifact">
+    <div
+      class="artifact-stage"
+      data-artifact-frame={frame}
+      data-artifact-title={alt}
+    >
+      {poster && <img src={poster} alt={alt} loading="lazy" decoding="async" />}
+      <div class="artifact-plate">
+        {!poster && <p class="artifact-label">{alt}</p>}
+        <Link href={home} treatment="pill" tone="wine" data-artifact-load>
+          {copy.load[kind]}
+        </Link>
+        <p class="artifact-note">{copy.note}</p>
+      </div>
+    </div>
+    <figcaption>
+      <Link href={home} arrow>
+        {copy.open[kind]}
+      </Link>
+    </figcaption>
+  </figure>
+)}
+<script>
+  // One listener for every stage on every page: a click on its pill makes
+  // the frame, in the stage's place. A modified click is left to open the
+  // link as links do. Capturing, so it is settled before the router looks.
+  document.addEventListener(
+    "click",
+    (event) => {
+      const pill = (event.target as Element | null)?.closest?.(
+        "[data-artifact-load]",
+      );
+      const stage = pill?.closest<HTMLElement>("[data-artifact-frame]");
+      if (!stage?.dataset.artifactFrame) return;
+      if (
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return;
+      event.preventDefault();
+      const frame = document.createElement("iframe");
+      frame.src = stage.dataset.artifactFrame;
+      frame.title = stage.dataset.artifactTitle ?? "";
+      frame.allow = "fullscreen";
+      stage.replaceChildren(frame);
+      frame.focus();
+    },
+    { capture: true },
+  );
+</script>
+<style>
+  .artifact {
+    display: grid;
+    max-width: var(--intro-width);
+  }
+  .artifact video {
+    width: 100%;
+    border: var(--rule-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+  .artifact audio {
+    width: 100%;
+  }
+  /* The stage is the frame's room from the start, so loading it moves
+     nothing: hatched like a picture's surround, the poster filling it. */
+  .artifact-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: var(--media-ratio);
+    padding: var(--space-m);
+    overflow: hidden;
+    border: var(--rule-width) solid var(--color-border);
+    background: var(--texture);
+  }
+  .artifact-stage > img,
+  .artifact-stage > :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .artifact-stage > img {
+    object-fit: cover;
+  }
+  .artifact-stage > :global(iframe) {
+    border: 0;
+    background: var(--color-page);
+  }
+  /* A slip of the page's own paper laid on the stage, holding the ask. */
+  .artifact-plate {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-xs);
+    max-width: 100%;
+    padding: var(--space-m) var(--space-l);
+    background: var(--color-page);
+    text-align: center;
+    rotate: var(--settle-angle);
+  }
+  .artifact-label {
+    max-width: var(--welcome-copy-width);
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+    line-height: var(--leading-tight);
+    color: var(--color-accent);
+  }
+  .artifact-note {
+    font-size: var(--text-xs);
+    line-height: var(--leading-tight);
+    color: var(--color-text-soft);
+  }
+  @media (max-width: 40.625rem) {
+    .artifact-stage {
+      padding: var(--space-s);
+    }
+    .artifact-plate {
+      padding: var(--space-s) var(--space-m);
+    }
+  }
+</style>

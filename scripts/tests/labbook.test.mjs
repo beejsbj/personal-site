@@ -222,12 +222,31 @@ test("content.json carries the Labbook, the headlines and where each experiment 
     );
     assert.ok(data.labbook.length >= 7, "the seeded updates are all here");
 
+    // The seeded headlines (#95 added three), newest first.
     assert.deepEqual(data.headlines, [
       {
         id: "dayshaper-is-out",
         date: "2026-09-26",
         text: "Dayshaper is out: a day planned around a 24-hour ring",
         updates: ["dayshaper"],
+      },
+      {
+        id: "emotitone-smaller-deck",
+        date: "2026-09-11",
+        text: "EmotiTone's performance deck tries on a smaller size",
+        updates: ["emotitone-performance-deck"],
+      },
+      {
+        id: "redesign-and-field-guide",
+        date: "2026-09-11",
+        text: "A warm-welcome redesign, and a little field guide to go with it",
+        updates: ["warm-welcome-pr", "component-guide"],
+      },
+      {
+        id: "qrng-spins-again",
+        date: "2026-06-20",
+        text: "The Lottery and the Roulette spin again",
+        updates: ["qrng-demos"],
       },
     ]);
 

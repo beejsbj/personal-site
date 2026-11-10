@@ -13,6 +13,29 @@ places:
   shelf:
     title: On the shelf
     note: Things that have gone quiet, and the older archive.
+labbook:
+  title: The Labbook
+  note: Everything I've made, changed or published, by date. Newest first.
+  listLabel: Updates, newest first
+  related:
+    experiment: Experiment
+    project: Project
+  artifact:
+    load:
+      pen: Play the Pen here
+      demo: Run the demo here
+    open:
+      pen: Open it on CodePen
+      demo: Open the demo on its own
+    note: Nothing loads until you ask.
+  redacted:
+    label: Redacted update
+    works:
+      code: Code
+      design: Design
+      writing: Writing
+      research: Research
+      other: Something else
 more:
   label: More sketches on CodePen
   href: "social:CodePen"

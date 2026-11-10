@@ -152,6 +152,35 @@ const pageSchema = z.object({
       shelf: z.object({ title: z.string(), note: z.string() }),
     })
     .optional(),
+  /** The Labbook on the Lab's page: its heading, what an artifact's frame
+   * says before and after it loads, and how a redacted update is named. */
+  labbook: z
+    .object({
+      title: z.string(),
+      note: z.string(),
+      listLabel: z.string(),
+      /** What introduces the experiment or project an update is about. */
+      related: z.object({ experiment: z.string(), project: z.string() }),
+      artifact: z.object({
+        /** Asks for a Pen or a demo to load where it stands. */
+        load: z.object({ pen: z.string(), demo: z.string() }),
+        /** Goes to where it lives instead. */
+        open: z.object({ pen: z.string(), demo: z.string() }),
+        note: z.string(),
+      }),
+      redacted: z.object({
+        label: z.string(),
+        /** A name for each kind of work a redacted update may be. */
+        works: z.object({
+          code: z.string(),
+          design: z.string(),
+          writing: z.string(),
+          research: z.string(),
+          other: z.string(),
+        }),
+      }),
+    })
+    .optional(),
   /** Copy for each entry's own page. */
   entry: z
     .object({
@@ -399,6 +428,8 @@ const siteSchema = z.object({
       href: z.string(),
     }),
   ),
+  /** The ticker: what the strip of headlines is called. */
+  ticker: z.object({ label: z.string() }).optional(),
   /** How each kind and source of update is named. */
   updateKinds: z.record(z.enum(UPDATE_KINDS), z.string()),
   updateSources: z.record(z.enum(UPDATE_SOURCES), z.string()),

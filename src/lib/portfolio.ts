@@ -194,6 +194,42 @@ export async function getHeadlines(): Promise<Headline[]> {
   );
 }
 
+/** Whose the site's Pens are: the name in its CodePen address. */
+export const penUser = (site: SiteData) =>
+  site.social
+    .map(
+      (entry: { href: string }) =>
+        entry.href.match(/^https:\/\/codepen\.io\/([\w-]+)/)?.[1],
+    )
+    .find(Boolean);
+
+/** What an update in the Labbook may link to: the experiments and projects
+ * that are shown, each where it lives. */
+export async function getRelatable() {
+  const [lab, projects] = await Promise.all([getLab(), getProjects()]);
+  return {
+    lab: lab.map((entry) => ({
+      slug: entry.slug,
+      title: entry.data.title as string,
+      detail: labDetail(entry),
+    })),
+    projects: projects.map((entry) => ({
+      slug: entry.slug,
+      title: entry.data.title as string,
+      href: `/projects/${entry.slug}`,
+    })),
+  };
+}
+
+/** The ticker: what it is called and the headlines it runs. */
+export async function getTicker() {
+  const site = await getSite();
+  return {
+    copy: need(site.ticker, "ticker in site/config.json"),
+    headlines: await getHeadlines(),
+  };
+}
+
 export async function getHome() {
   const site = await getSite();
   const entry = await getPageEntry("home");
@@ -264,6 +300,7 @@ export async function getLabPage() {
     more: resolveLink(site, need(data.more, "more in pages/lab.md")),
     aside: need(data.aside, "aside in pages/lab.md"),
     places: need(data.places, "places in pages/lab.md"),
+    labbook: need(data.labbook, "labbook in pages/lab.md"),
     detail: {
       eyebrow: need(detail.eyebrow, "entry.eyebrow in pages/lab.md"),
       back: resolveLink(site, need(detail.back, "entry.back in pages/lab.md")),

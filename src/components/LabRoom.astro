@@ -8,9 +8,9 @@ import type { getLabPage } from "../lib/portfolio";
 import { labPlaces } from "../lib/rules";
 import { part } from "../prism/parts";
 import type { LabEntry } from "../prism/shells/types";
-/** Composition: the Lab as a room. The page's opening, then each place that
- * holds something (the Bench, then the Shelf) under its own heading, then
- * the `labbook` slot, then the way out to more.
+/** Composition: the Lab as a room. The page's opening, the `ticker` slot,
+ * then each place that holds something (the Bench, then the Shelf) under
+ * its own heading, then the `labbook` slot, then the way out to more.
  * On the Bench experiments lie spread out, the featured one across the
  * whole width; on the Shelf they stand in quiet rows.
  */
@@ -37,6 +37,7 @@ const places = labPlaces(entries);
 <section class="shell page-section page-section--header">
   <PageHeader {...page.header} page="lab" />
 </section>
+<slot name="ticker" />
 {places.map(({ place, entries }) => (
   <section
     class:list={["shell", "page-section", "lab-place", `lab-place--${place}`]}

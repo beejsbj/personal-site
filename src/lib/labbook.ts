@@ -130,19 +130,28 @@ export function labbookUpdate(id: string, update: UpdateData): Update {
   });
 }
 
+/** The id of the element that holds an update in the Labbook. */
+export const labbookAnchor = (id: string) => `u-${id}`;
+
 /** Where an update sits in the Labbook. A headline links to the first of
  * its updates this way. */
-export const labbookHref = (id: string) => `/lab#u-${id}`;
+export const labbookHref = (id: string) => `/lab#${labbookAnchor(id)}`;
+
+/** The Labbook's one order: newest first and, on one day, by id. */
+export const newestFirst = <T extends { id: string; date: string }>(
+  list: T[],
+): T[] =>
+  [...list].sort(
+    (left, right) =>
+      right.date.localeCompare(left.date) || left.id.localeCompare(right.id),
+  );
 
 /** An experiment's part of the Labbook: the updates about it, newest
  * first, the redacted ones among them. Its page and every lens list these. */
 export function experimentUpdates(labbook: Update[], slug: string): Update[] {
-  return labbook
-    .filter((update) => update.relatedExperiment === slug)
-    .sort(
-      (left, right) =>
-        right.date.localeCompare(left.date) || left.id.localeCompare(right.id),
-    );
+  return newestFirst(
+    labbook.filter((update) => update.relatedExperiment === slug),
+  );
 }
 
 type Open<T> = Extract<T, { visibility: "open" }>;
@@ -179,10 +188,76 @@ export function publishedHeadlines(
   labbook: Update[],
 ): Headline[] {
   const published = new Set(labbook.map((update) => update.id));
-  return headlines
-    .filter((headline) => headline.updates.every((id) => published.has(id)))
-    .sort(
-      (left, right) =>
-        right.date.localeCompare(left.date) || left.id.localeCompare(right.id),
-    );
+  return newestFirst(
+    headlines.filter((headline) =>
+      headline.updates.every((id) => published.has(id)),
+    ),
+  );
+}
+
+const PEN =
+  /^https:\/\/(?:codepen|cdpn)\.io\/([\w-]+)\/\w+\/(\w+)\/?(?:[?#].*)?$/;
+
+/** The address a Pen's frame loads: built from its id, which is read out
+ * of a normal Pen URL (`https://codepen.io/<user>/pen/<id>`), or taken as
+ * written when `src` is the id alone and the Pen is `user`'s. Nothing,
+ * when `src` is not a Pen. */
+export function penEmbedSrc(src: string, user?: string): string | undefined {
+  const [, owner = user, id = /^\w+$/.test(src) ? src : undefined] =
+    src.match(PEN) ?? [];
+  return owner && id
+    ? `https://codepen.io/${owner}/embed/${id}?default-tab=result`
+    : undefined;
+}
+
+/** What an artifact's frame loads, once the visitor asks for it: a Pen's
+ * embed or a demo's own address. Nothing for an artifact shown in place
+ * (a picture, a film, a sound). `penUser` owns a Pen named by id alone. */
+export function embedSrc(
+  artifact: Artifact,
+  penUser?: string,
+): string | undefined {
+  if (artifact.kind === "pen") return penEmbedSrc(artifact.src, penUser);
+  return artifact.kind === "demo" ? artifact.src : undefined;
+}
+
+/** Something an update is about, as a link to it. */
+export type RelatedLink = {
+  kind: "experiment" | "project";
+  title: string;
+  href: string;
+};
+
+/** The experiment and the project an update is about, each where it lives.
+ * A project may be named by its slug or, as the older updates do, by its
+ * title. One that is not shown (hidden, or never written) links nowhere. */
+export function relatedLinks(
+  update: Pick<Update, "relatedExperiment" | "relatedProject">,
+  shown: {
+    lab: { slug: string; title: string; detail: string }[];
+    projects: { slug: string; title: string; href: string }[];
+  },
+): RelatedLink[] {
+  const experiment = shown.lab.find(
+    (entry) => entry.slug === update.relatedExperiment,
+  );
+  const project = shown.projects.find(
+    (entry) =>
+      entry.slug === update.relatedProject ||
+      entry.title === update.relatedProject,
+  );
+  return [
+    ...(experiment
+      ? [
+          {
+            kind: "experiment" as const,
+            title: experiment.title,
+            href: experiment.detail,
+          },
+        ]
+      : []),
+    ...(project
+      ? [{ kind: "project" as const, title: project.title, href: project.href }]
+      : []),
+  ];
 }

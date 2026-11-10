@@ -11,7 +11,13 @@ import {
   orderProjects,
   dateLine,
 } from "../lib/rules";
-import { streamUpdate, type Update as LabbookUpdate } from "../lib/labbook";
+import {
+  newestFirst,
+  publishedHeadlines,
+  streamUpdate,
+  type Update as LabbookUpdate,
+} from "../lib/labbook";
+import { labbookFixture } from "./labbook-fixture";
 import type { RouteRef } from "./parity";
 import type {
   LabEntry,
@@ -304,22 +310,29 @@ function withExperiment(
   content: SiteContent,
   { entry, labbook }: ExperimentFixture,
 ): SiteContent {
-  const newestFirst = <T extends { date: string; id: string }>(list: T[]) =>
-    list.sort(
-      (a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id),
-    );
+  return settle({
+    ...withUpdates(content, labbook),
+    lab: [...content.lab, entry],
+  });
+}
+
+/** Put fixture updates into the Labbook and, the open ones, into the home
+ * stream, newest first. */
+function withUpdates(
+  content: SiteContent,
+  labbook: LabbookUpdate[],
+): SiteContent {
   const stream: Update[] = labbook.flatMap((update) => {
     const shown = streamUpdate(update.id, update);
     return shown
       ? [{ ...shown, kindLabel: shown.kind, sourceLabel: shown.source }]
       : [];
   });
-  return settle({
+  return {
     ...content,
-    lab: [...content.lab, entry],
     labbook: newestFirst([...content.labbook, ...labbook]),
     updates: newestFirst([...content.updates, ...stream]),
-  });
+  };
 }
 
 const labEntryRoute = ({ entry }: ExperimentFixture): RouteRef => ({
@@ -517,6 +530,29 @@ export const FIXTURES: Record<string, Fixture> = {
       withExperiment(content, study(content.projects[0]?.slug ?? "")),
     routes: (content) => [
       labEntryRoute(study(content.projects[0]?.slug ?? "")),
+    ],
+  },
+  labbook: {
+    name: "labbook",
+    about:
+      "A Labbook with every kind of artifact and a redacted update, about two experiments and a project, and three headlines on the ticker.",
+    apply(content) {
+      const { labbook, headlines } = labbookFixture({
+        experiments: content.lab.slice(0, 2).map((entry) => entry.slug),
+        project: content.projects[0]?.slug,
+      });
+      const next = withUpdates(content, labbook);
+      return settle({
+        ...next,
+        headlines: publishedHeadlines(
+          [...content.headlines, ...headlines],
+          next.labbook,
+        ),
+      });
+    },
+    routes: () => [
+      { kind: "home", path: "/" },
+      { kind: "lab", path: "/lab" },
     ],
   },
   "writing-rich": {

@@ -1,18 +1,36 @@
 ---
 /** Daylight's side of the fuzz harness for the Lab itself: the room on
- * fixture experiments, so every state can be seen and tested whatever
- * src/content/lab holds. /prism/fixtures/lab is a full room;
- * ?fixture=shelf-only has nothing on the Bench and ?fixture=no-covers has
- * no pictures. scripts/tests/lab-daylight.browser.mjs reads it. Rendered on
- * demand: its page entries point at /lab/<slug>, where nothing is built. */
+ * fixture experiments, with a fixture Labbook and ticker, so every state
+ * can be seen and tested whatever src/content holds. /prism/fixtures/lab is
+ * a full room; ?fixture=shelf-only has nothing on the Bench and
+ * ?fixture=no-covers has no pictures. ?headlines=one leaves the ticker one
+ * headline and ?headlines=none leaves it none; ?labbook=none is a Lab with
+ * no updates. scripts/tests/lab-daylight.browser.mjs and
+ * labbook-daylight.browser.mjs read it. Rendered on demand: its page
+ * entries point at /lab/<slug>, where nothing is built. */
 import type { ComponentProps } from "astro/types";
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import LabRoom from "../../../../components/LabRoom.astro";
-import { getLabPage } from "../../../../lib/portfolio";
+import Labbook from "../../../../components/Labbook.astro";
+import Ticker from "../../../../design/unique/Ticker.astro";
+import { publishedHeadlines } from "../../../../lib/labbook";
+import {
+  getLabPage,
+  getRelatable,
+  getSite,
+  getTicker,
+  penUser,
+} from "../../../../lib/portfolio";
+import { labbookFixture } from "../../../../prism/labbook-fixture";
 
 export const prerender = false;
 
-const page = await getLabPage();
+const [page, site, ticker, relatable] = await Promise.all([
+  getLabPage(),
+  getSite(),
+  getTicker(),
+  getRelatable(),
+]);
 type Entries = ComponentProps<typeof LabRoom>["entries"];
 const room: Entries = [
   {
@@ -97,10 +115,39 @@ const fixtures: Record<string, Entries> = {
   "shelf-only": room.filter((entry) => entry.place === "shelf"),
   "no-covers": room.map((entry) => ({ ...entry, cover: undefined })),
 };
-const entries = fixtures[Astro.url.searchParams.get("fixture") ?? "room"];
+const asked = Astro.url.searchParams;
+const entries = fixtures[asked.get("fixture") ?? "room"];
 if (!entries) return new Response("No such fixture.", { status: 404 });
+
+// The fixture Labbook is about two experiments in the room (one that lives
+// elsewhere, one with a page) and the first real project.
+const written = labbookFixture({
+  experiments: ["fixture-quiet", "fixture-featured"],
+  project: relatable.projects[0]?.slug,
+});
+const labbook = asked.get("labbook") === "none" ? [] : written.labbook;
+const published = publishedHeadlines(written.headlines, written.labbook);
+const headlines =
+  { none: [], one: published.slice(0, 1) }[asked.get("headlines") ?? ""] ??
+  published;
 ---
 
 <BaseLayout title="Lab fixture" pageClass="page-lab" tool>
-  <LabRoom page={page} entries={entries} />
+  <LabRoom page={page} entries={entries}>
+    <Ticker
+      slot="ticker"
+      class="shell"
+      headlines={headlines}
+      copy={ticker.copy}
+    />
+    <Labbook
+      slot="labbook"
+      class="shell page-section"
+      updates={labbook}
+      copy={page.labbook}
+      labels={{ kinds: site.updateKinds, sources: site.updateSources }}
+      shown={{ ...relatable, lab: room }}
+      penUser={penUser(site)}
+    />
+  </LabRoom>
 </BaseLayout>

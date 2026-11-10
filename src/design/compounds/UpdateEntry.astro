@@ -2,27 +2,54 @@
 import type { StreamUpdate } from "../../lib/portfolio";
 import Link from "../primitives/Link.astro";
 import { part } from "../../prism/parts";
-
-type Props = StreamUpdate & {
-  /** The update's id, marking it as an update.item part. */
-  id?: string;
-  labels: { kinds: Record<string, string>; sources: Record<string, string> };
-  connected?: boolean;
-  detailed?: boolean;
+/** Compound: one update in a dated list (the home stream, an experiment's
+ * page, the Labbook).
+ * Open: its mark, where it came from, its title, with `detailed` its
+ * summary, then the slot (what it is about) and its date. The title is a
+ * link when the update has somewhere to go. Slot `artifact`: the thing it
+ * shows for itself, beside the words where there is room and under them
+ * where there is not.
+ * Redacted: it happened and is not shown. The site is given its shape and
+ * never its words, so this draws the shape: one black bar for each number
+ * in `bars` (a longer number, a longer bar), struck by hand like lines
+ * blacked out of a document, with its kind of work and its date. It links
+ * nowhere and has no slot. The bars say nothing to assistive technology,
+ * which is told `label` instead.
+ */
+type Open = Pick<StreamUpdate, "title" | "summary"> &
+  Partial<Pick<StreamUpdate, "kind" | "source" | "href">> & {
+    labels: { kinds: Record<string, string>; sources: Record<string, string> };
+    detailed?: boolean;
+    redacted?: undefined;
+  };
+type Redacted = {
+  redacted: {
+    /** The lengths of the bars. */
+    bars: number[];
+    /** Its kind of work, as it is named. */
+    work: string;
+    /** What it is called aloud. */
+    label: string;
+  };
 };
-const {
-  title,
-  date,
-  dateLabel,
-  href,
-  summary,
-  kind = "project",
-  source = "site",
-  id,
-  labels,
-  connected = false,
-  detailed = false,
-} = Astro.props;
+type Props = (Open | Redacted) & {
+  date: string;
+  dateLabel: string;
+  /** The update's id, marking it as an update.item or update.redacted part. */
+  id?: string;
+  connected?: boolean;
+};
+const props = Astro.props;
+const { date, dateLabel, id, connected = false, redacted } = props;
+const open = props.redacted ? undefined : props;
+const kind = open?.kind ?? "project";
+const source = open?.source ?? "site";
+const name = redacted && id ? `redacted-${id}` : undefined;
+// A slot that was handed nothing leaves no room behind.
+const artifact =
+  open && Astro.slots.has("artifact")
+    ? (await Astro.slots.render("artifact")).trim()
+    : "";
 
 const kinds = {
   project: { path: "M3 7h6l2-3h10v15H3z" },
@@ -54,32 +81,65 @@ const event = kinds[kind];
 ---
 
 <article
-  class:list={["update-entry", { "update-entry--connected": connected }]}
-  data-event-kind={kind}
-  {...(id ? part("update.item", id) : {})}
+  class:list={[
+    "update-entry",
+    {
+      "update-entry--connected": connected,
+      "update-entry--redacted": redacted,
+      "update-entry--shows": artifact,
+    },
+  ]}
+  data-event-kind={open ? kind : undefined}
+  aria-labelledby={name}
+  {...(id ? part(redacted ? "update.redacted" : "update.item", id) : {})}
 >
   <span class="event-mark" aria-hidden="true">
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d={event.path} />
-    </svg>
+    {open && (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d={event.path} />
+      </svg>
+    )}
   </span>
   <div class="event-body">
-    <p class="event-origin">
-      {labels.sources[source]}
-      <span aria-hidden="true"> / </span>
-      {labels.kinds[kind]}
-    </p>
-    <p class="event-title">
-      <Link href={href}>{title}</Link>
-    </p>
-    {detailed && <p class="event-detail">{summary}</p>}
+    {redacted && (
+      <>
+        <p class="redaction-name" id={name}>
+          {redacted.label}
+        </p>
+        <p class="event-origin">{redacted.work}</p>
+        <p class="redaction" aria-hidden="true">
+          {redacted.bars.map((bar) => (
+            <span data-redaction-bar style={`--bar:${bar}`} />
+          ))}
+        </p>
+      </>
+    )}
+    {open && (
+      <>
+        <p class="event-origin">
+          {open.labels.sources[source]}
+          <span aria-hidden="true"> / </span>
+          {open.labels.kinds[kind]}
+        </p>
+        <p class="event-title">
+          {open.href ? <Link href={open.href}>{open.title}</Link> : open.title}
+        </p>
+        {open.detailed && <p class="event-detail">{open.summary}</p>}
+        <slot />
+        {artifact && (
+          <div class="event-artifact">
+            <Fragment set:html={artifact} />
+          </div>
+        )}
+      </>
+    )}
     <time datetime={date}>{dateLabel}</time>
   </div>
 </article>
@@ -131,5 +191,67 @@ const event = kinds[kind];
   .event-detail {
     font-size: var(--text-sm);
     line-height: var(--leading-body);
+  }
+  @media (min-width: 62.501rem) {
+    .update-entry--shows .event-body {
+      grid-template-columns: minmax(0, 1fr) var(--feature-media-width);
+      column-gap: var(--space-xl);
+      align-content: start;
+    }
+    .update-entry--shows .event-body > :global(*) {
+      grid-column: 1;
+    }
+    .update-entry--shows .event-body > .event-artifact {
+      grid-column: 2;
+      grid-row: 1 / span 6;
+    }
+  }
+  /* Redacted: even the mark is blacked out. */
+  .update-entry--redacted .event-mark {
+    background: var(--color-text);
+  }
+  /* Said to assistive technology, not shown: what the bars stand for. */
+  .redaction-name {
+    position: absolute;
+    width: var(--rule-width);
+    height: var(--rule-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* The bars stand where the title's words would, word by word, each as
+     long as its number (--bar, set on the bar). Each is a marker stroke:
+     square-ended, a little off the level and uneven at its ends, so no two
+     are quite alike. */
+  .redaction {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-xs);
+    padding-block: var(--underline-pad);
+    font-size: var(--text-copy);
+  }
+  .redaction span {
+    --bar: 1;
+    width: calc(var(--bar) * var(--redaction-unit));
+    max-width: 100%;
+    height: var(--redaction-height);
+    background: var(--color-text);
+    rotate: var(--settle-angle);
+    clip-path: polygon(0 7%, 100% 0, 99% 93%, 1% 100%);
+  }
+  .redaction span:nth-child(even) {
+    rotate: calc(var(--settle-angle) * -1.5);
+    clip-path: polygon(1% 0, 99% 5%, 100% 100%, 0 96%);
+  }
+  .redaction span:nth-child(3n) {
+    rotate: 0deg;
+    clip-path: polygon(0 3%, 99% 0, 100% 97%, 2% 100%);
+  }
+  @media (forced-colors: active) {
+    .update-entry--redacted .event-mark,
+    .redaction span {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
   }
 </style>
