@@ -327,7 +327,8 @@ test(
               const landed = await follow(size, "/lab", entry.slug);
               assert.equal(
                 landed,
-                entry.hasPage ? `${base}/lab/${entry.slug}` : entry.href,
+                new URL(entry.hasPage ? `/lab/${entry.slug}` : entry.href, base)
+                  .href,
                 `${entry.slug} opens where it lives`,
               );
             }
