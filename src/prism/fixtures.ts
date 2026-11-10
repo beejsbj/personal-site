@@ -11,8 +11,15 @@ import {
   orderProjects,
   dateLine,
 } from "../lib/rules";
+import { streamUpdate, type Update as LabbookUpdate } from "../lib/labbook";
 import type { RouteRef } from "./parity";
-import type { Project, ResumeEntry, SiteContent, Update } from "./shells/types";
+import type {
+  LabEntry,
+  Project,
+  ResumeEntry,
+  SiteContent,
+  Update,
+} from "./shells/types";
 
 export interface Fixture {
   name: string;
@@ -143,6 +150,183 @@ function updates(count: number): Update[] {
     };
   });
 }
+
+/** An experiment that exists only as a fixture, with its part of the
+ * Labbook as written: oldest first. The shells meet it in the harness;
+ * Daylight renders its page at /prism/fixtures/lab/<slug>. */
+export interface ExperimentFixture {
+  entry: LabEntry;
+  labbook: LabbookUpdate[];
+}
+
+/** Words and a link, and nothing else: no cover, pictures or updates. */
+const sketch: ExperimentFixture = {
+  entry: {
+    slug: "fixture-sketch",
+    detail: "/lab/fixture-sketch",
+    hasPage: true,
+    title: "A sketch with no cover",
+    summary: "An experiment that lives here, with words but no picture.",
+    place: "bench",
+    type: "Canvas + sound",
+    sourceEra: "This site",
+    links: [{ label: "Source", url: "https://example.com/source" }],
+    media: [],
+    order: 99,
+    html: "<h2>How it works</h2><p>A paragraph about the sketch.</p><ul><li>One thing</li><li>Another thing</li></ul>",
+  },
+  labbook: [],
+};
+
+/** A cover and a paragraph: no type or era, no pictures of its own, no
+ * links or updates. */
+const poster: ExperimentFixture = {
+  entry: {
+    slug: "fixture-poster",
+    detail: "/lab/fixture-poster",
+    hasPage: true,
+    title: "A poster and a paragraph",
+    summary: "An experiment that says little about itself.",
+    place: "bench",
+    type: "",
+    sourceEra: "",
+    cover: "/images/lab/beating-shapes.png",
+    links: [],
+    media: [],
+    order: 97,
+    html: "<p>One paragraph, and the cover for a picture.</p>",
+  },
+  labbook: [],
+};
+
+/** Everything an experiment's page can show: pictures and a film, links, a
+ * body, updates (one of them redacted) and the project it graduated into. */
+function study(project: string): ExperimentFixture {
+  const slug = "fixture-study";
+  const about = {
+    kind: "lab",
+    source: "codepen",
+    relatedExperiment: slug,
+  } as const;
+  return {
+    entry: {
+      slug,
+      detail: `/lab/${slug}`,
+      hasPage: true,
+      title: "A study with everything on its page",
+      summary:
+        "An experiment that kept a record: pictures, a film, links out and what happened along the way.",
+      place: "shelf",
+      graduatedTo: project,
+      type: "SVG + motion",
+      sourceEra: "This site",
+      cover: "/images/lab/motion-path-graph.svg",
+      links: [
+        {
+          label: "Open the Pen",
+          url: "https://codepen.io/beejsbj/pen/abXZWLQ",
+        },
+        { label: "Source", url: "https://example.com/source" },
+      ],
+      media: [
+        {
+          type: "image",
+          src: "/images/lab/motion-path-graph.svg",
+          alt: "A lotus drawn in orange and blue lines",
+          caption: "The finished drawing.",
+        },
+        {
+          type: "image",
+          src: "/images/lab/beating-shapes.png",
+          alt: "Black and white shapes on a grid",
+        },
+        {
+          type: "video",
+          src: "/prism/fixtures/film.webm",
+          caption: "The lines, drawn one after another.",
+        },
+      ],
+      order: 98,
+      html: "<h2>How it was made</h2><p>A paragraph about measuring each path before drawing it.</p><ul><li>Measure the path</li><li>Draw it over time</li></ul><h2>What it taught me</h2><p>A closing paragraph about what carried over.</p>",
+    },
+    labbook: [
+      {
+        ...about,
+        id: "fixture-study-first-line",
+        date: "2026-08-02",
+        visibility: "open",
+        title: "The first line draws itself",
+        summary: "One path, measured and drawn from end to end.",
+      },
+      {
+        id: "fixture-study-kept-back",
+        date: "2026-08-20",
+        kind: "project",
+        source: "bjslab",
+        relatedExperiment: slug,
+        visibility: "redacted",
+        shape: { work: "code", bars: [4, 2, 3] },
+      },
+      {
+        ...about,
+        id: "fixture-study-replay",
+        date: "2026-09-12",
+        visibility: "open",
+        title: "A replay control, so it plays more than once",
+        summary: "The drawing can be watched again without reloading.",
+        href: "https://codepen.io/beejsbj/pen/abXZWLQ",
+        linkLabel: "Open the Pen",
+      },
+      {
+        id: "fixture-study-graduated",
+        date: "2026-09-30",
+        kind: "milestone",
+        source: "site",
+        relatedProject: project,
+        relatedExperiment: slug,
+        visibility: "open",
+        title: "The study became a project",
+        summary: "What started as one line has a home of its own now.",
+      },
+    ],
+  };
+}
+
+/** The fixture experiments. The one that graduated did so into the first
+ * of `projects`. */
+export const experimentFixtures = (
+  projects: { slug: string }[],
+): ExperimentFixture[] => [sketch, poster, study(projects[0]?.slug ?? "")];
+
+/** Put a fixture experiment into the content: on the lab's list, and its
+ * updates into the Labbook and the home stream, newest first. */
+function withExperiment(
+  content: SiteContent,
+  { entry, labbook }: ExperimentFixture,
+): SiteContent {
+  const newestFirst = <T extends { date: string; id: string }>(list: T[]) =>
+    list.sort(
+      (a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id),
+    );
+  const stream: Update[] = labbook.flatMap((update) => {
+    const shown = streamUpdate(update.id, update);
+    return shown
+      ? [{ ...shown, kindLabel: shown.kind, sourceLabel: shown.source }]
+      : [];
+  });
+  return settle({
+    ...content,
+    lab: [...content.lab, entry],
+    labbook: newestFirst([...content.labbook, ...labbook]),
+    updates: newestFirst([...content.updates, ...stream]),
+  });
+}
+
+const labEntryRoute = ({ entry }: ExperimentFixture): RouteRef => ({
+  kind: "lab-entry",
+  path: entry.detail,
+  slug: entry.slug,
+});
 
 const LONG_TITLE =
   "A project whose title runs on and on, far past where any layout expects a title to stop";
@@ -315,33 +499,24 @@ export const FIXTURES: Record<string, Fixture> = {
   "lab-no-cover": {
     name: "lab-no-cover",
     about: "A lab entry with its own page and no cover.",
-    apply(content) {
-      const lab = [
-        ...content.lab,
-        {
-          slug: "fixture-sketch",
-          detail: "/lab/fixture-sketch",
-          hasPage: true,
-          title: "A sketch with no cover",
-          summary: "An experiment that lives here, with words but no picture.",
-          place: "bench" as const,
-          type: "Canvas + sound",
-          sourceEra: "This site",
-          links: [{ label: "Source", url: "https://example.com/source" }],
-          media: [],
-          order: 99,
-          html: "<h2>How it works</h2><p>A paragraph about the sketch.</p><ul><li>One thing</li><li>Another thing</li></ul>",
-        },
-      ];
-      return settle({ ...content, lab });
-    },
-    routes: () => [
-      { kind: "lab", path: "/lab" },
-      {
-        kind: "lab-entry",
-        path: "/lab/fixture-sketch",
-        slug: "fixture-sketch",
-      },
+    apply: (content) => withExperiment(content, sketch),
+    routes: () => [{ kind: "lab", path: "/lab" }, labEntryRoute(sketch)],
+  },
+  "lab-bare-entry": {
+    name: "lab-bare-entry",
+    about:
+      "A lab entry that says no type or era, with a cover and no other picture.",
+    apply: (content) => withExperiment(content, poster),
+    routes: () => [{ kind: "lab", path: "/lab" }, labEntryRoute(poster)],
+  },
+  "lab-full-page": {
+    name: "lab-full-page",
+    about:
+      "An experiment whose page has everything: pictures, a film, links, a body, updates (one redacted) and the project it graduated into.",
+    apply: (content) =>
+      withExperiment(content, study(content.projects[0]?.slug ?? "")),
+    routes: (content) => [
+      labEntryRoute(study(content.projects[0]?.slug ?? "")),
     ],
   },
   "writing-rich": {

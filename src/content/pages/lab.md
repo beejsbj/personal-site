@@ -12,7 +12,12 @@ more:
 aside: Looking for the bigger pieces? The learning arcade and applications live in [Projects](/projects). This site's visual foundations have their own [Style Guide](/style-guide).
 entry:
   eyebrow: Lab
+  back:
+    label: Back to the Lab
+    href: /lab
   labels:
     type: Type
     era: Era
+    graduated: Graduated into
+    updates: From the Labbook
 ---
