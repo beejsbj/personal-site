@@ -11,8 +11,8 @@ import {
   getSite,
   getTicker,
   labDetail,
-  penUser,
 } from "../../lib/portfolio";
+import { penUser } from "../../lib/labbook";
 
 const [page, site, labbook, ticker, relatable] = await Promise.all([
   getLabPage(),
