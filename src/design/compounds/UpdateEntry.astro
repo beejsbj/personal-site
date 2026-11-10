@@ -110,7 +110,9 @@ const event = kinds[kind];
   <div class="event-body">
     {redacted && (
       <>
-        <p class="redaction-name" id={name}>{redacted.label}</p>
+        <p class="redaction-name" id={name}>
+          {redacted.label}
+        </p>
         <p class="event-origin">{redacted.work}</p>
         <p class="redaction" aria-hidden="true">
           {redacted.bars.map((bar) => (

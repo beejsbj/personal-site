@@ -249,6 +249,7 @@ test(
                 },
               ],
             );
+            await shot(page, "#labbook-title", `lab-labbook-${size}`);
             await context.close();
           },
         );

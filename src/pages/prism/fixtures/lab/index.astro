@@ -127,9 +127,9 @@ const written = labbookFixture({
 });
 const labbook = asked.get("labbook") === "none" ? [] : written.labbook;
 const published = publishedHeadlines(written.headlines, written.labbook);
-const headlines = { none: [], one: published.slice(0, 1) }[
-  asked.get("headlines") ?? ""
-] ?? published;
+const headlines =
+  { none: [], one: published.slice(0, 1) }[asked.get("headlines") ?? ""] ??
+  published;
 ---
 
 <BaseLayout title="Lab fixture" pageClass="page-lab" tool>
