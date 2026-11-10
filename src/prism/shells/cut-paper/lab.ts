@@ -203,7 +203,5 @@ export function labEntry(env: Env, item: LabEntry): Screen {
       : null,
     labbook(env, updates, { whole: false }),
   );
-  const el = screen("lab-entry", h("div", { class: "cp-clipview", style: `--note:${noteVar(index + 2)}` }, bar(side, 1), main));
-  tendLog(env, el);
-  return { el, heading: h1 };
+  return { el: screen("lab-entry", h("div", { class: "cp-clipview", style: `--note:${noteVar(index + 2)}` }, bar(side, 1), main)), heading: h1 };
 }

@@ -2609,6 +2609,324 @@
   display: none;
 }
 
+/* ── the Labbook: the Markers track, written out ───────────── */
+
+:root[data-lens="cut-paper"] .cp-log {
+  min-width: 0;
+  margin-top: 46px;
+}
+
+:root[data-lens="cut-paper"] .cp-clipview__main .cp-log {
+  margin-top: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-log .cp-session__bar {
+  margin: 16px 0 14px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--log {
+  --head: 196px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row--log {
+  border-bottom: 0;
+}
+
+/* a rest: a flag with nothing on it */
+:root[data-lens="cut-paper"] .cp-flag--rest .cp-flag__pin {
+  background: var(--cp-ink-5);
+}
+
+/* the log: a page of the notebook, punched down its margin */
+:root[data-lens="cut-paper"] .cp-log__sheet {
+  max-width: 1080px;
+  margin: 20px 0 0;
+  padding: 14px 30px 26px 54px;
+  background:
+    radial-gradient(circle, var(--cp-ink) 0 5px, transparent 5.6px) 12px 26px / 16px 92px repeat-y,
+    linear-gradient(var(--cp-tomato), var(--cp-tomato)) 40px 0 / 1.5px 100% no-repeat,
+    var(--cp-bone);
+  color: var(--cp-ink);
+  list-style: none;
+  clip-path: polygon(0 0, 100% 3px, 100% calc(100% - 9px), 94% 100%, 83% calc(100% - 7px), 70% 100%, 57% calc(100% - 8px), 44% 100%, 30% calc(100% - 6px), 16% 100%, 4% calc(100% - 7px), 0 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-log__sheet :focus-visible {
+  outline-color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-log__line {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px 22px;
+  padding: 20px 0;
+  border-bottom: 1px dashed rgba(10, 9, 8, 0.3);
+}
+
+:root[data-lens="cut-paper"] .cp-log__line:last-child {
+  border-bottom: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-log__when {
+  margin: 0;
+}
+
+/* a date is a locator: it moves the playhead, and lights while it is there */
+:root[data-lens="cut-paper"] .cp-app .cp-log__date {
+  display: inline-block;
+  margin: 0;
+  padding: 5px 8px 4px;
+  border: 0;
+  border-left: 3px solid var(--cp-ink);
+  background: rgba(10, 9, 8, 0.09);
+  color: var(--cp-ink);
+  font: 600 12px/1.2 var(--cp-mono);
+  white-space: nowrap;
+  transition: background var(--cp-dur-ui) var(--cp-ease-brush), color var(--cp-dur-ui) var(--cp-ease-brush);
+}
+
+:root[data-lens="cut-paper"] button.cp-log__date {
+  cursor: pointer;
+}
+
+:root[data-lens="cut-paper"] .cp-app button.cp-log__date:hover,
+:root[data-lens="cut-paper"] .cp-app .cp-log__line[data-live] .cp-log__date,
+:root[data-lens="cut-paper"] .cp-app .cp-log__line[data-hearing] .cp-log__date {
+  border-left-color: var(--cp-brass);
+  background: var(--cp-ink);
+  color: var(--cp-brass-hi);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-log__line--rest .cp-log__date {
+  border-left-style: dashed;
+  background: none;
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-log__line--rest[data-live] .cp-log__date {
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-log__words {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-log__origin {
+  margin: 0;
+  color: rgba(10, 9, 8, 0.64);
+  font: 600 10.5px/1.2 var(--cp-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-log__title {
+  margin: 0;
+  color: var(--cp-ink);
+  font: 400 28px/1 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-log__title a,
+:root[data-lens="cut-paper"] .cp-log__about a,
+:root[data-lens="cut-paper"] .cp-art__home a {
+  color: var(--cp-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--cp-tomato);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-log__title a:hover,
+:root[data-lens="cut-paper"] .cp-log__about a:hover,
+:root[data-lens="cut-paper"] .cp-art__home a:hover {
+  background: var(--cp-mustard);
+}
+
+:root[data-lens="cut-paper"] .cp-log__sum {
+  max-width: 62ch;
+  margin: 0;
+  font: 400 13px/1.6 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-log__about {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 2px 0 0;
+  font: 600 11.5px/1.4 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-log__about > span > span {
+  margin-right: 7px;
+  color: rgba(10, 9, 8, 0.64);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* the line a link landed on: a stroke of the highlighter */
+:root[data-lens="cut-paper"] .cp-log__line[data-landed] {
+  background: color-mix(in srgb, var(--cp-mustard) 46%, transparent);
+  box-shadow: -12px 0 0 color-mix(in srgb, var(--cp-mustard) 46%, transparent), 12px 0 0 color-mix(in srgb, var(--cp-mustard) 46%, transparent);
+}
+
+/* a redacted update: strips of black paper pasted over its words */
+:root[data-lens="cut-paper"] .cp-strike {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 9px;
+  padding: 2px 0;
+  font-size: 15px;
+}
+
+:root[data-lens="cut-paper"] .cp-strike i {
+  display: block;
+  width: min(calc(var(--len) * 1.15em), 100%);
+  height: 1.4em;
+  background: var(--cp-ink);
+  clip-path: polygon(0 7%, 3% 0, 97% 5%, 100% 13%, 99% 91%, 96% 100%, 2% 95%, 0 87%);
+  transform: rotate(var(--tilt, 0deg));
+}
+
+/* what an update shows for itself, pasted beside its words */
+:root[data-lens="cut-paper"] .cp-art {
+  min-width: 0;
+  margin: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-art--image {
+  position: relative;
+  justify-self: start;
+  max-width: 100%;
+  padding: 7px;
+  background: var(--note);
+  transform: rotate(1.1deg);
+}
+
+:root[data-lens="cut-paper"] .cp-art--image img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  background: var(--cp-ivory);
+  object-fit: contain;
+}
+
+:root[data-lens="cut-paper"] .cp-art__tape {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  z-index: 1;
+  width: 76px;
+  height: 17px;
+  background: color-mix(in srgb, var(--cp-plum) 78%, transparent);
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+:root[data-lens="cut-paper"] .cp-art--video video {
+  display: block;
+  width: 100%;
+  border: 6px solid var(--cp-ink);
+  border-radius: 4px;
+  background: var(--cp-ink);
+}
+
+/* a sound and a stage are dark: windows of the session, cut into the page */
+:root[data-lens="cut-paper"] .cp-art--sound {
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--cp-ink-2);
+  color: var(--cp-ivory-2);
+}
+
+:root[data-lens="cut-paper"] .cp-art--sound audio {
+  display: block;
+  width: 100%;
+  color-scheme: dark;
+}
+
+:root[data-lens="cut-paper"] .cp-art--sound figcaption {
+  margin-top: 8px;
+  color: var(--cp-ivory-2);
+  font-size: 11.5px;
+}
+
+:root[data-lens="cut-paper"] .cp-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 6px;
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0 2px, transparent 2px 7px), var(--cp-ink-2);
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-stage > img,
+:root[data-lens="cut-paper"] .cp-stage > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-stage__poster {
+  opacity: 0.3;
+  filter: grayscale(1);
+  object-fit: cover;
+}
+
+:root[data-lens="cut-paper"] .cp-stage__ask {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+:root[data-lens="cut-paper"] .cp-stage__label {
+  max-width: 24ch;
+  margin: 0;
+  font: 400 22px/1.05 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-stage__note {
+  margin: 0;
+  color: var(--cp-ivory-2);
+  font-size: 11px;
+}
+
+:root[data-lens="cut-paper"] .cp-stage :focus-visible {
+  outline-color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-art__home {
+  margin-top: 9px;
+  font: 600 11px/1.4 var(--cp-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 981px) {
+  :root[data-lens="cut-paper"] .cp-log__line[data-art] {
+    grid-template-columns: 112px minmax(0, 1fr) minmax(0, 40%);
+  }
+}
+
+@media (max-width: 980px) {
+  :root[data-lens="cut-paper"] .cp-art {
+    grid-column: 2;
+    max-width: 520px;
+  }
+}
+
 :root[data-lens="cut-paper"] .cp-lab__more {
   display: grid;
   gap: 10px;
@@ -3986,6 +4304,35 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  :root[data-lens="cut-paper"] .cp-arr--log {
+    --head: 84px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--log .cp-arr__name small,
+  :root[data-lens="cut-paper"] .cp-arr--log .cp-ruler__corner small,
+  :root[data-lens="cut-paper"] .cp-arr--log .cp-ruler__month {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-log__sheet {
+    padding: 8px 16px 22px 44px;
+    background-position: 9px 22px, 33px 0, 0 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-log__line {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 18px 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-art {
+    grid-column: 1;
+  }
+
+  :root[data-lens="cut-paper"] .cp-log__title {
+    font-size: 25px;
+  }
+
   :root[data-lens="cut-paper"] .cp-clipview__side .cp-pad {
     max-width: 220px;
   }
@@ -4075,8 +4422,13 @@
 
   :root[data-lens="cut-paper"] .cp-pad__hit--small,
   :root[data-lens="cut-paper"] .cp-pad__hit--small .cp-roll,
-  :root[data-lens="cut-paper"] .cp-pad__hit--small .cp-pad__art {
+  :root[data-lens="cut-paper"] .cp-pad__hit--small .cp-pad__art,
+  :root[data-lens="cut-paper"] .cp-log__date {
     transition: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-log__line[data-hearing] {
+    outline: 0;
   }
 }
 
