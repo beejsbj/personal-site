@@ -273,13 +273,16 @@ test(
       await page.waitForTimeout(700);
       return { context, page, asked, errors };
     };
-    /** A picture of the screen with `selector` near the top of it. */
+    /** A picture of the screen with `selector` near the top of it: with
+     * none, the top of the page; with HERE, wherever the page is. */
+    const HERE = Symbol("here");
     const shot = async (page, selector, name, block = "start") => {
       if (!SHOTS) return;
-      await page.evaluate(() => {
-        document.querySelector("#lens-shell .cp-scroll").scrollTop = 0;
-      });
-      if (selector)
+      if (selector !== HERE)
+        await page.evaluate(() => {
+          document.querySelector("#lens-shell .cp-scroll").scrollTop = 0;
+        });
+      if (selector && selector !== HERE)
         await page
           .locator(selector)
           .first()
@@ -465,7 +468,7 @@ test(
                 landed.bottom <= landed.view.bottom,
               `the update is in the view (${landed.top} to ${landed.bottom} in ${landed.view.top} to ${landed.view.bottom})`,
             );
-            await shot(page, null, `cut-paper-landed-${size}`);
+            await shot(page, HERE, `cut-paper-landed-${size}`);
             await context.close();
           },
         );
