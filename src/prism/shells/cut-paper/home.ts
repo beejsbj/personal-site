@@ -1,4 +1,5 @@
-/** Home: the set info, a turntable and the crate beside it. The record on
+/** Home: the ribbon of headlines (./ribbon) across the top, then the set
+ * info, a turntable and the crate beside it. The record on
  * the platter is a project's clip: press it and it plays that clip's motif
  * over the chords at its date, the record turning while it sounds. Picking
  * a record from the crate swaps it onto the platter and plays it. Press
@@ -10,6 +11,7 @@ import { featured, fill } from "../rich";
 import type { Project } from "../types";
 import { auditionClip, bar, heading, inlineCopy, noteVar, playButton, roll, scrap, screen, spell, type Env, type Screen } from "./bits";
 import { h, link, markup } from "./dom";
+import { ribbon } from "./ribbon";
 import { MONTH, type Clip } from "./score";
 
 /** How long a clip sounds when auditioned, in ms (a year is three seconds). */
@@ -299,8 +301,9 @@ export function home(env: Env): Screen {
   bar(info, 1);
   bar(tt.section, 2, 2);
   bar(tt.crateList, 1, 4);
+  const headlines = ribbon(env);
   return {
-    el: screen("home", h("div", { class: "cp-home" }, info, tt.section, tt.crate, locators(env))),
+    el: screen("home", headlines ? h("div", { class: "cp-home__ribbon" }, headlines) : null, h("div", { class: "cp-home" }, info, tt.section, tt.crate, locators(env))),
     heading: h1,
   };
 }

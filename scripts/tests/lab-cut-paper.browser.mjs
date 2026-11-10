@@ -9,7 +9,7 @@
  * the `labbook`, `lab-full-page` and `lab-bare-entry` fixtures, which hold
  * every state whatever src/content does. Same server and Chromium as
  * prism-parity.browser.mjs. LAB_SHOTS=<dir> also saves pictures of each
- * part at each size. */
+ * part at each size; LAB_ONLY=<regexp> runs only the subtests it names. */
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -33,6 +33,7 @@ const SIZES = {
   phone: phone(390),
 };
 const SHOTS = process.env.LAB_SHOTS;
+const ONLY = process.env.LAB_ONLY ? new RegExp(process.env.LAB_ONLY) : null;
 const PEN_FRAME = "https://codepen.io/beejsbj/embed/abXZWLQ?default-tab=result";
 const DEMO_FRAME = "https://example.com/fixture-demo/";
 const fixture = labbookFixture();
@@ -217,7 +218,11 @@ const skip = executable
 test(
   "Cut Paper shows the Bench, the Shelf, the Labbook and the tape of headlines",
   { skip, timeout: 15 * 60_000 },
-  async (t) => {
+  async (suite) => {
+    const t = {
+      test: (name, fn) =>
+        suite.test(name, { skip: !!ONLY && !ONLY.test(name) }, fn),
+    };
     const { chromium: browserType } = await import("playwright-core");
     const external = process.env.BASE;
     if (!external)
@@ -804,7 +809,387 @@ test(
             await context.close();
           },
         );
+
+        for (const path of ["/", "/lab"])
+          await t.test(
+            `${size}: the ribbon on ${path} carries the seeded headlines, each linking into the Labbook`,
+            async () => {
+              const { context, page, errors } = await open(
+                size,
+                `${path}?lens=cut-paper`,
+              );
+              const strip = await tape(page);
+              assert.ok(strip, "there is a ribbon");
+              assert.equal(strip.name, content.site.ticker.label);
+              assert.deepEqual(
+                strip.headlines.map(({ id, text, href, day }) => ({
+                  id,
+                  text,
+                  href,
+                  day,
+                })),
+                content.headlines.map((headline) => ({
+                  id: headline.id,
+                  text: headline.text,
+                  href: `/lab#u-${headline.updates[0]}`,
+                  day: headline.date,
+                })),
+              );
+              assert.equal(strip.reachable, content.headlines.length);
+              assert.equal(await overflow(page), 0, "nothing wider than the screen");
+              assert.deepEqual(errors, []);
+              const name = path === "/" ? "home" : "lab";
+              await shot(page, null, `cut-paper-ribbon-${name}-still-${size}`);
+              // And as most visitors meet it, running: one long line that
+              // widens nothing it lies in.
+              const live = await open(size, `${path}?lens=cut-paper`, {
+                motion: true,
+              });
+              await live.page.waitForTimeout(1500);
+              const running = await tape(live.page);
+              assert.deepEqual(
+                running.runs.map((run) => run.running),
+                [true, true],
+                "it runs",
+              );
+              assert.ok(
+                running.box.left >= running.view.left - 0.5 &&
+                  running.box.right <= running.view.right + 0.5,
+                `the running ribbon keeps inside the view (${running.box.left} to ${running.box.right} in ${running.view.left} to ${running.view.right})`,
+              );
+              assert.ok(
+                running.strip.left >= running.box.left - 0.5 &&
+                  running.strip.right <= running.box.right + 0.5,
+                "and its strip inside the ribbon",
+              );
+              assert.equal(await overflow(live.page), 0);
+              await shot(live.page, null, `cut-paper-ribbon-${name}-${size}`);
+              await live.context.close();
+              // Following one lands on its update, whichever page it was on.
+              const [first] = content.headlines;
+              await page
+                .locator("#lens-shell [data-part='ticker.headline'] a")
+                .first()
+                .click();
+              await page.waitForURL(
+                (url) =>
+                  url.pathname === "/lab" &&
+                  url.hash === `#u-${first.updates[0]}`,
+              );
+              await page.waitForSelector(
+                `#lens-shell #u-${first.updates[0]}[data-landed]`,
+              );
+              await page.waitForTimeout(900);
+              const landed = await page
+                .locator(`#lens-shell #u-${first.updates[0]}`)
+                .evaluate((el) => {
+                  const view = el.closest(".cp-scroll").getBoundingClientRect();
+                  const { top, bottom } = el.getBoundingClientRect();
+                  return { top, bottom, from: view.top, to: view.bottom };
+                });
+              assert.ok(
+                landed.top >= landed.from && landed.top < landed.to,
+                `the update is in the view (its top at ${landed.top})`,
+              );
+              await context.close();
+            },
+          );
+
+        await t.test(
+          `${size}: with motion reduced the ribbon is still, and every headline can be read`,
+          async () => {
+            const { context, page } = await open(size, ROOM);
+            const before = await tape(page);
+            await page.waitForTimeout(600);
+            const after = await tape(page);
+            assert.ok(before.headlines.length >= 3);
+            assert.deepEqual(
+              before.runs.map((run) => run.animations),
+              before.runs.map(() => 0),
+              "nothing is animated",
+            );
+            assert.deepEqual(
+              after.runs.map((run) => run.x),
+              before.runs.map((run) => run.x),
+              "nothing moves",
+            );
+            assert.deepEqual(
+              before.runs.map((run) => run.visible),
+              [true, false],
+              "the headlines are told once",
+            );
+            for (const headline of before.headlines) {
+              assert.ok(headline.visible, `${headline.id} is shown`);
+              assert.ok(
+                headline.box.left >= before.strip.left - 0.5 &&
+                  headline.box.right <= before.strip.right + 0.5,
+                `${headline.id} fits inside the strip`,
+              );
+            }
+            assert.equal(await overflow(page), 0);
+            await shot(page, null, `cut-paper-ribbon-still-${size}`);
+            await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: the ribbon runs at a reading pace, holds under a pointer, and never shifts the page`,
+          async () => {
+            const { context, page } = await open(size, ROOM, { motion: true });
+            await page.mouse.move(0, 0);
+            await page.waitForTimeout(1500);
+            const start = await tape(page);
+            await page.waitForTimeout(1000);
+            const later = await tape(page);
+            assert.deepEqual(
+              start.runs.map((run) => run.running),
+              [true, true],
+              "both runs of the ribbon are moving",
+            );
+            const travelled = start.runs[0].x - later.runs[0].x;
+            assert.ok(
+              travelled > 5 && travelled < 90,
+              `it runs left at a reading pace (${travelled.toFixed(1)}px in a second)`,
+            );
+            assert.equal(
+              (start.runs[0].x - start.runs[1].x).toFixed(1),
+              (later.runs[0].x - later.runs[1].x).toFixed(1),
+              "the two runs travel as one ribbon",
+            );
+            assert.ok(
+              start.runs[1].x - start.runs[0].x >= start.room - 1,
+              "a run is never shorter than the strip",
+            );
+            assert.equal(await overflow(page), 0, "nothing wider than the screen");
+            if (size === "desktop") {
+              const { strip } = later;
+              await page.mouse.move(
+                (strip.left + strip.right) / 2,
+                (strip.top + strip.bottom) / 2,
+              );
+              await page.waitForTimeout(100);
+              const held = await tape(page);
+              await page.waitForTimeout(600);
+              const still = await tape(page);
+              assert.equal(still.runs[0].x, held.runs[0].x, "it holds");
+              assert.deepEqual(
+                still.runs.map((run) => run.animations),
+                [1, 1],
+                "held, not started over",
+              );
+              await page.mouse.move(0, 0);
+              await page.waitForTimeout(600);
+              const released = await tape(page);
+              assert.ok(
+                released.runs[0].x < still.runs[0].x,
+                "and goes on from where it was",
+              );
+              for (const moment of [held, still, released]) {
+                assert.deepEqual(moment.box, start.box, "the ribbon stays put");
+                assert.equal(moment.below, start.below, "so does what follows");
+              }
+            }
+            assert.deepEqual(later.box, start.box, "the ribbon stays put");
+            assert.equal(later.below, start.below, "so does what follows");
+            await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: one headline still crosses the whole strip, and none leaves no ribbon`,
+          async () => {
+            const one = await open(size, "/?lens=cut-paper", {
+              motion: true,
+              bend: (data) => ({
+                ...data,
+                headlines: data.headlines.slice(0, 1),
+              }),
+            });
+            await one.page.waitForTimeout(1500);
+            const strip = await tape(one.page);
+            assert.equal(strip.headlines.length, 1);
+            assert.equal(strip.reachable, 1);
+            assert.ok(
+              strip.runs[1].x - strip.runs[0].x >= strip.room - 1,
+              "the ribbon is a full lap long",
+            );
+            await one.page.waitForTimeout(1000);
+            const travelled = strip.runs[0].x - (await tape(one.page)).runs[0].x;
+            assert.ok(
+              travelled > 5 && travelled < 90,
+              `and no faster for being short (${travelled.toFixed(1)}px in a second)`,
+            );
+            assert.equal(await overflow(one.page), 0);
+            await one.context.close();
+
+            for (const path of ["/", "/lab"]) {
+              const none = await open(size, `${path}?lens=cut-paper`, {
+                bend: (data) => ({ ...data, headlines: [] }),
+              });
+              assert.equal(await tape(none.page), null);
+              assert.equal(
+                await none.page
+                  .locator("#lens-shell :is([data-tape], .cp-ribbon)")
+                  .count(),
+                0,
+                `nothing is left where it would be on ${path}`,
+              );
+              assert.deepEqual(none.errors, []);
+              await none.context.close();
+            }
+          },
+        );
       }
+
+      /** Tab into the ribbon from whatever comes before it. */
+      const tabIn = async (page) => {
+        await page.evaluate(() => {
+          const first = document.querySelector(
+            "#lens-shell [data-part='ticker.headline'] a",
+          );
+          const all = [...document.querySelectorAll("a[href], button")].filter(
+            (el) => el.tabIndex >= 0 && el.checkVisibility(),
+          );
+          all[all.indexOf(first) - 1].focus();
+        });
+        await page.keyboard.press("Tab");
+      };
+      /** What has the focus, and where it and its headline lie. */
+      const focused = (page) =>
+        page.evaluate(() => {
+          const el = document.activeElement;
+          const item = el?.closest("[data-part='ticker.headline']");
+          const { left, right } = el.getBoundingClientRect();
+          return {
+            headline: item?.dataset.ref ?? null,
+            inRibbon: !!el?.closest("#lens-shell [data-tape]"),
+            left,
+            right,
+            from: item?.getBoundingClientRect().left ?? null,
+          };
+        });
+      /** The link in focus is all in view when its words fit the strip;
+       * when they are longer than the strip, its headline is at the
+       * strip's beginning. No allowance for how a machine sets its type. */
+      const inView = (now, strip) => {
+        const where = `${now.headline}: ${now.left} to ${now.right}, its headline from ${now.from}, in ${strip.strip.left} to ${strip.strip.right}`;
+        if (now.right - now.left <= strip.room)
+          assert.ok(
+            now.left >= strip.strip.left - 0.5 &&
+              now.right <= strip.strip.right + 0.5,
+            `words that fit are all in view (${where})`,
+          );
+        else
+          assert.ok(
+            now.from >= strip.strip.left - 0.5 &&
+              now.from <= strip.strip.left + 16,
+            `words longer than the strip are shown from the beginning (${where})`,
+          );
+      };
+
+      for (const [name, size] of [
+        ["desktop", SIZES.desktop],
+        ["390px", phone(390)],
+        ["450px", phone(450)],
+        ["480px", phone(480)],
+      ])
+        await t.test(
+          `${name}: the ribbon rests for the keyboard, shows the headline in focus, and lets go`,
+          async () => {
+            const { context, page } = await open(size, ROOM, { motion: true });
+            await page.waitForTimeout(1500);
+            const moving = await tape(page);
+            const links = page.locator(
+              "#lens-shell [data-part='ticker.headline'] a",
+            );
+            await tabIn(page);
+            const seen = [];
+            for (let i = 0; i < (await links.count()); i += 1) {
+              if (i) await page.keyboard.press("Tab");
+              await page.waitForTimeout(150);
+              const now = await focused(page);
+              const strip = await tape(page);
+              await page.waitForTimeout(400);
+              const still = await tape(page);
+              seen.push(now.headline);
+              assert.ok(now.inRibbon, "Tab reaches each headline");
+              assert.deepEqual(
+                still.runs.map((run) => run.x),
+                strip.runs.map((run) => run.x),
+                "the ribbon is at rest while a headline has focus",
+              );
+              inView(now, strip);
+              assert.deepEqual(strip.box, moving.box, "the ribbon keeps its place and size");
+            }
+            // In the order they are written, each once: the second run of
+            // the ribbon is for the eye only.
+            assert.deepEqual(
+              seen,
+              moving.headlines.map((headline) => headline.id),
+            );
+            await page.keyboard.press("Tab");
+            assert.equal(
+              (await focused(page)).inRibbon,
+              false,
+              "one more Tab leaves the ribbon",
+            );
+            await page.waitForTimeout(700);
+            const resumed = await tape(page);
+            assert.deepEqual(
+              resumed.runs.map((run) => run.running),
+              [true, true],
+              "and the ribbon runs again",
+            );
+            assert.equal(
+              resumed.scrolled,
+              0,
+              "from its start, not from wherever focus had scrolled it",
+            );
+            await context.close();
+          },
+        );
+
+      await t.test(
+        "a headline whose words fit the strip is shown whole in focus, though its day is not",
+        async () => {
+          // Measured here, so no machine's type decides it: the screen is
+          // cut to halfway between the first headline's words and the whole
+          // of it (its mark, its day, its words).
+          const wide = await open(phone(700), ROOM, { motion: true });
+          await tabIn(wide.page);
+          await wide.page.waitForTimeout(200);
+          const measured = await wide.page.evaluate(() => {
+            const link = document.activeElement;
+            const item = link.closest("[data-part='ticker.headline']");
+            const strip = link.closest("[data-tape-strip]");
+            return {
+              words: link.getBoundingClientRect().width,
+              whole: item.getBoundingClientRect().width,
+              chrome: innerWidth - strip.clientWidth,
+            };
+          });
+          await wide.context.close();
+          assert.ok(measured.whole > measured.words + 20);
+          const width = Math.round(
+            (measured.words + measured.whole) / 2 + measured.chrome,
+          );
+          const { context, page } = await open(phone(width), ROOM, {
+            motion: true,
+          });
+          await tabIn(page);
+          await page.waitForTimeout(300);
+          const now = await focused(page);
+          const strip = await tape(page);
+          assert.ok(now.inRibbon);
+          assert.ok(
+            now.right - now.left <= strip.room &&
+              strip.room < measured.whole,
+            `the words fit the strip and the headline does not (${now.right - now.left} and ${measured.whole} in ${strip.room})`,
+          );
+          inView(now, strip);
+          await context.close();
+        },
+      );
     } finally {
       await browser.close();
       await server?.close();

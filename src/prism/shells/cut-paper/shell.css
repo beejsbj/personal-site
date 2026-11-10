@@ -1048,6 +1048,178 @@
   100% { opacity: 0; left: 100%; }
 }
 
+/* ── the ribbon: headlines on a ribbon of paper ────────────── */
+
+/* --letters and --items say how much there is to read: the lap until the
+   run has been measured (--lap) */
+:root[data-lens="cut-paper"] .cp-ribbon {
+  --letters: 0;
+  --items: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  margin: 0 calc(var(--cp-pad) * -1) 24px 0;
+}
+
+:root[data-lens="cut-paper"] .cp-home__ribbon {
+  padding: var(--cp-pad) var(--cp-pad) 0;
+}
+
+:root[data-lens="cut-paper"] .cp-home__ribbon .cp-ribbon {
+  margin-bottom: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-home__ribbon + .cp-home {
+  padding-top: 18px;
+}
+
+/* the label: a tab of plum paper stuck on where the ribbon starts */
+:root[data-lens="cut-paper"] .cp-app .cp-tag.cp-ribbon__label {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  margin-right: -7px;
+  background: var(--cp-plum);
+  color: var(--cp-ivory);
+  transform: rotate(-2deg);
+}
+
+/* still, it is a slip: the headlines in rows */
+:root[data-lens="cut-paper"] .cp-ribbon__strip {
+  display: flex;
+  flex: 1 1 300px;
+  align-items: center;
+  min-width: 0;
+  background: var(--cp-bone);
+  color: var(--cp-ink);
+  clip-path: polygon(0 3%, 100% 0, 100% 97%, 0.4% 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__strip :focus-visible {
+  outline-color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__run {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 16px 9px;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__run--again {
+  display: none;
+}
+
+/* a headline: a scrap of cut paper, its day, its words */
+:root[data-lens="cut-paper"] .cp-ribbon__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  font: 600 12.5px/1.3 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__item time,
+:root[data-lens="cut-paper"] .cp-ribbon__day {
+  flex: none;
+  color: rgba(10, 9, 8, 0.64);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__item a {
+  color: var(--cp-ink);
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__item a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--cp-tomato);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__cut {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  background: var(--paper);
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__cut--tri {
+  clip-path: polygon(0 100%, 46% 0, 100% 88%);
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__cut--dot {
+  border-radius: 50%;
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__cut--bar {
+  width: 16px;
+  height: 6px;
+}
+
+:root[data-lens="cut-paper"] .cp-ribbon__cut--tab {
+  width: 14px;
+  height: 10px;
+  clip-path: var(--cp-cut-tab);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-ribbon__strip {
+    height: 34px;
+    overflow: clip;
+  }
+
+  /* Constant speed: the one place linear is right. Both runs travel one
+     run's length, so the second arrives where the first began. */
+  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-ribbon__run {
+    flex: none;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    min-width: 100%;
+    padding: 0 13px;
+    white-space: nowrap;
+    animation: cut-paper-ribbon var(--lap, max(24s, calc((var(--letters) + var(--items) * 13) * 0.1875s))) linear infinite;
+  }
+
+  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-ribbon__run--again {
+    display: flex;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :root[data-lens="cut-paper"] .cp-app .cp-ribbon__strip:hover .cp-ribbon__run {
+      animation-play-state: paused;
+    }
+  }
+
+  :root[data-lens="cut-paper"] .cp-app .cp-ribbon__strip:focus-within .cp-ribbon__run {
+    animation-play-state: paused;
+  }
+
+  /* at rest for the keyboard: the ribbon back at its start. The script
+     marks the strip while it may scroll to the headline in focus. */
+  :root[data-lens="cut-paper"] .cp-app .cp-ribbon__strip:has(:focus-visible) .cp-ribbon__run,
+  :root[data-lens="cut-paper"] .cp-app .cp-ribbon__strip[data-tape-rest] .cp-ribbon__run {
+    animation: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-ribbon__strip[data-tape-rest] {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes cut-paper-ribbon {
+  to { transform: translateX(-100%); }
+}
+
 /* ── the arrangement ───────────────────────────────────────── */
 
 :root[data-lens="cut-paper"] .cp-arr {
@@ -2350,7 +2522,7 @@
   border-bottom: 1px solid var(--cp-hairline);
 }
 
-:root[data-lens="cut-paper"] .cp-app .cp-place__tag--armed {
+:root[data-lens="cut-paper"] .cp-app .cp-tag.cp-place__tag--armed {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -4298,6 +4470,20 @@
 
   :root[data-lens="cut-paper"] .cp-place__note {
     flex-basis: 100%;
+  }
+
+  /* the label above, and the ribbon from edge to edge */
+  :root[data-lens="cut-paper"] .cp-ribbon {
+    margin-left: calc(var(--cp-pad) * -1);
+  }
+
+  :root[data-lens="cut-paper"] .cp-app .cp-tag.cp-ribbon__label {
+    margin: 0 0 -6px var(--cp-pad);
+  }
+
+  :root[data-lens="cut-paper"] .cp-ribbon__strip {
+    flex-basis: 100%;
+    clip-path: polygon(0 4%, 100% 0, 100% 96%, 0 100%);
   }
 
   :root[data-lens="cut-paper"] .cp-shelf {
