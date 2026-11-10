@@ -2264,7 +2264,10 @@
   color: var(--cp-ivory);
 }
 
+/* positioned, so the words for a screen reader after a link out are cut
+   with the title and widen nothing */
 :root[data-lens="cut-paper"] .cp-loc__title {
+  position: relative;
   overflow: hidden;
   color: var(--cp-ivory);
   font-size: 13px;
@@ -4280,10 +4283,12 @@
     display: block;
   }
 
+  /* the scraps run off the edge of the view, and do not widen it */
   :root[data-lens="cut-paper"] .cp-home {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "hero" "tt" "crate" "loc";
     gap: 34px;
+    overflow-x: clip;
   }
 
   :root[data-lens="cut-paper"] .cp-home__scrap-b {
