@@ -547,42 +547,100 @@
   aspect-ratio: 1;
   transform: rotate(20deg);
 }
-:root[data-lens="calling-card"] .cc-requests__board {
+/* The board's column: the wire across its top, and under it the board,
+   which turns (scrolls) while the title and the intro stay put. */
+:root[data-lens="calling-card"] .cc-requests__col {
   position: absolute;
   z-index: 3;
   left: 30vw;
-  right: 3vw;
-  top: 7rem;
-  bottom: 4rem;
+  right: 0;
+  top: 4.4rem;
+  bottom: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2.4rem;
+  flex-direction: column;
+}
+:root[data-lens="calling-card"] .cc-requests__board {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cc-white) transparent;
+  mask-image: linear-gradient(transparent, #000 2rem, #000 calc(100% - 3.5rem), transparent);
+}
+:root[data-lens="calling-card"] .cc-requests__sheet {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 3.4rem;
+  padding: 2.6rem 2.6rem 6rem 2.2rem;
+  overflow-x: clip;
+}
+
+/* A place on the board: its name on a plate, a line about it, its requests. */
+:root[data-lens="calling-card"] .cc-place,
+:root[data-lens="calling-card"] .cc-log {
+  display: grid;
+  gap: 1.6rem;
+}
+:root[data-lens="calling-card"] .cc-place__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem 1.2rem;
+}
+:root[data-lens="calling-card"] .cc-place__title {
   margin: 0;
-  padding: 0 1rem;
+  padding: 0.15rem 0.9rem 0.1rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 1.9rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transform: rotate(-2deg) skewX(-8deg);
+  box-shadow: 5px 5px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-place__note {
+  margin: 0;
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.3;
+}
+:root[data-lens="calling-card"] .cc-place__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  align-items: start;
+  gap: 2.4rem 1.9rem;
+  margin: 0;
+  padding: 0;
   list-style: none;
-  overflow-x: auto;
 }
-:root[data-lens="calling-card"] .cc-requests__board > li {
-  flex: 0 1 22rem;
-  min-width: 17rem;
+:root[data-lens="calling-card"] .cc-place__list > li[data-lab-featured] {
+  grid-column: 1 / -1;
 }
+
+/* A request on the Bench: a slip of paper pinned at an angle. */
 :root[data-lens="calling-card"] .cc-request {
   position: relative;
   display: grid;
-  gap: 0.7rem;
-  padding: 1.6rem 1.4rem 0;
+  gap: 0.6rem;
+  padding: 1.5rem 1.3rem 0;
   background:
     radial-gradient(circle, rgb(0 0 0 / 0.06) 0 1.4px, transparent 1.9px) 0 0 / 9px 9px,
     var(--cc-paper);
   color: var(--cc-black);
   text-decoration: none;
   border: 3px solid var(--cc-black);
-  box-shadow: 12px 12px 0 var(--cc-black);
-  transform: rotate(calc(-4deg + var(--i) * 6deg)) translateY(calc(var(--i) * 1.6rem));
+  box-shadow: 9px 9px 0 var(--cc-black);
+  transform: rotate(var(--tilt, 0deg));
   transition: transform 160ms var(--cc-snap), box-shadow 120ms;
   animation: calling-card-fly-up 420ms var(--cc-out) both;
-  animation-delay: calc(100ms + var(--i) * 80ms);
+  animation-delay: calc(100ms + var(--i) * 45ms);
 }
 :root[data-lens="calling-card"] .cc-request__no {
   font-family: var(--cc-display);
@@ -593,46 +651,34 @@
 }
 :root[data-lens="calling-card"] .cc-request__status {
   position: absolute;
-  top: 0.9rem;
-  right: 1rem;
-  padding: 0.1rem 0.6rem;
+  top: 0.8rem;
+  right: 0.9rem;
+  padding: 0.05rem 0.5rem;
   border: 3px solid var(--cc-red-ink);
   color: var(--cc-red-ink);
   font-family: var(--cc-display);
-  font-size: 1.1rem;
+  font-size: 1rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   transform: rotate(10deg);
 }
 :root[data-lens="calling-card"] .cc-request__title {
-  font-size: 2.3rem;
-  line-height: 1;
+  font-size: 2rem;
+  line-height: 1.02;
   --cc-box-bg: var(--cc-black);
   --cc-box-fg: var(--cc-white);
 }
-:root[data-lens="calling-card"] .cc-request__meta {
-  display: grid;
-  gap: 0.1rem;
-  font-size: 0.9rem;
-}
-:root[data-lens="calling-card"] .cc-request__meta b {
-  font-family: var(--cc-display);
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--cc-red-ink);
-}
 :root[data-lens="calling-card"] .cc-request__summary {
-  font-size: 1rem;
+  font-size: 0.98rem;
   line-height: 1.5;
 }
 :root[data-lens="calling-card"] .cc-request__accept {
-  margin: 0.4rem -1.4rem 0;
-  padding: 0.7rem 1.4rem;
+  margin: 0.4rem -1.3rem 0;
+  padding: 0.6rem 1.3rem;
   background: var(--cc-black);
   color: var(--cc-white);
   font-family: var(--cc-display);
-  font-size: 1.05rem;
+  font-size: 1rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -647,11 +693,158 @@
 }
 :root[data-lens="calling-card"] .cc-request[data-state="selected"] {
   z-index: 2;
-  transform: rotate(calc(-2deg + var(--i) * 3deg)) translateY(calc(var(--i) * 1.6rem - 0.9rem)) scale(1.05);
-  box-shadow: 12px 12px 0 var(--cc-red), 12px 12px 0 3px var(--cc-black);
+  transform: rotate(calc(var(--tilt, 0deg) * -0.4)) translateY(-0.5rem) scale(1.04);
+  box-shadow: 9px 9px 0 var(--cc-red), 9px 9px 0 3px var(--cc-black);
 }
 :root[data-lens="calling-card"] .cc-request[data-state="selected"] .cc-request__accept {
   background: var(--cc-red);
+}
+
+/* The featured request leads the Bench: the big target, in red, across
+   the board. */
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request {
+  --tilt: -1.1deg;
+  gap: 0.8rem;
+  padding: 1.7rem 1.8rem 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1.7px, transparent 2.3px) 0 0 / 10px 10px,
+    linear-gradient(160deg, var(--cc-red) 30%, var(--cc-red-deep));
+  color: var(--cc-white);
+  border-color: var(--cc-white);
+  box-shadow: 12px 12px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request::before {
+  content: "";
+  position: absolute;
+  right: 1.2rem;
+  bottom: 3.4rem;
+  width: clamp(6rem, 16vw, 11rem);
+  aspect-ratio: 1;
+  background: var(--cc-black);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  rotate: 14deg;
+  opacity: 0.9;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request > * {
+  position: relative;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__no {
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__status {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  border-color: var(--cc-white);
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-size: 1.3rem;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__title {
+  font-size: clamp(3rem, 6.4vw, 5rem);
+  line-height: 0.95;
+  color: var(--cc-white);
+  text-shadow: var(--cc-outline);
+  --cc-box-bg: var(--cc-white);
+  --cc-box-fg: var(--cc-black);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__summary {
+  max-width: 34rem;
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.3rem;
+  line-height: 1.35;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__accept {
+  margin-inline: -1.8rem;
+  padding-inline: 1.8rem;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request[data-state="selected"] {
+  box-shadow: 12px 12px 0 var(--cc-white), 12px 12px 0 3px var(--cc-black);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request[data-state="selected"] .cc-request__accept {
+  background: var(--cc-white);
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request[data-state="selected"] .cc-request__accept kbd {
+  background: var(--cc-red);
+  color: var(--cc-white);
+}
+
+/* On the Shelf: gone quiet. No paper, no cut-out letters; a dark slot
+   standing on its plank, the stamp gone grey. */
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-place__list {
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 1.5rem 1.7rem;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "no title status" "sum sum sum" "accept accept accept";
+  align-items: baseline;
+  gap: 0.35rem 0.7rem;
+  padding: 0.8rem 1rem 0.55rem;
+  background: var(--cc-ink);
+  color: var(--cc-white);
+  border: 2px solid rgb(255 255 255 / 0.85);
+  border-bottom: 7px solid var(--cc-white);
+  box-shadow: 6px 6px 0 var(--cc-black);
+  transform: rotate(calc(var(--tilt, 0deg) * 0.25));
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__no {
+  grid-area: no;
+  color: var(--cc-red-text);
+  font-size: 0.8rem;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__title {
+  grid-area: title;
+  font-family: var(--cc-display);
+  font-size: 1.35rem;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__status {
+  grid-area: status;
+  position: static;
+  padding: 0 0.4rem;
+  border: 2px solid var(--cc-grey);
+  color: var(--cc-grey);
+  font-size: 0.75rem;
+  transform: rotate(4deg);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__summary {
+  grid-area: sum;
+  color: var(--cc-grey);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__accept {
+  grid-area: accept;
+  justify-self: start;
+  margin: 0.2rem 0 0;
+  padding: 0.1rem 0.6rem 0.1rem 0.15rem;
+  background: none;
+  color: var(--cc-grey);
+  font-size: 0.82rem;
+  transform: skewX(-10deg);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__accept kbd {
+  width: 1.3rem;
+  height: 1.3rem;
+  font-size: 0.7rem;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"][data-state="selected"] {
+  transform: translate(-3px, -4px);
+  border-color: var(--cc-white);
+  box-shadow: 8px 8px 0 var(--cc-red), 8px 8px 0 2px var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"][data-state="selected"] .cc-request__summary {
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"][data-state="selected"] .cc-request__accept {
+  background: var(--cc-red);
+  color: var(--cc-white);
 }
 
 /* Brief: a lab entry */
@@ -708,19 +901,97 @@
   font-size: 1.25rem;
   line-height: 1.35;
 }
-:root[data-lens="calling-card"] .cc-brief__meta {
+/* What the request became: a rank up, and the way to the project. */
+:root[data-lens="calling-card"] .cc-brief__became {
   display: flex;
-  gap: 1.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.2rem;
+  transform: rotate(-1.5deg);
 }
-:root[data-lens="calling-card"] .cc-brief__meta dt {
+:root[data-lens="calling-card"] .cc-brief__became-label {
+  padding: 0.2rem 0.9rem 0.15rem;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.2) 0 1.5px, transparent 2px) 0 0 / 8px 8px,
+    var(--cc-red);
+  color: var(--cc-white);
   font-family: var(--cc-display);
+  font-size: 1.05rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--cc-red-ink);
+  transform: skewX(-12deg);
+  box-shadow: 4px 4px 0 var(--cc-black);
 }
-:root[data-lens="calling-card"] .cc-brief__meta dd {
+:root[data-lens="calling-card"] .cc-brief__became-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.1rem 1rem 0.05rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1.6rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: skewX(-12deg);
+  transition: transform 120ms var(--cc-snap), background 80ms;
+}
+:root[data-lens="calling-card"] .cc-brief__became-link::after {
+  content: "";
+  flex: none;
+  width: 0.7rem;
+  height: 0.85rem;
+  background: var(--cc-red-text);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+:root[data-lens="calling-card"] .cc-brief__became-link:hover {
+  background: var(--cc-red);
+  transform: skewX(-12deg) translateX(4px);
+}
+:root[data-lens="calling-card"] .cc-brief__became-link:hover::after {
+  background: var(--cc-white);
+}
+/* Its pictures, pinned side by side. */
+:root[data-lens="calling-card"] .cc-brief__media {
+  justify-self: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.6rem 1.5rem;
+  padding: 0.5rem 0.8rem 0.6rem 0.2rem;
+}
+:root[data-lens="calling-card"] .cc-brief__media figure {
+  display: grid;
+  justify-items: start;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
   margin: 0;
+  transform: rotate(var(--tilt, 0deg));
+}
+:root[data-lens="calling-card"] .cc-brief__media :is(img, video) {
+  display: block;
+  max-width: 100%;
+  max-height: 14rem;
+  width: auto;
+  height: auto;
+  background: var(--cc-white);
+  border: 5px solid var(--cc-white);
+  outline: 3px solid var(--cc-black);
+  box-shadow: 8px 8px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-brief__media figcaption {
+  justify-self: start;
+  padding: 0 0.5rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-didone);
   font-weight: 700;
+  font-style: italic;
+  font-size: 0.9rem;
 }
 :root[data-lens="calling-card"] .cc-brief__paper .cc-prose a {
   color: var(--cc-black);
@@ -1515,14 +1786,42 @@
   :root[data-lens="calling-card"] .cc-requests__curtain {
     clip-path: polygon(0 24%, 100% 14%, 100% 100%, 0 100%);
   }
-  :root[data-lens="calling-card"] .cc-requests__board {
+  :root[data-lens="calling-card"] .cc-requests__col {
+    position: relative;
+    inset: auto;
     display: grid;
-    gap: 2rem;
-    padding: 0.5rem 0.6rem 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.6rem;
   }
-  :root[data-lens="calling-card"] .cc-request,
-  :root[data-lens="calling-card"] .cc-request[data-state="selected"] {
-    transform: rotate(calc(-1.5deg + var(--i) * 3deg));
+  :root[data-lens="calling-card"] .cc-requests__board {
+    mask-image: none;
+  }
+  /* Cut at the screen's edges, not the column's: a pinned card's corner
+     and shadow reach into the margin. */
+  :root[data-lens="calling-card"] .cc-requests__sheet {
+    gap: 2.6rem;
+    margin-inline: -1rem;
+    padding: 0.5rem 1.4rem 0;
+  }
+  :root[data-lens="calling-card"] .cc-place__list,
+  :root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-place__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-lens="calling-card"] .cc-place__list {
+    gap: 2rem;
+  }
+  :root[data-lens="calling-card"] .cc-request[data-place="bench"][data-state="selected"] {
+    transform: rotate(calc(var(--tilt, 0deg) * -0.4));
+  }
+  :root[data-lens="calling-card"] li[data-lab-featured] > .cc-request {
+    padding-inline: 1.3rem;
+  }
+  :root[data-lens="calling-card"] li[data-lab-featured] .cc-request__title {
+    font-size: 3.2rem;
+  }
+  :root[data-lens="calling-card"] li[data-lab-featured] .cc-request__accept {
+    margin-inline: -1.3rem;
+    padding-inline: 1.3rem;
   }
   :root[data-lens="calling-card"] .cc-brief__paper {
     max-height: none;
