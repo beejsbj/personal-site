@@ -32,7 +32,7 @@ const { fixture, projects } = Astro.props as {
   projects: Target[];
 };
 const { entry, labbook } = fixture;
-const [site, { detail }] = await Promise.all([getSite(), getLabPage()]);
+const [site, { detail, labbook: book }] = await Promise.all([getSite(), getLabPage()]);
 ---
 
 <BaseLayout
@@ -49,6 +49,7 @@ const [site, { detail }] = await Promise.all([getSite(), getLabPage()]);
     graduatedTo={graduatedProject(entry, projects)}
     copy={detail}
     updateLabels={{ kinds: site.updateKinds, sources: site.updateSources }}
+    redacted={book.redacted}
   >
     <Fragment set:html={entry.html} />
   </ExperimentPage>
