@@ -274,7 +274,6 @@ test("the home page and the Lab owe every headline on the ticker", () => {
 
 test("each lens that has no Labbook or ticker yet says so, naming its ticket", () => {
   const tickets = {
-    "calling-card": "#96",
     "cut-paper": "#97",
   };
   const owed = [

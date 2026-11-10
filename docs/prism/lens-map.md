@@ -234,10 +234,26 @@ For each shell: content.json reads, `route.main` selectors, and hard-coded strin
 | `pages.home.headline`, `.eyebrow`, `.intro`, `.body` | `home.ts` (`home`; body: first paragraph only via `stripped`) |
 | `projects[]`: slug, href, title, summary, kind, year, dateLabel, role, location, tools, featured (only picks the "Selected" label), cover, links[], media[] (type/src/alt/caption) | `projects.ts` (`detailPanel`, `slots`, `projectEntry`) |
 | `projects.length`, `lab.length` | `home.ts` (odometer) |
-| `lab[]`: slug, detail, href, title, summary, type, sourceEra, cover (entry only), links[] | `lab.ts` |
+| `lab[]`: slug, detail, href, hasPage, title, summary, place, featured, graduatedTo, cover and media (entry only), links[], html (never `type` or `sourceEra`) | `lab.ts` |
+| `labbook[]` (narrowed on `visibility`: an open update's title, summary, href, artifact, relatedExperiment, relatedProject; a redacted one's `shape` and `date` only), `headlines[]`, `site.ticker.label`, `site.updateKinds`/`updateSources`, `pages.lab.places`, `.labbook`, `.detail.labels.graduated`/`.updates` | `labbook.ts`, `lab.ts`, `home.ts` |
 | `updates[]`: date, dateLabel, title, summary, href, linkLabel, kind, source; `.length` | `home.ts` (`dateWidget`), `panels.ts` (`phonePanel`) |
 
-Never read: `site.nav`, `site.siteTitle/siteDescription`, `pages.about.*`, `pages.resume.*`, `pages.*.title/description/availability`, `projects[].status/tags/order`, `lab[].media/order`, `updates[].relatedProject/evidence/expiresAt`.
+Never read: `site.nav`, `site.siteTitle/siteDescription`, `pages.about.*`, `pages.resume.*`, `pages.*.title/description/availability`, `projects[].status/tags/order`, `lab[].type/sourceEra/order`, `updates[].relatedProject/evidence/expiresAt`.
+
+**The Lab (`lab/96-calling-card`, issue #96).** The Lab is still the request board, and each of its new parts is something this game's menus already have: a pinned request, an item slot, the calendar, a dialogue box, a cut-out, the news. No new fonts or colours.
+
+| What | How | Where |
+|---|---|---|
+| The board | The title, the "The Lab" dialogue box and the tabs stay put; the board beside them turns (scrolls) under the wire, and on a phone the whole screen is one column. Arrow keys still move the cursor from request to request, Page keys turn the board, and the Labbook and the wire keep their own keys | `CC/lab.ts:lab`, `screens.css` |
+| The Bench | `data-lab-place="bench"` under its name on a white plate, its note beside it. Each experiment is a request slip pinned at its own small angle: No.NN, the red "Open" stamp, its name in cut-out letters, its summary, the Accept bar. The featured one leads across the whole board: the big target, in red with a black star, its name large and outlined | `CC/lab.ts:request` |
+| The Shelf | `data-lab-place="shelf"`. Gone quiet: no paper and no cut-out letters. A dark slot standing on a white plank, its name in plain capitals, its summary in grey, the stamp ("Shelved", lens copy) gone grey. One run of request numbers goes down the whole board | `CC/lab.ts:request`, `screens.css` |
+| Order and headings | `labPlaces(content.lab)` and `pages.lab.places` (shared rule and copy). A request keeps its number on its own brief | `CC/lab.ts:board` |
+| The Labbook | The calendar turned back a day at a time (`data-cc-labbook`): each update is a day plate as the pause menu's calendar writes one (year, month/day, weekday; assistive technology is told the date in full) beside a dialogue box whose tab says who sent it (`site.updateSources` · `updateKinds`). In the box: title (a link when the update has an `href`), summary, artifact, and the experiment or project it is about (`relatedLinks`). Each `li` is `id="u-<id>"`, where its links land | `CC/labbook.ts:record`, `logged` |
+| Artifacts | A picture and a film are pinned prints (white border, red shadow); a sound is its controls on a white plate with its caption. A Pen or a demo is a dark screen (`.cc-stagebox`, the frame's own room from the start), its poster dim under a halftone if the site has one, with a prompt (a button): pressing it makes the frame there and focuses it. Before that nothing is asked of another site; a poster kept elsewhere is not shown, and a frame is made only for an `https://` address or a path on this site | `CC/labbook.ts:artifact`, `tendRecord` |
+| A redacted update | A slip of paper with its words cut out: one blank black cut-out for each number in `shape.bars` (a longer number a longer cut-out, each tilted like a cut letter), hidden from assistive technology; the stamp says `labbook.redacted.label`, and its kind of work is named in red. Only `shape` and `date` are read (`censored`, the one function a redacted update is handed to) | `CC/labbook.ts:censored` |
+| The wire (the ticker) | The news crawl: a black band, tilted, running off the screen's edge, `site.ticker.label` on its red tab, the headlines right to left at about 55px a second (the lap is set from how much there is to read), a red star and the day (9/26) before each. On the pause menu under the name plates (on a phone it leads the page); in the Lab across the top of the board. A pointer holds it and the headline under it turns red; keyboard focus rests it at its start and the strip is moved to the headline in focus; the second run is for the eye only. Still (reduced motion): the headlines as a list on the band, told once; on the pause menu, which does not scroll, the list does when it is long, and the "command select" plate gives it its room. No headlines, no wire. The band is tilted inside a clipped window (`.cc-wire`), so it widens nothing it sits in | `CC/labbook.ts:wire`, `tendWire`, `labbook.css` |
+| Landing on an update | `/lab#u-<id>` (from a headline, the phone, or an experiment's brief) lands on its day: the board is already turned to it when the screen is seen, the menu's cursor points at it, its day plate turns red (`data-cc-landed`), and it takes the focus the title would. Done by the shell: Daylight's page under it holds the same ids, hidden, and the router changes a same-page hash without a `hashchange` | `CC/labbook.ts:tendRecord`, `CC/lab.ts:lab` |
+| An experiment's brief | "Client" and "Type" are gone. The stamp says where the request stands (`place`). The project it became (`graduatedProject`) is a red plate and a black one under the summary, the way to the project. Its own pictures are pinned to the brief, its cover standing in when it has none. Its part of the Labbook (`experimentUpdates`) closes the brief: no artifacts, redacted updates in their place, and a title with nowhere else to go leads to its place in the Labbook | `CC/lab.ts:labEntry` |
 
 **route.main selectors**
 
@@ -291,10 +307,8 @@ Home does not query `route.main`. Resume depends on the resume.md shape: H2 titl
 | `CC/projects.ts:71` | "Equip" | invented eyebrow |
 | `CC/projects.ts:118` | "Projects, newest first" | paraphrases Daylight aria-label |
 | `CC/projects.ts:233` | "More projects" | invented |
-| `CC/lab.ts:59` | "Client" (= `sourceEra`) | relabel of "Era" |
 | `CC/lab.ts:67` | "Accept" / "read the brief" / "open experiment" | invented verbs |
 | `CC/lab.ts:117` | "Open the experiment" | dead path (see section 0) |
-| `CC/lab.ts:85` | "Experiments" | flavour |
 | `CC/other.ts:29` | "Mementos" | flavour |
 | `CC/index.ts:198` | "Skip to content" | duplicates Daylight skip link |
 

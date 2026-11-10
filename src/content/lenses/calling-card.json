@@ -87,10 +87,8 @@
   "lab": {
     "eyebrow": "Requests",
     "speaker": "The Lab",
-    "board": "Experiments",
     "number": "No.{n}",
-    "status": "Open",
-    "client": "Client",
+    "status": { "bench": "Open", "shelf": "Shelved" },
     "accept": {
       "external": "Accept · open experiment",
       "page": "Accept · read the brief",
