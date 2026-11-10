@@ -2890,6 +2890,8 @@
   gap: 14px 22px;
   padding: 20px 0;
   border-bottom: 1px dashed rgba(10, 9, 8, 0.3);
+  /* where a link to it lands: a little of the line before it still in view */
+  scroll-margin-top: 84px;
 }
 
 :root[data-lens="cut-paper"] .cp-log__line:last-child {

@@ -13,8 +13,8 @@
  *   would be, strips of black paper pasted over them, one for each number
  *   in its shape, a longer number a longer strip. Only its shape and its
  *   date are read.
- * - A link to an update (`/lab#u-…`) lands on its line: it is brought into
- *   the view and marked, and the playhead goes to its date. The page under
+ * - A link to an update (`/lab#u-…`) lands on its line: it is brought to
+ *   the top of the view and marked, and the playhead goes to its date. The page under
  *   the shell holds the same ids, hidden, and the view is printed after the
  *   browser has looked for the fragment, so the landing is done here. */
 import { part } from "../../parts";
@@ -171,7 +171,8 @@ export function labbook(env: Env, updates: Update[], { whole }: { whole: boolean
   const { content, copy, session } = env;
   const page = content.pages.lab;
   const times = updates.map((update) => parseDay(update.date));
-  const range = { from: Math.min(Math.floor(Math.min(...times)), session.end - 1), to: session.end };
+  // the lane: from the year of the first update, inside the session
+  const range = { from: Math.max(session.from, Math.min(Math.floor(Math.min(...times)), session.end - 1)), to: session.end };
   return h(
     "section",
     { class: "cp-log", "data-log": whole ? "labbook" : "experiment", "aria-labelledby": "cp-log-title" },
@@ -220,7 +221,9 @@ export function tendLog(env: Env, view: HTMLElement) {
     const target = id ? view.querySelector<HTMLElement>(`[data-log="labbook"] [id="${CSS.escape(id)}"]`) : null;
     if (!target) return;
     target.setAttribute("data-landed", "");
-    target.scrollIntoView({ block: "center", behavior: glide && !reducedMotion ? "smooth" : "instant" });
+    // to the top of the view, under a margin (shell.css): where the
+    // browser's own jump to a fragment puts it, when the router asks for one
+    target.scrollIntoView({ block: "start", behavior: glide && !reducedMotion ? "smooth" : "instant" });
     // the playhead goes where the update is
     const t = Number(target.dataset.t);
     if (Number.isFinite(t)) transport.seek(t);
@@ -245,11 +248,11 @@ export function tendLog(env: Env, view: HTMLElement) {
   );
   return () => {
     land();
-    // the display face arriving late moves every line under it: land again,
+    // the display face arriving late moves every line above it: land again,
     // unless the visitor has moved on meanwhile
     const at = scroller.scrollTop;
     void document.fonts?.ready.then(() => {
-      if (!signal.aborted && Math.abs(scroller.scrollTop - at) < 2) view.querySelector("[data-landed]")?.scrollIntoView({ block: "center", behavior: "instant" });
+      if (!signal.aborted && Math.abs(scroller.scrollTop - at) < 2) view.querySelector("[data-landed]")?.scrollIntoView({ block: "start", behavior: "instant" });
     });
   };
 }

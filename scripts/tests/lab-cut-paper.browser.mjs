@@ -893,9 +893,11 @@ test(
                   const { top, bottom } = el.getBoundingClientRect();
                   return { top, bottom, from: view.top, to: view.bottom };
                 });
+              // Under the margin kept above a landed line, whether the
+              // shell or the browser's own jump to the fragment put it there.
               assert.ok(
-                landed.top >= landed.from && landed.top < landed.to,
-                `the update is in the view (its top at ${landed.top})`,
+                landed.top >= landed.from + 40 && landed.top < landed.to,
+                `the update is in the view, clear of its top (${landed.top} in ${landed.from} to ${landed.to})`,
               );
               await context.close();
             },
