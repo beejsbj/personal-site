@@ -35,23 +35,23 @@ export function ribbon(env: Env): HTMLElement | null {
   const cut = (i: number) => h("i", { class: `cp-ribbon__cut cp-ribbon__cut--${CUTS[i % CUTS.length]}`, style: `--paper:${noteVar(i)}`, "aria-hidden": "true" });
   const run = h(
     "ul",
-    { class: "cp-ribbon__run", "data-tape-run": "" },
+    { class: "cp-ribbon__run", "data-ribbon-run": "" },
     headlines.map((headline, i) =>
       h("li", { class: "cp-ribbon__item", ...part("ticker.headline", headline.id) }, cut(i), h("time", { datetime: headline.date }, day(headline.date)), link(labbookHref(headline.updates[0]), {}, headline.text)),
     ),
   );
   const again = h(
     "div",
-    { class: "cp-ribbon__run cp-ribbon__run--again", "data-tape-run": "", "aria-hidden": "true" },
+    { class: "cp-ribbon__run cp-ribbon__run--again", "data-ribbon-run": "", "aria-hidden": "true" },
     headlines.map((headline, i) =>
       h("span", { class: "cp-ribbon__item" }, cut(i), h("span", { class: "cp-ribbon__day" }, day(headline.date)), link(labbookHref(headline.updates[0]), { tabindex: "-1" }, headline.text)),
     ),
   );
-  const strip = h("div", { class: "cp-ribbon__strip", "data-tape-strip": "" }, run, again);
+  const strip = h("div", { class: "cp-ribbon__strip", "data-ribbon-strip": "" }, run, again);
   const letters = headlines.reduce((sum, { text }) => sum + text.length, 0);
   const root = h(
     "aside",
-    { class: "cp-ribbon", "data-tape": "", "aria-labelledby": "cp-ribbon-label", style: `--letters:${letters}; --items:${headlines.length}` },
+    { class: "cp-ribbon", "data-ribbon": "", "aria-labelledby": "cp-ribbon-label", style: `--letters:${letters}; --items:${headlines.length}` },
     h("p", { class: "cp-tag cp-ribbon__label", id: "cp-ribbon-label" }, content.site.ticker.label),
     strip,
   );
@@ -73,7 +73,7 @@ export function ribbon(env: Env): HTMLElement | null {
     (event) => {
       const a = event.target as HTMLElement;
       if (!a.matches("a:focus-visible")) return;
-      strip.dataset.tapeRest = "";
+      strip.dataset.ribbonRest = "";
       const edge = strip.getBoundingClientRect();
       // the whole headline, its day included, from its beginning
       strip.scrollLeft += (a.parentElement ?? a).getBoundingClientRect().left - edge.left - LEAD;
@@ -87,9 +87,9 @@ export function ribbon(env: Env): HTMLElement | null {
   strip.addEventListener(
     "focusout",
     (event) => {
-      if (!("tapeRest" in strip.dataset) || strip.contains(event.relatedTarget as Node | null)) return;
+      if (!("ribbonRest" in strip.dataset) || strip.contains(event.relatedTarget as Node | null)) return;
       strip.scrollLeft = 0;
-      delete strip.dataset.tapeRest;
+      delete strip.dataset.ribbonRest;
     },
     { signal },
   );

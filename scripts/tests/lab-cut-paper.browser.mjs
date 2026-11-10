@@ -1,6 +1,6 @@
 /** Cut Paper's Lab (issue #97): the armed and the muted pads of the rack
  * (the Bench and the Shelf), the Labbook with its artifacts and its redacted
- * updates, the tape of headlines on the home page and in the Lab, and an
+ * updates, the ribbon of headlines on the home page and in the Lab, and an
  * experiment's own record and graduation.
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
@@ -142,18 +142,18 @@ const labbook = (page) =>
     };
   });
 
-/** The tape of headlines as it stands this instant. */
-const tape = (page) =>
+/** The ribbon of headlines as it stands this instant. */
+const ribbon = (page) =>
   page.evaluate(() => {
     const text = (el) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
-    const root = document.querySelector("#lens-shell [data-tape]");
+    const root = document.querySelector("#lens-shell [data-ribbon]");
     if (!root) return null;
-    const strip = root.querySelector("[data-tape-strip]");
+    const strip = root.querySelector("[data-ribbon-strip]");
     const box = (el) => {
       const { left, right, top, bottom } = el.getBoundingClientRect();
       return { left, right, top, bottom };
     };
-    const runs = [...root.querySelectorAll("[data-tape-run]")];
+    const runs = [...root.querySelectorAll("[data-ribbon-run]")];
     const following = root.nextElementSibling ?? root.parentElement;
     const view = root.closest(".cp-scroll").getBoundingClientRect();
     return {
@@ -216,7 +216,7 @@ const skip = executable
   : "no Chromium: set PRISM_CHROMIUM or install a Playwright headless shell";
 
 test(
-  "Cut Paper shows the Bench, the Shelf, the Labbook and the tape of headlines",
+  "Cut Paper shows the Bench, the Shelf, the Labbook and the ribbon of headlines",
   { skip, timeout: 15 * 60_000 },
   async (suite) => {
     const t = {
@@ -431,7 +431,11 @@ test(
               "nothing wider than the screen",
             );
             assert.deepEqual(errors, []);
-            await shot(page, "#lens-shell [data-log]", `cut-paper-labbook-${size}`);
+            await shot(
+              page,
+              "#lens-shell [data-log]",
+              `cut-paper-labbook-${size}`,
+            );
             await context.close();
           },
         );
@@ -641,7 +645,9 @@ test(
               }, id);
 
             // Scroll the whole Labbook past, as a reader would.
-            await page.locator("#lens-shell [data-log]").scrollIntoViewIfNeeded();
+            await page
+              .locator("#lens-shell [data-log]")
+              .scrollIntoViewIfNeeded();
             await page.mouse.move(
               SIZES[size].viewport.width / 2,
               SIZES[size].viewport.height / 2,
@@ -824,7 +830,7 @@ test(
                 size,
                 `${path}?lens=cut-paper`,
               );
-              const strip = await tape(page);
+              const strip = await ribbon(page);
               assert.ok(strip, "there is a ribbon");
               assert.equal(strip.name, content.site.ticker.label);
               assert.deepEqual(
@@ -842,7 +848,11 @@ test(
                 })),
               );
               assert.equal(strip.reachable, content.headlines.length);
-              assert.equal(await overflow(page), 0, "nothing wider than the screen");
+              assert.equal(
+                await overflow(page),
+                0,
+                "nothing wider than the screen",
+              );
               assert.deepEqual(errors, []);
               const name = path === "/" ? "home" : "lab";
               await shot(page, null, `cut-paper-ribbon-${name}-still-${size}`);
@@ -852,7 +862,7 @@ test(
                 motion: true,
               });
               await live.page.waitForTimeout(1500);
-              const running = await tape(live.page);
+              const running = await ribbon(live.page);
               assert.deepEqual(
                 running.runs.map((run) => run.running),
                 [true, true],
@@ -907,9 +917,9 @@ test(
           `${size}: with motion reduced the ribbon is still, and every headline can be read`,
           async () => {
             const { context, page } = await open(size, ROOM);
-            const before = await tape(page);
+            const before = await ribbon(page);
             await page.waitForTimeout(600);
-            const after = await tape(page);
+            const after = await ribbon(page);
             assert.ok(before.headlines.length >= 3);
             assert.deepEqual(
               before.runs.map((run) => run.animations),
@@ -946,9 +956,9 @@ test(
             const { context, page } = await open(size, ROOM, { motion: true });
             await page.mouse.move(0, 0);
             await page.waitForTimeout(1500);
-            const start = await tape(page);
+            const start = await ribbon(page);
             await page.waitForTimeout(1000);
-            const later = await tape(page);
+            const later = await ribbon(page);
             assert.deepEqual(
               start.runs.map((run) => run.running),
               [true, true],
@@ -968,7 +978,11 @@ test(
               start.runs[1].x - start.runs[0].x >= start.room - 1,
               "a run is never shorter than the strip",
             );
-            assert.equal(await overflow(page), 0, "nothing wider than the screen");
+            assert.equal(
+              await overflow(page),
+              0,
+              "nothing wider than the screen",
+            );
             if (size === "desktop") {
               const { strip } = later;
               await page.mouse.move(
@@ -976,9 +990,9 @@ test(
                 (strip.top + strip.bottom) / 2,
               );
               await page.waitForTimeout(100);
-              const held = await tape(page);
+              const held = await ribbon(page);
               await page.waitForTimeout(600);
-              const still = await tape(page);
+              const still = await ribbon(page);
               assert.equal(still.runs[0].x, held.runs[0].x, "it holds");
               assert.deepEqual(
                 still.runs.map((run) => run.animations),
@@ -987,7 +1001,7 @@ test(
               );
               await page.mouse.move(0, 0);
               await page.waitForTimeout(600);
-              const released = await tape(page);
+              const released = await ribbon(page);
               assert.ok(
                 released.runs[0].x < still.runs[0].x,
                 "and goes on from where it was",
@@ -1014,7 +1028,7 @@ test(
               }),
             });
             await one.page.waitForTimeout(1500);
-            const strip = await tape(one.page);
+            const strip = await ribbon(one.page);
             assert.equal(strip.headlines.length, 1);
             assert.equal(strip.reachable, 1);
             assert.ok(
@@ -1022,7 +1036,8 @@ test(
               "the ribbon is a full lap long",
             );
             await one.page.waitForTimeout(1000);
-            const travelled = strip.runs[0].x - (await tape(one.page)).runs[0].x;
+            const travelled =
+              strip.runs[0].x - (await ribbon(one.page)).runs[0].x;
             assert.ok(
               travelled > 5 && travelled < 90,
               `and no faster for being short (${travelled.toFixed(1)}px in a second)`,
@@ -1034,10 +1049,10 @@ test(
               const none = await open(size, `${path}?lens=cut-paper`, {
                 bend: (data) => ({ ...data, headlines: [] }),
               });
-              assert.equal(await tape(none.page), null);
+              assert.equal(await ribbon(none.page), null);
               assert.equal(
                 await none.page
-                  .locator("#lens-shell :is([data-tape], .cp-ribbon)")
+                  .locator("#lens-shell :is([data-ribbon], .cp-ribbon)")
                   .count(),
                 0,
                 `nothing is left where it would be on ${path}`,
@@ -1128,7 +1143,10 @@ test(
               "#lens-shell [data-part='lab.graduation']",
             );
             assert.equal(await graduation.count(), 1);
-            assert.equal(await graduation.getAttribute("data-ref"), "fixture-study");
+            assert.equal(
+              await graduation.getAttribute("data-ref"),
+              "fixture-study",
+            );
             assert.equal(
               words(await graduation.locator("span").first().textContent()),
               content.pages.lab.detail.labels.graduated,
@@ -1268,7 +1286,7 @@ test(
           const { left, right } = el.getBoundingClientRect();
           return {
             headline: item?.dataset.ref ?? null,
-            inRibbon: !!el?.closest("#lens-shell [data-tape]"),
+            inRibbon: !!el?.closest("#lens-shell [data-ribbon]"),
             left,
             right,
             from: item?.getBoundingClientRect().left ?? null,
@@ -1304,7 +1322,7 @@ test(
           async () => {
             const { context, page } = await open(size, ROOM, { motion: true });
             await page.waitForTimeout(1500);
-            const moving = await tape(page);
+            const moving = await ribbon(page);
             const links = page.locator(
               "#lens-shell [data-part='ticker.headline'] a",
             );
@@ -1314,9 +1332,9 @@ test(
               if (i) await page.keyboard.press("Tab");
               await page.waitForTimeout(150);
               const now = await focused(page);
-              const strip = await tape(page);
+              const strip = await ribbon(page);
               await page.waitForTimeout(400);
-              const still = await tape(page);
+              const still = await ribbon(page);
               seen.push(now.headline);
               assert.ok(now.inRibbon, "Tab reaches each headline");
               assert.deepEqual(
@@ -1325,7 +1343,11 @@ test(
                 "the ribbon is at rest while a headline has focus",
               );
               inView(now, strip);
-              assert.deepEqual(strip.box, moving.box, "the ribbon keeps its place and size");
+              assert.deepEqual(
+                strip.box,
+                moving.box,
+                "the ribbon keeps its place and size",
+              );
             }
             // In the order they are written, each once: the second run of
             // the ribbon is for the eye only.
@@ -1340,7 +1362,7 @@ test(
               "one more Tab leaves the ribbon",
             );
             await page.waitForTimeout(700);
-            const resumed = await tape(page);
+            const resumed = await ribbon(page);
             assert.deepEqual(
               resumed.runs.map((run) => run.running),
               [true, true],
@@ -1367,7 +1389,7 @@ test(
           const measured = await wide.page.evaluate(() => {
             const link = document.activeElement;
             const item = link.closest("[data-part='ticker.headline']");
-            const strip = link.closest("[data-tape-strip]");
+            const strip = link.closest("[data-ribbon-strip]");
             return {
               words: link.getBoundingClientRect().width,
               whole: item.getBoundingClientRect().width,
@@ -1385,11 +1407,10 @@ test(
           await tabIn(page);
           await page.waitForTimeout(300);
           const now = await focused(page);
-          const strip = await tape(page);
+          const strip = await ribbon(page);
           assert.ok(now.inRibbon);
           assert.ok(
-            now.right - now.left <= strip.room &&
-              strip.room < measured.whole,
+            now.right - now.left <= strip.room && strip.room < measured.whole,
             `the words fit the strip and the headline does not (${now.right - now.left} and ${measured.whole} in ${strip.room})`,
           );
           inView(now, strip);

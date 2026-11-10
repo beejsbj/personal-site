@@ -1206,11 +1206,11 @@
   /* at rest for the keyboard: the ribbon back at its start. The script
      marks the strip while it may scroll to the headline in focus. */
   :root[data-lens="cut-paper"] .cp-app .cp-ribbon__strip:has(:focus-visible) .cp-ribbon__run,
-  :root[data-lens="cut-paper"] .cp-app .cp-ribbon__strip[data-tape-rest] .cp-ribbon__run {
+  :root[data-lens="cut-paper"] .cp-app .cp-ribbon__strip[data-ribbon-rest] .cp-ribbon__run {
     animation: none;
   }
 
-  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-ribbon__strip[data-tape-rest] {
+  :root[data-lens="cut-paper"] .cp-app:not([data-face]) .cp-ribbon__strip[data-ribbon-rest] {
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -2673,14 +2673,6 @@
 
 :root[data-lens="cut-paper"] .cp-pad__hit .cp-clip__run {
   background: var(--cp-ink);
-}
-
-:root[data-lens="cut-paper"] .cp-rack__meta {
-  margin: 4px 0 0;
-  color: var(--cp-ivory-3);
-  font: 600 10.5px/1.2 var(--cp-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 :root[data-lens="cut-paper"] .cp-rack__title {
