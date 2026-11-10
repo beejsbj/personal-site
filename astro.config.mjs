@@ -28,7 +28,10 @@ export default defineConfig({
   integrations: [
     sitemap({
       customSitemaps: ["https://burooj.dev/writing/sitemap.xml"],
-      filter: (page) => !excludedPaths.has(new URL(page).pathname),
+      // /prism/fixtures/ holds Daylight's pages on fixture content.
+      filter: (page) =>
+        !excludedPaths.has(new URL(page).pathname) &&
+        !new URL(page).pathname.startsWith("/prism/fixtures/"),
     }),
   ],
   // Runtime writing must not change the authored update snapshot that the

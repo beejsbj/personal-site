@@ -5,21 +5,34 @@
  * is built here. scripts/tests/lab-entry.browser.mjs reads it. */
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import ExperimentPage from "../../../../components/ExperimentPage.astro";
-import { getLabPage, getProjects } from "../../../../lib/portfolio";
+import { experimentUpdates } from "../../../../lib/labbook";
+import { getLabPage, getProjects, getSite } from "../../../../lib/portfolio";
+import { graduatedProject } from "../../../../lib/rules";
 import {
   experimentFixtures,
   type ExperimentFixture,
 } from "../../../../prism/fixtures";
 
+type Target = { slug: string; title: string; href: string };
+
 export async function getStaticPaths() {
-  return experimentFixtures(await getProjects()).map((fixture) => ({
+  const projects: Target[] = (await getProjects()).map((project) => ({
+    slug: project.slug,
+    title: project.data.title,
+    href: `/projects/${project.slug}`,
+  }));
+  return experimentFixtures(projects).map((fixture) => ({
     params: { slug: fixture.entry.slug },
-    props: { fixture },
+    props: { fixture, projects },
   }));
 }
 
-const { entry } = (Astro.props as { fixture: ExperimentFixture }).fixture;
-const { detail } = await getLabPage();
+const { fixture, projects } = Astro.props as {
+  fixture: ExperimentFixture;
+  projects: Target[];
+};
+const { entry, labbook } = fixture;
+const [site, { detail }] = await Promise.all([getSite(), getLabPage()]);
 ---
 
 <BaseLayout
@@ -29,7 +42,14 @@ const { detail } = await getLabPage();
   pageClass="page-entry"
   tool
 >
-  <ExperimentPage slug={entry.slug} experiment={entry} copy={detail}>
+  <ExperimentPage
+    slug={entry.slug}
+    experiment={entry}
+    updates={experimentUpdates(labbook, entry.slug)}
+    graduatedTo={graduatedProject(entry, projects)}
+    copy={detail}
+    updateLabels={{ kinds: site.updateKinds, sources: site.updateSources }}
+  >
     <Fragment set:html={entry.html} />
   </ExperimentPage>
 </BaseLayout>

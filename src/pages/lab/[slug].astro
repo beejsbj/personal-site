@@ -2,7 +2,16 @@
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ExperimentPage from "../../components/ExperimentPage.astro";
-import { getLab, getLabPage, labHasPage } from "../../lib/portfolio";
+import { experimentUpdates } from "../../lib/labbook";
+import {
+  getLab,
+  getLabbook,
+  getLabPage,
+  getProjects,
+  getSite,
+  labHasPage,
+} from "../../lib/portfolio";
+import { graduatedProject } from "../../lib/rules";
 
 export async function getStaticPaths() {
   return (await getLab())
@@ -17,7 +26,13 @@ const { entry } = Astro.props;
 const labEntry = entry as CollectionEntry<"lab">;
 const { slug, data } = labEntry;
 const { Content } = await labEntry.render();
-const { detail } = await getLabPage();
+const [site, { detail }, labbook, projects] = await Promise.all([
+  getSite(),
+  getLabPage(),
+  getLabbook(),
+  getProjects(),
+]);
+const project = graduatedProject(data, projects);
 ---
 
 <BaseLayout
@@ -26,7 +41,19 @@ const { detail } = await getLabPage();
   image={data.cover}
   pageClass="page-entry"
 >
-  <ExperimentPage slug={slug} experiment={data} copy={detail}>
+  <ExperimentPage
+    slug={slug}
+    experiment={data}
+    updates={experimentUpdates(labbook, slug)}
+    graduatedTo={
+      project && {
+        title: project.data.title,
+        href: `/projects/${project.slug}`,
+      }
+    }
+    copy={detail}
+    updateLabels={{ kinds: site.updateKinds, sources: site.updateSources }}
+  >
     <Content />
   </ExperimentPage>
 </BaseLayout>
