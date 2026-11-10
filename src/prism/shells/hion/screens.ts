@@ -25,6 +25,7 @@ import {
   experimentUpdates,
   labbookAnchor,
   labbookHref,
+  penUser,
   relatedLinks,
   updateDateLabel,
   type Artifact,
@@ -712,16 +713,6 @@ function project(content: SiteContent, data: Project) {
 
 /* ---------- The Labbook ---------- */
 
-/** How the site names an update's kind and source: content.json carries
- * them in `site`, for a Labbook update says only which it is. */
-type Named = { updateKinds: Record<string, string>; updateSources: Record<string, string> };
-const namesOf = (content: SiteContent) => content.site as SiteContent["site"] & Named;
-
-/** Whose the site's Pens are (a Pen may be named by its id alone): the name
- * in the site's own CodePen address. */
-const penUser = (content: SiteContent) =>
-  content.site.social.map((item) => item.href.match(/^https:\/\/codepen\.io\/([\w-]+)/)?.[1]).find(Boolean);
-
 /** What an update shows for itself. A picture, a film and a sound are
  * shown where they are tied on. A Pen or a demo is a place kept for it,
  * tacked out in stitches, with a pull-cord hanging in it: nothing is asked
@@ -757,7 +748,7 @@ function artifact(content: SiteContent, shown: Artifact, hue: "c" | "m") {
     );
   }
   // A frame is another site's page, or one of this site's own: nothing else.
-  const frame = embedSrc(shown, penUser(content));
+  const frame = embedSrc(shown, penUser(content.site));
   if (!frame || !/^(https:\/\/|\/(?!\/))/.test(frame)) return null;
   // Where it lives: the Pen's own page, or the demo itself.
   const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
@@ -825,7 +816,7 @@ function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: b
       ),
     );
   }
-  const { updateKinds, updateSources } = namesOf(content);
+  const { updateKinds, updateSources } = content.site;
   const href = update.href ?? (whole ? undefined : labbookHref(update.id));
   return h(
     "li",
