@@ -557,6 +557,20 @@ The new marks are layout only: `data-spine="knot"` (the two meet and are tied th
 
 Courses and tools stay below the track, down the page: courses are not all dated, and tools are not time-tied.
 
+**The Lab (`lab/99-hion`, issue #99).** The Lab is three of the things a Hion screen is already made of, one for each of its parts, and the ticker is a fourth. No new thread kinds: one new mark (`pastel.ts` `winding`) and one new ink (`ink.ts` `bound`).
+
+| What | How | Where |
+|---|---|---|
+| The Bench | A loop (`data-lab-place="bench"`) under its heading strung on a weft, its note beneath. The experiments hang in it, still in play: charms on drops from cords woven into the loop, swaying as every hung thing does. The featured one hangs first, across the row, like a sign: on two threads to the ends of its name (`data-sign`, read by `dom.ts` `signExtent`), its name written large | `S:lab`, `S:benched` |
+| The Shelf | A loop of wefts (`data-lab-place="shelf"`): each experiment's name is a strung `h3`, so a weft of its own crosses the loop to it, a shelf of thread, cyan in from the left strand and magenta from the right; names by turns to the left and the right, what each was beneath | `S:shelved` |
+| Order and headings | `labPlaces(content.lab)` and `pages.lab.places` (shared rule and copy); the two loops take turns left and right | `S:lab` |
+| The Labbook | A strand (`data-labbook`), as the home's updates are: heading strung out to one side of the hions, its note tied on at a knot on the other, then a knot for every update, newest first, tied on by turns either side. An entry is its date (level with the knot), title (a link when the update has an `href`), source and kind (`site.updateSources`/`updateKinds`), summary, artifact, and the experiment or project it is about (`relatedLinks`). Each `li` is `id="u-<id>"`, where its links land | `S:logbook`, `S:logged` |
+| Artifacts | A picture is a hung picture's frame, duotone until the update is reached for, shown whole (`contain`). A film and a sound keep their own controls and colours. A Pen or a demo is a place kept for it (`.hion-kept`, the frame's own room from the start), tacked out in dashed stitches, its poster behind a slip of black paper if the site has one, with a pull-cord: pulling it (a button) makes the frame there and focuses it. Before that nothing is asked of another site; a poster kept elsewhere is not shown | `S:artifact`, `HI/lab.ts` |
+| A redacted update | Its date, its kind of work, and where its title would be its words bound up: one binding for each number in `shape.bars`, a longer number a longer binding, thread wound tight round a thread of the other colour that shows at either end. Drawn by ink (`data-ink="bound"`), hidden from assistive technology, which is told `labbook.redacted.label`. Only `shape` and `date` are read | `S:bound`, `ink.ts`, `pastel.ts:winding` |
+| The reel (the ticker) | The headlines strung like beads on one thread, a bead and a length of thread between each two, drawn through from right to left at about 30px a second (the lap is set from how much there is to read), in the hand face; set as type, not written by thread, because it moves. On the home page under the hero's links; in the Lab in the head, under the title. A pointer holds it; keyboard focus rests it at its start and the strip scrolls to the headline in focus (`HI/lab.ts`); the second run is for the eye only. Still (reduced motion, a face): the headlines one under another, a bead before each, told once. No headlines, no reel. A headline's date is not shown: Hion has no small type to set it in | `S:reel`, `shell.css` |
+| Landing on an update | `/lab#u-<id>` (from a headline, or an experiment's page) lands on its knot: the drawing catches up to it, it is scrolled to the middle, and a bead of light rests on the knot (`data-landed`). Done by the shell: Daylight's page under it holds the same ids, hidden, and the router changes a same-page hash without a `hashchange` | `HI/lab.ts` |
+| An experiment's page | Its head no longer hangs Type and Era. The project it became (`graduatedProject`) is a tag in the head and a tassel at the end, beside the way back to the Lab. Its part of the Labbook (`experimentUpdates`) is a strand before the end: no artifacts, redacted updates shown bound in their place, and a title with nowhere else to go leads to its place in the Labbook. Its cover stands in when it has no pictures | `S:labEntry` |
+
 Line numbers are from the current tree and are still moving. `S` = `HI/screens.ts`.
 
 **content.json reads**
@@ -568,7 +582,8 @@ Line numbers are from the current tree and are still moving. `S` = `HI/screens.t
 | `pages.home.headline`, `.intro` (Currently fallback) | `S:203-215`, `S:288` |
 | `pages.about.title/description`, `pages.resume.title/description` | fallbacks in `S:about`, `S:resume` |
 | `projects[]`: slug, href, title, summary, kind, year, dateLabel, tools, featured, cover, links | `S:workCharm`, `S:projects`, `S:project`, `S:onward` |
-| `lab[]`: slug, href, detail, title, summary, type, sourceEra, links | `S:lab`, `S:labEntry` |
+| `lab[]`: slug, href, detail, hasPage, title, summary, place, featured, graduatedTo, cover, media, links, html (never `type` or `sourceEra`) | `S:lab`, `S:labEntry` |
+| `labbook[]` (narrowed on `visibility`: an open update's title, summary, href, artifact, relatedExperiment, relatedProject; a redacted one's `shape` and `date` only), `headlines[]`, `site.ticker.label`, `site.updateKinds`/`updateSources`, `pages.lab.places`, `.labbook`, `.detail.labels.graduated`/`.updates` | `S:logbook`, `S:reel`, `S:lab`, `S:labEntry` |
 | `updates[]`: source, kind, date, dateLabel, href, title (`slice(0,6)`) | `S:home` |
 | `resume.experience/education` (title; entries' id, title, org, start, end, current, dateLine, location, url, summary, bullets), `resume.tools` (title, items), `resume.ongoing`, `pages.resume.header/html` | `S:resume` |
 

@@ -756,8 +756,9 @@ function artifact(content: SiteContent, shown: Artifact, hue: "c" | "m") {
       h("figcaption", { class: "hion-picture__caption" }, alt),
     );
   }
+  // A frame is another site's page, or one of this site's own: nothing else.
   const frame = embedSrc(shown, penUser(content));
-  if (!frame) return null;
+  if (!frame || !/^(https:\/\/|\/(?!\/))/.test(frame)) return null;
   // Where it lives: the Pen's own page, or the demo itself.
   const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
   return h(
