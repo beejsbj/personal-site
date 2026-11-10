@@ -295,3 +295,32 @@ test("each lens that has no Labbook or ticker yet says so, naming its ticket", (
   assert.equal(isGap("daylight", "lab", "update.item"), false);
   assert.equal(isGap("daylight", "home", "ticker.headline"), false);
 });
+
+test("an experiment's page owes its part of the Labbook, a redacted update by its place", () => {
+  const about = (update) => ({ ...update, relatedExperiment: "lotus" });
+  const expected = expectedParts(
+    { kind: "lab-entry", path: "/lab/lotus", slug: "lotus" },
+    {
+      ...content,
+      lab: [{ slug: "lotus", title: "Lotus", summary: "", links: [] }],
+      labbook: [about(content.labbook[1]), about(content.labbook[2])],
+    },
+  ).map(({ part, ref, texts }) => ({ part, ref, texts }));
+  assert.deepEqual(
+    expected.filter(({ part }) => part.startsWith("update.")),
+    [
+      { part: "update.redacted", ref: "kept-private", texts: [] },
+      { part: "update.item", ref: "first-petal", texts: ["Update first-petal"] },
+    ],
+  );
+  // Owed wherever updates are listed: a lens that does not list them on a
+  // route yet owes no redacted update there either.
+  for (const lens of ["calling-card", "cut-paper", "back-page"])
+    assert.equal(
+      isGap(lens, "lab-entry", "update.redacted"),
+      isGap(lens, "lab-entry", "update.item"),
+      lens,
+    );
+  assert.equal(isGap("daylight", "lab-entry", "update.redacted"), false);
+  assert.equal(isGap("hion", "lab-entry", "update.redacted"), false);
+});

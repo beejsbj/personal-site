@@ -8,7 +8,7 @@ import MediaRail from "./MediaRail.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
 import Link from "../design/primitives/Link.astro";
-import { streamUpdate, type Update } from "../lib/labbook";
+import { streamUpdate, updateDateLabel, type Update } from "../lib/labbook";
 import { part } from "../prism/parts";
 import type { Link as LinkTo, Media } from "../prism/shells/types";
 
@@ -38,8 +38,10 @@ interface Props {
     kinds: Record<string, string>;
     sources: Record<string, string>;
   };
+  /** `labbook.redacted` in pages/lab.md: how a redacted update is named. */
+  redacted: { label: string; works: Record<string, string> };
 }
-const { slug, experiment, updates, graduatedTo, copy, updateLabels } =
+const { slug, experiment, updates, graduatedTo, copy, updateLabels, redacted } =
   Astro.props;
 
 // An entry no longer has to say its type or era.
@@ -53,12 +55,18 @@ const media: Media[] =
   experiment.media.length === 0 && cover
     ? [{ type: "image", src: cover }]
     : experiment.media;
-// The open updates, as the home stream shows one. A redacted update has a
-// shape and no words; drawing it belongs to the Labbook.
-const shown = updates.flatMap((update) => {
-  const open = streamUpdate(update.id, update);
-  return open ? [open] : [];
-});
+// Every update, in the order given: an open one as the home stream shows
+// it, a redacted one as the Labbook does, by its shape and its date alone.
+const shown = updates.map((update) =>
+  update.visibility === "redacted"
+    ? {
+        id: update.id,
+        date: update.date,
+        dateLabel: updateDateLabel(update.date),
+        shape: update.shape,
+      }
+    : streamUpdate(update.id, update)!,
+);
 ---
 
 <section class="shell entry-page">
@@ -113,12 +121,26 @@ const shown = updates.flatMap((update) => {
       <ol class="entry-updates__list">
         {shown.map((update, index) => (
           <li>
-            <UpdateEntry
-              {...update}
-              labels={updateLabels}
-              connected={index < shown.length - 1}
-              detailed
-            />
+            {"shape" in update ? (
+              <UpdateEntry
+                id={update.id}
+                date={update.date}
+                dateLabel={update.dateLabel}
+                redacted={{
+                  bars: update.shape.bars,
+                  work: redacted.works[update.shape.work],
+                  label: redacted.label,
+                }}
+                connected={index < shown.length - 1}
+              />
+            ) : (
+              <UpdateEntry
+                {...update}
+                labels={updateLabels}
+                connected={index < shown.length - 1}
+                detailed
+              />
+            )}
           </li>
         ))}
       </ol>

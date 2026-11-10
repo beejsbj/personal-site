@@ -227,15 +227,18 @@ export function expectedParts(
         ...(entry.links.length
           ? [page("lab.links", entry.slug, ...entry.links.map((l) => l.label))]
           : []),
-        // the project it graduated into, and its open updates
+        // the project it graduated into, and its part of the Labbook: a
+        // redacted update by its place alone
         ...content.projects
           .filter((p) => p.slug === entry.graduatedTo)
           .map((p) => page("lab.graduation", entry.slug, p.title)),
-        ...content.labbook.flatMap((u) =>
-          u.relatedExperiment === entry.slug && u.visibility === "open"
-            ? [page("update.item", u.id, u.title)]
-            : [],
-        ),
+        ...content.labbook
+          .filter((u) => u.relatedExperiment === entry.slug)
+          .map((u) =>
+            u.visibility === "open"
+              ? page("update.item", u.id, u.title)
+              : page("update.redacted", u.id),
+          ),
       ];
     }
     case "writing":
@@ -393,5 +396,10 @@ export const GAPS: Partial<
   },
 };
 
+/** A redacted update is owed wherever updates are listed: a lens that
+ * leaves the updates off a route leaves its redacted ones off with them. */
 export const isGap = (lens: LensId, kind: RouteKind, part: Part) =>
-  !!GAPS[lens]?.[kind]?.[part];
+  !!(
+    GAPS[lens]?.[kind]?.[part] ||
+    (part === "update.redacted" && GAPS[lens]?.[kind]?.["update.item"])
+  );
