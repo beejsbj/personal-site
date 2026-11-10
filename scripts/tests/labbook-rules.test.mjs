@@ -275,15 +275,15 @@ test("the home page and the Lab owe every headline on the ticker", () => {
 test("each lens that has no Labbook or ticker yet says so, naming its ticket", () => {
   const tickets = {
     "calling-card": "#96",
-    "back-page": "#98",
   };
+  const owed = [
+    ["lab", "update.item"],
+    ["lab", "update.redacted"],
+    ["lab", "ticker.headline"],
+    ["home", "ticker.headline"],
+  ];
   for (const [lens, ticket] of Object.entries(tickets)) {
-    for (const [kind, part] of [
-      ["lab", "update.item"],
-      ["lab", "update.redacted"],
-      ["lab", "ticker.headline"],
-      ["home", "ticker.headline"],
-    ]) {
+    for (const [kind, part] of owed) {
       assert.ok(isGap(lens, kind, part), `${lens} ${kind} ${part}`);
       assert.ok(
         GAPS[lens][kind][part].includes(ticket),
@@ -291,6 +291,11 @@ test("each lens that has no Labbook or ticker yet says so, naming its ticket", (
       );
     }
   }
+  // Cut Paper (#97), Back Page (#98) and Hion (#99) have both now: they
+  // owe them like Daylight does.
+  for (const lens of ["cut-paper", "back-page", "hion"])
+    for (const [kind, part] of owed)
+      assert.equal(isGap(lens, kind, part), false, `${lens} ${kind} ${part}`);
   assert.equal(isGap("daylight", "lab", "update.item"), false);
   assert.equal(isGap("daylight", "home", "ticker.headline"), false);
 });

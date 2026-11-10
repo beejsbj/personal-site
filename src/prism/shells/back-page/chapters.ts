@@ -2,18 +2,31 @@
  * of pages written in that book's pens. There's a book for each section,
  * each on its own paper (themes.ts): hello in the squared maths copy, study
  * notes in the quiet notebook with the resume stapled in after them, slip by
- * slip, doodles in the graph book, the war on blueprint, its map first
+ * slip, the lab in the graph book (a bench of doodles, a shelf, and the
+ * Labbook kept as dated lines), the war on blueprint, its map first
  * and a page for each project after, and the essays written out in a marbled
  * composition book, its contents first and each essay after.
  *
  * Every word comes from content: the portfolio and Daylight's copy from
  * `content`, the books' own handwriting from `content.lenses["back-page"]`. */
+import {
+  embedSrc,
+  experimentUpdates,
+  labbookAnchor,
+  labbookHref,
+  penUser,
+  relatedLinks,
+  type Artifact,
+  type Update as LabbookUpdate,
+} from "../../../lib/labbook";
+import { graduatedProject, labPlaces } from "../../../lib/rules";
 import { markPart, part, type Part } from "../../parts";
 import { blocks, fallbackBody, featured, fill, inline } from "../rich";
 import type { Route, SiteContent, WritingPost } from "../types";
 import { h, handDate, link, shortDate, svg } from "./dom";
 import {
   BLUE,
+  DOODLES,
   RED,
   arrow,
   camp,
@@ -23,6 +36,7 @@ import {
   flick,
   miniWar,
   ring,
+  scribbledOut,
   seed,
   shading,
   strike,
@@ -274,11 +288,14 @@ function taped(
   src: string,
   alt: string,
   key: string,
-  opts: { caption?: string; ratio?: number; video?: boolean; cls?: string } = {},
+  opts: { caption?: string; ratio?: number; video?: boolean; cls?: string; framed?: HTMLElement } = {},
 ) {
   const rng = seed(key);
   const tilt = ((rng() - 0.5) * 3).toFixed(2);
-  const media = opts.video
+  // `framed`: something else taped in, in the picture's place
+  const media = opts.framed
+    ? opts.framed
+    : opts.video
     ? h("video", {
         src,
         muted: true,
@@ -288,7 +305,7 @@ function taped(
         "aria-label": alt || null,
       })
     : h("img", { src, alt, loading: "lazy", decoding: "async" });
-  if (opts.ratio) media.style.aspectRatio = String(opts.ratio);
+  if (opts.ratio && !opts.framed) media.style.aspectRatio = String(opts.ratio);
   const fig = h(
     "figure",
     { class: `bp-taped ${opts.cls ?? ""}`.trim(), style: `--tilt:${tilt}deg` },
@@ -522,7 +539,7 @@ function home(b: Build): HTMLElement[] {
     h("figcaption", null, h("a", { href: hero.portrait.href }, `${jotted(hero.portrait.caption)} →`)),
   );
 
-  const hello: HTMLElement[] = [
+  const hello = [
     h(
       "div",
       { class: "bp-hello__top" },
@@ -532,13 +549,14 @@ function home(b: Build): HTMLElement[] {
     ),
     h("p", { class: "bp-typed-line", ...part("home.occupation") }, hero.occupation),
     h("p", { class: "bp-lead", ...part("home.welcome") }, hero.welcome),
+    ticker(b),
     h(
       "aside",
       { class: "bp-note", "aria-label": currently.title, ...part("home.currently") },
       h("b", null, `${currently.title}: `),
       inline(currently.body),
     ),
-  ];
+  ].filter((el) => !!el);
 
   // the diary: dated lines, newest first
   const diary = h("ol", { class: "bp-diary", "aria-label": updates.listLabel });
@@ -760,24 +778,259 @@ function resumeStart(b: Build) {
   return notes.page + aboutPages({ ...b, route }).pages.length;
 }
 
-// ---- the lab: doodles in the margin ----------------------------------------------------
+// ---- the lab: a bench, a shelf and a labbook ------------------------------------------
 
-function labCard(b: Build, item: LabItem, i: number) {
-  const rng = seed(item.slug);
+/** An experiment's name, linked to where it lives: its own page in this
+ * book or, marked with an arrow out, somewhere else. */
+const experimentLink = (b: Build, item: LabItem) =>
+  link(
+    item.detail,
+    b.copy.newTab,
+    item.title,
+    item.hasPage ? null : h("span", { class: "bp-out", "aria-hidden": "true" }, " ↗"),
+  );
+
+/** The doodle each experiment is given: one picked by its name, and while
+ * there are doodles to spare, one no other experiment has. */
+function doodleKinds(lab: LabItem[]) {
+  const kinds = new Map<string, number>();
+  const used = new Set<number>();
+  for (const { entries } of labPlaces(lab))
+    for (const item of entries) {
+      let kind = Math.floor(seed(`doodle-${item.slug}`)() * DOODLES);
+      if (used.size < DOODLES) while (used.has(kind)) kind = (kind + 1) % DOODLES;
+      used.add(kind);
+      kinds.set(item.slug, kind);
+    }
+  return kinds;
+}
+
+/** A place in the lab, written across the page: what it's called, ruled
+ * under, and a line about it. It stays with whatever comes under it. */
+function placeHead(words: { title: string; note?: string }, key: string, place?: string) {
   return h(
-    "article",
-    { class: "bp-labitem", "data-side": i % 2 ? "right" : "left" },
-    svg(doodle(i, rng)),
-    h("h2", { class: "bp-h2", ...part("lab.title", item.slug) }, link(item.detail, b.copy.newTab, item.title)),
-    h("p", { ...part("lab.summary", item.slug) }, item.summary),
-    h("p", { class: "bp-labitem__meta", ...part("lab.meta", item.slug) }, `${item.type} · ${item.sourceEra}`),
+    "div",
+    { class: "bp-sechead", "data-bp-keep": "", "data-lab-place": place ?? null },
+    withUnderline(h("h2", { class: "bp-h2" }, words.title), RED, key),
+    words.note ? h("p", { class: "bp-sub" }, jotted(words.note)) : null,
   );
 }
 
+/** An experiment on the bench: a doodle in the margin, its name and what it
+ * is. The one given pride of place is drawn larger, starred, and ruled
+ * under twice. */
+function benchEntry(b: Build, item: LabItem, i: number, kind: number) {
+  const title = h("h3", { class: "bp-labitem__title", ...part("lab.title", item.slug) }, experimentLink(b, item));
+  return h(
+    "article",
+    { class: "bp-labitem", "data-side": i % 2 ? "right" : "left", "data-featured": !!item.featured },
+    svg(doodle(kind, seed(item.slug))),
+    item.featured ? withUnderline(title, RED, `lab-${item.slug}`, true) : title,
+    h("p", { ...part("lab.summary", item.slug) }, item.summary),
+  );
+}
+
+/** The shelf: a library card stapled in, a line for each experiment put
+ * away. A long one runs on to a second card overleaf. */
+function shelfCard(b: Build, entries: LabItem[], label: string) {
+  return h(
+    "ol",
+    { class: "bp-shelfcard", "aria-label": label },
+    ...entries.map((item) =>
+      h(
+        "li",
+        null,
+        h("h3", { class: "bp-shelfcard__title", ...part("lab.title", item.slug) }, experimentLink(b, item)),
+        h("p", { ...part("lab.summary", item.slug) }, item.summary),
+      ),
+    ),
+  );
+}
+
+/** The ticker: the headlines written along a strip of paper threaded
+ * through two slits in the page, pulled through a headline at a time (the
+ * pull is CSS, in lab.css). Each headline is a link to the first update it
+ * is about, in the Labbook. The last is written once more before the first,
+ * for the eye only, so the strip has no end. Nothing, without headlines. */
+function ticker(b: Build): HTMLElement | null {
+  const { content, copy } = b;
+  const { headlines } = content;
+  if (!headlines.length) return null;
+  const label = content.site.ticker.label;
+  const last = headlines[headlines.length - 1];
+  const day = (date: string) => shortDate(date, copy.months);
+  return h(
+    "aside",
+    {
+      class: "bp-ticker",
+      "aria-label": label,
+      "data-ticker": "",
+      // one headline has nowhere to be pulled to
+      "data-moving": headlines.length > 1,
+      style: `--n:${headlines.length}`,
+    },
+    h("p", { class: "bp-ticker__tag", "aria-hidden": "true" }, label),
+    h(
+      "div",
+      { class: "bp-ticker__window" },
+      h(
+        "ul",
+        { class: "bp-ticker__strip" },
+        ...headlines.map((headline) =>
+          h(
+            "li",
+            { class: "bp-ticker__frame", ...part("ticker.headline", headline.id) },
+            h("time", { datetime: headline.date }, day(headline.date)),
+            h("a", { href: labbookHref(headline.updates[0]) }, headline.text),
+            // lying still, the strip breaks its lines between headlines
+            " ",
+          ),
+        ),
+        headlines.length > 1
+          ? h(
+              "li",
+              { class: "bp-ticker__frame bp-ticker__frame--again", "aria-hidden": "true" },
+              h("span", { class: "bp-ticker__day" }, day(last.date)),
+              h("span", null, last.text),
+            )
+          : null,
+      ),
+    ),
+  );
+}
+
+/** What an update shows for itself, taped in. A picture, a film and a
+ * sound are there to look at or play. A Pen or a demo is a blank card, or
+ * its poster when this site keeps one, with the way to start it written
+ * on: nothing is asked of another site until that is pressed (index.ts
+ * makes the frame then), and the link under it always opens it where it
+ * lives. */
+function artifactFigure(b: Build, artifact: Artifact, key: string): HTMLElement | null {
+  const { kind, src, alt } = artifact;
+  const words = b.content.pages.lab.labbook.artifact;
+  const poster = artifact.poster?.startsWith("/") ? artifact.poster : undefined;
+  const ratio = 16 / 10;
+  if (kind === "image" || kind === "video") {
+    const fig = taped(src, alt, key, { ratio, video: kind === "video", cls: "bp-artifact" });
+    fig.dataset.artifact = kind;
+    if (poster) fig.querySelector("video")?.setAttribute("poster", poster);
+    return fig;
+  }
+  if (kind === "sound") {
+    const fig = taped(src, alt, key, {
+      caption: alt,
+      cls: "bp-artifact",
+      framed: h("audio", { src, controls: true, preload: "none", "aria-label": alt }),
+    });
+    fig.dataset.artifact = kind;
+    return fig;
+  }
+  const frame = embedSrc(artifact, penUser(b.content.site));
+  if (!frame) return null;
+  // where it lives: the Pen's own page, or the demo itself
+  const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
+  const stage = h(
+    "span",
+    { class: "bp-ask", style: `aspect-ratio:${ratio}`, "data-artifact-frame": frame, "data-artifact-title": alt },
+    poster ? h("img", { src: poster, alt, loading: "lazy", decoding: "async" }) : null,
+    h(
+      "span",
+      { class: "bp-ask__note" },
+      poster ? null : h("span", { class: "bp-ask__what" }, alt),
+      h("a", { class: "bp-ask__load", href: home, "data-artifact-load": "" }, words.load[kind]),
+      h("span", { class: "bp-ask__small" }, words.note),
+    ),
+  );
+  const fig = taped(src, alt, key, { cls: "bp-artifact", framed: stage });
+  fig.dataset.artifact = kind;
+  fig.append(h("figcaption", null, link(home, b.copy.newTab, `${words.open[kind]} ↗`)));
+  return fig;
+}
+
+/** A run of updates as dated lines, the way the diary on the first page is
+ * kept. An open update has its day in the margin, what happened and where
+ * it came from; in the Labbook itself (`full`) it is also where links to it
+ * land (its `id`), and it says what it is about and shows its artifact. A
+ * redacted update is its day, the kind of work, and its words scribbled
+ * out: one scribble for each bar of its shape, as long as the bar says.
+ * Only its shape and date are read, whatever else arrives with it. */
+function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: boolean) {
+  const { content, copy } = b;
+  const words = content.pages.lab.labbook;
+  const { updateKinds, updateSources } = content.site;
+  const list = h("ol", { class: "bp-diary bp-log", "aria-label": label });
+  let year = "";
+  for (const u of updates) {
+    const turn = full && u.date.slice(0, 4) !== year;
+    year = u.date.slice(0, 4);
+    const when = [
+      turn ? h("p", { class: "bp-log__year" }, year) : null,
+      h("time", { class: "bp-mnote", datetime: u.date }, shortDate(u.date, copy.months)),
+    ];
+    const id = full ? labbookAnchor(u.id) : null;
+    if (u.visibility !== "open") {
+      const { work, bars } = u.shape;
+      const rng = seed(`struck-${u.id}`);
+      list.append(
+        h(
+          "li",
+          { id, "data-year": turn ? year : null, "data-redacted": "", ...part("update.redacted", u.id) },
+          ...when,
+          h(
+            "p",
+            { class: "bp-log__struck" },
+            h("span", { class: "bp-sr" }, words.redacted.label),
+            ...bars.map((bar) => {
+              const mark = h("span", { "data-redaction-bar": "", style: `--len:${bar}`, "aria-hidden": "true" });
+              mark.append(svg(scribbledOut(bar, BLUE, rng)));
+              return mark;
+            }),
+          ),
+          h("p", { class: "bp-diary__src" }, words.redacted.works[work]),
+        ),
+      );
+      continue;
+    }
+    const about = full ? relatedLinks(u, content) : [];
+    list.append(
+      h(
+        "li",
+        { id, "data-kind": u.kind, "data-year": turn ? year : null, ...part("update.item", u.id) },
+        ...when,
+        h(
+          "p",
+          { class: "bp-diary__title" },
+          u.href ? link(u.href, copy.newTab, u.title) : full ? u.title : h("a", { href: labbookHref(u.id) }, u.title),
+        ),
+        h("p", { class: "bp-diary__summary" }, u.summary),
+        h(
+          "p",
+          { class: "bp-diary__src" },
+          `${updateSources[u.source] ?? u.source} · ${updateKinds[u.kind] ?? u.kind}`,
+        ),
+        about.length
+          ? h(
+              "p",
+              { class: "bp-log__about" },
+              ...about.flatMap((to, i) => [
+                i ? " · " : "",
+                `${words.related[to.kind]}: `,
+                link(to.href, copy.newTab, to.title),
+              ]),
+            )
+          : null,
+        full && u.artifact ? artifactFigure(b, u.artifact, `artifact-${u.id}`) : null,
+      ),
+    );
+  }
+  return list;
+}
+
 function lab(b: Build) {
-  const page = b.content.pages.lab;
-  const { header } = page;
-  const blocks: HTMLElement[] = [
+  const { content } = b;
+  const page = content.pages.lab;
+  const { header, places, labbook } = page;
+  const blocks: (HTMLElement | null)[] = [
     h(
       "header",
       { class: "bp-entryhead" },
@@ -789,21 +1042,37 @@ function lab(b: Build) {
       withUnderline(h1(header.title, part("page.title", "lab")), RED, "lab-title"),
       header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "lab") }, header.intro) : null,
     ),
-    ...b.content.lab.map((item, i) => labCard(b, item, i)),
+    ticker(b),
   ];
-  return written(b, "lab", "squared", blocks, firstPage(b), null);
+  const kinds = doodleKinds(content.lab);
+  let n = 0;
+  for (const { place, entries } of labPlaces(content.lab)) {
+    blocks.push(placeHead(places[place], `lab-${place}`, place));
+    if (place === "bench")
+      for (const item of entries) blocks.push(benchEntry(b, item, n++, kinds.get(item.slug) ?? n));
+    else blocks.push(shelfCard(b, entries, places[place].title));
+  }
+  if (content.labbook.length)
+    blocks.push(
+      placeHead(labbook, "labbook"),
+      updateLines(b, content.labbook, labbook.listLabel, true),
+    );
+  return written(b, "lab", "squared", blocks.filter((el) => !!el), firstPage(b), null);
 }
 
+/** An experiment's own pages: what it is, the project it became (a sticky
+ * note pointing to it, ticked), where to try it, how it was made, and its
+ * part of the Labbook. */
 function labEntry(b: Build): HTMLElement[] | null {
   const { route, content, copy } = b;
   const item = content.lab.find((l) => l.slug === route.slug && l.hasPage);
   if (!item) return null;
   const { detail } = content.pages.lab;
-  const i = content.lab.indexOf(item);
-  const links = item.href
-    ? [{ label: fill(copy.lab.tryIt, { era: item.sourceEra }), url: item.href }, ...item.links]
-    : item.links;
-  const blocks: HTMLElement[] = [
+  const kind = doodleKinds(content.lab).get(item.slug) ?? 0;
+  const links = item.href ? [{ label: copy.lab.tryIt, url: item.href }, ...item.links] : item.links;
+  const became = graduatedProject(item, content.projects);
+  const updates = experimentUpdates(content.labbook, item.slug);
+  const blocks: (HTMLElement | null)[] = [
     h(
       "header",
       { class: "bp-entryhead" },
@@ -811,18 +1080,25 @@ function labEntry(b: Build): HTMLElement[] | null {
       withUnderline(h1(item.title, part("lab.title", item.slug)), RED, `lab-${item.slug}`),
       h("p", { class: "bp-lead", ...part("lab.summary", item.slug) }, item.summary),
     ),
-    h("div", { class: "bp-bigdoodle" }, svg(doodle(i, seed(item.slug)))),
-    fields(
-      [
-        [detail.labels.type, item.type],
-        [detail.labels.era, item.sourceEra],
-      ],
-      part("lab.meta", item.slug),
-    ),
+    became
+      ? h(
+          "a",
+          { class: "bp-sticky bp-grad", href: became.href, ...part("lab.graduation", item.slug) },
+          svg(tick(RED, seed(`grad-${item.slug}`))),
+          h("small", { class: "bp-sticky__where" }, detail.labels.graduated),
+          h("span", { class: "bp-sticky__label" }, `${became.title} →`),
+        )
+      : null,
+    h("div", { class: "bp-bigdoodle" }, svg(doodle(kind, seed(item.slug)))),
     arrows(b, links, part("lab.links", item.slug)),
     ...prose(item.html, "lab.body", item.slug),
   ];
-  return written(b, "lab-entry", "squared", blocks, firstPage(b), null);
+  if (updates.length)
+    blocks.push(
+      placeHead({ title: detail.labels.updates }, `log-${item.slug}`),
+      updateLines(b, updates, detail.labels.updates, false),
+    );
+  return written(b, "lab-entry", "squared", blocks.filter((el) => !!el), firstPage(b), null);
 }
 
 // ---- a project: its own page, the screenshot taped in -------------------------------
