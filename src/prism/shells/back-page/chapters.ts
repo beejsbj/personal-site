@@ -14,6 +14,7 @@ import {
   experimentUpdates,
   labbookAnchor,
   labbookHref,
+  penUser,
   relatedLinks,
   type Artifact,
   type Update as LabbookUpdate,
@@ -924,7 +925,7 @@ function artifactFigure(b: Build, artifact: Artifact, key: string): HTMLElement 
     fig.dataset.artifact = kind;
     return fig;
   }
-  const frame = embedSrc(artifact);
+  const frame = embedSrc(artifact, penUser(b.content.site));
   if (!frame) return null;
   // where it lives: the Pen's own page, or the demo itself
   const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
@@ -956,8 +957,7 @@ function artifactFigure(b: Build, artifact: Artifact, key: string): HTMLElement 
 function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: boolean) {
   const { content, copy } = b;
   const words = content.pages.lab.labbook;
-  // what the kinds and sources are called is written on the home stream's copy
-  const named = new Map(content.updates.map((u) => [u.id, u]));
+  const { updateKinds, updateSources } = content.site;
   const list = h("ol", { class: "bp-diary bp-log", "aria-label": label });
   let year = "";
   for (const u of updates) {
@@ -991,7 +991,6 @@ function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: bo
       );
       continue;
     }
-    const origin = named.get(u.id);
     const about = full ? relatedLinks(u, content) : [];
     list.append(
       h(
@@ -1004,7 +1003,11 @@ function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: bo
           u.href ? link(u.href, copy.newTab, u.title) : full ? u.title : h("a", { href: labbookHref(u.id) }, u.title),
         ),
         h("p", { class: "bp-diary__summary" }, u.summary),
-        origin ? h("p", { class: "bp-diary__src" }, `${origin.sourceLabel} · ${origin.kindLabel}`) : null,
+        h(
+          "p",
+          { class: "bp-diary__src" },
+          `${updateSources[u.source] ?? u.source} · ${updateKinds[u.kind] ?? u.kind}`,
+        ),
         about.length
           ? h(
               "p",

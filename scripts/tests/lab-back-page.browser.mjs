@@ -19,7 +19,11 @@ import { join } from "node:path";
 import test from "node:test";
 import { chromium } from "./lib/chromium.mjs";
 import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
-import { experimentUpdates, labbookHref } from "../../src/lib/labbook.ts";
+import {
+  experimentUpdates,
+  labbookHref,
+  penUser,
+} from "../../src/lib/labbook.ts";
 import { labPlaces } from "../../src/lib/rules.ts";
 import { REDACTION_MARKER } from "../../src/prism/labbook-fixture.ts";
 
@@ -620,6 +624,36 @@ test(
             await demo.page.waitForTimeout(300);
             assert.deepEqual(demo.asked, [DEMO_FRAME]);
             await demo.context.close();
+
+            // A Pen named by its id alone is the site's own.
+            if (size === "desktop") {
+              const [newest] = content.labbook;
+              const own = await open(size, real(`/lab#u-${newest.id}`), {
+                rewrite: (data) => ({
+                  ...data,
+                  labbook: data.labbook.map((update) =>
+                    update.id === newest.id
+                      ? {
+                          ...update,
+                          artifact: {
+                            kind: "pen",
+                            src: "abXZWLQ",
+                            alt: "A Pen named by its id",
+                          },
+                        }
+                      : update,
+                  ),
+                }),
+              });
+              assert.equal(
+                await own.page
+                  .locator(`${OPEN} #u-${newest.id} [data-artifact-frame]`)
+                  .getAttribute("data-artifact-frame"),
+                `https://codepen.io/${penUser(content.site)}/embed/abXZWLQ?default-tab=result`,
+              );
+              assert.deepEqual(own.asked, []);
+              await own.context.close();
+            }
           },
         );
 
