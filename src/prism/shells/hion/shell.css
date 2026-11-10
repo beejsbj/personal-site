@@ -3510,10 +3510,20 @@
   margin: 0 0 0.2em;
 }
 
-/* Room above and below for a headline's focus ring. */
+/* Room above and below for a headline's focus ring. The strip is as wide
+   as the reel and asks for no width of its own: a running thread is one
+   long line, and must not widen what it hangs in. */
 :root[data-lens="hion"] .hion-reel__strip {
   display: flex;
+  width: 0;
+  min-width: 100%;
   padding-block: 0.5em;
+}
+
+/* In a screen's head, which is only as wide as what hangs in it. */
+:root[data-lens="hion"] .hion-head .hion-reel {
+  width: 34rem;
+  max-width: 100%;
 }
 
 /* Standing still: the headlines one under another, a bead before each. */
@@ -3637,5 +3647,10 @@
 
   :root[data-lens="hion"] .hion-reel {
     margin-top: 1.6rem;
+  }
+
+  /* On the home page the portrait hangs next: room for its cord. */
+  :root[data-lens="hion"] .hion-hero .hion-reel {
+    margin-bottom: 2.4rem;
   }
 }

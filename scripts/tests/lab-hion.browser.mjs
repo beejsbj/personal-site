@@ -725,25 +725,35 @@ test(
               );
               assert.equal(strip.reachable, content.headlines.length);
               assert.equal(strip.overflow, 0, "nothing wider than the screen");
-              if (SHOTS) {
-                const name = path === "/" ? "home" : "lab";
-                await shot(
-                  page,
-                  "[data-reel]",
-                  `hion-reel-${name}-still-${size}`,
-                );
-                // And as most visitors meet it: running.
-                const live = await open(size, `${path}?lens=hion`, {
-                  motion: true,
-                });
-                await live.page.waitForTimeout(3000);
-                await shot(
-                  live.page,
-                  "[data-reel]",
-                  `hion-reel-${name}-${size}`,
-                );
-                await live.context.close();
-              }
+              const name = path === "/" ? "home" : "lab";
+              await shot(
+                page,
+                "#lens-shell [data-reel]",
+                `hion-reel-${name}-still-${size}`,
+              );
+              // And as most visitors meet it, running: one long line that
+              // widens nothing it hangs in.
+              const live = await open(size, `${path}?lens=hion`, {
+                motion: true,
+              });
+              await live.page.waitForTimeout(1200);
+              const running = await reel(live.page);
+              const { width } = SIZES[size].viewport;
+              assert.ok(
+                running.box.left >= 0 && running.box.right <= width + 0.5,
+                `the running reel keeps inside the screen (${running.box.left} to ${running.box.right} of ${width})`,
+              );
+              assert.ok(
+                running.strip.right - running.strip.left <=
+                  running.box.right - running.box.left + 0.5,
+                "and its strip inside the reel",
+              );
+              await shot(
+                live.page,
+                "#lens-shell [data-reel]",
+                `hion-reel-${name}-${size}`,
+              );
+              await live.context.close();
               // Following one lands on its update, whichever page it was on.
               const [first] = content.headlines;
               await page
