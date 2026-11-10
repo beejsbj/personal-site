@@ -326,23 +326,12 @@ export const GAPS: Partial<
         "No Currently note on the pause menu: its corner is the calendar, which names the latest update instead.",
       "home.elsewhere":
         "No Elsewhere list on the pause menu: Writing is a command and the socials are on the Calling Card dialog, without blurbs.",
-      "ticker.headline": "Not built yet (#96): the home page has no ticker.",
     },
     lab: {
-      "ticker.headline": "Not built yet (#96): the Lab has no ticker.",
-      "update.item": "Not built yet (#96): the Lab has no Labbook.",
-      "update.redacted":
-        "Not built yet (#96): the Lab has no Labbook, so no redacted updates.",
       "lab.more":
         "The request board shows only the experiments; it has no link out to more sketches on CodePen.",
       "lab.aside":
         "The request board has no aside pointing to Projects and the Style Guide; Projects is a tab.",
-    },
-    "lab-entry": {
-      "lab.graduation":
-        "Not built yet (#96): an experiment's page does not name the project it graduated into.",
-      "update.item":
-        "Not built yet (#96): an experiment's page does not list its updates.",
     },
   },
   "cut-paper": {
