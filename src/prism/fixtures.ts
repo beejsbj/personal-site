@@ -17,7 +17,7 @@ import {
   streamUpdate,
   type Update as LabbookUpdate,
 } from "../lib/labbook";
-import { labbookFixture } from "./labbook-fixture";
+import { labbookFixture, REDACTION_MARKER } from "./labbook-fixture";
 import type { RouteRef } from "./parity";
 import type {
   LabEntry,
@@ -264,6 +264,7 @@ function study(project: string): ExperimentFixture {
         title: "The first line draws itself",
         summary: "One path, measured and drawn from end to end.",
       },
+      // As it must never arrive, with words: a lens draws its shape alone.
       {
         id: "fixture-study-kept-back",
         date: "2026-08-20",
@@ -272,7 +273,11 @@ function study(project: string): ExperimentFixture {
         relatedExperiment: slug,
         visibility: "redacted",
         shape: { work: "code", bars: [4, 2, 3] },
-      },
+        title: `${REDACTION_MARKER}: the title`,
+        summary: `${REDACTION_MARKER}: the summary`,
+        href: `/lab/${REDACTION_MARKER}`,
+        linkLabel: `${REDACTION_MARKER}: the link`,
+      } as LabbookUpdate,
       {
         ...about,
         id: "fixture-study-replay",

@@ -185,6 +185,16 @@ const reel = (page) =>
     };
   });
 
+/** Focus whatever comes before the reel, so the next Tab goes into it. */
+const beforeReel = (page) =>
+  page.evaluate(() => {
+    const first = document.querySelector("[data-part='ticker.headline'] a");
+    const all = [...document.querySelectorAll("a[href], button")].filter(
+      (el) => el.tabIndex >= 0 && el.checkVisibility(),
+    );
+    all[all.indexOf(first) - 1].focus();
+  });
+
 const overflow = (page) =>
   page.evaluate(
     () =>
@@ -220,7 +230,7 @@ test(
      * answered with a blank. `bend` changes content.json on its way in. */
     const open = async (size, path, { motion = false, bend } = {}) => {
       const context = await browser.newContext({
-        ...SIZES[size],
+        ...(SIZES[size] ?? size),
         reducedMotion: motion ? "no-preference" : "reduce",
       });
       const asked = [];
@@ -900,16 +910,7 @@ test(
                   right,
                 };
               });
-            // Tab in from whatever comes before the reel.
-            await page.evaluate(() => {
-              const first = document.querySelector(
-                "[data-part='ticker.headline'] a",
-              );
-              const all = [
-                ...document.querySelectorAll("a[href], button"),
-              ].filter((el) => el.tabIndex >= 0 && el.checkVisibility());
-              all[all.indexOf(first) - 1].focus();
-            });
+            await beforeReel(page);
             const seen = [];
             for (let i = 0; i < (await links.count()); i += 1) {
               await page.keyboard.press("Tab");
@@ -1151,6 +1152,69 @@ test(
           },
         );
       }
+
+      // Between a phone and a desk the strip is longer than some headlines'
+      // words and shorter than those words with their thread: 450px and
+      // 480px, and a screen cut so the first headline's words only just fit.
+      for (const cut of [450, 480, "just"])
+        await t.test(
+          `${cut}: a headline in focus is shown whole whenever its words fit the strip`,
+          async () => {
+            const { context, page } = await open(
+              { ...SIZES.phone, viewport: { width: 450, height: 844 } },
+              ROOM,
+              { motion: true },
+            );
+            await page.waitForTimeout(1500);
+            const links = page.locator("[data-part='ticker.headline'] a");
+            const strip = page.locator("[data-reel-strip]");
+            if (cut === "just") {
+              const words = await links
+                .first()
+                .evaluate((link) => link.getBoundingClientRect().width);
+              const edges = 450 - (await strip.evaluate((el) => el.clientWidth));
+              await page.setViewportSize({
+                width: Math.ceil(words) + edges + 4,
+                height: 844,
+              });
+            } else await page.setViewportSize({ width: cut, height: 844 });
+            await beforeReel(page);
+            let cutShort = 0;
+            for (let i = 0; i < (await links.count()); i += 1) {
+              await page.keyboard.press("Tab");
+              await page.waitForTimeout(150);
+              const now = await page.evaluate(() => {
+                const link = document.activeElement;
+                const strip = link.closest("[data-reel-strip]");
+                const { left, right } = link.getBoundingClientRect();
+                const box = strip.getBoundingClientRect();
+                return {
+                  headline: link.closest("[data-part]")?.dataset.ref,
+                  left,
+                  right,
+                  whole: link.parentElement.getBoundingClientRect().width,
+                  room: strip.clientWidth,
+                  strip: { left: box.left, right: box.right },
+                };
+              });
+              assert.ok(now.headline, "Tab reaches each headline");
+              // Words longer than the strip are shown from their beginning
+              // (the subtest at each size above).
+              if (now.right - now.left > now.room) continue;
+              if (now.whole > now.room) cutShort += 1;
+              assert.ok(
+                now.left >= now.strip.left - 1 &&
+                  now.right <= now.strip.right + 1,
+                `${now.headline}'s words fit the strip and are all in view (${now.left} to ${now.right} in ${now.strip.left} to ${now.strip.right})`,
+              );
+            }
+            assert.ok(
+              cutShort > 0,
+              "a headline's words fit the strip here where its thread and words together do not",
+            );
+            await context.close();
+          },
+        );
     } finally {
       await browser.close();
       await server?.close();

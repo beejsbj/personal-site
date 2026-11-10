@@ -6,8 +6,9 @@
  *   Until then the page has asked nothing of anyone else.
  * - The reel rests for the keyboard. Its thread stops at its start in CSS;
  *   resting, the strip may scroll, so the headline in focus is brought into
- *   view wherever on the thread it lies, and when focus leaves the strip
- *   goes back to its start before the thread runs on.
+ *   view wherever on the thread it lies (all of its words, when they fit
+ *   the strip), and when focus leaves the strip goes back to its start
+ *   before the thread runs on.
  * - A link to an update (`/lab#u-…`, from a headline, the home stream or an
  *   experiment's page) lands on its knot in the Labbook: the drawing
  *   catches up to it and a bead of light rests on the knot (shell.css
@@ -50,6 +51,14 @@ export function tendLab(page: HTMLElement, { signal, catchUp, instant }: Options
       strip.dataset.reelRest = "";
       // The whole headline, from its beginning.
       (link.parentElement ?? link).scrollIntoView({ block: "nearest", inline: "start" });
+      // Where that is longer than the strip and the words alone are not, the
+      // words are shown whole and the thread before them gives way.
+      if (link.getBoundingClientRect().width > strip.clientWidth) return;
+      link.scrollIntoView({ block: "nearest", inline: "nearest" });
+      // Words nearly as long as the strip have no room for its scroll
+      // padding too: they go to the strip's end.
+      const over = link.getBoundingClientRect().right - strip.getBoundingClientRect().right;
+      if (over > 0) strip.scrollLeft += Math.ceil(over);
     },
     { signal },
   );
