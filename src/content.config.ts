@@ -225,29 +225,29 @@ const projectSchema = z.object({
   hidden: z.boolean().default(false),
 });
 
-const labSchema = z.object({
-  title: z.string(),
-  summary: z.string(),
-  /** The Bench holds what is being worked on now; the Shelf what has gone
-   * quiet, and the archive. */
-  place: z.enum(["bench", "shelf"]),
-  /** The slug of the project this experiment graduated into. */
-  graduatedTo: z.string().optional(),
-  /** The one entry given pride of place. */
-  featured: z.boolean().optional(),
-  /** Optional, and on their way out: every lens still prints them, so an
-   * entry without them reads as empty rather than missing. */
-  type: z.string().default(""),
-  sourceEra: z.string().default(""),
-  cover: z.string().optional(),
-  /** The live experiment, when it lives elsewhere: the entry links straight
-   * out and has no page here. */
-  href: z.string().url().optional(),
-  links: z.array(linkSchema).default([]),
-  media: z.array(mediaSchema).default([]),
-  order: z.number().default(100),
-  hidden: z.boolean().default(false),
-});
+/** Strict: a field an experiment does not have would only be dropped;
+ * here it is refused by name, so one left over from before is loud. */
+const labSchema = z
+  .object({
+    title: z.string(),
+    summary: z.string(),
+    /** The Bench holds what is being worked on now; the Shelf what has gone
+     * quiet, and the archive. */
+    place: z.enum(["bench", "shelf"]),
+    /** The slug of the project this experiment graduated into. */
+    graduatedTo: z.string().optional(),
+    /** The one entry given pride of place. */
+    featured: z.boolean().optional(),
+    cover: z.string().optional(),
+    /** The live experiment, when it lives elsewhere: the entry links straight
+     * out and has no page here. */
+    href: z.string().url().optional(),
+    links: z.array(linkSchema).default([]),
+    media: z.array(mediaSchema).default([]),
+    order: z.number().default(100),
+    hidden: z.boolean().default(false),
+  })
+  .strict();
 
 const UPDATE_KINDS = [
   "project",

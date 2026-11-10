@@ -174,8 +174,6 @@ const sketch: ExperimentFixture = {
     title: "A sketch with no cover",
     summary: "An experiment that lives here, with words but no picture.",
     place: "bench",
-    type: "Canvas + sound",
-    sourceEra: "This site",
     links: [{ label: "Source", url: "https://example.com/source" }],
     media: [],
     order: 99,
@@ -184,8 +182,7 @@ const sketch: ExperimentFixture = {
   labbook: [],
 };
 
-/** A cover and a paragraph: no type or era, no pictures of its own, no
- * links or updates. */
+/** A cover and a paragraph: no pictures of its own, no links or updates. */
 const poster: ExperimentFixture = {
   entry: {
     slug: "fixture-poster",
@@ -194,8 +191,6 @@ const poster: ExperimentFixture = {
     title: "A poster and a paragraph",
     summary: "An experiment that says little about itself.",
     place: "bench",
-    type: "",
-    sourceEra: "",
     cover: "/images/lab/beating-shapes.png",
     links: [],
     media: [],
@@ -224,8 +219,6 @@ function study(project: string): ExperimentFixture {
         "An experiment that kept a record: pictures, a film, links out and what happened along the way.",
       place: "shelf",
       graduatedTo: project,
-      type: "SVG + motion",
-      sourceEra: "This site",
       cover: "/images/lab/motion-path-graph.svg",
       links: [
         {
@@ -523,7 +516,7 @@ export const FIXTURES: Record<string, Fixture> = {
   "lab-bare-entry": {
     name: "lab-bare-entry",
     about:
-      "A lab entry that says no type or era, with a cover and no other picture.",
+      "A lab entry that says little, with a cover and no other picture.",
     apply: (content) => withExperiment(content, poster),
     routes: () => [{ kind: "lab", path: "/lab" }, labEntryRoute(poster)],
   },

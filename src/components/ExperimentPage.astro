@@ -17,8 +17,6 @@ interface Props {
   experiment: {
     title: string;
     summary: string;
-    type: string;
-    sourceEra: string;
     cover?: string;
     links: { label: string; url: string }[];
     media: Media[];
@@ -31,7 +29,7 @@ interface Props {
   copy: {
     eyebrow: string;
     back: LinkTo;
-    labels: { type: string; era: string; graduated: string; updates: string };
+    labels: { graduated: string; updates: string };
   };
   /** How each kind and source of update is named. */
   updateLabels: {
@@ -44,11 +42,6 @@ interface Props {
 const { slug, experiment, updates, graduatedTo, copy, updateLabels, redacted } =
   Astro.props;
 
-// An entry no longer has to say its type or era.
-const facts = [
-  { label: copy.labels.type, value: experiment.type },
-  { label: copy.labels.era, value: experiment.sourceEra },
-].filter((fact) => fact.value);
 // With no pictures of its own, the page shows the cover.
 const { cover } = experiment;
 const media: Media[] =
@@ -80,22 +73,14 @@ const shown = updates.map((update) =>
     }}
   />
 
-  {(facts.length > 0 || graduatedTo) && (
+  {graduatedTo && (
     <div class="entry-page__meta" {...part("lab.meta", slug)}>
-      {facts.map((fact) => (
-        <div>
-          <span class="entry-page__label">{fact.label}</span>
-          <p>{fact.value}</p>
-        </div>
-      ))}
-      {graduatedTo && (
-        <div {...part("lab.graduation", slug)}>
-          <span class="entry-page__label">{copy.labels.graduated}</span>
-          <p>
-            <Link href={graduatedTo.href}>{graduatedTo.title}</Link>
-          </p>
-        </div>
-      )}
+      <div {...part("lab.graduation", slug)}>
+        <span class="entry-page__label">{copy.labels.graduated}</span>
+        <p>
+          <Link href={graduatedTo.href}>{graduatedTo.title}</Link>
+        </p>
+      </div>
     </div>
   )}
 

@@ -104,9 +104,6 @@ export interface LabEntry {
   graduatedTo?: string;
   /** The one entry given pride of place. */
   featured?: boolean;
-  /** May be empty, like `sourceEra`: an entry no longer has to say. */
-  type: string;
-  sourceEra: string;
   cover?: string;
   links: { label: string; url: string }[];
   media: Media[];
@@ -288,8 +285,6 @@ export interface SiteContent {
         eyebrow: string;
         back: Link;
         labels: {
-          type: string;
-          era: string;
           graduated: string;
           updates: string;
         };

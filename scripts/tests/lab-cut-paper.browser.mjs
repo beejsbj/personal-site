@@ -1250,8 +1250,10 @@ test(
               };
             });
             const { labels } = content.pages.lab.detail;
-            for (const label of [labels.type, labels.era, labels.graduated])
-              assert.ok(!shown.text.includes(label), `no "${label}" label`);
+            assert.ok(
+              !shown.text.includes(labels.graduated),
+              `no "${labels.graduated}" label`,
+            );
             assert.equal(shown.hollow, 0, "nothing on the page is empty");
             assert.equal(shown.meta, 0);
             assert.equal(shown.record, 0, "no updates, no log");

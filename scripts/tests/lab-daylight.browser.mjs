@@ -206,7 +206,7 @@ test(
         );
 
         await t.test(
-          `${size}: an entry with no cover, type or era leaves no gap behind`,
+          `${size}: an entry with no cover leaves no gap behind, and no card prints a type or era`,
           async () => {
             const { context, page } = await open(size, "/prism/fixtures/lab");
             const room = await survey(page);
@@ -217,12 +217,12 @@ test(
                 .map((entry) => [entry.slug, entry.meta]),
             );
             assert.deepEqual(metas, {
-              "fixture-featured": "Tools",
-              "fixture-linkout": "Canvas + sound · CodePen",
+              "fixture-featured": null,
+              "fixture-linkout": null,
               "fixture-bare": null,
-              "fixture-note": "A deck",
-              "fixture-archive": "Client archive",
-              "fixture-quiet": "SVG + motion · CodePen",
+              "fixture-note": null,
+              "fixture-archive": null,
+              "fixture-quiet": null,
               "fixture-plain": null,
             });
             for (const entry of room.places.flatMap((place) => place.entries)) {

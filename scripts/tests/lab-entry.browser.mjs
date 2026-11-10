@@ -72,6 +72,8 @@ const read = (page) =>
         .map(text),
       summary: text(one("lab.summary")),
       facts: all(".entry-page__label").map(text),
+      // The strip the facts sit in, by how many it holds.
+      strips: all(".entry-page__meta").map((strip) => strip.children.length),
       links: all("a", one("lab.links")).map((a) => ({
         label: text(a.querySelector(".link-label")),
         href: a.getAttribute("href"),
@@ -237,19 +239,23 @@ test(
                   painted: true,
                 },
               ]);
-              // It says no type or era, and has no links.
+              // It graduated into nothing, so has no fact and no strip
+              // for one, and it has no links.
               assert.deepEqual(seen.facts, []);
+              assert.deepEqual(seen.strips, []);
               assert.deepEqual(seen.links, []);
               assert.match(seen.body, /^One paragraph, and the cover/);
               assert.deepEqual(seen.tooWide, [], "nothing runs off the side");
             });
-            await visit(STUDY, size, (seen) =>
-              assert.deepEqual(seen.facts, [
-                labels.type,
-                labels.era,
-                labels.graduated,
-              ]),
-            );
+            // What it graduated into is the only fact a page has.
+            assert.deepEqual(Object.keys(labels).sort(), [
+              "graduated",
+              "updates",
+            ]);
+            await visit(STUDY, size, (seen) => {
+              assert.deepEqual(seen.facts, [labels.graduated]);
+              assert.deepEqual(seen.strips, [1]);
+            });
           },
         );
 
