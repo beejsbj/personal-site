@@ -685,15 +685,17 @@ test(
                 };
               });
             // Tab in from whatever comes before the ticker.
-            await page.evaluate(() => {
-              const first = document.querySelector(
-                "[data-part='ticker.headline'] a",
-              );
-              const all = [
-                ...document.querySelectorAll("a[href], button"),
-              ].filter((el) => el.tabIndex >= 0 && el.checkVisibility());
-              all[all.indexOf(first) - 1].focus();
-            });
+            const before = () =>
+              page.evaluate(() => {
+                const first = document.querySelector(
+                  "[data-part='ticker.headline'] a",
+                );
+                const all = [
+                  ...document.querySelectorAll("a[href], button"),
+                ].filter((el) => el.tabIndex >= 0 && el.checkVisibility());
+                all[all.indexOf(first) - 1].focus();
+              });
+            await before();
             const seen = [];
             for (let i = 0; i < (await links.count()); i += 1) {
               await page.keyboard.press("Tab");
@@ -748,6 +750,38 @@ test(
               0,
               "from its start, not from wherever focus had scrolled it",
             );
+            if (size === "phone") {
+              // Whatever the fonts measure: a screen cut so the first
+              // headline's words fit the strip and its day beside them
+              // does not. The words in focus are still shown whole.
+              const [words, whole] = await links
+                .first()
+                .evaluate((link) => [
+                  link.getBoundingClientRect().width,
+                  link.parentElement.getBoundingClientRect().width,
+                ]);
+              const edges =
+                SIZES[size].viewport.width -
+                (moving.strip.right - moving.strip.left);
+              await page.setViewportSize({
+                ...SIZES[size].viewport,
+                width: Math.round((words + whole) / 2 + edges),
+              });
+              await before();
+              await page.keyboard.press("Tab");
+              await page.waitForTimeout(150);
+              const now = await focused();
+              const { strip } = await ticker(page);
+              const room = strip.right - strip.left;
+              assert.ok(
+                words < room - 20 && whole > room + 20,
+                `the strip is cut between the words and the whole headline (${words} < ${room} < ${whole})`,
+              );
+              assert.ok(
+                now.left >= strip.left - 1 && now.right <= strip.right + 1,
+                `words that fit are all in view, though their day is not (${now.left} to ${now.right} in ${strip.left} to ${strip.right})`,
+              );
+            }
             await context.close();
           },
         );

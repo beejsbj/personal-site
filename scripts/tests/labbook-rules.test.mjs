@@ -4,6 +4,7 @@ import {
   embedSrc,
   newestFirst,
   penEmbedSrc,
+  penUser,
   relatedLinks,
 } from "../../src/lib/labbook.ts";
 import { expectedParts, GAPS, isGap } from "../../src/prism/parity.ts";
@@ -65,6 +66,40 @@ test("what is not a Pen has no Pen frame", () => {
     "",
   ])
     assert.equal(penEmbedSrc(src, "beejsbj"), undefined, src);
+});
+
+test("the site's Pens are whoever its CodePen address names", () => {
+  const social = (...hrefs) => ({
+    social: hrefs.map((href) => ({ label: "A fixture", href })),
+  });
+  assert.equal(
+    penUser(
+      social(
+        "https://github.com/someone/",
+        "https://codepen.io/beejsbj",
+        "https://codepen.io/someone-else",
+        "mailto:someone@example.com",
+      ),
+    ),
+    "beejsbj",
+    "the first CodePen address, by its name",
+  );
+  assert.equal(
+    penUser(social("https://codepen.io/be-ej_sbj/pen/abXZWLQ?editors=1010")),
+    "be-ej_sbj",
+  );
+  for (const href of [
+    "https://example.com/codepen.io/beejsbj",
+    "http://codepen.io/beejsbj",
+    "https://codepen.io/",
+  ])
+    assert.equal(penUser(social(href)), undefined, href);
+  assert.equal(penUser(social()), undefined, "no address, no one");
+  // And that name owns a Pen written as its id alone.
+  assert.equal(
+    penEmbedSrc("abXZWLQ", penUser(social("https://codepen.io/beejsbj"))),
+    "https://codepen.io/beejsbj/embed/abXZWLQ?default-tab=result",
+  );
 });
 
 test("only a Pen and a demo load into a frame, and a demo loads its own address", () => {
