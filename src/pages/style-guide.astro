@@ -12,6 +12,8 @@ import CurvedArrow from "../design/unique/CurvedArrow.astro";
 import BallNav from "../design/unique/BallNav.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
+import Artifact from "../design/compounds/Artifact.astro";
+import Ticker from "../design/unique/Ticker.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import ProjectRow from "../components/ProjectRow.astro";
@@ -20,8 +22,8 @@ import LabCard from "../components/LabCard.astro";
 import PageHeader from "../components/PageHeader.astro";
 import SectionIntro from "../components/SectionIntro.astro";
 import MediaRail from "../components/MediaRail.astro";
-import { getHome, updateId } from "../lib/portfolio";
-import { streamUpdate } from "../lib/labbook";
+import { getHome, getLabPage, getTicker, updateId } from "../lib/portfolio";
+import { streamUpdate, updateDateLabel } from "../lib/labbook";
 const site = (await getEntry("site", "config"))!.data;
 const home = await getHome();
 const labels = { kinds: site.updateKinds, sources: site.updateSources };
@@ -38,6 +40,8 @@ const updates = (await getCollection("updates")).flatMap(
     streamUpdate(updateId(entry), entry.data) ?? [],
 );
 const update = updates[0];
+const ticker = await getTicker();
+const { labbook } = await getLabPage();
 const colors = [
   ["Paper", "--color-page"],
   ["Burgundy", "--color-accent"],
@@ -342,6 +346,42 @@ const anatomy = [
         place. On the Bench a card is a picture or, with no cover, a slip of
         paper; on the Shelf it is a quiet row standing on its board. Type and
         era are optional and leave no separator behind.
+      </p>
+    </section>
+
+    <section class="specimen" aria-labelledby="labbook-specimen">
+      <SectionHeading id="labbook-specimen" title="The Labbook and the ticker" />
+      <Ticker headlines={ticker.headlines} copy={ticker.copy} />
+      <div class="spaced">
+        <UpdateEntry {...update} labels={labels} detailed connected>
+          <Artifact
+            slot="artifact"
+            artifact={{
+              kind: "pen",
+              src: "https://codepen.io/beejsbj/pen/abXZWLQ",
+              alt: "A lotus drawing itself, one line at a time",
+              poster: "/images/lab/motion-path-graph.svg",
+            }}
+            copy={labbook.artifact}
+          />
+        </UpdateEntry>
+        <UpdateEntry
+          date="2026-08-20"
+          dateLabel={updateDateLabel("2026-08-20")}
+          redacted={{
+            bars: [5, 3, 8, 4],
+            work: labbook.redacted.works.code,
+            label: labbook.redacted.label,
+          }}
+        />
+      </div>
+      <p class="annotation">
+        The ticker drifts at a reading pace, holds under a pointer and rests
+        for the keyboard; with motion reduced the headlines simply stand
+        there. In the Labbook an update may show an artifact: a Pen or a demo
+        waits on its stage until it is asked for, so nothing loads from
+        another site before the click. A redacted update is its shape and
+        nothing else: one struck bar for each number it was given.
       </p>
     </section>
 
