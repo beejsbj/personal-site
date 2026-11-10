@@ -5,12 +5,48 @@ The personal site presents Burooj's work as an apparently normal portfolio that 
 ## Language
 
 **Project**:
-A lasting piece of Burooj's work, from a small experiment to an ongoing undertaking such as bjslab. A project may have a detail page and multiple updates over time.
+A lasting piece of Burooj's work with a home of its own. A project may have a detail page and multiple updates over time; experiments may graduate into projects.
 _Avoid_: update, activity event
 
 **Update**:
-A dated account of something Burooj made, changed, published, or is doing. It may refer to a project, but does not require a project or a full case study.
-_Avoid_: project, raw commit log
+One dated entry in the Labbook: something Burooj made, changed, or published. It may refer to a project or experiment and may carry an artifact, but does not require a full case study.
+_Avoid_: project, slice, raw commit log
+
+**Labbook**:
+The complete, dated record of updates, like a lab notebook or a game journal. It holds everything that has been published; the ticker shows only its highlights.
+_Avoid_: journal, feed, changelog
+
+**Headline**:
+A short, possibly playful line written about one or more updates for the ticker. A headline always points back to the updates it describes.
+_Avoid_: update, announcement
+
+**Lab**:
+Burooj's workshop, seen through a window: a room the visitor steps into to watch work in progress, live and in history. Private things stay visibly redacted rather than hidden.
+_Avoid_: cockpit, dashboard, experiments list
+
+**bjslab**:
+Burooj's home lab, the real place the Lab is a window into. It feeds the room rather than appearing as an entry in it.
+_Avoid_: home server project, lab entry
+
+**Bench**:
+The part of the Lab holding experiments being worked on now.
+_Avoid_: active list, in-progress status
+
+**Shelf**:
+The part of the Lab holding experiments that have gone quiet, plus the archive of older work.
+_Avoid_: graveyard, archived status
+
+**Ticker**:
+The ambient, always-moving strip of headlines and live presence. It shows what is highlighted, not the full record.
+_Avoid_: feed, activity log
+
+**Experiment**:
+Exploratory work shown in the Lab, from a one-off sketch to a long-running line of tries. An experiment is a showcase of trying things: it may point straight to where it lives (a Pen, a demo, a deck) or tell its making as a short case study. It may graduate or go quiet.
+_Avoid_: thread, lab item
+
+**Graduation**:
+The moment an experiment becomes a dedicated push and gains a project of its own.
+_Avoid_: promotion, launch
 
 **Prism Portfolio**:
 The site experience where a normal portfolio is contained within a prism-like spatial frame that can later be exited, traversed, and re-entered through different lenses.
