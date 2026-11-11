@@ -899,9 +899,12 @@ function artifactFigure(b: Build, artifact: Artifact, key: string): HTMLElement 
  * when it has somewhere to go, text when it has not) and where it came
  * from; in the Labbook itself (`full`) it is also where a link to it would
  * land (its `id`), and it says what it is about and shows its artifact. A
- * redacted update is its day, the kind of work, and its words scribbled
- * out: one scribble for each bar of its shape, as long as the bar says.
- * Only its shape and date are read, whatever else arrives with it. */
+ * redacted update is its day, the kind of work, and its line: a word it
+ * shows written as a title is, and a scribble over each word it does not,
+ * one for each bar of its shape, as long as the bar says, running on and
+ * wrapping as a title does. Aloud, its words are read and each scribble
+ * is said once. Only its shape and date are read, whatever else arrives
+ * with it. */
 function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: boolean) {
   const { content, copy } = b;
   const words = content.pages.lab.labbook;
@@ -917,8 +920,7 @@ function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: bo
     ];
     const id = full ? labbookAnchor(u.id) : null;
     if (u.visibility !== "open") {
-      const { work } = u.shape;
-      const bars = u.shape.parts.filter((part) => typeof part === "number");
+      const { work, parts } = u.shape;
       const rng = seed(`struck-${u.id}`);
       list.append(
         h(
@@ -929,11 +931,22 @@ function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: bo
             "p",
             { class: "bp-log__struck" },
             h("span", { class: "bp-sr" }, words.redacted.label),
-            ...bars.map((bar) => {
-              const mark = h("span", { "data-redaction-bar": "", style: `--len:${bar}`, "aria-hidden": "true" });
-              mark.append(svg(scribbledOut(bar, BLUE, rng)));
-              return mark;
-            }),
+            h(
+              "span",
+              { class: "bp-log__line", "data-redaction-line": "" },
+              ...parts.flatMap((shown) => {
+                if (typeof shown === "string")
+                  return [h("span", { class: "bp-log__word", "data-redaction-word": "" }, shown), " "];
+                const bar = Number(shown) || 1;
+                const mark = h(
+                  "span",
+                  { "data-redaction-bar": "", style: `--len:${bar}` },
+                  h("span", { class: "bp-sr" }, words.redacted.bar),
+                );
+                mark.append(svg(scribbledOut(bar, BLUE, rng)));
+                return [mark, " "];
+              }),
+            ),
           ),
           h("p", { class: "bp-diary__src" }, words.redacted.works[work]),
         ),

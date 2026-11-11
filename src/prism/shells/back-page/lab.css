@@ -155,13 +155,21 @@
   outline: none;
 }
 
-/* an update scribbled out: each word gone under the pen */
+/* an update scribbled out: its line, the words it shows written as a
+   title is, each of the rest gone under the pen */
 :root[data-lens="back-page"] .bp-flow .bp-log__struck {
-  display: flex;
-  flex-wrap: wrap;
-  gap: calc(var(--lh) * 0.3) 0.85em;
   margin: calc(var(--lh) * 0.1) 0 calc(var(--lh) * 0.16);
   padding: 0 0.4em 0 0.1em;
+}
+:root[data-lens="back-page"] .bp-log__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--lh) * 0.3) 0.85em;
+}
+:root[data-lens="back-page"] .bp-log__word {
+  font: 700 1.3em / var(--lh) var(--bp-hand);
+  overflow-wrap: anywhere;
 }
 :root[data-lens="back-page"] .bp-log__struck [data-redaction-bar] {
   position: relative;

@@ -1,8 +1,8 @@
 /** Back Page's Lab (issue #98): what the parity test cannot see. The lab
  * book has a Bench and a Shelf with the featured experiment leading; the
  * Labbook is every update newest first, each where its links land, with
- * its artifact taped in; a redacted update is scribbles, and none of its
- * words; a Pen or a demo asks nothing of another site until asked; the
+ * its artifact taped in; a redacted update is scribbles with the few words
+ * it shows among them, and none of the words it hides; a Pen or a demo asks nothing of another site until asked; the
  * first page's diary is where the recent updates are, with no strip of
  * headlines there or in the lab book; and an experiment's page lists its
  * updates and the project it became.
@@ -27,6 +27,7 @@ import {
 } from "../../src/lib/labbook.ts";
 import { labPlaces } from "../../src/lib/rules.ts";
 import { REDACTION_MARKER } from "../../src/prism/labbook-fixture.ts";
+import { checkRedactedLine, redactedLine } from "./lib/redaction.mjs";
 
 const SIZES = {
   desktop: { viewport: { width: 1280, height: 800 } },
@@ -115,7 +116,6 @@ const updates = () => {
       bars: [...item.querySelectorAll("[data-redaction-bar]")].map((bar) => ({
         width: bar.getBoundingClientRect().width,
         inked: bar.querySelectorAll("svg path").length,
-        hidden: bar.getAttribute("aria-hidden") === "true",
       })),
       controls: item.querySelectorAll(
         "a, button, iframe, img, video, audio, [data-artifact]",
@@ -390,48 +390,57 @@ test(
         );
 
         await t.test(
-          `${size}: a redacted update is scribbles, its kind of work and its day, and none of its words`,
+          `${size}: a redacted update is scribbles, each said once, its kind of work and its day, and none of the words it hides`,
           async () => {
             const { context, page } = await open(
               size,
               harness("labbook", "/lab"),
             );
-            await turnTo(page, "[data-part='update.redacted']");
-            await shot(page, `redacted-${size}`);
-            const [entry] = (await page.evaluate(updates)).filter(
-              (item) => item.part === "update.redacted",
-            );
             const fixture = await fixtureContent(page);
             const kept = fixture.labbook.find(
               (update) => update.id === "fixture-kept-back",
             );
-            assert.equal(entry.id, kept.id);
+            const { parts } = kept.shape;
+            assert.ok(parts.every((part) => typeof part === "number"));
+            await turnTo(page, `#u-${kept.id}`);
+            await shot(page, `redacted-${size}`);
+            const entry = (await page.evaluate(updates)).find(
+              (item) => item.id === kept.id,
+            );
+            assert.equal(entry.part, "update.redacted");
+            const { redacted } = words.labbook;
             assert.equal(
               entry.text,
               [
                 day(kept.date),
-                words.labbook.redacted.label,
-                words.labbook.redacted.works[kept.shape.work],
+                redacted.label,
+                ...parts.map(() => redacted.bar),
+                redacted.works[kept.shape.work],
               ].join(" "),
-              "its day, that it is redacted, and the kind of work: no more",
+              "its day, that it is redacted, a word for each scribble and the kind of work: no more",
             );
             assert.equal(entry.controls, 0, "no link, picture or frame");
-            assert.equal(entry.bars.length, kept.shape.bars.length);
-            assert.ok(entry.bars.every((bar) => bar.hidden && bar.inked));
-            if (size === "desktop") {
-              // A longer number, a longer scribble: 5, 3, 8, 4.
-              const [five, three, eight, four] = entry.bars.map(
-                (bar) => bar.width,
-              );
-              assert.ok(
-                eight > five && five > four && four > three,
-                `${[five, three, eight, four]}`,
-              );
-            }
+            assert.equal(entry.bars.length, parts.length);
+            assert.ok(entry.bars.every((bar) => bar.inked));
+            const item = page.locator(`${OPEN} #u-${kept.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el
+                    .closest(".bp-page")
+                    .getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
             await context.close();
 
-            // The fixture's redacted update arrives with words it must not
-            // have. None reaches any page it could be on.
+            // The fixture's redacted updates arrive with words they must
+            // not have. None reaches any page they could be on.
             for (const path of [
               harness("labbook", "/lab"),
               harness("labbook", "/"),
@@ -448,6 +457,73 @@ test(
               );
               await book.context.close();
             }
+          },
+        );
+
+        await t.test(
+          `${size}: a redacted update may show a few of its words, in their places among its scribbles`,
+          async () => {
+            const { context, page, errors } = await open(
+              size,
+              harness("labbook", "/lab"),
+            );
+            const fixture = await fixtureContent(page);
+            const half = fixture.labbook.find(
+              (update) => update.id === "fixture-half-said",
+            );
+            const { parts } = half.shape;
+            assert.deepEqual(parts, ["Rewired", 4, 2, "the", 6]);
+            await turnTo(page, `#u-${half.id}`);
+            await shot(page, `redacted-mixed-${size}`);
+            const entry = (await page.evaluate(updates)).find(
+              (item) => item.id === half.id,
+            );
+            assert.equal(entry.part, "update.redacted");
+            const { redacted } = words.labbook;
+            assert.equal(
+              entry.text,
+              [
+                day(half.date),
+                redacted.label,
+                `Rewired ${redacted.bar} ${redacted.bar} the ${redacted.bar}`,
+                redacted.works[half.shape.work],
+              ].join(" "),
+              "its day, that it is redacted, its line and the kind of work: no more",
+            );
+            assert.equal(entry.controls, 0, "no link, picture or frame");
+            assert.equal(entry.bars.length, 3);
+            assert.ok(entry.bars.every((bar) => bar.inked));
+            const item = page.locator(`${OPEN} #u-${half.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el
+                    .closest(".bp-page")
+                    .getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            // The words are in the hand an update's title is written in.
+            const type = (selector) =>
+              page
+                .locator(`${OPEN} ${selector}`)
+                .first()
+                .evaluate((el) => {
+                  const { color, fontFamily, fontSize, fontWeight } =
+                    getComputedStyle(el);
+                  return { color, fontFamily, fontSize, fontWeight };
+                });
+            const word = await type(`#u-${half.id} [data-redaction-word]`);
+            await turnTo(page, ".bp-log .bp-diary__title");
+            assert.deepEqual(word, await type(".bp-log .bp-diary__title"));
+            assert.deepEqual(await page.evaluate(spills), []);
+            assert.deepEqual(errors, []);
+            await context.close();
           },
         );
 
@@ -916,7 +992,7 @@ test(
               assert.equal(entry.id, null);
               if (update.visibility !== "open") {
                 assert.equal(entry.part, "update.redacted");
-                assert.equal(entry.bars.length, update.shape.bars.length);
+                assert.equal(entry.bars.length, update.shape.parts.length);
                 assert.equal(entry.controls, 0);
                 continue;
               }
