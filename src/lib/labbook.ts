@@ -166,9 +166,9 @@ export function streamUpdate<T extends UpdateData>(
   update: T,
 ): InStream<T> | undefined {
   if (update.visibility !== "open") return undefined;
-  const { href, linkLabel, ...said } = update;
+  const { href, linkLabel, ...words } = update;
   return {
-    ...said,
+    ...words,
     dateLabel: update.dateLabel ?? updateDateLabel(update.date),
     ...(href ? { href, linkLabel: linkLabel ?? update.title } : {}),
   } as InStream<T>;
