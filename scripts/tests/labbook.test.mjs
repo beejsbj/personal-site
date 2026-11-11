@@ -223,7 +223,6 @@ test("content.json carries the Labbook and where each experiment sits, and no he
     assert.deepEqual(
       data.lab.map((entry) => [entry.slug, entry.place]),
       [
-        ["cockpit", "bench"],
         ["strudel-tools", "bench"],
         ["clockwork-observatory", "bench"],
         ["films-from-code", "bench"],
@@ -244,6 +243,13 @@ test("content.json carries the Labbook and where each experiment sits, and no he
         ["design-trampoline-logo", "shelf"],
         ["css-notebook", "shelf"],
       ],
+    );
+
+    // Cockpit is not an experiment, and none is featured in its place.
+    assert.ok(!data.lab.some((entry) => entry.slug === "cockpit"));
+    assert.deepEqual(
+      data.lab.filter((entry) => entry.featured),
+      [],
     );
 
     // What the lenses read today is all still there.
