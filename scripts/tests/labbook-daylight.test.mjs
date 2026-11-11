@@ -58,7 +58,7 @@ test("the schema refuses a redacted update that carries words", () => {
   assert.deepEqual(
     problems("updates", written),
     WORDS.map(
-      (field) => `${field}: A redacted update shows its shape and no words.`,
+      (field) => `${field}: A redacted update shows its shape and nothing else.`,
     ),
   );
   // Without them it is a redacted update the build accepts.
