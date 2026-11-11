@@ -2104,7 +2104,7 @@
   text-overflow: ellipsis;
 }
 
-:root[data-lens="cut-paper"] .cp-loc__title:hover {
+:root[data-lens="cut-paper"] a.cp-loc__title:hover {
   text-decoration: underline;
 }
 
@@ -2678,6 +2678,11 @@
 
 :root[data-lens="cut-paper"] .cp-arr__row--log {
   border-bottom: 0;
+}
+
+/* a flag on the log's lane is pressed to go to its line */
+:root[data-lens="cut-paper"] .cp-flag[data-flag] {
+  cursor: pointer;
 }
 
 /* a rest: a flag with nothing on it */

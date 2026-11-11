@@ -126,6 +126,7 @@ const labbook = (page) =>
         strips: item.querySelectorAll("[data-strip]").length,
         controls: item.querySelectorAll("a, button, iframe, video, audio")
           .length,
+        links: item.querySelectorAll("a").length,
       });
     }
     return {
@@ -166,6 +167,7 @@ const locators = (page) =>
           title: text(title.firstChild),
           href: title.getAttribute("href"),
           origin: text(item.querySelector("small")),
+          links: item.querySelectorAll("a").length,
         };
       }),
       // What lies in the view above the home grid.
@@ -449,6 +451,126 @@ test(
             );
             await shot(page, HERE, `cut-paper-landed-${size}`);
             await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: an update with nowhere to go is text, not a link, in the locators and in the Labbook`,
+          async () => {
+            const written = fixture.labbook.filter(
+              (update) => update.visibility === "open",
+            );
+            const nowhere = written.filter((update) => !update.href);
+            assert.ok(nowhere.length >= 2, "the fixture has such updates");
+            assert.ok(written.length > nowhere.length, "and ones that do go");
+            // Nothing in the view points at an update's place in the Labbook.
+            const pointers = (page) =>
+              page.locator("#lens-shell a[href*='#u-']").count();
+
+            const home = await open(size, harness("labbook", "/"));
+            const shown = (await locators(home.page)).items;
+            const stream = (
+              await home.page.evaluate(() => window.prismHarness.content)
+            ).updates.slice(0, content.pages.home.updates.limit);
+            assert.ok(
+              stream.some((update) => !update.href) &&
+                stream.some((update) => update.href),
+              "both kinds are among the recent updates",
+            );
+            assert.deepEqual(
+              shown.map(({ id, title, href, links }) => ({
+                id,
+                title,
+                href,
+                links,
+              })),
+              stream.map((update) => ({
+                id: update.id,
+                title: update.title,
+                href: update.href ?? null,
+                links: update.href ? 1 : 0,
+              })),
+            );
+            assert.equal(await pointers(home.page), 0);
+            assert.equal(await overflow(home.page), 0);
+            assert.deepEqual(home.errors, []);
+            await shot(
+              home.page,
+              "#lens-shell .cp-locators",
+              `cut-paper-home-nowhere-${size}`,
+            );
+            await home.context.close();
+
+            // The arrangement's Markers lane and, on a phone, the tape.
+            const session = await open(size, harness("labbook", "/projects"));
+            const marks = await session.page.evaluate(() => ({
+              flags: [
+                ...document.querySelectorAll(
+                  "#lens-shell .cp-lane--markers .cp-flag",
+                ),
+              ].map((flag) => flag.getAttribute("href")),
+              tape: [...document.querySelectorAll("#lens-shell .cp-tmark")].map(
+                (mark) => ({
+                  id: mark.dataset.ref,
+                  href: mark.querySelector("a")?.getAttribute("href") ?? null,
+                }),
+              ),
+            }));
+            const all = (
+              await session.page.evaluate(() => window.prismHarness.content)
+            ).updates;
+            assert.deepEqual(
+              [...marks.flags].sort(),
+              all.map((update) => update.href ?? null).sort(),
+              "a flag is a link only where its update goes somewhere",
+            );
+            assert.deepEqual(
+              marks.tape,
+              marks.tape.map(({ id }) => ({
+                id,
+                href: all.find((update) => update.id === id).href ?? null,
+              })),
+            );
+            assert.equal(await pointers(session.page), 0);
+            assert.deepEqual(session.errors, []);
+            await session.context.close();
+
+            const room = await open(size, ROOM);
+            const book = (await labbook(room.page)).entries;
+            for (const update of written) {
+              const entry = book.find((item) => item.id === update.id);
+              assert.equal(entry.title, update.title);
+              assert.equal(entry.href, update.href ?? null, update.id);
+            }
+            // With nothing it is about and nothing that lives elsewhere,
+            // such an update has no link in it at all.
+            for (const id of ["fixture-film", "fixture-tone"])
+              assert.equal(
+                book.find((entry) => entry.id === id).links,
+                0,
+                `${id} has no link in it`,
+              );
+            assert.equal(await pointers(room.page), 0);
+            // A flag on the lane still goes to its update's line: the
+            // oldest update's, the one no other flag lies over.
+            const oldest = (
+              await room.page.evaluate(() => window.prismHarness.content)
+            ).labbook.at(-1).id;
+            const flag = room.page.locator(
+              `#lens-shell [data-log='labbook'] .cp-flag[data-flag='u-${oldest}']`,
+            );
+            assert.equal(
+              await flag.evaluate((el) => el.tagName),
+              "SPAN",
+              "a flag is a pin, not a link",
+            );
+            await flag.evaluate((el) => el.scrollIntoView({ block: "center" }));
+            await flag.click({ position: { x: 3, y: 4 } });
+            await room.page.waitForSelector(
+              `#lens-shell #u-${oldest}[data-landed]`,
+            );
+            assert.deepEqual(room.errors, []);
+            await room.context.close();
           },
         );
 
@@ -846,7 +968,7 @@ test(
             assert.equal(shown.intro, updates.intro);
             assert.equal(shown.label, updates.listLabel);
             assert.deepEqual(
-              shown.items,
+              shown.items.map(({ links, ...item }) => item),
               content.updates.slice(0, updates.limit).map((update) => ({
                 id: update.id,
                 when: update.dateLabel,
@@ -914,15 +1036,17 @@ test(
             );
             const entry = (ref) =>
               book.entries.find((item) => item.ref === ref);
-            // With somewhere to go it goes there; with nowhere, to its
-            // line in the Labbook.
+            // With somewhere to go it goes there; with nowhere, it is
+            // text, not a link to its line in the Labbook.
             assert.equal(
               entry("fixture-study-replay").href,
               "https://codepen.io/beejsbj/pen/abXZWLQ",
             );
+            assert.equal(entry("fixture-study-first-line").href, null);
             assert.equal(
-              entry("fixture-study-first-line").href,
-              "/lab#u-fixture-study-first-line",
+              await page.locator("#lens-shell a[href*='#u-']").count(),
+              0,
+              "nothing points at the Labbook's lines",
             );
             const hidden = entry("fixture-study-kept-back");
             assert.equal(hidden.strips, 3);
