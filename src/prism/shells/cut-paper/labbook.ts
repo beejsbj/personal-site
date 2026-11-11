@@ -9,10 +9,12 @@
  *   are shown where they are. A Pen or a demo is a dark stage cut into the
  *   paper, with a play button: its frame is made only when that is pressed,
  *   in the stage's own room, so until then nothing is asked of another site.
- * - A redacted update is a rest: no bell, no link, and where its words
- *   would be, strips of black paper pasted over them, one for each number
- *   in its shape, a longer number a longer strip. Only its shape and its
- *   date are read.
+ * - A redacted update is a rest: no bell, no link, and where its title
+ *   would be, its line: a word it shows set as a title's words are, and a
+ *   strip of black paper pasted over each word it does not, one for each
+ *   number in its shape, a longer number a longer strip. The line wraps as
+ *   a title does. Only its shape and its date are read; aloud, its words
+ *   are read and each strip is said once.
  * - An update with nowhere to go is its title, not a link: nothing here
  *   links to an update's own line. A flag on the lane is a pin that goes
  *   to its line when pressed.
@@ -123,9 +125,14 @@ function line(env: Env, update: Update, index: number, whole: boolean) {
         h("span", { class: "cp-sr" }, words.redacted.label),
         h("p", { class: "cp-log__origin" }, words.redacted.works[update.shape.work]),
         h(
-          "div",
-          { class: "cp-strike", "aria-hidden": "true" },
-          update.shape.parts.filter((part) => typeof part === "number").map((length, i) => h("i", { "data-strip": "", style: `--len:${Number(length) || 1}; --tilt:${[-0.7, 0.5, -0.3, 0.8][i % 4]}deg` })),
+          "p",
+          { class: "cp-strike", "data-redaction-line": "" },
+          update.shape.parts.flatMap((shown, i) => [
+            typeof shown === "string"
+              ? h("span", { class: "cp-strike__word", "data-redaction-word": "" }, shown)
+              : h("span", { class: "cp-strike__strip", "data-strip": "", "data-redaction-bar": "", style: `--len:${Number(shown) || 1}; --tilt:${[-0.7, 0.5, -0.3, 0.8][i % 4]}deg` }, h("span", { class: "cp-sr" }, words.redacted.bar)),
+            " ",
+          ]),
         ),
       ),
     );

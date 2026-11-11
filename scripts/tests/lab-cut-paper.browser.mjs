@@ -22,6 +22,7 @@ import {
 } from "../../src/prism/labbook-fixture.ts";
 import { updateDateLabel } from "../../src/lib/labbook.ts";
 import { labPlaces } from "../../src/lib/rules.ts";
+import { checkRedactedLine, redactedLine } from "./lib/redaction.mjs";
 
 const phone = (width) => ({
   viewport: { width, height: 844 },
@@ -588,6 +589,7 @@ test(
                 "fixture-demo",
                 "fixture-replay",
                 "fixture-film",
+                "fixture-half-said",
                 "fixture-kept-back",
                 "fixture-first-line",
               ],
@@ -836,58 +838,61 @@ test(
         );
 
         await t.test(
-          `${size}: a redacted update is strips of black paper over its words, with a name a screen reader can say`,
+          `${size}: a redacted update is strips of black paper over its words, each said once, under a name a screen reader can say`,
           async () => {
             const { context, page } = await open(size, ROOM);
             const book = await labbook(page);
             const hidden = fixture.labbook.find(
-              (update) => update.visibility === "redacted",
+              (update) => update.id === "fixture-kept-back",
             );
+            const { parts } = hidden.shape;
+            assert.ok(parts.every((part) => typeof part === "number"));
             const entry = book.entries.find((item) => item.id === hidden.id);
             assert.equal(entry.part, "update.redacted");
             assert.equal(entry.ref, hidden.id);
-            assert.equal(entry.strips, hidden.shape.bars.length);
+            assert.equal(entry.strips, parts.length);
             assert.equal(entry.date, hidden.date);
             assert.equal(
               entry.text,
-              `${updateDateLabel(hidden.date)} ${copy.redacted.label} ${copy.redacted.works[hidden.shape.work]}`,
-              "its date, what it is, its kind of work: no other word",
+              [
+                updateDateLabel(hidden.date),
+                copy.redacted.label,
+                copy.redacted.works[hidden.shape.work],
+                ...parts.map(() => copy.redacted.bar),
+              ].join(" "),
+              "its date, what it is, its kind of work, a word for each strip: no other word",
             );
             assert.equal(entry.controls, 0, "nothing to follow or play");
             assert.deepEqual(entry.related, []);
             assert.deepEqual(entry.pictures, []);
+            const item = page.locator(`#lens-shell #u-${hidden.id}`);
             assert.equal(
-              await page
-                .locator(`#lens-shell #u-${hidden.id}`)
+              await item
                 .getByText(copy.redacted.label, { exact: true })
                 .count(),
               1,
               "it is named for assistive technology",
             );
-            const strike = await page.evaluate((id) => {
-              const struck = document.querySelector(
-                `#lens-shell #u-${id} .cp-strike`,
-              );
-              const paper = getComputedStyle(struck.closest("ol"));
-              return {
-                hidden: struck.getAttribute("aria-hidden") === "true",
-                paper: paper.backgroundColor,
-                strips: [...struck.querySelectorAll("[data-strip]")].map(
-                  (strip) => {
-                    const { width, height } = strip.getBoundingClientRect();
-                    return {
-                      width,
-                      height,
-                      ink: getComputedStyle(strip).backgroundColor,
-                      shown: strip.checkVisibility(),
-                    };
-                  },
-                ),
-              };
-            }, hidden.id);
-            assert.ok(strike.hidden, "the strips say nothing");
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            const strike = await item.evaluate((el) => ({
+              paper: getComputedStyle(el.closest("ol")).backgroundColor,
+              strips: [...el.querySelectorAll("[data-strip]")].map((strip) => ({
+                height: strip.getBoundingClientRect().height,
+                ink: getComputedStyle(strip).backgroundColor,
+              })),
+            }));
             for (const strip of strike.strips) {
-              assert.ok(strip.shown);
               assert.ok(
                 strip.height > 8,
                 "a strip is tall enough to hide a word",
@@ -895,16 +900,6 @@ test(
               assert.equal(strip.ink, "rgb(10, 9, 8)", "black paper");
               assert.notEqual(strip.ink, strike.paper, "on paper that is not");
             }
-            // Longer numbers, longer strips.
-            const order = (list) =>
-              list
-                .map((value, index) => [value, index])
-                .sort(([a], [b]) => a - b)
-                .map(([, index]) => index);
-            assert.deepEqual(
-              order(strike.strips.map((strip) => strip.width)),
-              order(hidden.shape.bars),
-            );
             assert.ok(
               !(await page.content()).includes(REDACTION_MARKER),
               "nothing it hides is in the page",
@@ -913,6 +908,73 @@ test(
               page,
               `#lens-shell #u-${hidden.id}`,
               `cut-paper-redacted-${size}`,
+              "center",
+            );
+            await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: a redacted update may show a few of its words, in their places among its strips`,
+          async () => {
+            const { context, page, errors } = await open(size, ROOM);
+            const book = await labbook(page);
+            const half = fixture.labbook.find(
+              (update) => update.id === "fixture-half-said",
+            );
+            const { parts } = half.shape;
+            assert.deepEqual(parts, ["Rewired", 4, 2, "the", 6]);
+            const entry = book.entries.find((item) => item.id === half.id);
+            assert.equal(entry.part, "update.redacted");
+            assert.equal(entry.strips, 3);
+            assert.equal(
+              entry.text,
+              [
+                updateDateLabel(half.date),
+                copy.redacted.label,
+                copy.redacted.works[half.shape.work],
+                `Rewired ${copy.redacted.bar} ${copy.redacted.bar} the ${copy.redacted.bar}`,
+              ].join(" "),
+              "its date, what it is, its kind of work and its line: no other word",
+            );
+            assert.equal(entry.controls, 0, "nothing to follow or play");
+            const item = page.locator(`#lens-shell #u-${half.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            // The words are set as an update's title is, in the log's ink.
+            const type = (selector) =>
+              page
+                .locator(`#lens-shell ${selector}`)
+                .first()
+                .evaluate((el) => {
+                  const { color, fontFamily, fontSize, textTransform } =
+                    getComputedStyle(el);
+                  return { color, fontFamily, fontSize, textTransform };
+                });
+            assert.deepEqual(
+              await type(`#u-${half.id} [data-redaction-word]`),
+              await type("[data-log='labbook'] .cp-log__title"),
+            );
+            assert.equal(await overflow(page), 0);
+            assert.ok(
+              !(await page.content()).includes(REDACTION_MARKER),
+              "nothing it hides is in the page",
+            );
+            assert.deepEqual(errors, []);
+            await shot(
+              page,
+              `#lens-shell #u-${half.id}`,
+              `cut-paper-redacted-mixed-${size}`,
               "center",
             );
             await context.close();
@@ -1053,8 +1115,8 @@ test(
             assert.equal(hidden.controls, 0);
             assert.equal(
               hidden.text,
-              `20 Aug 2026 ${copy.redacted.label} ${copy.redacted.works.code}`,
-              "its date, what it is, its kind of work: no other word",
+              `20 Aug 2026 ${copy.redacted.label} ${copy.redacted.works.code} ${copy.redacted.bar} ${copy.redacted.bar} ${copy.redacted.bar}`,
+              "its date, what it is, its kind of work, a word for each strip: no other word",
             );
             assert.ok(
               !(await page.content()).includes(REDACTION_MARKER),
