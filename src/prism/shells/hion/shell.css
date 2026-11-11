@@ -3359,16 +3359,26 @@
   position: relative;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.6em 0.75em;
   margin: 0.3em 0 0.5em;
   font-size: 1.5rem;
 }
 
-:root[data-lens="hion"] .hion-bound > span {
+:root[data-lens="hion"] .hion-bound > [data-redaction-bar] {
   --hion-bar: 1;
+  position: relative;
   width: calc(var(--hion-bar) * 0.8em);
   max-width: 100%;
   height: 0.8em;
+}
+
+/* A word it shows is a title's word (.hion-tied__title): written by the
+   thread, over the bindings' own drawing. */
+:root[data-lens="hion"] .hion-bound > .hion-bound__word {
+  position: relative;
+  z-index: 1;
+  text-wrap: wrap;
 }
 
 :root[data-lens="hion"] .hion-bound > .hion-ink {

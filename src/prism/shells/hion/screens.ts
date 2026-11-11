@@ -730,14 +730,26 @@ function artifact(content: SiteContent, shown: Artifact, hue: "c" | "m") {
   );
 }
 
-/** A redacted update's words, bound: thread wound tight round each one, a
- * longer number a longer binding (ink.ts `bound`). The site is given the
- * lengths and never the words; the bindings say nothing aloud. */
-function bound(bars: number[], hue: "c" | "m") {
+/** A redacted update's line: a word it shows written by the thread as a
+ * title's words are, and each word it does not, bound: thread wound tight
+ * round it, a longer number a longer binding (ink.ts `bound`). The line
+ * runs on and wraps as a title does. The site is given the words it shows
+ * and the lengths of the rest; aloud, the words are read and each binding
+ * is said once, as `said`. */
+function bound(parts: (string | number)[], said: string, hue: "c" | "m") {
   return h(
     "p",
-    { class: "hion-bound", "aria-hidden": "true", "data-ink": "bound", "data-seed": nextSeed(), "data-hue": hue },
-    bars.map((bar) => h("span", { "data-redaction-bar": "", style: `--hion-bar:${Number(bar) || 1}` })),
+    { class: "hion-bound", "data-redaction-line": "", "data-ink": "bound", "data-seed": nextSeed(), "data-hue": hue },
+    parts.flatMap((shown) => [
+      typeof shown === "string"
+        ? h("span", { class: "hion-tied__title hion-bound__word", "data-redaction-word": "" }, shown)
+        : h(
+            "span",
+            { "data-redaction-bar": "", style: `--hion-bar:${Number(shown) || 1}` },
+            h("span", { class: "hion-sr" }, said),
+          ),
+      " ",
+    ]),
   );
 }
 
@@ -745,7 +757,8 @@ function bound(bars: number[], hue: "c" | "m") {
  * its title (a link when it has somewhere to go, text when it has not),
  * where it came from and its summary, and in the Labbook (`whole`) what it
  * shows for itself and what it is about. A redacted one is its date, its
- * bindings and its kind of work: nothing else of it is read. */
+ * line (the words it shows, and its bindings) and its kind of work:
+ * nothing else of it is read. */
 function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: boolean) {
   const copy = content.pages.lab.labbook;
   const hue = i % 2 ? "m" : "c";
@@ -764,7 +777,7 @@ function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: b
         when,
         {},
         h("p", { class: "hion-sr" }, copy.redacted.label),
-        bound(shape.parts.filter((part) => typeof part === "number"), hue),
+        bound(shape.parts, copy.redacted.bar, hue),
         h("p", { class: "hion-meta" }, copy.redacted.works[shape.work]),
       ),
     );

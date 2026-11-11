@@ -22,6 +22,7 @@ import {
 } from "../../src/prism/labbook-fixture.ts";
 import { updateDateLabel } from "../../src/lib/labbook.ts";
 import { labPlaces } from "../../src/lib/rules.ts";
+import { checkRedactedLine, redactedLine } from "./lib/redaction.mjs";
 
 const SIZES = {
   desktop: { viewport: { width: 1280, height: 800 } },
@@ -500,6 +501,7 @@ test(
                 "fixture-demo",
                 "fixture-replay",
                 "fixture-film",
+                "fixture-half-said",
                 "fixture-kept-back",
                 "fixture-first-line",
               ],
@@ -694,70 +696,153 @@ test(
         );
 
         await t.test(
-          `${size}: a redacted update is its bindings, with a name a screen reader can say`,
+          `${size}: a redacted update is its bindings, each said once, under a name a screen reader can say`,
           async () => {
             const { context, page } = await open(size, ROOM);
             const book = await labbook(page);
             const hidden = fixture.labbook.find(
-              (update) => update.visibility === "redacted",
+              (update) => update.id === "fixture-kept-back",
             );
+            const { parts } = hidden.shape;
+            assert.ok(parts.every((part) => typeof part === "number"));
             const entry = book.entries.find((item) => item.id === hidden.id);
             assert.equal(entry.part, "update.redacted");
             assert.equal(entry.ref, hidden.id);
-            assert.equal(entry.bars, hidden.shape.bars.length);
+            assert.equal(entry.bars, parts.length);
             assert.equal(entry.date, hidden.date);
             assert.equal(
               entry.text,
-              `${updateDateLabel(hidden.date)} ${copy.redacted.label} ${copy.redacted.works[hidden.shape.work]}`,
-              "its date, what it is, its kind of work: no other word",
+              [
+                updateDateLabel(hidden.date),
+                copy.redacted.label,
+                ...parts.map(() => copy.redacted.bar),
+                copy.redacted.works[hidden.shape.work],
+              ].join(" "),
+              "its date, what it is, a word for each binding, its kind of work: no other word",
             );
             assert.equal(entry.controls, 0, "nothing to follow or play");
             assert.deepEqual(entry.related, []);
             assert.deepEqual(entry.pictures, []);
+            const item = page.locator(`#lens-shell #u-${hidden.id}`);
             assert.equal(
-              await page
-                .locator(`#u-${hidden.id}`)
+              await item
                 .getByText(copy.redacted.label, { exact: true })
                 .count(),
               1,
               "it is named for assistive technology",
             );
-            const bars = await page.evaluate((id) => {
-              const bound = document.querySelector(`#u-${id} .hion-bound`);
-              const canvas = bound.querySelector("canvas");
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            const bound = await item.evaluate((el) => {
+              const canvas = el.querySelector(".hion-bound canvas");
               return {
-                hidden: bound.getAttribute("aria-hidden") === "true",
                 wound: !!canvas && canvas.width > 0 && canvas.checkVisibility(),
-                bars: [...bound.querySelectorAll("[data-redaction-bar]")].map(
-                  (bar) => {
-                    const { width, height } = bar.getBoundingClientRect();
-                    return { width, height };
-                  },
+                heights: [...el.querySelectorAll("[data-redaction-bar]")].map(
+                  (bar) => bar.getBoundingClientRect().height,
                 ),
               };
-            }, hidden.id);
-            assert.ok(bars.hidden, "the bindings say nothing");
-            assert.ok(bars.wound, "thread is wound round them");
-            for (const bar of bars.bars)
-              assert.ok(
-                bar.height > 8,
-                "a binding is tall enough to hide a word",
-              );
-            // Longer numbers, longer bindings.
-            const order = (list) =>
-              list
-                .map((value, index) => [value, index])
-                .sort(([a], [b]) => a - b)
-                .map(([, index]) => index);
-            assert.deepEqual(
-              order(bars.bars.map((bar) => bar.width)),
-              order(hidden.shape.bars),
-            );
+            });
+            assert.ok(bound.wound, "thread is wound round them");
+            for (const height of bound.heights)
+              assert.ok(height > 8, "a binding is tall enough to hide a word");
             assert.ok(
               !(await page.content()).includes(REDACTION_MARKER),
               "nothing it hides is in the page",
             );
             await shot(page, `#u-${hidden.id}`, `hion-redacted-${size}`);
+            await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: a redacted update may show a few of its words, in their places among its bindings`,
+          async () => {
+            const { context, page, errors } = await open(size, ROOM);
+            const book = await labbook(page);
+            const half = fixture.labbook.find(
+              (update) => update.id === "fixture-half-said",
+            );
+            const { parts } = half.shape;
+            assert.deepEqual(parts, ["Rewired", 4, 2, "the", 6]);
+            const entry = book.entries.find((item) => item.id === half.id);
+            assert.equal(entry.part, "update.redacted");
+            assert.equal(entry.bars, 3);
+            assert.equal(
+              entry.text,
+              [
+                updateDateLabel(half.date),
+                copy.redacted.label,
+                `Rewired ${copy.redacted.bar} ${copy.redacted.bar} the ${copy.redacted.bar}`,
+                copy.redacted.works[half.shape.work],
+              ].join(" "),
+              "its date, what it is, its line and its kind of work: no other word",
+            );
+            assert.equal(entry.controls, 0, "nothing to follow or play");
+            const item = page.locator(`#lens-shell #u-${half.id}`);
+            await item.evaluate((el) => el.scrollIntoView({ block: "center" }));
+            await page.waitForTimeout(900);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            // The words are set as an update's title is, and written by
+            // the thread as a title is: the same face, and no more left
+            // unwritten than a title beside them.
+            const type = (selector) =>
+              page
+                .locator(`#lens-shell ${selector}`)
+                .first()
+                .evaluate((el) => {
+                  const { fontFamily, fontSize, letterSpacing } =
+                    getComputedStyle(el);
+                  return {
+                    fontFamily,
+                    fontSize,
+                    letterSpacing,
+                    written: el.dataset.spunState ?? null,
+                  };
+                });
+            const title = "#u-fixture-film .hion-tied__title";
+            await page
+              .locator(`#lens-shell ${title}`)
+              .evaluate((el) => el.scrollIntoView({ block: "center" }));
+            await page.waitForTimeout(900);
+            assert.deepEqual(
+              await type(`#u-${half.id} [data-redaction-word]`),
+              await type(title),
+            );
+            assert.ok(
+              await item.evaluate((el) => {
+                const canvas = el.querySelector(".hion-bound canvas");
+                return !!canvas && canvas.width > 0 && canvas.checkVisibility();
+              }),
+              "thread is wound round its bindings",
+            );
+            assert.equal(await overflow(page), 0);
+            assert.ok(
+              !(await page.content()).includes(REDACTION_MARKER),
+              "nothing it hides is in the page",
+            );
+            assert.deepEqual(errors, []);
+            await shot(page, `#u-${half.id}`, `hion-redacted-mixed-${size}`);
             await context.close();
           },
         );
