@@ -231,9 +231,8 @@ export function tendLog(env: Env, view: HTMLElement) {
   // back and forward, and an address typed in
   addEventListener("hashchange", () => land(), { signal });
   addEventListener("popstate", () => land(), { signal });
-  // a link in this view to an update in this view (a headline on the Lab's
-  // own ribbon, a flag on the lane): the router moves the address and tells
-  // no one
+  // a link in this view to an update in this view (a flag on the lane): the
+  // router moves the address and tells no one
   view.addEventListener(
     "click",
     (event) => {
