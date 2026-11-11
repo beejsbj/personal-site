@@ -69,6 +69,8 @@ const places = () =>
       newTab: link.target === "_blank",
       arrow: !!el.querySelector(".bp-out"),
       featured: !!el.closest("[data-featured]"),
+      // how large its name is written
+      size: parseFloat(getComputedStyle(el).fontSize),
     };
   });
 
@@ -252,7 +254,7 @@ test(
     try {
       for (const size of Object.keys(SIZES)) {
         await t.test(
-          `${size}: the lab book has a Bench and a Shelf, the featured experiment leading`,
+          `${size}: the lab book has a Bench and a Shelf, each in the shared order`,
           async () => {
             const { context, page, errors } = await open(size, real("/lab"));
             const views = await leaf(page, places, `lab-${size}`);
@@ -310,6 +312,83 @@ test(
               "no line for a type or an era, and no empty one",
             );
             await bare.context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: the Bench with one experiment featured, and with none`,
+          async () => {
+            const bench = async (fixture) => {
+              const { context, page, errors } = await open(
+                size,
+                harness(fixture, "/lab"),
+              );
+              const { lab } = await fixtureContent(page);
+              const expected = labPlaces(lab).find(
+                ({ place }) => place === "bench",
+              ).entries;
+              const views = await leaf(
+                page,
+                [places, spills],
+                `bench-${fixture.replace("lab-", "")}-${size}`,
+              );
+              const shown = views
+                .flatMap(([seen]) => seen)
+                .filter((item) => item.slug)
+                .slice(0, expected.length);
+              assert.deepEqual(
+                views.flatMap(([, spilt]) => spilt),
+                [],
+                `${fixture}: nothing runs off its page`,
+              );
+              assert.deepEqual(errors, []);
+              await context.close();
+              return { expected, shown };
+            };
+
+            // One featured: the last on the Bench by order, so it leads
+            // only because it is featured.
+            const withOne = await bench("lab-featured");
+            assert.ok(
+              withOne.expected[0].featured &&
+                withOne.expected[0].order > withOne.expected[1].order,
+              "the fixture features the last experiment by order",
+            );
+            assert.deepEqual(
+              withOne.shown.map((item) => item.slug),
+              withOne.expected.map((entry) => entry.slug),
+              "it leads the Bench",
+            );
+            assert.deepEqual(
+              withOne.shown.map((item) => item.featured),
+              withOne.shown.map((_, i) => i === 0),
+              "one experiment has pride of place",
+            );
+            const [lead, ...rest] = withOne.shown;
+            assert.ok(
+              rest.every((item) => item.size < lead.size),
+              "and its name is written larger than the rest",
+            );
+
+            // None featured: the same Bench in its plain order, every
+            // name written the one size.
+            const without = await bench("lab-none-featured");
+            assert.ok(without.expected.every((entry) => !entry.featured));
+            assert.deepEqual(
+              without.shown.map((item) => item.slug),
+              without.expected.map((entry) => entry.slug),
+              "the Bench in its own order",
+            );
+            assert.deepEqual(
+              without.shown.filter((item) => item.featured),
+              [],
+              "no experiment is marked as featured",
+            );
+            assert.deepEqual(
+              [...new Set(without.shown.map((item) => item.size))],
+              [rest[0].size],
+              "and every name is written the plain size",
+            );
           },
         );
 

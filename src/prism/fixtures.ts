@@ -506,6 +506,34 @@ export const FIXTURES: Record<string, Fixture> = {
     },
     routes: () => [{ kind: "resume", path: "/about/resume" }],
   },
+  "lab-featured": {
+    name: "lab-featured",
+    about:
+      "A Bench with one experiment given pride of place: the last on it by order, so it leads only because it is featured.",
+    apply(content) {
+      const lead = content.lab
+        .filter((entry) => entry.place === "bench")
+        .at(-1);
+      return settle({
+        ...content,
+        lab: content.lab.map((entry) => ({
+          ...entry,
+          featured: entry === lead,
+        })),
+      });
+    },
+    routes: () => [{ kind: "lab", path: "/lab" }],
+  },
+  "lab-none-featured": {
+    name: "lab-none-featured",
+    about: "A Lab with no experiment given pride of place.",
+    apply: (content) =>
+      settle({
+        ...content,
+        lab: content.lab.map((entry) => ({ ...entry, featured: undefined })),
+      }),
+    routes: () => [{ kind: "lab", path: "/lab" }],
+  },
   "lab-no-cover": {
     name: "lab-no-cover",
     about: "A lab entry with its own page and no cover.",

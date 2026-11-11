@@ -272,7 +272,7 @@ test(
     try {
       for (const size of Object.keys(SIZES)) {
         await t.test(
-          `${size}: /lab arms the Bench and mutes the Shelf, the featured experiment leading`,
+          `${size}: /lab arms the Bench and mutes the Shelf, each in the shared order`,
           async () => {
             const { context, page, errors } = await open(
               size,
@@ -321,25 +321,15 @@ test(
                 `the ${group.place} says what it is`,
               );
             }
+            // Pride of place is given as the content gives it: to one
+            // experiment, or to none (both are looked at on fixtures below).
             const bench = room.find(({ place }) => place === "bench");
-            const lead = content.lab.find(
-              (entry) => entry.place === "bench" && entry.featured,
+            assert.deepEqual(
+              bench.entries.map((entry) => entry.featured),
+              expected
+                .find(({ place }) => place === "bench")
+                .entries.map((entry) => !!entry.featured),
             );
-            if (lead) {
-              assert.equal(bench.entries[0].slug, lead.slug);
-              assert.deepEqual(
-                bench.entries.map((entry) => entry.featured),
-                bench.entries.map((_, i) => i === 0),
-                "one experiment has pride of place",
-              );
-              if (size === "desktop")
-                assert.ok(
-                  bench.entries
-                    .slice(1)
-                    .every((entry) => entry.width < bench.entries[0].width),
-                  "and it is given more room than the rest",
-                );
-            }
             assert.equal(
               await page.locator("#lens-shell [data-part='lab.meta']").count(),
               0,
@@ -363,6 +353,95 @@ test(
               `cut-paper-shelf-${size}`,
             );
             await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: the Bench with one experiment featured, and with none`,
+          async () => {
+            const benchOf = async (page) => {
+              const { lab } = await page.evaluate(
+                () => window.prismHarness.content,
+              );
+              return {
+                expected: labPlaces(lab).find(({ place }) => place === "bench")
+                  .entries,
+                shown: (await places(page)).find(
+                  ({ place }) => place === "bench",
+                ).entries,
+              };
+            };
+
+            // One featured: the last on the Bench by order, so it leads
+            // only because it is featured.
+            const one = await open(size, harness("lab-featured", "/lab"));
+            const withOne = await benchOf(one.page);
+            assert.ok(
+              withOne.expected[0].featured &&
+                withOne.expected[0].order > withOne.expected[1].order,
+              "the fixture features the last experiment by order",
+            );
+            assert.deepEqual(
+              withOne.shown.map((entry) => entry.slug),
+              withOne.expected.map((entry) => entry.slug),
+              "it leads the Bench",
+            );
+            assert.deepEqual(
+              withOne.shown.map((entry) => entry.featured),
+              withOne.shown.map((_, i) => i === 0),
+              "one experiment has pride of place",
+            );
+            const [lead, ...rest] = withOne.shown;
+            if (size === "desktop")
+              assert.ok(
+                rest.every((entry) => entry.width < lead.width),
+                "and it is given more room than the rest",
+              );
+            assert.equal(
+              await overflow(one.page),
+              0,
+              "nothing wider than the screen",
+            );
+            assert.deepEqual(one.errors, []);
+            await shot(
+              one.page,
+              "#lens-shell [data-lab-place='bench']",
+              `cut-paper-bench-featured-${size}`,
+            );
+            await one.context.close();
+
+            // None featured: the same Bench in its plain order, no
+            // experiment marked and none given the featured one's room.
+            const none = await open(size, harness("lab-none-featured", "/lab"));
+            const without = await benchOf(none.page);
+            assert.ok(without.expected.every((entry) => !entry.featured));
+            assert.deepEqual(
+              without.shown.map((entry) => entry.slug),
+              without.expected.map((entry) => entry.slug),
+              "the Bench in its own order",
+            );
+            assert.deepEqual(
+              without.shown.filter((entry) => entry.featured),
+              [],
+              "no experiment is marked as featured",
+            );
+            if (size === "desktop")
+              assert.ok(
+                without.shown.every((entry) => entry.width < lead.width),
+                "and none is given the featured one's room",
+              );
+            assert.equal(
+              await overflow(none.page),
+              0,
+              "nothing wider than the screen",
+            );
+            assert.deepEqual(none.errors, []);
+            await shot(
+              none.page,
+              "#lens-shell [data-lab-place='bench']",
+              `cut-paper-bench-none-featured-${size}`,
+            );
+            await none.context.close();
           },
         );
 

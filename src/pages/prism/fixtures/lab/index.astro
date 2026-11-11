@@ -2,9 +2,9 @@
 /** Daylight's side of the fuzz harness for the Lab itself: the room on
  * fixture experiments, with a fixture Labbook, so every state can be seen
  * and tested whatever src/content holds. /prism/fixtures/lab is a full
- * room; ?fixture=shelf-only has nothing on the Bench and
- * ?fixture=no-covers has no pictures. ?labbook=none is a Lab with no
- * updates. scripts/tests/lab-daylight.browser.mjs and
+ * room; ?fixture=shelf-only has nothing on the Bench,
+ * ?fixture=no-covers has no pictures and ?fixture=no-featured gives no
+ * experiment pride of place. ?labbook=none is a Lab with no updates. scripts/tests/lab-daylight.browser.mjs and
  * labbook-daylight.browser.mjs read it. Rendered on demand: its page
  * entries point at /lab/<slug>, where nothing is built. */
 import type { ComponentProps } from "astro/types";
@@ -91,6 +91,7 @@ const fixtures: Record<string, Entries> = {
   room,
   "shelf-only": room.filter((entry) => entry.place === "shelf"),
   "no-covers": room.map((entry) => ({ ...entry, cover: undefined })),
+  "no-featured": room.map((entry) => ({ ...entry, featured: undefined })),
 };
 const asked = Astro.url.searchParams;
 const entries = fixtures[asked.get("fixture") ?? "room"];
