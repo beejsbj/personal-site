@@ -13,7 +13,6 @@ import BallNav from "../design/unique/BallNav.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
 import Artifact from "../design/compounds/Artifact.astro";
-import Ticker from "../design/unique/Ticker.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import ProjectRow from "../components/ProjectRow.astro";
@@ -22,7 +21,7 @@ import LabCard from "../components/LabCard.astro";
 import PageHeader from "../components/PageHeader.astro";
 import SectionIntro from "../components/SectionIntro.astro";
 import MediaRail from "../components/MediaRail.astro";
-import { getHome, getLabPage, getTicker, updateId } from "../lib/portfolio";
+import { getHome, getLabPage, updateId } from "../lib/portfolio";
 import { streamUpdate, updateDateLabel } from "../lib/labbook";
 const site = (await getEntry("site", "config"))!.data;
 const home = await getHome();
@@ -40,7 +39,6 @@ const updates = (await getCollection("updates")).flatMap(
     streamUpdate(updateId(entry), entry.data) ?? [],
 );
 const update = updates[0];
-const ticker = await getTicker();
 const { labbook } = await getLabPage();
 const colors = [
   ["Paper", "--color-page"],
@@ -349,9 +347,8 @@ const anatomy = [
     </section>
 
     <section class="specimen" aria-labelledby="labbook-specimen">
-      <SectionHeading id="labbook-specimen" title="The Labbook and the ticker" />
-      <Ticker headlines={ticker.headlines} copy={ticker.copy} />
-      <div class="spaced">
+      <SectionHeading id="labbook-specimen" title="The Labbook" />
+      <div>
         <UpdateEntry {...update} labels={labels} detailed connected>
           <Artifact
             slot="artifact"
@@ -375,12 +372,10 @@ const anatomy = [
         />
       </div>
       <p class="annotation">
-        The ticker drifts at a reading pace, holds under a pointer and rests
-        for the keyboard; with motion reduced the headlines simply stand
-        there. In the Labbook an update may show an artifact: a Pen or a demo
-        waits on its stage until it is asked for, so nothing loads from
-        another site before the click. A redacted update is its shape and
-        nothing else: one struck bar for each number it was given.
+        In the Labbook an update may show an artifact: a Pen or a demo waits
+        on its stage until it is asked for, so nothing loads from another
+        site before the click. A redacted update is its shape and nothing
+        else: one struck bar for each number it was given.
       </p>
     </section>
 

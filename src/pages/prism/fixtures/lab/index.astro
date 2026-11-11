@@ -1,33 +1,25 @@
 ---
 /** Daylight's side of the fuzz harness for the Lab itself: the room on
- * fixture experiments, with a fixture Labbook and ticker, so every state
- * can be seen and tested whatever src/content holds. /prism/fixtures/lab is
- * a full room; ?fixture=shelf-only has nothing on the Bench and
- * ?fixture=no-covers has no pictures. ?headlines=one leaves the ticker one
- * headline and ?headlines=none leaves it none; ?labbook=none is a Lab with
- * no updates. scripts/tests/lab-daylight.browser.mjs and
+ * fixture experiments, with a fixture Labbook, so every state can be seen
+ * and tested whatever src/content holds. /prism/fixtures/lab is a full
+ * room; ?fixture=shelf-only has nothing on the Bench and
+ * ?fixture=no-covers has no pictures. ?labbook=none is a Lab with no
+ * updates. scripts/tests/lab-daylight.browser.mjs and
  * labbook-daylight.browser.mjs read it. Rendered on demand: its page
  * entries point at /lab/<slug>, where nothing is built. */
 import type { ComponentProps } from "astro/types";
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import LabRoom from "../../../../components/LabRoom.astro";
 import Labbook from "../../../../components/Labbook.astro";
-import Ticker from "../../../../design/unique/Ticker.astro";
-import { penUser, publishedHeadlines } from "../../../../lib/labbook";
-import {
-  getLabPage,
-  getRelatable,
-  getSite,
-  getTicker,
-} from "../../../../lib/portfolio";
+import { penUser } from "../../../../lib/labbook";
+import { getLabPage, getRelatable, getSite } from "../../../../lib/portfolio";
 import { labbookFixture } from "../../../../prism/labbook-fixture";
 
 export const prerender = false;
 
-const [page, site, ticker, relatable] = await Promise.all([
+const [page, site, relatable] = await Promise.all([
   getLabPage(),
   getSite(),
-  getTicker(),
   getRelatable(),
 ]);
 type Entries = ComponentProps<typeof LabRoom>["entries"];
@@ -111,20 +103,10 @@ const written = labbookFixture({
   project: relatable.projects[0]?.slug,
 });
 const labbook = asked.get("labbook") === "none" ? [] : written.labbook;
-const published = publishedHeadlines(written.headlines, written.labbook);
-const headlines =
-  { none: [], one: published.slice(0, 1) }[asked.get("headlines") ?? ""] ??
-  published;
 ---
 
 <BaseLayout title="Lab fixture" pageClass="page-lab" tool>
   <LabRoom page={page} entries={entries}>
-    <Ticker
-      slot="ticker"
-      class="shell"
-      headlines={headlines}
-      copy={ticker.copy}
-    />
     <Labbook
       slot="labbook"
       class="shell page-section"
