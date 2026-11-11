@@ -23,7 +23,6 @@ import {
   embedSrc,
   experimentUpdates,
   labbookAnchor,
-  labbookHref,
   penUser,
   relatedLinks,
   updateDateLabel,
@@ -429,7 +428,8 @@ function home(content: SiteContent) {
   );
 
   // Off the loops: the hions run down together here, knotted at each
-  // update, and the updates are tied on either side of them.
+  // update, and the updates are tied on either side of them. An update
+  // with nowhere to go is its title, not a link.
   const signals = h(
     "section",
     { class: "hion-strand hion-strand--updates", "aria-labelledby": "hion-home-updates" },
@@ -450,7 +450,7 @@ function home(content: SiteContent) {
           knotted(
             h("time", { datetime: update.date }, update.dateLabel),
             {},
-            h("p", { class: "hion-tied__title" }, link(update.href, {}, update.title)),
+            h("p", { class: "hion-tied__title" }, update.href ? link(update.href, {}, update.title) : update.title),
             h("p", { class: "hion-meta" }, `${update.sourceLabel} · ${update.kindLabel}`),
           ),
         ),
@@ -742,11 +742,10 @@ function bound(bars: number[], hue: "c" | "m") {
 }
 
 /** One update, knotted on the strand: its date level with the knot, then
- * its title, where it came from and its summary, and in the Labbook
- * (`whole`) what it shows for itself and what it is about. A redacted one
- * is its date, its bindings and its kind of work: nothing else of it is
- * read. On an experiment's own page a title with nowhere else to go leads
- * to the update's place in the Labbook. */
+ * its title (a link when it has somewhere to go, text when it has not),
+ * where it came from and its summary, and in the Labbook (`whole`) what it
+ * shows for itself and what it is about. A redacted one is its date, its
+ * bindings and its kind of work: nothing else of it is read. */
 function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: boolean) {
   const copy = content.pages.lab.labbook;
   const hue = i % 2 ? "m" : "c";
@@ -771,7 +770,7 @@ function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: b
     );
   }
   const { updateKinds, updateSources } = content.site;
-  const href = update.href ?? (whole ? undefined : labbookHref(update.id));
+  const { href } = update;
   return h(
     "li",
     { ...part("update.item", update.id), ...attrs, class: "hion-tied hion-logged" },
@@ -802,8 +801,8 @@ function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: b
 /** A stretch of the Labbook, newest first: a strand, its heading strung out
  * to one side of the hions and a knot for every update. With a `note` it
  * is the Labbook itself (`whole`): the note is tied on at a knot on the
- * hions' other side, and each update is where its links land. No updates,
- * no strand. */
+ * hions' other side, and each update is where a link to it would land. No
+ * updates, no strand. */
 function logbook(
   content: SiteContent,
   updates: LabbookUpdate[],

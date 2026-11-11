@@ -4,11 +4,11 @@
  * - A Pen or a demo is asked of its own site only when its cord is pulled:
  *   the frame is made then, in the place kept for it, and takes the focus.
  *   Until then the page has asked nothing of anyone else.
- * - A link to an update (`/lab#u-…`, from the home stream or an
- *   experiment's page) lands on its knot in the Labbook: the drawing
- *   catches up to it and a bead of light rests on the knot (shell.css
- *   `data-landed`). The page under the shell holds the same ids, hidden,
- *   so the browser's own landing cannot be relied on. */
+ * - A link to an update (`/lab#u-…`), should one be written, lands on its
+ *   knot in the Labbook: the drawing catches up to it and a bead of light
+ *   rests on the knot (shell.css `data-landed`). The page under the shell
+ *   holds the same ids, hidden, so the browser's own landing cannot be
+ *   relied on. */
 import { h } from "./dom";
 
 interface Options {
@@ -53,19 +53,5 @@ export function tendLab(page: HTMLElement, { signal, catchUp, instant }: Options
   // Back and forward, and an address typed in.
   addEventListener("hashchange", () => land(), { signal });
   addEventListener("popstate", () => land(), { signal });
-  // A link on this page to an update on this page: the router moves the
-  // address without a word to anyone.
-  page.addEventListener(
-    "click",
-    (event) => {
-      const link = (event.target as Element | null)?.closest?.<HTMLAnchorElement>("a[href*='#']");
-      if (!link || link.target || link.pathname !== location.pathname) return;
-      const { hash } = link;
-      requestAnimationFrame(() => {
-        if (!signal.aborted && location.hash === hash) land(hash);
-      });
-    },
-    { signal },
-  );
   return { land };
 }

@@ -120,6 +120,7 @@ const labbook = (page) =>
         bars: item.querySelectorAll("[data-redaction-bar]").length,
         controls: item.querySelectorAll("a, button, iframe, video, audio")
           .length,
+        links: item.querySelectorAll("a").length,
       });
     }
     return {
@@ -143,9 +144,7 @@ const REEL = ":is([data-reel], .hion-reel)";
 const strand = (page) =>
   page.evaluate(() => {
     const text = (el) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
-    const section = document.querySelector(
-      "#lens-shell .hion-strand--updates",
-    );
+    const section = document.querySelector("#lens-shell .hion-strand--updates");
     const list = section.querySelector("ol");
     return {
       heading: text(
@@ -163,6 +162,7 @@ const strand = (page) =>
           title: text(link?.firstChild ?? title),
           href: link?.getAttribute("href") ?? undefined,
           origin: text([...item.querySelectorAll("p.hion-meta")].at(-1)),
+          links: item.querySelectorAll("a").length,
         };
       }),
       // What hangs in the hero under its row of links.
@@ -415,6 +415,74 @@ test(
             assert.equal(landed.shown, "1", "and drawn");
             await shot(page, null, `hion-landed-${size}`);
             await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: an update with nowhere to go is text, not a link, on the home strand and in the Labbook`,
+          async () => {
+            const written = fixture.labbook.filter(
+              (update) => update.visibility === "open",
+            );
+            const nowhere = written.filter((update) => !update.href);
+            assert.ok(nowhere.length >= 2, "the fixture has such updates");
+            assert.ok(written.length > nowhere.length, "and ones that do go");
+            // Nothing on the page points at an update's place in the Labbook.
+            const pointers = (page) =>
+              page.locator("#lens-shell a[href*='#u-']").count();
+
+            const home = await open(size, harness("labbook", "/"));
+            const shown = (await strand(home.page)).items;
+            const stream = (
+              await home.page.evaluate(() => window.prismHarness.content)
+            ).updates.slice(0, content.pages.home.updates.limit);
+            assert.ok(
+              stream.some((update) => !update.href) &&
+                stream.some((update) => update.href),
+              "both kinds are among the recent updates",
+            );
+            assert.deepEqual(
+              shown.map(({ id, title, href, links }) => ({
+                id,
+                title,
+                href,
+                links,
+              })),
+              stream.map((update) => ({
+                id: update.id,
+                title: update.title,
+                href: update.href,
+                links: update.href ? 1 : 0,
+              })),
+            );
+            assert.equal(await pointers(home.page), 0);
+            assert.equal(await overflow(home.page), 0);
+            assert.deepEqual(home.errors, []);
+            await shot(
+              home.page,
+              "#lens-shell .hion-strand--updates",
+              `hion-home-nowhere-${size}`,
+            );
+            await home.context.close();
+
+            const room = await open(size, ROOM);
+            const book = (await labbook(room.page)).entries;
+            for (const update of written) {
+              const entry = book.find((item) => item.id === update.id);
+              assert.equal(entry.title, update.title);
+              assert.equal(entry.href, update.href ?? null, update.id);
+            }
+            // With nothing it is about and nothing that lives elsewhere,
+            // such an update has no link in it at all.
+            for (const id of ["fixture-film", "fixture-tone"])
+              assert.equal(
+                book.find((entry) => entry.id === id).links,
+                0,
+                `${id} has no link in it`,
+              );
+            assert.equal(await pointers(room.page), 0);
+            assert.deepEqual(room.errors, []);
+            await room.context.close();
           },
         );
 
@@ -737,7 +805,7 @@ test(
             assert.equal(shown.intro, updates.intro);
             assert.equal(shown.label, updates.listLabel);
             assert.deepEqual(
-              shown.items,
+              shown.items.map(({ links, ...item }) => item),
               content.updates.slice(0, updates.limit).map((update) => ({
                 id: update.id,
                 date: update.date,
@@ -809,15 +877,17 @@ test(
             );
             const entry = (ref) =>
               book.entries.find((item) => item.ref === ref);
-            // With somewhere to go it goes there; with nowhere, to its
-            // place in the Labbook.
+            // With somewhere to go it goes there; with nowhere, it is
+            // text, not a link to its place in the Labbook.
             assert.equal(
               entry("fixture-study-replay").href,
               "https://codepen.io/beejsbj/pen/abXZWLQ",
             );
+            assert.equal(entry("fixture-study-first-line").href, null);
             assert.equal(
-              entry("fixture-study-first-line").href,
-              "/lab#u-fixture-study-first-line",
+              await page.locator("#lens-shell a[href*='#u-']").count(),
+              0,
+              "nothing points at the Labbook's knots",
             );
             assert.equal(entry("fixture-study-kept-back").bars, 3);
             assert.equal(entry("fixture-study-kept-back").controls, 0);
