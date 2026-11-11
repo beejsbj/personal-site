@@ -672,15 +672,17 @@ test(
             );
             const diary = views.flatMap(([entries]) => entries);
             assert.deepEqual(
-              diary.map(({ ref, part, date, title, href, summary, origin }) => ({
-                ref,
-                part,
-                date,
-                title,
-                href,
-                summary,
-                origin,
-              })),
+              diary.map(
+                ({ ref, part, date, title, href, summary, origin }) => ({
+                  ref,
+                  part,
+                  date,
+                  title,
+                  href,
+                  summary,
+                  origin,
+                }),
+              ),
               content.updates.map((update) => ({
                 ref: update.id,
                 part: "update.item",
@@ -736,7 +738,10 @@ test(
             // The address moves to another update (typed in, or Back and
             // Forward): the pages turn to it, and Back takes the mark away.
             const lab = await open(size, real("/lab"));
-            assert.equal(await lab.page.locator(`${OPEN} [data-here]`).count(), 0);
+            assert.equal(
+              await lab.page.locator(`${OPEN} [data-here]`).count(),
+              0,
+            );
             await lab.page.evaluate((id) => {
               location.hash = `u-${id}`;
             }, last.id);

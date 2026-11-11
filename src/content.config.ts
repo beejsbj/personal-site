@@ -365,7 +365,6 @@ export type UpdateData = z.infer<typeof updateSchema>;
 export type UpdateKind = (typeof UPDATE_KINDS)[number];
 export type UpdateSource = (typeof UPDATE_SOURCES)[number];
 
-
 const siteSchema = z.object({
   name: z.string(),
   siteTitle: z.string(),
