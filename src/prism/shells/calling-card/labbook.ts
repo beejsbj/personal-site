@@ -4,8 +4,9 @@
  * a day plate (month/day, weekday, as the pause menu's calendar writes
  * them) with a dialogue box beside it, whoever sent it named on the box's
  * tab. What an update shows for itself is pinned under its words. A
- * redacted update is a slip of paper with its words cut out: one blank
- * cut-out for each bar of its shape, a stamp, and its kind of work. */
+ * redacted update is a slip of paper with words cut out of its line: a
+ * word it shows set as a title's words are, a black cut-out for each bar
+ * of its shape, then a stamp and its kind of work. */
 import type { SiteContent } from "../types";
 import { part } from "../../parts";
 import {
@@ -110,10 +111,12 @@ function artifact(content: SiteContent, shown: Artifact) {
   );
 }
 
-/** A redacted update: its day, a slip with one blank cut-out for each bar
- * (a longer number a longer cut-out), the stamp that says what it is, and
- * its kind of work. The site is given the lengths and never the words, and
- * nothing else of the update is read here. */
+/** A redacted update: its day, a slip with its line on it (a word it
+ * shows as written, a black cut-out for each bar, a longer number a longer
+ * cut-out, flowing and wrapping as a title does), the stamp that says what
+ * it is, and its kind of work. The site is given the words it shows and
+ * the lengths of the rest, and nothing else of the update is read here.
+ * Aloud, the words are read and each cut-out is said once. */
 function censored(content: SiteContent, update: Hidden, attrs: Record<string, string | undefined>) {
   const copy = content.pages.lab.labbook.redacted;
   const { shape } = update;
@@ -127,10 +130,17 @@ function censored(content: SiteContent, update: Hidden, attrs: Record<string, st
       h("p", { class: "cc-entry__stamp" }, copy.label),
       h(
         "p",
-        { class: "cc-entry__bars", "aria-hidden": "true" },
-        shape.parts.filter((part) => typeof part === "number").map((bar, i) =>
-          h("span", { "data-redaction-bar": "", style: `--bar:${Number(bar) || 1};--n:${i}` }),
-        ),
+        { class: "cc-entry__bars", "data-redaction-line": "" },
+        shape.parts.flatMap((shown, i) => [
+          typeof shown === "string"
+            ? h("span", { class: "cc-entry__word", "data-redaction-word": "" }, shown)
+            : h(
+                "span",
+                { "data-redaction-bar": "", style: `--bar:${Number(shown) || 1};--n:${i}` },
+                h("span", { class: "cc-sr" }, copy.bar),
+              ),
+          " ",
+        ]),
       ),
       h("p", { class: "cc-entry__work" }, copy.works[shape.work]),
     ),

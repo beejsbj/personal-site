@@ -187,7 +187,17 @@
   align-items: center;
   gap: 0.7rem 0.55rem;
 }
-:root[data-lens="calling-card"] .cc-entry__bars span {
+/* A word it shows, set as a title's words are. */
+:root[data-lens="calling-card"] .cc-entry__word {
+  font-family: var(--cc-display);
+  font-size: 1.45rem;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+:root[data-lens="calling-card"] .cc-entry__bars [data-redaction-bar] {
+  position: relative;
   display: block;
   width: calc(var(--bar) * 1.55rem);
   max-width: 100%;
@@ -195,11 +205,11 @@
   background: var(--cc-black);
   transform: rotate(-1.6deg) skewX(-6deg);
 }
-:root[data-lens="calling-card"] .cc-entry__bars span:nth-child(3n + 2) {
+:root[data-lens="calling-card"] .cc-entry__bars [data-redaction-bar]:nth-child(3n + 2) {
   height: 1.9rem;
   transform: rotate(1.2deg);
 }
-:root[data-lens="calling-card"] .cc-entry__bars span:nth-child(3n) {
+:root[data-lens="calling-card"] .cc-entry__bars [data-redaction-bar]:nth-child(3n) {
   height: 1.55rem;
   transform: rotate(-0.6deg) skewX(8deg);
 }

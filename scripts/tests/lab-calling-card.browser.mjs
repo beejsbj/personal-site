@@ -23,6 +23,7 @@ import {
 } from "../../src/prism/labbook-fixture.ts";
 import { updateDateLabel } from "../../src/lib/labbook.ts";
 import { labPlaces } from "../../src/lib/rules.ts";
+import { checkRedactedLine, redactedLine } from "./lib/redaction.mjs";
 
 const SIZES = {
   desktop: { viewport: { width: 1280, height: 800 } },
@@ -629,6 +630,7 @@ test(
                 "fixture-demo",
                 "fixture-replay",
                 "fixture-film",
+                "fixture-half-said",
                 "fixture-kept-back",
                 "fixture-first-line",
               ],
@@ -850,64 +852,59 @@ test(
         );
 
         await t.test(
-          `${size}: a redacted update is its cut-outs, with a name a screen reader can say`,
+          `${size}: a redacted update is its cut-outs, each said once, under a name a screen reader can say`,
           async () => {
             const { context, page } = await open(size, ROOM);
             const book = await labbook(page);
             const hidden = fixture.labbook.find(
-              (update) => update.visibility === "redacted",
+              (update) => update.id === "fixture-kept-back",
             );
+            const { parts } = hidden.shape;
+            assert.ok(parts.every((part) => typeof part === "number"));
             const entry = book.entries.find((item) => item.id === hidden.id);
             assert.equal(entry.part, "update.redacted");
             assert.equal(entry.ref, hidden.id);
-            assert.equal(entry.bars, hidden.shape.bars.length);
+            assert.equal(entry.bars, parts.length);
             assert.equal(entry.date, hidden.date);
             assert.deepEqual(
               entry.said,
               [
                 updateDateLabel(hidden.date),
                 copy.redacted.label,
+                ...parts.map(() => copy.redacted.bar),
                 copy.redacted.works[hidden.shape.work],
               ],
-              "its date, what it is, its kind of work: no other word",
+              "its date, what it is, a word for each cut-out, its kind of work: no other word",
             );
             assert.equal(entry.controls, 0, "nothing to follow or play");
             assert.deepEqual(entry.related, []);
             assert.deepEqual(entry.pictures, []);
-            const bars = await page.evaluate((id) => {
-              const slip = document.querySelector(
-                `#lens-shell #u-${id} .cc-entry__bars`,
-              );
-              return {
-                hidden: slip.getAttribute("aria-hidden") === "true",
-                bars: [...slip.querySelectorAll("[data-redaction-bar]")].map(
-                  (bar) => ({
-                    // The bar's own length: a tilted box measures longer.
-                    width: bar.offsetWidth,
-                    height: bar.offsetHeight,
-                    ink: getComputedStyle(bar).backgroundColor,
-                  }),
-                ),
-              };
-            }, hidden.id);
-            assert.ok(bars.hidden, "the cut-outs say nothing");
-            for (const bar of bars.bars) {
+            const item = page.locator(`#lens-shell #u-${hidden.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            const bars = await item.evaluate((el) =>
+              [...el.querySelectorAll("[data-redaction-bar]")].map((bar) => ({
+                height: bar.offsetHeight,
+                ink: getComputedStyle(bar).backgroundColor,
+              })),
+            );
+            for (const bar of bars) {
               assert.ok(
                 bar.height > 16,
                 "a cut-out is tall enough to hide a word",
               );
               assert.equal(bar.ink, "rgb(10, 10, 10)", "and solid black");
             }
-            // Longer numbers, longer cut-outs.
-            const order = (list) =>
-              list
-                .map((value, index) => [value, index])
-                .sort(([a], [b]) => a - b)
-                .map(([, index]) => index);
-            assert.deepEqual(
-              order(bars.bars.map((bar) => bar.width)),
-              order(hidden.shape.bars),
-            );
             assert.ok(
               !(await page.content()).includes(REDACTION_MARKER),
               "nothing it hides is in the page",
@@ -916,6 +913,84 @@ test(
               page,
               `#lens-shell #u-${hidden.id}`,
               `calling-card-redacted-${size}`,
+            );
+            await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: a redacted update may show a few of its words, in their places among its cut-outs`,
+          async () => {
+            const { context, page, errors } = await open(size, ROOM);
+            const book = await labbook(page);
+            const half = fixture.labbook.find(
+              (update) => update.id === "fixture-half-said",
+            );
+            const { parts } = half.shape;
+            assert.deepEqual(parts, ["Rewired", 4, 2, "the", 6]);
+            const entry = book.entries.find((item) => item.id === half.id);
+            assert.equal(entry.part, "update.redacted");
+            assert.equal(entry.bars, 3);
+            assert.deepEqual(
+              entry.said,
+              [
+                updateDateLabel(half.date),
+                copy.redacted.label,
+                "Rewired",
+                copy.redacted.bar,
+                copy.redacted.bar,
+                "the",
+                copy.redacted.bar,
+                copy.redacted.works[half.shape.work],
+              ],
+              "its date, what it is, its line and its kind of work: no other word",
+            );
+            assert.equal(entry.controls, 0, "nothing to follow or play");
+            const item = page.locator(`#lens-shell #u-${half.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            // The words are set as an update's title is, in the slip's ink.
+            const type = (selector) =>
+              page
+                .locator(`#lens-shell ${selector}`)
+                .first()
+                .evaluate((el) => {
+                  const { fontFamily, fontSize, textTransform } =
+                    getComputedStyle(el);
+                  return { fontFamily, fontSize, textTransform };
+                });
+            assert.deepEqual(
+              await type(`#u-${half.id} [data-redaction-word]`),
+              await type("[data-cc-labbook] .cc-entry__title"),
+            );
+            assert.equal(
+              await item
+                .locator("[data-redaction-word]")
+                .first()
+                .evaluate((el) => getComputedStyle(el).color),
+              "rgb(10, 10, 10)",
+              "in the black the cut-outs are",
+            );
+            assert.deepEqual(await sideways(page), [], "nothing slides");
+            assert.ok(
+              !(await page.content()).includes(REDACTION_MARKER),
+              "nothing it hides is in the page",
+            );
+            assert.deepEqual(errors, []);
+            await shot(
+              page,
+              `#lens-shell #u-${half.id}`,
+              `calling-card-redacted-mixed-${size}`,
             );
             await context.close();
           },
@@ -1068,6 +1143,9 @@ test(
             assert.deepEqual(entry("fixture-study-kept-back").said, [
               "20 Aug 2026",
               copy.redacted.label,
+              copy.redacted.bar,
+              copy.redacted.bar,
+              copy.redacted.bar,
               copy.redacted.works.code,
             ]);
             assert.ok(
