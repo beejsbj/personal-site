@@ -13,7 +13,6 @@ import {
   type Update,
   embedSrc,
   labbookAnchor,
-  labbookHref,
   penUser,
   relatedLinks,
   updateDateLabel,
@@ -139,10 +138,8 @@ function censored(content: SiteContent, update: Hidden, attrs: Record<string, st
 }
 
 /** One update on its day: who sent it on the box's tab, its title (a link
- * when it has somewhere to go), its summary and, in the Labbook (`whole`),
- * what it shows for itself and what it is about. On an experiment's own
- * page a title with nowhere else to go leads to the update's place in the
- * Labbook. */
+ * when it has somewhere to go, text when it has not), its summary and, in
+ * the Labbook (`whole`), what it shows for itself and what it is about. */
 function logged(content: SiteContent, update: Update, i: number, whole: boolean) {
   const copy = content.pages.lab.labbook;
   const attrs = {
@@ -152,7 +149,7 @@ function logged(content: SiteContent, update: Update, i: number, whole: boolean)
   };
   if (update.visibility !== "open") return censored(content, update, attrs);
   const { updateKinds, updateSources } = content.site;
-  const href = update.href ?? (whole ? undefined : labbookHref(update.id));
+  const { href } = update;
   const external = !!href && isExternal(href);
   return h(
     "li",
@@ -226,11 +223,11 @@ export function record(content: SiteContent, updates: Update[], id: string, titl
  * - A Pen or a demo is asked of its own site only when its prompt is
  *   pressed: the frame is made then, in the screen kept for it, and takes
  *   the focus.
- * - A link to an update (`/lab#u-…`, from the phone or an experiment's
- *   page) lands on its day: the board turns to it and the
- *   menu's cursor points at it (`data-cc-landed`). The page under the shell
- *   holds the same ids, hidden, so the browser's own landing cannot be
- *   relied on. `find` is the update the address names now. */
+ * - A link to an update (`/lab#u-…`), should one be written, lands on its
+ *   day: the board turns to it and the menu's cursor points at it
+ *   (`data-cc-landed`). The page under the shell holds the same ids,
+ *   hidden, so the browser's own landing cannot be relied on. `find` is
+ *   the update the address names now. */
 export function tendRecord(screen: HTMLElement, { signal, instant }: { signal: AbortSignal; instant: boolean }) {
   screen.addEventListener(
     "click",
@@ -266,21 +263,5 @@ export function tendRecord(screen: HTMLElement, { signal, instant }: { signal: A
   // Back and forward, and an address typed in.
   addEventListener("hashchange", () => land(), { signal });
   addEventListener("popstate", () => land(), { signal });
-  // A link on this screen to an update on this screen (a message on the
-  // phone): the router moves the address without a word to anyone.
-  screen.addEventListener(
-    "click",
-    (event) => {
-      const link = (event.target as Element | null)?.closest?.<HTMLAnchorElement>("a[href*='#']");
-      if (!link || link.target || link.pathname !== location.pathname) return;
-      const { hash } = link;
-      requestAnimationFrame(() => {
-        if (signal.aborted || location.hash !== hash) return;
-        land(hash);
-        find(hash)?.focus({ preventScroll: true });
-      });
-    },
-    { signal },
-  );
   return { find, land };
 }

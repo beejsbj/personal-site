@@ -132,6 +132,7 @@ const labbook = (page) =>
         bars: item.querySelectorAll("[data-redaction-bar]").length,
         controls: item.querySelectorAll("a, button, iframe, video, audio")
           .length,
+        links: item.querySelectorAll("a").length,
       });
     }
     return {
@@ -549,6 +550,68 @@ test(
             assert.deepEqual(await sideways(page), [], "nothing slid sideways");
             await shot(page, null, `calling-card-landed-${size}`);
             await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: an update with nowhere to go is text, not a link, on the phone and in the Labbook`,
+          async () => {
+            const written = fixture.labbook.filter(
+              (update) => update.visibility === "open",
+            );
+            const nowhere = written.filter((update) => !update.href);
+            assert.ok(nowhere.length >= 2, "the fixture has such updates");
+            assert.ok(written.length > nowhere.length, "and ones that do go");
+            // Nothing on the screen points at an update's place in the Labbook.
+            const pointers = (page) =>
+              page.locator("#lens-shell a[href*='#u-']").count();
+
+            const home = await open(size, harness("labbook", "/"));
+            const stream = (
+              await home.page.evaluate(() => window.prismHarness.content)
+            ).updates;
+            await home.page.locator("#lens-shell .cc-phonechip").click();
+            await home.page.waitForSelector("#lens-shell .cc-phone .cc-msg");
+            const thread = await messages(home.page);
+            assert.equal(thread.length, stream.length);
+            for (const update of stream) {
+              const message = thread.find(
+                (item) => item.title === update.title,
+              );
+              assert.ok(message, `${update.id} is a message`);
+              // A message with nowhere to go has no link under its words.
+              assert.equal(message.href, update.href, update.id);
+              assert.equal(message.link, update.linkLabel, update.id);
+            }
+            for (const update of nowhere)
+              assert.equal(
+                thread.find((item) => item.title === update.title).href,
+                undefined,
+                `${update.id} has no link`,
+              );
+            assert.equal(await pointers(home.page), 0);
+            assert.deepEqual(home.errors, []);
+            await home.page.waitForTimeout(600);
+            await shot(home.page, null, `calling-card-home-nowhere-${size}`);
+            await home.context.close();
+
+            const room = await open(size, ROOM);
+            const book = (await labbook(room.page)).entries;
+            for (const update of written) {
+              const entry = book.find((item) => item.id === update.id);
+              assert.equal(entry.href, update.href ?? null, update.id);
+            }
+            // With nothing it is about and nothing that lives elsewhere,
+            // such an update has no link in it at all.
+            for (const id of ["fixture-film", "fixture-tone"])
+              assert.equal(
+                book.find((entry) => entry.id === id).links,
+                0,
+                `${id} has no link in it`,
+              );
+            assert.equal(await pointers(room.page), 0);
+            assert.deepEqual(room.errors, []);
+            await room.context.close();
           },
         );
 
@@ -987,15 +1050,17 @@ test(
             );
             const entry = (ref) =>
               book.entries.find((item) => item.ref === ref);
-            // With somewhere to go it goes there; with nowhere, to its
-            // place in the Labbook.
+            // With somewhere to go it goes there; with nowhere, it is
+            // text, not a link to its place in the Labbook.
             assert.equal(
               entry("fixture-study-replay").href,
               "https://codepen.io/beejsbj/pen/abXZWLQ",
             );
+            assert.equal(entry("fixture-study-first-line").href, null);
             assert.equal(
-              entry("fixture-study-first-line").href,
-              "/lab#u-fixture-study-first-line",
+              await page.locator("#lens-shell a[href*='#u-']").count(),
+              0,
+              "nothing points at the Labbook's days",
             );
             assert.equal(entry("fixture-study-kept-back").bars, 3);
             assert.equal(entry("fixture-study-kept-back").controls, 0);
