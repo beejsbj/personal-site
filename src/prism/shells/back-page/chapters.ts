@@ -539,7 +539,7 @@ function home(b: Build): HTMLElement[] {
     h("figcaption", null, h("a", { href: hero.portrait.href }, `${jotted(hero.portrait.caption)} →`)),
   );
 
-  const hello = [
+  const hello: HTMLElement[] = [
     h(
       "div",
       { class: "bp-hello__top" },
@@ -549,14 +549,13 @@ function home(b: Build): HTMLElement[] {
     ),
     h("p", { class: "bp-typed-line", ...part("home.occupation") }, hero.occupation),
     h("p", { class: "bp-lead", ...part("home.welcome") }, hero.welcome),
-    ticker(b),
     h(
       "aside",
       { class: "bp-note", "aria-label": currently.title, ...part("home.currently") },
       h("b", null, `${currently.title}: `),
       inline(currently.body),
     ),
-  ].filter((el) => !!el);
+  ];
 
   // the diary: dated lines, newest first
   const diary = h("ol", { class: "bp-diary", "aria-label": updates.listLabel });
@@ -847,58 +846,6 @@ function shelfCard(b: Build, entries: LabItem[], label: string) {
   );
 }
 
-/** The ticker: the headlines written along a strip of paper threaded
- * through two slits in the page, pulled through a headline at a time (the
- * pull is CSS, in lab.css). Each headline is a link to the first update it
- * is about, in the Labbook. The last is written once more before the first,
- * for the eye only, so the strip has no end. Nothing, without headlines. */
-function ticker(b: Build): HTMLElement | null {
-  const { content, copy } = b;
-  const { headlines } = content;
-  if (!headlines.length) return null;
-  const label = content.site.ticker.label;
-  const last = headlines[headlines.length - 1];
-  const day = (date: string) => shortDate(date, copy.months);
-  return h(
-    "aside",
-    {
-      class: "bp-ticker",
-      "aria-label": label,
-      "data-ticker": "",
-      // one headline has nowhere to be pulled to
-      "data-moving": headlines.length > 1,
-      style: `--n:${headlines.length}`,
-    },
-    h("p", { class: "bp-ticker__tag", "aria-hidden": "true" }, label),
-    h(
-      "div",
-      { class: "bp-ticker__window" },
-      h(
-        "ul",
-        { class: "bp-ticker__strip" },
-        ...headlines.map((headline) =>
-          h(
-            "li",
-            { class: "bp-ticker__frame", ...part("ticker.headline", headline.id) },
-            h("time", { datetime: headline.date }, day(headline.date)),
-            h("a", { href: labbookHref(headline.updates[0]) }, headline.text),
-            // lying still, the strip breaks its lines between headlines
-            " ",
-          ),
-        ),
-        headlines.length > 1
-          ? h(
-              "li",
-              { class: "bp-ticker__frame bp-ticker__frame--again", "aria-hidden": "true" },
-              h("span", { class: "bp-ticker__day" }, day(last.date)),
-              h("span", null, last.text),
-            )
-          : null,
-      ),
-    ),
-  );
-}
-
 /** What an update shows for itself, taped in. A picture, a film and a
  * sound are there to look at or play. A Pen or a demo is a blank card, or
  * its poster when this site keeps one, with the way to start it written
@@ -1042,7 +989,6 @@ function lab(b: Build) {
       withUnderline(h1(header.title, part("page.title", "lab")), RED, "lab-title"),
       header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "lab") }, header.intro) : null,
     ),
-    ticker(b),
   ];
   const kinds = doodleKinds(content.lab);
   let n = 0;
