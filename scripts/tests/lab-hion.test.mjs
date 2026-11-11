@@ -9,14 +9,14 @@ import { GAPS, isGap } from "../../src/prism/parity.ts";
 import { REDACTION_MARKER } from "../../src/prism/labbook-fixture.ts";
 
 const SHELL = "src/prism/shells/hion";
-const sources = readdirSync(SHELL)
-  .filter((name) => name.endsWith(".ts"))
-  .map((name) => ({ name, source: readFileSync(join(SHELL, name), "utf8") }));
+const read = (ending) =>
+  readdirSync(SHELL)
+    .filter((name) => name.endsWith(ending))
+    .map((name) => ({ name, source: readFileSync(join(SHELL, name), "utf8") }));
+const sources = read(".ts");
 
 test("Hion leaves nothing of the Lab out", () => {
   for (const [kind, part] of [
-    ["home", "ticker.headline"],
-    ["lab", "ticker.headline"],
     ["lab", "update.item"],
     ["lab", "update.redacted"],
     ["lab-entry", "lab.graduation"],
@@ -27,6 +27,15 @@ test("Hion leaves nothing of the Lab out", () => {
     !JSON.stringify(GAPS.hion ?? {}).includes("#99"),
     "no gap still waits on #99",
   );
+});
+
+test("Hion has no reel of headlines: the recent updates are where they were", () => {
+  for (const { name, source } of [...sources, ...read(".css")])
+    assert.doesNotMatch(
+      source,
+      /\bheadlines\b|\bticker\b|\breel\b|hion-reel/i,
+      `${name} still has the reel`,
+    );
 });
 
 test("Hion's shell reads neither an experiment's era nor its type", () => {

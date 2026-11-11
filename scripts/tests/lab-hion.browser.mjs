@@ -1,6 +1,7 @@
 /** Hion's Lab (issue #99): the Bench and the Shelf, the Labbook with its
- * artifacts and its redacted updates, the reel of headlines on the home
- * page and in the Lab, and an experiment's own record and graduation.
+ * artifacts and its redacted updates, the home page's strand where the
+ * recent updates are, and an experiment's own record and graduation. There
+ * is no reel of headlines.
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
@@ -8,7 +9,7 @@
  * the `labbook`, `lab-full-page` and `lab-bare-entry` fixtures, which hold
  * every state whatever src/content does. Same server and Chromium as
  * prism-parity.browser.mjs. LAB_SHOTS=<dir> also saves pictures of each
- * part at each size. */
+ * part at each size; LAB_ONLY=<regexp> runs only the subtests it names. */
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -31,6 +32,7 @@ const SIZES = {
   },
 };
 const SHOTS = process.env.LAB_SHOTS;
+const ONLY = process.env.LAB_ONLY ? new RegExp(process.env.LAB_ONLY) : null;
 const PEN_FRAME = "https://codepen.io/beejsbj/embed/abXZWLQ?default-tab=result";
 const DEMO_FRAME = "https://example.com/fixture-demo/";
 const fixture = labbookFixture();
@@ -134,65 +136,40 @@ const labbook = (page) =>
     };
   });
 
-/** The reel as it stands this instant. */
-const reel = (page) =>
+/** Where the reel of headlines used to be, by every name it had. */
+const REEL = ":is([data-reel], .hion-reel)";
+
+/** The home page's strand of updates, as a visitor meets it. */
+const strand = (page) =>
   page.evaluate(() => {
     const text = (el) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
-    const root = document.querySelector("#lens-shell [data-reel]");
-    if (!root) return null;
-    const strip = root.querySelector("[data-reel-strip]");
-    const box = (el) => {
-      const { left, right, top, bottom } = el.getBoundingClientRect();
-      return { left, right, top, bottom };
-    };
-    const runs = [...root.querySelectorAll("[data-reel-run]")];
-    const following = root.nextElementSibling ?? root.parentElement;
+    const section = document.querySelector(
+      "#lens-shell .hion-strand--updates",
+    );
+    const list = section.querySelector("ol");
     return {
-      name: text(document.getElementById(root.getAttribute("aria-labelledby"))),
-      headlines: [
-        ...root.querySelectorAll("[data-part='ticker.headline']"),
-      ].map((item) => {
-        const link = item.querySelector("a");
+      heading: text(
+        document.getElementById(section.getAttribute("aria-labelledby")),
+      ),
+      intro: text(section.querySelector(".hion-aside")),
+      label: list.getAttribute("aria-label"),
+      items: [...list.querySelectorAll(":scope > li")].map((item) => {
+        const title = item.querySelector(".hion-tied__title");
+        const link = title.querySelector("a");
         return {
-          id: item.dataset.ref,
-          text: text(link),
-          href: link.getAttribute("href"),
-          box: box(link),
-          visible: link.checkVisibility(),
+          id: item.dataset.part === "update.item" ? item.dataset.ref : null,
+          date: item.querySelector("time").getAttribute("datetime"),
+          when: text(item.querySelector("time")),
+          title: text(link?.firstChild ?? title),
+          href: link?.getAttribute("href") ?? undefined,
+          origin: text([...item.querySelectorAll("p.hion-meta")].at(-1)),
         };
       }),
-      // Links anyone can reach with Tab or a screen reader.
-      reachable: [...root.querySelectorAll("a")].filter(
-        (link) =>
-          link.tabIndex >= 0 &&
-          link.checkVisibility() &&
-          !link.closest("[aria-hidden='true']"),
-      ).length,
-      runs: runs.map((run) => ({
-        x: run.getBoundingClientRect().left,
-        visible: run.checkVisibility(),
-        running: run
-          .getAnimations()
-          .some((animation) => animation.playState === "running"),
-        animations: run.getAnimations().length,
-      })),
-      strip: box(strip),
-      box: box(root),
-      below: following.getBoundingClientRect().top,
-      overflow:
-        document.documentElement.scrollWidth -
-        document.documentElement.clientWidth,
+      // What hangs in the hero under its row of links.
+      afterLinks:
+        document.querySelector("#lens-shell [data-part='home.links']")
+          .nextElementSibling?.className ?? null,
     };
-  });
-
-/** Focus whatever comes before the reel, so the next Tab goes into it. */
-const beforeReel = (page) =>
-  page.evaluate(() => {
-    const first = document.querySelector("[data-part='ticker.headline'] a");
-    const all = [...document.querySelectorAll("a[href], button")].filter(
-      (el) => el.tabIndex >= 0 && el.checkVisibility(),
-    );
-    all[all.indexOf(first) - 1].focus();
   });
 
 const overflow = (page) =>
@@ -208,9 +185,13 @@ const skip = executable
   : "no Chromium: set PRISM_CHROMIUM or install a Playwright headless shell";
 
 test(
-  "Hion shows the Bench, the Shelf, the Labbook and the reel",
+  "Hion shows the Bench, the Shelf, the Labbook and the recent updates",
   { skip, timeout: 15 * 60_000 },
-  async (t) => {
+  async (suite) => {
+    const t = {
+      test: (name, fn) =>
+        suite.test(name, { skip: !!ONLY && !ONLY.test(name) }, fn),
+    };
     const { chromium: browserType } = await import("playwright-core");
     const external = process.env.BASE;
     if (!external)
@@ -715,305 +696,74 @@ test(
 
         for (const path of ["/", "/lab"])
           await t.test(
-            `${size}: the reel on ${path} carries the seeded headlines, each linking into the Labbook`,
+            `${size}: there is no reel of headlines on ${path}`,
             async () => {
-              const { context, page } = await open(size, `${path}?lens=hion`);
-              const strip = await reel(page);
-              assert.ok(strip, "there is a reel");
-              assert.equal(strip.name, content.site.ticker.label);
-              assert.deepEqual(
-                strip.headlines.map(({ id, text, href }) => ({
-                  id,
-                  text,
-                  href,
-                })),
-                content.headlines.map((headline) => ({
-                  id: headline.id,
-                  text: headline.text,
-                  href: `/lab#u-${headline.updates[0]}`,
-                })),
-              );
-              assert.equal(strip.reachable, content.headlines.length);
-              assert.equal(strip.overflow, 0, "nothing wider than the screen");
-              const name = path === "/" ? "home" : "lab";
-              await shot(
-                page,
-                "#lens-shell [data-reel]",
-                `hion-reel-${name}-still-${size}`,
-              );
-              // And as most visitors meet it, running: one long line that
-              // widens nothing it hangs in.
-              const live = await open(size, `${path}?lens=hion`, {
-                motion: true,
-              });
-              await live.page.waitForTimeout(1200);
-              const running = await reel(live.page);
-              const { width } = SIZES[size].viewport;
-              assert.ok(
-                running.box.left >= 0 && running.box.right <= width + 0.5,
-                `the running reel keeps inside the screen (${running.box.left} to ${running.box.right} of ${width})`,
-              );
-              assert.ok(
-                running.strip.right - running.strip.left <=
-                  running.box.right - running.box.left + 0.5,
-                "and its strip inside the reel",
-              );
-              await shot(
-                live.page,
-                "#lens-shell [data-reel]",
-                `hion-reel-${name}-${size}`,
-              );
-              await live.context.close();
-              // Following one lands on its update, whichever page it was on.
-              const [first] = content.headlines;
-              await page
-                .locator("[data-part='ticker.headline'] a")
-                .first()
-                .click();
-              await page.waitForURL(
-                (url) =>
-                  url.pathname === "/lab" &&
-                  url.hash === `#u-${first.updates[0]}`,
-              );
-              await page.waitForSelector(
-                `#lens-shell #u-${first.updates[0]}[data-landed]`,
-              );
-              await page.waitForTimeout(900);
-              const top = await page
-                .locator(`#lens-shell #u-${first.updates[0]}`)
-                .evaluate((el) => el.getBoundingClientRect().top);
-              assert.ok(
-                top >= 0 && top < SIZES[size].viewport.height,
-                `the update is on screen (its top at ${top})`,
-              );
-              await context.close();
+              // On real content and on the fixture Labbook alike.
+              for (const address of [
+                `${path}?lens=hion`,
+                harness("labbook", path),
+              ]) {
+                const { context, page, errors } = await open(size, address);
+                assert.equal(
+                  await page.locator(`#lens-shell ${REEL}`).count(),
+                  0,
+                  `no reel on ${address}`,
+                );
+                assert.equal(
+                  await page
+                    .locator("#lens-shell [data-part='ticker.headline']")
+                    .count(),
+                  0,
+                  "and no headline",
+                );
+                assert.equal(
+                  await overflow(page),
+                  0,
+                  "nothing wider than the screen",
+                );
+                assert.deepEqual(errors, []);
+                await context.close();
+              }
             },
           );
 
         await t.test(
-          `${size}: with motion reduced the reel is still, and every headline can be read`,
+          `${size}: the home page's strand is the recent updates, newest first, as before`,
           async () => {
-            const { context, page } = await open(size, ROOM);
-            const before = await reel(page);
-            await page.waitForTimeout(600);
-            const after = await reel(page);
-            assert.ok(before.headlines.length >= 3);
+            const { context, page, errors } = await open(size, "/?lens=hion");
+            const { updates } = content.pages.home;
+            const shown = await strand(page);
+            assert.equal(shown.heading, updates.title);
+            assert.equal(shown.intro, updates.intro);
+            assert.equal(shown.label, updates.listLabel);
             assert.deepEqual(
-              before.runs.map((run) => run.animations),
-              before.runs.map(() => 0),
-              "nothing is animated",
+              shown.items,
+              content.updates.slice(0, updates.limit).map((update) => ({
+                id: update.id,
+                date: update.date,
+                when: update.dateLabel,
+                title: update.title,
+                href: update.href,
+                origin: `${update.sourceLabel} · ${update.kindLabel}`,
+              })),
+              "the first of the home stream, in its order",
             );
-            assert.deepEqual(
-              after.runs.map((run) => run.x),
-              before.runs.map((run) => run.x),
-              "nothing moves",
-            );
-            assert.deepEqual(
-              before.runs.map((run) => run.visible),
-              [true, false],
-              "the headlines are told once",
-            );
-            for (const headline of before.headlines) {
-              assert.ok(headline.visible, `${headline.id} is shown`);
-              assert.ok(
-                headline.box.left >= before.strip.left - 1 &&
-                  headline.box.right <= before.strip.right + 1,
-                `${headline.id} fits inside the strip`,
-              );
-            }
-            assert.equal(before.overflow, 0);
-            await shot(page, "[data-reel]", `hion-reel-still-${size}`);
-            await context.close();
-          },
-        );
-
-        await t.test(
-          `${size}: the reel is drawn through gently, holds under a pointer, and never shifts the page`,
-          async () => {
-            const { context, page } = await open(size, ROOM, { motion: true });
-            await page.mouse.move(0, 0);
-            await page.waitForTimeout(1200);
-            const start = await reel(page);
-            await page.waitForTimeout(1000);
-            const later = await reel(page);
-            assert.deepEqual(
-              start.runs.map((run) => run.running),
-              [true, true],
-              "both runs of the thread are moving",
-            );
-            const travelled = start.runs[0].x - later.runs[0].x;
-            assert.ok(
-              travelled > 5 && travelled < 90,
-              `it is drawn left at a reading pace (${travelled.toFixed(1)}px in a second)`,
-            );
+            assert.ok(shown.items.length >= 7, "the seeded updates are there");
+            // The hero ends with its row of links, as it did: nothing
+            // hangs under them.
             assert.equal(
-              (start.runs[0].x - start.runs[1].x).toFixed(1),
-              (later.runs[0].x - later.runs[1].x).toFixed(1),
-              "the two runs travel as one thread",
+              shown.afterLinks,
+              null,
+              "nothing follows the hero's links",
             );
-            assert.ok(
-              start.runs[1].x - start.runs[0].x >=
-                start.strip.right - start.strip.left - 1,
-              "a run is never shorter than the strip",
-            );
-            assert.equal(later.overflow, 0, "nothing wider than the screen");
-            if (size === "desktop") {
-              const { strip } = later;
-              await page.mouse.move(
-                (strip.left + strip.right) / 2,
-                (strip.top + strip.bottom) / 2,
-              );
-              await page.waitForTimeout(100);
-              const held = await reel(page);
-              await page.waitForTimeout(600);
-              const still = await reel(page);
-              assert.equal(still.runs[0].x, held.runs[0].x, "it holds");
-              assert.deepEqual(
-                still.runs.map((run) => run.animations),
-                [1, 1],
-                "held, not started over",
-              );
-              await page.mouse.move(0, 0);
-              await page.waitForTimeout(600);
-              const released = await reel(page);
-              assert.ok(
-                released.runs[0].x < still.runs[0].x,
-                "and goes on from where it was",
-              );
-              for (const moment of [held, still, released]) {
-                assert.deepEqual(moment.box, start.box, "the reel stays put");
-                assert.equal(moment.below, start.below, "so does what follows");
-              }
-            }
-            assert.deepEqual(later.box, start.box, "the reel stays put");
-            assert.equal(later.below, start.below, "so does what follows");
-            await context.close();
-          },
-        );
-
-        await t.test(
-          `${size}: the reel rests for the keyboard, shows the headline in focus, and lets go`,
-          async () => {
-            const { context, page } = await open(size, ROOM, { motion: true });
-            await page.waitForTimeout(1500);
-            const moving = await reel(page);
-            const links = page.locator("[data-part='ticker.headline'] a");
-            const focused = () =>
-              page.evaluate(() => {
-                const el = document.activeElement;
-                const item = el?.closest("[data-part='ticker.headline']");
-                const { left, right } = el.getBoundingClientRect();
-                return {
-                  headline: item?.dataset.ref ?? null,
-                  inReel: !!el?.closest("[data-reel]"),
-                  left,
-                  right,
-                };
-              });
-            await beforeReel(page);
-            const seen = [];
-            for (let i = 0; i < (await links.count()); i += 1) {
-              await page.keyboard.press("Tab");
-              await page.waitForTimeout(150);
-              const now = await focused();
-              const strip = await reel(page);
-              await page.waitForTimeout(400);
-              const still = await reel(page);
-              seen.push(now.headline);
-              assert.ok(now.inReel, "Tab reaches each headline");
-              assert.deepEqual(
-                still.runs.map((run) => run.x),
-                strip.runs.map((run) => run.x),
-                "the thread is at rest while a headline has focus",
-              );
-              // All of it when it fits; its beginning when it is longer
-              // than the strip.
-              const room = strip.strip.right - strip.strip.left;
-              assert.ok(
-                now.left >= strip.strip.left - 1 &&
-                  (now.right <= strip.strip.right + 1 ||
-                    (now.right - now.left > room - 120 &&
-                      now.left < strip.strip.left + 160)),
-                `${now.headline} is in view while it has focus (${now.left} to ${now.right} in ${strip.strip.left} to ${strip.strip.right})`,
-              );
-              assert.equal(
-                strip.box.right - strip.box.left,
-                moving.box.right - moving.box.left,
-                "the reel keeps its width",
-              );
-              assert.equal(
-                strip.box.bottom - strip.box.top,
-                moving.box.bottom - moving.box.top,
-                "and its height",
-              );
-            }
-            // In the order they are written, each once: the second run of
-            // the thread is for the eye only.
-            assert.deepEqual(
-              seen,
-              moving.headlines.map((headline) => headline.id),
-            );
-            await page.keyboard.press("Tab");
-            assert.equal(
-              (await focused()).inReel,
-              false,
-              "one more Tab leaves the reel",
-            );
-            await page.waitForTimeout(700);
-            const resumed = await reel(page);
-            assert.deepEqual(
-              resumed.runs.map((run) => run.running),
-              [true, true],
-              "and the thread runs again",
-            );
-            assert.equal(
-              await page.evaluate(
-                () => document.querySelector("[data-reel-strip]").scrollLeft,
-              ),
-              0,
-              "from its start, not from wherever focus had scrolled it",
+            assert.equal(await overflow(page), 0);
+            assert.deepEqual(errors, []);
+            await shot(
+              page,
+              "#lens-shell .hion-strand--updates",
+              `hion-home-updates-${size}`,
             );
             await context.close();
-          },
-        );
-
-        await t.test(
-          `${size}: one headline still crosses the whole strip, and none leaves no reel`,
-          async () => {
-            const one = await open(size, "/?lens=hion", {
-              motion: true,
-              bend: (data) => ({
-                ...data,
-                headlines: data.headlines.slice(0, 1),
-              }),
-            });
-            await one.page.waitForTimeout(1200);
-            const strip = await reel(one.page);
-            assert.equal(strip.headlines.length, 1);
-            assert.equal(strip.reachable, 1);
-            assert.ok(
-              strip.runs[1].x - strip.runs[0].x >=
-                strip.strip.right - strip.strip.left - 1,
-              "the thread is a full lap long",
-            );
-            assert.equal(strip.overflow, 0);
-            await one.context.close();
-
-            for (const path of ["/", "/lab"]) {
-              const none = await open(size, `${path}?lens=hion`, {
-                bend: (data) => ({ ...data, headlines: [] }),
-              });
-              assert.equal(await reel(none.page), null);
-              assert.equal(
-                await none.page
-                  .locator("#lens-shell :is([data-reel], .hion-reel)")
-                  .count(),
-                0,
-                `nothing is left where it would be on ${path}`,
-              );
-              assert.deepEqual(none.errors, []);
-              await none.context.close();
-            }
           },
         );
 
@@ -1154,69 +904,6 @@ test(
           },
         );
       }
-
-      // Between a phone and a desk the strip is longer than some headlines'
-      // words and shorter than those words with their thread: 450px and
-      // 480px, and a screen cut so the first headline's words only just fit.
-      for (const cut of [450, 480, "just"])
-        await t.test(
-          `${cut}: a headline in focus is shown whole whenever its words fit the strip`,
-          async () => {
-            const { context, page } = await open(
-              { ...SIZES.phone, viewport: { width: 450, height: 844 } },
-              ROOM,
-              { motion: true },
-            );
-            await page.waitForTimeout(1500);
-            const links = page.locator("[data-part='ticker.headline'] a");
-            const strip = page.locator("[data-reel-strip]");
-            if (cut === "just") {
-              const words = await links
-                .first()
-                .evaluate((link) => link.getBoundingClientRect().width);
-              const edges = 450 - (await strip.evaluate((el) => el.clientWidth));
-              await page.setViewportSize({
-                width: Math.ceil(words) + edges + 4,
-                height: 844,
-              });
-            } else await page.setViewportSize({ width: cut, height: 844 });
-            await beforeReel(page);
-            let cutShort = 0;
-            for (let i = 0; i < (await links.count()); i += 1) {
-              await page.keyboard.press("Tab");
-              await page.waitForTimeout(150);
-              const now = await page.evaluate(() => {
-                const link = document.activeElement;
-                const strip = link.closest("[data-reel-strip]");
-                const { left, right } = link.getBoundingClientRect();
-                const box = strip.getBoundingClientRect();
-                return {
-                  headline: link.closest("[data-part]")?.dataset.ref,
-                  left,
-                  right,
-                  whole: link.parentElement.getBoundingClientRect().width,
-                  room: strip.clientWidth,
-                  strip: { left: box.left, right: box.right },
-                };
-              });
-              assert.ok(now.headline, "Tab reaches each headline");
-              // Words longer than the strip are shown from their beginning
-              // (the subtest at each size above).
-              if (now.right - now.left > now.room) continue;
-              if (now.whole > now.room) cutShort += 1;
-              assert.ok(
-                now.left >= now.strip.left - 1 &&
-                  now.right <= now.strip.right + 1,
-                `${now.headline}'s words fit the strip and are all in view (${now.left} to ${now.right} in ${now.strip.left} to ${now.strip.right})`,
-              );
-            }
-            assert.ok(
-              cutShort > 0,
-              "a headline's words fit the strip here where its thread and words together do not",
-            );
-            await context.close();
-          },
-        );
     } finally {
       await browser.close();
       await server?.close();

@@ -18,8 +18,7 @@
  * still in play, the featured one hung like a sign; the Shelf is a loop of
  * wefts, an experiment laid on each, gone quiet; the Labbook is a strand,
  * a knot for every update, and a redacted update is its words bound up in
- * thread. The ticker is a reel: the headlines strung on one thread that is
- * drawn slowly through. */
+ * thread. */
 import {
   embedSrc,
   experimentUpdates,
@@ -281,50 +280,6 @@ function beads(items: string[], label: string, attrs: Attrs = {}) {
   );
 }
 
-/* ---------- The reel: the ticker ---------- */
-
-/** The headlines, strung like beads on one thread that is drawn slowly
- * through, each a link to the first update it is about, in the Labbook.
- * The thread comes round again in a second run, for the eye only. It holds
- * under a pointer and rests for the keyboard (lab.ts); where nothing moves
- * (shell.css) the headlines are told once, one under another. No
- * headlines, no reel. */
-function reel(content: SiteContent) {
-  const { headlines } = content;
-  if (!headlines.length) return null;
-  // How long the thread takes to come round: by how much there is to read.
-  const letters = headlines.reduce((sum, { text }) => sum + text.length, 0);
-  const lap = Math.round(letters * 0.3 + headlines.length * 2.4);
-  const run = (again: boolean) =>
-    h(
-      again ? "div" : "ul",
-      { class: "hion-reel__run", "data-reel-run": "", "aria-hidden": again ? "true" : undefined },
-      headlines.map((headline) =>
-        h(
-          again ? "span" : "li",
-          { ...(again ? {} : part("ticker.headline", headline.id)), class: "hion-reel__bead" },
-          h(
-            "a",
-            { href: labbookHref(headline.updates[0]), tabindex: again ? "-1" : undefined },
-            headline.text,
-          ),
-        ),
-      ),
-    );
-  return h(
-    "aside",
-    {
-      class: "hion-reel",
-      "aria-labelledby": "hion-reel-label",
-      "data-reel": "",
-      "data-reveal": "",
-      style: `--hion-reel-lap:${lap}s`,
-    },
-    h("p", { class: "hion-meta hion-reel__label", id: "hion-reel-label" }, content.site.ticker.label),
-    h("div", { class: "hion-reel__strip", "data-reel-strip": "" }, run(false), run(true)),
-  );
-}
-
 /* ---------- Home ---------- */
 
 function workCharm(copy: Copy, project: Project, level: "h2" | "h3", i: number) {
@@ -437,7 +392,6 @@ function home(content: SiteContent) {
           ),
         ),
       ),
-      reel(content),
     ),
     h("span", { class: "hion-lane", "data-spine": "via", "aria-hidden": "true" }),
     h(
@@ -1002,7 +956,7 @@ function lab(content: SiteContent) {
   return screen(
     "lab",
     "hion-page-title",
-    pageTitle(page.header, "lab", {}, reel(content)),
+    pageTitle(page.header, "lab"),
     ...places,
     logbook(content, content.labbook, "hion-labbook-title", page.labbook.title, page.labbook.note),
     loop(

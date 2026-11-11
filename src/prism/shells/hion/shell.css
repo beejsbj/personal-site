@@ -3188,13 +3188,12 @@
 }
 
 /* ==========================================================================
-   The Lab (screens.ts lab, logbook, reel)
+   The Lab (screens.ts lab, logbook)
    The Bench is a loop its experiments hang in, still in play: charms on
    drops, the featured one hung like a sign across the row. The Shelf is a
    loop of wefts, an experiment's name strung on each, gone quiet. The
    Labbook is a strand, a knot for every update; a redacted update is its
-   words bound up in thread. The reel is the ticker: the headlines strung
-   like beads on one thread, drawn slowly through.
+   words bound up in thread.
    ========================================================================== */
 
 /* What a place is for, said under its heading. */
@@ -3504,142 +3503,6 @@
   }
 }
 
-/* ---------- The reel: the ticker ---------- */
-
-:root[data-lens="hion"] .hion-reel {
-  max-width: 34rem;
-  margin: 2.2rem 0 0;
-}
-
-:root[data-lens="hion"] .hion-reel__label {
-  margin: 0 0 0.2em;
-}
-
-/* Room above and below for a headline's focus ring. The strip is as wide
-   as the reel and asks for no width of its own: a running thread is one
-   long line, and must not widen what it hangs in. */
-:root[data-lens="hion"] .hion-reel__strip {
-  display: flex;
-  width: 0;
-  min-width: 100%;
-  padding-block: 0.5em;
-}
-
-/* In a screen's head, which is only as wide as what hangs in it. */
-:root[data-lens="hion"] .hion-head .hion-reel {
-  width: 34rem;
-  max-width: 100%;
-}
-
-/* Standing still: the headlines one under another, a bead before each. */
-:root[data-lens="hion"] .hion-reel__run {
-  display: grid;
-  gap: 0.35em;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.45rem * var(--hion-hand-scale))/1.4 var(--hion-hand);
-  color: var(--hion-cl);
-}
-
-:root[data-lens="hion"] .hion-reel__run + .hion-reel__run {
-  display: none;
-}
-
-:root[data-lens="hion"] .hion-reel__bead {
-  display: flex;
-  align-items: baseline;
-  min-width: 0;
-}
-
-/* The thread between two headlines, and the bead on it. */
-:root[data-lens="hion"] .hion-reel__bead::before {
-  content: "";
-  flex: none;
-  align-self: center;
-  width: 2.2em;
-  height: 0.42em;
-  margin-right: 0.6em;
-  background:
-    radial-gradient(circle at 50% 50%, var(--hion-m) 0 30%, transparent 34%) 50% 50% / 0.42em 0.42em no-repeat,
-    linear-gradient(var(--hion-c), var(--hion-c)) 50% 50% / 100% 2px no-repeat;
-}
-
-:root[data-lens="hion"] .hion-reel__bead a {
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-:root[data-lens="hion"] .hion-reel__bead a:hover {
-  color: var(--hion-c);
-}
-
-/* Running: one line of them, drawn through from right to left at a
-   reading pace, without end. Both runs travel one run's length, so the
-   second arrives where the first began; a run is never shorter than the
-   strip, so one headline crosses the whole of it alone. Constant speed: a
-   thread pulled through does not ease. */
-@media (prefers-reduced-motion: no-preference) {
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip {
-    overflow-x: clip;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent);
-    mask-image: linear-gradient(to right, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent);
-  }
-
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__run {
-    display: flex;
-    flex: none;
-    gap: 0;
-    min-width: 100%;
-    white-space: nowrap;
-    animation: hion-reel var(--hion-reel-lap, 60s) linear infinite;
-  }
-
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__bead {
-    flex: 1 0 auto;
-  }
-
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__bead::before {
-    flex: 1 0 3.6em;
-    margin-inline: 0.7em;
-  }
-
-  /* Held where it is under a pointer; and for the keyboard. */
-  @media (hover: hover) and (pointer: fine) {
-    :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip:hover .hion-reel__run {
-      animation-play-state: paused;
-    }
-  }
-
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip:focus-within .hion-reel__run {
-    animation-play-state: paused;
-  }
-
-  /* At rest for the keyboard: the thread back at its start, unfaded; the
-     strip may scroll to the headline in focus (lab.ts). */
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip:is(:has(:focus-visible), [data-reel-rest]) {
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip:is(:has(:focus-visible), [data-reel-rest]) .hion-reel__run {
-    animation: none;
-  }
-
-  :root[data-lens="hion"] .hion:not([data-still]) .hion-reel__strip[data-reel-rest] {
-    overflow-x: auto;
-    scrollbar-width: none;
-    scroll-padding-inline: 0.4em;
-  }
-}
-
-@keyframes hion-reel {
-  to {
-    transform: translateX(-100%);
-  }
-}
-
 /* Phones: the place's wefts and bindings take the column's width. */
 @media (max-width: 719px) {
   :root[data-lens="hion"] .hion-work--featured {
@@ -3648,14 +3511,5 @@
 
   :root[data-lens="hion"] .hion-shelf {
     gap: 2.2rem;
-  }
-
-  :root[data-lens="hion"] .hion-reel {
-    margin-top: 1.6rem;
-  }
-
-  /* On the home page the portrait hangs next: room for its cord. */
-  :root[data-lens="hion"] .hion-hero .hion-reel {
-    margin-bottom: 2.4rem;
   }
 }

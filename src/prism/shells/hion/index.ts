@@ -203,7 +203,7 @@ function show(route: Route, first: boolean) {
         onIdleChange: ctx.onIdleChange,
       });
   drew = () => (life ? life.wake() : skein.wake());
-  // The Labbook's cords and the reel answer; a link to an update lands.
+  // The Labbook's cords answer; a link to an update lands.
   const tended = tendLab(page, {
     signal: controller.signal,
     catchUp: (to) => loom.catchUp(to),

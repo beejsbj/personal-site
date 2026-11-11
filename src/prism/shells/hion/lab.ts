@@ -1,15 +1,10 @@
-/** The Lab, answering the visitor: what the Labbook and the reel
- * (screens.ts) do when they are reached for.
+/** The Lab, answering the visitor: what the Labbook (screens.ts) does when
+ * it is reached for.
  *
  * - A Pen or a demo is asked of its own site only when its cord is pulled:
  *   the frame is made then, in the place kept for it, and takes the focus.
  *   Until then the page has asked nothing of anyone else.
- * - The reel rests for the keyboard. Its thread stops at its start in CSS;
- *   resting, the strip may scroll, so the headline in focus is brought into
- *   view wherever on the thread it lies (all of its words, when they fit
- *   the strip), and when focus leaves the strip goes back to its start
- *   before the thread runs on.
- * - A link to an update (`/lab#u-…`, from a headline, the home stream or an
+ * - A link to an update (`/lab#u-…`, from the home stream or an
  *   experiment's page) lands on its knot in the Labbook: the drawing
  *   catches up to it and a bead of light rests on the knot (shell.css
  *   `data-landed`). The page under the shell holds the same ids, hidden,
@@ -42,37 +37,6 @@ export function tendLab(page: HTMLElement, { signal, catchUp, instant }: Options
     { signal },
   );
 
-  page.addEventListener(
-    "focusin",
-    (event) => {
-      const link = event.target as Element | null;
-      const strip = link?.closest?.<HTMLElement>("[data-reel-strip]");
-      if (!link || !strip || !link.matches(":focus-visible")) return;
-      strip.dataset.reelRest = "";
-      // The whole headline, from its beginning.
-      (link.parentElement ?? link).scrollIntoView({ block: "nearest", inline: "start" });
-      // Where that is longer than the strip and the words alone are not, the
-      // words are shown whole and the thread before them gives way.
-      if (link.getBoundingClientRect().width > strip.clientWidth) return;
-      link.scrollIntoView({ block: "nearest", inline: "nearest" });
-      // Words nearly as long as the strip have no room for its scroll
-      // padding too: they go to the strip's end.
-      const over = link.getBoundingClientRect().right - strip.getBoundingClientRect().right;
-      if (over > 0) strip.scrollLeft += Math.ceil(over);
-    },
-    { signal },
-  );
-  page.addEventListener(
-    "focusout",
-    (event) => {
-      const strip = (event.target as Element | null)?.closest?.<HTMLElement>("[data-reel-rest]");
-      if (!strip || strip.contains(event.relatedTarget as Node | null)) return;
-      strip.scrollLeft = 0;
-      delete strip.dataset.reelRest;
-    },
-    { signal },
-  );
-
   const land = (hash = location.hash) => {
     for (const el of page.querySelectorAll("[data-landed]")) el.removeAttribute("data-landed");
     let id = hash.slice(1);
@@ -89,8 +53,8 @@ export function tendLab(page: HTMLElement, { signal, catchUp, instant }: Options
   // Back and forward, and an address typed in.
   addEventListener("hashchange", () => land(), { signal });
   addEventListener("popstate", () => land(), { signal });
-  // A link on this page to an update on this page (a headline in the Lab's
-  // own reel): the router moves the address without a word to anyone.
+  // A link on this page to an update on this page: the router moves the
+  // address without a word to anyone.
   page.addEventListener(
     "click",
     (event) => {
