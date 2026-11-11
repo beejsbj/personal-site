@@ -1,8 +1,8 @@
 /** The Lab's data contract, and the rules that turn src/content into it.
  *
- * Three documents: the Labbook (every update), the headlines written about
- * those updates, and who is in the room now. In v1 the first two are built
- * from src/content; later the same shapes arrive from storage.
+ * Two documents: the Labbook (every update) and who is in the room now. In
+ * v1 the first is built from src/content; later the same shape arrives
+ * from storage.
  *
  * Pure functions over plain data, with no Astro imports, so the lenses and
  * the tests can import this file directly. */
@@ -44,17 +44,6 @@ export type Artifact = {
   src: string;
   alt: string;
   poster?: string;
-};
-
-/** A line written about one or more updates, for the ticker. It links to
- * the first of them in the Labbook (`labbookHref`). */
-export type Headline = {
-  id: string;
-  /** YYYY-MM-DD. */
-  date: string;
-  text: string;
-  /** Update ids. */
-  updates: string[];
 };
 
 /** Who is in the room. Missing or expired, the live parts say "in repair";
@@ -133,8 +122,7 @@ export function labbookUpdate(id: string, update: UpdateData): Update {
 /** The id of the element that holds an update in the Labbook. */
 export const labbookAnchor = (id: string) => `u-${id}`;
 
-/** Where an update sits in the Labbook. A headline links to the first of
- * its updates this way. */
+/** Where an update sits in the Labbook. */
 export const labbookHref = (id: string) => `/lab#${labbookAnchor(id)}`;
 
 /** The Labbook's one order: newest first and, on one day, by id. */
@@ -178,21 +166,6 @@ export function streamUpdate<T extends UpdateData>(
     href: update.href ?? labbookHref(id),
     linkLabel: update.linkLabel ?? update.title,
   } as InStream<T>;
-}
-
-/** The headlines the ticker may show, newest first. A headline goes with
- * its updates: when one it names is not in the Labbook (withdrawn, expired
- * or not yet due), the headline is not published either. */
-export function publishedHeadlines(
-  headlines: Headline[],
-  labbook: Update[],
-): Headline[] {
-  const published = new Set(labbook.map((update) => update.id));
-  return newestFirst(
-    headlines.filter((headline) =>
-      headline.updates.every((id) => published.has(id)),
-    ),
-  );
 }
 
 const PEN =

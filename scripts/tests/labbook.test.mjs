@@ -4,14 +4,13 @@ import test from "node:test";
 import {
   labbookHref,
   labbookUpdate,
-  publishedHeadlines,
   streamUpdate,
   updateDateLabel,
 } from "../../src/lib/labbook.ts";
 import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
 
-// The Labbook's rules (issue #14): how src/content's updates and headlines
-// become the documents /prism/content.json hands to every lens.
+// The Labbook's rules (issue #14): how src/content's updates become the
+// documents /prism/content.json hands to every lens.
 
 const read = (path) => readFileSync(path, "utf8");
 
@@ -158,35 +157,7 @@ test("the home stream has no redacted updates", () => {
   assert.equal(streamUpdate("something-private", redacted()), undefined);
 });
 
-test("a headline is published only while every update it names is in the Labbook", () => {
-  const labbook = [
-    labbookUpdate("lotus-replay", open()),
-    labbookUpdate("something-private", redacted()),
-  ];
-  const headline = (id, date, updates) => ({
-    id,
-    date,
-    text: `Headline ${id}`,
-    updates,
-  });
-  const about = {
-    one: headline("one", "2026-09-26", ["lotus-replay"]),
-    both: headline("both", "2026-09-27", ["something-private", "lotus-replay"]),
-    withdrawn: headline("withdrawn", "2026-09-28", ["taken-down"]),
-    partly: headline("partly", "2026-09-28", ["lotus-replay", "taken-down"]),
-    sameDay: headline("a-same-day", "2026-09-26", ["lotus-replay"]),
-  };
-  const before = structuredClone(about);
-  assert.deepEqual(
-    publishedHeadlines(Object.values(about), labbook),
-    // Newest first; on one day, in id order.
-    [about.both, about.sameDay, about.one],
-  );
-  assert.deepEqual(about, before);
-  assert.deepEqual(publishedHeadlines(Object.values(about), []), []);
-});
-
-test("content.json carries the Labbook, the headlines and where each experiment sits", async () => {
+test("content.json carries the Labbook and where each experiment sits, and no headlines", async () => {
   const fixture = await serveRuntimeFixture();
   try {
     const data = await (await fixture.fetch("/prism/content.json")).json();
@@ -222,33 +193,10 @@ test("content.json carries the Labbook, the headlines and where each experiment 
     );
     assert.ok(data.labbook.length >= 7, "the seeded updates are all here");
 
-    // The seeded headlines (#95 added three), newest first.
-    assert.deepEqual(data.headlines, [
-      {
-        id: "dayshaper-is-out",
-        date: "2026-09-26",
-        text: "Dayshaper is out: a day planned around a 24-hour ring",
-        updates: ["dayshaper"],
-      },
-      {
-        id: "emotitone-smaller-deck",
-        date: "2026-09-11",
-        text: "EmotiTone's performance deck tries on a smaller size",
-        updates: ["emotitone-performance-deck"],
-      },
-      {
-        id: "redesign-and-field-guide",
-        date: "2026-09-11",
-        text: "A warm-welcome redesign, and a little field guide to go with it",
-        updates: ["warm-welcome-pr", "component-guide"],
-      },
-      {
-        id: "qrng-spins-again",
-        date: "2026-06-20",
-        text: "The Lottery and the Roulette spin again",
-        updates: ["qrng-demos"],
-      },
-    ]);
+    // One record, the update: no headlines beside the Labbook, and no
+    // words for a strip of them.
+    assert.ok(!("headlines" in data), "content.json has a headlines key");
+    assert.ok(!("ticker" in data.site), "content.json names a ticker");
 
     assert.deepEqual(
       data.lab.map((entry) => [entry.slug, entry.place]),

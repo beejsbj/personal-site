@@ -147,10 +147,6 @@ export function expectedParts(
     ref,
     texts: texts.filter((t): t is string => !!t),
   });
-  // the ticker, wherever it runs
-  const ticker = content.headlines.map((headline) =>
-    page("ticker.headline", headline.id, headline.text),
-  );
   switch (route.kind) {
     case "home": {
       const home = pages.home;
@@ -166,7 +162,6 @@ export function expectedParts(
         ...content.updates
           .slice(0, home.updates.limit)
           .map((u) => page("update.item", u.id, u.title)),
-        ...ticker,
         { part: "home.currently", texts: [words(home.currently.body)] },
         ...home.elsewhere.items.map((item, i) =>
           page("home.elsewhere", String(i), item.title),
@@ -205,7 +200,6 @@ export function expectedParts(
           page("lab.title", entry.slug, entry.title),
           page("lab.summary", entry.slug, entry.summary),
         ]),
-        ...ticker,
         // the Labbook: every update, a redacted one by its place alone
         ...content.labbook.map((u) =>
           u.visibility === "open"

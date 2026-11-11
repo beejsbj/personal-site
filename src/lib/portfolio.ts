@@ -13,9 +13,7 @@ import type {
 import { selectActivitySnapshot } from "./activity.mjs";
 import {
   labbookUpdate,
-  publishedHeadlines,
   streamUpdate,
-  type Headline,
   type InStream,
   type Update,
 } from "./labbook";
@@ -184,16 +182,6 @@ export async function getLabbook(): Promise<Update[]> {
   );
 }
 
-/** The headlines whose updates are all in the Labbook, newest first. */
-export async function getHeadlines(): Promise<Headline[]> {
-  const entries: CollectionEntry<"headlines">[] =
-    await getCollection("headlines");
-  return publishedHeadlines(
-    entries.map((entry) => ({ id: entry.id, ...entry.data })),
-    await getLabbook(),
-  );
-}
-
 /** What an update in the Labbook may link to: the experiments and projects
  * that are shown, each where it lives. */
 export async function getRelatable() {
@@ -209,15 +197,6 @@ export async function getRelatable() {
       title: entry.data.title as string,
       href: `/projects/${entry.slug}`,
     })),
-  };
-}
-
-/** The ticker: what it is called and the headlines it runs. */
-export async function getTicker() {
-  const site = await getSite();
-  return {
-    copy: need(site.ticker, "ticker in site/config.json"),
-    headlines: await getHeadlines(),
   };
 }
 

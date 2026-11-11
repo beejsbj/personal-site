@@ -1,10 +1,9 @@
-/** A fixture Labbook and the headlines written about it: every state the
- * Labbook and the ticker can show, whatever src/content holds. The shells
- * meet it in the harness (the `labbook` fixture in ./fixtures); Daylight
- * renders it at /prism/fixtures/lab.
+/** A fixture Labbook: every state the Labbook can show, whatever
+ * src/content holds. The shells meet it in the harness (the `labbook`
+ * fixture in ./fixtures); Daylight renders it at /prism/fixtures/lab.
  *
  * Plain data with no runtime imports, so the Node tests load it too. */
-import type { Headline, Update } from "../lib/labbook";
+import type { Update } from "../lib/labbook";
 
 /** Written into every field a redacted update must not have. It is on no
  * page: a lens that shows it is showing hidden words. */
@@ -40,7 +39,6 @@ export const labbookFixture = ({
   project,
 }: { experiments?: string[]; project?: string } = {}): {
   labbook: Update[];
-  headlines: Headline[];
 } => ({
   labbook: [
     {
@@ -134,26 +132,6 @@ export const labbookFixture = ({
       summary: "What started as one line has a home of its own now.",
       href: "/projects",
       linkLabel: "See the projects",
-    },
-  ],
-  headlines: [
-    {
-      id: "fixture-twice",
-      date: "2026-09-12",
-      text: "The lotus can be watched twice now",
-      updates: ["fixture-replay", "fixture-first-line"],
-    },
-    {
-      id: "fixture-hush",
-      date: "2026-08-20",
-      text: "Something happened here, and that is all anyone will say",
-      updates: ["fixture-kept-back"],
-    },
-    {
-      id: "fixture-grown",
-      date: "2026-09-30",
-      text: "A study grows up and leaves the bench",
-      updates: ["fixture-graduated"],
     },
   ],
 });

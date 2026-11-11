@@ -58,9 +58,6 @@
       "href": "mailto:burooj.bj@gmail.com"
     }
   ],
-  "ticker": {
-    "label": "From the Lab"
-  },
   "updateKinds": {
     "project": "Project",
     "pull-request": "Pull request",

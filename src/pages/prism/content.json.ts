@@ -14,7 +14,6 @@ import {
   getResume,
   getSite,
   getTextPage,
-  getTicker,
   getUpdates,
   getWritingPage,
   getPosts,
@@ -69,13 +68,12 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
       getLabPage(),
       getWritingPage(),
     ]);
-  const [projects, lab, updates, labbook, ticker, featured, derived] =
+  const [projects, lab, updates, labbook, featured, derived] =
     await Promise.all([
       getProjects(),
       getLab(),
       getUpdates(),
       getLabbook(),
-      getTicker(),
       getFeatured(),
       getDerived(),
     ]);
@@ -98,7 +96,6 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
   const content: Omit<SiteContent, "writing"> = {
     site: {
       ...site,
-      ticker: ticker.copy,
       footer: {
         ...site.footer,
         links: site.footer.links.map((link) => resolveLink(site, link)),
@@ -163,7 +160,6 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
       };
     }),
     labbook,
-    headlines: ticker.headlines,
     featured: featured.map((entry) => entry.slug),
     derived,
     lenses,

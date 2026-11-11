@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
-import { parse, problems } from "./lib/content-config.mjs";
+import { collections, parse, problems } from "./lib/content-config.mjs";
 
 // The Lab's data contract (issue #14): what src/content may say about an
-// experiment, an update and a headline, checked against the schemas the
-// build itself validates with.
+// experiment and an update, checked against the schemas the build itself
+// validates with.
 
 const experiment = (over = {}) => ({
   title: "A fixture experiment",
@@ -192,37 +192,17 @@ test("a redacted update carries nothing that could say what it hides", () => {
     );
 });
 
-const headline = (over = {}) => ({
-  date: "2026-09-26",
-  text: "A day now fits on a ring",
-  updates: ["dayshaper"],
-  ...over,
-});
-
-test("a headline is a dated line about one or more updates", () => {
-  assert.deepEqual(problems("headlines", headline()), []);
-  assert.deepEqual(
-    problems("headlines", headline({ updates: ["dayshaper", "qrng-demos"] })),
-    [],
+test("there is one record, the update: no collection of headlines beside it", () => {
+  assert.ok(!("headlines" in collections), "a headlines collection");
+  assert.ok(
+    !existsSync("src/content/headlines.json"),
+    "src/content/headlines.json",
   );
-  const { text, ...wordless } = headline();
-  assert.deepEqual(problems("headlines", wordless), ["text: Required"]);
-  assert.match(
-    problems("headlines", headline({ updates: [] })).join("\n"),
-    /^updates: /,
-  );
-  assert.match(
-    problems("headlines", headline({ date: "26 Sep 2026" })).join("\n"),
-    /^date: /,
-  );
-});
-
-test("a headline naming an update that does not exist is rejected", () => {
-  assert.deepEqual(
-    problems(
-      "headlines",
-      headline({ updates: ["dayshaper", "an-update-nobody-wrote"] }),
-    ),
-    ['updates.1: No update has the id "an-update-nobody-wrote".'],
+  // And the site has no words for a strip of them.
+  const site = JSON.parse(readFileSync("src/content/site/config.json", "utf8"));
+  assert.ok(!("ticker" in site), "ticker in site/config.json");
+  assert.ok(
+    !("ticker" in parse("site", { ...site, ticker: { label: "News" } })),
+    "the site carries a ticker's words",
   );
 });

@@ -1,6 +1,4 @@
-import { readdirSync } from "node:fs";
 import { defineCollection, z } from "astro:content";
-import { file } from "astro/loaders";
 
 /* Every word a visitor reads lives in src/content. Daylight renders it and
  * /prism/content.json hands the same words to every lens. Short copy fields
@@ -367,32 +365,6 @@ export type UpdateData = z.infer<typeof updateSchema>;
 export type UpdateKind = (typeof UPDATE_KINDS)[number];
 export type UpdateSource = (typeof UPDATE_SOURCES)[number];
 
-/** An update's id is its file name (`updateId` in src/lib/portfolio.ts). */
-const updateIds = () =>
-  readdirSync(new URL("./content/updates/", import.meta.url))
-    .filter((name) => name.endsWith(".md"))
-    .map((name) => name.slice(0, -".md".length));
-
-/** A line written about one or more updates, for the ticker. Naming an
- * update that is not there fails the build. */
-const headlineSchema = z
-  .object({
-    date: day,
-    text: z.string().min(1),
-    /** The ids of the updates it is about; it links to the first. */
-    updates: z.array(z.string()).min(1),
-  })
-  .superRefine((headline, context) => {
-    const known = new Set(updateIds());
-    headline.updates.forEach((id, index) => {
-      if (known.has(id)) return;
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["updates", index],
-        message: `No update has the id "${id}".`,
-      });
-    });
-  });
 
 const siteSchema = z.object({
   name: z.string(),
@@ -428,8 +400,6 @@ const siteSchema = z.object({
       href: z.string(),
     }),
   ),
-  /** The ticker: what the strip of headlines is called. */
-  ticker: z.object({ label: z.string() }).optional(),
   /** How each kind and source of update is named. */
   updateKinds: z.record(z.enum(UPDATE_KINDS), z.string()),
   updateSources: z.record(z.enum(UPDATE_SOURCES), z.string()),
@@ -457,12 +427,6 @@ const updates = defineCollection({
   schema: updateSchema,
 });
 
-/** Every headline, in one file: a list of `{ id, date, text, updates }`. */
-const headlines = defineCollection({
-  loader: file("src/content/headlines.json"),
-  schema: headlineSchema,
-});
-
 const site = defineCollection({
   type: "data",
   schema: siteSchema,
@@ -482,7 +446,6 @@ export const collections = {
   projects,
   lab,
   updates,
-  headlines,
   site,
   lenses,
 };

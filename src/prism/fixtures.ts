@@ -13,7 +13,6 @@ import {
 } from "../lib/rules";
 import {
   newestFirst,
-  publishedHeadlines,
   streamUpdate,
   type Update as LabbookUpdate,
 } from "../lib/labbook";
@@ -533,21 +532,17 @@ export const FIXTURES: Record<string, Fixture> = {
   labbook: {
     name: "labbook",
     about:
-      "A Labbook with every kind of artifact and a redacted update, about two experiments and a project, and three headlines on the ticker.",
-    apply(content) {
-      const { labbook, headlines } = labbookFixture({
-        experiments: content.lab.slice(0, 2).map((entry) => entry.slug),
-        project: content.projects[0]?.slug,
-      });
-      const next = withUpdates(content, labbook);
-      return settle({
-        ...next,
-        headlines: publishedHeadlines(
-          [...content.headlines, ...headlines],
-          next.labbook,
+      "A Labbook with every kind of artifact and a redacted update, about two experiments and a project.",
+    apply: (content) =>
+      settle(
+        withUpdates(
+          content,
+          labbookFixture({
+            experiments: content.lab.slice(0, 2).map((entry) => entry.slug),
+            project: content.projects[0]?.slug,
+          }).labbook,
         ),
-      });
-    },
+      ),
     routes: () => [
       { kind: "home", path: "/" },
       { kind: "lab", path: "/lab" },

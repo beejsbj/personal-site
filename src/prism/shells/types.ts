@@ -16,7 +16,7 @@ import type CutPaperCopy from "../../content/lenses/cut-paper.json";
 import type BackPageCopy from "../../content/lenses/back-page.json";
 import type HionCopy from "../../content/lenses/hion.json";
 import type { UpdateKind, UpdateSource } from "../../content.config";
-import type { Headline, Update as LabbookUpdate } from "../../lib/labbook";
+import type { Update as LabbookUpdate } from "../../lib/labbook";
 
 export interface Link {
   label: string;
@@ -182,8 +182,6 @@ export interface SiteContent {
     header: { label: string; home: string; hello: string; items: string[] };
     footer: { links: Link[]; signoff: string };
     social: { label: string; href: string }[];
-    /** The ticker: what the strip of headlines is called. */
-    ticker: { label: string };
     /** How the site names each kind of update and each place one comes
      * from ("Pull request", "This site"): a Labbook update says only which.
      * The schema asks for no name in particular, so one may be missing. */
@@ -313,8 +311,6 @@ export interface SiteContent {
   /** The Labbook: every due, unexpired update, newest first. A redacted
    * one is its shape alone. */
   labbook: LabbookUpdate[];
-  /** The headlines written about updates in the Labbook, newest first. */
-  headlines: Headline[];
   /** Slugs of the featured projects, in project order (shared rule; never
    * empty while there are projects). */
   featured: string[];
