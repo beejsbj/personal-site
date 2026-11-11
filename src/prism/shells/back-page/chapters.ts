@@ -13,7 +13,6 @@ import {
   embedSrc,
   experimentUpdates,
   labbookAnchor,
-  labbookHref,
   penUser,
   relatedLinks,
   type Artifact,
@@ -557,7 +556,8 @@ function home(b: Build): HTMLElement[] {
     ),
   ];
 
-  // the diary: dated lines, newest first
+  // the diary: dated lines, newest first; an update with nowhere to go is
+  // its title, not a link
   const diary = h("ol", { class: "bp-diary", "aria-label": updates.listLabel });
   for (const u of content.updates) {
     diary.append(
@@ -565,7 +565,7 @@ function home(b: Build): HTMLElement[] {
         "li",
         { "data-kind": u.kind, ...part("update.item", u.id) },
         h("time", { class: "bp-mnote", datetime: u.date }, shortDate(u.date, copy.months)),
-        h("p", { class: "bp-diary__title" }, link(u.href, copy.newTab, u.title)),
+        h("p", { class: "bp-diary__title" }, u.href ? link(u.href, copy.newTab, u.title) : u.title),
         h("p", { class: "bp-diary__summary" }, u.summary),
         h("p", { class: "bp-diary__src" }, `${u.sourceLabel} · ${u.kindLabel}`),
       ),
@@ -895,8 +895,9 @@ function artifactFigure(b: Build, artifact: Artifact, key: string): HTMLElement 
 }
 
 /** A run of updates as dated lines, the way the diary on the first page is
- * kept. An open update has its day in the margin, what happened and where
- * it came from; in the Labbook itself (`full`) it is also where links to it
+ * kept. An open update has its day in the margin, what happened (a link
+ * when it has somewhere to go, text when it has not) and where it came
+ * from; in the Labbook itself (`full`) it is also where a link to it would
  * land (its `id`), and it says what it is about and shows its artifact. A
  * redacted update is its day, the kind of work, and its words scribbled
  * out: one scribble for each bar of its shape, as long as the bar says.
@@ -947,7 +948,7 @@ function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: bo
         h(
           "p",
           { class: "bp-diary__title" },
-          u.href ? link(u.href, copy.newTab, u.title) : full ? u.title : h("a", { href: labbookHref(u.id) }, u.title),
+          u.href ? link(u.href, copy.newTab, u.title) : u.title,
         ),
         h("p", { class: "bp-diary__summary" }, u.summary),
         h(

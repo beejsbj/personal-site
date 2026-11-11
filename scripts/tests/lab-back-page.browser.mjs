@@ -120,6 +120,7 @@ const updates = () => {
       controls: item.querySelectorAll(
         "a, button, iframe, img, video, audio, [data-artifact]",
       ).length,
+      links: item.querySelectorAll("a").length,
     };
   });
 };
@@ -718,6 +719,67 @@ test(
         );
 
         await t.test(
+          `${size}: an update with nowhere to go is text, not a link, in the first page's diary and in the Labbook`,
+          async () => {
+            // Nothing in the book points at an update's place in the Labbook.
+            const pointers = () =>
+              document.querySelectorAll("#lens-shell a[href*='#u-']").length;
+
+            const home = await open(size, harness("labbook", "/"));
+            const stream = (await fixtureContent(home.page)).updates;
+            const nowhere = stream.filter((update) => !update.href);
+            assert.ok(nowhere.length >= 2, "the fixture has such updates");
+            assert.ok(stream.length > nowhere.length, "and ones that do go");
+            const views = await leaf(
+              home.page,
+              [updates, pointers],
+              `home-nowhere-${size}`,
+            );
+            const diary = views.flatMap(([entries]) => entries);
+            assert.deepEqual(
+              diary.map(({ ref, href, links }) => ({ ref, href, links })),
+              stream.map((update) => ({
+                ref: update.id,
+                href: update.href ?? null,
+                links: update.href ? 1 : 0,
+              })),
+              "a title is a link only where its update goes somewhere",
+            );
+            assert.deepEqual(
+              views.map(([, pointing]) => pointing),
+              views.map(() => 0),
+            );
+            assert.deepEqual(home.errors, []);
+            await home.context.close();
+
+            const lab = await open(size, harness("labbook", "/lab"));
+            const written = (await fixtureContent(lab.page)).labbook.filter(
+              (update) => update.visibility === "open",
+            );
+            const read = await leaf(lab.page, [updates, pointers]);
+            const entries = read.flatMap(([list]) => list);
+            for (const update of written) {
+              const entry = entries.find((item) => item.ref === update.id);
+              assert.equal(entry.href, update.href ?? null, update.id);
+            }
+            // With nothing it is about and nothing that lives elsewhere,
+            // such an update has no link in it at all.
+            for (const id of ["fixture-film", "fixture-tone"])
+              assert.equal(
+                entries.find((entry) => entry.ref === id).links,
+                0,
+                `${id} has no link in it`,
+              );
+            assert.deepEqual(
+              read.map(([, pointing]) => pointing),
+              read.map(() => 0),
+            );
+            assert.deepEqual(lab.errors, []);
+            await lab.context.close();
+          },
+        );
+
+        await t.test(
           `${size}: a link to an update opens the lab book at it, and the address moving on turns the pages`,
           async () => {
             // the update furthest into the book, and the one it opens at
@@ -859,8 +921,9 @@ test(
                 continue;
               }
               assert.ok(entry.title.startsWith(update.title));
-              // An update with nowhere else to go opens the Labbook at it.
-              assert.equal(entry.href, update.href ?? labbookHref(update.id));
+              // An update with nowhere to go is text, not a link to its
+              // place in the Labbook.
+              assert.equal(entry.href, update.href ?? null, update.id);
             }
             assert.deepEqual([...errors, ...again.errors], []);
             await context.close();
