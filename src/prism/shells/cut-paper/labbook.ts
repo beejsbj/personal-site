@@ -125,7 +125,7 @@ function line(env: Env, update: Update, index: number, whole: boolean) {
         h(
           "div",
           { class: "cp-strike", "aria-hidden": "true" },
-          update.shape.bars.map((length, i) => h("i", { "data-strip": "", style: `--len:${Number(length) || 1}; --tilt:${[-0.7, 0.5, -0.3, 0.8][i % 4]}deg` })),
+          update.shape.parts.filter((part) => typeof part === "number").map((length, i) => h("i", { "data-strip": "", style: `--len:${Number(length) || 1}; --tilt:${[-0.7, 0.5, -0.3, 0.8][i % 4]}deg` })),
         ),
       ),
     );

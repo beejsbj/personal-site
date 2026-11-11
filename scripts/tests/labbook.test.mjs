@@ -45,7 +45,7 @@ const redacted = (over = {}) => ({
   source: "bjslab",
   visibility: "redacted",
   date: "2026-09-27",
-  shape: { work: "code", bars: [4, 2, 3] },
+  shape: { work: "code", parts: [4, 2, 3] },
   ...over,
 });
 
@@ -106,7 +106,7 @@ test("the Labbook carries a redacted update's shape and never its words", () => 
     source: "bjslab",
     relatedExperiment: "cockpit",
     visibility: "redacted",
-    shape: { work: "code", bars: [4, 2, 3] },
+    shape: { work: "code", parts: [4, 2, 3] },
   };
   assert.deepEqual(
     labbookUpdate(
@@ -132,6 +132,16 @@ test("the Labbook carries a redacted update's shape and never its words", () => 
     ),
     shown,
   );
+});
+
+test("the Labbook carries the few words a redacted update shows, in their places among its bars", () => {
+  const shape = { work: "design", parts: ["Rewired", 4, 2, "the", 6] };
+  const written = redacted({ shape });
+  const carried = labbookUpdate("half-said", written);
+  assert.deepEqual(carried.shape, shape);
+  // A copy: what a lens does with it cannot reach back into the content.
+  carried.shape.parts.push("more");
+  assert.deepEqual(written.shape.parts, ["Rewired", 4, 2, "the", 6]);
 });
 
 test("the home stream shows a fully written update exactly as written", () => {

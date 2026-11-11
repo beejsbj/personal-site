@@ -68,11 +68,22 @@ test("the schema refuses a redacted update that carries words", () => {
   assert.deepEqual(problems("updates", shapeOnly), []);
 });
 
-test("a redacted update is drawn as its bars, its kind of work and its date, and nothing it hides", async () => {
+/** A redacted update's line in its entry's markup, part by part: a word
+ * as written, a bar as what it says aloud. */
+const line = (html) =>
+  [
+    ...html.matchAll(
+      /<span\b[^>]*\bdata-redaction-(word|bar)\b[^>]*>([\s\S]*?)<\/span>/g,
+    ),
+  ].map(([, kind, inside]) =>
+    kind === "word" ? text(inside) : { bar: text(inside) },
+  );
+
+test("a redacted update is drawn as its line, its kind of work and its date, and nothing it hides", async () => {
   const fixture = await serveRuntimeFixture();
   try {
     const { pages } = await (await fixture.fetch("/prism/content.json")).json();
-    const { label, works } = pages.lab.labbook.redacted;
+    const { label, bar, works } = pages.lab.labbook.redacted;
     const response = await fixture.fetch("/prism/fixtures/lab");
     assert.equal(response.status, 200);
     const html = await response.text();
@@ -82,24 +93,42 @@ test("a redacted update is drawn as its bars, its kind of work and its date, and
       shown.some((entry) => entry.id === "fixture-replay"),
       "the fixture room has a Labbook",
     );
-    const redacted = shown.find((entry) => entry.id === keptBack.id);
-    assert.ok(redacted, "the redacted update has its place in the Labbook");
-    assert.equal(
-      (redacted.html.match(/\bdata-redaction-bar\b/g) ?? []).length,
-      keptBack.shape.bars.length,
-      "one bar for each number in its shape",
+    const hidden = labbookFixture().labbook.filter(
+      (update) => update.visibility === "redacted",
     );
-    assert.match(redacted.html, /data-part="update\.redacted"/);
-    assert.equal(
-      text(redacted.html),
-      `${label} ${works[keptBack.shape.work]} ${updateDateLabel(keptBack.date)}`,
-      "its name, its kind of work and its date are all it says",
+    assert.deepEqual(
+      hidden.map((update) =>
+        update.shape.parts.some((part) => typeof part === "string"),
+      ),
+      [false, true],
+      "the fixture has one that is bars alone and one that shows a few words",
     );
-    assert.doesNotMatch(
-      redacted.html,
-      /<(?:a|img|iframe|video|audio|source|button)\b/,
-      "it links to nothing and shows no artifact",
-    );
+    for (const update of hidden) {
+      const redacted = shown.find((entry) => entry.id === update.id);
+      assert.ok(redacted, `${update.id} has its place in the Labbook`);
+      const { parts, work } = update.shape;
+      assert.deepEqual(
+        line(redacted.html),
+        parts.map((part) => (typeof part === "string" ? part : { bar })),
+        `${update.id}: its words as written and a bar for each number, in order`,
+      );
+      assert.match(redacted.html, /data-part="update\.redacted"/);
+      assert.equal(
+        text(redacted.html),
+        [
+          label,
+          works[work],
+          ...parts.map((part) => (typeof part === "string" ? part : bar)),
+          updateDateLabel(update.date),
+        ].join(" "),
+        `${update.id}: its name, its kind of work, its line and its date are all it says`,
+      );
+      assert.doesNotMatch(
+        redacted.html,
+        /<(?:a|img|iframe|video|audio|source|button)\b/,
+        `${update.id} links to nothing and shows no artifact`,
+      );
+    }
     // Not in its own entry, not anywhere.
     assert.ok(
       !html.includes(REDACTION_MARKER),

@@ -128,7 +128,7 @@ function censored(content: SiteContent, update: Hidden, attrs: Record<string, st
       h(
         "p",
         { class: "cc-entry__bars", "aria-hidden": "true" },
-        shape.bars.map((bar, i) =>
+        shape.parts.filter((part) => typeof part === "number").map((bar, i) =>
           h("span", { "data-redaction-bar": "", style: `--bar:${Number(bar) || 1};--n:${i}` }),
         ),
       ),

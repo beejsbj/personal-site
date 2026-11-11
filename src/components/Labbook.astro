@@ -86,9 +86,10 @@ const updates = newestFirst(Astro.props.updates);
               date={update.date}
               dateLabel={updateDateLabel(update.date)}
               redacted={{
-                bars: update.shape.bars,
+                parts: update.shape.parts,
                 work: copy.redacted.works[update.shape.work],
                 label: copy.redacted.label,
+                bar: copy.redacted.bar,
               }}
               connected={index < updates.length - 1}
             />

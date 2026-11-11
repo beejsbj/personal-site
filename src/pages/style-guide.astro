@@ -365,9 +365,21 @@ const anatomy = [
           date="2026-08-20"
           dateLabel={updateDateLabel("2026-08-20")}
           redacted={{
-            bars: [5, 3, 8, 4],
+            parts: [5, 3, 8, 4],
             work: labbook.redacted.works.code,
             label: labbook.redacted.label,
+            bar: labbook.redacted.bar,
+          }}
+          connected
+        />
+        <UpdateEntry
+          date="2026-08-24"
+          dateLabel={updateDateLabel("2026-08-24")}
+          redacted={{
+            parts: ["Rewired", 4, 2, "the", 6],
+            work: labbook.redacted.works.design,
+            label: labbook.redacted.label,
+            bar: labbook.redacted.bar,
           }}
         />
       </div>
@@ -375,7 +387,8 @@ const anatomy = [
         In the Labbook an update may show an artifact: a Pen or a demo waits
         on its stage until it is asked for, so nothing loads from another
         site before the click. A redacted update is its shape and nothing
-        else: one struck bar for each number it was given.
+        else: its line, with the few words it shows as written and a struck
+        bar for each word it does not.
       </p>
     </section>
 

@@ -62,7 +62,7 @@ test("an experiment's updates are the ones about it, newest first", () => {
   const redacted = {
     ...wordless,
     visibility: "redacted",
-    shape: { work: "code", bars: [4, 2, 3] },
+    shape: { work: "code", parts: [4, 2, 3] },
   };
   const labbook = [
     update("first-petal", "2026-08-02", "lotus-studies"),

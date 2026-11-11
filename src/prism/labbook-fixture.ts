@@ -9,16 +9,10 @@ import type { Update } from "../lib/labbook";
  * page: a lens that shows it is showing hidden words. */
 export const REDACTION_MARKER = "fixture-words-nobody-may-read";
 
-/** A redacted update as it must never arrive: with words. The schema
- * refuses it (scripts/tests/labbook-daylight.test.mjs); should one get
- * past, a lens still draws its shape and nothing else. */
-const keptBack = {
-  id: "fixture-kept-back",
-  date: "2026-08-20",
-  kind: "project",
-  source: "bjslab",
-  visibility: "redacted",
-  shape: { work: "code", bars: [5, 3, 8, 4] },
+/** What a redacted update must never arrive with: words outside its shape.
+ * The schema refuses them (scripts/tests/labbook-daylight.test.mjs);
+ * should some get past, a lens still draws its shape and nothing else. */
+const hidden = {
   title: `${REDACTION_MARKER}: the title`,
   summary: `${REDACTION_MARKER}: the summary`,
   href: `/lab/${REDACTION_MARKER}`,
@@ -28,6 +22,29 @@ const keptBack = {
     src: `/images/${REDACTION_MARKER}.png`,
     alt: `${REDACTION_MARKER}: the picture`,
   },
+};
+
+/** A redacted update that is bars alone. */
+const keptBack = {
+  id: "fixture-kept-back",
+  date: "2026-08-20",
+  kind: "project",
+  source: "bjslab",
+  visibility: "redacted",
+  shape: { work: "code", parts: [5, 3, 8, 4] },
+  ...hidden,
+} as Update;
+
+/** A redacted update that shows a few of its words: its line reads
+ * "Rewired ████ ██ the ██████". */
+const halfSaid = {
+  id: "fixture-half-said",
+  date: "2026-08-24",
+  kind: "project",
+  source: "bjslab",
+  visibility: "redacted",
+  shape: { work: "design", parts: ["Rewired", 4, 2, "the", 6] },
+  ...hidden,
 } as Update;
 
 const PEN = "https://codepen.io/beejsbj/pen/abXZWLQ";
@@ -57,6 +74,7 @@ export const labbookFixture = ({
       },
     },
     keptBack,
+    halfSaid,
     {
       id: "fixture-film",
       date: "2026-08-28",

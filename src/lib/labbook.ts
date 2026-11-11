@@ -9,7 +9,8 @@
 import type { UpdateData, UpdateKind, UpdateSource } from "../content.config";
 
 /** One dated entry in the Labbook. A redacted update happened and is not
- * shown: the site is given its shape and never its words. */
+ * shown: the site is given its shape, which may show a few of its words,
+ * and never the rest. */
 export type Update = {
   /** Stable and opaque. In v1, the file name. */
   id: string;
@@ -33,8 +34,10 @@ export type Update = {
       visibility: "redacted";
       shape: {
         work: "code" | "design" | "writing" | "research" | "other";
-        /** The lengths of the black bars, not derived from the hidden text. */
-        bars: number[];
+        /** Its line, in order: a string is a word shown as written, a
+         * number the length of a black bar (not derived from the hidden
+         * text). At least one part is a bar. */
+        parts: (string | number)[];
       };
     }
 );
@@ -106,7 +109,7 @@ export function labbookUpdate(id: string, update: UpdateData): Update {
     return said({
       ...common,
       visibility: update.visibility,
-      shape: { work: update.shape.work, bars: [...update.shape.bars] },
+      shape: { work: update.shape.work, parts: [...update.shape.parts] },
     });
   return said({
     ...common,

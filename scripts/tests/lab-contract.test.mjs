@@ -112,13 +112,18 @@ test("an open update may belong to an experiment and carry an artifact", () => {
   ]);
 });
 
-const shape = { work: "code", bars: [4, 2, 3] };
+// A redacted update's shape: what kind of work it was, and its line, part
+// by part. A string is a word shown as written; a number is a black bar of
+// that length.
+const shape = { work: "code", parts: ["Rewired", 4, 2, "the", 6] };
 const redacted = (over = {}) => ({
   date: "2026-09-26",
   visibility: "redacted",
   shape,
   ...over,
 });
+const shaped = (parts) => redacted({ shape: { ...shape, parts } });
+const REFUSED = "A redacted update shows its shape and nothing else.";
 
 test("a redacted update with a title or a summary is rejected", () => {
   assert.deepEqual(
@@ -126,10 +131,7 @@ test("a redacted update with a title or a summary is rejected", () => {
       "updates",
       redacted({ title: "The hidden thing", summary: "What it was." }),
     ),
-    [
-      "title: A redacted update shows its shape and no words.",
-      "summary: A redacted update shows its shape and no words.",
-    ],
+    [`title: ${REFUSED}`, `summary: ${REFUSED}`],
   );
 });
 
@@ -139,7 +141,7 @@ test("an open update with a shape is rejected", () => {
   ]);
 });
 
-test("a redacted update is a date, a kind of work and some black bars", () => {
+test("a redacted update is a date, a kind of work and a line of words and black bars", () => {
   assert.deepEqual(parse("updates", redacted({ source: "bjslab" })), {
     kind: "project",
     source: "bjslab",
@@ -152,6 +154,13 @@ test("a redacted update is a date, a kind of work and some black bars", () => {
       problems("updates", redacted({ shape: { ...shape, work } })),
       [],
     );
+  // Bars alone, with no word shown, is still a shape.
+  assert.deepEqual(problems("updates", shaped([4, 2, 3])), []);
+  // A word may be as long as 24 characters, and may carry its punctuation.
+  assert.deepEqual(
+    problems("updates", shaped(["a".repeat(24), 3, "(re-wired),"])),
+    [],
+  );
 
   const { shape: _, ...shapeless } = redacted();
   assert.deepEqual(problems("updates", shapeless), ["shape: Required"]);
@@ -162,15 +171,52 @@ test("a redacted update is a date, a kind of work and some black bars", () => {
     ).join("\n"),
     /^shape\.work: /,
   );
+  // The bars it used to be written as are not its parts.
+  assert.deepEqual(
+    problems("updates", redacted({ shape: { work: "code", bars: [4, 2] } })),
+    ["shape.parts: Required"],
+  );
 });
 
-test("a redacted update always has something to show: at least one bar, each with a length", () => {
-  for (const bars of [[], [4, 0], [4, -2]])
+test("a redacted update always blacks something out: at least one bar, each with a length", () => {
+  assert.deepEqual(problems("updates", shaped(["Rewired", "the"])), [
+    "shape.parts: A redacted update blacks out at least one part.",
+  ]);
+  assert.deepEqual(problems("updates", shaped([])), [
+    "shape.parts: A redacted update blacks out at least one part.",
+  ]);
+  for (const parts of [
+    [4, 0],
+    [4, -2],
+    ["Rewired", 0],
+  ])
     assert.match(
-      problems("updates", redacted({ shape: { ...shape, bars } })).join("\n"),
-      /^shape\.bars/,
-      `bars ${JSON.stringify(bars)} should be refused`,
+      problems("updates", shaped(parts)).join("\n"),
+      /^shape\.parts\.1: /,
+      `parts ${JSON.stringify(parts)} should be refused`,
     );
+});
+
+test("a word shown in a redacted update is one short word, never a sentence", () => {
+  assert.deepEqual(problems("updates", shaped(["a".repeat(25), 4])), [
+    "shape.parts.0: A word shown in a redacted update is at most 24 characters.",
+  ]);
+  for (const sentence of ["Rewired the", "Rewired\tthe", "line\nbreak", " the"])
+    assert.deepEqual(
+      problems("updates", shaped([4, sentence])),
+      [
+        "shape.parts.1: A word shown in a redacted update has no spaces: one word to a part.",
+      ],
+      JSON.stringify(sentence),
+    );
+  assert.deepEqual(problems("updates", shaped([4, ""])), [
+    "shape.parts.1: A word shown in a redacted update is not empty.",
+  ]);
+  // Nothing but a word or a length is a part.
+  assert.match(
+    problems("updates", shaped([4, { word: "Rewired" }])).join("\n"),
+    /^shape\.parts\.1: /,
+  );
 });
 
 test("a redacted update carries nothing that could say what it hides", () => {
@@ -187,7 +233,7 @@ test("a redacted update carries nothing that could say what it hides", () => {
   for (const [field, value] of Object.entries(words))
     assert.deepEqual(
       problems("updates", redacted({ [field]: value })),
-      [`${field}: A redacted update shows its shape and no words.`],
+      [`${field}: ${REFUSED}`],
       `a redacted update with ${field}`,
     );
 });

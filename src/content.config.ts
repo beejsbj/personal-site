@@ -151,7 +151,8 @@ const pageSchema = z.object({
     })
     .optional(),
   /** The Labbook on the Lab's page: its heading, what an artifact's frame
-   * says before and after it loads, and how a redacted update is named. */
+   * says before and after it loads, and how a redacted update, and each
+   * bar on its line, is named. */
   labbook: z
     .object({
       title: z.string(),
@@ -168,6 +169,8 @@ const pageSchema = z.object({
       }),
       redacted: z.object({
         label: z.string(),
+        /** What a black bar is called aloud. */
+        bar: z.string(),
         /** A name for each kind of work a redacted update may be. */
         works: z.object({
           code: z.string(),
@@ -314,17 +317,34 @@ const openUpdateSchema = z.object({
   shape: refused("Only a redacted update has a shape."),
 });
 
+/** A word a redacted update shows: one short word, so a sentence cannot
+ * be passed as one. */
+const shownWord = z
+  .string()
+  .min(1, "A word shown in a redacted update is not empty.")
+  .max(24, "A word shown in a redacted update is at most 24 characters.")
+  .regex(
+    /^\S*$/,
+    "A word shown in a redacted update has no spaces: one word to a part.",
+  );
+
 /** Something made that stays private: the site is told that it happened
- * and what shape it has, and never what it says. */
-const noWords = refused("A redacted update shows its shape and no words.");
+ * and what shape it has. Its line is given part by part, and the site is
+ * never told the parts that are blacked out. */
+const noWords = refused("A redacted update shows its shape and nothing else.");
 const redactedUpdateSchema = z.object({
   ...updateFields,
   visibility: z.literal("redacted"),
   shape: z.object({
     work: z.enum(["code", "design", "writing", "research", "other"]),
-    /** The lengths of the black bars. Chosen, not measured from the
-     * hidden text. */
-    bars: z.array(z.number().positive()).min(1),
+    /** Its line, in order: a word shown as written, or the length of a
+     * black bar (chosen, not measured from the hidden text). At least one
+     * part is a bar. */
+    parts: z
+      .array(z.union([shownWord, z.number().positive()]))
+      .refine((parts) => parts.some((part) => typeof part === "number"), {
+        message: "A redacted update blacks out at least one part.",
+      }),
   }),
   title: noWords,
   summary: noWords,

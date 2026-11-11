@@ -917,7 +917,8 @@ function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: bo
     ];
     const id = full ? labbookAnchor(u.id) : null;
     if (u.visibility !== "open") {
-      const { work, bars } = u.shape;
+      const { work } = u.shape;
+      const bars = u.shape.parts.filter((part) => typeof part === "number");
       const rng = seed(`struck-${u.id}`);
       list.append(
         h(

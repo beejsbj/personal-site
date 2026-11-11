@@ -335,8 +335,8 @@ test(
               const { redacted } = content.pages.lab.labbook;
               assert.equal(
                 kept.text,
-                `${redacted.label} ${redacted.works.code} 20 Aug 2026`,
-                "its name, its kind of work and its date are all it says",
+                `${redacted.label} ${redacted.works.code} ${redacted.bar} ${redacted.bar} ${redacted.bar} 20 Aug 2026`,
+                "its name, its kind of work, a word for each bar and its date are all it says",
               );
               assert.equal(kept.controls, 0, "nothing to follow or play");
               // The fixture's shape is 4, 2, 3: a bar for each, a longer

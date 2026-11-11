@@ -221,7 +221,7 @@ const content = {
       kind: "project",
       source: "bjslab",
       visibility: "redacted",
-      shape: { work: "code", bars: [4, 2, 3] },
+      shape: { work: "code", parts: [4, 2, 3] },
     },
     open("first-petal", "2026-08-02"),
   ],

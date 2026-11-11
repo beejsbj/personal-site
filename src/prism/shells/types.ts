@@ -256,7 +256,8 @@ export interface SiteContent {
       /** The Labbook: its heading and a line about it; what introduces the
        * experiment or project an update is about; what an artifact's frame
        * says before it loads (`load`), where it lives instead (`open`); and
-       * how a redacted update, and each kind of work it may be, is named. */
+       * how a redacted update, a black bar on its line (said aloud, once
+       * for each) and each kind of work it may be are named. */
       labbook: {
         title: string;
         note: string;
@@ -269,6 +270,7 @@ export interface SiteContent {
         };
         redacted: {
           label: string;
+          bar: string;
           works: Record<
             "code" | "design" | "writing" | "research" | "other",
             string

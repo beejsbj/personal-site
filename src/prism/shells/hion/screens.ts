@@ -764,7 +764,7 @@ function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: b
         when,
         {},
         h("p", { class: "hion-sr" }, copy.redacted.label),
-        bound(shape.bars, hue),
+        bound(shape.parts.filter((part) => typeof part === "number"), hue),
         h("p", { class: "hion-meta" }, copy.redacted.works[shape.work]),
       ),
     );

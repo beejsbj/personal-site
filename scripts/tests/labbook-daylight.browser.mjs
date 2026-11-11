@@ -23,6 +23,7 @@ import {
   REDACTION_MARKER,
 } from "../../src/prism/labbook-fixture.ts";
 import { updateDateLabel } from "../../src/lib/labbook.ts";
+import { checkRedactedLine, redactedLine } from "./lib/redaction.mjs";
 
 const SIZES = {
   desktop: { viewport: { width: 1280, height: 800 } },
@@ -505,21 +506,29 @@ test(
         );
 
         await t.test(
-          `${size}: a redacted update is its bars, with a name a screen reader can say`,
+          `${size}: a redacted update is its bars, each said once, under a name a screen reader can say`,
           async () => {
             const { context, page } = await open(size, ROOM);
             const book = await labbook(page);
             const kept = fixture.labbook.find(
-              (update) => update.visibility === "redacted",
+              (update) => update.id === "fixture-kept-back",
             );
+            const { parts } = kept.shape;
+            assert.ok(parts.every((part) => typeof part === "number"));
             const entry = book.entries.find((item) => item.id === kept.id);
             assert.equal(entry.part, "update.redacted");
             assert.equal(entry.ref, kept.id);
-            assert.equal(entry.bars, kept.shape.bars.length);
+            assert.equal(entry.bars, parts.length);
             assert.equal(entry.date, kept.date);
             assert.equal(
               entry.text,
-              `${copy.redacted.label} ${copy.redacted.works[kept.shape.work]} ${updateDateLabel(kept.date)}`,
+              [
+                copy.redacted.label,
+                copy.redacted.works[kept.shape.work],
+                ...parts.map(() => copy.redacted.bar),
+                updateDateLabel(kept.date),
+              ].join(" "),
+              "its name, its kind of work, a word for each bar and its date are all it says",
             );
             assert.equal(entry.controls, 0, "nothing to follow or play");
             assert.deepEqual(entry.related, []);
@@ -527,46 +536,100 @@ test(
               await page
                 .getByRole("article", { name: copy.redacted.label })
                 .count(),
-              1,
-              "it is named for assistive technology",
+              2,
+              "each redacted update is named for assistive technology",
             );
-            const bars = await page.evaluate((id) => {
-              const all = [
-                ...document.querySelectorAll(`#u-${id} [data-redaction-bar]`),
-              ];
-              return all.map((bar) => {
-                const { width, height } = bar.getBoundingClientRect();
-                return {
-                  width,
-                  height,
-                  hidden: !!bar.closest("[aria-hidden='true']"),
-                  ink: getComputedStyle(bar).backgroundColor,
-                };
-              });
-            }, kept.id);
+            const item = page.locator(`#u-${kept.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            const bars = await item.evaluate((el) =>
+              [...el.querySelectorAll("[data-redaction-bar]")].map((bar) => ({
+                height: bar.getBoundingClientRect().height,
+                ink: getComputedStyle(bar).backgroundColor,
+              })),
+            );
             const text = await page.evaluate(
               () => getComputedStyle(document.body).color,
             );
             for (const bar of bars) {
-              assert.ok(bar.hidden, "a bar says nothing");
               assert.ok(bar.height > 8, "a bar is tall enough to be a line");
               assert.equal(bar.ink, text, "a bar is the ink's own black");
             }
-            // Longer numbers, longer bars.
-            const order = (list) =>
-              list
-                .map((value, index) => [value, index])
-                .sort(([a], [b]) => a - b)
-                .map(([, index]) => index);
-            assert.deepEqual(
-              order(bars.map((bar) => bar.width)),
-              order(kept.shape.bars),
-            );
             assert.ok(
               !(await page.content()).includes(REDACTION_MARKER),
               "nothing it hides is in the page",
             );
             await shot(page, `#u-${kept.id}`, `redacted-${size}`);
+            await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: a redacted update may show a few of its words, in their places among its bars`,
+          async () => {
+            const { context, page } = await open(size, ROOM);
+            const book = await labbook(page);
+            const half = fixture.labbook.find(
+              (update) => update.id === "fixture-half-said",
+            );
+            const { parts } = half.shape;
+            assert.deepEqual(parts, ["Rewired", 4, 2, "the", 6]);
+            const entry = book.entries.find((item) => item.id === half.id);
+            assert.equal(entry.part, "update.redacted");
+            assert.equal(entry.bars, 3);
+            assert.equal(
+              entry.text,
+              [
+                copy.redacted.label,
+                copy.redacted.works[half.shape.work],
+                `Rewired ${copy.redacted.bar} ${copy.redacted.bar} the ${copy.redacted.bar}`,
+                updateDateLabel(half.date),
+              ].join(" "),
+              "its name, its kind of work, its line and its date are all it says",
+            );
+            assert.equal(entry.controls, 0, "nothing to follow or play");
+            const item = page.locator(`#u-${half.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            // The words are set as an update's title is, in the page's ink.
+            const type = (selector) =>
+              page
+                .locator(selector)
+                .first()
+                .evaluate((el) => {
+                  const { color, fontFamily, fontSize, fontWeight } =
+                    getComputedStyle(el);
+                  return { color, fontFamily, fontSize, fontWeight };
+                });
+            assert.deepEqual(
+              await type(`#u-${half.id} [data-redaction-word]`),
+              await type("#labbook .event-title"),
+            );
+            assert.ok(
+              !(await page.content()).includes(REDACTION_MARKER),
+              "nothing it hides is in the page",
+            );
+            await shot(page, `#u-${half.id}`, `redacted-mixed-${size}`);
             await context.close();
           },
         );

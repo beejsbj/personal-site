@@ -264,7 +264,7 @@ function study(project: string): ExperimentFixture {
         source: "bjslab",
         relatedExperiment: slug,
         visibility: "redacted",
-        shape: { work: "code", bars: [4, 2, 3] },
+        shape: { work: "code", parts: [4, 2, 3] },
         title: `${REDACTION_MARKER}: the title`,
         summary: `${REDACTION_MARKER}: the summary`,
         href: `/lab/${REDACTION_MARKER}`,
@@ -532,7 +532,7 @@ export const FIXTURES: Record<string, Fixture> = {
   labbook: {
     name: "labbook",
     about:
-      "A Labbook with every kind of artifact and a redacted update, about two experiments and a project.",
+      "A Labbook with every kind of artifact and two redacted updates (one bars alone, one showing a few words), about two experiments and a project.",
     apply: (content) =>
       settle(
         withUpdates(

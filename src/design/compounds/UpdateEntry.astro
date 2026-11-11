@@ -10,11 +10,13 @@ import { part } from "../../prism/parts";
  * shows for itself, beside the words where there is room and under them
  * where there is not.
  * Redacted: it happened and is not shown. The site is given its shape and
- * never its words, so this draws the shape: one black bar for each number
- * in `bars` (a longer number, a longer bar), struck by hand like lines
- * blacked out of a document, with its kind of work and its date. It links
- * nowhere and has no slot. The bars say nothing to assistive technology,
- * which is told `label` instead.
+ * never the words it hides, so this draws the shape: its line, part by
+ * part, a word it shows set as a title's words are and a black bar for
+ * each number in `parts` (a longer number, a longer bar), struck by hand
+ * like lines blacked out of a document, with its kind of work and its
+ * date. The line flows and wraps as a title would. It links nowhere and
+ * has no slot. To assistive technology it is named `label`, its words are
+ * read, and each bar is said once, as `bar`.
  */
 type Open = Pick<StreamUpdate, "title" | "summary"> &
   Partial<Pick<StreamUpdate, "kind" | "source" | "href">> & {
@@ -24,12 +26,14 @@ type Open = Pick<StreamUpdate, "title" | "summary"> &
   };
 type Redacted = {
   redacted: {
-    /** The lengths of the bars. */
-    bars: number[];
+    /** Its line, in order: a word shown as written, or a bar's length. */
+    parts: (string | number)[];
     /** Its kind of work, as it is named. */
     work: string;
     /** What it is called aloud. */
     label: string;
+    /** What a bar is called aloud. */
+    bar: string;
   };
 };
 type Props = (Open | Redacted) & {
@@ -114,9 +118,17 @@ const event = kinds[kind];
           {redacted.label}
         </p>
         <p class="event-origin">{redacted.work}</p>
-        <p class="redaction" aria-hidden="true">
-          {redacted.bars.map((bar) => (
-            <span data-redaction-bar style={`--bar:${bar}`} />
+        <p class="redaction" data-redaction-line>
+          {redacted.parts.map((part) => (
+            <>
+              {typeof part === "number" ? (
+                <span data-redaction-bar style={`--bar:${part}`}>
+                  <span class="redaction-said">{redacted.bar}</span>
+                </span>
+              ) : (
+                <span data-redaction-word>{part}</span>
+              )}{" "}
+            </>
           ))}
         </p>
       </>
@@ -210,8 +222,10 @@ const event = kinds[kind];
   .update-entry--redacted .event-mark {
     background: var(--color-text);
   }
-  /* Said to assistive technology, not shown: what the bars stand for. */
-  .redaction-name {
+  /* Said to assistive technology, not shown: what the update is, and what
+     each bar stands for. */
+  .redaction-name,
+  .redaction-said {
     position: absolute;
     width: var(--rule-width);
     height: var(--rule-width);
@@ -219,19 +233,25 @@ const event = kinds[kind];
     clip-path: inset(50%);
     white-space: nowrap;
   }
-  /* The bars stand where the title's words would, word by word, each as
-     long as its number (--bar, set on the bar). Each is a marker stroke:
+  /* The line stands where the title would, set as a title is: the words
+     it shows as written, and a bar for each word it does not, as long as
+     its number (--bar, set on the bar). Each bar is a marker stroke:
      square-ended, a little off the level and uneven at its ends, so no two
-     are quite alike. */
+     are quite alike. The line wraps as words do. */
   .redaction {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: var(--space-2xs) var(--space-xs);
     padding-block: var(--underline-pad);
     font-size: var(--text-copy);
+    line-height: var(--leading-tight);
+    font-weight: var(--weight-bold);
+    overflow-wrap: anywhere;
   }
-  .redaction span {
+  .redaction [data-redaction-bar] {
     --bar: 1;
+    position: relative;
     width: calc(var(--bar) * var(--redaction-unit));
     max-width: 100%;
     height: var(--redaction-height);
@@ -239,17 +259,17 @@ const event = kinds[kind];
     rotate: var(--settle-angle);
     clip-path: polygon(0 7%, 100% 0, 99% 93%, 1% 100%);
   }
-  .redaction span:nth-child(even) {
+  .redaction [data-redaction-bar]:nth-child(even) {
     rotate: calc(var(--settle-angle) * -1.5);
     clip-path: polygon(1% 0, 99% 5%, 100% 100%, 0 96%);
   }
-  .redaction span:nth-child(3n) {
+  .redaction [data-redaction-bar]:nth-child(3n) {
     rotate: 0deg;
     clip-path: polygon(0 3%, 99% 0, 100% 97%, 2% 100%);
   }
   @media (forced-colors: active) {
     .update-entry--redacted .event-mark,
-    .redaction span {
+    .redaction [data-redaction-bar] {
       forced-color-adjust: none;
       background: CanvasText;
     }
