@@ -330,6 +330,7 @@ test(
                 "fixture-demo",
                 "fixture-replay",
                 "fixture-film",
+                "fixture-half-said",
                 "fixture-kept-back",
                 "fixture-first-line",
               ],
