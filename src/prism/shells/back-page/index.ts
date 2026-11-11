@@ -325,9 +325,9 @@ class App {
     return here;
   }
 
-  /** The address now points somewhere else in the open chapter (a headline
-   * followed from the Lab's own ticker, or Back and Forward between two
-   * updates): turn to it. */
+  /** The address now points somewhere else in the open chapter (Back and
+   * Forward between two updates, or a link to one from its own book): turn
+   * to it. */
   async toMark() {
     const to = this.marked(this.paged);
     if (!to || to.view === this.view) {

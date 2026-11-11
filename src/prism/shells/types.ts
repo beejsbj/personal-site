@@ -16,7 +16,7 @@ import type CutPaperCopy from "../../content/lenses/cut-paper.json";
 import type BackPageCopy from "../../content/lenses/back-page.json";
 import type HionCopy from "../../content/lenses/hion.json";
 import type { UpdateKind, UpdateSource } from "../../content.config";
-import type { Headline, Update as LabbookUpdate } from "../../lib/labbook";
+import type { Update as LabbookUpdate, UpdateLink } from "../../lib/labbook";
 
 export interface Link {
   label: string;
@@ -111,10 +111,10 @@ export interface LabEntry {
   html: string;
 }
 
-/** An update as the home stream shows it: open, with a date label and
- * somewhere to go. The Labbook's own `Update`, which may be redacted, is in
- * src/lib/labbook.ts. */
-export interface Update {
+/** An update as the home stream shows it: open, with a date label and,
+ * if it goes anywhere, its link (one that does not is shown as text). The
+ * Labbook's own `Update`, which may be redacted, is in src/lib/labbook.ts. */
+export type Update = {
   /** The file name, the `data-ref` of its `update.item` part. */
   id: string;
   kind: string;
@@ -126,10 +126,8 @@ export interface Update {
   date: string;
   dateLabel: string;
   summary: string;
-  href: string;
-  linkLabel: string;
   relatedProject?: string;
-}
+} & UpdateLink;
 
 export interface Lenses {
   "calling-card": typeof CallingCardCopy;
@@ -182,8 +180,6 @@ export interface SiteContent {
     header: { label: string; home: string; hello: string; items: string[] };
     footer: { links: Link[]; signoff: string };
     social: { label: string; href: string }[];
-    /** The ticker: what the strip of headlines is called. */
-    ticker: { label: string };
     /** How the site names each kind of update and each place one comes
      * from ("Pull request", "This site"): a Labbook update says only which.
      * The schema asks for no name in particular, so one may be missing. */
@@ -260,7 +256,8 @@ export interface SiteContent {
       /** The Labbook: its heading and a line about it; what introduces the
        * experiment or project an update is about; what an artifact's frame
        * says before it loads (`load`), where it lives instead (`open`); and
-       * how a redacted update, and each kind of work it may be, is named. */
+       * how a redacted update, a black bar on its line (said aloud, once
+       * for each) and each kind of work it may be are named. */
       labbook: {
         title: string;
         note: string;
@@ -273,6 +270,7 @@ export interface SiteContent {
         };
         redacted: {
           label: string;
+          bar: string;
           works: Record<
             "code" | "design" | "writing" | "research" | "other",
             string
@@ -313,8 +311,6 @@ export interface SiteContent {
   /** The Labbook: every due, unexpired update, newest first. A redacted
    * one is its shape alone. */
   labbook: LabbookUpdate[];
-  /** The headlines written about updates in the Labbook, newest first. */
-  headlines: Headline[];
   /** Slugs of the featured projects, in project order (shared rule; never
    * empty while there are projects). */
   featured: string[];

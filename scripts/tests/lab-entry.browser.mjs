@@ -267,7 +267,8 @@ test(
                 {
                   id: "fixture-study-graduated",
                   title: "The study became a project",
-                  href: "/lab#u-fixture-study-graduated",
+                  // nowhere to go: text, not a link to its place in the Labbook
+                  href: undefined,
                   summary:
                     "What started as one line has a home of its own now.",
                   date: "2026-09-30",
@@ -287,7 +288,7 @@ test(
                 {
                   id: "fixture-study-first-line",
                   title: "The first line draws itself",
-                  href: "/lab#u-fixture-study-first-line",
+                  href: undefined,
                   summary: "One path, measured and drawn from end to end.",
                   date: "2026-08-02",
                   dateLabel: "02 Aug 2026",
@@ -334,8 +335,8 @@ test(
               const { redacted } = content.pages.lab.labbook;
               assert.equal(
                 kept.text,
-                `${redacted.label} ${redacted.works.code} 20 Aug 2026`,
-                "its name, its kind of work and its date are all it says",
+                `${redacted.label} ${redacted.works.code} ${redacted.bar} ${redacted.bar} ${redacted.bar} 20 Aug 2026`,
+                "its name, its kind of work, a word for each bar and its date are all it says",
               );
               assert.equal(kept.controls, 0, "nothing to follow or play");
               // The fixture's shape is 4, 2, 3: a bar for each, a longer

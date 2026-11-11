@@ -1,16 +1,12 @@
-/** The Lab's dated record and its news, as this game tells them.
+/** The Lab's dated record, as this game tells it.
  *
  * The Labbook is the calendar turned back a day at a time: every update is
  * a day plate (month/day, weekday, as the pause menu's calendar writes
  * them) with a dialogue box beside it, whoever sent it named on the box's
  * tab. What an update shows for itself is pinned under its words. A
- * redacted update is a slip of paper with its words cut out: one blank
- * cut-out for each bar of its shape, a stamp, and its kind of work.
- *
- * The wire is the news crawl: the headlines run right to left along a
- * black band, a star between each, under a red tab that says whose news it
- * is. It holds under a pointer, rests for the keyboard, and stands as a
- * list where nothing moves. */
+ * redacted update is a slip of paper with words cut out of its line: a
+ * word it shows set as a title's words are, a black cut-out for each bar
+ * of its shape, then a stamp and its kind of work. */
 import type { SiteContent } from "../types";
 import { part } from "../../parts";
 import {
@@ -18,7 +14,6 @@ import {
   type Update,
   embedSrc,
   labbookAnchor,
-  labbookHref,
   penUser,
   relatedLinks,
   updateDateLabel,
@@ -49,111 +44,6 @@ function dayPlate(content: SiteContent, date: string) {
       String(day.getUTCDate()),
     ),
     h("span", { class: "cc-day__wd", "aria-hidden": "true" }, copyOf(content).weekdays[day.getUTCDay()]),
-  );
-}
-
-/* ---------- The wire ---------- */
-
-/** The ticker: every headline, each a link to the first update it is about
- * in the Labbook. The run is laid twice so the crawl has no end; the second
- * is for the eye only. With no headlines there is no wire. */
-export function wire(content: SiteContent) {
-  const { headlines } = content;
-  if (!headlines.length) return null;
-  const letters = headlines.reduce((sum, { text }) => sum + text.length, 0);
-  // "26 Sep" aloud, 9/26 on the band: the year is the Labbook's to say.
-  const when = (date: string) => {
-    const day = parseDay(date);
-    return h(
-      "time",
-      { class: "cc-wire__day", datetime: date },
-      h("span", { class: "cc-sr" }, updateDateLabel(date).slice(0, 6)),
-      h("span", { "aria-hidden": "true" }, `${day.getUTCMonth() + 1}/${day.getUTCDate()}`),
-    );
-  };
-  const item = (headline: (typeof headlines)[number], again: boolean) => [
-    when(headline.date),
-    h(
-      "a",
-      {
-        class: "cc-wire__link",
-        href: labbookHref(headline.updates[0]),
-        "data-cc-title": copyOf(content).sections.lab,
-        ...(again ? { tabindex: -1 } : {}),
-      },
-      headline.text,
-    ),
-  ];
-  return h(
-    "aside",
-    {
-      class: "cc-wire",
-      "aria-labelledby": "cc-wire-label",
-      "data-cc-wire": "",
-      style: `--cc-wire-letters:${letters};--cc-wire-items:${headlines.length}`,
-    },
-    // The band is tilted and runs off the screen's edge; the wire's own
-    // box is the window it is seen through, so it widens nothing it sits in.
-    h(
-      "div",
-      { class: "cc-wire__band" },
-      h("p", { class: "cc-wire__label", id: "cc-wire-label" }, content.site.ticker.label),
-      h(
-        "div",
-        { class: "cc-wire__strip", "data-cc-wire-strip": "" },
-        h(
-          "ul",
-          { class: "cc-wire__run", "data-cc-wire-run": "" },
-          headlines.map((headline) =>
-            h("li", { class: "cc-wire__item", ...part("ticker.headline", headline.id) }, item(headline, false)),
-          ),
-        ),
-        h(
-          "div",
-          { class: "cc-wire__run cc-wire__run--again", "data-cc-wire-run": "", "aria-hidden": "true" },
-          headlines.map((headline) => h("span", { class: "cc-wire__item" }, item(headline, true))),
-        ),
-      ),
-    ),
-  );
-}
-
-/** The wire rests for the keyboard. Its crawl stops at its start in CSS;
- * resting, the strip may scroll, so the headline in focus is brought to
- * the strip's start wherever on the band it lies, and when focus leaves
- * the strip goes back to its own start before the crawl runs on. The strip
- * is moved by hand: asking the browser to bring the headline into view
- * would let it slide the screen under the wire as well. */
-export function tendWire(screen: HTMLElement, signal: AbortSignal) {
-  screen.addEventListener(
-    "focusin",
-    (event) => {
-      const link = event.target as Element | null;
-      const strip = link?.closest?.<HTMLElement>("[data-cc-wire-strip]");
-      if (!link || !strip || !link.matches(":focus-visible")) return;
-      strip.dataset.ccWireRest = "";
-      // The whole headline, its star and its day included, from its
-      // beginning; the list that stands still has nowhere to go.
-      const item = link.closest<HTMLElement>(".cc-wire__item");
-      if (!item || !(link instanceof HTMLElement) || strip.scrollWidth <= strip.clientWidth) return;
-      strip.scrollLeft = item.offsetLeft;
-      // Where that is longer than the strip and the words alone are not,
-      // the words are shown whole and the day gives way.
-      const end = link.offsetLeft + link.offsetWidth;
-      if (link.offsetWidth <= strip.clientWidth && end > strip.scrollLeft + strip.clientWidth)
-        strip.scrollLeft = end - strip.clientWidth;
-    },
-    { signal },
-  );
-  screen.addEventListener(
-    "focusout",
-    (event) => {
-      const strip = (event.target as Element | null)?.closest?.<HTMLElement>("[data-cc-wire-rest]");
-      if (!strip || strip.contains(event.relatedTarget as Node | null)) return;
-      strip.scrollLeft = 0;
-      delete strip.dataset.ccWireRest;
-    },
-    { signal },
   );
 }
 
@@ -221,10 +111,12 @@ function artifact(content: SiteContent, shown: Artifact) {
   );
 }
 
-/** A redacted update: its day, a slip with one blank cut-out for each bar
- * (a longer number a longer cut-out), the stamp that says what it is, and
- * its kind of work. The site is given the lengths and never the words, and
- * nothing else of the update is read here. */
+/** A redacted update: its day, a slip with its line on it (a word it
+ * shows as written, a black cut-out for each bar, a longer number a longer
+ * cut-out, flowing and wrapping as a title does), the stamp that says what
+ * it is, and its kind of work. The site is given the words it shows and
+ * the lengths of the rest, and nothing else of the update is read here.
+ * Aloud, the words are read and each cut-out is said once. */
 function censored(content: SiteContent, update: Hidden, attrs: Record<string, string | undefined>) {
   const copy = content.pages.lab.labbook.redacted;
   const { shape } = update;
@@ -238,10 +130,17 @@ function censored(content: SiteContent, update: Hidden, attrs: Record<string, st
       h("p", { class: "cc-entry__stamp" }, copy.label),
       h(
         "p",
-        { class: "cc-entry__bars", "aria-hidden": "true" },
-        shape.bars.map((bar, i) =>
-          h("span", { "data-redaction-bar": "", style: `--bar:${Number(bar) || 1};--n:${i}` }),
-        ),
+        { class: "cc-entry__bars", "data-redaction-line": "" },
+        shape.parts.flatMap((shown, i) => [
+          typeof shown === "string"
+            ? h("span", { class: "cc-entry__word", "data-redaction-word": "" }, shown)
+            : h(
+                "span",
+                { "data-redaction-bar": "", style: `--bar:${Number(shown) || 1};--n:${i}` },
+                h("span", { class: "cc-sr" }, copy.bar),
+              ),
+          " ",
+        ]),
       ),
       h("p", { class: "cc-entry__work" }, copy.works[shape.work]),
     ),
@@ -249,10 +148,8 @@ function censored(content: SiteContent, update: Hidden, attrs: Record<string, st
 }
 
 /** One update on its day: who sent it on the box's tab, its title (a link
- * when it has somewhere to go), its summary and, in the Labbook (`whole`),
- * what it shows for itself and what it is about. On an experiment's own
- * page a title with nowhere else to go leads to the update's place in the
- * Labbook. */
+ * when it has somewhere to go, text when it has not), its summary and, in
+ * the Labbook (`whole`), what it shows for itself and what it is about. */
 function logged(content: SiteContent, update: Update, i: number, whole: boolean) {
   const copy = content.pages.lab.labbook;
   const attrs = {
@@ -262,7 +159,7 @@ function logged(content: SiteContent, update: Update, i: number, whole: boolean)
   };
   if (update.visibility !== "open") return censored(content, update, attrs);
   const { updateKinds, updateSources } = content.site;
-  const href = update.href ?? (whole ? undefined : labbookHref(update.id));
+  const { href } = update;
   const external = !!href && isExternal(href);
   return h(
     "li",
@@ -336,11 +233,11 @@ export function record(content: SiteContent, updates: Update[], id: string, titl
  * - A Pen or a demo is asked of its own site only when its prompt is
  *   pressed: the frame is made then, in the screen kept for it, and takes
  *   the focus.
- * - A link to an update (`/lab#u-…`, from a headline, the phone or an
- *   experiment's page) lands on its day: the board turns to it and the
- *   menu's cursor points at it (`data-cc-landed`). The page under the shell
- *   holds the same ids, hidden, so the browser's own landing cannot be
- *   relied on. `find` is the update the address names now. */
+ * - A link to an update (`/lab#u-…`), should one be written, lands on its
+ *   day: the board turns to it and the menu's cursor points at it
+ *   (`data-cc-landed`). The page under the shell holds the same ids,
+ *   hidden, so the browser's own landing cannot be relied on. `find` is
+ *   the update the address names now. */
 export function tendRecord(screen: HTMLElement, { signal, instant }: { signal: AbortSignal; instant: boolean }) {
   screen.addEventListener(
     "click",
@@ -376,21 +273,5 @@ export function tendRecord(screen: HTMLElement, { signal, instant }: { signal: A
   // Back and forward, and an address typed in.
   addEventListener("hashchange", () => land(), { signal });
   addEventListener("popstate", () => land(), { signal });
-  // A link on this screen to an update on this screen (a headline on the
-  // Lab's own wire): the router moves the address without a word to anyone.
-  screen.addEventListener(
-    "click",
-    (event) => {
-      const link = (event.target as Element | null)?.closest?.<HTMLAnchorElement>("a[href*='#']");
-      if (!link || link.target || link.pathname !== location.pathname) return;
-      const { hash } = link;
-      requestAnimationFrame(() => {
-        if (signal.aborted || location.hash !== hash) return;
-        land(hash);
-        find(hash)?.focus({ preventScroll: true });
-      });
-    },
-    { signal },
-  );
   return { find, land };
 }

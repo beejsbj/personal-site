@@ -30,6 +30,7 @@ labbook:
     note: Nothing loads until you ask.
   redacted:
     label: Redacted update
+    bar: redacted
     works:
       code: Code
       design: Design

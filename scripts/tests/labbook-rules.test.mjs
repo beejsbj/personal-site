@@ -10,9 +10,9 @@ import {
 import { expectedParts, GAPS, isGap } from "../../src/prism/parity.ts";
 import { PARTS } from "../../src/prism/parts.ts";
 
-// The rules behind the Labbook and the ticker as a page shows them (issue
-// #95): the order, what an artifact's frame loads, what an update is about,
-// and what every lens owes. The pages themselves are looked at in a
+// The rules behind the Labbook as a page shows it (issue #95): the order,
+// what an artifact's frame loads, what an update is about, and what every
+// lens owes. The pages themselves are looked at in a
 // browser, in labbook-daylight.browser.mjs.
 
 test("the Labbook reads newest first, whatever order it was written in", () => {
@@ -221,23 +221,9 @@ const content = {
       kind: "project",
       source: "bjslab",
       visibility: "redacted",
-      shape: { work: "code", bars: [4, 2, 3] },
+      shape: { work: "code", parts: [4, 2, 3] },
     },
     open("first-petal", "2026-08-02"),
-  ],
-  headlines: [
-    {
-      id: "petals",
-      date: "2026-09-26",
-      text: "A lotus learns to draw itself twice",
-      updates: ["replay-control", "first-petal"],
-    },
-    {
-      id: "hush",
-      date: "2026-09-20",
-      text: "Something is afoot",
-      updates: ["kept-private"],
-    },
   ],
 };
 const owed = (kind, part) =>
@@ -257,46 +243,44 @@ test("the Lab owes the whole Labbook: each open update by its title, each redact
   ]);
 });
 
-test("the home page and the Lab owe every headline on the ticker", () => {
-  assert.ok(PARTS.includes("ticker.headline"));
-  const headlines = [
-    { ref: "petals", texts: ["A lotus learns to draw itself twice"] },
-    { ref: "hush", texts: ["Something is afoot"] },
-  ];
-  assert.deepEqual(owed("home", "ticker.headline"), headlines);
-  assert.deepEqual(owed("lab", "ticker.headline"), headlines);
-  // The home stream is still its own list, cut to its limit.
+test("no page owes a headline: the home page owes its recent updates, as it did", () => {
+  assert.ok(!PARTS.includes("ticker.headline"), "ticker.headline is a part");
+  for (const kind of ["home", "lab"])
+    assert.deepEqual(
+      expectedParts({ kind, path: "/" }, content)
+        .map(({ part }) => part)
+        .filter((part) => part.startsWith("ticker")),
+      [],
+      `${kind} owes a part of a ticker`,
+    );
+  // The home stream is its own list, cut to its limit.
   assert.deepEqual(owed("home", "update.item"), [
     { ref: "replay-control", texts: ["Update replay-control"] },
   ]);
   assert.deepEqual(owed("home", "update.redacted"), []);
 });
 
-test("each lens that has no Labbook or ticker yet says so, naming its ticket", () => {
-  // No lens is waiting any more: #96 to #99 are all in.
-  const tickets = {};
+test("every lens owes the Labbook: none says it is still waiting", () => {
   const owed = [
     ["lab", "update.item"],
     ["lab", "update.redacted"],
-    ["lab", "ticker.headline"],
-    ["home", "ticker.headline"],
   ];
-  for (const [lens, ticket] of Object.entries(tickets)) {
-    for (const [kind, part] of owed) {
-      assert.ok(isGap(lens, kind, part), `${lens} ${kind} ${part}`);
-      assert.ok(
-        GAPS[lens][kind][part].includes(ticket),
-        `${lens} ${kind} ${part} names ${ticket}`,
-      );
-    }
-  }
   // Calling Card (#96), Cut Paper (#97), Back Page (#98) and Hion (#99)
-  // have both now: they owe them like Daylight does.
-  for (const lens of ["calling-card", "cut-paper", "back-page", "hion"])
+  // owe it like Daylight does.
+  for (const lens of [
+    "daylight",
+    "calling-card",
+    "cut-paper",
+    "back-page",
+    "hion",
+  ])
     for (const [kind, part] of owed)
       assert.equal(isGap(lens, kind, part), false, `${lens} ${kind} ${part}`);
-  assert.equal(isGap("daylight", "lab", "update.item"), false);
-  assert.equal(isGap("daylight", "home", "ticker.headline"), false);
+  for (const ticket of ["#96", "#97", "#98", "#99"])
+    assert.ok(
+      !JSON.stringify(GAPS).includes(ticket),
+      `a gap waits on ${ticket}`,
+    );
 });
 
 test("an experiment's page owes its part of the Labbook, a redacted update by its place", () => {
@@ -313,7 +297,11 @@ test("an experiment's page owes its part of the Labbook, a redacted update by it
     expected.filter(({ part }) => part.startsWith("update.")),
     [
       { part: "update.redacted", ref: "kept-private", texts: [] },
-      { part: "update.item", ref: "first-petal", texts: ["Update first-petal"] },
+      {
+        part: "update.item",
+        ref: "first-petal",
+        texts: ["Update first-petal"],
+      },
     ],
   );
   // Owed wherever updates are listed: a lens that does not list them on a

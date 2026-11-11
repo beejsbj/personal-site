@@ -36,8 +36,9 @@ interface Props {
     kinds: Record<string, string>;
     sources: Record<string, string>;
   };
-  /** `labbook.redacted` in pages/lab.md: how a redacted update is named. */
-  redacted: { label: string; works: Record<string, string> };
+  /** `labbook.redacted` in pages/lab.md: how a redacted update, and a bar
+   * on its line, is named. */
+  redacted: { label: string; bar: string; works: Record<string, string> };
 }
 const { slug, experiment, updates, graduatedTo, copy, updateLabels, redacted } =
   Astro.props;
@@ -58,7 +59,7 @@ const shown = updates.map((update) =>
         dateLabel: updateDateLabel(update.date),
         shape: update.shape,
       }
-    : streamUpdate(update.id, update)!,
+    : streamUpdate(update)!,
 );
 ---
 
@@ -112,9 +113,10 @@ const shown = updates.map((update) =>
                 date={update.date}
                 dateLabel={update.dateLabel}
                 redacted={{
-                  bars: update.shape.bars,
+                  parts: update.shape.parts,
                   work: redacted.works[update.shape.work],
                   label: redacted.label,
+                  bar: redacted.bar,
                 }}
                 connected={index < shown.length - 1}
               />

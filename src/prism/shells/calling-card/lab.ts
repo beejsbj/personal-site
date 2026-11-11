@@ -1,9 +1,9 @@
 /** The lab as a request board. On the Bench the requests still open are
  * pinned at angles, the featured one across the top of the board like the
  * big target; on the Shelf the ones gone quiet stand in rows, each on its
- * plank. Under them the Labbook turns the calendar back (labbook.ts), and
- * the wire runs the headlines over it all. A lab entry is the request's
- * full brief: what it became, its pictures, its notes and its own days. */
+ * plank. Under them the Labbook turns the calendar back (labbook.ts). A
+ * lab entry is the request's full brief: what it became, its pictures, its
+ * notes and its own days. */
 import type { Route, SiteContent } from "../types";
 import { markPart, part } from "../../parts";
 import { experimentUpdates, newestFirst } from "../../../lib/labbook";
@@ -24,7 +24,7 @@ import {
   tabs,
 } from "./chrome";
 import { concentricStar, h, prose, ransom } from "./dom";
-import { record, tendRecord, tendWire, wire } from "./labbook";
+import { record, tendRecord } from "./labbook";
 import { other } from "./other";
 
 type Experiment = SiteContent["lab"][number];
@@ -151,7 +151,7 @@ export function lab(route: Route, env: Env): Screen {
           h("p", part("page.intro", "lab"), header.intro),
         )
       : "",
-    h("div", { class: "cc-requests__col" }, wire(content), scroller),
+    h("div", { class: "cc-requests__col" }, scroller),
     prompts([
       ["↑↓", copy.chrome.prompts.select],
       ["⏎", copy.chrome.prompts.accept],
@@ -164,7 +164,6 @@ export function lab(route: Route, env: Env): Screen {
   const menu = cards.length
     ? roving(cards, env.signal, (i) => (rememberedLab = i), Math.min(rememberedLab, cards.length - 1))
     : undefined;
-  tendWire(el, env.signal);
   const { find, land } = tendRecord(el, { signal: env.signal, instant: env.reducedMotion });
   // Arriving by a link to an update: the board is already turned to it
   // when the screen is seen, and it takes the focus the title would.
@@ -204,9 +203,8 @@ export function lab(route: Route, env: Env): Screen {
     heading: landed ?? heading,
     back: el.querySelector<HTMLAnchorElement>(".cc-back")!,
     onKey(event) {
-      // The Labbook and the wire keep their own keys: a film's arrows, a
-      // prompt's Enter.
-      if ((event.target as Element | null)?.closest?.(".cc-log, .cc-wire")) return false;
+      // The Labbook keeps its own keys: a film's arrows, a prompt's Enter.
+      if ((event.target as Element | null)?.closest?.(".cc-log")) return false;
       return menu?.key(event, "both") || page(event);
     },
   };

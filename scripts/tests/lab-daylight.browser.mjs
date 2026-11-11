@@ -241,6 +241,40 @@ test(
         );
 
         await t.test(
+          `${size}: with no experiment featured the Bench is its cards in order, none given more room`,
+          async () => {
+            const { context, page } = await open(
+              size,
+              "/prism/fixtures/lab?fixture=no-featured",
+            );
+            const room = await survey(page);
+            const spans = await page
+              .locator("[data-lab-place='bench'] .lab-place__featured")
+              .count();
+            await context.close();
+            assert.equal(room.overflow, 0, "nothing wider than the screen");
+            const [onBench] = room.places;
+            assert.equal(onBench.place, "bench");
+            // The one that was featured is back in its place by order: last.
+            assert.deepEqual(
+              onBench.entries.map((entry) => entry.slug),
+              [
+                "fixture-linkout",
+                "fixture-bare",
+                "fixture-note",
+                "fixture-featured",
+              ],
+            );
+            assert.equal(spans, 0, "no card is laid across the Bench");
+            assert.deepEqual(
+              [...new Set(onBench.entries.map((entry) => entry.width))],
+              [onBench.entries[0].width],
+              "every card is given the same room",
+            );
+          },
+        );
+
+        await t.test(
           `${size}: a place with nothing in it is not there at all`,
           async () => {
             const { context, page } = await open(

@@ -9,14 +9,14 @@ import { GAPS, isGap } from "../../src/prism/parity.ts";
 import { REDACTION_MARKER } from "../../src/prism/labbook-fixture.ts";
 
 const SHELL = "src/prism/shells/calling-card";
-const sources = readdirSync(SHELL)
-  .filter((name) => name.endsWith(".ts"))
-  .map((name) => ({ name, source: readFileSync(join(SHELL, name), "utf8") }));
+const read = (ending) =>
+  readdirSync(SHELL)
+    .filter((name) => name.endsWith(ending))
+    .map((name) => ({ name, source: readFileSync(join(SHELL, name), "utf8") }));
+const sources = read(".ts");
 
 test("Calling Card leaves nothing of the new Lab out", () => {
   for (const [kind, part] of [
-    ["home", "ticker.headline"],
-    ["lab", "ticker.headline"],
     ["lab", "update.item"],
     ["lab", "update.redacted"],
     ["lab-entry", "lab.graduation"],
@@ -31,6 +31,15 @@ test("Calling Card leaves nothing of the new Lab out", () => {
     !JSON.stringify(GAPS["calling-card"] ?? {}).includes("#96"),
     "no gap still waits on #96",
   );
+});
+
+test("Calling Card has no wire of headlines: the recent updates are where they were", () => {
+  for (const { name, source } of [...sources, ...read(".css")])
+    assert.doesNotMatch(
+      source,
+      /\bheadlines\b|\bticker\b|cc-wire|\btendWire\b|\bwire\(/i,
+      `${name} still has the wire`,
+    );
 });
 
 test("Calling Card's shell reads neither an experiment's era nor its type", () => {

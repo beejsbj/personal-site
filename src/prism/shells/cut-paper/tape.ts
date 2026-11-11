@@ -65,7 +65,7 @@ export function tape(env: Env, full: boolean) {
     const mark = h(
       "p",
       { class: "cp-tmark", ...part("update.item", update.id) },
-      link(update.href, { class: "cp-tmark__title" }, update.title),
+      update.href ? link(update.href, { class: "cp-tmark__title" }, update.title) : h("span", { class: "cp-tmark__title" }, update.title),
       h("small", null, `${update.kindLabel} · ${update.dateLabel}`),
     );
     transport.watch(mark, clip.start, clip.start + 1 / 12, signal, "markers");

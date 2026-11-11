@@ -1,41 +1,38 @@
 # Base homepage: warm welcome
 
-## Lab: the Labbook and the ticker (November, issue #95)
+## Lab: the Labbook (November, issue #95)
 
 Built from the existing grammar: no new fonts, colours or dependencies, and
-five new tokens (the ticker's pace and lap, a redaction bar's unit and
-height). Chosen under delegated authority; it still needs Burooj's eye.
+two new tokens (a redaction bar's unit and height). Chosen under delegated
+authority; it still needs Burooj's eye.
+
+There is one record, the update. The home page's Recent updates is the
+ticker: the place that shows the most recent ones, as it did before the
+Lab. The moving strip of headlines first built here was removed.
 
 - **`Labbook`** is the section below the Shelf: every update, newest first,
-  each in an element with `id="u-<id>"` so a link from a headline or an
-  experiment's page lands on it. The update a link landed on wears the
-  nav's current ball. With no updates there is no section.
+  each in an element with `id="u-<id>"` so a link written to it lands on
+  it (nothing links there by default). The update a link landed on wears
+  the nav's current ball. With no updates there is no section.
 - **`UpdateEntry`** is still the one look for an update, in the home
   stream, on an experiment's page and here. It gained an optional link (an
   update with nowhere to go is a title, not a link to itself), a slot for
   what the update is about, an `artifact` slot that stands beside the words
   from 62.5rem and under them below, and a redacted state.
 - **Redacted** is a document with lines blacked out, not a loading
-  skeleton: square-ended ink bars where the title's words would be, one
-  for each number in `bars`, each a little off the level and uneven at its
-  ends like a marker stroke. Even the mark is blacked out. It says its kind
-  of work and its date, and "Redacted update" to a screen reader.
+  skeleton: where the title would be, its line, part by part (`parts`): a
+  word it shows set as a title's words are, and a square-ended ink bar for
+  each word it does not, as long as its number, each a little off the
+  level and uneven at its ends like a marker stroke. The line wraps as a
+  title does. Even the mark is blacked out. It says its kind of work and
+  its date; to a screen reader it is "Redacted update", its words are
+  read, and each bar is said once as "redacted".
 - **`Artifact`**: a picture sits in a `MediaFrame`; a film and a sound use
   the browser's own controls. A Pen or a demo waits on a hatched stage (its
   poster, or a slip of paper saying what it is) behind a wine pill. The
   frame is made on the click, in the stage's own room, so nothing moves and
   nothing is asked of another site before then. A poster kept on another
   site is not shown, for the same reason.
-- **`Ticker`** is a unique specimen: a lamp (the current ball, small), a
-  label, and a tape of headlines set as small serif links with a peach ball
-  between them. It runs under the welcome on the home page and under the
-  Lab's opening. The tape moves at constant speed (the one place `linear`
-  is right), about 40px a second; a run is never narrower than the strip,
-  so a single headline crosses it alone and still reads as meant. A pointer
-  holds it; keyboard focus rests it at its start and scrolls the strip to
-  the headline in focus. With motion reduced there is no tape: the
-  headlines stand in a wrapped row. It has a named `presence` slot beside
-  the label, empty until the lab reports who is in the room.
 
 ## Lab: the Bench and the Shelf (November, issue #93)
 

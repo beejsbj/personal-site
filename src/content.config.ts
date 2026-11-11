@@ -1,6 +1,4 @@
-import { readdirSync } from "node:fs";
 import { defineCollection, z } from "astro:content";
-import { file } from "astro/loaders";
 
 /* Every word a visitor reads lives in src/content. Daylight renders it and
  * /prism/content.json hands the same words to every lens. Short copy fields
@@ -153,7 +151,8 @@ const pageSchema = z.object({
     })
     .optional(),
   /** The Labbook on the Lab's page: its heading, what an artifact's frame
-   * says before and after it loads, and how a redacted update is named. */
+   * says before and after it loads, and how a redacted update, and each
+   * bar on its line, is named. */
   labbook: z
     .object({
       title: z.string(),
@@ -170,6 +169,8 @@ const pageSchema = z.object({
       }),
       redacted: z.object({
         label: z.string(),
+        /** What a black bar is called aloud. */
+        bar: z.string(),
         /** A name for each kind of work a redacted update may be. */
         works: z.object({
           code: z.string(),
@@ -316,17 +317,34 @@ const openUpdateSchema = z.object({
   shape: refused("Only a redacted update has a shape."),
 });
 
+/** A word a redacted update shows: one short word, so a sentence cannot
+ * be passed as one. */
+const shownWord = z
+  .string()
+  .min(1, "A word shown in a redacted update is not empty.")
+  .max(24, "A word shown in a redacted update is at most 24 characters.")
+  .regex(
+    /^\S*$/,
+    "A word shown in a redacted update has no spaces: one word to a part.",
+  );
+
 /** Something made that stays private: the site is told that it happened
- * and what shape it has, and never what it says. */
-const noWords = refused("A redacted update shows its shape and no words.");
+ * and what shape it has. Its line is given part by part, and the site is
+ * never told the parts that are blacked out. */
+const noWords = refused("A redacted update shows its shape and nothing else.");
 const redactedUpdateSchema = z.object({
   ...updateFields,
   visibility: z.literal("redacted"),
   shape: z.object({
     work: z.enum(["code", "design", "writing", "research", "other"]),
-    /** The lengths of the black bars. Chosen, not measured from the
-     * hidden text. */
-    bars: z.array(z.number().positive()).min(1),
+    /** Its line, in order: a word shown as written, or the length of a
+     * black bar (chosen, not measured from the hidden text). At least one
+     * part is a bar. */
+    parts: z
+      .array(z.union([shownWord, z.number().positive()]))
+      .refine((parts) => parts.some((part) => typeof part === "number"), {
+        message: "A redacted update blacks out at least one part.",
+      }),
   }),
   title: noWords,
   summary: noWords,
@@ -367,33 +385,6 @@ export type UpdateData = z.infer<typeof updateSchema>;
 export type UpdateKind = (typeof UPDATE_KINDS)[number];
 export type UpdateSource = (typeof UPDATE_SOURCES)[number];
 
-/** An update's id is its file name (`updateId` in src/lib/portfolio.ts). */
-const updateIds = () =>
-  readdirSync(new URL("./content/updates/", import.meta.url))
-    .filter((name) => name.endsWith(".md"))
-    .map((name) => name.slice(0, -".md".length));
-
-/** A line written about one or more updates, for the ticker. Naming an
- * update that is not there fails the build. */
-const headlineSchema = z
-  .object({
-    date: day,
-    text: z.string().min(1),
-    /** The ids of the updates it is about; it links to the first. */
-    updates: z.array(z.string()).min(1),
-  })
-  .superRefine((headline, context) => {
-    const known = new Set(updateIds());
-    headline.updates.forEach((id, index) => {
-      if (known.has(id)) return;
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["updates", index],
-        message: `No update has the id "${id}".`,
-      });
-    });
-  });
-
 const siteSchema = z.object({
   name: z.string(),
   siteTitle: z.string(),
@@ -428,8 +419,6 @@ const siteSchema = z.object({
       href: z.string(),
     }),
   ),
-  /** The ticker: what the strip of headlines is called. */
-  ticker: z.object({ label: z.string() }).optional(),
   /** How each kind and source of update is named. */
   updateKinds: z.record(z.enum(UPDATE_KINDS), z.string()),
   updateSources: z.record(z.enum(UPDATE_SOURCES), z.string()),
@@ -457,12 +446,6 @@ const updates = defineCollection({
   schema: updateSchema,
 });
 
-/** Every headline, in one file: a list of `{ id, date, text, updates }`. */
-const headlines = defineCollection({
-  loader: file("src/content/headlines.json"),
-  schema: headlineSchema,
-});
-
 const site = defineCollection({
   type: "data",
   schema: siteSchema,
@@ -482,7 +465,6 @@ export const collections = {
   projects,
   lab,
   updates,
-  headlines,
   site,
   lenses,
 };

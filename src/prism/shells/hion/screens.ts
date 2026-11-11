@@ -18,13 +18,11 @@
  * still in play, the featured one hung like a sign; the Shelf is a loop of
  * wefts, an experiment laid on each, gone quiet; the Labbook is a strand,
  * a knot for every update, and a redacted update is its words bound up in
- * thread. The ticker is a reel: the headlines strung on one thread that is
- * drawn slowly through. */
+ * thread. */
 import {
   embedSrc,
   experimentUpdates,
   labbookAnchor,
-  labbookHref,
   penUser,
   relatedLinks,
   updateDateLabel,
@@ -281,50 +279,6 @@ function beads(items: string[], label: string, attrs: Attrs = {}) {
   );
 }
 
-/* ---------- The reel: the ticker ---------- */
-
-/** The headlines, strung like beads on one thread that is drawn slowly
- * through, each a link to the first update it is about, in the Labbook.
- * The thread comes round again in a second run, for the eye only. It holds
- * under a pointer and rests for the keyboard (lab.ts); where nothing moves
- * (shell.css) the headlines are told once, one under another. No
- * headlines, no reel. */
-function reel(content: SiteContent) {
-  const { headlines } = content;
-  if (!headlines.length) return null;
-  // How long the thread takes to come round: by how much there is to read.
-  const letters = headlines.reduce((sum, { text }) => sum + text.length, 0);
-  const lap = Math.round(letters * 0.3 + headlines.length * 2.4);
-  const run = (again: boolean) =>
-    h(
-      again ? "div" : "ul",
-      { class: "hion-reel__run", "data-reel-run": "", "aria-hidden": again ? "true" : undefined },
-      headlines.map((headline) =>
-        h(
-          again ? "span" : "li",
-          { ...(again ? {} : part("ticker.headline", headline.id)), class: "hion-reel__bead" },
-          h(
-            "a",
-            { href: labbookHref(headline.updates[0]), tabindex: again ? "-1" : undefined },
-            headline.text,
-          ),
-        ),
-      ),
-    );
-  return h(
-    "aside",
-    {
-      class: "hion-reel",
-      "aria-labelledby": "hion-reel-label",
-      "data-reel": "",
-      "data-reveal": "",
-      style: `--hion-reel-lap:${lap}s`,
-    },
-    h("p", { class: "hion-meta hion-reel__label", id: "hion-reel-label" }, content.site.ticker.label),
-    h("div", { class: "hion-reel__strip", "data-reel-strip": "" }, run(false), run(true)),
-  );
-}
-
 /* ---------- Home ---------- */
 
 function workCharm(copy: Copy, project: Project, level: "h2" | "h3", i: number) {
@@ -437,7 +391,6 @@ function home(content: SiteContent) {
           ),
         ),
       ),
-      reel(content),
     ),
     h("span", { class: "hion-lane", "data-spine": "via", "aria-hidden": "true" }),
     h(
@@ -475,7 +428,8 @@ function home(content: SiteContent) {
   );
 
   // Off the loops: the hions run down together here, knotted at each
-  // update, and the updates are tied on either side of them.
+  // update, and the updates are tied on either side of them. An update
+  // with nowhere to go is its title, not a link.
   const signals = h(
     "section",
     { class: "hion-strand hion-strand--updates", "aria-labelledby": "hion-home-updates" },
@@ -496,7 +450,7 @@ function home(content: SiteContent) {
           knotted(
             h("time", { datetime: update.date }, update.dateLabel),
             {},
-            h("p", { class: "hion-tied__title" }, link(update.href, {}, update.title)),
+            h("p", { class: "hion-tied__title" }, update.href ? link(update.href, {}, update.title) : update.title),
             h("p", { class: "hion-meta" }, `${update.sourceLabel} · ${update.kindLabel}`),
           ),
         ),
@@ -776,23 +730,35 @@ function artifact(content: SiteContent, shown: Artifact, hue: "c" | "m") {
   );
 }
 
-/** A redacted update's words, bound: thread wound tight round each one, a
- * longer number a longer binding (ink.ts `bound`). The site is given the
- * lengths and never the words; the bindings say nothing aloud. */
-function bound(bars: number[], hue: "c" | "m") {
+/** A redacted update's line: a word it shows written by the thread as a
+ * title's words are, and each word it does not, bound: thread wound tight
+ * round it, a longer number a longer binding (ink.ts `bound`). The line
+ * runs on and wraps as a title does. The site is given the words it shows
+ * and the lengths of the rest; aloud, the words are read and each binding
+ * is said once, as `said`. */
+function bound(parts: (string | number)[], said: string, hue: "c" | "m") {
   return h(
     "p",
-    { class: "hion-bound", "aria-hidden": "true", "data-ink": "bound", "data-seed": nextSeed(), "data-hue": hue },
-    bars.map((bar) => h("span", { "data-redaction-bar": "", style: `--hion-bar:${Number(bar) || 1}` })),
+    { class: "hion-bound", "data-redaction-line": "", "data-ink": "bound", "data-seed": nextSeed(), "data-hue": hue },
+    parts.flatMap((shown) => [
+      typeof shown === "string"
+        ? h("span", { class: "hion-tied__title hion-bound__word", "data-redaction-word": "" }, shown)
+        : h(
+            "span",
+            { "data-redaction-bar": "", style: `--hion-bar:${Number(shown) || 1}` },
+            h("span", { class: "hion-sr" }, said),
+          ),
+      " ",
+    ]),
   );
 }
 
 /** One update, knotted on the strand: its date level with the knot, then
- * its title, where it came from and its summary, and in the Labbook
- * (`whole`) what it shows for itself and what it is about. A redacted one
- * is its date, its bindings and its kind of work: nothing else of it is
- * read. On an experiment's own page a title with nowhere else to go leads
- * to the update's place in the Labbook. */
+ * its title (a link when it has somewhere to go, text when it has not),
+ * where it came from and its summary, and in the Labbook (`whole`) what it
+ * shows for itself and what it is about. A redacted one is its date, its
+ * line (the words it shows, and its bindings) and its kind of work:
+ * nothing else of it is read. */
 function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: boolean) {
   const copy = content.pages.lab.labbook;
   const hue = i % 2 ? "m" : "c";
@@ -811,13 +777,13 @@ function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: b
         when,
         {},
         h("p", { class: "hion-sr" }, copy.redacted.label),
-        bound(shape.bars, hue),
+        bound(shape.parts, copy.redacted.bar, hue),
         h("p", { class: "hion-meta" }, copy.redacted.works[shape.work]),
       ),
     );
   }
   const { updateKinds, updateSources } = content.site;
-  const href = update.href ?? (whole ? undefined : labbookHref(update.id));
+  const { href } = update;
   return h(
     "li",
     { ...part("update.item", update.id), ...attrs, class: "hion-tied hion-logged" },
@@ -848,8 +814,8 @@ function logged(content: SiteContent, update: LabbookUpdate, i: number, whole: b
 /** A stretch of the Labbook, newest first: a strand, its heading strung out
  * to one side of the hions and a knot for every update. With a `note` it
  * is the Labbook itself (`whole`): the note is tied on at a knot on the
- * hions' other side, and each update is where its links land. No updates,
- * no strand. */
+ * hions' other side, and each update is where a link to it would land. No
+ * updates, no strand. */
 function logbook(
   content: SiteContent,
   updates: LabbookUpdate[],
@@ -1002,7 +968,7 @@ function lab(content: SiteContent) {
   return screen(
     "lab",
     "hion-page-title",
-    pageTitle(page.header, "lab", {}, reel(content)),
+    pageTitle(page.header, "lab"),
     ...places,
     logbook(content, content.labbook, "hion-labbook-title", page.labbook.title, page.labbook.note),
     loop(

@@ -13,9 +13,7 @@ import type {
 import { selectActivitySnapshot } from "./activity.mjs";
 import {
   labbookUpdate,
-  publishedHeadlines,
   streamUpdate,
-  type Headline,
   type InStream,
   type Update,
 } from "./labbook";
@@ -165,9 +163,8 @@ export const streamUpdates = (
   entries: UpdateEntry[],
 ): (StreamUpdate & { id: string })[] =>
   entries.flatMap((entry) => {
-    const id = updateId(entry);
-    const update = streamUpdate(id, entry.data);
-    return update ? [{ ...update, id }] : [];
+    const update = streamUpdate(entry.data);
+    return update ? [{ ...update, id: updateId(entry) }] : [];
   });
 
 /** The home stream: the open updates that are due and not expired, newest
@@ -181,16 +178,6 @@ export async function getUpdates() {
 export async function getLabbook(): Promise<Update[]> {
   return (await dueUpdates()).map((entry) =>
     labbookUpdate(updateId(entry), entry.data),
-  );
-}
-
-/** The headlines whose updates are all in the Labbook, newest first. */
-export async function getHeadlines(): Promise<Headline[]> {
-  const entries: CollectionEntry<"headlines">[] =
-    await getCollection("headlines");
-  return publishedHeadlines(
-    entries.map((entry) => ({ id: entry.id, ...entry.data })),
-    await getLabbook(),
   );
 }
 
@@ -209,15 +196,6 @@ export async function getRelatable() {
       title: entry.data.title as string,
       href: `/projects/${entry.slug}`,
     })),
-  };
-}
-
-/** The ticker: what it is called and the headlines it runs. */
-export async function getTicker() {
-  const site = await getSite();
-  return {
-    copy: need(site.ticker, "ticker in site/config.json"),
-    headlines: await getHeadlines(),
   };
 }
 

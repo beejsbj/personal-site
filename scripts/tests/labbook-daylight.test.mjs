@@ -3,13 +3,13 @@ import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
 import { problems } from "./lib/content-config.mjs";
 import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
-import { labbookHref, updateDateLabel } from "../../src/lib/labbook.ts";
+import { updateDateLabel } from "../../src/lib/labbook.ts";
 import {
   labbookFixture,
   REDACTION_MARKER,
 } from "../../src/prism/labbook-fixture.ts";
 
-// The Labbook and the ticker as Daylight ships them (issue #95). Run after
+// The Labbook as Daylight ships it (issue #95). Run after
 // `pnpm build`: these read the built pages and the emitted handler. How
 // they behave in a browser is in labbook-daylight.browser.mjs.
 
@@ -35,22 +35,11 @@ const entries = (html) => {
     .map((html) => ({ id: html.match(/\bid="u-([^"]+)"/)[1], html }));
 };
 
-/** The ticker's headlines in a page: the ones said once, in order. */
-const tickerLinks = (html) => {
-  const ticker = html.match(
-    /<aside\b[^>]*\bdata-ticker\b[^>]*>([\s\S]*?)<\/aside>/,
-  )?.[1];
-  if (!ticker) return null;
-  return [
-    ...ticker.matchAll(
-      /<li\b[^>]*data-part="ticker\.headline"[^>]*data-ref="([^"]+)"[^>]*>([\s\S]*?)<\/li>/g,
-    ),
-  ].map(([, id, body]) => ({
-    id,
-    href: body.match(/<a\b[^>]*\bhref="([^"]+)"/)?.[1],
-    text: text(body.match(/<a\b[^>]*>([\s\S]*?)<\/a>/)?.[1] ?? ""),
-  }));
-};
+/** Every trace of a ticker of headlines in a page, by the names it had. */
+const tickerTraces = (html) =>
+  html.match(
+    /<[a-z]+\b[^>]*\s(?:data-ticker\b|data-part="ticker\.headline"|class="[^"]*\bticker\b)[^>]*>/g,
+  ) ?? [];
 
 const keptBack = labbookFixture().labbook.find(
   (update) => update.visibility === "redacted",
@@ -69,7 +58,7 @@ test("the schema refuses a redacted update that carries words", () => {
   assert.deepEqual(
     problems("updates", written),
     WORDS.map(
-      (field) => `${field}: A redacted update shows its shape and no words.`,
+      (field) => `${field}: A redacted update shows its shape and nothing else.`,
     ),
   );
   // Without them it is a redacted update the build accepts.
@@ -79,11 +68,22 @@ test("the schema refuses a redacted update that carries words", () => {
   assert.deepEqual(problems("updates", shapeOnly), []);
 });
 
-test("a redacted update is drawn as its bars, its kind of work and its date, and nothing it hides", async () => {
+/** A redacted update's line in its entry's markup, part by part: a word
+ * as written, a bar as what it says aloud. */
+const line = (html) =>
+  [
+    ...html.matchAll(
+      /<span\b[^>]*\bdata-redaction-(word|bar)\b[^>]*>([\s\S]*?)<\/span>/g,
+    ),
+  ].map(([, kind, inside]) =>
+    kind === "word" ? text(inside) : { bar: text(inside) },
+  );
+
+test("a redacted update is drawn as its line, its kind of work and its date, and nothing it hides", async () => {
   const fixture = await serveRuntimeFixture();
   try {
     const { pages } = await (await fixture.fetch("/prism/content.json")).json();
-    const { label, works } = pages.lab.labbook.redacted;
+    const { label, bar, works } = pages.lab.labbook.redacted;
     const response = await fixture.fetch("/prism/fixtures/lab");
     assert.equal(response.status, 200);
     const html = await response.text();
@@ -93,25 +93,43 @@ test("a redacted update is drawn as its bars, its kind of work and its date, and
       shown.some((entry) => entry.id === "fixture-replay"),
       "the fixture room has a Labbook",
     );
-    const redacted = shown.find((entry) => entry.id === keptBack.id);
-    assert.ok(redacted, "the redacted update has its place in the Labbook");
-    assert.equal(
-      (redacted.html.match(/\bdata-redaction-bar\b/g) ?? []).length,
-      keptBack.shape.bars.length,
-      "one bar for each number in its shape",
+    const hidden = labbookFixture().labbook.filter(
+      (update) => update.visibility === "redacted",
     );
-    assert.match(redacted.html, /data-part="update\.redacted"/);
-    assert.equal(
-      text(redacted.html),
-      `${label} ${works[keptBack.shape.work]} ${updateDateLabel(keptBack.date)}`,
-      "its name, its kind of work and its date are all it says",
+    assert.deepEqual(
+      hidden.map((update) =>
+        update.shape.parts.some((part) => typeof part === "string"),
+      ),
+      [false, true],
+      "the fixture has one that is bars alone and one that shows a few words",
     );
-    assert.doesNotMatch(
-      redacted.html,
-      /<(?:a|img|iframe|video|audio|source|button)\b/,
-      "it links to nothing and shows no artifact",
-    );
-    // Not in its own entry, not in a headline about it, not anywhere.
+    for (const update of hidden) {
+      const redacted = shown.find((entry) => entry.id === update.id);
+      assert.ok(redacted, `${update.id} has its place in the Labbook`);
+      const { parts, work } = update.shape;
+      assert.deepEqual(
+        line(redacted.html),
+        parts.map((part) => (typeof part === "string" ? part : { bar })),
+        `${update.id}: its words as written and a bar for each number, in order`,
+      );
+      assert.match(redacted.html, /data-part="update\.redacted"/);
+      assert.equal(
+        text(redacted.html),
+        [
+          label,
+          works[work],
+          ...parts.map((part) => (typeof part === "string" ? part : bar)),
+          updateDateLabel(update.date),
+        ].join(" "),
+        `${update.id}: its name, its kind of work, its line and its date are all it says`,
+      );
+      assert.doesNotMatch(
+        redacted.html,
+        /<(?:a|img|iframe|video|audio|source|button)\b/,
+        `${update.id} links to nothing and shows no artifact`,
+      );
+    }
+    // Not in its own entry, not anywhere.
     assert.ok(
       !html.includes(REDACTION_MARKER),
       "nothing a redacted update hides is anywhere in the page",
@@ -196,57 +214,27 @@ test("/lab lists the seeded updates newest first, each where its links land", as
   }
 });
 
-test("the ticker runs the seeded headlines on the home page and in the Lab, each linking into the Labbook", async () => {
+test("neither the home page nor the Lab has a ticker of headlines", async () => {
   const fixture = await serveRuntimeFixture();
   try {
-    const data = await (await fixture.fetch("/prism/content.json")).json();
-    assert.equal(typeof data.site.ticker.label, "string");
-    assert.ok(data.headlines.length >= 1, "there is a headline to run");
-    const expected = data.headlines.map((headline) => ({
-      id: headline.id,
-      href: `/lab#u-${headline.updates[0]}`,
-      text: headline.text,
-    }));
-    assert.deepEqual(
-      expected.map((headline) => headline.href),
-      data.headlines.map((headline) => labbookHref(headline.updates[0])),
-    );
-    const anchors = new Set(
-      entries(read("dist/client/lab/index.html")).map((entry) => entry.id),
-    );
-    for (const page of ["index.html", "lab/index.html"]) {
-      const html = read(`dist/client/${page}`);
-      assert.deepEqual(tickerLinks(html), expected, page);
-      assert.ok(
-        text(html).includes(data.site.ticker.label),
-        `${page}: the ticker is named`,
-      );
-    }
-    for (const headline of data.headlines)
-      assert.ok(
-        anchors.has(headline.updates[0]),
-        `${headline.id} lands on an update in the Labbook`,
-      );
-    // A page with no reason to run it does not.
-    assert.equal(tickerLinks(read("dist/client/about/index.html")), null);
+    for (const page of ["index.html", "lab/index.html", "about/index.html"])
+      assert.deepEqual(tickerTraces(read(`dist/client/${page}`)), [], page);
+    const room = await (await fixture.fetch("/prism/fixtures/lab")).text();
+    assert.ok(entries(room).length > 0, "the fixture room has a Labbook");
+    assert.deepEqual(tickerTraces(room), [], "the fixture room");
   } finally {
     await fixture.close();
   }
 });
 
-test("with no headlines there is no ticker, and with no updates no Labbook", async () => {
+test("with no updates there is no Labbook", async () => {
   const fixture = await serveRuntimeFixture();
   try {
     const bare = await (
-      await fixture.fetch("/prism/fixtures/lab?headlines=none&labbook=none")
+      await fixture.fetch("/prism/fixtures/lab?labbook=none")
     ).text();
-    assert.equal(tickerLinks(bare), null);
     assert.deepEqual(entries(bare), []);
-    assert.doesNotMatch(bare, /<[a-z]+\b[^>]*\s(?:data-ticker|id="labbook")/);
-    const one = await (
-      await fixture.fetch("/prism/fixtures/lab?headlines=one")
-    ).text();
-    assert.equal(tickerLinks(one).length, 1);
+    assert.doesNotMatch(bare, /<[a-z]+\b[^>]*\sid="labbook"/);
   } finally {
     await fixture.close();
   }

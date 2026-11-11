@@ -2,23 +2,20 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import LabRoom from "../../components/LabRoom.astro";
 import Labbook from "../../components/Labbook.astro";
-import Ticker from "../../design/unique/Ticker.astro";
 import {
   getLab,
   getLabbook,
   getLabPage,
   getRelatable,
   getSite,
-  getTicker,
   labDetail,
 } from "../../lib/portfolio";
 import { penUser } from "../../lib/labbook";
 
-const [page, site, labbook, ticker, relatable] = await Promise.all([
+const [page, site, labbook, relatable] = await Promise.all([
   getLabPage(),
   getSite(),
   getLabbook(),
-  getTicker(),
   getRelatable(),
 ]);
 const entries = (await getLab()).map((entry) => ({
@@ -34,12 +31,6 @@ const entries = (await getLab()).map((entry) => ({
   pageClass="page-lab"
 >
   <LabRoom page={page} entries={entries}>
-    <Ticker
-      slot="ticker"
-      class="shell"
-      headlines={ticker.headlines}
-      copy={ticker.copy}
-    />
     <Labbook
       slot="labbook"
       class="shell page-section"

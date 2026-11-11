@@ -1,7 +1,7 @@
 /** Cut Paper's Lab (issue #97): the armed and the muted pads of the rack
  * (the Bench and the Shelf), the Labbook with its artifacts and its redacted
- * updates, the ribbon of headlines on the home page and in the Lab, and an
- * experiment's own record and graduation.
+ * updates, the home page's locators where the recent updates are, and an
+ * experiment's own record and graduation. There is no ribbon of headlines.
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
@@ -22,6 +22,7 @@ import {
 } from "../../src/prism/labbook-fixture.ts";
 import { updateDateLabel } from "../../src/lib/labbook.ts";
 import { labPlaces } from "../../src/lib/rules.ts";
+import { checkRedactedLine, redactedLine } from "./lib/redaction.mjs";
 
 const phone = (width) => ({
   viewport: { width, height: 844 },
@@ -126,6 +127,7 @@ const labbook = (page) =>
         strips: item.querySelectorAll("[data-strip]").length,
         controls: item.querySelectorAll("a, button, iframe, video, audio")
           .length,
+        links: item.querySelectorAll("a").length,
       });
     }
     return {
@@ -142,59 +144,35 @@ const labbook = (page) =>
     };
   });
 
-/** The ribbon of headlines as it stands this instant. */
-const ribbon = (page) =>
+/** Where the ribbon of headlines used to be, by every name it had. */
+const RIBBON = ":is([data-ribbon], .cp-ribbon, .cp-home__ribbon)";
+
+/** The home page's locators: the recent updates, as a visitor meets them. */
+const locators = (page) =>
   page.evaluate(() => {
     const text = (el) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
-    const root = document.querySelector("#lens-shell [data-ribbon]");
-    if (!root) return null;
-    const strip = root.querySelector("[data-ribbon-strip]");
-    const box = (el) => {
-      const { left, right, top, bottom } = el.getBoundingClientRect();
-      return { left, right, top, bottom };
-    };
-    const runs = [...root.querySelectorAll("[data-ribbon-run]")];
-    const following = root.nextElementSibling ?? root.parentElement;
-    const view = root.closest(".cp-scroll").getBoundingClientRect();
+    const section = document.querySelector("#lens-shell .cp-locators");
+    const list = section.querySelector("ol");
+    const home = document.querySelector("#lens-shell .cp-home");
     return {
-      name: text(document.getElementById(root.getAttribute("aria-labelledby"))),
-      headlines: [
-        ...root.querySelectorAll("[data-part='ticker.headline']"),
-      ].map((item) => {
-        const link = item.querySelector("a");
+      heading: text(
+        document.getElementById(section.getAttribute("aria-labelledby")),
+      ),
+      intro: text(section.querySelector(".cp-locators__intro")),
+      label: list?.getAttribute("aria-label") ?? null,
+      items: [...(list?.querySelectorAll(":scope > li") ?? [])].map((item) => {
+        const title = item.querySelector(".cp-loc__title");
         return {
-          id: item.dataset.ref,
-          text: text(link),
-          href: link.getAttribute("href"),
-          day: item.querySelector("time")?.getAttribute("datetime") ?? null,
-          box: box(link),
-          visible: link.checkVisibility(),
+          id: item.dataset.part === "update.item" ? item.dataset.ref : null,
+          when: text(item.querySelector(".cp-loc__when")),
+          title: text(title.firstChild),
+          href: title.getAttribute("href"),
+          origin: text(item.querySelector("small")),
+          links: item.querySelectorAll("a").length,
         };
       }),
-      // Links anyone can reach with Tab or a screen reader.
-      reachable: [...root.querySelectorAll("a")].filter(
-        (link) =>
-          link.tabIndex >= 0 &&
-          link.checkVisibility() &&
-          !link.closest("[aria-hidden='true']"),
-      ).length,
-      runs: runs.map((run) => ({
-        x: run.getBoundingClientRect().left,
-        visible: run.checkVisibility(),
-        running: run
-          .getAnimations()
-          .some((animation) => animation.playState === "running"),
-        animations: run.getAnimations().length,
-      })),
-      strip: box(strip),
-      room: strip.clientWidth,
-      scrolled: strip.scrollLeft,
-      box: box(root),
-      view: { left: view.left, right: view.right },
-      below: following.getBoundingClientRect().top,
-      overflow:
-        document.documentElement.scrollWidth -
-        document.documentElement.clientWidth,
+      // What lies in the view above the home grid.
+      above: [...home.parentElement.children].indexOf(home),
     };
   });
 
@@ -216,7 +194,7 @@ const skip = executable
   : "no Chromium: set PRISM_CHROMIUM or install a Playwright headless shell";
 
 test(
-  "Cut Paper shows the Bench, the Shelf, the Labbook and the ribbon of headlines",
+  "Cut Paper shows the Bench, the Shelf, the Labbook and the recent updates",
   { skip, timeout: 15 * 60_000 },
   async (suite) => {
     const t = {
@@ -294,7 +272,7 @@ test(
     try {
       for (const size of Object.keys(SIZES)) {
         await t.test(
-          `${size}: /lab arms the Bench and mutes the Shelf, the featured experiment leading`,
+          `${size}: /lab arms the Bench and mutes the Shelf, each in the shared order`,
           async () => {
             const { context, page, errors } = await open(
               size,
@@ -343,25 +321,15 @@ test(
                 `the ${group.place} says what it is`,
               );
             }
+            // Pride of place is given as the content gives it: to one
+            // experiment, or to none (both are looked at on fixtures below).
             const bench = room.find(({ place }) => place === "bench");
-            const lead = content.lab.find(
-              (entry) => entry.place === "bench" && entry.featured,
+            assert.deepEqual(
+              bench.entries.map((entry) => entry.featured),
+              expected
+                .find(({ place }) => place === "bench")
+                .entries.map((entry) => !!entry.featured),
             );
-            if (lead) {
-              assert.equal(bench.entries[0].slug, lead.slug);
-              assert.deepEqual(
-                bench.entries.map((entry) => entry.featured),
-                bench.entries.map((_, i) => i === 0),
-                "one experiment has pride of place",
-              );
-              if (size === "desktop")
-                assert.ok(
-                  bench.entries
-                    .slice(1)
-                    .every((entry) => entry.width < bench.entries[0].width),
-                  "and it is given more room than the rest",
-                );
-            }
             assert.equal(
               await page.locator("#lens-shell [data-part='lab.meta']").count(),
               0,
@@ -385,6 +353,95 @@ test(
               `cut-paper-shelf-${size}`,
             );
             await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: the Bench with one experiment featured, and with none`,
+          async () => {
+            const benchOf = async (page) => {
+              const { lab } = await page.evaluate(
+                () => window.prismHarness.content,
+              );
+              return {
+                expected: labPlaces(lab).find(({ place }) => place === "bench")
+                  .entries,
+                shown: (await places(page)).find(
+                  ({ place }) => place === "bench",
+                ).entries,
+              };
+            };
+
+            // One featured: the last on the Bench by order, so it leads
+            // only because it is featured.
+            const one = await open(size, harness("lab-featured", "/lab"));
+            const withOne = await benchOf(one.page);
+            assert.ok(
+              withOne.expected[0].featured &&
+                withOne.expected[0].order > withOne.expected[1].order,
+              "the fixture features the last experiment by order",
+            );
+            assert.deepEqual(
+              withOne.shown.map((entry) => entry.slug),
+              withOne.expected.map((entry) => entry.slug),
+              "it leads the Bench",
+            );
+            assert.deepEqual(
+              withOne.shown.map((entry) => entry.featured),
+              withOne.shown.map((_, i) => i === 0),
+              "one experiment has pride of place",
+            );
+            const [lead, ...rest] = withOne.shown;
+            if (size === "desktop")
+              assert.ok(
+                rest.every((entry) => entry.width < lead.width),
+                "and it is given more room than the rest",
+              );
+            assert.equal(
+              await overflow(one.page),
+              0,
+              "nothing wider than the screen",
+            );
+            assert.deepEqual(one.errors, []);
+            await shot(
+              one.page,
+              "#lens-shell [data-lab-place='bench']",
+              `cut-paper-bench-featured-${size}`,
+            );
+            await one.context.close();
+
+            // None featured: the same Bench in its plain order, no
+            // experiment marked and none given the featured one's room.
+            const none = await open(size, harness("lab-none-featured", "/lab"));
+            const without = await benchOf(none.page);
+            assert.ok(without.expected.every((entry) => !entry.featured));
+            assert.deepEqual(
+              without.shown.map((entry) => entry.slug),
+              without.expected.map((entry) => entry.slug),
+              "the Bench in its own order",
+            );
+            assert.deepEqual(
+              without.shown.filter((entry) => entry.featured),
+              [],
+              "no experiment is marked as featured",
+            );
+            if (size === "desktop")
+              assert.ok(
+                without.shown.every((entry) => entry.width < lead.width),
+                "and none is given the featured one's room",
+              );
+            assert.equal(
+              await overflow(none.page),
+              0,
+              "nothing wider than the screen",
+            );
+            assert.deepEqual(none.errors, []);
+            await shot(
+              none.page,
+              "#lens-shell [data-lab-place='bench']",
+              `cut-paper-bench-none-featured-${size}`,
+            );
+            await none.context.close();
           },
         );
 
@@ -478,6 +535,126 @@ test(
         );
 
         await t.test(
+          `${size}: an update with nowhere to go is text, not a link, in the locators and in the Labbook`,
+          async () => {
+            const written = fixture.labbook.filter(
+              (update) => update.visibility === "open",
+            );
+            const nowhere = written.filter((update) => !update.href);
+            assert.ok(nowhere.length >= 2, "the fixture has such updates");
+            assert.ok(written.length > nowhere.length, "and ones that do go");
+            // Nothing in the view points at an update's place in the Labbook.
+            const pointers = (page) =>
+              page.locator("#lens-shell a[href*='#u-']").count();
+
+            const home = await open(size, harness("labbook", "/"));
+            const shown = (await locators(home.page)).items;
+            const stream = (
+              await home.page.evaluate(() => window.prismHarness.content)
+            ).updates.slice(0, content.pages.home.updates.limit);
+            assert.ok(
+              stream.some((update) => !update.href) &&
+                stream.some((update) => update.href),
+              "both kinds are among the recent updates",
+            );
+            assert.deepEqual(
+              shown.map(({ id, title, href, links }) => ({
+                id,
+                title,
+                href,
+                links,
+              })),
+              stream.map((update) => ({
+                id: update.id,
+                title: update.title,
+                href: update.href ?? null,
+                links: update.href ? 1 : 0,
+              })),
+            );
+            assert.equal(await pointers(home.page), 0);
+            assert.equal(await overflow(home.page), 0);
+            assert.deepEqual(home.errors, []);
+            await shot(
+              home.page,
+              "#lens-shell .cp-locators",
+              `cut-paper-home-nowhere-${size}`,
+            );
+            await home.context.close();
+
+            // The arrangement's Markers lane and, on a phone, the tape.
+            const session = await open(size, harness("labbook", "/projects"));
+            const marks = await session.page.evaluate(() => ({
+              flags: [
+                ...document.querySelectorAll(
+                  "#lens-shell .cp-lane--markers .cp-flag",
+                ),
+              ].map((flag) => flag.getAttribute("href")),
+              tape: [...document.querySelectorAll("#lens-shell .cp-tmark")].map(
+                (mark) => ({
+                  id: mark.dataset.ref,
+                  href: mark.querySelector("a")?.getAttribute("href") ?? null,
+                }),
+              ),
+            }));
+            const all = (
+              await session.page.evaluate(() => window.prismHarness.content)
+            ).updates;
+            assert.deepEqual(
+              [...marks.flags].sort(),
+              all.map((update) => update.href ?? null).sort(),
+              "a flag is a link only where its update goes somewhere",
+            );
+            assert.deepEqual(
+              marks.tape,
+              marks.tape.map(({ id }) => ({
+                id,
+                href: all.find((update) => update.id === id).href ?? null,
+              })),
+            );
+            assert.equal(await pointers(session.page), 0);
+            assert.deepEqual(session.errors, []);
+            await session.context.close();
+
+            const room = await open(size, ROOM);
+            const book = (await labbook(room.page)).entries;
+            for (const update of written) {
+              const entry = book.find((item) => item.id === update.id);
+              assert.equal(entry.title, update.title);
+              assert.equal(entry.href, update.href ?? null, update.id);
+            }
+            // With nothing it is about and nothing that lives elsewhere,
+            // such an update has no link in it at all.
+            for (const id of ["fixture-film", "fixture-tone"])
+              assert.equal(
+                book.find((entry) => entry.id === id).links,
+                0,
+                `${id} has no link in it`,
+              );
+            assert.equal(await pointers(room.page), 0);
+            // A flag on the lane still goes to its update's line: the
+            // oldest update's, the one no other flag lies over.
+            const oldest = (
+              await room.page.evaluate(() => window.prismHarness.content)
+            ).labbook.at(-1).id;
+            const flag = room.page.locator(
+              `#lens-shell [data-log='labbook'] .cp-flag[data-flag='u-${oldest}']`,
+            );
+            assert.equal(
+              await flag.evaluate((el) => el.tagName),
+              "SPAN",
+              "a flag is a pin, not a link",
+            );
+            await flag.evaluate((el) => el.scrollIntoView({ block: "center" }));
+            await flag.click({ position: { x: 3, y: 4 } });
+            await room.page.waitForSelector(
+              `#lens-shell #u-${oldest}[data-landed]`,
+            );
+            assert.deepEqual(room.errors, []);
+            await room.context.close();
+          },
+        );
+
+        await t.test(
           `${size}: an update with an artifact shows it, with its words`,
           async () => {
             const { context, page, asked, errors } = await open(size, ROOM);
@@ -491,6 +668,7 @@ test(
                 "fixture-demo",
                 "fixture-replay",
                 "fixture-film",
+                "fixture-half-said",
                 "fixture-kept-back",
                 "fixture-first-line",
               ],
@@ -739,58 +917,61 @@ test(
         );
 
         await t.test(
-          `${size}: a redacted update is strips of black paper over its words, with a name a screen reader can say`,
+          `${size}: a redacted update is strips of black paper over its words, each said once, under a name a screen reader can say`,
           async () => {
             const { context, page } = await open(size, ROOM);
             const book = await labbook(page);
             const hidden = fixture.labbook.find(
-              (update) => update.visibility === "redacted",
+              (update) => update.id === "fixture-kept-back",
             );
+            const { parts } = hidden.shape;
+            assert.ok(parts.every((part) => typeof part === "number"));
             const entry = book.entries.find((item) => item.id === hidden.id);
             assert.equal(entry.part, "update.redacted");
             assert.equal(entry.ref, hidden.id);
-            assert.equal(entry.strips, hidden.shape.bars.length);
+            assert.equal(entry.strips, parts.length);
             assert.equal(entry.date, hidden.date);
             assert.equal(
               entry.text,
-              `${updateDateLabel(hidden.date)} ${copy.redacted.label} ${copy.redacted.works[hidden.shape.work]}`,
-              "its date, what it is, its kind of work: no other word",
+              [
+                updateDateLabel(hidden.date),
+                copy.redacted.label,
+                copy.redacted.works[hidden.shape.work],
+                ...parts.map(() => copy.redacted.bar),
+              ].join(" "),
+              "its date, what it is, its kind of work, a word for each strip: no other word",
             );
             assert.equal(entry.controls, 0, "nothing to follow or play");
             assert.deepEqual(entry.related, []);
             assert.deepEqual(entry.pictures, []);
+            const item = page.locator(`#lens-shell #u-${hidden.id}`);
             assert.equal(
-              await page
-                .locator(`#lens-shell #u-${hidden.id}`)
+              await item
                 .getByText(copy.redacted.label, { exact: true })
                 .count(),
               1,
               "it is named for assistive technology",
             );
-            const strike = await page.evaluate((id) => {
-              const struck = document.querySelector(
-                `#lens-shell #u-${id} .cp-strike`,
-              );
-              const paper = getComputedStyle(struck.closest("ol"));
-              return {
-                hidden: struck.getAttribute("aria-hidden") === "true",
-                paper: paper.backgroundColor,
-                strips: [...struck.querySelectorAll("[data-strip]")].map(
-                  (strip) => {
-                    const { width, height } = strip.getBoundingClientRect();
-                    return {
-                      width,
-                      height,
-                      ink: getComputedStyle(strip).backgroundColor,
-                      shown: strip.checkVisibility(),
-                    };
-                  },
-                ),
-              };
-            }, hidden.id);
-            assert.ok(strike.hidden, "the strips say nothing");
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            const strike = await item.evaluate((el) => ({
+              paper: getComputedStyle(el.closest("ol")).backgroundColor,
+              strips: [...el.querySelectorAll("[data-strip]")].map((strip) => ({
+                height: strip.getBoundingClientRect().height,
+                ink: getComputedStyle(strip).backgroundColor,
+              })),
+            }));
             for (const strip of strike.strips) {
-              assert.ok(strip.shown);
               assert.ok(
                 strip.height > 8,
                 "a strip is tall enough to hide a word",
@@ -798,16 +979,6 @@ test(
               assert.equal(strip.ink, "rgb(10, 9, 8)", "black paper");
               assert.notEqual(strip.ink, strike.paper, "on paper that is not");
             }
-            // Longer numbers, longer strips.
-            const order = (list) =>
-              list
-                .map((value, index) => [value, index])
-                .sort(([a], [b]) => a - b)
-                .map(([, index]) => index);
-            assert.deepEqual(
-              order(strike.strips.map((strip) => strip.width)),
-              order(hidden.shape.bars),
-            );
             assert.ok(
               !(await page.content()).includes(REDACTION_MARKER),
               "nothing it hides is in the page",
@@ -822,244 +993,144 @@ test(
           },
         );
 
+        await t.test(
+          `${size}: a redacted update may show a few of its words, in their places among its strips`,
+          async () => {
+            const { context, page, errors } = await open(size, ROOM);
+            const book = await labbook(page);
+            const half = fixture.labbook.find(
+              (update) => update.id === "fixture-half-said",
+            );
+            const { parts } = half.shape;
+            assert.deepEqual(parts, ["Rewired", 4, 2, "the", 6]);
+            const entry = book.entries.find((item) => item.id === half.id);
+            assert.equal(entry.part, "update.redacted");
+            assert.equal(entry.strips, 3);
+            assert.equal(
+              entry.text,
+              [
+                updateDateLabel(half.date),
+                copy.redacted.label,
+                copy.redacted.works[half.shape.work],
+                `Rewired ${copy.redacted.bar} ${copy.redacted.bar} the ${copy.redacted.bar}`,
+              ].join(" "),
+              "its date, what it is, its kind of work and its line: no other word",
+            );
+            assert.equal(entry.controls, 0, "nothing to follow or play");
+            const item = page.locator(`#lens-shell #u-${half.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            // The words are set as an update's title is, in the log's ink.
+            const type = (selector) =>
+              page
+                .locator(`#lens-shell ${selector}`)
+                .first()
+                .evaluate((el) => {
+                  const { color, fontFamily, fontSize, textTransform } =
+                    getComputedStyle(el);
+                  return { color, fontFamily, fontSize, textTransform };
+                });
+            assert.deepEqual(
+              await type(`#u-${half.id} [data-redaction-word]`),
+              await type("[data-log='labbook'] .cp-log__title"),
+            );
+            assert.equal(await overflow(page), 0);
+            assert.ok(
+              !(await page.content()).includes(REDACTION_MARKER),
+              "nothing it hides is in the page",
+            );
+            assert.deepEqual(errors, []);
+            await shot(
+              page,
+              `#lens-shell #u-${half.id}`,
+              `cut-paper-redacted-mixed-${size}`,
+              "center",
+            );
+            await context.close();
+          },
+        );
+
         for (const path of ["/", "/lab"])
           await t.test(
-            `${size}: the ribbon on ${path} carries the seeded headlines, each linking into the Labbook`,
+            `${size}: there is no ribbon of headlines on ${path}`,
             async () => {
-              const { context, page, errors } = await open(
-                size,
+              // On real content and on the fixture Labbook alike.
+              for (const address of [
                 `${path}?lens=cut-paper`,
-              );
-              const strip = await ribbon(page);
-              assert.ok(strip, "there is a ribbon");
-              assert.equal(strip.name, content.site.ticker.label);
-              assert.deepEqual(
-                strip.headlines.map(({ id, text, href, day }) => ({
-                  id,
-                  text,
-                  href,
-                  day,
-                })),
-                content.headlines.map((headline) => ({
-                  id: headline.id,
-                  text: headline.text,
-                  href: `/lab#u-${headline.updates[0]}`,
-                  day: headline.date,
-                })),
-              );
-              assert.equal(strip.reachable, content.headlines.length);
-              assert.equal(
-                await overflow(page),
-                0,
-                "nothing wider than the screen",
-              );
-              assert.deepEqual(errors, []);
-              const name = path === "/" ? "home" : "lab";
-              await shot(page, null, `cut-paper-ribbon-${name}-still-${size}`);
-              // And as most visitors meet it, running: one long line that
-              // widens nothing it lies in.
-              const live = await open(size, `${path}?lens=cut-paper`, {
-                motion: true,
-              });
-              await live.page.waitForTimeout(1500);
-              const running = await ribbon(live.page);
-              assert.deepEqual(
-                running.runs.map((run) => run.running),
-                [true, true],
-                "it runs",
-              );
-              assert.ok(
-                running.box.left >= running.view.left - 0.5 &&
-                  running.box.right <= running.view.right + 0.5,
-                `the running ribbon keeps inside the view (${running.box.left} to ${running.box.right} in ${running.view.left} to ${running.view.right})`,
-              );
-              assert.ok(
-                running.strip.left >= running.box.left - 0.5 &&
-                  running.strip.right <= running.box.right + 0.5,
-                "and its strip inside the ribbon",
-              );
-              assert.equal(await overflow(live.page), 0);
-              await shot(live.page, null, `cut-paper-ribbon-${name}-${size}`);
-              await live.context.close();
-              // Following one lands on its update, whichever page it was on.
-              const [first] = content.headlines;
-              await page
-                .locator("#lens-shell [data-part='ticker.headline'] a")
-                .first()
-                .click();
-              await page.waitForURL(
-                (url) =>
-                  url.pathname === "/lab" &&
-                  url.hash === `#u-${first.updates[0]}`,
-              );
-              await page.waitForSelector(
-                `#lens-shell #u-${first.updates[0]}[data-landed]`,
-              );
-              await page.waitForTimeout(900);
-              const landed = await page
-                .locator(`#lens-shell #u-${first.updates[0]}`)
-                .evaluate((el) => {
-                  const view = el.closest(".cp-scroll").getBoundingClientRect();
-                  const { top, bottom } = el.getBoundingClientRect();
-                  return { top, bottom, from: view.top, to: view.bottom };
-                });
-              // Under the margin kept above a landed line, whether the
-              // shell or the browser's own jump to the fragment put it there.
-              assert.ok(
-                landed.top >= landed.from + 40 && landed.top < landed.to,
-                `the update is in the view, clear of its top (${landed.top} in ${landed.from} to ${landed.to})`,
-              );
-              await context.close();
+                harness("labbook", path),
+              ]) {
+                const { context, page, errors } = await open(size, address);
+                assert.equal(
+                  await page.locator(`#lens-shell ${RIBBON}`).count(),
+                  0,
+                  `no ribbon on ${address}`,
+                );
+                assert.equal(
+                  await page
+                    .locator("#lens-shell [data-part='ticker.headline']")
+                    .count(),
+                  0,
+                  "and no headline",
+                );
+                assert.equal(
+                  await overflow(page),
+                  0,
+                  "nothing wider than the screen",
+                );
+                assert.deepEqual(errors, []);
+                await context.close();
+              }
             },
           );
 
         await t.test(
-          `${size}: with motion reduced the ribbon is still, and every headline can be read`,
+          `${size}: the home page's locators are the recent updates, newest first, as before`,
           async () => {
-            const { context, page } = await open(size, ROOM);
-            const before = await ribbon(page);
-            await page.waitForTimeout(600);
-            const after = await ribbon(page);
-            assert.ok(before.headlines.length >= 3);
-            assert.deepEqual(
-              before.runs.map((run) => run.animations),
-              before.runs.map(() => 0),
-              "nothing is animated",
+            const { context, page, errors } = await open(
+              size,
+              "/?lens=cut-paper",
             );
-            assert.deepEqual(
-              after.runs.map((run) => run.x),
-              before.runs.map((run) => run.x),
-              "nothing moves",
+            const { updates } = content.pages.home;
+            const shown = await locators(page);
+            assert.equal(
+              shown.heading,
+              `${content.lenses["cut-paper"].home.locators} · ${updates.title}`,
             );
+            assert.equal(shown.intro, updates.intro);
+            assert.equal(shown.label, updates.listLabel);
             assert.deepEqual(
-              before.runs.map((run) => run.visible),
-              [true, false],
-              "the headlines are told once",
+              shown.items.map(({ links, ...item }) => item),
+              content.updates.slice(0, updates.limit).map((update) => ({
+                id: update.id,
+                when: update.dateLabel,
+                title: update.title,
+                href: update.href,
+                origin: `${update.kindLabel} · ${update.sourceLabel}`,
+              })),
+              "the first of the home stream, in its order",
             );
-            for (const headline of before.headlines) {
-              assert.ok(headline.visible, `${headline.id} is shown`);
-              assert.ok(
-                headline.box.left >= before.strip.left - 0.5 &&
-                  headline.box.right <= before.strip.right + 0.5,
-                `${headline.id} fits inside the strip`,
-              );
-            }
+            assert.ok(shown.items.length >= 7, "the seeded updates are there");
+            // The view starts with the set's name, as it did: nothing
+            // lies above the home grid.
+            assert.equal(shown.above, 0, "nothing lies above the home grid");
             assert.equal(await overflow(page), 0);
-            await shot(page, null, `cut-paper-ribbon-still-${size}`);
+            assert.deepEqual(errors, []);
+            await shot(
+              page,
+              "#lens-shell .cp-locators",
+              `cut-paper-home-updates-${size}`,
+            );
             await context.close();
-          },
-        );
-
-        await t.test(
-          `${size}: the ribbon runs at a reading pace, holds under a pointer, and never shifts the page`,
-          async () => {
-            const { context, page } = await open(size, ROOM, { motion: true });
-            await page.mouse.move(0, 0);
-            await page.waitForTimeout(1500);
-            const start = await ribbon(page);
-            await page.waitForTimeout(1000);
-            const later = await ribbon(page);
-            assert.deepEqual(
-              start.runs.map((run) => run.running),
-              [true, true],
-              "both runs of the ribbon are moving",
-            );
-            const travelled = start.runs[0].x - later.runs[0].x;
-            assert.ok(
-              travelled > 5 && travelled < 90,
-              `it runs left at a reading pace (${travelled.toFixed(1)}px in a second)`,
-            );
-            assert.equal(
-              (start.runs[0].x - start.runs[1].x).toFixed(1),
-              (later.runs[0].x - later.runs[1].x).toFixed(1),
-              "the two runs travel as one ribbon",
-            );
-            assert.ok(
-              start.runs[1].x - start.runs[0].x >= start.room - 1,
-              "a run is never shorter than the strip",
-            );
-            assert.equal(
-              await overflow(page),
-              0,
-              "nothing wider than the screen",
-            );
-            if (size === "desktop") {
-              const { strip } = later;
-              await page.mouse.move(
-                (strip.left + strip.right) / 2,
-                (strip.top + strip.bottom) / 2,
-              );
-              await page.waitForTimeout(100);
-              const held = await ribbon(page);
-              await page.waitForTimeout(600);
-              const still = await ribbon(page);
-              assert.equal(still.runs[0].x, held.runs[0].x, "it holds");
-              assert.deepEqual(
-                still.runs.map((run) => run.animations),
-                [1, 1],
-                "held, not started over",
-              );
-              await page.mouse.move(0, 0);
-              await page.waitForTimeout(600);
-              const released = await ribbon(page);
-              assert.ok(
-                released.runs[0].x < still.runs[0].x,
-                "and goes on from where it was",
-              );
-              for (const moment of [held, still, released]) {
-                assert.deepEqual(moment.box, start.box, "the ribbon stays put");
-                assert.equal(moment.below, start.below, "so does what follows");
-              }
-            }
-            assert.deepEqual(later.box, start.box, "the ribbon stays put");
-            assert.equal(later.below, start.below, "so does what follows");
-            await context.close();
-          },
-        );
-
-        await t.test(
-          `${size}: one headline still crosses the whole strip, and none leaves no ribbon`,
-          async () => {
-            const one = await open(size, "/?lens=cut-paper", {
-              motion: true,
-              bend: (data) => ({
-                ...data,
-                headlines: data.headlines.slice(0, 1),
-              }),
-            });
-            await one.page.waitForTimeout(1500);
-            const strip = await ribbon(one.page);
-            assert.equal(strip.headlines.length, 1);
-            assert.equal(strip.reachable, 1);
-            assert.ok(
-              strip.runs[1].x - strip.runs[0].x >= strip.room - 1,
-              "the ribbon is a full lap long",
-            );
-            await one.page.waitForTimeout(1000);
-            const travelled =
-              strip.runs[0].x - (await ribbon(one.page)).runs[0].x;
-            assert.ok(
-              travelled > 5 && travelled < 90,
-              `and no faster for being short (${travelled.toFixed(1)}px in a second)`,
-            );
-            assert.equal(await overflow(one.page), 0);
-            await one.context.close();
-
-            for (const path of ["/", "/lab"]) {
-              const none = await open(size, `${path}?lens=cut-paper`, {
-                bend: (data) => ({ ...data, headlines: [] }),
-              });
-              assert.equal(await ribbon(none.page), null);
-              assert.equal(
-                await none.page
-                  .locator("#lens-shell :is([data-ribbon], .cp-ribbon)")
-                  .count(),
-                0,
-                `nothing is left where it would be on ${path}`,
-              );
-              assert.deepEqual(none.errors, []);
-              await none.context.close();
-            }
           },
         );
 
@@ -1106,23 +1177,25 @@ test(
             );
             const entry = (ref) =>
               book.entries.find((item) => item.ref === ref);
-            // With somewhere to go it goes there; with nowhere, to its
-            // line in the Labbook.
+            // With somewhere to go it goes there; with nowhere, it is
+            // text, not a link to its line in the Labbook.
             assert.equal(
               entry("fixture-study-replay").href,
               "https://codepen.io/beejsbj/pen/abXZWLQ",
             );
+            assert.equal(entry("fixture-study-first-line").href, null);
             assert.equal(
-              entry("fixture-study-first-line").href,
-              "/lab#u-fixture-study-first-line",
+              await page.locator("#lens-shell a[href*='#u-']").count(),
+              0,
+              "nothing points at the Labbook's lines",
             );
             const hidden = entry("fixture-study-kept-back");
             assert.equal(hidden.strips, 3);
             assert.equal(hidden.controls, 0);
             assert.equal(
               hidden.text,
-              `20 Aug 2026 ${copy.redacted.label} ${copy.redacted.works.code}`,
-              "its date, what it is, its kind of work: no other word",
+              `20 Aug 2026 ${copy.redacted.label} ${copy.redacted.works.code} ${copy.redacted.bar} ${copy.redacted.bar} ${copy.redacted.bar}`,
+              "its date, what it is, its kind of work, a word for each strip: no other word",
             );
             assert.ok(
               !(await page.content()).includes(REDACTION_MARKER),
@@ -1270,159 +1343,6 @@ test(
           },
         );
       }
-
-      /** Tab into the ribbon from whatever comes before it. */
-      const tabIn = async (page) => {
-        await page.evaluate(() => {
-          const first = document.querySelector(
-            "#lens-shell [data-part='ticker.headline'] a",
-          );
-          const all = [...document.querySelectorAll("a[href], button")].filter(
-            (el) => el.tabIndex >= 0 && el.checkVisibility(),
-          );
-          all[all.indexOf(first) - 1].focus();
-        });
-        await page.keyboard.press("Tab");
-      };
-      /** What has the focus, and where it and its headline lie. */
-      const focused = (page) =>
-        page.evaluate(() => {
-          const el = document.activeElement;
-          const item = el?.closest("[data-part='ticker.headline']");
-          const { left, right } = el.getBoundingClientRect();
-          return {
-            headline: item?.dataset.ref ?? null,
-            inRibbon: !!el?.closest("#lens-shell [data-ribbon]"),
-            left,
-            right,
-            from: item?.getBoundingClientRect().left ?? null,
-          };
-        });
-      /** The link in focus is all in view when its words fit the strip;
-       * when they are longer than the strip, its headline is at the
-       * strip's beginning. No allowance for how a machine sets its type. */
-      const inView = (now, strip) => {
-        const where = `${now.headline}: ${now.left} to ${now.right}, its headline from ${now.from}, in ${strip.strip.left} to ${strip.strip.right}`;
-        if (now.right - now.left <= strip.room)
-          assert.ok(
-            now.left >= strip.strip.left - 0.5 &&
-              now.right <= strip.strip.right + 0.5,
-            `words that fit are all in view (${where})`,
-          );
-        else
-          assert.ok(
-            now.from >= strip.strip.left - 0.5 &&
-              now.from <= strip.strip.left + 16,
-            `words longer than the strip are shown from the beginning (${where})`,
-          );
-      };
-
-      for (const [name, size] of [
-        ["desktop", SIZES.desktop],
-        ["390px", phone(390)],
-        ["450px", phone(450)],
-        ["480px", phone(480)],
-      ])
-        await t.test(
-          `${name}: the ribbon rests for the keyboard, shows the headline in focus, and lets go`,
-          async () => {
-            const { context, page } = await open(size, ROOM, { motion: true });
-            await page.waitForTimeout(1500);
-            const moving = await ribbon(page);
-            const links = page.locator(
-              "#lens-shell [data-part='ticker.headline'] a",
-            );
-            await tabIn(page);
-            const seen = [];
-            for (let i = 0; i < (await links.count()); i += 1) {
-              if (i) await page.keyboard.press("Tab");
-              await page.waitForTimeout(150);
-              const now = await focused(page);
-              const strip = await ribbon(page);
-              await page.waitForTimeout(400);
-              const still = await ribbon(page);
-              seen.push(now.headline);
-              assert.ok(now.inRibbon, "Tab reaches each headline");
-              assert.deepEqual(
-                still.runs.map((run) => run.x),
-                strip.runs.map((run) => run.x),
-                "the ribbon is at rest while a headline has focus",
-              );
-              inView(now, strip);
-              assert.deepEqual(
-                strip.box,
-                moving.box,
-                "the ribbon keeps its place and size",
-              );
-            }
-            // In the order they are written, each once: the second run of
-            // the ribbon is for the eye only.
-            assert.deepEqual(
-              seen,
-              moving.headlines.map((headline) => headline.id),
-            );
-            await page.keyboard.press("Tab");
-            assert.equal(
-              (await focused(page)).inRibbon,
-              false,
-              "one more Tab leaves the ribbon",
-            );
-            await page.waitForTimeout(700);
-            const resumed = await ribbon(page);
-            assert.deepEqual(
-              resumed.runs.map((run) => run.running),
-              [true, true],
-              "and the ribbon runs again",
-            );
-            assert.equal(
-              resumed.scrolled,
-              0,
-              "from its start, not from wherever focus had scrolled it",
-            );
-            await context.close();
-          },
-        );
-
-      await t.test(
-        "a headline whose words fit the strip is shown whole in focus, though its day is not",
-        async () => {
-          // Measured here, so no machine's type decides it: the screen is
-          // cut to halfway between the first headline's words and the whole
-          // of it (its mark, its day, its words).
-          const wide = await open(phone(700), ROOM, { motion: true });
-          await tabIn(wide.page);
-          await wide.page.waitForTimeout(200);
-          const measured = await wide.page.evaluate(() => {
-            const link = document.activeElement;
-            const item = link.closest("[data-part='ticker.headline']");
-            const strip = link.closest("[data-ribbon-strip]");
-            return {
-              words: link.getBoundingClientRect().width,
-              whole: item.getBoundingClientRect().width,
-              chrome: innerWidth - strip.clientWidth,
-            };
-          });
-          await wide.context.close();
-          assert.ok(measured.whole > measured.words + 20);
-          const width = Math.round(
-            (measured.words + measured.whole) / 2 + measured.chrome,
-          );
-          const { context, page } = await open(phone(width), ROOM, {
-            motion: true,
-          });
-          await tabIn(page);
-          await page.waitForTimeout(300);
-          const now = await focused(page);
-          const strip = await ribbon(page);
-          assert.ok(now.inRibbon);
-          assert.ok(
-            now.right - now.left <= strip.room && strip.room < measured.whole,
-            `the words fit the strip and the headline does not (${now.right - now.left} and ${measured.whole} in ${strip.room})`,
-          );
-          inView(now, strip);
-          await context.close();
-        },
-      );
     } finally {
       await browser.close();
       await server?.close();

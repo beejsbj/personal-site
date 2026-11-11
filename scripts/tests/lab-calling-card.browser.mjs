@@ -1,7 +1,7 @@
 /** Calling Card's Lab (issue #96): the Bench and the Shelf on the request
- * board, the Labbook with its artifacts and its redacted updates, the wire
- * of headlines on the pause menu and over the board, and an experiment's
- * own record and graduation.
+ * board, the Labbook with its artifacts and its redacted updates, the
+ * pause menu's phone where the recent updates are, and an experiment's own
+ * record and graduation. There is no wire of headlines.
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
@@ -9,7 +9,8 @@
  * the `labbook`, `lab-full-page`, `lab-bare-entry` and `lab-no-cover`
  * fixtures, which hold every state whatever src/content does. Same server
  * and Chromium as prism-parity.browser.mjs. LAB_SHOTS=<dir> also saves
- * pictures of each part at each size. */
+ * pictures of each part at each size; LAB_ONLY=<regexp> runs only the
+ * subtests it names. */
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -22,6 +23,7 @@ import {
 } from "../../src/prism/labbook-fixture.ts";
 import { updateDateLabel } from "../../src/lib/labbook.ts";
 import { labPlaces } from "../../src/lib/rules.ts";
+import { checkRedactedLine, redactedLine } from "./lib/redaction.mjs";
 
 const SIZES = {
   desktop: { viewport: { width: 1280, height: 800 } },
@@ -32,6 +34,7 @@ const SIZES = {
   },
 };
 const SHOTS = process.env.LAB_SHOTS;
+const ONLY = process.env.LAB_ONLY ? new RegExp(process.env.LAB_ONLY) : null;
 const PEN_FRAME = "https://codepen.io/beejsbj/embed/abXZWLQ?default-tab=result";
 const DEMO_FRAME = "https://example.com/fixture-demo/";
 const fixture = labbookFixture();
@@ -130,6 +133,7 @@ const labbook = (page) =>
         bars: item.querySelectorAll("[data-redaction-bar]").length,
         controls: item.querySelectorAll("a, button, iframe, video, audio")
           .length,
+        links: item.querySelectorAll("a").length,
       });
     }
     return {
@@ -146,62 +150,34 @@ const labbook = (page) =>
     };
   });
 
-/** The wire as it stands this instant. */
-const wire = (page) =>
+/** Where the wire of headlines used to be, by every name it had: the wire
+ * itself, and the column put round the pause menu's plates to hold it. */
+const WIRE = ":is([data-cc-wire], .cc-wire, .cc-home__side)";
+
+/** The phone's messages, top to bottom: the home page's recent updates. */
+const messages = (page) =>
   page.evaluate(() => {
     const text = (el) => (el?.textContent ?? "").replace(/\s+/g, " ").trim();
-    const root = document.querySelector("#lens-shell [data-cc-wire]");
-    if (!root) return null;
-    const strip = root.querySelector("[data-cc-wire-strip]");
-    const box = (el) => {
-      const { left, right, top, bottom } = el.getBoundingClientRect();
-      return { left, right, top, bottom };
-    };
-    const runs = [...root.querySelectorAll("[data-cc-wire-run]")];
-    const following = root.nextElementSibling ?? root.parentElement;
-    return {
-      name: text(document.getElementById(root.getAttribute("aria-labelledby"))),
-      headlines: [
-        ...root.querySelectorAll("[data-part='ticker.headline']"),
-      ].map((item) => {
-        const link = item.querySelector("a");
-        return {
-          id: item.dataset.ref,
-          text: text(link),
-          href: link.getAttribute("href"),
-          day: text(item.querySelector("time .cc-sr")),
-          box: box(link),
-          visible: link.checkVisibility(),
-        };
-      }),
-      // Links anyone can reach with Tab or a screen reader.
-      reachable: [...root.querySelectorAll("a")].filter(
-        (link) =>
-          link.tabIndex >= 0 &&
-          link.checkVisibility() &&
-          !link.closest("[aria-hidden='true']"),
-      ).length,
-      runs: runs.map((run) => ({
-        x: run.getBoundingClientRect().left,
-        visible: run.checkVisibility(),
-        running: run
-          .getAnimations()
-          .some((animation) => animation.playState === "running"),
-        animations: run.getAnimations().length,
-      })),
-      strip: box(strip),
-      // The strip's own room for a headline, whatever else it holds.
-      room: strip.clientWidth,
-      tall: strip.scrollHeight > strip.clientHeight + 1,
-      box: box(root),
-      below: following.getBoundingClientRect().top,
-    };
+    return [
+      ...document.querySelectorAll(
+        "#lens-shell .cc-phone .cc-msg:not(.cc-msg--typing)",
+      ),
+    ].map((message) => {
+      const link = message.querySelector("a");
+      return {
+        title: text(message.querySelector(".cc-msg__title")),
+        summary: text(message.querySelector(".cc-msg__body")),
+        // Its words, without the arrow that marks a way out.
+        link: link ? text(link.firstChild) : undefined,
+        href: link?.getAttribute("href") ?? undefined,
+        origin: text(message.querySelector(".cc-msg__meta")),
+      };
+    });
   });
 
 /** Whatever on the screen has been slid sideways, or could be: the document
  * wider than the screen, a column scrolled off its start, or one with room
- * to be. The wire's own strip rests that way, and nothing can reach the
- * lens's painted grounds. On a phone the pause menu's portrait and a
+ * to be. Nothing can reach the lens's painted grounds. On a phone the pause menu's portrait and a
  * brief's tilted paper hang over the edge of their columns, as they did
  * before the Lab: those two may have room, and must still not have moved. */
 const sideways = (page) =>
@@ -213,8 +189,7 @@ const sideways = (page) =>
       document.documentElement.clientWidth;
     if (wide > 0) out.push(`the document, by ${wide}px`);
     for (const el of document.querySelectorAll("#lens-shell *")) {
-      if (el.closest(".cc-sr, .cc-screen__bg, .cc-wipe, [data-cc-wire-strip]"))
-        continue;
+      if (el.closest(".cc-sr, .cc-screen__bg, .cc-wipe")) continue;
       if (el.scrollLeft !== 0) out.push(`${name(el)} is at ${el.scrollLeft}`);
       // The screen itself is fixed: only its columns turn.
       if (el.scrollTop !== 0 && el.matches(".cc-stage, .cc-screen"))
@@ -237,9 +212,13 @@ const skip = executable
   : "no Chromium: set PRISM_CHROMIUM or install a Playwright headless shell";
 
 test(
-  "Calling Card shows the Bench, the Shelf, the Labbook and the wire",
+  "Calling Card shows the Bench, the Shelf, the Labbook and the recent updates",
   { skip, timeout: 15 * 60_000 },
-  async (t) => {
+  async (suite) => {
+    const t = {
+      test: (name, fn) =>
+        suite.test(name, { skip: !!ONLY && !ONLY.test(name) }, fn),
+    };
     const { chromium: browserType } = await import("playwright-core");
     const external = process.env.BASE;
     if (!external)
@@ -309,7 +288,7 @@ test(
         const { width, height } = SIZES[size].viewport;
 
         await t.test(
-          `${size}: /lab pins the Bench and stands the Shelf, the featured experiment leading`,
+          `${size}: /lab pins the Bench and stands the Shelf, each in the shared order`,
           async () => {
             const { context, page, errors } = await open(
               size,
@@ -362,25 +341,15 @@ test(
                   ),
                 ),
             );
+            // Pride of place is given as the content gives it: to one
+            // experiment, or to none (both are looked at on fixtures below).
             const bench = room.find(({ place }) => place === "bench");
-            const lead = content.lab.find(
-              (entry) => entry.place === "bench" && entry.featured,
+            assert.deepEqual(
+              bench.entries.map((entry) => entry.featured),
+              expected
+                .find(({ place }) => place === "bench")
+                .entries.map((entry) => !!entry.featured),
             );
-            if (lead) {
-              assert.equal(bench.entries[0].slug, lead.slug);
-              assert.deepEqual(
-                bench.entries.map((entry) => entry.featured),
-                bench.entries.map((_, i) => i === 0),
-                "one experiment has pride of place",
-              );
-              if (size === "desktop")
-                assert.ok(
-                  bench.entries
-                    .slice(1)
-                    .every((entry) => entry.width < bench.entries[0].width),
-                  "and it is given more room than the rest",
-                );
-            }
             assert.deepEqual(await sideways(page), [], "nothing slides");
             assert.deepEqual(errors, []);
             await shot(page, null, `calling-card-lab-${size}`);
@@ -395,6 +364,87 @@ test(
               `calling-card-shelf-${size}`,
             );
             await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: the Bench with one experiment featured, and with none`,
+          async () => {
+            const benchOf = async (page) => {
+              const { lab } = await page.evaluate(
+                () => window.prismHarness.content,
+              );
+              return {
+                expected: labPlaces(lab).find(({ place }) => place === "bench")
+                  .entries,
+                shown: (await places(page)).find(
+                  ({ place }) => place === "bench",
+                ).entries,
+              };
+            };
+
+            // One featured: the last on the Bench by order, so it leads
+            // only because it is featured.
+            const one = await open(size, harness("lab-featured", "/lab"));
+            const withOne = await benchOf(one.page);
+            assert.ok(
+              withOne.expected[0].featured &&
+                withOne.expected[0].order > withOne.expected[1].order,
+              "the fixture features the last experiment by order",
+            );
+            assert.deepEqual(
+              withOne.shown.map((entry) => entry.slug),
+              withOne.expected.map((entry) => entry.slug),
+              "it leads the Bench",
+            );
+            assert.deepEqual(
+              withOne.shown.map((entry) => entry.featured),
+              withOne.shown.map((_, i) => i === 0),
+              "one experiment has pride of place",
+            );
+            const [lead, ...rest] = withOne.shown;
+            if (size === "desktop")
+              assert.ok(
+                rest.every((entry) => entry.width < lead.width),
+                "and it is given more room than the rest",
+              );
+            assert.deepEqual(await sideways(one.page), [], "nothing slides");
+            assert.deepEqual(one.errors, []);
+            await shot(
+              one.page,
+              "#lens-shell [data-lab-place='bench']",
+              `calling-card-bench-featured-${size}`,
+            );
+            await one.context.close();
+
+            // None featured: the same Bench in its plain order, no
+            // experiment marked and none given the featured one's room.
+            const none = await open(size, harness("lab-none-featured", "/lab"));
+            const without = await benchOf(none.page);
+            assert.ok(without.expected.every((entry) => !entry.featured));
+            assert.deepEqual(
+              without.shown.map((entry) => entry.slug),
+              without.expected.map((entry) => entry.slug),
+              "the Bench in its own order",
+            );
+            assert.deepEqual(
+              without.shown.filter((entry) => entry.featured),
+              [],
+              "no experiment is marked as featured",
+            );
+            if (size === "desktop")
+              assert.ok(
+                without.shown.every((entry) => entry.width < lead.width),
+                "and none is given the featured one's room",
+              );
+            assert.deepEqual(await sideways(none.page), [], "nothing slides");
+            assert.deepEqual(none.errors, []);
+            await shot(
+              none.page,
+              "#lens-shell [data-lab-place='bench']",
+              `calling-card-bench-none-featured-${size}`,
+            );
+            await none.context.close();
           },
         );
 
@@ -576,6 +626,68 @@ test(
         );
 
         await t.test(
+          `${size}: an update with nowhere to go is text, not a link, on the phone and in the Labbook`,
+          async () => {
+            const written = fixture.labbook.filter(
+              (update) => update.visibility === "open",
+            );
+            const nowhere = written.filter((update) => !update.href);
+            assert.ok(nowhere.length >= 2, "the fixture has such updates");
+            assert.ok(written.length > nowhere.length, "and ones that do go");
+            // Nothing on the screen points at an update's place in the Labbook.
+            const pointers = (page) =>
+              page.locator("#lens-shell a[href*='#u-']").count();
+
+            const home = await open(size, harness("labbook", "/"));
+            const stream = (
+              await home.page.evaluate(() => window.prismHarness.content)
+            ).updates;
+            await home.page.locator("#lens-shell .cc-phonechip").click();
+            await home.page.waitForSelector("#lens-shell .cc-phone .cc-msg");
+            const thread = await messages(home.page);
+            assert.equal(thread.length, stream.length);
+            for (const update of stream) {
+              const message = thread.find(
+                (item) => item.title === update.title,
+              );
+              assert.ok(message, `${update.id} is a message`);
+              // A message with nowhere to go has no link under its words.
+              assert.equal(message.href, update.href, update.id);
+              assert.equal(message.link, update.linkLabel, update.id);
+            }
+            for (const update of nowhere)
+              assert.equal(
+                thread.find((item) => item.title === update.title).href,
+                undefined,
+                `${update.id} has no link`,
+              );
+            assert.equal(await pointers(home.page), 0);
+            assert.deepEqual(home.errors, []);
+            await home.page.waitForTimeout(600);
+            await shot(home.page, null, `calling-card-home-nowhere-${size}`);
+            await home.context.close();
+
+            const room = await open(size, ROOM);
+            const book = (await labbook(room.page)).entries;
+            for (const update of written) {
+              const entry = book.find((item) => item.id === update.id);
+              assert.equal(entry.href, update.href ?? null, update.id);
+            }
+            // With nothing it is about and nothing that lives elsewhere,
+            // such an update has no link in it at all.
+            for (const id of ["fixture-film", "fixture-tone"])
+              assert.equal(
+                book.find((entry) => entry.id === id).links,
+                0,
+                `${id} has no link in it`,
+              );
+            assert.equal(await pointers(room.page), 0);
+            assert.deepEqual(room.errors, []);
+            await room.context.close();
+          },
+        );
+
+        await t.test(
           `${size}: an update with an artifact shows it, with its words`,
           async () => {
             const { context, page, asked, errors } = await open(size, ROOM);
@@ -589,6 +701,7 @@ test(
                 "fixture-demo",
                 "fixture-replay",
                 "fixture-film",
+                "fixture-half-said",
                 "fixture-kept-back",
                 "fixture-first-line",
               ],
@@ -810,64 +923,59 @@ test(
         );
 
         await t.test(
-          `${size}: a redacted update is its cut-outs, with a name a screen reader can say`,
+          `${size}: a redacted update is its cut-outs, each said once, under a name a screen reader can say`,
           async () => {
             const { context, page } = await open(size, ROOM);
             const book = await labbook(page);
             const hidden = fixture.labbook.find(
-              (update) => update.visibility === "redacted",
+              (update) => update.id === "fixture-kept-back",
             );
+            const { parts } = hidden.shape;
+            assert.ok(parts.every((part) => typeof part === "number"));
             const entry = book.entries.find((item) => item.id === hidden.id);
             assert.equal(entry.part, "update.redacted");
             assert.equal(entry.ref, hidden.id);
-            assert.equal(entry.bars, hidden.shape.bars.length);
+            assert.equal(entry.bars, parts.length);
             assert.equal(entry.date, hidden.date);
             assert.deepEqual(
               entry.said,
               [
                 updateDateLabel(hidden.date),
                 copy.redacted.label,
+                ...parts.map(() => copy.redacted.bar),
                 copy.redacted.works[hidden.shape.work],
               ],
-              "its date, what it is, its kind of work: no other word",
+              "its date, what it is, a word for each cut-out, its kind of work: no other word",
             );
             assert.equal(entry.controls, 0, "nothing to follow or play");
             assert.deepEqual(entry.related, []);
             assert.deepEqual(entry.pictures, []);
-            const bars = await page.evaluate((id) => {
-              const slip = document.querySelector(
-                `#lens-shell #u-${id} .cc-entry__bars`,
-              );
-              return {
-                hidden: slip.getAttribute("aria-hidden") === "true",
-                bars: [...slip.querySelectorAll("[data-redaction-bar]")].map(
-                  (bar) => ({
-                    // The bar's own length: a tilted box measures longer.
-                    width: bar.offsetWidth,
-                    height: bar.offsetHeight,
-                    ink: getComputedStyle(bar).backgroundColor,
-                  }),
-                ),
-              };
-            }, hidden.id);
-            assert.ok(bars.hidden, "the cut-outs say nothing");
-            for (const bar of bars.bars) {
+            const item = page.locator(`#lens-shell #u-${hidden.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            const bars = await item.evaluate((el) =>
+              [...el.querySelectorAll("[data-redaction-bar]")].map((bar) => ({
+                height: bar.offsetHeight,
+                ink: getComputedStyle(bar).backgroundColor,
+              })),
+            );
+            for (const bar of bars) {
               assert.ok(
                 bar.height > 16,
                 "a cut-out is tall enough to hide a word",
               );
               assert.equal(bar.ink, "rgb(10, 10, 10)", "and solid black");
             }
-            // Longer numbers, longer cut-outs.
-            const order = (list) =>
-              list
-                .map((value, index) => [value, index])
-                .sort(([a], [b]) => a - b)
-                .map(([, index]) => index);
-            assert.deepEqual(
-              order(bars.bars.map((bar) => bar.width)),
-              order(hidden.shape.bars),
-            );
             assert.ok(
               !(await page.content()).includes(REDACTION_MARKER),
               "nothing it hides is in the page",
@@ -881,358 +989,168 @@ test(
           },
         );
 
+        await t.test(
+          `${size}: a redacted update may show a few of its words, in their places among its cut-outs`,
+          async () => {
+            const { context, page, errors } = await open(size, ROOM);
+            const book = await labbook(page);
+            const half = fixture.labbook.find(
+              (update) => update.id === "fixture-half-said",
+            );
+            const { parts } = half.shape;
+            assert.deepEqual(parts, ["Rewired", 4, 2, "the", 6]);
+            const entry = book.entries.find((item) => item.id === half.id);
+            assert.equal(entry.part, "update.redacted");
+            assert.equal(entry.bars, 3);
+            assert.deepEqual(
+              entry.said,
+              [
+                updateDateLabel(half.date),
+                copy.redacted.label,
+                "Rewired",
+                copy.redacted.bar,
+                copy.redacted.bar,
+                "the",
+                copy.redacted.bar,
+                copy.redacted.works[half.shape.work],
+              ],
+              "its date, what it is, its line and its kind of work: no other word",
+            );
+            assert.equal(entry.controls, 0, "nothing to follow or play");
+            const item = page.locator(`#lens-shell #u-${half.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: copy.redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el.getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            // The words are set as an update's title is, in the slip's ink.
+            const type = (selector) =>
+              page
+                .locator(`#lens-shell ${selector}`)
+                .first()
+                .evaluate((el) => {
+                  const { fontFamily, fontSize, textTransform } =
+                    getComputedStyle(el);
+                  return { fontFamily, fontSize, textTransform };
+                });
+            assert.deepEqual(
+              await type(`#u-${half.id} [data-redaction-word]`),
+              await type("[data-cc-labbook] .cc-entry__title"),
+            );
+            assert.equal(
+              await item
+                .locator("[data-redaction-word]")
+                .first()
+                .evaluate((el) => getComputedStyle(el).color),
+              "rgb(10, 10, 10)",
+              "in the black the cut-outs are",
+            );
+            assert.deepEqual(await sideways(page), [], "nothing slides");
+            assert.ok(
+              !(await page.content()).includes(REDACTION_MARKER),
+              "nothing it hides is in the page",
+            );
+            assert.deepEqual(errors, []);
+            await shot(
+              page,
+              `#lens-shell #u-${half.id}`,
+              `calling-card-redacted-mixed-${size}`,
+            );
+            await context.close();
+          },
+        );
+
         for (const path of ["/", "/lab"])
           await t.test(
-            `${size}: the wire on ${path} carries the seeded headlines, each linking into the Labbook`,
+            `${size}: there is no wire of headlines on ${path}`,
             async () => {
-              const { context, page } = await open(
-                size,
+              // On real content and on the fixture Labbook alike.
+              for (const address of [
                 `${path}?lens=calling-card`,
-              );
-              const strip = await wire(page);
-              assert.ok(strip, "there is a wire");
-              assert.equal(strip.name, content.site.ticker.label);
-              assert.deepEqual(
-                strip.headlines.map(({ id, text, href, day }) => ({
-                  id,
-                  text,
-                  href,
-                  day,
-                })),
-                content.headlines.map((headline) => ({
-                  id: headline.id,
-                  text: headline.text,
-                  href: `/lab#u-${headline.updates[0]}`,
-                  day: updateDateLabel(headline.date).slice(0, 6),
-                })),
-              );
-              assert.equal(strip.reachable, content.headlines.length);
-              assert.deepEqual(await sideways(page), [], "nothing slides");
-              const name = path === "/" ? "home" : "lab";
-              await shot(page, null, `calling-card-wire-${name}-still-${size}`);
-              // And as most visitors meet it, running: one long line that
-              // widens nothing it sits in.
-              const live = await open(size, `${path}?lens=calling-card`, {
-                motion: true,
-              });
-              await live.page.waitForTimeout(1200);
-              const running = await wire(live.page);
-              assert.ok(
-                running.box.left >= 0 && running.box.right <= width + 0.5,
-                `the running wire keeps inside the screen (${running.box.left} to ${running.box.right} of ${width})`,
-              );
-              assert.deepEqual(
-                await sideways(live.page),
-                [],
-                "and gives nothing a way to slide",
-              );
-              await shot(live.page, null, `calling-card-wire-${name}-${size}`);
-              await live.context.close();
-              // Following one lands on its update, whichever screen it was
-              // on, and the update takes the focus.
-              const [first] = content.headlines;
-              await page
-                .locator("#lens-shell [data-part='ticker.headline'] a")
-                .first()
-                .click();
-              await page.waitForURL(
-                (url) =>
-                  url.pathname === "/lab" &&
-                  url.hash === `#u-${first.updates[0]}`,
-              );
-              await page.waitForSelector(
-                `#lens-shell #u-${first.updates[0]}[data-cc-landed]`,
-              );
-              await page.waitForTimeout(900);
-              const arrived = await page
-                .locator(`#lens-shell #u-${first.updates[0]}`)
-                .evaluate((el) => ({
-                  top: el.getBoundingClientRect().top,
-                  focused: document.activeElement === el,
-                }));
-              assert.ok(
-                arrived.top >= 0 && arrived.top < height,
-                `the update is on screen (its top at ${arrived.top})`,
-              );
-              assert.ok(arrived.focused, "and has the focus");
-              assert.deepEqual(await sideways(page), [], "nothing slid");
-              await context.close();
+                harness("labbook", path),
+              ]) {
+                const { context, page, errors } = await open(size, address);
+                assert.equal(
+                  await page.locator(`#lens-shell ${WIRE}`).count(),
+                  0,
+                  `no wire on ${address}`,
+                );
+                assert.equal(
+                  await page
+                    .locator("#lens-shell [data-part='ticker.headline']")
+                    .count(),
+                  0,
+                  "and no headline",
+                );
+                assert.deepEqual(await sideways(page), [], "nothing slides");
+                assert.deepEqual(errors, []);
+                await context.close();
+              }
             },
           );
 
         await t.test(
-          `${size}: with motion reduced the wire is still, and every headline can be read`,
+          `${size}: the home page's phone holds the updates as messages, the newest last, as before`,
           async () => {
-            const { context, page } = await open(size, ROOM);
-            const before = await wire(page);
-            await page.waitForTimeout(600);
-            const after = await wire(page);
-            assert.ok(before.headlines.length >= 3);
+            const { context, page, errors } = await open(
+              size,
+              "/?lens=calling-card",
+            );
+            const [latest] = content.updates;
+            const chip = page.locator("#lens-shell .cc-phonechip");
             assert.deepEqual(
-              before.runs.map((run) => run.animations),
-              before.runs.map(() => 0),
-              "nothing is animated",
+              await chip.evaluate((el) => ({
+                id: el.dataset.part === "update.item" ? el.dataset.ref : null,
+                says: el.querySelector(".cc-phonechip__text").textContent,
+                count: el.querySelector(".cc-phonechip__badge").textContent,
+              })),
+              {
+                id: latest.id,
+                says: latest.title,
+                count: String(content.updates.length),
+              },
+              "the phone on the pause menu shows the newest update",
             );
-            assert.deepEqual(
-              after.runs.map((run) => run.x),
-              before.runs.map((run) => run.x),
-              "nothing moves",
-            );
-            assert.deepEqual(
-              before.runs.map((run) => run.visible),
-              [true, false],
-              "the headlines are told once",
-            );
-            assert.ok(!before.tall, "the list stands whole over the board");
-            for (const headline of before.headlines) {
-              assert.ok(headline.visible, `${headline.id} is shown`);
-              // The band is tilted a degree, so a box may lean a pixel out.
-              assert.ok(
-                headline.box.left >= before.strip.left - 2 &&
-                  headline.box.right <= before.strip.right + 2 &&
-                  headline.box.top >= before.strip.top - 2 &&
-                  headline.box.bottom <= before.strip.bottom + 2,
-                `${headline.id} fits inside the strip`,
-              );
-            }
-            assert.deepEqual(await sideways(page), [], "nothing slides");
-            await shot(page, null, `calling-card-wire-still-${size}`);
-            await context.close();
-
-            // The pause menu does not scroll on a wide screen, so there a
-            // long list does: every headline is still reached, once each.
-            const home = await open(size, harness("labbook", "/"));
-            const menu = await wire(home.page);
-            assert.deepEqual(
-              menu.runs.map((run) => run.animations),
-              menu.runs.map(() => 0),
-            );
-            assert.equal(menu.reachable, menu.headlines.length);
-            assert.equal(menu.tall, size === "desktop");
-            assert.ok(
-              menu.box.left >= 0 && menu.box.right <= width + 0.5,
-              "the standing wire keeps inside the screen",
-            );
-            for (const [i, headline] of menu.headlines.entries()) {
-              await home.page
-                .locator("#lens-shell [data-part='ticker.headline'] a")
-                .nth(i)
-                .focus();
-              const now = await wire(home.page);
-              const at = now.headlines[i].box;
-              assert.ok(
-                at.top >= now.strip.top - 2 &&
-                  at.bottom <= now.strip.bottom + 2,
-                `${headline.id} is in view when it has the focus`,
-              );
-            }
-            assert.deepEqual(await sideways(home.page), [], "nothing slides");
-            await shot(home.page, null, `calling-card-wire-home-long-${size}`);
-            await home.context.close();
-          },
-        );
-
-        await t.test(
-          `${size}: the wire crawls at a reading pace, holds under a pointer, and never shifts the screen`,
-          async () => {
-            const { context, page } = await open(size, ROOM, { motion: true });
-            await page.mouse.move(0, 0);
-            await page.waitForTimeout(1200);
-            const start = await wire(page);
-            await page.waitForTimeout(1000);
-            const later = await wire(page);
-            assert.deepEqual(
-              start.runs.map((run) => run.running),
-              [true, true],
-              "both runs of the wire are moving",
-            );
-            const travelled = start.runs[0].x - later.runs[0].x;
-            assert.ok(
-              travelled > 5 && travelled < 90,
-              `it crawls left at a reading pace (${travelled.toFixed(1)}px in a second)`,
-            );
+            // The plates stand in the pause menu itself, as they did: no
+            // column was put round them to hold a wire.
             assert.equal(
-              (start.runs[0].x - start.runs[1].x).toFixed(1),
-              (later.runs[0].x - later.runs[1].x).toFixed(1),
-              "the two runs travel as one line",
+              await page
+                .locator("#lens-shell .cc-home__plates")
+                .evaluate((el) => el.parentElement.tagName),
+              "MAIN",
             );
-            assert.ok(
-              start.runs[1].x - start.runs[0].x >= start.room - 1,
-              "a run is never shorter than the strip",
+            await shot(page, null, `calling-card-home-${size}`);
+            await chip.click();
+            await page.waitForSelector("#lens-shell .cc-phone .cc-msg");
+            assert.deepEqual(
+              await messages(page),
+              // Oldest day first; on one day, the later in the stream
+              // comes first, so the newest of all is last.
+              content.updates
+                .map((update, at) => ({ update, at }))
+                .sort(
+                  (a, b) =>
+                    a.update.date.localeCompare(b.update.date) || b.at - a.at,
+                )
+                .map(({ update }) => ({
+                  title: update.title,
+                  summary: update.summary,
+                  link: update.linkLabel,
+                  href: update.href,
+                  origin: `${update.sourceLabel} · ${update.kindLabel}`,
+                })),
             );
-            if (size === "desktop") {
-              const { strip } = later;
-              await page.mouse.move(
-                (strip.left + strip.right) / 2,
-                (strip.top + strip.bottom) / 2,
-              );
-              await page.waitForTimeout(100);
-              const held = await wire(page);
-              await page.waitForTimeout(600);
-              const still = await wire(page);
-              assert.equal(still.runs[0].x, held.runs[0].x, "it holds");
-              assert.deepEqual(
-                still.runs.map((run) => run.animations),
-                [1, 1],
-                "held, not started over",
-              );
-              await page.mouse.move(0, 0);
-              await page.waitForTimeout(600);
-              const released = await wire(page);
-              assert.ok(
-                released.runs[0].x < still.runs[0].x,
-                "and goes on from where it was",
-              );
-              for (const moment of [held, still, released]) {
-                assert.deepEqual(moment.box, start.box, "the wire stays put");
-                assert.equal(moment.below, start.below, "so does what follows");
-              }
-            }
-            assert.deepEqual(later.box, start.box, "the wire stays put");
-            assert.equal(later.below, start.below, "so does what follows");
-            assert.deepEqual(await sideways(page), [], "nothing slides");
+            assert.deepEqual(errors, []);
+            await page.waitForTimeout(600);
+            await shot(page, null, `calling-card-home-updates-${size}`);
             await context.close();
-          },
-        );
-
-        await t.test(
-          `${size}: the wire rests for the keyboard, shows the headline in focus, and lets go`,
-          async () => {
-            for (const path of [ROOM, harness("labbook", "/")]) {
-              const { context, page } = await open(size, path, {
-                motion: true,
-              });
-              await page.waitForTimeout(1500);
-              const moving = await wire(page);
-              const links = page.locator(
-                "#lens-shell [data-part='ticker.headline'] a",
-              );
-              const focused = () =>
-                page.evaluate(() => {
-                  const el = document.activeElement;
-                  const item = el?.closest("[data-part='ticker.headline']");
-                  const { left, right } = el.getBoundingClientRect();
-                  return {
-                    headline: item?.dataset.ref ?? null,
-                    inWire: !!el?.closest("[data-cc-wire]"),
-                    left,
-                    right,
-                  };
-                });
-              // Tab in from whatever comes before the wire.
-              await page.evaluate(() => {
-                const first = document.querySelector(
-                  "#lens-shell [data-part='ticker.headline'] a",
-                );
-                const all = [
-                  ...document.querySelectorAll(
-                    "#lens-shell a[href], #lens-shell button",
-                  ),
-                ].filter((el) => el.tabIndex >= 0 && el.checkVisibility());
-                all[all.indexOf(first) - 1].focus();
-              });
-              const seen = [];
-              for (let i = 0; i < (await links.count()); i += 1) {
-                await page.keyboard.press("Tab");
-                await page.waitForTimeout(150);
-                const now = await focused();
-                const strip = await wire(page);
-                await page.waitForTimeout(400);
-                const still = await wire(page);
-                seen.push(now.headline);
-                assert.ok(now.inWire, "Tab reaches each headline");
-                assert.deepEqual(
-                  still.runs.map((run) => run.x),
-                  strip.runs.map((run) => run.x),
-                  "the wire is at rest while a headline has focus",
-                );
-                // All of it when it fits; its beginning when it is longer
-                // than the strip.
-                const room = strip.strip.right - strip.strip.left;
-                assert.ok(
-                  now.left >= strip.strip.left - 1 &&
-                    (now.right <= strip.strip.right + 1 ||
-                      (now.right - now.left > room - 160 &&
-                        now.left < strip.strip.left + 160)),
-                  `${now.headline} is in view while it has focus (${now.left} to ${now.right} in ${strip.strip.left} to ${strip.strip.right})`,
-                );
-                assert.deepEqual(strip.box, moving.box, "the wire stays put");
-                assert.deepEqual(
-                  await sideways(page),
-                  [],
-                  "and the screen under it",
-                );
-              }
-              // In the order they are written, each once: the second run
-              // of the wire is for the eye only.
-              assert.deepEqual(
-                seen,
-                moving.headlines.map((headline) => headline.id),
-              );
-              await page.keyboard.press("Tab");
-              assert.equal(
-                (await focused()).inWire,
-                false,
-                "one more Tab leaves the wire",
-              );
-              await page.waitForTimeout(700);
-              const resumed = await wire(page);
-              assert.deepEqual(
-                resumed.runs.map((run) => run.running),
-                [true, true],
-                "and the wire runs again",
-              );
-              assert.equal(
-                await page.evaluate(
-                  () =>
-                    document.querySelector("#lens-shell [data-cc-wire-strip]")
-                      .scrollLeft,
-                ),
-                0,
-                "from its start, not from wherever focus had scrolled it",
-              );
-              assert.deepEqual(await sideways(page), [], "nothing slid");
-              await context.close();
-            }
-          },
-        );
-
-        await t.test(
-          `${size}: one headline still crosses the whole strip, and none leaves no wire`,
-          async () => {
-            const one = await open(size, "/?lens=calling-card", {
-              motion: true,
-              bend: (data) => ({
-                ...data,
-                headlines: data.headlines.slice(0, 1),
-              }),
-            });
-            await one.page.waitForTimeout(1200);
-            const strip = await wire(one.page);
-            assert.equal(strip.headlines.length, 1);
-            assert.equal(strip.reachable, 1);
-            assert.ok(
-              strip.runs[1].x - strip.runs[0].x >= strip.room - 1,
-              "the wire is a full lap long",
-            );
-            assert.deepEqual(await sideways(one.page), []);
-            await one.context.close();
-
-            for (const path of ["/", "/lab"]) {
-              const none = await open(size, `${path}?lens=calling-card`, {
-                bend: (data) => ({ ...data, headlines: [] }),
-              });
-              assert.equal(await wire(none.page), null);
-              assert.equal(
-                await none.page
-                  .locator("#lens-shell :is([data-cc-wire], .cc-wire)")
-                  .count(),
-                0,
-                `nothing is left where it would be on ${path}`,
-              );
-              assert.deepEqual(none.errors, []);
-              await none.context.close();
-            }
           },
         );
 
@@ -1278,15 +1196,17 @@ test(
             );
             const entry = (ref) =>
               book.entries.find((item) => item.ref === ref);
-            // With somewhere to go it goes there; with nowhere, to its
-            // place in the Labbook.
+            // With somewhere to go it goes there; with nowhere, it is
+            // text, not a link to its place in the Labbook.
             assert.equal(
               entry("fixture-study-replay").href,
               "https://codepen.io/beejsbj/pen/abXZWLQ",
             );
+            assert.equal(entry("fixture-study-first-line").href, null);
             assert.equal(
-              entry("fixture-study-first-line").href,
-              "/lab#u-fixture-study-first-line",
+              await page.locator("#lens-shell a[href*='#u-']").count(),
+              0,
+              "nothing points at the Labbook's days",
             );
             assert.equal(entry("fixture-study-kept-back").bars, 3);
             assert.equal(entry("fixture-study-kept-back").controls, 0);
@@ -1294,6 +1214,9 @@ test(
             assert.deepEqual(entry("fixture-study-kept-back").said, [
               "20 Aug 2026",
               copy.redacted.label,
+              copy.redacted.bar,
+              copy.redacted.bar,
+              copy.redacted.bar,
               copy.redacted.works.code,
             ]);
             assert.ok(

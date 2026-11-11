@@ -7,8 +7,8 @@
  *
  * Refs: `page.*` take the page id (home, about, resume, projects, lab,
  * not-found); `project.*` and `lab.*` the entry slug; `update.*` the
- * update id; `ticker.headline` the headline id; `resume.*` the entry id
- * from content.json; `home.elsewhere` the item's index.
+ * update id; `resume.*` the entry id from content.json; `home.elsewhere`
+ * the item's index.
  *
  * Plain data, no imports: Astro, the shells and the Node tests all load it. */
 
@@ -56,8 +56,6 @@ export const PARTS = [
   // one update in a list of them, and one that is redacted: its shape alone
   "update.item",
   "update.redacted",
-  // one headline on the ticker
-  "ticker.headline",
   // the structured resume
   "resume.role",
   "resume.education",

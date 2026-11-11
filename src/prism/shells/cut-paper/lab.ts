@@ -4,9 +4,9 @@
  * head of the rack. The Shelf is the pads that are muted: gone quiet, ink
  * with their colour at the edge, lying in rows, and still lighting up when
  * pressed. What does carry a date is the Labbook (./labbook), the Markers
- * track written out below the rack, and the ribbon of headlines (./ribbon)
- * across the top. An experiment opens as its pad, with its part of the
- * Labbook and, when it graduated, the clip it became on the arrangement. */
+ * track written out below the rack. An experiment opens as its pad, with
+ * its part of the Labbook and, when it graduated, the clip it became on
+ * the arrangement. */
 import { part } from "../../parts";
 import { experimentUpdates } from "../../../lib/labbook";
 import { graduatedProject, labPlaces } from "../../../lib/rules";
@@ -17,7 +17,6 @@ import { bar, buttons, heading, inlineCopy, noteVar, pageHead, prose, roll, scre
 import { h, link } from "./dom";
 import { labbook, tendLog } from "./labbook";
 import { chord, voicing } from "./music";
-import { ribbon } from "./ribbon";
 import { sketchNotes } from "./score";
 
 /** Hear a sketch: its motif on the kalimba over the home chord. */
@@ -122,7 +121,6 @@ export function lab(env: Env): Screen {
     h(
       "div",
       { class: "cp-page cp-lab" },
-      ribbon(env),
       bar(head, 2),
       h("p", { class: "cp-session__legend" }, copy.lab.undated),
       places,

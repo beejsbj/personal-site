@@ -9,16 +9,22 @@
  *   are shown where they are. A Pen or a demo is a dark stage cut into the
  *   paper, with a play button: its frame is made only when that is pressed,
  *   in the stage's own room, so until then nothing is asked of another site.
- * - A redacted update is a rest: no bell, no link, and where its words
- *   would be, strips of black paper pasted over them, one for each number
- *   in its shape, a longer number a longer strip. Only its shape and its
- *   date are read.
- * - A link to an update (`/lab#u-…`) lands on its line: it is brought to
- *   the top of the view and marked, and the playhead goes to its date. The page under
- *   the shell holds the same ids, hidden, and the view is printed after the
- *   browser has looked for the fragment, so the landing is done here. */
+ * - A redacted update is a rest: no bell, no link, and where its title
+ *   would be, its line: a word it shows set as a title's words are, and a
+ *   strip of black paper pasted over each word it does not, one for each
+ *   number in its shape, a longer number a longer strip. The line wraps as
+ *   a title does. Only its shape and its date are read; aloud, its words
+ *   are read and each strip is said once.
+ * - An update with nowhere to go is its title, not a link: nothing here
+ *   links to an update's own line. A flag on the lane is a pin that goes
+ *   to its line when pressed.
+ * - A link to an update (`/lab#u-…`), should one be written, lands on its
+ *   line: it is brought to the top of the view and marked, and the playhead
+ *   goes to its date. The page under the shell holds the same ids, hidden,
+ *   and the view is printed after the browser has looked for the fragment,
+ *   so the landing is done here. */
 import { part } from "../../parts";
-import { embedSrc, labbookAnchor, labbookHref, penUser, relatedLinks, updateDateLabel, type Artifact, type Update } from "../../../lib/labbook";
+import { embedSrc, labbookAnchor, penUser, relatedLinks, updateDateLabel, type Artifact, type Update } from "../../../lib/labbook";
 import { fill } from "../rich";
 import { overlay, ruler } from "./arrangement";
 import { auditionClip, noteVar, playButton, type Env } from "./bits";
@@ -42,9 +48,10 @@ function lane(env: Env, updates: Update[], range: { from: number; to: number }) 
       previous = t;
       const open = update.visibility === "open";
       const when = updateDateLabel(update.date);
-      const flag = link(
-        labbookHref(update.id),
-        { class: open ? "cp-flag" : "cp-flag cp-flag--rest", style: `--at:${place(t, range).toFixed(5)}; --row:${row}`, tabindex: "-1", title: open ? `${when} · ${update.title}` : when },
+      // a pin, not a link: pressed, it goes to its update's line (tendLog)
+      const flag = h(
+        "span",
+        { class: open ? "cp-flag" : "cp-flag cp-flag--rest", style: `--at:${place(t, range).toFixed(5)}; --row:${row}`, "data-flag": labbookAnchor(update.id), title: open ? `${when} · ${update.title}` : when },
         h("span", { class: "cp-flag__pin" }),
       );
       transport.watch(flag, t, t + MONTH, signal, "markers");
@@ -98,7 +105,7 @@ function artifact(env: Env, shown: Artifact) {
 }
 
 /** One line of the log. `whole` is the Labbook itself: the line is where
- * links to the update land, and it shows its artifact. */
+ * a link to the update would land, and it shows its artifact. */
 function line(env: Env, update: Update, index: number, whole: boolean) {
   const { content, copy, session, transport, signal, face } = env;
   const words = content.pages.lab.labbook;
@@ -118,9 +125,14 @@ function line(env: Env, update: Update, index: number, whole: boolean) {
         h("span", { class: "cp-sr" }, words.redacted.label),
         h("p", { class: "cp-log__origin" }, words.redacted.works[update.shape.work]),
         h(
-          "div",
-          { class: "cp-strike", "aria-hidden": "true" },
-          update.shape.bars.map((length, i) => h("i", { "data-strip": "", style: `--len:${Number(length) || 1}; --tilt:${[-0.7, 0.5, -0.3, 0.8][i % 4]}deg` })),
+          "p",
+          { class: "cp-strike", "data-redaction-line": "" },
+          update.shape.parts.flatMap((shown, i) => [
+            typeof shown === "string"
+              ? h("span", { class: "cp-strike__word", "data-redaction-word": "" }, shown)
+              : h("span", { class: "cp-strike__strip", "data-strip": "", "data-redaction-bar": "", style: `--len:${Number(shown) || 1}; --tilt:${[-0.7, 0.5, -0.3, 0.8][i % 4]}deg` }, h("span", { class: "cp-sr" }, words.redacted.bar)),
+            " ",
+          ]),
         ),
       ),
     );
@@ -142,9 +154,8 @@ function line(env: Env, update: Update, index: number, whole: boolean) {
       "div",
       { class: "cp-log__words" },
       h("p", { class: "cp-log__origin" }, `${updateSources[update.source] ?? update.source} · ${updateKinds[update.kind] ?? update.kind}`),
-      // in the Labbook an update with nowhere to go is a title; on an
-      // experiment's page it goes to its line in the Labbook
-      h("h3", { class: "cp-log__title" }, whole && !update.href ? update.title : link(update.href ?? labbookHref(update.id), {}, update.title)),
+      // an update with nowhere to go is a title, not a link
+      h("h3", { class: "cp-log__title" }, update.href ? link(update.href, {}, update.title) : update.title),
       h("p", { class: "cp-log__sum" }, update.summary),
       about.length
         ? h(
@@ -194,8 +205,9 @@ export function labbook(env: Env, updates: Update[], { whole }: { whole: boolean
 }
 
 /** The Labbook answering the visitor: a Pen or a demo is loaded when its
- * button is pressed, and a link to an update lands on its line. Returns
- * the landing, for when the view arrives. */
+ * button is pressed, a flag on the lane goes to its update's line, and a
+ * link to an update lands on its line. Returns the landing, for when the
+ * view arrives. */
 export function tendLog(env: Env, view: HTMLElement) {
   const { signal, transport, face, reducedMotion, scroller } = env;
   view.addEventListener(
@@ -231,18 +243,12 @@ export function tendLog(env: Env, view: HTMLElement) {
   // back and forward, and an address typed in
   addEventListener("hashchange", () => land(), { signal });
   addEventListener("popstate", () => land(), { signal });
-  // a link in this view to an update in this view (a headline on the Lab's
-  // own ribbon, a flag on the lane): the router moves the address and tells
-  // no one
+  // a flag on the lane: to its update's line, the address left as it is
   view.addEventListener(
     "click",
     (event) => {
-      const a = (event.target as Element | null)?.closest?.<HTMLAnchorElement>("a[href*='#']");
-      if (!a || a.target || a.pathname !== location.pathname) return;
-      const { hash } = a;
-      requestAnimationFrame(() => {
-        if (location.hash === hash) land(hash, true);
-      });
+      const flag = (event.target as Element | null)?.closest?.<HTMLElement>("[data-flag]");
+      if (flag?.dataset.flag) land(`#${flag.dataset.flag}`, true);
     },
     { signal },
   );

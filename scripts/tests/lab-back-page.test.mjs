@@ -30,6 +30,15 @@ test("Back Page reads neither an experiment's era nor its type", () => {
   assert.doesNotMatch(copy.lab.tryIt, /\{/);
 });
 
+test("Back Page has no strip of headlines: the recent updates are where they were", () => {
+  for (const { name, source } of sources)
+    assert.doesNotMatch(
+      source,
+      /\bheadlines\b|\bticker\b|bp-ticker/i,
+      `${name} still has the strip`,
+    );
+});
+
 test("a scribble is strokes and nothing else, the same every time, longer for a longer bar", () => {
   const draw = (letters, key = "struck-fixture") =>
     scribbledOut(letters, "var(--bp-blue)", seed(key));

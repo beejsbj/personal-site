@@ -64,11 +64,23 @@ test("every experiment on show links out or has a body to read", () => {
     );
 });
 
-test("exactly one experiment on show takes pride of place", () => {
-  assert.deepEqual(
-    visible
-      .filter((entry) => entry.field("featured") === "true")
-      .map((entry) => entry.slug),
-    ["cockpit"],
+test("at most one experiment on show takes pride of place", () => {
+  const featured = visible
+    .filter((entry) => entry.field("featured") === "true")
+    .map((entry) => entry.slug);
+  assert.ok(
+    featured.length <= 1,
+    `more than one experiment is featured: ${featured.join(", ")}`,
+  );
+});
+
+test("Cockpit is not an experiment: the Lab has no entry for it", () => {
+  assert.ok(
+    !entries.some((entry) => entry.slug === "cockpit"),
+    "src/content/lab/cockpit.md",
+  );
+  assert.ok(
+    !entries.some((entry) => /^cockpit$/i.test(entry.field("title") ?? "")),
+    "an experiment titled Cockpit",
   );
 });

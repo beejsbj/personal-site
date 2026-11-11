@@ -1,15 +1,16 @@
 /** The Lab's data contract, and the rules that turn src/content into it.
  *
- * Three documents: the Labbook (every update), the headlines written about
- * those updates, and who is in the room now. In v1 the first two are built
- * from src/content; later the same shapes arrive from storage.
+ * Two documents: the Labbook (every update) and who is in the room now. In
+ * v1 the first is built from src/content; later the same shape arrives
+ * from storage.
  *
  * Pure functions over plain data, with no Astro imports, so the lenses and
  * the tests can import this file directly. */
 import type { UpdateData, UpdateKind, UpdateSource } from "../content.config";
 
 /** One dated entry in the Labbook. A redacted update happened and is not
- * shown: the site is given its shape and never its words. */
+ * shown: the site is given its shape, which may show a few of its words,
+ * and never the rest. */
 export type Update = {
   /** Stable and opaque. In v1, the file name. */
   id: string;
@@ -33,8 +34,10 @@ export type Update = {
       visibility: "redacted";
       shape: {
         work: "code" | "design" | "writing" | "research" | "other";
-        /** The lengths of the black bars, not derived from the hidden text. */
-        bars: number[];
+        /** Its line, in order: a string is a word shown as written, a
+         * number the length of a black bar (not derived from the hidden
+         * text). At least one part is a bar. */
+        parts: (string | number)[];
       };
     }
 );
@@ -44,17 +47,6 @@ export type Artifact = {
   src: string;
   alt: string;
   poster?: string;
-};
-
-/** A line written about one or more updates, for the ticker. It links to
- * the first of them in the Labbook (`labbookHref`). */
-export type Headline = {
-  id: string;
-  /** YYYY-MM-DD. */
-  date: string;
-  text: string;
-  /** Update ids. */
-  updates: string[];
 };
 
 /** Who is in the room. Missing or expired, the live parts say "in repair";
@@ -117,7 +109,7 @@ export function labbookUpdate(id: string, update: UpdateData): Update {
     return said({
       ...common,
       visibility: update.visibility,
-      shape: { work: update.shape.work, bars: [...update.shape.bars] },
+      shape: { work: update.shape.work, parts: [...update.shape.parts] },
     });
   return said({
     ...common,
@@ -133,8 +125,8 @@ export function labbookUpdate(id: string, update: UpdateData): Update {
 /** The id of the element that holds an update in the Labbook. */
 export const labbookAnchor = (id: string) => `u-${id}`;
 
-/** Where an update sits in the Labbook. A headline links to the first of
- * its updates this way. */
+/** Where an update sits in the Labbook. Nothing links there unless it is
+ * written to. */
 export const labbookHref = (id: string) => `/lab#${labbookAnchor(id)}`;
 
 /** The Labbook's one order: newest first and, on one day, by id. */
@@ -154,45 +146,32 @@ export function experimentUpdates(labbook: Update[], slug: string): Update[] {
   );
 }
 
+/** Where an update goes, with the words for the way there; or nowhere,
+ * and then it is shown as text. */
+export type UpdateLink =
+  | { href: string; linkLabel: string }
+  | { href?: undefined; linkLabel?: undefined };
+
 type Open<T> = Extract<T, { visibility: "open" }>;
-/** An update the home stream can show: its words, a label for its date and
- * somewhere to go. */
-export type InStream<T> = Open<T> & {
-  dateLabel: string;
-  href: string;
-  linkLabel: string;
-};
+/** An update the home stream can show: its words, a label for its date
+ * and, if it goes anywhere, its link. */
+export type InStream<T> = Open<T> & { dateLabel: string } & UpdateLink;
 
 /** An update as the home stream, and each lens's `updates`, show it; or
- * nothing, for a redacted one. What an open update left unsaid is filled
- * in: the date label is written from the date, and an update with nowhere
- * else to go links to itself in the Labbook, by its title. */
+ * nothing, for a redacted one. The date label an open update left unsaid
+ * is written from its date. An update need not open anywhere: one with no
+ * `href` has no link, and one with an `href` and no words for it is linked
+ * by its title. */
 export function streamUpdate<T extends UpdateData>(
-  id: string,
   update: T,
 ): InStream<T> | undefined {
   if (update.visibility !== "open") return undefined;
+  const { href, linkLabel, ...words } = update;
   return {
-    ...update,
+    ...words,
     dateLabel: update.dateLabel ?? updateDateLabel(update.date),
-    href: update.href ?? labbookHref(id),
-    linkLabel: update.linkLabel ?? update.title,
+    ...(href ? { href, linkLabel: linkLabel ?? update.title } : {}),
   } as InStream<T>;
-}
-
-/** The headlines the ticker may show, newest first. A headline goes with
- * its updates: when one it names is not in the Labbook (withdrawn, expired
- * or not yet due), the headline is not published either. */
-export function publishedHeadlines(
-  headlines: Headline[],
-  labbook: Update[],
-): Headline[] {
-  const published = new Set(labbook.map((update) => update.id));
-  return newestFirst(
-    headlines.filter((headline) =>
-      headline.updates.every((id) => published.has(id)),
-    ),
-  );
 }
 
 const PEN =

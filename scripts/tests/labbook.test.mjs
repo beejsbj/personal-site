@@ -4,14 +4,13 @@ import test from "node:test";
 import {
   labbookHref,
   labbookUpdate,
-  publishedHeadlines,
   streamUpdate,
   updateDateLabel,
 } from "../../src/lib/labbook.ts";
 import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
 
-// The Labbook's rules (issue #14): how src/content's updates and headlines
-// become the documents /prism/content.json hands to every lens.
+// The Labbook's rules (issue #14): how src/content's updates become the
+// documents /prism/content.json hands to every lens.
 
 const read = (path) => readFileSync(path, "utf8");
 
@@ -46,7 +45,7 @@ const redacted = (over = {}) => ({
   source: "bjslab",
   visibility: "redacted",
   date: "2026-09-27",
-  shape: { work: "code", bars: [4, 2, 3] },
+  shape: { work: "code", parts: [4, 2, 3] },
   ...over,
 });
 
@@ -107,7 +106,7 @@ test("the Labbook carries a redacted update's shape and never its words", () => 
     source: "bjslab",
     relatedExperiment: "cockpit",
     visibility: "redacted",
-    shape: { work: "code", bars: [4, 2, 3] },
+    shape: { work: "code", parts: [4, 2, 3] },
   };
   assert.deepEqual(
     labbookUpdate(
@@ -135,58 +134,52 @@ test("the Labbook carries a redacted update's shape and never its words", () => 
   );
 });
 
+test("the Labbook carries the few words a redacted update shows, in their places among its bars", () => {
+  const shape = { work: "design", parts: ["Rewired", 4, 2, "the", 6] };
+  const written = redacted({ shape });
+  const carried = labbookUpdate("half-said", written);
+  assert.deepEqual(carried.shape, shape);
+  // A copy: what a lens does with it cannot reach back into the content.
+  carried.shape.parts.push("more");
+  assert.deepEqual(written.shape.parts, ["Rewired", 4, 2, "the", 6]);
+});
+
 test("the home stream shows a fully written update exactly as written", () => {
   const written = open({
     dateLabel: "Late September",
     href: "https://codepen.io/beejsbj/pen/abXZWLQ",
     linkLabel: "Open the Pen",
   });
-  assert.deepEqual(streamUpdate("lotus-replay", written), written);
+  assert.deepEqual(streamUpdate(written), written);
 });
 
-test("the home stream fills in what an open update left unsaid", () => {
+test("an update need not open anywhere: the home stream gives it no link", () => {
+  const shown = streamUpdate(open());
+  // Only its date label is written for it.
+  assert.deepEqual(shown, { ...open(), dateLabel: "26 Sep 2026" });
+  assert.ok(!("href" in shown), "it is sent somewhere it did not say");
+  assert.ok(!("linkLabel" in shown), "it has words for a way it has not got");
+  // Words for a way are nothing without the way.
+  assert.deepEqual(streamUpdate(open({ linkLabel: "Open the Pen" })), shown);
+  // Its place in the Labbook is still where it is, for whoever points there.
   assert.equal(labbookHref("lotus-replay"), "/lab#u-lotus-replay");
-  assert.deepEqual(streamUpdate("lotus-replay", open()), {
+});
+
+test("an update with somewhere to go and no words for the way is linked by its title", () => {
+  const href = "https://codepen.io/beejsbj/pen/abXZWLQ";
+  assert.deepEqual(streamUpdate(open({ href })), {
     ...open(),
     dateLabel: "26 Sep 2026",
-    href: "/lab#u-lotus-replay",
+    href,
     linkLabel: "A lotus, one line at a time",
   });
 });
 
 test("the home stream has no redacted updates", () => {
-  assert.equal(streamUpdate("something-private", redacted()), undefined);
+  assert.equal(streamUpdate(redacted()), undefined);
 });
 
-test("a headline is published only while every update it names is in the Labbook", () => {
-  const labbook = [
-    labbookUpdate("lotus-replay", open()),
-    labbookUpdate("something-private", redacted()),
-  ];
-  const headline = (id, date, updates) => ({
-    id,
-    date,
-    text: `Headline ${id}`,
-    updates,
-  });
-  const about = {
-    one: headline("one", "2026-09-26", ["lotus-replay"]),
-    both: headline("both", "2026-09-27", ["something-private", "lotus-replay"]),
-    withdrawn: headline("withdrawn", "2026-09-28", ["taken-down"]),
-    partly: headline("partly", "2026-09-28", ["lotus-replay", "taken-down"]),
-    sameDay: headline("a-same-day", "2026-09-26", ["lotus-replay"]),
-  };
-  const before = structuredClone(about);
-  assert.deepEqual(
-    publishedHeadlines(Object.values(about), labbook),
-    // Newest first; on one day, in id order.
-    [about.both, about.sameDay, about.one],
-  );
-  assert.deepEqual(about, before);
-  assert.deepEqual(publishedHeadlines(Object.values(about), []), []);
-});
-
-test("content.json carries the Labbook, the headlines and where each experiment sits", async () => {
+test("content.json carries the Labbook and where each experiment sits, and no headlines", async () => {
   const fixture = await serveRuntimeFixture();
   try {
     const data = await (await fixture.fetch("/prism/content.json")).json();
@@ -222,38 +215,14 @@ test("content.json carries the Labbook, the headlines and where each experiment 
     );
     assert.ok(data.labbook.length >= 7, "the seeded updates are all here");
 
-    // The seeded headlines (#95 added three), newest first.
-    assert.deepEqual(data.headlines, [
-      {
-        id: "dayshaper-is-out",
-        date: "2026-09-26",
-        text: "Dayshaper is out: a day planned around a 24-hour ring",
-        updates: ["dayshaper"],
-      },
-      {
-        id: "emotitone-smaller-deck",
-        date: "2026-09-11",
-        text: "EmotiTone's performance deck tries on a smaller size",
-        updates: ["emotitone-performance-deck"],
-      },
-      {
-        id: "redesign-and-field-guide",
-        date: "2026-09-11",
-        text: "A warm-welcome redesign, and a little field guide to go with it",
-        updates: ["warm-welcome-pr", "component-guide"],
-      },
-      {
-        id: "qrng-spins-again",
-        date: "2026-06-20",
-        text: "The Lottery and the Roulette spin again",
-        updates: ["qrng-demos"],
-      },
-    ]);
+    // One record, the update: no headlines beside the Labbook, and no
+    // words for a strip of them.
+    assert.ok(!("headlines" in data), "content.json has a headlines key");
+    assert.ok(!("ticker" in data.site), "content.json names a ticker");
 
     assert.deepEqual(
       data.lab.map((entry) => [entry.slug, entry.place]),
       [
-        ["cockpit", "bench"],
         ["strudel-tools", "bench"],
         ["clockwork-observatory", "bench"],
         ["films-from-code", "bench"],
@@ -274,6 +243,13 @@ test("content.json carries the Labbook, the headlines and where each experiment 
         ["design-trampoline-logo", "shelf"],
         ["css-notebook", "shelf"],
       ],
+    );
+
+    // Cockpit is not an experiment, and none is featured in its place.
+    assert.ok(!data.lab.some((entry) => entry.slug === "cockpit"));
+    assert.deepEqual(
+      data.lab.filter((entry) => entry.featured),
+      [],
     );
 
     // What the lenses read today is all still there.

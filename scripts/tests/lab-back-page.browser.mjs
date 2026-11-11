@@ -1,18 +1,19 @@
 /** Back Page's Lab (issue #98): what the parity test cannot see. The lab
  * book has a Bench and a Shelf with the featured experiment leading; the
  * Labbook is every update newest first, each where its links land, with
- * its artifact taped in; a redacted update is scribbles, and none of its
- * words; a Pen or a demo asks nothing of another site until asked; the
- * ticker is pulled through a headline at a time, holds for a pointer and
- * the keyboard, and lies still when motion is reduced; and an experiment's
- * page lists its updates and the project it became.
+ * its artifact taped in; a redacted update is scribbles with the few words
+ * it shows among them, and none of the words it hides; a Pen or a demo asks nothing of another site until asked; the
+ * first page's diary is where the recent updates are, with no strip of
+ * headlines there or in the lab book; and an experiment's page lists its
+ * updates and the project it became.
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
  * Real routes are read against /prism/content.json; the states src/content
  * does not hold come from the harness's fixtures (src/prism/fixtures.ts).
  * Same server and Chromium as prism-parity.browser.mjs (or BASE=<origin>).
- * LAB_SHOTS=<dir> also saves pictures of each part at each size. */
+ * LAB_SHOTS=<dir> also saves pictures of each part at each size;
+ * LAB_ONLY=<regexp> runs only the subtests it names. */
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -26,6 +27,7 @@ import {
 } from "../../src/lib/labbook.ts";
 import { labPlaces } from "../../src/lib/rules.ts";
 import { REDACTION_MARKER } from "../../src/prism/labbook-fixture.ts";
+import { checkRedactedLine, redactedLine } from "./lib/redaction.mjs";
 
 const SIZES = {
   desktop: { viewport: { width: 1280, height: 800 } },
@@ -36,6 +38,7 @@ const SIZES = {
   },
 };
 const SHOTS = process.env.LAB_SHOTS;
+const ONLY = process.env.LAB_ONLY ? new RegExp(process.env.LAB_ONLY) : null;
 const PEN_FRAME = "https://codepen.io/beejsbj/embed/abXZWLQ?default-tab=result";
 const DEMO_FRAME = "https://example.com/fixture-demo/";
 /** The pages lying open. */
@@ -66,6 +69,8 @@ const places = () =>
       newTab: link.target === "_blank",
       arrow: !!el.querySelector(".bp-out"),
       featured: !!el.closest("[data-featured]"),
+      // how large its name is written
+      size: parseFloat(getComputedStyle(el).fontSize),
     };
   });
 
@@ -96,6 +101,7 @@ const updates = () => {
       title: text(title),
       href: title?.querySelector("a")?.getAttribute("href") ?? null,
       summary: text(item.querySelector(".bp-diary__summary")),
+      origin: text(item.querySelector(".bp-diary__src")),
       date: item.querySelector("time")?.getAttribute("datetime") ?? null,
       about: [...item.querySelectorAll(".bp-log__about a")].map((a) => ({
         href: a.getAttribute("href"),
@@ -112,11 +118,11 @@ const updates = () => {
       bars: [...item.querySelectorAll("[data-redaction-bar]")].map((bar) => ({
         width: bar.getBoundingClientRect().width,
         inked: bar.querySelectorAll("svg path").length,
-        hidden: bar.getAttribute("aria-hidden") === "true",
       })),
       controls: item.querySelectorAll(
         "a, button, iframe, img, video, audio, [data-artifact]",
       ).length,
+      links: item.querySelectorAll("a").length,
     };
   });
 };
@@ -130,7 +136,7 @@ const spills = () => {
     const box = page.getBoundingClientRect();
     if (page.hasAttribute("data-oversize")) out.push("a page too full to turn");
     for (const el of page.querySelectorAll(
-      ".bp-flow > *, .bp-shelfcard li, [data-artifact], [data-redaction-bar], .bp-ticker__window",
+      ".bp-flow > *, .bp-shelfcard li, [data-artifact], [data-redaction-bar]",
     )) {
       const r = el.getBoundingClientRect();
       if (r.width && (r.left < box.left - 1 || r.right > box.right + 1))
@@ -140,59 +146,6 @@ const spills = () => {
   return out;
 };
 
-/** The ticker on the open pages, as it stands this instant. */
-const ticker = () => {
-  const root = document.querySelector("#lens-shell .bp-spread [data-ticker]");
-  if (!root) return null;
-  const box = (el) => {
-    const { left, right, top, bottom } = el.getBoundingClientRect();
-    return { left, right, top, bottom };
-  };
-  const strip = root.querySelector(".bp-ticker__strip");
-  const frames = [...root.querySelectorAll("[data-part='ticker.headline']")];
-  return {
-    name: root.getAttribute("aria-label"),
-    tag: root.querySelector(".bp-ticker__tag")?.textContent ?? null,
-    headlines: frames.map((frame) => {
-      const link = frame.querySelector("a");
-      return {
-        id: frame.dataset.ref,
-        text: link.textContent,
-        href: link.getAttribute("href"),
-        date: frame.querySelector("time")?.getAttribute("datetime"),
-        box: box(link),
-        shown:
-          link.checkVisibility() && getComputedStyle(frame).opacity !== "0",
-        focused: document.activeElement === link,
-      };
-    }),
-    // Links anyone can reach with Tab or a screen reader.
-    reachable: [...root.querySelectorAll("a")].filter(
-      (link) => link.tabIndex >= 0 && !link.closest("[aria-hidden='true']"),
-    ).length,
-    x: strip.getBoundingClientRect().left,
-    animations: strip.getAnimations().length,
-    running: strip
-      .getAnimations()
-      .filter((animation) => animation.playState === "running").length,
-    window: box(root.querySelector(".bp-ticker__window")),
-    box: box(root),
-    focusInside: root.contains(document.activeElement),
-  };
-};
-/** The headlines whose words are wholly inside the strip's window. */
-const inWindow = (state) =>
-  state.headlines
-    .filter(
-      ({ box, shown }) =>
-        shown &&
-        box.left >= state.window.left - 1 &&
-        box.right <= state.window.right + 1 &&
-        box.top >= state.window.top - 1 &&
-        box.bottom <= state.window.bottom + 1,
-    )
-    .map(({ id }) => id);
-
 const executable = chromium();
 const skip = executable
   ? false
@@ -201,7 +154,11 @@ const skip = executable
 test(
   "Back Page keeps the Lab in its lab book",
   { skip, timeout: 15 * 60_000 },
-  async (t) => {
+  async (suite) => {
+    const t = {
+      test: (name, fn) =>
+        suite.test(name, { skip: !!ONLY && !ONLY.test(name) }, fn),
+    };
     const { chromium: browserType } = await import("playwright-core");
     const external = process.env.BASE;
     if (!external)
@@ -297,7 +254,7 @@ test(
     try {
       for (const size of Object.keys(SIZES)) {
         await t.test(
-          `${size}: the lab book has a Bench and a Shelf, the featured experiment leading`,
+          `${size}: the lab book has a Bench and a Shelf, each in the shared order`,
           async () => {
             const { context, page, errors } = await open(size, real("/lab"));
             const views = await leaf(page, places, `lab-${size}`);
@@ -355,6 +312,83 @@ test(
               "no line for a type or an era, and no empty one",
             );
             await bare.context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: the Bench with one experiment featured, and with none`,
+          async () => {
+            const bench = async (fixture) => {
+              const { context, page, errors } = await open(
+                size,
+                harness(fixture, "/lab"),
+              );
+              const { lab } = await fixtureContent(page);
+              const expected = labPlaces(lab).find(
+                ({ place }) => place === "bench",
+              ).entries;
+              const views = await leaf(
+                page,
+                [places, spills],
+                `bench-${fixture.replace("lab-", "")}-${size}`,
+              );
+              const shown = views
+                .flatMap(([seen]) => seen)
+                .filter((item) => item.slug)
+                .slice(0, expected.length);
+              assert.deepEqual(
+                views.flatMap(([, spilt]) => spilt),
+                [],
+                `${fixture}: nothing runs off its page`,
+              );
+              assert.deepEqual(errors, []);
+              await context.close();
+              return { expected, shown };
+            };
+
+            // One featured: the last on the Bench by order, so it leads
+            // only because it is featured.
+            const withOne = await bench("lab-featured");
+            assert.ok(
+              withOne.expected[0].featured &&
+                withOne.expected[0].order > withOne.expected[1].order,
+              "the fixture features the last experiment by order",
+            );
+            assert.deepEqual(
+              withOne.shown.map((item) => item.slug),
+              withOne.expected.map((entry) => entry.slug),
+              "it leads the Bench",
+            );
+            assert.deepEqual(
+              withOne.shown.map((item) => item.featured),
+              withOne.shown.map((_, i) => i === 0),
+              "one experiment has pride of place",
+            );
+            const [lead, ...rest] = withOne.shown;
+            assert.ok(
+              rest.every((item) => item.size < lead.size),
+              "and its name is written larger than the rest",
+            );
+
+            // None featured: the same Bench in its plain order, every
+            // name written the one size.
+            const without = await bench("lab-none-featured");
+            assert.ok(without.expected.every((entry) => !entry.featured));
+            assert.deepEqual(
+              without.shown.map((item) => item.slug),
+              without.expected.map((entry) => entry.slug),
+              "the Bench in its own order",
+            );
+            assert.deepEqual(
+              without.shown.filter((item) => item.featured),
+              [],
+              "no experiment is marked as featured",
+            );
+            assert.deepEqual(
+              [...new Set(without.shown.map((item) => item.size))],
+              [rest[0].size],
+              "and every name is written the plain size",
+            );
           },
         );
 
@@ -435,48 +469,57 @@ test(
         );
 
         await t.test(
-          `${size}: a redacted update is scribbles, its kind of work and its day, and none of its words`,
+          `${size}: a redacted update is scribbles, each said once, its kind of work and its day, and none of the words it hides`,
           async () => {
             const { context, page } = await open(
               size,
               harness("labbook", "/lab"),
             );
-            await turnTo(page, "[data-part='update.redacted']");
-            await shot(page, `redacted-${size}`);
-            const [entry] = (await page.evaluate(updates)).filter(
-              (item) => item.part === "update.redacted",
-            );
             const fixture = await fixtureContent(page);
             const kept = fixture.labbook.find(
               (update) => update.id === "fixture-kept-back",
             );
-            assert.equal(entry.id, kept.id);
+            const { parts } = kept.shape;
+            assert.ok(parts.every((part) => typeof part === "number"));
+            await turnTo(page, `#u-${kept.id}`);
+            await shot(page, `redacted-${size}`);
+            const entry = (await page.evaluate(updates)).find(
+              (item) => item.id === kept.id,
+            );
+            assert.equal(entry.part, "update.redacted");
+            const { redacted } = words.labbook;
             assert.equal(
               entry.text,
               [
                 day(kept.date),
-                words.labbook.redacted.label,
-                words.labbook.redacted.works[kept.shape.work],
+                redacted.label,
+                ...parts.map(() => redacted.bar),
+                redacted.works[kept.shape.work],
               ].join(" "),
-              "its day, that it is redacted, and the kind of work: no more",
+              "its day, that it is redacted, a word for each scribble and the kind of work: no more",
             );
             assert.equal(entry.controls, 0, "no link, picture or frame");
-            assert.equal(entry.bars.length, kept.shape.bars.length);
-            assert.ok(entry.bars.every((bar) => bar.hidden && bar.inked));
-            if (size === "desktop") {
-              // A longer number, a longer scribble: 5, 3, 8, 4.
-              const [five, three, eight, four] = entry.bars.map(
-                (bar) => bar.width,
-              );
-              assert.ok(
-                eight > five && five > four && four > three,
-                `${[five, three, eight, four]}`,
-              );
-            }
+            assert.equal(entry.bars.length, parts.length);
+            assert.ok(entry.bars.every((bar) => bar.inked));
+            const item = page.locator(`${OPEN} #u-${kept.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el
+                    .closest(".bp-page")
+                    .getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
             await context.close();
 
-            // The fixture's redacted update arrives with words it must not
-            // have. None reaches any page it could be on.
+            // The fixture's redacted updates arrive with words they must
+            // not have. None reaches any page they could be on.
             for (const path of [
               harness("labbook", "/lab"),
               harness("labbook", "/"),
@@ -493,6 +536,73 @@ test(
               );
               await book.context.close();
             }
+          },
+        );
+
+        await t.test(
+          `${size}: a redacted update may show a few of its words, in their places among its scribbles`,
+          async () => {
+            const { context, page, errors } = await open(
+              size,
+              harness("labbook", "/lab"),
+            );
+            const fixture = await fixtureContent(page);
+            const half = fixture.labbook.find(
+              (update) => update.id === "fixture-half-said",
+            );
+            const { parts } = half.shape;
+            assert.deepEqual(parts, ["Rewired", 4, 2, "the", 6]);
+            await turnTo(page, `#u-${half.id}`);
+            await shot(page, `redacted-mixed-${size}`);
+            const entry = (await page.evaluate(updates)).find(
+              (item) => item.id === half.id,
+            );
+            assert.equal(entry.part, "update.redacted");
+            const { redacted } = words.labbook;
+            assert.equal(
+              entry.text,
+              [
+                day(half.date),
+                redacted.label,
+                `Rewired ${redacted.bar} ${redacted.bar} the ${redacted.bar}`,
+                redacted.works[half.shape.work],
+              ].join(" "),
+              "its day, that it is redacted, its line and the kind of work: no more",
+            );
+            assert.equal(entry.controls, 0, "no link, picture or frame");
+            assert.equal(entry.bars.length, 3);
+            assert.ok(entry.bars.every((bar) => bar.inked));
+            const item = page.locator(`${OPEN} #u-${half.id}`);
+            checkRedactedLine(
+              assert,
+              await item.evaluate(redactedLine),
+              parts,
+              {
+                bar: redacted.bar,
+                within: await item.evaluate((el) => {
+                  const { left, right } = el
+                    .closest(".bp-page")
+                    .getBoundingClientRect();
+                  return { left, right };
+                }),
+              },
+            );
+            // The words are in the hand an update's title is written in.
+            const type = (selector) =>
+              page
+                .locator(`${OPEN} ${selector}`)
+                .first()
+                .evaluate((el) => {
+                  const { color, fontFamily, fontSize, fontWeight } =
+                    getComputedStyle(el);
+                  return { color, fontFamily, fontSize, fontWeight };
+                });
+            const word = await type(`#u-${half.id} [data-redaction-word]`);
+            await turnTo(page, ".bp-log .bp-diary__title");
+            assert.deepEqual(word, await type(".bp-log .bp-diary__title"));
+            assert.deepEqual(await page.evaluate(spills), []);
+            assert.deepEqual(errors, []);
+            await context.close();
           },
         );
 
@@ -658,151 +768,20 @@ test(
         );
 
         await t.test(
-          `${size}: the ticker is on the first page and in the lab book, each headline a link to its update`,
+          `${size}: there is no strip of headlines on the first page or in the lab book`,
           async () => {
-            for (const path of ["/", "/lab"]) {
-              const { context, page, errors } = await open(size, real(path));
-              await turnTo(page, "[data-ticker]");
-              await shot(
-                page,
-                `ticker-still-${path === "/" ? "home" : "lab"}-${size}`,
-              );
-              const strip = await page.evaluate(ticker);
-              assert.equal(strip.name, content.site.ticker.label);
-              assert.equal(strip.tag, content.site.ticker.label);
-              assert.deepEqual(
-                strip.headlines.map(({ id, text, href, date }) => ({
-                  id,
-                  text,
-                  href,
-                  date,
-                })),
-                content.headlines.map((headline) => ({
-                  id: headline.id,
-                  text: headline.text,
-                  href: labbookHref(headline.updates[0]),
-                  date: headline.date,
-                })),
-              );
-              assert.equal(strip.reachable, content.headlines.length);
-              // Motion is reduced here: the strip lies still, and every
-              // headline can be read where it lies.
-              assert.equal(strip.animations, 0, "nothing moves");
-              assert.deepEqual(
-                inWindow(strip),
-                content.headlines.map((headline) => headline.id),
-                "every headline is on the strip",
-              );
-              assert.deepEqual(await page.evaluate(spills), []);
-              assert.deepEqual(errors, []);
-              await context.close();
-            }
-          },
-        );
-
-        await t.test(
-          `${size}: the ticker is pulled through a headline at a time, and holds for a pointer and the keyboard`,
-          async () => {
-            const { context, page } = await open(size, real("/lab"), {
-              motion: true,
-            });
-            await page.waitForSelector(`${OPEN} [data-ticker]`);
-            // the book has come onto the desk and its page is written in
-            await page.waitForTimeout(2500);
-            const first = await page.evaluate(ticker);
-            assert.equal(first.running, 2, "the strip is being pulled");
-            await shot(page, `ticker-lab-${size}`);
-            if (SHOTS) {
-              const home = await open(size, real("/"), { motion: true });
-              await turnTo(home.page, "[data-ticker]");
-              await home.page.waitForTimeout(2500);
-              await shot(home.page, `ticker-home-${size}`);
-              await home.context.close();
-            }
-            const ids = content.headlines.map((headline) => headline.id);
-            // Within two pulls a different headline is in the window, and
-            // the strip has not moved the page around it.
-            const seen = new Set(inWindow(first));
-            let later = first;
-            for (let i = 0; i < 60 && seen.size < 2; i += 1) {
-              await page.waitForTimeout(200);
-              later = await page.evaluate(ticker);
-              for (const id of inWindow(later)) seen.add(id);
-              assert.ok(
-                inWindow(later).length <= 1,
-                "one headline at a time is whole in the window",
-              );
-            }
-            assert.ok(seen.size >= 2, `it moves on: ${[...seen]}`);
-            assert.deepEqual(later.window, first.window);
-            assert.deepEqual(later.box, first.box);
-
-            if (size === "desktop") {
-              // A pointer over the strip holds it where it is, for longer
-              // than a pull takes to come round.
-              await page.hover(`${OPEN} .bp-ticker__window`);
-              await page.waitForTimeout(200);
-              const held = await page.evaluate(ticker);
-              await page.waitForTimeout(6500);
-              const still = await page.evaluate(ticker);
-              assert.equal(still.x, held.x, "held under the pointer");
-              assert.equal(still.running, 0);
-              await page.mouse.move(2, 2);
-              let moved = false;
-              for (let i = 0; i < 40 && !moved; i += 1) {
-                await page.waitForTimeout(200);
-                moved = (await page.evaluate(ticker)).x !== held.x;
-              }
-              assert.ok(moved, "and goes on when the pointer leaves");
-            }
-
-            // The keyboard: the strip lies still, the headline in focus is
-            // the one in the window, and Tab reaches each once, in order.
-            await page.locator(`${OPEN} [data-ticker] a`).first().focus();
-            for (const id of ids) {
-              const resting = await page.evaluate(ticker);
-              assert.equal(resting.animations, 0, "at rest for the keyboard");
-              assert.equal(
-                resting.headlines.find((headline) => headline.focused)?.id,
-                id,
-              );
-              assert.deepEqual(inWindow(resting), [id], `${id} is in view`);
-              assert.deepEqual(resting.window, first.window);
-              await page.keyboard.press("Tab");
-            }
-            const left = await page.evaluate(ticker);
-            assert.equal(left.focusInside, false, "one more Tab leaves it");
-            assert.equal(left.running, 2, "and it is pulled again");
-            await context.close();
-          },
-        );
-
-        await t.test(
-          `${size}: one headline lies still on its strip, and none leaves no strip`,
-          async () => {
-            const one = await open(size, real("/lab"), {
-              motion: true,
-              rewrite: (data) => ({
-                ...data,
-                headlines: data.headlines.slice(0, 1),
-              }),
-            });
-            const alone = await one.page.evaluate(ticker);
-            assert.deepEqual(
-              alone.headlines.map((headline) => headline.id),
-              [content.headlines[0].id],
-            );
-            assert.equal(alone.animations, 0, "nowhere to be pulled to");
-            assert.deepEqual(inWindow(alone), [content.headlines[0].id]);
-            await one.context.close();
-
-            for (const path of ["/", "/lab"]) {
-              const none = await open(size, real(path), {
-                rewrite: (data) => ({ ...data, headlines: [] }),
-              });
-              const views = await leaf(none.page, () => ({
-                strips: document.querySelectorAll("#lens-shell [data-ticker]")
-                  .length,
+            // On real content and on the fixture Labbook alike.
+            for (const path of [
+              real("/"),
+              real("/lab"),
+              harness("labbook", "/"),
+              harness("labbook", "/lab"),
+            ]) {
+              const { context, page, errors } = await open(size, path);
+              const views = await leaf(page, () => ({
+                strips: document.querySelectorAll(
+                  "#lens-shell :is([data-ticker], .bp-ticker, [data-part='ticker.headline'])",
+                ).length,
                 h1: document.querySelectorAll("#lens-shell .bp-spread h1")
                   .length,
               }));
@@ -816,24 +795,151 @@ test(
                 1,
                 `${path} is still written`,
               );
-              assert.deepEqual(none.errors, []);
-              await none.context.close();
+              assert.deepEqual(errors, []);
+              await context.close();
             }
           },
         );
 
         await t.test(
-          `${size}: a headline opens the lab book at its update`,
+          `${size}: the first page's diary lists every update, newest first, as before`,
           async () => {
-            // the headline about the update furthest into the book
-            const at = (headline) =>
-              content.labbook.findIndex(
-                (update) => update.id === headline.updates[0],
-              );
-            const headline = content.headlines.reduce((far, item) =>
-              at(item) > at(far) ? item : far,
+            const { context, page, errors } = await open(size, real("/"));
+            const views = await leaf(
+              page,
+              [
+                updates,
+                // what is written down the page, block by block
+                () =>
+                  [
+                    ...document.querySelectorAll(
+                      "#lens-shell .bp-spread .bp-flow > *",
+                    ),
+                  ].map(
+                    (el) =>
+                      el.dataset.part ??
+                      (el.querySelector(".bp-tally")
+                        ? `tally:${el.querySelector("h2").textContent}`
+                        : el.className),
+                  ),
+                spills,
+              ],
+              `home-updates-${size}`,
             );
-            const last = content.labbook[at(headline)];
+            const diary = views.flatMap(([entries]) => entries);
+            assert.deepEqual(
+              diary.map(
+                ({ ref, part, date, title, href, summary, origin }) => ({
+                  ref,
+                  part,
+                  date,
+                  title,
+                  href,
+                  summary,
+                  origin,
+                }),
+              ),
+              content.updates.map((update) => ({
+                ref: update.id,
+                part: "update.item",
+                date: update.date,
+                // a way out of the book says so, to a screen reader
+                title: /^https?:/.test(update.href)
+                  ? `${update.title} (${content.lenses["back-page"].newTab})`
+                  : update.title,
+                href: update.href,
+                summary: update.summary,
+                origin: `${update.sourceLabel} · ${update.kindLabel}`,
+              })),
+              "the whole home stream, in its order",
+            );
+            assert.ok(diary.length >= 7, "the seeded updates are there");
+            // Down the page as it was: the welcome, the note of what is
+            // going on now straight after it, then the diary under its
+            // heading and its tally.
+            const blocks = views.flatMap(([, written]) => written);
+            const welcome = blocks.indexOf("home.welcome");
+            assert.deepEqual(blocks.slice(welcome, welcome + 3), [
+              "home.welcome",
+              "home.currently",
+              `tally:${content.pages.home.updates.title}`,
+            ]);
+            assert.deepEqual(
+              views.flatMap(([, , spilt]) => spilt),
+              [],
+            );
+            assert.deepEqual(errors, []);
+            await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: an update with nowhere to go is text, not a link, in the first page's diary and in the Labbook`,
+          async () => {
+            // Nothing in the book points at an update's place in the Labbook.
+            const pointers = () =>
+              document.querySelectorAll("#lens-shell a[href*='#u-']").length;
+
+            const home = await open(size, harness("labbook", "/"));
+            const stream = (await fixtureContent(home.page)).updates;
+            const nowhere = stream.filter((update) => !update.href);
+            assert.ok(nowhere.length >= 2, "the fixture has such updates");
+            assert.ok(stream.length > nowhere.length, "and ones that do go");
+            const views = await leaf(
+              home.page,
+              [updates, pointers],
+              `home-nowhere-${size}`,
+            );
+            const diary = views.flatMap(([entries]) => entries);
+            assert.deepEqual(
+              diary.map(({ ref, href, links }) => ({ ref, href, links })),
+              stream.map((update) => ({
+                ref: update.id,
+                href: update.href ?? null,
+                links: update.href ? 1 : 0,
+              })),
+              "a title is a link only where its update goes somewhere",
+            );
+            assert.deepEqual(
+              views.map(([, pointing]) => pointing),
+              views.map(() => 0),
+            );
+            assert.deepEqual(home.errors, []);
+            await home.context.close();
+
+            const lab = await open(size, harness("labbook", "/lab"));
+            const written = (await fixtureContent(lab.page)).labbook.filter(
+              (update) => update.visibility === "open",
+            );
+            const read = await leaf(lab.page, [updates, pointers]);
+            const entries = read.flatMap(([list]) => list);
+            for (const update of written) {
+              const entry = entries.find((item) => item.ref === update.id);
+              assert.equal(entry.href, update.href ?? null, update.id);
+            }
+            // With nothing it is about and nothing that lives elsewhere,
+            // such an update has no link in it at all.
+            for (const id of ["fixture-film", "fixture-tone"])
+              assert.equal(
+                entries.find((entry) => entry.ref === id).links,
+                0,
+                `${id} has no link in it`,
+              );
+            assert.deepEqual(
+              read.map(([, pointing]) => pointing),
+              read.map(() => 0),
+            );
+            assert.deepEqual(lab.errors, []);
+            await lab.context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: a link to an update opens the lab book at it, and the address moving on turns the pages`,
+          async () => {
+            // the update furthest into the book, and the one it opens at
+            const [first] = content.labbook;
+            const last = content.labbook.at(-1);
             const landed = (page, id) =>
               page.waitForSelector(`${OPEN} #u-${id}[data-here]`, {
                 timeout: 15000,
@@ -843,43 +949,39 @@ test(
             const deep = await open(size, real(`/lab#u-${last.id}`));
             await landed(deep.page, last.id);
             await shot(deep.page, `landed-${size}`);
+            assert.deepEqual(deep.errors, []);
             await deep.context.close();
 
-            // From the first page's ticker: another book, opened there.
-            const home = await open(size, real("/"));
-            await turnTo(home.page, "[data-ticker]");
-            await home.page
-              .locator(
-                `${OPEN} [data-part='ticker.headline'][data-ref='${headline.id}'] a`,
-              )
-              .click();
-            await landed(home.page, last.id);
-            assert.equal(
-              new URL(home.page.url()).pathname + new URL(home.page.url()).hash,
-              labbookHref(last.id),
-            );
-            assert.equal(
-              await home.page.evaluate(() => document.activeElement?.id),
-              `u-${last.id}`,
-              "and the update has the focus",
-            );
-            assert.deepEqual(home.errors, []);
-            await home.context.close();
-
-            // From the Lab's own ticker: the pages turn to it, and Back
-            // takes the mark away again.
+            // The address moves to another update (typed in, or Back and
+            // Forward): the pages turn to it, and Back takes the mark away.
             const lab = await open(size, real("/lab"));
-            await turnTo(lab.page, "[data-ticker]");
-            await lab.page
-              .locator(
-                `${OPEN} [data-part='ticker.headline'][data-ref='${headline.id}'] a`,
-              )
-              .click();
+            assert.equal(
+              await lab.page.locator(`${OPEN} [data-here]`).count(),
+              0,
+            );
+            await lab.page.evaluate((id) => {
+              location.hash = `u-${id}`;
+            }, last.id);
             await landed(lab.page, last.id);
             assert.equal(
               await lab.page.locator(`${OPEN} [data-here]`).count(),
               1,
             );
+            assert.equal(
+              new URL(lab.page.url()).pathname + new URL(lab.page.url()).hash,
+              labbookHref(last.id),
+            );
+            assert.equal(
+              await lab.page.evaluate(() => document.activeElement?.id),
+              `u-${last.id}`,
+              "and the update has the focus",
+            );
+            await lab.page.evaluate((id) => {
+              location.hash = `u-${id}`;
+            }, first.id);
+            await landed(lab.page, first.id);
+            await lab.page.goBack();
+            await landed(lab.page, last.id);
             await lab.page.goBack();
             await lab.page.waitForFunction(
               () => !document.querySelector("#lens-shell [data-here]"),
@@ -969,13 +1071,14 @@ test(
               assert.equal(entry.id, null);
               if (update.visibility !== "open") {
                 assert.equal(entry.part, "update.redacted");
-                assert.equal(entry.bars.length, update.shape.bars.length);
+                assert.equal(entry.bars.length, update.shape.parts.length);
                 assert.equal(entry.controls, 0);
                 continue;
               }
               assert.ok(entry.title.startsWith(update.title));
-              // An update with nowhere else to go opens the Labbook at it.
-              assert.equal(entry.href, update.href ?? labbookHref(update.id));
+              // An update with nowhere to go is text, not a link to its
+              // place in the Labbook.
+              assert.equal(entry.href, update.href ?? null, update.id);
             }
             assert.deepEqual([...errors, ...again.errors], []);
             await context.close();

@@ -25,7 +25,6 @@ const SOLID = [
   ".bp-slip",
   ".bp-sticky",
   ".bp-shelfcard",
-  ".bp-ticker__window",
   ".bp-keybox",
   ".bp-callout",
   // on the war map, its camps (the old flicks between them are open paper)

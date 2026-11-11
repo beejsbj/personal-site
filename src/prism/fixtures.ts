@@ -13,7 +13,6 @@ import {
 } from "../lib/rules";
 import {
   newestFirst,
-  publishedHeadlines,
   streamUpdate,
   type Update as LabbookUpdate,
 } from "../lib/labbook";
@@ -265,7 +264,7 @@ function study(project: string): ExperimentFixture {
         source: "bjslab",
         relatedExperiment: slug,
         visibility: "redacted",
-        shape: { work: "code", bars: [4, 2, 3] },
+        shape: { work: "code", parts: [4, 2, 3] },
         title: `${REDACTION_MARKER}: the title`,
         summary: `${REDACTION_MARKER}: the summary`,
         href: `/lab/${REDACTION_MARKER}`,
@@ -321,7 +320,7 @@ function withUpdates(
   labbook: LabbookUpdate[],
 ): SiteContent {
   const stream: Update[] = labbook.flatMap((update) => {
-    const shown = streamUpdate(update.id, update);
+    const shown = streamUpdate(update);
     return shown
       ? [{ ...shown, kindLabel: shown.kind, sourceLabel: shown.source }]
       : [];
@@ -507,6 +506,34 @@ export const FIXTURES: Record<string, Fixture> = {
     },
     routes: () => [{ kind: "resume", path: "/about/resume" }],
   },
+  "lab-featured": {
+    name: "lab-featured",
+    about:
+      "A Bench with one experiment given pride of place: the last on it by order, so it leads only because it is featured.",
+    apply(content) {
+      const lead = content.lab
+        .filter((entry) => entry.place === "bench")
+        .at(-1);
+      return settle({
+        ...content,
+        lab: content.lab.map((entry) => ({
+          ...entry,
+          featured: entry === lead,
+        })),
+      });
+    },
+    routes: () => [{ kind: "lab", path: "/lab" }],
+  },
+  "lab-none-featured": {
+    name: "lab-none-featured",
+    about: "A Lab with no experiment given pride of place.",
+    apply: (content) =>
+      settle({
+        ...content,
+        lab: content.lab.map((entry) => ({ ...entry, featured: undefined })),
+      }),
+    routes: () => [{ kind: "lab", path: "/lab" }],
+  },
   "lab-no-cover": {
     name: "lab-no-cover",
     about: "A lab entry with its own page and no cover.",
@@ -533,21 +560,17 @@ export const FIXTURES: Record<string, Fixture> = {
   labbook: {
     name: "labbook",
     about:
-      "A Labbook with every kind of artifact and a redacted update, about two experiments and a project, and three headlines on the ticker.",
-    apply(content) {
-      const { labbook, headlines } = labbookFixture({
-        experiments: content.lab.slice(0, 2).map((entry) => entry.slug),
-        project: content.projects[0]?.slug,
-      });
-      const next = withUpdates(content, labbook);
-      return settle({
-        ...next,
-        headlines: publishedHeadlines(
-          [...content.headlines, ...headlines],
-          next.labbook,
+      "A Labbook with every kind of artifact and two redacted updates (one bars alone, one showing a few words), about two experiments and a project.",
+    apply: (content) =>
+      settle(
+        withUpdates(
+          content,
+          labbookFixture({
+            experiments: content.lab.slice(0, 2).map((entry) => entry.slug),
+            project: content.projects[0]?.slug,
+          }).labbook,
         ),
-      });
-    },
+      ),
     routes: () => [
       { kind: "home", path: "/" },
       { kind: "lab", path: "/lab" },

@@ -1,0 +1,34 @@
+---
+/** Daylight's side of the fuzz harness for the home page: the real page
+ * with the fixture Labbook's updates in its Recent updates, so an update
+ * that opens nowhere can be seen and tested whatever src/content holds.
+ * scripts/tests/labbook-daylight.browser.mjs reads it. Rendered on demand,
+ * like /prism/fixtures/lab. */
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Homepage from "../../../components/Homepage.astro";
+import { newestFirst, streamUpdate } from "../../../lib/labbook";
+import { getFeatured, getHome, getSite } from "../../../lib/portfolio";
+import { labbookFixture } from "../../../prism/labbook-fixture";
+
+export const prerender = false;
+
+const [home, site] = await Promise.all([getHome(), getSite()]);
+const projects = (await getFeatured()).slice(0, home.work.limit);
+// The home stream: the open updates, newest first.
+const updates = newestFirst(labbookFixture().labbook).flatMap(
+  (update) => streamUpdate(update) ?? [],
+);
+---
+
+<BaseLayout title="Home fixture" pageClass="page-warm-home" tool>
+  <Homepage
+    home={home}
+    projects={projects.map((project) => ({
+      ...project.data,
+      slug: project.slug,
+      href: `/projects/${project.slug}`,
+    }))}
+    updates={updates}
+    labels={{ kinds: site.updateKinds, sources: site.updateSources }}
+  />
+</BaseLayout>

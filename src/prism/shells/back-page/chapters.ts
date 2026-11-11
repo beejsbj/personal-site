@@ -13,7 +13,6 @@ import {
   embedSrc,
   experimentUpdates,
   labbookAnchor,
-  labbookHref,
   penUser,
   relatedLinks,
   type Artifact,
@@ -539,7 +538,7 @@ function home(b: Build): HTMLElement[] {
     h("figcaption", null, h("a", { href: hero.portrait.href }, `${jotted(hero.portrait.caption)} →`)),
   );
 
-  const hello = [
+  const hello: HTMLElement[] = [
     h(
       "div",
       { class: "bp-hello__top" },
@@ -549,16 +548,16 @@ function home(b: Build): HTMLElement[] {
     ),
     h("p", { class: "bp-typed-line", ...part("home.occupation") }, hero.occupation),
     h("p", { class: "bp-lead", ...part("home.welcome") }, hero.welcome),
-    ticker(b),
     h(
       "aside",
       { class: "bp-note", "aria-label": currently.title, ...part("home.currently") },
       h("b", null, `${currently.title}: `),
       inline(currently.body),
     ),
-  ].filter((el) => !!el);
+  ];
 
-  // the diary: dated lines, newest first
+  // the diary: dated lines, newest first; an update with nowhere to go is
+  // its title, not a link
   const diary = h("ol", { class: "bp-diary", "aria-label": updates.listLabel });
   for (const u of content.updates) {
     diary.append(
@@ -566,7 +565,7 @@ function home(b: Build): HTMLElement[] {
         "li",
         { "data-kind": u.kind, ...part("update.item", u.id) },
         h("time", { class: "bp-mnote", datetime: u.date }, shortDate(u.date, copy.months)),
-        h("p", { class: "bp-diary__title" }, link(u.href, copy.newTab, u.title)),
+        h("p", { class: "bp-diary__title" }, u.href ? link(u.href, copy.newTab, u.title) : u.title),
         h("p", { class: "bp-diary__summary" }, u.summary),
         h("p", { class: "bp-diary__src" }, `${u.sourceLabel} · ${u.kindLabel}`),
       ),
@@ -847,58 +846,6 @@ function shelfCard(b: Build, entries: LabItem[], label: string) {
   );
 }
 
-/** The ticker: the headlines written along a strip of paper threaded
- * through two slits in the page, pulled through a headline at a time (the
- * pull is CSS, in lab.css). Each headline is a link to the first update it
- * is about, in the Labbook. The last is written once more before the first,
- * for the eye only, so the strip has no end. Nothing, without headlines. */
-function ticker(b: Build): HTMLElement | null {
-  const { content, copy } = b;
-  const { headlines } = content;
-  if (!headlines.length) return null;
-  const label = content.site.ticker.label;
-  const last = headlines[headlines.length - 1];
-  const day = (date: string) => shortDate(date, copy.months);
-  return h(
-    "aside",
-    {
-      class: "bp-ticker",
-      "aria-label": label,
-      "data-ticker": "",
-      // one headline has nowhere to be pulled to
-      "data-moving": headlines.length > 1,
-      style: `--n:${headlines.length}`,
-    },
-    h("p", { class: "bp-ticker__tag", "aria-hidden": "true" }, label),
-    h(
-      "div",
-      { class: "bp-ticker__window" },
-      h(
-        "ul",
-        { class: "bp-ticker__strip" },
-        ...headlines.map((headline) =>
-          h(
-            "li",
-            { class: "bp-ticker__frame", ...part("ticker.headline", headline.id) },
-            h("time", { datetime: headline.date }, day(headline.date)),
-            h("a", { href: labbookHref(headline.updates[0]) }, headline.text),
-            // lying still, the strip breaks its lines between headlines
-            " ",
-          ),
-        ),
-        headlines.length > 1
-          ? h(
-              "li",
-              { class: "bp-ticker__frame bp-ticker__frame--again", "aria-hidden": "true" },
-              h("span", { class: "bp-ticker__day" }, day(last.date)),
-              h("span", null, last.text),
-            )
-          : null,
-      ),
-    ),
-  );
-}
-
 /** What an update shows for itself, taped in. A picture, a film and a
  * sound are there to look at or play. A Pen or a demo is a blank card, or
  * its poster when this site keeps one, with the way to start it written
@@ -948,12 +895,16 @@ function artifactFigure(b: Build, artifact: Artifact, key: string): HTMLElement 
 }
 
 /** A run of updates as dated lines, the way the diary on the first page is
- * kept. An open update has its day in the margin, what happened and where
- * it came from; in the Labbook itself (`full`) it is also where links to it
+ * kept. An open update has its day in the margin, what happened (a link
+ * when it has somewhere to go, text when it has not) and where it came
+ * from; in the Labbook itself (`full`) it is also where a link to it would
  * land (its `id`), and it says what it is about and shows its artifact. A
- * redacted update is its day, the kind of work, and its words scribbled
- * out: one scribble for each bar of its shape, as long as the bar says.
- * Only its shape and date are read, whatever else arrives with it. */
+ * redacted update is its day, the kind of work, and its line: a word it
+ * shows written as a title is, and a scribble over each word it does not,
+ * one for each bar of its shape, as long as the bar says, running on and
+ * wrapping as a title does. Aloud, its words are read and each scribble
+ * is said once. Only its shape and date are read, whatever else arrives
+ * with it. */
 function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: boolean) {
   const { content, copy } = b;
   const words = content.pages.lab.labbook;
@@ -969,7 +920,7 @@ function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: bo
     ];
     const id = full ? labbookAnchor(u.id) : null;
     if (u.visibility !== "open") {
-      const { work, bars } = u.shape;
+      const { work, parts } = u.shape;
       const rng = seed(`struck-${u.id}`);
       list.append(
         h(
@@ -980,11 +931,22 @@ function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: bo
             "p",
             { class: "bp-log__struck" },
             h("span", { class: "bp-sr" }, words.redacted.label),
-            ...bars.map((bar) => {
-              const mark = h("span", { "data-redaction-bar": "", style: `--len:${bar}`, "aria-hidden": "true" });
-              mark.append(svg(scribbledOut(bar, BLUE, rng)));
-              return mark;
-            }),
+            h(
+              "span",
+              { class: "bp-log__line", "data-redaction-line": "" },
+              ...parts.flatMap((shown) => {
+                if (typeof shown === "string")
+                  return [h("span", { class: "bp-log__word", "data-redaction-word": "" }, shown), " "];
+                const bar = Number(shown) || 1;
+                const mark = h(
+                  "span",
+                  { "data-redaction-bar": "", style: `--len:${bar}` },
+                  h("span", { class: "bp-sr" }, words.redacted.bar),
+                );
+                mark.append(svg(scribbledOut(bar, BLUE, rng)));
+                return [mark, " "];
+              }),
+            ),
           ),
           h("p", { class: "bp-diary__src" }, words.redacted.works[work]),
         ),
@@ -1000,7 +962,7 @@ function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: bo
         h(
           "p",
           { class: "bp-diary__title" },
-          u.href ? link(u.href, copy.newTab, u.title) : full ? u.title : h("a", { href: labbookHref(u.id) }, u.title),
+          u.href ? link(u.href, copy.newTab, u.title) : u.title,
         ),
         h("p", { class: "bp-diary__summary" }, u.summary),
         h(
@@ -1042,7 +1004,6 @@ function lab(b: Build) {
       withUnderline(h1(header.title, part("page.title", "lab")), RED, "lab-title"),
       header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "lab") }, header.intro) : null,
     ),
-    ticker(b),
   ];
   const kinds = doodleKinds(content.lab);
   let n = 0;
