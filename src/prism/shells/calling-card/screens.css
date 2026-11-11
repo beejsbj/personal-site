@@ -547,8 +547,8 @@
   aspect-ratio: 1;
   transform: rotate(20deg);
 }
-/* The board's column: the wire across its top, and under it the board,
-   which turns (scrolls) while the title and the intro stay put. */
+/* The board's column: the board turns (scrolls) in it while the title and
+   the intro stay put. */
 :root[data-lens="calling-card"] .cc-requests__col {
   position: absolute;
   z-index: 3;

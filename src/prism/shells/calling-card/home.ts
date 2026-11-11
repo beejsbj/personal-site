@@ -1,7 +1,6 @@
 /** Home is the pause menu: the COMMAND screen. Huge tilted commands on a
  * blood-red field, the cut-out portrait across the split, a calendar in the
- * corner, the lab's news on the wire, and a phone that has a new message
- * waiting. */
+ * corner, and a phone that has a new message waiting. */
 import type { Route } from "../types";
 import { part } from "../../parts";
 import { fill } from "../rich";
@@ -17,7 +16,6 @@ import {
 import { concentricStar, h, parseDay, ransom, starPoints, svg } from "./dom";
 import { portrait } from "./portrait";
 import { flashPortrait, slideHelp, tickUp, tickWords } from "./micro";
-import { tendWire, wire } from "./labbook";
 import { RESUME_PATH } from "../../routes";
 
 interface Command {
@@ -234,8 +232,7 @@ export function home(route: Route, env: Env): Screen {
 
   main.append(
     figure,
-    // The wire runs under the plates; on a phone it leads the page.
-    h("div", { class: "cc-home__side" }, plates, wire(content)),
+    plates,
     num,
     dateWidget(env) ?? "",
     nav,
@@ -245,8 +242,6 @@ export function home(route: Route, env: Env): Screen {
     phoneChip ?? "",
     prompts([["↑↓", copy.chrome.prompts.select], ["⏎", copy.chrome.prompts.confirm]]),
   );
-
-  tendWire(el, env.signal);
 
   let first = true;
   const menu = roving(items, env.signal, (i) => {

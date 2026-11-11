@@ -217,18 +217,12 @@
 }
 
 /* ---------- Name plates & the big number ---------- */
-/* The plates, and the wire under them, down the right-hand side. */
-:root[data-lens="calling-card"] .cc-home__side {
+:root[data-lens="calling-card"] .cc-home__plates {
   position: absolute;
   z-index: 3;
   right: 2.4vw;
   top: 19vh;
   width: min(30rem, 34vw);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 1.1rem;
-}
-:root[data-lens="calling-card"] .cc-home__plates {
   display: grid;
   justify-items: end;
   gap: 0.55rem;
@@ -635,15 +629,11 @@
   :root[data-lens="calling-card"] .cc-date__note {
     display: none;
   }
-  /* The side column dissolves: the plates keep their place in the page,
-     and the wire leads it. */
-  :root[data-lens="calling-card"] .cc-home__side {
-    display: contents;
-  }
   :root[data-lens="calling-card"] .cc-home__plates {
     position: relative;
-    z-index: 3;
     order: 1;
+    right: auto;
+    top: auto;
     width: 72%;
     justify-items: start;
     gap: 0.4rem;
