@@ -140,21 +140,33 @@ test("the home stream shows a fully written update exactly as written", () => {
     href: "https://codepen.io/beejsbj/pen/abXZWLQ",
     linkLabel: "Open the Pen",
   });
-  assert.deepEqual(streamUpdate("lotus-replay", written), written);
+  assert.deepEqual(streamUpdate(written), written);
 });
 
-test("the home stream fills in what an open update left unsaid", () => {
+test("an update need not open anywhere: the home stream gives it no link", () => {
+  const shown = streamUpdate(open());
+  // Only its date label is written for it.
+  assert.deepEqual(shown, { ...open(), dateLabel: "26 Sep 2026" });
+  assert.ok(!("href" in shown), "it is sent somewhere it did not say");
+  assert.ok(!("linkLabel" in shown), "it has words for a way it has not got");
+  // Words for a way are nothing without the way.
+  assert.deepEqual(streamUpdate(open({ linkLabel: "Open the Pen" })), shown);
+  // Its place in the Labbook is still where it is, for whoever points there.
   assert.equal(labbookHref("lotus-replay"), "/lab#u-lotus-replay");
-  assert.deepEqual(streamUpdate("lotus-replay", open()), {
+});
+
+test("an update with somewhere to go and no words for the way is linked by its title", () => {
+  const href = "https://codepen.io/beejsbj/pen/abXZWLQ";
+  assert.deepEqual(streamUpdate(open({ href })), {
     ...open(),
     dateLabel: "26 Sep 2026",
-    href: "/lab#u-lotus-replay",
+    href,
     linkLabel: "A lotus, one line at a time",
   });
 });
 
 test("the home stream has no redacted updates", () => {
-  assert.equal(streamUpdate("something-private", redacted()), undefined);
+  assert.equal(streamUpdate(redacted()), undefined);
 });
 
 test("content.json carries the Labbook and where each experiment sits, and no headlines", async () => {

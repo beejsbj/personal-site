@@ -267,7 +267,8 @@ test(
                 {
                   id: "fixture-study-graduated",
                   title: "The study became a project",
-                  href: "/lab#u-fixture-study-graduated",
+                  // nowhere to go: text, not a link to its place in the Labbook
+                  href: undefined,
                   summary:
                     "What started as one line has a home of its own now.",
                   date: "2026-09-30",
@@ -287,7 +288,7 @@ test(
                 {
                   id: "fixture-study-first-line",
                   title: "The first line draws itself",
-                  href: "/lab#u-fixture-study-first-line",
+                  href: undefined,
                   summary: "One path, measured and drawn from end to end.",
                   date: "2026-08-02",
                   dateLabel: "02 Aug 2026",

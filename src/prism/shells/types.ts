@@ -16,7 +16,7 @@ import type CutPaperCopy from "../../content/lenses/cut-paper.json";
 import type BackPageCopy from "../../content/lenses/back-page.json";
 import type HionCopy from "../../content/lenses/hion.json";
 import type { UpdateKind, UpdateSource } from "../../content.config";
-import type { Update as LabbookUpdate } from "../../lib/labbook";
+import type { Update as LabbookUpdate, UpdateLink } from "../../lib/labbook";
 
 export interface Link {
   label: string;
@@ -111,10 +111,10 @@ export interface LabEntry {
   html: string;
 }
 
-/** An update as the home stream shows it: open, with a date label and
- * somewhere to go. The Labbook's own `Update`, which may be redacted, is in
- * src/lib/labbook.ts. */
-export interface Update {
+/** An update as the home stream shows it: open, with a date label and,
+ * if it goes anywhere, its link (one that does not is shown as text). The
+ * Labbook's own `Update`, which may be redacted, is in src/lib/labbook.ts. */
+export type Update = {
   /** The file name, the `data-ref` of its `update.item` part. */
   id: string;
   kind: string;
@@ -126,10 +126,8 @@ export interface Update {
   date: string;
   dateLabel: string;
   summary: string;
-  href: string;
-  linkLabel: string;
   relatedProject?: string;
-}
+} & UpdateLink;
 
 export interface Lenses {
   "calling-card": typeof CallingCardCopy;

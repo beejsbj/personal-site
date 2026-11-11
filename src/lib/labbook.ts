@@ -122,7 +122,8 @@ export function labbookUpdate(id: string, update: UpdateData): Update {
 /** The id of the element that holds an update in the Labbook. */
 export const labbookAnchor = (id: string) => `u-${id}`;
 
-/** Where an update sits in the Labbook. */
+/** Where an update sits in the Labbook. Nothing links there unless it is
+ * written to. */
 export const labbookHref = (id: string) => `/lab#${labbookAnchor(id)}`;
 
 /** The Labbook's one order: newest first and, on one day, by id. */
@@ -142,29 +143,31 @@ export function experimentUpdates(labbook: Update[], slug: string): Update[] {
   );
 }
 
+/** Where an update goes, with the words for the way there; or nowhere,
+ * and then it is shown as text. */
+export type UpdateLink =
+  | { href: string; linkLabel: string }
+  | { href?: undefined; linkLabel?: undefined };
+
 type Open<T> = Extract<T, { visibility: "open" }>;
-/** An update the home stream can show: its words, a label for its date and
- * somewhere to go. */
-export type InStream<T> = Open<T> & {
-  dateLabel: string;
-  href: string;
-  linkLabel: string;
-};
+/** An update the home stream can show: its words, a label for its date
+ * and, if it goes anywhere, its link. */
+export type InStream<T> = Open<T> & { dateLabel: string } & UpdateLink;
 
 /** An update as the home stream, and each lens's `updates`, show it; or
- * nothing, for a redacted one. What an open update left unsaid is filled
- * in: the date label is written from the date, and an update with nowhere
- * else to go links to itself in the Labbook, by its title. */
+ * nothing, for a redacted one. The date label an open update left unsaid
+ * is written from its date. An update need not open anywhere: one with no
+ * `href` has no link, and one with an `href` and no words for it is linked
+ * by its title. */
 export function streamUpdate<T extends UpdateData>(
-  id: string,
   update: T,
 ): InStream<T> | undefined {
   if (update.visibility !== "open") return undefined;
+  const { href, linkLabel, ...said } = update;
   return {
-    ...update,
+    ...said,
     dateLabel: update.dateLabel ?? updateDateLabel(update.date),
-    href: update.href ?? labbookHref(id),
-    linkLabel: update.linkLabel ?? update.title,
+    ...(href ? { href, linkLabel: linkLabel ?? update.title } : {}),
   } as InStream<T>;
 }
 

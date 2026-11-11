@@ -7,8 +7,8 @@
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
  * Read on /lab and / against /prism/content.json, and on
- * /prism/fixtures/lab, whose fixture Labbook (src/prism/labbook-fixture.ts)
- * has every state whatever src/content holds. Same server and Chromium as
+ * /prism/fixtures/lab and /prism/fixtures/home, whose fixture Labbook
+ * (src/prism/labbook-fixture.ts) has every state whatever src/content holds. Same server and Chromium as
  * prism-parity.browser.mjs. LAB_SHOTS=<dir> also saves pictures of the
  * Labbook's parts and the home page's updates at each size;
  * LAB_ONLY=<regexp> runs only the subtests it names. */
@@ -33,6 +33,7 @@ const SIZES = {
   },
 };
 const ROOM = "/prism/fixtures/lab";
+const HOME = "/prism/fixtures/home";
 const SHOTS = process.env.LAB_SHOTS;
 const ONLY = process.env.LAB_ONLY ? new RegExp(process.env.LAB_ONLY) : null;
 const PEN_FRAME = "https://codepen.io/beejsbj/embed/abXZWLQ?default-tab=result";
@@ -82,6 +83,7 @@ const labbook = (page) =>
         bars: item.querySelectorAll("[data-redaction-bar]").length,
         controls: item.querySelectorAll("a, button, iframe, video, audio")
           .length,
+        links: item.querySelectorAll("a").length,
       });
     }
     return {
@@ -125,6 +127,7 @@ const recent = (page) =>
           href: title.querySelector("a")?.getAttribute("href") ?? undefined,
           date: item.querySelector("time").getAttribute("datetime"),
           when: text(item.querySelector("time")),
+          links: item.querySelectorAll("a").length,
         };
       }),
       // What follows the welcome on the page.
@@ -245,6 +248,52 @@ test(
             );
             await shot(page, "#labbook-title", `lab-labbook-${size}`);
             await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: an update with nowhere to go is text, not a link, in Recent updates and in the Labbook`,
+          async () => {
+            const written = fixture.labbook.filter(
+              (update) => update.visibility === "open",
+            );
+            const nowhere = written.filter((update) => !update.href);
+            assert.ok(nowhere.length >= 2, "the fixture has such updates");
+            assert.ok(written.length > nowhere.length, "and ones that do go");
+            // Nothing on the page points at an update's place in the Labbook.
+            const pointers = (page) =>
+              page.locator(".site-frame main a[href*='#u-']").count();
+
+            const home = await open(size, HOME);
+            const stream = (await recent(home.page)).items;
+            for (const update of written) {
+              const item = stream.find((entry) => entry.id === update.id);
+              assert.ok(item, `${update.id} is in Recent updates`);
+              assert.equal(item.title, update.title);
+              assert.equal(item.href, update.href, update.id);
+              assert.equal(item.links, update.href ? 1 : 0, update.id);
+            }
+            assert.equal(await pointers(home.page), 0);
+            await shot(home.page, "section.updates", `home-nowhere-${size}`);
+            await home.context.close();
+
+            const room = await open(size, ROOM);
+            const book = (await labbook(room.page)).entries;
+            for (const update of written) {
+              const entry = book.find((item) => item.id === update.id);
+              assert.equal(entry.title, update.title);
+              assert.equal(entry.href, update.href ?? null, update.id);
+            }
+            // With nothing it is about and nothing that lives elsewhere,
+            // such an update has no link in it at all.
+            for (const id of ["fixture-film", "fixture-tone"])
+              assert.equal(
+                book.find((entry) => entry.id === id).links,
+                0,
+                `${id} has no link in it`,
+              );
+            assert.equal(await pointers(room.page), 0);
+            await room.context.close();
           },
         );
 
@@ -555,7 +604,7 @@ test(
             assert.equal(shown.intro, updates.intro);
             assert.equal(shown.label, updates.listLabel);
             assert.deepEqual(
-              shown.items,
+              shown.items.map(({ links, ...item }) => item),
               content.updates.slice(0, updates.limit).map((update) => ({
                 id: update.id,
                 origin: `${update.sourceLabel} / ${update.kindLabel}`,

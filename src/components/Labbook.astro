@@ -12,10 +12,12 @@ import {
 } from "../lib/labbook";
 import type { getLabPage } from "../lib/portfolio";
 /** Composition: the Labbook, the complete dated record of updates, newest
- * first. Each update sits in an element whose id is where its links land
- * (`labbookHref`): the home stream's own entry with its summary, its
- * artifact and what it is about, or, redacted, its shape and nothing else.
- * With no updates there is no section.
+ * first. Each update sits in an element whose id is where a link to it
+ * would land (`labbookHref`), though nothing links there unless it is
+ * written to: the home stream's own entry with its summary, its artifact
+ * and what it is about, or, redacted, its shape and nothing else. An
+ * update with nowhere to go is text, not a link. With no updates there is
+ * no section.
  */
 interface Props {
   /** Every update, in any order. */

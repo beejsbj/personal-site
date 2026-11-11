@@ -163,9 +163,8 @@ export const streamUpdates = (
   entries: UpdateEntry[],
 ): (StreamUpdate & { id: string })[] =>
   entries.flatMap((entry) => {
-    const id = updateId(entry);
-    const update = streamUpdate(id, entry.data);
-    return update ? [{ ...update, id }] : [];
+    const update = streamUpdate(entry.data);
+    return update ? [{ ...update, id: updateId(entry) }] : [];
   });
 
 /** The home stream: the open updates that are due and not expired, newest

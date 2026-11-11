@@ -58,7 +58,7 @@ const shown = updates.map((update) =>
         dateLabel: updateDateLabel(update.date),
         shape: update.shape,
       }
-    : streamUpdate(update.id, update)!,
+    : streamUpdate(update)!,
 );
 ---
 

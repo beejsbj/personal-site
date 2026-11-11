@@ -320,7 +320,7 @@ function withUpdates(
   labbook: LabbookUpdate[],
 ): SiteContent {
   const stream: Update[] = labbook.flatMap((update) => {
-    const shown = streamUpdate(update.id, update);
+    const shown = streamUpdate(update);
     return shown
       ? [{ ...shown, kindLabel: shown.kind, sourceLabel: shown.source }]
       : [];
