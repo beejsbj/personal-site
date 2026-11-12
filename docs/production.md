@@ -8,7 +8,7 @@ the bjslab tunnel to serve public visitors.
 
 1. Push a feature branch and open a pull request. Ten minutes after the last
    push, the `pr-preview` workflow builds one Vercel preview of the PR head; its
-   link is the `Vercel` status in the PR's checks.
+   link is the `Vercel preview` status in the PR's checks.
 2. Merge accepted work into `main`.
 3. Vercel builds that commit and promotes it only when the build command succeeds.
 
