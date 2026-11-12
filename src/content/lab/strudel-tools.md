@@ -11,6 +11,18 @@ links:
     url: "https://midi-strudel.vercel.app"
   - label: "midi-strudel source"
     url: "https://github.com/beejsbj/midi-strudel"
+cover: "/images/lab/strudel-tools.png"
+media:
+  - type: "image"
+    src: "/images/lab/strudel-tools.png"
+    alt: "Melograph's opening screen: the words \"sing it before it disappears\" above a yellow pitch line drawn across a dark grid, with a record button at the top."
+    width: 800
+    height: 600
+  - type: "image"
+    src: "/images/lab/strudel-tools-midi-strudel.png"
+    alt: "midi-strudel's page: \"drop a MIDI file, get strudel code\", three numbered steps, an upload box, and a sample of the Strudel code it writes."
+    width: 800
+    height: 600
 order: 2
 ---
 
