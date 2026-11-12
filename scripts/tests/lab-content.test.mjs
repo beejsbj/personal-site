@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
@@ -62,6 +62,22 @@ test("every experiment on show links out or has a body to read", () => {
       entry.field("href") || entry.body,
       `${entry.slug}: neither an href nor a body`,
     );
+});
+
+test("every picture an experiment names is a file in public/", () => {
+  for (const entry of entries) {
+    const cover = entry.field("cover");
+    if (cover !== undefined)
+      assert.match(cover, /^\//, `${entry.slug}: its cover is not a site path`);
+    const media = [...entry.frontmatter.matchAll(/^\s+src:\s*"?(.*?)"?\s*$/gm)]
+      .map(([, src]) => src)
+      .filter((src) => src.startsWith("/"));
+    for (const src of [cover, ...media].filter(Boolean))
+      assert.ok(
+        existsSync(join("public", src)),
+        `${entry.slug}: ${src} is not in public/`,
+      );
+  }
 });
 
 test("at most one experiment on show takes pride of place", () => {

@@ -5,6 +5,13 @@ place: "bench"
 links:
   - label: "Source"
     url: "https://github.com/beejsbj/meditejo"
+cover: "/images/lab/meditejo.png"
+media:
+  - type: "image"
+    src: "/images/lab/meditejo.png"
+    alt: "Three Meditejo screens side by side: the home screen with a session to resume and a timer, the sounds screen with generated art on each tile, and a list of starting bells to choose from."
+    width: 800
+    height: 600
 order: 9
 ---
 
