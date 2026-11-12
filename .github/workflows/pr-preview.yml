@@ -13,12 +13,16 @@
 # A new push cancels the wait and restarts it, and so does converting the PR
 # to a draft. Drafts and fork PRs get no preview. The preview branch is deleted when the PR closes.
 #
+# The trigger is pull_request_target so the workflow still runs, and still
+# cleans up, when the PR has merge conflicts. That is safe here because no step
+# checks out or runs the PR's code.
+#
 # Every deployment counts toward Vercel's 100-per-day Hobby limit, across all
 # projects; per-push previews exhausted it on 2026-11-09.
 name: pr-preview
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]
 
 permissions:
