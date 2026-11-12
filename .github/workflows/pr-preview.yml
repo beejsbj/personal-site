@@ -1,0 +1,55 @@
+# One Vercel preview per pull request, not one per push.
+#
+# vercel.json turns Git deployments off for every branch except `main` and
+# `preview/**`, so pushing to a PR branch builds nothing. Once a PR has been
+# quiet for ten minutes, this workflow points `preview/pr-<number>` at the PR
+# head, and that push is the one Vercel builds. Its commit status lands on the
+# PR head, so the preview link shows in the PR's checks.
+#
+# A new push cancels the wait and restarts it. Drafts and fork PRs get no
+# preview. The preview branch is deleted when the PR closes.
+#
+# Every deployment counts toward Vercel's 100-per-day Hobby limit, across all
+# projects; per-push previews exhausted it on 2026-11-09.
+name: pr-preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, closed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  REF: heads/preview/pr-${{ github.event.pull_request.number }}
+
+jobs:
+  preview:
+    if: >-
+      github.event.action != 'closed' &&
+      !github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Wait for the PR to go quiet
+        run: sleep 600
+      - name: Point the preview branch at the PR head
+        env:
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/git/refs/$REF" -f sha="$SHA" -F force=true --silent ||
+            gh api -X POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/$REF" -f sha="$SHA" --silent
+
+  cleanup:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Delete the preview branch
+        run: gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/$REF" --silent || true

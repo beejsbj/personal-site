@@ -6,12 +6,16 @@ the bjslab tunnel to serve public visitors.
 
 ## Release workflow
 
-1. Push a feature branch and review its Vercel preview through the pull request.
+1. Push a feature branch and open a pull request. Ten minutes after the last
+   push, the `pr-preview` workflow builds one Vercel preview of the PR head; its
+   link is the `Vercel` status in the PR's checks.
 2. Merge accepted work into `main`.
 3. Vercel builds that commit and promotes it only when the build command succeeds.
 
 Vercel is connected to `beejsbj/personal-site`, with `main` as the production
-branch and Git deployments enabled. Preview/deployment URLs require Vercel
+branch. `vercel.json` limits Git deployments to `main` and the `preview/pr-<number>`
+branches that `.github/workflows/pr-preview.yml` maintains, so a push to any
+other branch builds nothing. Draft PRs get no preview. Preview/deployment URLs require Vercel
 authentication under the current project protection setting; the production
 domain is public.
 

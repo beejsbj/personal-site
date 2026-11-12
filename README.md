@@ -111,7 +111,8 @@ can overwrite authored content.
 
 `public/images/` and compatibility routes remain active. `/style-guide` is the
 dedicated current guide; `/design-system` and `/lab/style-guide` redirect there.
-Production is hosted by Vercel at `https://burooj.dev`. GitHub branches receive
-preview deployments; successful builds from `main` update production. See
+Production is hosted by Vercel at `https://burooj.dev`. Each pull request
+gets one preview deployment once its pushes settle; successful builds from `main`
+update production. See
 [production operations](docs/production.md) for the build gate, DNS boundary,
 verification, and rollback.
