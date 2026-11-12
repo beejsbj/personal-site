@@ -25,11 +25,11 @@ Burooj's home lab, the real place the Lab is a window into. It feeds the room ra
 _Avoid_: home server project, lab entry
 
 **Bench**:
-The part of the Lab holding experiments being worked on now.
-_Avoid_: active list, in-progress status
+The part of the Lab holding what is being worked on now: experiments with work under way or recently touched, and other work in progress shown redacted. Nothing is sorted onto it by hand, though an experiment can be pinned there.
+_Avoid_: active list, in-progress status, pile
 
 **Shelf**:
-The part of the Lab holding experiments that have gone quiet, plus the archive of older work.
+The part of the Lab where every other experiment rests: the ones that have gone quiet, and the archive of older work. An experiment returns to the Bench when it is picked up again.
 _Avoid_: graveyard, archived status
 
 **Ticker**:
