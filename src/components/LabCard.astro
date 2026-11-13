@@ -5,7 +5,12 @@ import MediaFrame from "../design/primitives/MediaFrame.astro";
 import Note from "../design/primitives/Note.astro";
 import { part } from "../prism/parts";
 /** Compound: one experiment. cover + linked heading + summary; the cover
- * is optional and leaves nothing behind.
+ * is optional and leaves nothing behind. An experiment that can be played
+ * where it stands (`preview`) has a stage for it, the size of the cover (or,
+ * with none, of an empty frame), and a button under its words that loads it
+ * there in place of the still: nothing is asked of another site until the
+ * press, and a second press or Escape brings the still back
+ * (src/lib/block-stage.ts). The link out is the title's, always.
  * layout=card: lying on the Bench, a picture or (with no cover) a paper slip.
  * layout=feature: the featured experiment, across the width of its place.
  * layout=row: standing on the Shelf, a quiet line with a small picture.
@@ -19,6 +24,15 @@ interface Props {
   title: string;
   summary: string;
   cover?: string;
+  /** What to load in place of the cover, and what it is. */
+  preview?: { kind: "pen" | "demo"; frame: string };
+  /** `preview` in pages/lab.md. */
+  copy?: {
+    load: { pen: string; demo: string };
+    close: string;
+    note: string;
+    loading: string;
+  };
   layout?: "card" | "feature" | "row";
   lean?: "left" | "right";
 }
@@ -28,9 +42,15 @@ const {
   title,
   summary,
   cover,
+  preview,
+  copy,
   layout = "card",
   lean,
 } = Astro.props;
+const play =
+  preview && copy && slug
+    ? { ...preview, copy, id: `lab-play-${slug}` }
+    : undefined;
 const mark = (name: Parameters<typeof part>[0]) =>
   slug === undefined ? {} : part(name, slug);
 // With no picture, a card or a feature is written on a slip of paper.
@@ -42,10 +62,30 @@ const Slip = cover || layout === "row" ? Fragment : Note;
     "lab-card",
     `lab-card--${layout}`,
     lean && `lab-card--lean-${lean}`,
-    { "lab-card--bare": !cover },
+    { "lab-card--bare": !cover && !play },
   ]}
+  data-stage-room={play ? "" : undefined}
 >
-  {cover && <MediaFrame src={cover} alt="" fit="cover" href={href} />}
+  {play ? (
+    <div
+      class="lab-card__stage"
+      id={play.id}
+      data-block-stage
+      data-frame={play.frame}
+      data-title={title}
+      data-loading={play.copy.loading}
+    >
+      <div class="lab-card__still">
+        {cover ? (
+          <MediaFrame src={cover} alt="" fit="cover" href={href} />
+        ) : (
+          <div class="lab-card__blank" aria-hidden="true" />
+        )}
+      </div>
+    </div>
+  ) : (
+    cover && <MediaFrame src={cover} alt="" fit="cover" href={href} />
+  )}
   <Slip>
     <div class="lab-copy">
       <Heading
@@ -60,6 +100,27 @@ const Slip = cover || layout === "row" ? Fragment : Note;
       <p class="summary" {...mark("lab.summary")}>
         {summary}
       </p>
+      {play && (
+        <>
+          <p class="lab-card__play" {...mark("lab.preview")}>
+            <button
+              type="button"
+              class="lab-card__toggle"
+              aria-pressed="false"
+              aria-controls={play.id}
+              aria-label={`${play.copy.load[play.kind]}: ${title}`}
+              data-block-toggle
+              data-load={play.copy.load[play.kind]}
+              data-close={play.copy.close}
+              data-subject={title}
+            >
+              {play.copy.load[play.kind]}
+            </button>
+            <span class="lab-card__note">{play.copy.note}</span>
+          </p>
+          <p class="lab-card__status block-stage__status" role="status"></p>
+        </>
+      )}
     </div>
   </Slip>
 </article>
@@ -95,7 +156,8 @@ const Slip = cover || layout === "row" ? Fragment : Note;
     --lab-lean: calc(-1 * var(--settle-angle));
   }
   .lab-card :global(.ds-media),
-  .lab-card :global(.ds-note) {
+  .lab-card :global(.ds-note),
+  .lab-card__stage {
     rotate: var(--lab-lean);
   }
   .lab-card--feature {
@@ -142,19 +204,22 @@ const Slip = cover || layout === "row" ? Fragment : Note;
     max-width: var(--reading-width);
     color: var(--color-text-soft);
   }
-  .lab-card--row :global(.ds-media) {
+  .lab-card--row :global(.ds-media),
+  .lab-card--row .lab-card__stage {
     align-self: end;
     margin-bottom: var(--space-2xs);
   }
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
     .lab-card :global(.ds-media),
-    .lab-card :global(.ds-note) {
+    .lab-card :global(.ds-note),
+    .lab-card__stage {
       transition:
         rotate var(--duration-hover) var(--ease-settle),
         translate var(--duration-hover) var(--ease-settle);
     }
     .lab-card:is(:hover, :has(:focus-visible)) :global(.ds-media),
-    .lab-card:is(:hover, :has(:focus-visible)) :global(.ds-note) {
+    .lab-card:is(:hover, :has(:focus-visible)) :global(.ds-note),
+    .lab-card:is(:hover, :has(:focus-visible)) .lab-card__stage {
       rotate: 0deg;
       translate: 0 calc(-1 * var(--motion-lift));
     }
@@ -170,8 +235,87 @@ const Slip = cover || layout === "row" ? Fragment : Note;
       grid-template-columns: minmax(0, 1fr);
       gap: 0;
     }
-    .lab-card--row :global(.ds-media) {
+    .lab-card--row :global(.ds-media),
+    .lab-card--row .lab-card__stage {
       width: var(--media-width);
     }
+  }
+  /* A card that can be played: the stage is where the cover would be, the
+     size of it, and it is the stage that leans and lifts, with the cover
+     (or the empty frame) lying flat in it. The frame is laid over it, out
+     of sight until it has loaded, then the still steps aside and keeps
+     the room, so nothing about the card moves. Picked up to play, it lies
+     straight. */
+  .lab-card__stage {
+    position: relative;
+    align-self: start;
+  }
+  .lab-card .lab-card__still :global(.ds-media) {
+    rotate: none;
+    translate: none;
+  }
+  .lab-card__blank {
+    padding: var(--space-s);
+    background: var(--texture);
+  }
+  .lab-card__blank::before {
+    content: "";
+    display: block;
+    aspect-ratio: var(--media-ratio);
+  }
+  .lab-card__stage :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--color-page);
+  }
+  .lab-card__stage[data-live="loading"] :global(iframe),
+  .lab-card__stage[data-live="on"] .lab-card__still {
+    visibility: hidden;
+  }
+  .lab-card__stage[aria-busy="true"] {
+    cursor: progress;
+  }
+  .lab-card:has([aria-pressed="true"]) .lab-card__stage {
+    rotate: 0deg;
+  }
+  /* The note is on a line of its own, so that the button's words changing
+     (to play, to put away) never changes how the two sit. */
+  .lab-card__play {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-2xs);
+  }
+  .lab-card__toggle {
+    min-height: var(--control-min-height);
+    padding-inline: var(--space-m);
+    border: var(--rule-width) solid var(--color-accent);
+    border-radius: var(--radius-pill);
+    background: var(--color-page);
+    color: var(--color-accent);
+    cursor: pointer;
+  }
+  .lab-card__toggle:hover {
+    background: var(--color-hover);
+  }
+  .lab-card__toggle[aria-pressed="true"] {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+  .lab-card__note {
+    font-size: var(--text-xs);
+    line-height: var(--leading-tight);
+    color: var(--color-text-soft);
+  }
+  /* Said to assistive technology, not shown, so saying it moves nothing. */
+  .lab-card__status {
+    position: absolute;
+    width: var(--rule-width);
+    height: var(--rule-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 </style>

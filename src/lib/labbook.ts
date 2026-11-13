@@ -229,6 +229,18 @@ export function labPreview(entry: {
   return embeddable ? href : undefined;
 }
 
+/** What a Lab entry's card plays in place, and what it is (a Pen or a demo,
+ * which the card's words follow); nothing when it is not played in place. */
+export function labPlay(entry: {
+  href?: string;
+  embeddable?: boolean;
+}): { kind: "pen" | "demo"; frame: string } | undefined {
+  const frame = labPreview(entry);
+  return frame
+    ? { kind: isPen(entry.href ?? "") ? "pen" : "demo", frame }
+    : undefined;
+}
+
 /** Something an update is about, as a link to it. */
 export type RelatedLink = {
   kind: "experiment" | "project";

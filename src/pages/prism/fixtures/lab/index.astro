@@ -3,8 +3,9 @@
  * fixture experiments, with a fixture Labbook, so every state can be seen
  * and tested whatever src/content holds. /prism/fixtures/lab is a full
  * room; ?fixture=shelf-only has nothing on the Bench,
- * ?fixture=no-covers has no pictures and ?fixture=no-featured gives no
- * experiment pride of place. ?labbook=none is a Lab with no updates. scripts/tests/lab-daylight.browser.mjs and
+ * ?fixture=no-covers has no pictures, ?fixture=no-featured gives no
+ * experiment pride of place and ?fixture=preview has cards that can be
+ * played where they stand (scripts/tests/lab-preview.browser.mjs). ?labbook=none is a Lab with no updates. scripts/tests/lab-daylight.browser.mjs and
  * labbook-daylight.browser.mjs read it. Rendered on demand: its page
  * entries point at /lab/<slug>, where nothing is built. */
 import type { ComponentProps } from "astro/types";
@@ -87,7 +88,71 @@ const room: Entries = [
     order: 3,
   },
 ];
+/** Cards that can be played in place: a Pen with a cover, one without, the
+ * featured card, a demo on the Shelf; and one that cannot. */
+const playing: Entries = [
+  {
+    slug: "fixture-feature",
+    detail: "https://codepen.io/beejsbj/pen/BaeoNPG",
+    title: "The one with pride of place",
+    summary:
+      "The featured card, across the width of the Bench, played in place.",
+    place: "bench",
+    featured: true,
+    cover: "/images/lab/beating-shapes.png",
+    preview: {
+      kind: "pen",
+      frame: "https://codepen.io/beejsbj/embed/BaeoNPG?default-tab=result",
+    },
+    order: 1,
+  },
+  {
+    slug: "fixture-pen",
+    detail: "https://codepen.io/beejsbj/pen/abXZWLQ",
+    title: "A Pen with a cover",
+    summary: "It lives on CodePen, and can be played where it lies.",
+    place: "bench",
+    cover: "/images/lab/motion-path-graph.svg",
+    preview: {
+      kind: "pen",
+      frame: "https://codepen.io/beejsbj/embed/abXZWLQ?default-tab=result",
+    },
+    order: 2,
+  },
+  {
+    slug: "fixture-pen-bare",
+    detail: "https://codepen.io/beejsbj/pen/xxexKMq",
+    title: "A Pen with no cover",
+    summary: "No picture to show: an empty frame stands in its place.",
+    place: "bench",
+    preview: {
+      kind: "pen",
+      frame: "https://codepen.io/beejsbj/embed/xxexKMq?default-tab=result",
+    },
+    order: 3,
+  },
+  {
+    slug: "fixture-link",
+    detail: "https://example.com/fixture-link",
+    title: "A link out that cannot be played here",
+    summary: "It opens where it lives, and that is all it does.",
+    place: "bench",
+    cover: "/images/lab/game-of-life.png",
+    order: 4,
+  },
+  {
+    slug: "fixture-demo-row",
+    detail: "https://demo.example/play",
+    title: "A demo on the Shelf",
+    summary: "A deployed demo that says it may be framed.",
+    place: "shelf",
+    cover: "/images/lab/game-of-life.png",
+    preview: { kind: "demo", frame: "https://demo.example/play" },
+    order: 1,
+  },
+];
 const fixtures: Record<string, Entries> = {
+  preview: playing,
   room,
   "shelf-only": room.filter((entry) => entry.place === "shelf"),
   "no-covers": room.map((entry) => ({ ...entry, cover: undefined })),

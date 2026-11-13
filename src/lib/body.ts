@@ -6,7 +6,7 @@ import type { CollectionEntry } from "astro:content";
 import type { BlockData } from "../content.config";
 import type { LabEntry } from "../prism/shells/types";
 import { placeBlocks, proseHtml, type Block } from "./blocks";
-import { isPen, labPreview } from "./labbook";
+import { labPlay } from "./labbook";
 import { labDetail, labHasPage } from "./portfolio";
 
 type Renderable = { render(): Promise<{ Content: unknown }> };
@@ -62,15 +62,10 @@ export async function labPayload(
   void hidden;
   void embeddable;
   const experiment = entry as CollectionEntry<"lab">;
-  const frame = labPreview(entry.data);
+  const preview = labPlay(entry.data);
   return {
     ...data,
-    ...(frame && {
-      preview: {
-        kind: isPen(data.href ?? "") ? "pen" : "demo",
-        frame,
-      },
-    }),
+    ...(preview && { preview }),
     slug: entry.slug,
     detail: labDetail(experiment),
     hasPage: labHasPage(experiment),

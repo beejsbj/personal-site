@@ -231,7 +231,9 @@ test(
                 assert.equal(await stage(page, "fixture-link").count(), 0);
                 // Said once, plainly, on each: nothing loads until asked.
                 assert.equal(
-                  await page.getByText(copy.note).count(),
+                  await page
+                    .locator(".lab-card__note", { hasText: copy.note })
+                    .count(),
                   Object.keys(PENS).length,
                 );
               },
@@ -305,9 +307,11 @@ test(
                     }));
                   assert.deepEqual(attrs, {
                     src: frame,
-                    title: await card(page, slug)
-                      .locator("[data-part='lab.title'] .link-label")
-                      .innerText(),
+                    title: (
+                      await card(page, slug)
+                        .locator("[data-part='lab.title'] .link-label")
+                        .innerText()
+                    ).trim(),
                     sandbox: SANDBOX,
                     referrerpolicy: "strict-origin",
                     loading: "eager",

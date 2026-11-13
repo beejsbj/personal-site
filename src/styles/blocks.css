@@ -75,6 +75,14 @@
 .block-stage[aria-busy="true"] {
   cursor: progress;
 }
+/* A frame waits behind the poster until it has loaded, then the poster
+   steps aside and keeps the room. */
+.block-stage[data-live="loading"] > iframe {
+  visibility: hidden;
+}
+.block-stage[data-live="on"] > :not(iframe) {
+  visibility: hidden;
+}
 .block-stage__label {
   max-width: var(--intro-width);
   margin: var(--space-m);

@@ -1,10 +1,15 @@
-/** What makes a page's blocks live, in Daylight (src/components/Blocks.astro).
+/** What makes a page's blocks live, in Daylight (src/components/Blocks.astro),
+ * and a card on the Lab's list that plays its experiment in place
+ * (src/components/LabCard.astro, which marks its room `data-stage-room`).
  *
  * An embed or a model stands as its poster until its button is pressed.
  * Then, and not before, an embed's frame is made in the stage's own room,
  * or the viewer is fetched (./model-viewer, a chunk of its own) and shows
- * the model there. A second press, or Escape from anywhere in the block,
- * puts it away and brings the poster back.
+ * the model there. The poster stays, keeping the stage's size, until the
+ * frame has loaded (`data-live` is "loading", then "on"). A second press,
+ * or Escape from anywhere in the block, puts it away and brings the poster
+ * back. Only one stage is showing on a page at a time: showing another puts
+ * the first away, so a page never runs several heavy pieces at once.
  *
  * A film that loops plays by itself, silently, while it is in view, unless
  * the visitor asked for less motion; its controls are always there.
@@ -13,7 +18,7 @@
  * in needs nothing set up. */
 
 /** What a stage is showing, and how to put it away. */
-const showing = new WeakMap<HTMLElement, () => void>();
+const showing = new Map<HTMLElement, () => void>();
 
 const stageOf = (button: Element) =>
   document.getElementById(button.getAttribute("aria-controls") ?? "");
@@ -28,8 +33,32 @@ function setPressed(stage: HTMLElement, pressed: boolean) {
   const button = buttonOf(stage);
   if (!button) return;
   button.setAttribute("aria-pressed", String(pressed));
-  button.textContent =
-    (pressed ? button.dataset.close : button.dataset.load) ?? "";
+  const words = (pressed ? button.dataset.close : button.dataset.load) ?? "";
+  button.textContent = words;
+  // Said of what it is for, when the page has several of them.
+  if (button.dataset.subject)
+    button.setAttribute("aria-label", `${words}: ${button.dataset.subject}`);
+}
+
+/** How a frame is made. A piece of someone else's page is given as little
+ * as it can run on: scripts, and its own origin so it can keep its own
+ * state (it is not ours, so this lends it nothing of this site's); popups,
+ * so that a link in it can open, and open free of the sandbox. Not forms,
+ * dialogs, downloads, pointer lock or leading this page away. Only
+ * fullscreen is lent, and the referrer is this site's name alone. It is
+ * made on a press, so it loads at once. */
+function makeFrame(src: string, title: string) {
+  const element = document.createElement("iframe");
+  element.setAttribute(
+    "sandbox",
+    "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox",
+  );
+  element.referrerPolicy = "strict-origin";
+  element.loading = "eager";
+  element.allow = "fullscreen";
+  element.title = title;
+  element.src = src;
+  return element;
 }
 
 function putAway(stage: HTMLElement) {
@@ -39,6 +68,9 @@ function putAway(stage: HTMLElement) {
 }
 
 function show(stage: HTMLElement) {
+  for (const other of [...showing.keys()])
+    if (other !== stage)
+      other.isConnected ? putAway(other) : showing.delete(other);
   const poster = [...stage.childNodes];
   const status = statusOf(stage);
   const say = (words = "") => status && (status.textContent = words);
@@ -47,6 +79,7 @@ function show(stage: HTMLElement) {
   showing.set(stage, () => {
     leave();
     stage.removeAttribute("aria-busy");
+    delete stage.dataset.live;
     stage.replaceChildren(...poster);
     say();
   });
@@ -55,11 +88,19 @@ function show(stage: HTMLElement) {
 
   const { frame, model, title = "" } = stage.dataset;
   if (frame) {
-    const element = document.createElement("iframe");
-    element.src = frame;
-    element.title = title;
-    element.allow = "fullscreen";
-    stage.replaceChildren(element);
+    // The poster stays, under the frame, until the frame has loaded; then
+    // it is hidden, still holding the room, and shows again when put away.
+    const element = makeFrame(frame, title);
+    stage.dataset.live = "loading";
+    stage.setAttribute("aria-busy", "true");
+    say(stage.dataset.loading);
+    element.addEventListener("load", () => {
+      if (!showing.has(stage) || !element.isConnected) return;
+      stage.dataset.live = "on";
+      stage.removeAttribute("aria-busy");
+      say();
+    });
+    stage.append(element);
     return;
   }
   if (!model) return;
@@ -108,7 +149,7 @@ document.addEventListener("click", (event) => {
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   const stage = (event.target as Element | null)
-    ?.closest?.(".block")
+    ?.closest?.(".block, [data-stage-room]")
     ?.querySelector<HTMLElement>("[data-block-stage]");
   if (!stage || !showing.has(stage)) return;
   putAway(stage);

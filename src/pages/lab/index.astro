@@ -10,7 +10,7 @@ import {
   getSite,
   labDetail,
 } from "../../lib/portfolio";
-import { penUser } from "../../lib/labbook";
+import { labPlay, penUser } from "../../lib/labbook";
 
 const [page, site, labbook, relatable] = await Promise.all([
   getLabPage(),
@@ -22,6 +22,7 @@ const entries = (await getLab()).map((entry) => ({
   ...entry.data,
   slug: entry.slug,
   detail: labDetail(entry),
+  preview: labPlay(entry.data),
 }));
 ---
 
