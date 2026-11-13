@@ -213,16 +213,23 @@ export type RelatedLink = {
   href: string;
 };
 
+/** Something an update is about: an experiment or a project that is shown,
+ * by its slug, with its title and where it lives. */
+export type Subject = RelatedLink & { slug: string };
+
+type Shown = {
+  lab: { slug: string; title: string; detail: string }[];
+  projects: { slug: string; title: string; href: string }[];
+};
+
 /** The experiment and the project an update is about, each where it lives.
  * A project may be named by its slug or, as the older updates do, by its
- * title. One that is not shown (hidden, or never written) links nowhere. */
-export function relatedLinks(
+ * title. One that is not shown (hidden, or never written) is nothing. A
+ * redacted update keeps what it is about, so it has subjects too. */
+export function subjectsOf(
   update: Pick<Update, "relatedExperiment" | "relatedProject">,
-  shown: {
-    lab: { slug: string; title: string; detail: string }[];
-    projects: { slug: string; title: string; href: string }[];
-  },
-): RelatedLink[] {
+  shown: Shown,
+): Subject[] {
   const experiment = shown.lab.find(
     (entry) => entry.slug === update.relatedExperiment,
   );
@@ -236,13 +243,120 @@ export function relatedLinks(
       ? [
           {
             kind: "experiment" as const,
+            slug: experiment.slug,
             title: experiment.title,
             href: experiment.detail,
           },
         ]
       : []),
     ...(project
-      ? [{ kind: "project" as const, title: project.title, href: project.href }]
+      ? [
+          {
+            kind: "project" as const,
+            slug: project.slug,
+            title: project.title,
+            href: project.href,
+          },
+        ]
       : []),
   ];
+}
+
+/** The experiment and the project an update is about, as links to each. */
+export function relatedLinks(
+  update: Pick<Update, "relatedExperiment" | "relatedProject">,
+  shown: Shown,
+): RelatedLink[] {
+  return subjectsOf(update, shown).map(({ kind, title, href }) => ({
+    kind,
+    title,
+    href,
+  }));
+}
+
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+/** "2026-09" -> "September 2026". */
+export function monthLabel(month: string): string {
+  const [year, number] = month.split("-");
+  return `${MONTH_NAMES[Number(number) - 1]} ${year}`;
+}
+
+/** The Labbook kept by month, as a notebook is: the newest month first,
+ * each holding its updates newest first. A month with nothing in it has no
+ * place. `month` is "YYYY-MM" (`monthLabel` names it). */
+export function labbookMonths<T extends { id: string; date: string }>(
+  list: T[],
+): { month: string; updates: T[] }[] {
+  const months: { month: string; updates: T[] }[] = [];
+  for (const update of newestFirst(list)) {
+    const month = update.date.slice(0, 7);
+    if (months.at(-1)?.month !== month) months.push({ month, updates: [] });
+    months.at(-1)!.updates.push(update);
+  }
+  return months;
+}
+
+/** What the Labbook can be narrowed to: every experiment and project its
+ * updates are about (a redacted update among them), each with how many
+ * entries it has, the one written in most recently first. */
+export function labbookSubjects(
+  labbook: Update[],
+  shown: Shown,
+): (Subject & { count: number })[] {
+  const subjects = new Map<string, Subject & { count: number }>();
+  for (const update of newestFirst(labbook))
+    for (const subject of subjectsOf(update, shown)) {
+      const key = `${subject.kind}:${subject.slug}`;
+      const known = subjects.get(key);
+      if (known) known.count += 1;
+      else subjects.set(key, { ...subject, count: 1 });
+    }
+  return [...subjects.values()];
+}
+
+/** What a narrowing names: one experiment or one project, by slug. */
+export type Narrowing = Pick<Subject, "kind" | "slug">;
+
+/** The Labbook is narrowed in the address's query, `?experiment=<slug>` or
+ * `?project=<slug>`: a different query is a different page to the client
+ * router, so every lens is handed it as it mounts, Back and reload keep it,
+ * and the fragment stays free to land on an update. */
+const NARROW_KINDS = ["experiment", "project"] as const;
+
+/** What an address's query narrows the Labbook to, if anything. With both
+ * named, the experiment. */
+export function narrowedTo(search: string): Narrowing | undefined {
+  const query = new URLSearchParams(search);
+  for (const kind of NARROW_KINDS) {
+    const slug = query.get(kind);
+    if (slug) return { kind, slug };
+  }
+  return undefined;
+}
+
+/** The address of the Labbook narrowed to `subject`, or of all of it, from
+ * the page it is on (`from`: a path and its query). Whatever else the
+ * query says stays; it lands on the Labbook's head. */
+export function narrowHref(
+  subject: Narrowing | undefined,
+  from = "/lab",
+): string {
+  const url = new URL(from, "https://labbook.invalid");
+  for (const kind of NARROW_KINDS) url.searchParams.delete(kind);
+  if (subject) url.searchParams.set(subject.kind, subject.slug);
+  return `${url.pathname}${url.search}#labbook`;
 }

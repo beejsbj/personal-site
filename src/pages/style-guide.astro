@@ -349,7 +349,7 @@ const anatomy = [
     <section class="specimen" aria-labelledby="labbook-specimen">
       <SectionHeading id="labbook-specimen" title="The Labbook" />
       <div>
-        <UpdateEntry {...update} labels={labels} detailed connected>
+        <UpdateEntry {...update} labels={labels} detailed layout="notebook">
           <Artifact
             slot="artifact"
             artifact={{
@@ -370,7 +370,7 @@ const anatomy = [
             label: labbook.redacted.label,
             bar: labbook.redacted.bar,
           }}
-          connected
+          layout="notebook"
         />
         <UpdateEntry
           date="2026-08-24"
@@ -381,10 +381,13 @@ const anatomy = [
             label: labbook.redacted.label,
             bar: labbook.redacted.bar,
           }}
+          layout="notebook"
         />
       </div>
       <p class="annotation">
-        In the Labbook an update may show an artifact: a Pen or a demo waits
+        The Labbook is written as a notebook: each entry's day in the margin,
+        its words to the right of the margin's rule, its months as chapters
+        (the composition, on /lab). An update may show an artifact: a Pen or a demo waits
         on its stage until it is asked for, so nothing loads from another
         site before the click. A redacted update is its shape and nothing
         else: its line, with the few words it shows as written and a struck

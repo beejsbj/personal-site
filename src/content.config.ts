@@ -353,6 +353,16 @@ const pageSchema = z.object({
       title: z.string(),
       note: z.string(),
       listLabel: z.string(),
+      /** Narrowing it to one experiment or project: what the links to
+       * each are called together, what it says while narrowed, the way
+       * back to every entry, and how many entries one has, said aloud
+       * (`{count}` is the number). */
+      narrow: z.object({
+        label: z.string(),
+        showing: z.string(),
+        all: z.string(),
+        count: z.object({ one: z.string(), other: z.string() }),
+      }),
       /** What introduces the experiment or project an update is about. */
       related: z.object({ experiment: z.string(), project: z.string() }),
       artifact: z.object({
@@ -677,6 +687,15 @@ const fixtures = defineCollection({
   schema: labSchema,
 });
 
+/** A Labbook that is not on show: updates written as real ones are, and
+ * checked by the same schema, spanning months and holding every kind of
+ * entry. /prism/fixtures/lab?labbook=notebook renders it, and the harness
+ * hands it to the shells (/prism/fixtures/labbook.json). */
+const fixtureUpdates = defineCollection({
+  type: "content",
+  schema: updateSchema,
+});
+
 /** Each lens's own flavour copy: the words a lens's designer wrote for it
  * (command help lines, captions, labels). Shells read it as
  * `content.lenses[id]`; its shape is the JSON file itself (see
@@ -694,4 +713,5 @@ export const collections = {
   site,
   lenses,
   fixtures,
+  "fixture-updates": fixtureUpdates,
 };

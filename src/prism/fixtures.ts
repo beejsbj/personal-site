@@ -368,6 +368,12 @@ const UNHEARD_OF = {
   caption: "A kind of block that does not exist yet.",
 } as unknown as Block;
 
+/** The fixture Labbook written as content, as content.json would carry it
+ * (src/pages/prism/fixtures/labbook.json.ts). Its experiments are the
+ * fixture room's; here they become the first two of the real Lab. */
+const NOTEBOOK_FIXTURE = "/prism/fixtures/labbook.json";
+const NOTEBOOK_EXPERIMENTS = ["fixture-quiet", "fixture-featured"];
+
 const LONG_TITLE =
   "A project whose title runs on and on, far past where any layout expects a title to stop";
 
@@ -572,8 +578,7 @@ export const FIXTURES: Record<string, Fixture> = {
   },
   "lab-bare-entry": {
     name: "lab-bare-entry",
-    about:
-      "A lab entry that says little, with a cover and no other picture.",
+    about: "A lab entry that says little, with a cover and no other picture.",
     apply: (content) => withExperiment(content, poster),
     routes: () => [{ kind: "lab", path: "/lab" }, labEntryRoute(poster)],
   },
@@ -620,6 +625,23 @@ export const FIXTURES: Record<string, Fixture> = {
       { kind: "home", path: "/" },
       { kind: "lab", path: "/lab" },
     ],
+  },
+  "labbook-notebook": {
+    name: "labbook-notebook",
+    about:
+      "A Labbook kept over four months, one of them with a single small entry: plain, linked, every kind of artifact, redacted with words and with bars alone, about an experiment, a project, both or neither. A lens that keeps it by month or narrows it shows that; every lens shows every entry.",
+    async apply(content) {
+      const written: LabbookUpdate[] = await (
+        await fetch(NOTEBOOK_FIXTURE)
+      ).json();
+      const lab = content.lab.slice(0, 2).map((entry) => entry.slug);
+      const labbook = written.map((update) => {
+        const at = NOTEBOOK_EXPERIMENTS.indexOf(update.relatedExperiment ?? "");
+        return at < 0 ? update : { ...update, relatedExperiment: lab[at] };
+      });
+      return settle(withUpdates(content, labbook));
+    },
+    routes: () => [{ kind: "lab", path: "/lab" }],
   },
   "writing-rich": {
     name: "writing-rich",
