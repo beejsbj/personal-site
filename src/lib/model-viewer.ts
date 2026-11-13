@@ -35,6 +35,8 @@ export interface ModelOptions {
  * much nearer or further. */
 const TURN = Math.PI / 24;
 const ZOOM = 0.85;
+/** How long a viewer put away keeps its context, in milliseconds. */
+const LET_GO = 500;
 
 /** Show the model on `canvas`. Resolves, once it is showing, to what puts
  * it away; rejects when it cannot be shown (no WebGL, no such file). */
@@ -103,15 +105,16 @@ export async function showModel(
     controls.dispose();
     release();
     renderer.dispose();
-    renderer.forceContextLoss();
+    // Spark reads a splat's depths back a frame or two behind, and three.js
+    // rejects that wait, with no reason, if the context is lost under it:
+    // let what is in flight land first.
+    setTimeout(() => renderer.forceContextLoss(), LET_GO);
   };
 
   try {
     const bounds = new Box3();
     if (format === "glb") {
-      const { GLTFLoader } = await import(
-        "three/addons/loaders/GLTFLoader.js"
-      );
+      const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
       const { scene: model } = await new GLTFLoader().loadAsync(src);
       holder.add(model);
       const sun = new DirectionalLight(0xffffff, 2);
@@ -119,9 +122,8 @@ export async function showModel(
       scene.add(new HemisphereLight(0xffffff, 0x444444, 2), sun);
       bounds.setFromObject(holder);
     } else {
-      const { SparkRenderer, SplatMesh, SplatFileType } = await import(
-        "@sparkjsdev/spark"
-      );
+      const { SparkRenderer, SplatMesh, SplatFileType } =
+        await import("@sparkjsdev/spark");
       const fileType = {
         spz: SplatFileType.SPZ,
         sog: SplatFileType.PCSOGSZIP,

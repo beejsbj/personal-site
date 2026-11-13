@@ -44,171 +44,173 @@ const stageId = (block: Told) => `block-${slug}-${block.name}`;
 ---
 
 {told && <link rel="stylesheet" href={stylesheet} />}
-{
-  blocks.map((block) => (
-    <>
-      {block.type === "text" && <Fragment set:html={block.html} />}
-      {block.type === "gallery" && (
-        <div class="block block-gallery" {...mark(block)}>
-          {block.items.map((picture) => (
-            <BlockPicture picture={picture} />
-          ))}
+{blocks.map((block) => (
+  <>
+    {block.type === "text" && <Fragment set:html={block.html} />}
+    {block.type === "gallery" && (
+      <div class="block block-gallery" {...mark(block)}>
+        {block.items.map((picture) => (
+          <BlockPicture picture={picture} />
+        ))}
+      </div>
+    )}
+    {block.type === "compare" && (
+      <figure class="block block-compare" {...mark(block)}>
+        <div class="block-compare__sides">
+          <BlockPicture
+            picture={block.before}
+            label={block.before.label ?? copy.compare.before}
+          />
+          <BlockPicture
+            picture={block.after}
+            label={block.after.label ?? copy.compare.after}
+          />
         </div>
-      )}
-      {block.type === "compare" && (
-        <figure class="block block-compare" {...mark(block)}>
-          <div class="block-compare__sides">
-            <BlockPicture
-              picture={block.before}
-              label={block.before.label ?? copy.compare.before}
-            />
-            <BlockPicture
-              picture={block.after}
-              label={block.after.label ?? copy.compare.after}
-            />
-          </div>
-          {block.caption && (
-            <figcaption>
-              <Inline text={block.caption} links="plain" />
-            </figcaption>
-          )}
-        </figure>
-      )}
-      {block.type === "embed" && (
-        <figure class="block block-embed" {...mark(block)}>
-          <BlockStage
-            id={stageId(block)}
-            title={named(block)}
-            poster={block.poster}
-            ratio={block.ratio}
-            load={copy.embed.load[block.kind]}
-            close={copy.embed.close}
-            note={copy.embed.note}
-            data-frame={block.frame}
-          >
-            <Link slot="open" href={block.src} arrow>
-              {copy.embed.open[block.kind]}
-            </Link>
-          </BlockStage>
-          {block.caption && (
-            <figcaption>
-              <Inline text={block.caption} links="plain" />
-            </figcaption>
-          )}
-        </figure>
-      )}
-      {block.type === "model" && (
-        <figure class="block block-model" {...mark(block)}>
-          <BlockStage
-            id={stageId(block)}
-            title={named(block)}
-            poster={block.poster}
-            ratio={block.ratio}
-            load={copy.model.load}
-            close={copy.model.close}
-            note={copy.model.note}
-            data-model={block.src}
-            data-format={block.format}
-            data-rotation={block.rotation?.join(",")}
-            data-hint={copy.model.hint}
-            data-failed={copy.model.failed}
-          />
-          {block.caption && (
-            <figcaption>
-              <Inline text={block.caption} links="plain" />
-            </figcaption>
-          )}
-        </figure>
-      )}
-      {block.type === "code" && (
-        <figure class="block block-code" {...mark(block)}>
-          <pre tabindex="0" data-language={block.language}><code set:text={block.code.trimEnd()} /></pre>
-          {block.caption && (
-            <figcaption>
-              <Inline text={block.caption} links="plain" />
-            </figcaption>
-          )}
-        </figure>
-      )}
-      {block.type === "quote" && (
-        <figure class="block block-quote" {...mark(block)}>
-          <blockquote>
-            {block.text
-              .split(/\n\s*\n/)
-              .map((paragraph) => (
-                <p>
-                  <Inline text={paragraph.trim()} links="plain" />
-                </p>
-              ))}
-          </blockquote>
+        {block.caption && (
           <figcaption>
-            <cite>{block.source}</cite>
-            {block.date && (
-              <time datetime={block.date}>{quoteDateLabel(block.date)}</time>
-            )}
+            <Inline text={block.caption} links="plain" />
           </figcaption>
-        </figure>
-      )}
-      {block.type === "steps" && (
-        <ol class="block-steps" {...mark(block)}>
-          {block.items.map((step) => (
-            <li>
-              <div class="block-step">
-                {step.title && <p class="block-step__title">{step.title}</p>}
-                <p>
-                  <Inline text={step.text} links="plain" />
-                </p>
-                {step.image && <BlockPicture picture={step.image} />}
-              </div>
-            </li>
+        )}
+      </figure>
+    )}
+    {block.type === "embed" && (
+      <figure class="block block-embed" {...mark(block)}>
+        <BlockStage
+          id={stageId(block)}
+          title={named(block)}
+          poster={block.poster}
+          ratio={block.ratio}
+          load={copy.embed.load[block.kind]}
+          close={copy.embed.close}
+          note={copy.embed.note}
+          data-frame={block.frame}
+        >
+          <Link slot="open" href={block.src} arrow>
+            {copy.embed.open[block.kind]}
+          </Link>
+        </BlockStage>
+        {block.caption && (
+          <figcaption>
+            <Inline text={block.caption} links="plain" />
+          </figcaption>
+        )}
+      </figure>
+    )}
+    {block.type === "model" && (
+      <figure class="block block-model" {...mark(block)}>
+        <BlockStage
+          id={stageId(block)}
+          title={named(block)}
+          poster={block.poster}
+          ratio={block.ratio}
+          load={copy.model.load}
+          close={copy.model.close}
+          note={copy.model.note}
+          data-model={block.src}
+          data-format={block.format}
+          data-rotation={block.rotation?.join(",")}
+          data-hint={copy.model.hint}
+          data-failed={copy.model.failed}
+        />
+        {block.caption && (
+          <figcaption>
+            <Inline text={block.caption} links="plain" />
+          </figcaption>
+        )}
+      </figure>
+    )}
+    {block.type === "code" && (
+      <figure class="block block-code" {...mark(block)}>
+        <pre
+          tabindex="0"
+          data-language={block.language}
+        ><code set:text={block.code.trimEnd()} /></pre>
+        {block.caption && (
+          <figcaption>
+            <Inline text={block.caption} links="plain" />
+          </figcaption>
+        )}
+      </figure>
+    )}
+    {block.type === "quote" && (
+      <figure class="block block-quote" {...mark(block)}>
+        <blockquote>
+          {block.text.split(/\n\s*\n/).map((paragraph) => (
+            <p>
+              <Inline text={paragraph.trim()} links="plain" />
+            </p>
           ))}
-        </ol>
-      )}
-      {block.type === "tree" && (
-        <figure class="block block-tree" {...mark(block)}>
-          <BlockTree nodes={block.tree} />
-          {block.caption && (
-            <figcaption>
-              <Inline text={block.caption} links="plain" />
-            </figcaption>
+        </blockquote>
+        <figcaption>
+          <cite>{block.source}</cite>
+          {block.date && (
+            <>
+              {", "}
+              <time datetime={block.date}>{quoteDateLabel(block.date)}</time>
+            </>
           )}
-        </figure>
-      )}
-      {block.type === "audio" && (
-        <figure class="block block-audio" {...mark(block)}>
-          <audio
-            controls
-            preload="none"
-            src={block.src}
-            aria-label={named(block)}
-          />
+        </figcaption>
+      </figure>
+    )}
+    {block.type === "steps" && (
+      <ol class="block-steps" {...mark(block)}>
+        {block.items.map((step) => (
+          <li>
+            <div class="block-step">
+              {step.title && <p class="block-step__title">{step.title}</p>}
+              <p>
+                <Inline text={step.text} links="plain" />
+              </p>
+              {step.image && <BlockPicture picture={step.image} />}
+            </div>
+          </li>
+        ))}
+      </ol>
+    )}
+    {block.type === "tree" && (
+      <figure class="block block-tree" {...mark(block)}>
+        <BlockTree nodes={block.tree} />
+        {block.caption && (
           <figcaption>
-            <Inline text={block.caption ?? block.alt ?? ""} links="plain" />
+            <Inline text={block.caption} links="plain" />
           </figcaption>
-        </figure>
-      )}
-      {block.type === "film" && (
-        <figure class="block block-film" {...mark(block)}>
-          <video
-            controls
-            muted
-            playsinline
-            loop={block.loop}
-            preload="metadata"
-            poster={block.poster}
-            aria-label={named(block)}
-            data-block-loop={block.loop ? "" : undefined}
-          >
-            <source src={block.src} />
-          </video>
-          {block.caption && (
-            <figcaption>
-              <Inline text={block.caption} links="plain" />
-            </figcaption>
-          )}
-        </figure>
-      )}
-    </>
-  ))
-}
+        )}
+      </figure>
+    )}
+    {block.type === "audio" && (
+      <figure class="block block-audio" {...mark(block)}>
+        <audio
+          controls
+          preload="none"
+          src={block.src}
+          aria-label={named(block)}
+        />
+        <figcaption>
+          <Inline text={block.caption ?? block.alt ?? ""} links="plain" />
+        </figcaption>
+      </figure>
+    )}
+    {block.type === "film" && (
+      <figure class="block block-film" {...mark(block)}>
+        <video
+          controls
+          muted
+          playsinline
+          loop={block.loop}
+          preload="metadata"
+          poster={block.poster}
+          aria-label={named(block)}
+          data-block-loop={block.loop ? "" : undefined}
+        >
+          <source src={block.src} />
+        </video>
+        {block.caption && (
+          <figcaption>
+            <Inline text={block.caption} links="plain" />
+          </figcaption>
+        )}
+      </figure>
+    )}
+  </>
+))}
 {live && <BlockScript />}

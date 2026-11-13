@@ -132,9 +132,6 @@
   font-family: var(--font-serif);
   font-size: var(--text-lead);
 }
-.block-quote time::before {
-  content: ", ";
-}
 /* The list keeps its own numbers. */
 .prose .block-steps > li + li {
   margin-top: var(--space-m);
