@@ -1,6 +1,4 @@
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
 import test from "node:test";
 import { BLOCK_TYPES } from "../../src/lib/blocks.ts";
 import { BLOCK_GAPS, expectedParts, isGap } from "../../src/prism/parity.ts";
@@ -176,18 +174,14 @@ test("Daylight draws every block; each other lens records the gap and its design
     assert.equal(isGap("daylight", "lab-entry", part), false, part);
 });
 
-test("no lens shell reads a page's blocks yet, so none can trip on one it does not know", () => {
-  // The design passes change this, and then the browser parity test on the
-  // `lab-blocks` fixture is what holds them to it.
-  const walk = (dir) =>
-    readdirSync(dir, { withFileTypes: true }).flatMap((item) =>
-      item.isDirectory() ? walk(join(dir, item.name)) : [join(dir, item.name)],
-    );
-  const readers = walk("src/prism/shells")
-    .filter((path) => path.endsWith(".ts") && !path.endsWith("types.ts"))
-    .filter((path) => /\.blocks\b/.test(readFileSync(path, "utf8")));
-  const gapped = Object.values(BLOCK_GAPS).every(
-    (gap) => gap.parts.length === BLOCK_PARTS.length,
+test("a kind of block the contract has not heard of is owed by no lens", () => {
+  // What the shells do with one is a browser test (blocks.browser.mjs, on
+  // the `lab-blocks` harness fixture): they show the prose and pass over it.
+  const later = { type: "hologram", name: "from-later", caption: "Later." };
+  const only = { ...content, lab: [{ ...content.lab[0], blocks: [later] }] };
+  assert.deepEqual(
+    expectedParts({ kind: "lab-entry", path: "/lab/lotus", slug: "lotus" }, only)
+      .map((want) => want.part),
+    ["lab.title", "lab.summary", "lab.body"],
   );
-  if (gapped) assert.deepEqual(readers, []);
 });
