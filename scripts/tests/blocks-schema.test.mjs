@@ -33,10 +33,9 @@ test("a gallery is pictures, each with its own words", () => {
     "blocks.it.items: A gallery shows at least one picture.",
   ]);
   assert.deepEqual(said({ type: "gallery" }), ["blocks.it.items: Required"]);
-  assert.deepEqual(
-    said({ type: "gallery", items: [picture], columns: 3 }),
-    ["blocks.it: Unrecognized key(s) in object: 'columns'"],
-  );
+  assert.deepEqual(said({ type: "gallery", items: [picture], columns: 3 }), [
+    "blocks.it: Unrecognized key(s) in object: 'columns'",
+  ]);
   assert.deepEqual(
     said({ type: "gallery", items: [{ ...picture, credit: "Someone" }] }),
     ["blocks.it.items.0: Unrecognized key(s) in object: 'credit'"],
@@ -84,7 +83,10 @@ test("an embed is a Pen, a demo or a deck, and where it lives", () => {
     caption: "The talk's slides.",
     ratio: "16/9",
   });
-  assert.match(said({ ...pen, kind: "tweet" }).join("\n"), /^blocks\.it\.kind: /);
+  assert.match(
+    said({ ...pen, kind: "tweet" }).join("\n"),
+    /^blocks\.it\.kind: /,
+  );
   assert.deepEqual(said({ ...pen, src: "https://example.com/not-a-pen" }), [
     "blocks.it.src: A Pen is named by its address: https://codepen.io/<user>/pen/<id>.",
   ]);
@@ -276,7 +278,10 @@ test("a film is a short clip that may loop, with a poster", () => {
     poster: "/images/lab/motion-path-graph.svg",
     caption: "It plays on a loop.",
   });
-  assert.match(said({ ...film, loop: "yes" }).join("\n"), /^blocks\.it\.loop: /);
+  assert.match(
+    said({ ...film, loop: "yes" }).join("\n"),
+    /^blocks\.it\.loop: /,
+  );
   assert.deepEqual(said({ ...film, controls: false }), [
     "blocks.it: Unrecognized key(s) in object: 'controls'",
   ]);

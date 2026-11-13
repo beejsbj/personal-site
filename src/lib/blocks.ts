@@ -156,10 +156,18 @@ export function parseTree(source: string): TreeNode[] {
 /** A line of a rendered body that places a block: `::name`, alone in its
  * paragraph. */
 const PLACED = /<p(?:\s[^>]*)?>::([a-z][a-z0-9-]*)<\/p>/g;
+/** What a paragraph may sit inside. Cutting the body there would leave
+ * the prose on each side with half of it. */
+const HOLDER = "blockquote|ul|ol|li|table|details|div|section";
+const HOLDER_OPENS = new RegExp(`<(?:${HOLDER})\\b`, "g");
+const HOLDER_CLOSES = new RegExp(`</(?:${HOLDER})>`, "g");
 
 /** A block as a lens is handed it: as written, with its name and what the
  * site works out for it (a Pen's frame, a model's format). */
-function named(name: string, block: BlockData): Exclude<Block, { type: "text" }> {
+function named(
+  name: string,
+  block: BlockData,
+): Exclude<Block, { type: "text" }> {
   switch (block.type) {
     case "embed":
       return {
@@ -202,7 +210,15 @@ export function placeBlocks(
     if (placed.has(name))
       throw new Error(`The block "${name}" is placed twice in ${where}.`);
     placed.add(name);
-    prose(html.slice(last, match.index));
+    const before = html.slice(last, match.index);
+    if (
+      (before.match(HOLDER_OPENS)?.length ?? 0) !==
+      (before.match(HOLDER_CLOSES)?.length ?? 0)
+    )
+      throw new Error(
+        `::${name} is inside a list or a quote in ${where}: a block is placed by a line of its own.`,
+      );
+    prose(before);
     page.push(named(name, blocks[name]));
     last = match.index + line.length;
   }
@@ -215,7 +231,9 @@ export function placeBlocks(
 /** A page's prose alone, as one rendered body: what a lens that reads
  * `html` shows, and what every lens showed before there were blocks. */
 export const proseHtml = (page: Block[]): string =>
-  page.flatMap((block) => (block.type === "text" ? [block.html] : [])).join("\n");
+  page
+    .flatMap((block) => (block.type === "text" ? [block.html] : []))
+    .join("\n");
 
 const MONTHS = [
   "Jan",
