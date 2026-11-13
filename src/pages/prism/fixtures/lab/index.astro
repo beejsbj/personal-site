@@ -131,6 +131,7 @@ if (!labbook) return new Response("No such Labbook.", { status: 404 });
       labels={{ kinds: site.updateKinds, sources: site.updateSources }}
       shown={{ ...relatable, lab: room }}
       penUser={penUser(site)}
+      at={`${Astro.url.pathname}${Astro.url.search}`}
     />
   </LabRoom>
 </BaseLayout>

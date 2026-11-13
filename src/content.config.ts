@@ -353,6 +353,16 @@ const pageSchema = z.object({
       title: z.string(),
       note: z.string(),
       listLabel: z.string(),
+      /** Narrowing it to one experiment or project: what the links to
+       * each are called together, what it says while narrowed, the way
+       * back to every entry, and how many entries one has, said aloud
+       * (`{count}` is the number). */
+      narrow: z.object({
+        label: z.string(),
+        showing: z.string(),
+        all: z.string(),
+        count: z.object({ one: z.string(), other: z.string() }),
+      }),
       /** What introduces the experiment or project an update is about. */
       related: z.object({ experiment: z.string(), project: z.string() }),
       artifact: z.object({
