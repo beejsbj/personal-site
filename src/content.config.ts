@@ -439,13 +439,27 @@ const labSchema = z
     /** The live experiment, when it lives elsewhere: the entry links straight
      * out and has no page here. */
     href: z.string().url().optional(),
+    /** That `href` may be played where its card sits in the Lab, in a frame
+     * (src/lib/labbook.ts, `labPreview`). A Pen needs no word: it is told by
+     * its address. Any other page is never framed unless it is said here, and
+     * `false` keeps a Pen from being. */
+    embeddable: z.boolean().optional(),
     links: z.array(linkSchema).default([]),
     media: z.array(mediaSchema).default([]),
     blocks: blocksSchema,
     order: z.number().default(100),
     hidden: z.boolean().default(false),
   })
-  .strict();
+  .strict()
+  .superRefine((entry, context) => {
+    if (entry.embeddable && !entry.href?.startsWith("https://"))
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["embeddable"],
+        message:
+          "A page can be framed only if the entry links out: give it an https:// href.",
+      });
+  });
 
 const UPDATE_KINDS = [
   "project",

@@ -206,6 +206,24 @@ export function embedSrc(
   return artifact.kind === "demo" ? artifact.src : undefined;
 }
 
+/** The kinds of Pen address that are one Pen. A page of Pens, a collection
+ * and a profile are not. */
+const A_PEN = /^https:\/\/codepen\.io\/[\w-]+\/(?:pen|full|fullpage|details|embed)\/\w+/;
+
+/** What a Lab entry's card loads in place of its still, once the visitor
+ * asks for it; nothing for an entry that is not played in place. A Pen is
+ * told by its `href` (its embed address); any other page only when the
+ * entry says `embeddable`, so nothing is framed by accident. */
+export function labPreview(entry: {
+  href?: string;
+  embeddable?: boolean;
+}): string | undefined {
+  const { href, embeddable } = entry;
+  if (!href?.startsWith("https://")) return undefined;
+  if (A_PEN.test(href)) return embeddable === false ? undefined : penEmbedSrc(href);
+  return embeddable ? href : undefined;
+}
+
 /** Something an update is about, as a link to it. */
 export type RelatedLink = {
   kind: "experiment" | "project";
