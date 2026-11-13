@@ -113,7 +113,7 @@ test("every file a project on show or a fixture experiment names is in public/ t
     "/prism/fixtures/cloud.splat",
     "/prism/fixtures/film.webm",
     "/prism/fixtures/tone.wav",
-    "/prism/fixtures/demo.html",
+    "/prism/fixtures/demo.svg",
   ])
     assert.ok(named(fixture).includes(file), `the check sees ${file}`);
 });

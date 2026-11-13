@@ -39,7 +39,7 @@ blocks:
   the-demo:
     type: embed
     kind: demo
-    src: /prism/fixtures/demo.html
+    src: /prism/fixtures/demo.svg
     alt: A demo that says it is running
     ratio: 16/9
   cube:

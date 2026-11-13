@@ -115,7 +115,7 @@ test("an experiment written with every block is carried in the order its body pl
     poster: "/images/lab/motion-path-graph.svg",
     caption: "The Pen itself. It draws when it loads.",
   });
-  assert.equal(named["the-demo"].frame, "/prism/fixtures/demo.html");
+  assert.equal(named["the-demo"].frame, "/prism/fixtures/demo.svg");
   assert.equal(named.cube.format, "glb");
   assert.deepEqual(
     [named.cloud.format, named.cloud.rotation, named.cloud.ratio],

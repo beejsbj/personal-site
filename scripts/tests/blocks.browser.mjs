@@ -36,7 +36,7 @@ const SHOTS = process.env.BLOCK_SHOTS;
 /** What a request asks for that only a pressed embed or model may: a
  * frame's page, a model's file, or the viewer. */
 const LIVE =
-  /\/prism\/fixtures\/(demo\.html|cube\.glb|cloud\.splat)|codepen\.io|model-viewer|spark|three/;
+  /\/prism\/fixtures\/(demo\.svg|cube\.glb|cloud\.splat)|codepen\.io|model-viewer|spark|three/;
 
 /** The blocks Daylight shows, as a visitor finds them. */
 const read = (page) =>
@@ -286,7 +286,7 @@ test(
             await frame.waitFor();
             assert.equal(
               await frame.getAttribute("src"),
-              "/prism/fixtures/demo.html",
+              "/prism/fixtures/demo.svg",
             );
             assert.equal(await button.getAttribute("aria-pressed"), "true");
             assert.equal(await button.textContent(), copy.embed.close);
@@ -294,7 +294,7 @@ test(
               .frameLocator(`[data-ref="${SLUG}/the-demo"] iframe`)
               .getByText("The fixture demo is running.")
               .waitFor();
-            assert.ok(asked.some((url) => url.endsWith("/demo.html")));
+            assert.ok(asked.some((url) => url.endsWith("/demo.svg")));
 
             // A second press puts it away, and its words come back.
             await page.keyboard.press(" ");
