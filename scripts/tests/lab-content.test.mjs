@@ -100,3 +100,86 @@ test("Cockpit is not an experiment: the Lab has no entry for it", () => {
     "an experiment titled Cockpit",
   );
 });
+
+test("Strudel tools are two entries, Melograph and midi-strudel, each with its own picture", () => {
+  const slugs = entries.map((entry) => entry.slug);
+  assert.ok(
+    !slugs.some((slug) => slug.startsWith("strudel")),
+    "the one Strudel entry is still there",
+  );
+
+  const mediaOf = (entry) =>
+    [...entry.frontmatter.matchAll(/^\s+src:\s*"?(.*?)"?\s*$/gm)].map(
+      ([, src]) => src,
+    );
+  const expected = {
+    melograph: {
+      title: "Melograph",
+      live: "https://melograph-swart.vercel.app",
+      source: "https://github.com/beejsbj/melograph",
+    },
+    "midi-strudel": {
+      title: "midi-strudel",
+      live: "https://midi-strudel.vercel.app",
+      source: "https://github.com/beejsbj/midi-strudel",
+    },
+  };
+
+  const pictures = [];
+  for (const [slug, { title, live, source }] of Object.entries(expected)) {
+    const entry = entries.find((item) => item.slug === slug);
+    assert.ok(entry, `${slug}: no entry`);
+    assert.equal(entry.field("title"), title, `${slug}: title`);
+    assert.ok(entry.field("summary"), `${slug}: no summary`);
+    assert.ok(entry.body, `${slug}: no page`);
+    assert.ok(
+      entry.frontmatter.includes(`url: "${live}"`),
+      `${slug}: live link`,
+    );
+    assert.ok(
+      entry.frontmatter.includes(`url: "${source}"`),
+      `${slug}: source link`,
+    );
+    // Each tool names only itself, and its cover is the one picture it has.
+    for (const other of Object.values(expected).filter(
+      (o) => o.title !== title,
+    ))
+      for (const url of [other.live, other.source])
+        assert.ok(!entry.frontmatter.includes(url), `${slug}: links to ${url}`);
+    const cover = entry.field("cover");
+    assert.ok(cover, `${slug}: no cover`);
+    assert.deepEqual(
+      mediaOf(entry),
+      [cover],
+      `${slug}: its picture is its cover`,
+    );
+    pictures.push(cover);
+  }
+  assert.equal(
+    new Set(pictures).size,
+    pictures.length,
+    "the two share a picture",
+  );
+});
+
+test("Meditejo says its art is drawn by code", () => {
+  const meditejo = entries.find((entry) => entry.slug === "meditejo");
+  const summary = meditejo.field("summary");
+  assert.match(summary, /drawn by code/i, "its summary");
+  assert.match(meditejo.body, /drawn by code/i, "its body");
+  assert.doesNotMatch(
+    `${meditejo.frontmatter}\n${meditejo.body}`,
+    /generated (art|mark)|\bAI\b/i,
+    "meditejo: its art is called generated, or AI",
+  );
+});
+
+test("no experiment calls code-made work 'generated' without saying by what", () => {
+  for (const entry of entries) {
+    const text = `${entry.frontmatter}\n${entry.body}`;
+    for (const [phrase] of text.matchAll(
+      /\bgenerat(?:ed|ive)\b(?!\s+by\b)[^.\n]{0,30}/gi,
+    ))
+      assert.fail(`${entry.slug}: "${phrase.trim()}" does not say by what`);
+  }
+});

@@ -223,7 +223,8 @@ test("content.json carries the Labbook and where each experiment sits, and no he
     assert.deepEqual(
       data.lab.map((entry) => [entry.slug, entry.place]),
       [
-        ["strudel-tools", "bench"],
+        ["melograph", "bench"],
+        ["midi-strudel", "bench"],
         ["clockwork-observatory", "bench"],
         ["films-from-code", "bench"],
         ["undertext", "bench"],
