@@ -24,6 +24,7 @@ export default defineConfig({
     "/lab/garden": "/projects/garden",
     "/lab/flashcards": "/projects/flashcards",
     "/lab/style-guide": "/style-guide",
+    "/lab/strudel-tools": "/lab/melograph",
   },
   integrations: [
     sitemap({
