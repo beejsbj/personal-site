@@ -7,7 +7,9 @@
  *
  * Refs: `page.*` take the page id (home, about, resume, projects, lab,
  * not-found); `project.*` and `lab.*` the entry slug; `update.*` the
- * update id; `resume.*` the entry id from content.json; `home.elsewhere`
+ * update id; `labbook.month` the month ("2026-09"); `labbook.subject` the
+ * kind and slug of what it narrows to ("experiment:lotus"); `resume.*` the
+ * entry id from content.json; `home.elsewhere`
  * the item's index; `block.*` the entry's slug and the block's name
  * (`blockRef`).
  *
@@ -57,6 +59,10 @@ export const PARTS = [
   // one update in a list of them, and one that is redacted: its shape alone
   "update.item",
   "update.redacted",
+  // the Labbook kept as a notebook: a month's heading, and a way to narrow
+  // it to one experiment or project
+  "labbook.month",
+  "labbook.subject",
   // a block of a project's or an experiment's page, by its type
   "block.gallery",
   "block.compare",

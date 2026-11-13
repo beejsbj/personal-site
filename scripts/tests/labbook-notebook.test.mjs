@@ -8,6 +8,8 @@ import {
   narrowHref,
   subjectsOf,
 } from "../../src/lib/labbook.ts";
+import { expectedParts, GAPS, isGap } from "../../src/prism/parity.ts";
+import { PARTS } from "../../src/prism/parts.ts";
 
 // The rules behind the Labbook as a notebook (issue #134): its months, the
 // experiments and projects it can be narrowed to, and how the narrowing is
@@ -215,4 +217,65 @@ test("the address is read back the same way", () => {
     kind: "experiment",
     slug: "lotus",
   });
+});
+
+// As little of /prism/content.json as the Lab's route reads.
+const content = {
+  pages: {
+    lab: {
+      header: { title: "Small things.", intro: "My workshop." },
+      more: { label: "More sketches" },
+      aside: "Looking for more?",
+    },
+  },
+  projects: shown.projects,
+  lab: shown.lab.map((entry) => ({ ...entry, summary: "A try." })),
+  labbook: [
+    update("ring", "2026-09-26", { relatedProject: "dayshaper" }),
+    kept("hidden-petal", "2026-09-20", { relatedExperiment: "lotus" }),
+    update("first-petal", "2026-07-02", { relatedExperiment: "lotus" }),
+    update("plain", "2026-06-27"),
+  ],
+};
+const owed = (part) =>
+  expectedParts({ kind: "lab", path: "/lab" }, content)
+    .filter((expectation) => expectation.part === part)
+    .map(({ ref, texts }) => ({ ref, texts }));
+
+test("the Lab owes a heading for each month of the Labbook, named in full", () => {
+  assert.ok(PARTS.includes("labbook.month"));
+  assert.deepEqual(owed("labbook.month"), [
+    { ref: "2026-09", texts: ["September 2026"] },
+    { ref: "2026-07", texts: ["July 2026"] },
+    { ref: "2026-06", texts: ["June 2026"] },
+  ]);
+});
+
+test("the Lab owes a way to narrow the Labbook to each thing it is about", () => {
+  assert.ok(PARTS.includes("labbook.subject"));
+  assert.deepEqual(owed("labbook.subject"), [
+    { ref: "project:dayshaper", texts: ["Dayshaper"] },
+    { ref: "experiment:lotus", texts: ["Lotus"] },
+  ]);
+});
+
+test("Daylight groups and narrows the Labbook; each other lens says which design pass will", () => {
+  const passes = {
+    "calling-card": "#129",
+    "cut-paper": "#130",
+    "back-page": "#131",
+    hion: "#132",
+  };
+  for (const part of ["labbook.month", "labbook.subject"]) {
+    assert.equal(isGap("daylight", "lab", part), false, `daylight ${part}`);
+    for (const [lens, ticket] of Object.entries(passes)) {
+      assert.equal(isGap(lens, "lab", part), true, `${lens} ${part}`);
+      assert.match(GAPS[lens].lab[part], new RegExp(ticket), `${lens} ${part}`);
+    }
+  }
+  // Every update stays owed by every lens: a gap here is the grouping and
+  // the narrowing, never the record.
+  for (const lens of ["daylight", ...Object.keys(passes)])
+    for (const part of ["update.item", "update.redacted"])
+      assert.equal(isGap(lens, "lab", part), false, `${lens} ${part}`);
 });

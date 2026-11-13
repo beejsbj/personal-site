@@ -7,10 +7,12 @@
  * knowingly leaves out, so a gap is a decision written down rather than a
  * drift nobody saw.
  *
- * No runtime imports: Node (the tests), Astro (the atlas) and the browser
- * (the harness) all load it. */
+ * Node (the tests), Astro (the atlas) and the browser (the harness) all
+ * load it, so its one runtime import is the Labbook's pure rules, by their
+ * file name. */
 import type { Part } from "./parts";
 import type { Block, RouteKind, SiteContent, TreeNode } from "./shells/types";
+import { labbookMonths, labbookSubjects, monthLabel } from "../lib/labbook.ts";
 
 export type LensId =
   "daylight" | "calling-card" | "cut-paper" | "back-page" | "hion";
@@ -256,6 +258,21 @@ export function expectedParts(
             ? page("update.item", u.id, u.title)
             : page("update.redacted", u.id),
         ),
+        // kept by month, each under its heading, and narrowed to one
+        // experiment or project by a link naming it
+        ...labbookMonths(content.labbook).map(({ month }) =>
+          page("labbook.month", month, monthLabel(month)),
+        ),
+        ...labbookSubjects(content.labbook, {
+          lab: content.lab,
+          projects: content.projects,
+        }).map((subject) =>
+          page(
+            "labbook.subject",
+            `${subject.kind}:${subject.slug}`,
+            subject.title,
+          ),
+        ),
         { part: "lab.more", texts: [pages.lab.more.label] },
         { part: "lab.aside", texts: [words(pages.lab.aside)] },
       ];
@@ -381,12 +398,22 @@ export const GAPS: Partial<
         "The request board shows only the experiments; it has no link out to more sketches on CodePen.",
       "lab.aside":
         "The request board has no aside pointing to Projects and the Style Guide; Projects is a tab.",
+      "labbook.month":
+        "Calling Card's Labbook is one list, not yet kept by month: its design pass (#129) draws the months.",
+      "labbook.subject":
+        "Calling Card's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#129) adds it. With either in the address it shows every update, as before.",
     },
   },
   "cut-paper": {
     home: {
       "home.elsewhere":
         "No Elsewhere section: Lab and Writing are keys on the keyboard, without their blurbs.",
+    },
+    lab: {
+      "labbook.month":
+        "Cut Paper's Labbook is one list, not yet kept by month: its design pass (#130) draws the months.",
+      "labbook.subject":
+        "Cut Paper's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#130) adds it. With either in the address it shows every update, as before.",
     },
   },
   "back-page": {
@@ -403,6 +430,18 @@ export const GAPS: Partial<
         "The lab book has no link out to more sketches; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
         "The lab book has no aside; Projects is a book of its own on the pile, and the style guide is not in any book.",
+      "labbook.month":
+        "Back Page's Labbook is one list, not yet kept by month: its design pass (#131) draws the months.",
+      "labbook.subject":
+        "Back Page's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#131) adds it. With either in the address it shows every update, as before.",
+    },
+  },
+  hion: {
+    lab: {
+      "labbook.month":
+        "Hion's Labbook is one list, not yet kept by month: its design pass (#132) draws the months.",
+      "labbook.subject":
+        "Hion's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#132) adds it. With either in the address it shows every update, as before.",
     },
   },
 };
