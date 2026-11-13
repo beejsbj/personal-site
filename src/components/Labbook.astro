@@ -115,7 +115,8 @@ const about = (update: Update) =>
       </nav>
     )}
     <p class="labbook-narrowed" data-labbook-narrowed tabindex="-1" hidden>
-      {copy.narrow.showing} <strong data-labbook-narrowed-to></strong>.{" "}
+      {`${copy.narrow.showing} `}
+      <strong data-labbook-narrowed-to></strong>.{" "}
       <Link
         href={narrowHref(undefined, at)}
         data-no-cover=""
@@ -390,9 +391,10 @@ const about = (update: Update) =>
   .labbook-narrowed strong {
     color: var(--color-accent);
   }
-  .labbook-narrowed:focus-visible {
-    outline: var(--focus-width) solid var(--color-accent);
-    outline-offset: var(--focus-offset);
+  /* It takes the focus after a narrowing only so it is read first; the
+     next Tab is the way back, which shows its own focus. */
+  .labbook-narrowed:focus {
+    outline: none;
   }
 
   /* Months are chapters: each ruled off from the one before, its name

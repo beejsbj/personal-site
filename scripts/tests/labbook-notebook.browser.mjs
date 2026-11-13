@@ -428,7 +428,12 @@ test(
                 book.status?.includes(QUIET.title),
                 `${when}: it says what it is narrowed to (${book.status})`,
               );
-              assert.ok(book.status.includes(copy.narrow.all));
+              assert.ok(
+                book.status.startsWith(
+                  `${copy.narrow.showing} ${QUIET.title}. ${copy.narrow.all}`,
+                ),
+                `${when}: it reads as written (${book.status})`,
+              );
               assert.deepEqual(
                 book.subjects.map(({ ref, current }) => [ref, current]),
                 [
