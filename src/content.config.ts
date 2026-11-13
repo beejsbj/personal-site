@@ -377,6 +377,16 @@ const pageSchema = z.object({
       }),
     })
     .optional(),
+  /** What a card on the list says for the way to play an experiment where
+   * it stands: to ask for it, to put it away, and while it loads. */
+  preview: z
+    .object({
+      load: z.object({ pen: z.string(), demo: z.string() }),
+      close: z.string(),
+      note: z.string(),
+      loading: z.string(),
+    })
+    .optional(),
   /** Copy for each entry's own page. */
   entry: z
     .object({

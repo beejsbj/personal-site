@@ -270,6 +270,7 @@ export async function getLabPage() {
     aside: need(data.aside, "aside in pages/lab.md"),
     places: need(data.places, "places in pages/lab.md"),
     labbook: need(data.labbook, "labbook in pages/lab.md"),
+    preview: need(data.preview, "preview in pages/lab.md"),
     detail: {
       eyebrow: need(detail.eyebrow, "entry.eyebrow in pages/lab.md"),
       back: resolveLink(site, need(detail.back, "entry.back in pages/lab.md")),

@@ -249,6 +249,15 @@ export function expectedParts(
         ...content.lab.flatMap((entry) => [
           page("lab.title", entry.slug, entry.title),
           page("lab.summary", entry.slug, entry.summary),
+          ...(entry.preview
+            ? [
+                page(
+                  "lab.preview",
+                  entry.slug,
+                  pages.lab.preview.load[entry.preview.kind],
+                ),
+              ]
+            : []),
         ]),
         // the Labbook: every update, a redacted one by its place alone
         ...content.labbook.map((u) =>
@@ -377,6 +386,8 @@ export const GAPS: Partial<
         "No Elsewhere list on the pause menu: Writing is a command and the socials are on the Calling Card dialog, without blurbs.",
     },
     lab: {
+      "lab.preview":
+        "The request board lists the experiments with no way to play one where it stands until its design pass draws it (#129); each still links out to where it lives.",
       "lab.more":
         "The request board shows only the experiments; it has no link out to more sketches on CodePen.",
       "lab.aside":
@@ -387,6 +398,10 @@ export const GAPS: Partial<
     home: {
       "home.elsewhere":
         "No Elsewhere section: Lab and Writing are keys on the keyboard, without their blurbs.",
+    },
+    lab: {
+      "lab.preview":
+        "The cut-paper Lab lists the experiments with no way to play one where it stands until its design pass draws it (#130); each still links out to where it lives.",
     },
   },
   "back-page": {
@@ -399,10 +414,18 @@ export const GAPS: Partial<
         "The war book's first pages are a roll call of names and dates and the war map; each project's summary is on its own page.",
     },
     lab: {
+      "lab.preview":
+        "The lab book lists the experiments with no way to play one where it stands until its design pass draws it (#131); each still links out to where it lives.",
       "lab.more":
         "The lab book has no link out to more sketches; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
         "The lab book has no aside; Projects is a book of its own on the pile, and the style guide is not in any book.",
+    },
+  },
+  hion: {
+    lab: {
+      "lab.preview":
+        "Hion lists the experiments with no way to play one where it stands until its design pass draws it (#132); each still links out to where it lives.",
     },
   },
 };

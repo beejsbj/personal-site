@@ -208,7 +208,11 @@ export function embedSrc(
 
 /** The kinds of Pen address that are one Pen. A page of Pens, a collection
  * and a profile are not. */
-const A_PEN = /^https:\/\/codepen\.io\/[\w-]+\/(?:pen|full|fullpage|details|embed)\/\w+/;
+const A_PEN =
+  /^https:\/\/codepen\.io\/[\w-]+\/(?:pen|full|fullpage|details|embed)\/\w+/;
+
+/** Whether an address is one Pen's. */
+export const isPen = (href: string) => A_PEN.test(href);
 
 /** What a Lab entry's card loads in place of its still, once the visitor
  * asks for it; nothing for an entry that is not played in place. A Pen is
@@ -220,7 +224,8 @@ export function labPreview(entry: {
 }): string | undefined {
   const { href, embeddable } = entry;
   if (!href?.startsWith("https://")) return undefined;
-  if (A_PEN.test(href)) return embeddable === false ? undefined : penEmbedSrc(href);
+  if (A_PEN.test(href))
+    return embeddable === false ? undefined : penEmbedSrc(href);
   return embeddable ? href : undefined;
 }
 

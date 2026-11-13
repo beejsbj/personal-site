@@ -18,7 +18,10 @@ const pen = "https://codepen.io/beejsbj/pen/abXZWLQ";
 
 test("an entry may say its demo can be played in place, and only a link out can say so", () => {
   assert.deepEqual(
-    problems("lab", experiment({ href: "https://demo.example", embeddable: true })),
+    problems(
+      "lab",
+      experiment({ href: "https://demo.example", embeddable: true }),
+    ),
     [],
   );
   assert.equal(
@@ -30,7 +33,10 @@ test("an entry may say its demo can be played in place, and only a link out can 
     "embeddable: A page can be framed only if the entry links out: give it an https:// href.",
   ]);
   assert.deepEqual(
-    problems("lab", experiment({ href: "http://demo.example", embeddable: true })),
+    problems(
+      "lab",
+      experiment({ href: "http://demo.example", embeddable: true }),
+    ),
     [
       "embeddable: A page can be framed only if the entry links out: give it an https:// href.",
     ],

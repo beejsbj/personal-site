@@ -46,6 +46,8 @@ export const PARTS = [
   "lab.graduation",
   "lab.more",
   "lab.aside",
+  // the way to play an experiment where its card stands on the Lab page
+  "lab.preview",
   // public writing entries from the runtime source
   "writing.title",
   "writing.summary",
