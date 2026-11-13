@@ -1,7 +1,9 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Blocks from "../../components/Blocks.astro";
 import ExperimentPage from "../../components/ExperimentPage.astro";
+import { pageBody } from "../../lib/body";
 import { experimentUpdates } from "../../lib/labbook";
 import {
   getLab,
@@ -25,13 +27,14 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const labEntry = entry as CollectionEntry<"lab">;
 const { slug, data } = labEntry;
-const { Content } = await labEntry.render();
-const [site, { detail, labbook: book }, labbook, projects] = await Promise.all([
-  getSite(),
-  getLabPage(),
-  getLabbook(),
-  getProjects(),
-]);
+const [site, { detail, labbook: book }, labbook, projects, { blocks }] =
+  await Promise.all([
+    getSite(),
+    getLabPage(),
+    getLabbook(),
+    getProjects(),
+    pageBody(labEntry),
+  ]);
 const project = graduatedProject(data, projects);
 ---
 
@@ -55,6 +58,6 @@ const project = graduatedProject(data, projects);
     updateLabels={{ kinds: site.updateKinds, sources: site.updateSources }}
     redacted={book.redacted}
   >
-    <Content />
+    <Blocks blocks={blocks} slug={slug} copy={site.blocks} />
   </ExperimentPage>
 </BaseLayout>

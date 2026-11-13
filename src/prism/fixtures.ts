@@ -19,6 +19,7 @@ import {
 import { labbookFixture, REDACTION_MARKER } from "./labbook-fixture";
 import type { RouteRef } from "./parity";
 import type {
+  Block,
   LabEntry,
   Project,
   ResumeEntry,
@@ -29,9 +30,18 @@ import type {
 export interface Fixture {
   name: string;
   about: string;
-  apply(content: SiteContent): SiteContent;
+  /** One that needs something the site built (a fixture written as content
+   * is) fetches it first. */
+  apply(content: SiteContent): SiteContent | Promise<SiteContent>;
   routes(content: SiteContent): RouteRef[];
 }
+
+/** A page that is prose and nothing else: its body, and the same as the
+ * one block it is. */
+const prose = (html: string): { html: string; blocks: Block[] } => ({
+  html,
+  blocks: [{ type: "text", html }],
+});
 
 const projectRoute = (p: Project): RouteRef => ({
   kind: "project",
@@ -76,7 +86,7 @@ function project(base: SiteContent, over: Partial<Project>): Project {
     media: [],
     tags: [],
     order: 0,
-    html: "<p>Only the harness has seen this one.</p>",
+    ...prose("<p>Only the harness has seen this one.</p>"),
     ...over,
   };
 }
@@ -176,7 +186,9 @@ const sketch: ExperimentFixture = {
     links: [{ label: "Source", url: "https://example.com/source" }],
     media: [],
     order: 99,
-    html: "<h2>How it works</h2><p>A paragraph about the sketch.</p><ul><li>One thing</li><li>Another thing</li></ul>",
+    ...prose(
+      "<h2>How it works</h2><p>A paragraph about the sketch.</p><ul><li>One thing</li><li>Another thing</li></ul>",
+    ),
   },
   labbook: [],
 };
@@ -194,7 +206,7 @@ const poster: ExperimentFixture = {
     links: [],
     media: [],
     order: 97,
-    html: "<p>One paragraph, and the cover for a picture.</p>",
+    ...prose("<p>One paragraph, and the cover for a picture.</p>"),
   },
   labbook: [],
 };
@@ -245,7 +257,9 @@ function study(project: string): ExperimentFixture {
         },
       ],
       order: 98,
-      html: "<h2>How it was made</h2><p>A paragraph about measuring each path before drawing it.</p><ul><li>Measure the path</li><li>Draw it over time</li></ul><h2>What it taught me</h2><p>A closing paragraph about what carried over.</p>",
+      ...prose(
+        "<h2>How it was made</h2><p>A paragraph about measuring each path before drawing it.</p><ul><li>Measure the path</li><li>Draw it over time</li></ul><h2>What it taught me</h2><p>A closing paragraph about what carried over.</p>",
+      ),
     },
     labbook: [
       {
@@ -337,6 +351,22 @@ const labEntryRoute = ({ entry }: ExperimentFixture): RouteRef => ({
   path: entry.detail,
   slug: entry.slug,
 });
+
+/** The experiment told with every block there is, written as a real one
+ * is (src/content/fixtures/fixture-blocks.md) and carried as
+ * /prism/content.json would carry it. Daylight's page on it is
+ * /prism/fixtures/lab/fixture-blocks. */
+const BLOCKS_SLUG = "fixture-blocks";
+const BLOCKS_FIXTURE = `/prism/fixtures/lab/${BLOCKS_SLUG}.json`;
+
+/** As a later site might send it: a kind of block no lens here has heard
+ * of. A lens passes over it. */
+const UNHEARD_OF = {
+  type: "hologram",
+  name: "from-later",
+  src: "/prism/fixtures/cube.glb",
+  caption: "A kind of block that does not exist yet.",
+} as unknown as Block;
 
 const LONG_TITLE =
   "A project whose title runs on and on, far past where any layout expects a title to stop";
@@ -555,6 +585,21 @@ export const FIXTURES: Record<string, Fixture> = {
       withExperiment(content, study(content.projects[0]?.slug ?? "")),
     routes: (content) => [
       labEntryRoute(study(content.projects[0]?.slug ?? "")),
+    ],
+  },
+  "lab-blocks": {
+    name: "lab-blocks",
+    about:
+      "An experiment told with every block there is (a gallery, a compare, embeds, models, code, a quote, steps, a tree, a sound and films), and one of a kind no lens has heard of.",
+    async apply(content) {
+      const entry: LabEntry = await (await fetch(BLOCKS_FIXTURE)).json();
+      return withExperiment(content, {
+        entry: { ...entry, blocks: [...entry.blocks, UNHEARD_OF] },
+        labbook: [],
+      });
+    },
+    routes: () => [
+      { kind: "lab-entry", path: `/lab/${BLOCKS_SLUG}`, slug: BLOCKS_SLUG },
     ],
   },
   labbook: {

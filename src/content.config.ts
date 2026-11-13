@@ -619,6 +619,27 @@ const siteSchema = z.object({
   /** How each kind and source of update is named. */
   updateKinds: z.record(z.enum(UPDATE_KINDS), z.string()),
   updateSources: z.record(z.enum(UPDATE_SOURCES), z.string()),
+  /** What a page's blocks say for themselves: which side of a compare is
+   * which, and what asks for an embed or a model to load, goes to where
+   * an embed lives instead, and puts either away again. */
+  blocks: z.object({
+    compare: z.object({ before: z.string(), after: z.string() }),
+    embed: z.object({
+      load: z.object({ pen: z.string(), demo: z.string(), deck: z.string() }),
+      open: z.object({ pen: z.string(), demo: z.string(), deck: z.string() }),
+      close: z.string(),
+      note: z.string(),
+    }),
+    model: z.object({
+      load: z.string(),
+      close: z.string(),
+      note: z.string(),
+      /** How the viewer is handled, said once it is showing. */
+      hint: z.string(),
+      /** Said when the viewer cannot show the model. */
+      failed: z.string(),
+    }),
+  }),
 });
 
 export type SiteData = z.infer<typeof siteSchema>;
@@ -648,6 +669,14 @@ const site = defineCollection({
   schema: siteSchema,
 });
 
+/** Experiments that are not on show: written as one is, and checked by the
+ * same schema, so the pages built on them (/prism/fixtures/lab) and the
+ * tests that read those pages see what a real entry would give. */
+const fixtures = defineCollection({
+  type: "content",
+  schema: labSchema,
+});
+
 /** Each lens's own flavour copy: the words a lens's designer wrote for it
  * (command help lines, captions, labels). Shells read it as
  * `content.lenses[id]`; its shape is the JSON file itself (see
@@ -664,4 +693,5 @@ export const collections = {
   updates,
   site,
   lenses,
+  fixtures,
 };
