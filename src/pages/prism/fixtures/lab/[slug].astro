@@ -1,10 +1,15 @@
 ---
 /** Daylight's side of the fuzz harness: an experiment's own page, on a
- * fixture experiment (src/prism/fixtures.ts). /prism/harness shows the same
- * fixtures to the shells; Daylight is rendered on the server, so its page
- * is built here. scripts/tests/lab-entry.browser.mjs reads it. */
+ * fixture experiment: one built in src/prism/fixtures.ts, or one written
+ * as a real experiment is, in src/content/fixtures. /prism/harness shows
+ * the same fixtures to the shells; Daylight is rendered on the server, so
+ * its page is built here. scripts/tests/lab-entry.browser.mjs and
+ * blocks.browser.mjs read it. */
+import { getCollection, type CollectionEntry } from "astro:content";
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import Blocks from "../../../../components/Blocks.astro";
 import ExperimentPage from "../../../../components/ExperimentPage.astro";
+import { labPayload } from "../../../../lib/body";
 import { experimentUpdates } from "../../../../lib/labbook";
 import { getLabPage, getProjects, getSite } from "../../../../lib/portfolio";
 import { graduatedProject } from "../../../../lib/rules";
@@ -21,7 +26,15 @@ export async function getStaticPaths() {
     title: project.data.title,
     href: `/projects/${project.slug}`,
   }));
-  return experimentFixtures(projects).map((fixture) => ({
+  const written: ExperimentFixture[] = await Promise.all(
+    (await getCollection("fixtures")).map(
+      async (entry: CollectionEntry<"fixtures">) => ({
+        entry: await labPayload(entry),
+        labbook: [],
+      }),
+    ),
+  );
+  return [...experimentFixtures(projects), ...written].map((fixture) => ({
     params: { slug: fixture.entry.slug },
     props: { fixture, projects },
   }));
@@ -32,7 +45,10 @@ const { fixture, projects } = Astro.props as {
   projects: Target[];
 };
 const { entry, labbook } = fixture;
-const [site, { detail, labbook: book }] = await Promise.all([getSite(), getLabPage()]);
+const [site, { detail, labbook: book }] = await Promise.all([
+  getSite(),
+  getLabPage(),
+]);
 ---
 
 <BaseLayout
@@ -51,6 +67,6 @@ const [site, { detail, labbook: book }] = await Promise.all([getSite(), getLabPa
     updateLabels={{ kinds: site.updateKinds, sources: site.updateSources }}
     redacted={book.redacted}
   >
-    <Fragment set:html={entry.html} />
+    <Blocks blocks={entry.blocks} slug={entry.slug} copy={site.blocks} />
   </ExperimentPage>
 </BaseLayout>

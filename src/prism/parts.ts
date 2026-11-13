@@ -8,7 +8,8 @@
  * Refs: `page.*` take the page id (home, about, resume, projects, lab,
  * not-found); `project.*` and `lab.*` the entry slug; `update.*` the
  * update id; `resume.*` the entry id from content.json; `home.elsewhere`
- * the item's index.
+ * the item's index; `block.*` the entry's slug and the block's name
+ * (`blockRef`).
  *
  * Plain data, no imports: Astro, the shells and the Node tests all load it. */
 
@@ -56,6 +57,17 @@ export const PARTS = [
   // one update in a list of them, and one that is redacted: its shape alone
   "update.item",
   "update.redacted",
+  // a block of a project's or an experiment's page, by its type
+  "block.gallery",
+  "block.compare",
+  "block.embed",
+  "block.model",
+  "block.code",
+  "block.quote",
+  "block.steps",
+  "block.tree",
+  "block.audio",
+  "block.film",
   // the structured resume
   "resume.role",
   "resume.education",
@@ -88,3 +100,6 @@ export function markPart<T extends Element>(
   if (ref !== undefined) element.setAttribute("data-ref", String(ref));
   return element;
 }
+
+/** The ref of a block's part: which entry's page, and which block on it. */
+export const blockRef = (slug: string, name: string) => `${slug}/${name}`;

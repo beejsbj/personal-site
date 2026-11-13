@@ -1,4 +1,6 @@
 import { defineCollection, z } from "astro:content";
+import { BLOCK_NAME, parseTree } from "./lib/blocks.ts";
+import { penEmbedSrc } from "./lib/labbook.ts";
 
 /* Every word a visitor reads lives in src/content. Daylight renders it and
  * /prism/content.json hands the same words to every lens. Short copy fields
@@ -42,6 +44,199 @@ const partialDate = z
   .union([z.string(), z.number()])
   .transform(String)
   .pipe(z.string().regex(/^\d{4}(-\d{2}){0,2}$/));
+
+/* ---- blocks: what an experiment's or a project's page is told with ----
+ *
+ * A page names its blocks in `blocks` and its body places each with a line
+ * that is `::name` and nothing else (src/lib/blocks.ts). Every block is
+ * strict: a field it does not have is refused by name. `caption`, a
+ * quote's `text` and a step's `text` may use inline markdown. */
+
+/** A file a block shows: one of the site's own, or one kept elsewhere. */
+const file = z
+  .string()
+  .regex(
+    /^(?:\/(?!\/)|https:\/\/)\S+$/,
+    "A file is a site path (/images/…) or an https:// address.",
+  );
+const poster = z
+  .string()
+  .regex(
+    /^\/(?!\/)\S+$/,
+    "A poster is one of the site's own files (/images/…): nothing is asked of another site before a click.",
+  );
+const ratio = z
+  .string()
+  .regex(/^\d+\/\d+$/, 'A ratio is written width/height: "16/9".');
+
+/** Every piece of media says what it shows. */
+const UNSAID = {
+  message: "Say what it shows: give it alt text or a caption.",
+  path: ["alt"],
+};
+const said = (media: { alt?: string; caption?: string }) =>
+  !!(media.alt?.trim() || media.caption?.trim());
+const words = {
+  alt: z.string().optional(),
+  caption: z.string().optional(),
+};
+
+const pictureFields = {
+  src: file,
+  ...words,
+  width: z.number().int().positive().optional(),
+  height: z.number().int().positive().optional(),
+};
+const picture = z.object(pictureFields).strict().refine(said, UNSAID);
+/** One side of a compare: `label` says which, in place of "Before". */
+const side = z
+  .object({ ...pictureFields, label: z.string().optional() })
+  .strict()
+  .refine(said, UNSAID);
+
+const blockSchema = z
+  .discriminatedUnion("type", [
+    z
+      .object({
+        type: z.literal("gallery"),
+        items: z.array(picture).min(1, "A gallery shows at least one picture."),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("compare"),
+        before: side,
+        after: side,
+        caption: z.string().optional(),
+      })
+      .strict(),
+    /** Something live, loaded only when asked for: a Pen by its address,
+     * a demo or a deck by the page a frame should show. */
+    z
+      .object({
+        type: z.literal("embed"),
+        kind: z.enum(["pen", "demo", "deck"]),
+        src: file,
+        ...words,
+        poster: poster.optional(),
+        ratio: ratio.optional(),
+      })
+      .strict(),
+    /** A 3D model or a Gaussian splat, shown by a viewer loaded only when
+     * asked for. `rotation` stands it upright: degrees about x, y and z. */
+    z
+      .object({
+        type: z.literal("model"),
+        src: file.regex(
+          /\.(?:glb|spz|sog|splat)(?:[?#].*)?$/i,
+          "A model is a .glb, .spz, .sog or .splat file.",
+        ),
+        ...words,
+        poster: poster.optional(),
+        ratio: ratio.optional(),
+        rotation: z.tuple([z.number(), z.number(), z.number()]).optional(),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("code"),
+        code: z.string().regex(/\S/, "A code excerpt is not empty."),
+        language: z.string().min(1),
+        caption: z.string().optional(),
+      })
+      .strict(),
+    /** Burooj's own words, and where they were said. */
+    z
+      .object({
+        type: z.literal("quote"),
+        text: z.string().min(1),
+        source: z.string().min(1),
+        date: partialDate.optional(),
+      })
+      .strict(),
+    /** Numbered by their order. */
+    z
+      .object({
+        type: z.literal("steps"),
+        items: z
+          .array(
+            z
+              .object({
+                title: z.string().optional(),
+                text: z.string().min(1),
+                image: picture.optional(),
+              })
+              .strict(),
+          )
+          .min(1, "Steps have at least one step."),
+      })
+      .strict(),
+    /** Files and folders, written as an indented outline (two spaces to a
+     * level, `# a note` after a name) and handed on as nodes. */
+    z
+      .object({
+        type: z.literal("tree"),
+        tree: z.string().transform((outline, context) => {
+          try {
+            return parseTree(outline);
+          } catch (error) {
+            context.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: (error as Error).message,
+            });
+            return z.NEVER;
+          }
+        }),
+        caption: z.string().optional(),
+      })
+      .strict(),
+    z.object({ type: z.literal("audio"), src: file, ...words }).strict(),
+    /** A short clip. One that loops plays by itself, silently, unless the
+     * visitor asked for less motion. */
+    z
+      .object({
+        type: z.literal("film"),
+        src: file,
+        ...words,
+        poster: poster.optional(),
+        loop: z.boolean().default(false),
+      })
+      .strict(),
+  ])
+  .superRefine((block, context) => {
+    if (
+      ["embed", "model", "audio", "film"].includes(block.type) &&
+      !said(block as { alt?: string; caption?: string })
+    )
+      context.addIssue({ code: z.ZodIssueCode.custom, ...UNSAID });
+    if (
+      block.type === "embed" &&
+      block.kind === "pen" &&
+      block.src.startsWith("https://") &&
+      !penEmbedSrc(block.src)
+    )
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["src"],
+        message:
+          "A Pen is named by its address: https://codepen.io/<user>/pen/<id>.",
+      });
+  });
+
+/** A page's blocks, each under the name its body places it by. */
+const blocksSchema = z
+  .record(
+    z
+      .string()
+      .regex(
+        BLOCK_NAME,
+        'A block is named in lower-case letters, digits and hyphens, starting with a letter: "first-drawings".',
+      ),
+    blockSchema,
+  )
+  .default({});
+
+export type BlockData = z.infer<typeof blockSchema>;
 
 /** A role or a course on the resume. The date line is derived from
  * `kind`, `start` and `end` ("January 2022 - November 2024"), unless
@@ -221,6 +416,7 @@ const projectSchema = z.object({
   cover: z.string(),
   links: z.array(linkSchema).default([]),
   media: z.array(mediaSchema).default([]),
+  blocks: blocksSchema,
   order: z.number().default(100),
   tags: z.array(z.string()).default([]),
   hidden: z.boolean().default(false),
@@ -245,6 +441,7 @@ const labSchema = z
     href: z.string().url().optional(),
     links: z.array(linkSchema).default([]),
     media: z.array(mediaSchema).default([]),
+    blocks: blocksSchema,
     order: z.number().default(100),
     hidden: z.boolean().default(false),
   })
@@ -422,6 +619,27 @@ const siteSchema = z.object({
   /** How each kind and source of update is named. */
   updateKinds: z.record(z.enum(UPDATE_KINDS), z.string()),
   updateSources: z.record(z.enum(UPDATE_SOURCES), z.string()),
+  /** What a page's blocks say for themselves: which side of a compare is
+   * which, and what asks for an embed or a model to load, goes to where
+   * an embed lives instead, and puts either away again. */
+  blocks: z.object({
+    compare: z.object({ before: z.string(), after: z.string() }),
+    embed: z.object({
+      load: z.object({ pen: z.string(), demo: z.string(), deck: z.string() }),
+      open: z.object({ pen: z.string(), demo: z.string(), deck: z.string() }),
+      close: z.string(),
+      note: z.string(),
+    }),
+    model: z.object({
+      load: z.string(),
+      close: z.string(),
+      note: z.string(),
+      /** How the viewer is handled, said once it is showing. */
+      hint: z.string(),
+      /** Said when the viewer cannot show the model. */
+      failed: z.string(),
+    }),
+  }),
 });
 
 export type SiteData = z.infer<typeof siteSchema>;
@@ -451,6 +669,14 @@ const site = defineCollection({
   schema: siteSchema,
 });
 
+/** Experiments that are not on show: written as one is, and checked by the
+ * same schema, so the pages built on them (/prism/fixtures/lab) and the
+ * tests that read those pages see what a real entry would give. */
+const fixtures = defineCollection({
+  type: "content",
+  schema: labSchema,
+});
+
 /** Each lens's own flavour copy: the words a lens's designer wrote for it
  * (command help lines, captions, labels). Shells read it as
  * `content.lenses[id]`; its shape is the JSON file itself (see
@@ -467,4 +693,5 @@ export const collections = {
   updates,
   site,
   lenses,
+  fixtures,
 };

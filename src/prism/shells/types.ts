@@ -16,7 +16,10 @@ import type CutPaperCopy from "../../content/lenses/cut-paper.json";
 import type BackPageCopy from "../../content/lenses/back-page.json";
 import type HionCopy from "../../content/lenses/hion.json";
 import type { UpdateKind, UpdateSource } from "../../content.config";
+import type { Block } from "../../lib/blocks";
 import type { Update as LabbookUpdate, UpdateLink } from "../../lib/labbook";
+
+export type { Block, BlockOf, BlockType, Picture, TreeNode } from "../../lib/blocks";
 
 export interface Link {
   label: string;
@@ -83,8 +86,12 @@ export interface Project {
   media: Media[];
   tags: string[];
   order: number;
-  /** The rendered markdown body. May be empty. */
+  /** The rendered markdown body: its prose, without its blocks. May be
+   * empty. */
   html: string;
+  /** The page in reading order: the prose (`text`) and the blocks it is
+   * told with, each by its `type` (src/lib/blocks.ts). May be empty. */
+  blocks: Block[];
 }
 
 export interface LabEntry {
@@ -108,7 +115,11 @@ export interface LabEntry {
   links: { label: string; url: string }[];
   media: Media[];
   order: number;
+  /** The rendered markdown body: its prose, without its blocks. */
   html: string;
+  /** The page in reading order: the prose (`text`) and the blocks it is
+   * told with, each by its `type` (src/lib/blocks.ts). May be empty. */
+  blocks: Block[];
 }
 
 /** An update as the home stream shows it: open, with a date label and,
@@ -185,6 +196,27 @@ export interface SiteContent {
      * The schema asks for no name in particular, so one may be missing. */
     updateKinds: Partial<Record<UpdateKind, string>>;
     updateSources: Partial<Record<UpdateSource, string>>;
+    /** What a page's blocks say for themselves: which side of a compare
+     * is which; what asks for an embed or a model to load where it stands
+     * (`load`), goes to where an embed lives instead (`open`) and puts
+     * either away again (`close`); and what a model's viewer says about
+     * handling it, or when it cannot show it. */
+    blocks: {
+      compare: { before: string; after: string };
+      embed: {
+        load: Record<"pen" | "demo" | "deck", string>;
+        open: Record<"pen" | "demo" | "deck", string>;
+        close: string;
+        note: string;
+      };
+      model: {
+        load: string;
+        close: string;
+        note: string;
+        hint: string;
+        failed: string;
+      };
+    };
   };
   pages: {
     home: {

@@ -64,20 +64,58 @@ test("every experiment on show links out or has a body to read", () => {
     );
 });
 
+/** The site's own files an entry's front matter names: its cover, and the
+ * `src` and `poster` of its media and of its blocks. */
+const named = (frontmatter) =>
+  [...frontmatter.matchAll(/^\s*(?:cover|src|poster):\s*"?(.*?)"?\s*$/gm)]
+    .map(([, src]) => src)
+    .filter((src) => src.startsWith("/"));
+
 test("every picture an experiment names is a file in public/", () => {
   for (const entry of entries) {
     const cover = entry.field("cover");
     if (cover !== undefined)
       assert.match(cover, /^\//, `${entry.slug}: its cover is not a site path`);
-    const media = [...entry.frontmatter.matchAll(/^\s+src:\s*"?(.*?)"?\s*$/gm)]
-      .map(([, src]) => src)
-      .filter((src) => src.startsWith("/"));
-    for (const src of [cover, ...media].filter(Boolean))
+    for (const src of named(entry.frontmatter))
       assert.ok(
         existsSync(join("public", src)),
         `${entry.slug}: ${src} is not in public/`,
       );
   }
+});
+
+test("every file a project on show or a fixture experiment names is in public/ too", () => {
+  for (const dir of ["src/content/projects", "src/content/fixtures"]) {
+    const files = readdirSync(dir).filter((name) => name.endsWith(".md"));
+    assert.ok(files.length, `${dir} has entries`);
+    for (const name of files) {
+      const [, frontmatter = ""] = readFileSync(join(dir, name), "utf8").split(
+        /^---$/m,
+      );
+      // A hidden project is not built, and two of them name covers that
+      // were never brought over.
+      if (/^hidden:\s*true\s*$/m.test(frontmatter)) continue;
+      for (const src of named(frontmatter))
+        assert.ok(
+          existsSync(join("public", src)),
+          `${dir}/${name}: ${src} is not in public/`,
+        );
+    }
+  }
+  // The fixture names a poster, a model and a film, so each kind is looked for.
+  const [, fixture] = readFileSync(
+    "src/content/fixtures/fixture-blocks.md",
+    "utf8",
+  ).split(/^---$/m);
+  for (const file of [
+    "/images/lab/beating-shapes.png",
+    "/prism/fixtures/cube.glb",
+    "/prism/fixtures/cloud.splat",
+    "/prism/fixtures/film.webm",
+    "/prism/fixtures/tone.wav",
+    "/prism/fixtures/demo.svg",
+  ])
+    assert.ok(named(fixture).includes(file), `the check sees ${file}`);
 });
 
 test("at most one experiment on show takes pride of place", () => {
