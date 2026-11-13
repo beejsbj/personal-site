@@ -83,8 +83,9 @@ const about = (update: Update) =>
       <p class="labbook-note">{copy.note}</p>
     </header>
     {subjects.length > 0 && (
-      <nav
+      <div
         class="labbook-index"
+        role="group"
         aria-labelledby="labbook-index-label"
         data-labbook-index
         hidden
@@ -112,7 +113,7 @@ const about = (update: Update) =>
             </li>
           ))}
         </ul>
-      </nav>
+      </div>
     )}
     <p class="labbook-narrowed" data-labbook-narrowed tabindex="-1" hidden>
       {`${copy.narrow.showing} `}
