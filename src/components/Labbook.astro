@@ -127,8 +127,8 @@ const about = (update: Update) =>
     <script is:inline>
       // Narrow the Labbook to what the address names (?experiment= or
       // ?project=), before its entries are drawn: a rule hides every entry
-      // about something else, and every month left empty. It runs again
-      // each time the router swaps a page in.
+      // about something else, and every month left empty. It runs once
+      // per document; the router's swaps are narrowed by its listeners.
       (() => {
         const narrow = (section) => {
           const query = new URLSearchParams(location.search);
@@ -187,7 +187,11 @@ const about = (update: Update) =>
         };
         const section = document.currentScript.closest("[data-labbook]");
         narrow(section);
-        land(section);
+        // On a whole load the browser goes to #labbook once the page has
+        // loaded, which would undo an earlier focus; on a swap it already
+        // has.
+        if (document.readyState === "complete") land(section);
+        else addEventListener("load", () => land(section), { once: true });
         if (window.labbookNarrow) return;
         window.labbookNarrow = narrow;
         document.addEventListener(
@@ -221,6 +225,12 @@ const about = (update: Update) =>
         document.addEventListener("astro:after-swap", () => {
           const section = document.querySelector("[data-labbook]");
           if (section) narrow(section);
+        });
+        // The router does not run this script again on the page it swaps
+        // in (it has run it once), so the keyboard is landed here.
+        document.addEventListener("astro:page-load", () => {
+          const section = document.querySelector("[data-labbook]");
+          if (section) land(section);
         });
       })();
     </script>

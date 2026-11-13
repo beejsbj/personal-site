@@ -471,61 +471,77 @@ test(
           },
         );
 
-        await t.test(
-          `${size}: the keyboard narrows it and brings it back, and focus follows`,
-          async () => {
-            const { context, page } = await open(size, NOTEBOOK);
-            const focused = () =>
-              page.evaluate(() => {
-                const el = document.activeElement;
-                return {
-                  ref: el?.dataset?.ref ?? null,
-                  narrowed: !!el?.closest?.("[data-labbook-narrowed]"),
-                  all: el?.hasAttribute?.("data-labbook-all") ?? false,
-                  text: (el?.textContent ?? "").replace(/\s+/g, " ").trim(),
-                };
+        // On the fixture room a narrowing is a whole page load (it is a
+        // tool page, without the client router); on /lab it is the
+        // router's swap. The keyboard is followed through both.
+        for (const path of [NOTEBOOK, "/lab"])
+          await t.test(
+            `${size}: on ${path} the keyboard narrows it and brings it back, and focus follows`,
+            async () => {
+              const { context, page, errors } = await open(size, path);
+              const focused = () =>
+                page.evaluate(() => {
+                  const el = document.activeElement;
+                  return {
+                    ref: el?.dataset?.ref ?? null,
+                    narrowed: !!el?.closest?.("[data-labbook-narrowed]"),
+                    all: el?.hasAttribute?.("data-labbook-all") ?? false,
+                    text: (el?.textContent ?? "")
+                      .replace(/\s+/g, " ")
+                      .trim()
+                      .slice(0, 80),
+                  };
+                });
+              const before = await notebook(page);
+              // The first thing it can be narrowed to: on the fixture,
+              // the project.
+              const [first] = before.subjects;
+              if (path === NOTEBOOK) assert.equal(first.ref, DAYSHAPER.ref);
+              // Tab from the Labbook's heading to that link.
+              await page.locator("#labbook-title").evaluate((el) => {
+                el.tabIndex = -1;
+                el.focus();
               });
-            // Tab from the Labbook's heading to the project's link.
-            await page.locator("#labbook-title").evaluate((el) => {
-              el.tabIndex = -1;
-              el.focus();
-            });
-            let reached = false;
-            for (let i = 0; i < 10 && !reached; i += 1) {
               await page.keyboard.press("Tab");
-              reached = (await focused()).ref === DAYSHAPER.ref;
-            }
-            assert.ok(reached, "Tab reaches the project's link");
-            await page.keyboard.press("Enter");
-            await narrowedTo(page, DAYSHAPER.ref);
-            assert.equal(
-              where(page),
-              "/prism/fixtures/lab?labbook=notebook&project=dayshaper#labbook",
-            );
-            assert.deepEqual((await notebook(page)).shown, DAYSHAPER.ids);
-            assert.deepEqual(
-              (await notebook(page)).months.map(({ month }) => month),
-              DAYSHAPER.months,
-            );
-            const after = await focused();
-            assert.ok(
-              after.narrowed,
-              `focus lands on what it is narrowed to (${after.text})`,
-            );
-            // One Tab on is the way back.
-            await page.keyboard.press("Tab");
-            assert.ok((await focused()).all, "the next stop is the way back");
-            await page.keyboard.press("Enter");
-            await narrowedTo(page, null);
-            assert.deepEqual((await notebook(page)).shown, EVERY);
-            assert.equal(
-              (await focused()).ref,
-              DAYSHAPER.ref,
-              "focus returns to the link it left from",
-            );
-            await context.close();
-          },
-        );
+              assert.equal(
+                (await focused()).ref,
+                first.ref,
+                "one Tab from the heading is the first link",
+              );
+              await page.keyboard.press("Enter");
+              await narrowedTo(page, first.ref);
+              assert.equal(where(page), first.href);
+              const narrowed = await notebook(page);
+              if (path === NOTEBOOK) {
+                assert.deepEqual(narrowed.shown, DAYSHAPER.ids);
+                assert.deepEqual(
+                  narrowed.months.map(({ month }) => month),
+                  DAYSHAPER.months,
+                );
+              } else {
+                assert.ok(narrowed.shown.length > 0);
+                assert.ok(narrowed.shown.length < before.shown.length);
+              }
+              const after = await focused();
+              assert.ok(
+                after.narrowed,
+                `focus lands on what it is narrowed to (${after.text})`,
+              );
+              // One Tab on is the way back.
+              await page.keyboard.press("Tab");
+              assert.ok((await focused()).all, "the next stop is the way back");
+              await page.keyboard.press("Enter");
+              await narrowedTo(page, null);
+              assert.deepEqual((await notebook(page)).shown, before.shown);
+              assert.equal(
+                (await focused()).ref,
+                first.ref,
+                "focus returns to the link it left from",
+              );
+              assert.deepEqual(errors, []);
+              await context.close();
+            },
+          );
 
         await t.test(
           `${size}: an address naming nothing it holds narrows nothing`,
@@ -546,9 +562,11 @@ test(
         await t.test(
           `${size}: narrowing is a turn of the page, not a trip: no cover plays`,
           async () => {
-            const { context, page } = await open(size, NOTEBOOK, {
+            // On /lab, where the client router and its cover are.
+            const { context, page } = await open(size, "/lab", {
               motion: true,
             });
+            const [first] = (await notebook(page)).subjects;
             const covers = page.evaluate(
               () =>
                 new Promise((done) => {
@@ -564,11 +582,24 @@ test(
                 }),
             );
             await page.click(
-              `[data-part='labbook.subject'][data-ref='${QUIET.ref}']`,
+              `[data-part='labbook.subject'][data-ref='${first.ref}']`,
             );
             assert.equal(await covers, 0, "the page cover never swells");
-            await narrowedTo(page, QUIET.ref);
-            assert.deepEqual((await notebook(page)).shown, QUIET.ids);
+            await narrowedTo(page, first.ref);
+            // A link that does go somewhere still plays it.
+            const away = page.evaluate(
+              () =>
+                new Promise((done) => {
+                  const timer = setInterval(() => {
+                    if (!document.querySelector(".page-cover")) return;
+                    clearInterval(timer);
+                    done(true);
+                  }, 16);
+                  setTimeout(() => done(false), 1500);
+                }),
+            );
+            await page.click(".site-frame main .lab-aside a");
+            assert.equal(await away, true, "a trip to another page has it");
             await context.close();
           },
         );
@@ -662,17 +693,31 @@ test(
                 { timeout: 15_000 },
               );
               await page.waitForTimeout(800);
-              const shown = await page.evaluate(() =>
-                [
-                  ...document.querySelectorAll(
-                    "#lens-shell :is([data-part='update.item'], [data-part='update.redacted'])",
+              const look = () =>
+                page.evaluate(() => ({
+                  refs: [
+                    ...document.querySelectorAll(
+                      "#lens-shell :is([data-part='update.item'], [data-part='update.redacted'])",
+                    ),
+                  ]
+                    .filter((el) => el.checkVisibility())
+                    .map((el) => el.dataset.ref),
+                  turn: !!document.querySelector(
+                    "#lens-shell [data-prism-turn='next']:not([disabled])",
                   ),
-                ]
-                  .filter((el) => el.checkVisibility())
-                  .map((el) => el.dataset.ref),
-              );
+                }));
+              // A lens that shows a page at a time (Back Page) is read to
+              // its end, as the parity test reads it.
+              let seen = await look();
+              const shown = [...seen.refs];
+              for (let i = 0; seen.turn && i < 40; i += 1) {
+                await page.click("#lens-shell [data-prism-turn='next']");
+                await page.waitForTimeout(450);
+                seen = await look();
+                shown.push(...seen.refs);
+              }
               await context.close();
-              return { shown, errors };
+              return { shown: [...new Set(shown)].sort(), errors };
             };
             const whole = await arrive("/lab");
             const narrowed = await arrive(narrowing);
