@@ -127,9 +127,8 @@ const about = (update: Update) =>
     <script is:inline>
       // Narrow the Labbook to what the address names (?experiment= or
       // ?project=), before its entries are drawn: a rule hides every entry
-      // about something else, and every month left empty. Run again when
-      // the router swaps the page in, and remember which link was used so
-      // the keyboard lands where it should.
+      // about something else, and every month left empty. It runs again
+      // each time the router swaps a page in.
       (() => {
         const narrow = (section) => {
           const query = new URLSearchParams(location.search);
@@ -166,32 +165,18 @@ const about = (update: Update) =>
           const it = `[data-${kind}="${CSS.escape(query.get(kind))}"]`;
           rule.textContent = `#labbook[data-narrowed] .labbook-entry:not(${it}), #labbook[data-narrowed] .labbook-month:not(:has(${it})) { display: none; }`;
         };
-        narrow(document.currentScript.closest("[data-labbook]"));
-        if (window.labbookNarrow) return;
-        window.labbookNarrow = narrow;
-        let land;
-        document.addEventListener(
-          "click",
-          (event) => {
-            const link = event.target.closest?.(
-              "[data-labbook-subject], [data-labbook-all]",
-            );
-            if (!link) return;
-            land = link.hasAttribute("data-labbook-all")
-              ? link.closest("[data-labbook]").dataset.narrowed
-              : "narrowed";
-          },
-          { capture: true },
-        );
-        document.addEventListener("astro:after-swap", () => {
-          const section = document.querySelector("[data-labbook]");
-          if (section) narrow(section);
-        });
-        document.addEventListener("astro:page-load", () => {
-          const section = document.querySelector("[data-labbook]");
-          const to = land;
-          land = undefined;
-          if (!section || !to) return;
+        // Where the keyboard goes once a narrowing link has taken the
+        // visitor there: to what it is narrowed to, or, coming back, to
+        // the link it was narrowed by. Kept for the next page, which may
+        // be a whole load (without the client router) or a swap.
+        const KEY = "labbook:land";
+        const land = (section) => {
+          let to;
+          try {
+            to = sessionStorage.getItem(KEY);
+            sessionStorage.removeItem(KEY);
+          } catch {}
+          if (!to) return;
           const target =
             to === "narrowed"
               ? section.querySelector("[data-labbook-narrowed]:not([hidden])")
@@ -199,6 +184,43 @@ const about = (update: Update) =>
                   `[data-labbook-subject][data-ref="${CSS.escape(to)}"]`,
                 );
           target?.focus({ preventScroll: true });
+        };
+        const section = document.currentScript.closest("[data-labbook]");
+        narrow(section);
+        land(section);
+        if (window.labbookNarrow) return;
+        window.labbookNarrow = narrow;
+        document.addEventListener(
+          "click",
+          (event) => {
+            const link = event.target.closest?.(
+              "[data-labbook-subject], [data-labbook-all]",
+            );
+            if (
+              !link ||
+              event.button !== 0 ||
+              event.metaKey ||
+              event.ctrlKey ||
+              event.shiftKey ||
+              event.altKey
+            )
+              return;
+            try {
+              sessionStorage.setItem(
+                KEY,
+                link.hasAttribute("data-labbook-all")
+                  ? link.closest("[data-labbook]").dataset.narrowed
+                  : "narrowed",
+              );
+            } catch {}
+          },
+          { capture: true },
+        );
+        // The router's swap puts in the new page before its scripts run
+        // again: narrow it then, so it is never seen whole first.
+        document.addEventListener("astro:after-swap", () => {
+          const section = document.querySelector("[data-labbook]");
+          if (section) narrow(section);
         });
       })();
     </script>
