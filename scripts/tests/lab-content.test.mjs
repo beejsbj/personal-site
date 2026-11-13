@@ -103,7 +103,10 @@ test("Cockpit is not an experiment: the Lab has no entry for it", () => {
 
 test("Strudel tools are two entries, Melograph and midi-strudel, each with its own picture", () => {
   const slugs = entries.map((entry) => entry.slug);
-  assert.ok(!slugs.includes("strudel-tools"), "src/content/lab/strudel-tools.md");
+  assert.ok(
+    !slugs.some((slug) => slug.startsWith("strudel")),
+    "the one Strudel entry is still there",
+  );
 
   const mediaOf = (entry) =>
     [...entry.frontmatter.matchAll(/^\s+src:\s*"?(.*?)"?\s*$/gm)].map(
@@ -129,18 +132,34 @@ test("Strudel tools are two entries, Melograph and midi-strudel, each with its o
     assert.equal(entry.field("title"), title, `${slug}: title`);
     assert.ok(entry.field("summary"), `${slug}: no summary`);
     assert.ok(entry.body, `${slug}: no page`);
-    assert.ok(entry.frontmatter.includes(`url: "${live}"`), `${slug}: live link`);
-    assert.ok(entry.frontmatter.includes(`url: "${source}"`), `${slug}: source link`);
+    assert.ok(
+      entry.frontmatter.includes(`url: "${live}"`),
+      `${slug}: live link`,
+    );
+    assert.ok(
+      entry.frontmatter.includes(`url: "${source}"`),
+      `${slug}: source link`,
+    );
     // Each tool names only itself, and its cover is the one picture it has.
-    for (const other of Object.values(expected).filter((o) => o.title !== title))
+    for (const other of Object.values(expected).filter(
+      (o) => o.title !== title,
+    ))
       for (const url of [other.live, other.source])
         assert.ok(!entry.frontmatter.includes(url), `${slug}: links to ${url}`);
     const cover = entry.field("cover");
     assert.ok(cover, `${slug}: no cover`);
-    assert.deepEqual(mediaOf(entry), [cover], `${slug}: its picture is its cover`);
+    assert.deepEqual(
+      mediaOf(entry),
+      [cover],
+      `${slug}: its picture is its cover`,
+    );
     pictures.push(cover);
   }
-  assert.equal(new Set(pictures).size, pictures.length, "the two share a picture");
+  assert.equal(
+    new Set(pictures).size,
+    pictures.length,
+    "the two share a picture",
+  );
 });
 
 test("Meditejo says its art is drawn by code", () => {
@@ -158,7 +177,9 @@ test("Meditejo says its art is drawn by code", () => {
 test("no experiment calls code-made work 'generated' without saying by what", () => {
   for (const entry of entries) {
     const text = `${entry.frontmatter}\n${entry.body}`;
-    for (const [phrase] of text.matchAll(/\bgenerat(?:ed|ive)\b(?!\s+by\b)[^.\n]{0,30}/gi))
+    for (const [phrase] of text.matchAll(
+      /\bgenerat(?:ed|ive)\b(?!\s+by\b)[^.\n]{0,30}/gi,
+    ))
       assert.fail(`${entry.slug}: "${phrase.trim()}" does not say by what`);
   }
 });
