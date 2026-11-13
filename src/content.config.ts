@@ -677,6 +677,15 @@ const fixtures = defineCollection({
   schema: labSchema,
 });
 
+/** A Labbook that is not on show: updates written as real ones are, and
+ * checked by the same schema, spanning months and holding every kind of
+ * entry. /prism/fixtures/lab?labbook=notebook renders it, and the harness
+ * hands it to the shells (/prism/fixtures/labbook.json). */
+const fixtureUpdates = defineCollection({
+  type: "content",
+  schema: updateSchema,
+});
+
 /** Each lens's own flavour copy: the words a lens's designer wrote for it
  * (command help lines, captions, labels). Shells read it as
  * `content.lenses[id]`; its shape is the JSON file itself (see
@@ -694,4 +703,5 @@ export const collections = {
   site,
   lenses,
   fixtures,
+  "fixture-updates": fixtureUpdates,
 };

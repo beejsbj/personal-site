@@ -181,6 +181,16 @@ export async function getLabbook(): Promise<Update[]> {
   );
 }
 
+/** The fixture Labbook (src/content/fixture-updates): every kind of entry,
+ * over several months, as the Labbook would carry it. Only the fixture
+ * pages and the harness read it. */
+export async function getFixtureLabbook(): Promise<Update[]> {
+  return (await getCollection("fixture-updates")).map(
+    (entry: CollectionEntry<"fixture-updates">) =>
+      labbookUpdate(entry.id.replace(/\.md$/, ""), entry.data),
+  );
+}
+
 /** What an update in the Labbook may link to: the experiments and projects
  * that are shown, each where it lives. */
 export async function getRelatable() {

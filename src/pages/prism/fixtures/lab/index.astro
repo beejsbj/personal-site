@@ -4,15 +4,24 @@
  * and tested whatever src/content holds. /prism/fixtures/lab is a full
  * room; ?fixture=shelf-only has nothing on the Bench,
  * ?fixture=no-covers has no pictures and ?fixture=no-featured gives no
- * experiment pride of place. ?labbook=none is a Lab with no updates. scripts/tests/lab-daylight.browser.mjs and
- * labbook-daylight.browser.mjs read it. Rendered on demand: its page
+ * experiment pride of place. ?labbook=none is a Lab with no updates;
+ * ?labbook=notebook is the Labbook written as content
+ * (src/content/fixture-updates), over four months with every kind of
+ * entry, and narrows with ?experiment= or ?project= as /lab does.
+ * scripts/tests/lab-daylight.browser.mjs, labbook-daylight.browser.mjs and
+ * labbook-notebook.browser.mjs read it. Rendered on demand: its page
  * entries point at /lab/<slug>, where nothing is built. */
 import type { ComponentProps } from "astro/types";
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import LabRoom from "../../../../components/LabRoom.astro";
 import Labbook from "../../../../components/Labbook.astro";
-import { penUser } from "../../../../lib/labbook";
-import { getLabPage, getRelatable, getSite } from "../../../../lib/portfolio";
+import { penUser, type Update } from "../../../../lib/labbook";
+import {
+  getFixtureLabbook,
+  getLabPage,
+  getRelatable,
+  getSite,
+} from "../../../../lib/portfolio";
 import { labbookFixture } from "../../../../prism/labbook-fixture";
 
 export const prerender = false;
@@ -103,7 +112,13 @@ const written = labbookFixture({
   experiments: ["fixture-quiet", "fixture-featured"],
   project: relatable.projects[0]?.slug,
 });
-const labbook = asked.get("labbook") === "none" ? [] : written.labbook;
+const labbooks: Record<string, Update[]> = {
+  written: written.labbook,
+  none: [],
+  notebook: await getFixtureLabbook(),
+};
+const labbook = labbooks[asked.get("labbook") ?? "written"];
+if (!labbook) return new Response("No such Labbook.", { status: 404 });
 ---
 
 <BaseLayout title="Lab fixture" pageClass="page-lab" tool>
