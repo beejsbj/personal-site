@@ -81,9 +81,10 @@ function putAway(stage: HTMLElement) {
 }
 
 function show(stage: HTMLElement, { focus = false } = {}) {
-  for (const other of [...showing.keys()])
-    if (other !== stage)
-      other.isConnected ? putAway(other) : showing.delete(other);
+  // Whatever else is showing is put away, a stage whose page has been taken
+  // off the screen too (a book's page that is turned away keeps its stage,
+  // and would be playing still when turned back to).
+  for (const other of [...showing.keys()]) if (other !== stage) putAway(other);
   const poster = [...stage.childNodes];
   const status = statusOf(stage);
   const say = (words = "") => status && (status.textContent = words);
