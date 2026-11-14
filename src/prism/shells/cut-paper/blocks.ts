@@ -21,14 +21,15 @@ import { arrangeBlocks, quoteDateLabel } from "../../../lib/blocks";
 import { type Part, blockRef, markPart } from "../../parts";
 import { inline, plain } from "../rich";
 import type { Block, Picture, SiteContent, TreeNode } from "../types";
-import { makeLink, noteVar, prose, type Env } from "./bits";
+import { noteVar, prose, type Env } from "./bits";
 import { h } from "./dom";
 
 type Told = Exclude<Block, { type: "text" }>;
 type Copy = SiteContent["site"]["blocks"];
 
-/** A caption's inline markdown, its links the lens's own. */
-const words = (source: string) => inline(source, makeLink);
+/** A caption's inline markdown. Its links are plain: a block's words are
+ * read as they are written. */
+const words = (source: string) => inline(source);
 /** What a piece of media is, in plain words. */
 const named = (media: { alt?: string; caption?: string }) => media.alt ?? plain(media.caption ?? "");
 

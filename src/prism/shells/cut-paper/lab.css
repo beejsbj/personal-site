@@ -1898,8 +1898,9 @@
   }
 
   :root[data-lens="cut-paper"] .cp-shelf__item > .cp-device {
-    grid-column: 1 / -1;
+    grid-column: 2;
     grid-row: 3;
+    margin-top: 6px;
   }
 
   :root[data-lens="cut-paper"] .cp-shelf .cp-rack__title {
