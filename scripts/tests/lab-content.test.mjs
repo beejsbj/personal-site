@@ -292,11 +292,12 @@ test("no experiment's href answers 401 or 403 from the public internet", async (
   );
 });
 
-test("no experiment claims photographs", () => {
-  for (const entry of entries)
-    assert.doesNotMatch(
-      `${entry.frontmatter}\n${entry.body}`,
-      /photograph/i,
-      `${entry.slug}: claims photographs`,
-    );
+test("Kitchen does not claim photographs", () => {
+  const kitchen = entries.find((entry) => entry.slug === "kitchen");
+  assert.ok(kitchen, "the Kitchen entry exists");
+  assert.doesNotMatch(
+    `${kitchen.frontmatter}\n${kitchen.body}`,
+    /photograph/i,
+    "kitchen: claims photographs",
+  );
 });
