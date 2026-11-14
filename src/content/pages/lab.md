@@ -16,7 +16,14 @@ places:
 labbook:
   title: The Labbook
   note: Everything I've made, changed or published, by date. Newest first.
-  listLabel: Updates, newest first
+  listLabel: Updates, newest first, by month
+  narrow:
+    label: Follow one experiment or project
+    showing: Only the entries about
+    all: Show every entry
+    count:
+      one: 1 entry
+      other: "{count} entries"
   related:
     experiment: Experiment
     project: Project

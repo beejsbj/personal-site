@@ -1,5 +1,49 @@
 # Base homepage: warm welcome
 
+## Lab: the Labbook as a notebook (November, issue #134)
+
+Burooj saw the Labbook and the home page's Recent updates as the same
+seven lines shown the same way. They are the same records at two depths;
+the Labbook now reads as a lab notebook. Built from the existing grammar:
+no new fonts, colours or dependencies; two new tokens (the margin an
+entry's day sits in, and the column a month's name stands in). Chosen
+under delegated authority; it needs Burooj's eye.
+
+- **Months are chapters** (`labbookMonths`, `monthLabel` in
+  `src/lib/labbook.ts`): newest first, each ruled off from the last. From
+  62.5rem a month's name stands in its own column beside its entries,
+  serif burgundy over a small year, and stays in view while they are
+  read; below, it heads them. A month with one small entry is its name
+  beside one line, not an empty chapter.
+- **An entry is written as a notebook's is** (`UpdateEntry`
+  `layout="notebook"`): the day alone in the margin as a serif numeral
+  (the month is the heading; the whole date is still said), a peach rule
+  down the page beside it, the words to the right, entries ruled off from
+  each other. No kind mark and no string between entries: that is the
+  home stream's look, and stays there unchanged. A picture is laid in a
+  touch off the straight, turned one way then the other down the page,
+  straightening when its entry is pointed at; a Pen, demo, film or sound
+  sits beside the words from 62.5rem and under them below. A redacted
+  entry is its line among the rest. The entry a link lands on wears the
+  current ball on its day.
+- **Narrowing** to one experiment or project: an index of peach pills at
+  the Labbook's head, each with how many entries it holds, the one in
+  use burgundy; while narrowed, a slip of paper says to what, with the
+  way back. The choice is the query (`?experiment=` / `?project=`,
+  `narrowHref`, `narrowedTo`): a query change is a page change to the
+  client router, so Back, Forward, reload and every lens's shell get it
+  with no new listener, and the fragment stays free to land on an
+  update. A narrowing plays no page cover (`data-no-cover`). `/lab` is
+  prerendered, so a script applies the narrowing as the Labbook is drawn,
+  before its entries; without scripts the Labbook is whole and the index
+  is not shown.
+- **Rejected:** a timeline with the kind marks (the home look again);
+  cards in a grid (the Bench's language, and it breaks the reading
+  order); a sticky month band on phones (it covers the words on a short
+  screen); the month and day shown on every entry (the heading says it);
+  narrowing in the fragment (it fights the update anchors, the router
+  sends no `hashchange` on the same page, and the prism's faces drop it).
+
 ## Lab: the Labbook (November, issue #95)
 
 Built from the existing grammar: no new fonts, colours or dependencies, and

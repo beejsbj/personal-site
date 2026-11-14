@@ -183,6 +183,11 @@
      against the words it stands in for. */
   --redaction-unit: 0.9em;
   --redaction-height: 1.2em;
+  /* The Labbook as a notebook: the margin an entry's day sits in, and the
+     column a month's name stands in beside its entries where there is
+     room. */
+  --labbook-margin: 2.75rem;
+  --labbook-month-width: 11rem;
 }
 @media (max-width: 40.625rem) {
   :root {
