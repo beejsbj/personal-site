@@ -32,6 +32,8 @@ const ONLY = process.env.LAB_ONLY ? new RegExp(process.env.LAB_ONLY) : null;
 /** The pages lying open. */
 const OPEN = "#lens-shell .bp-spread";
 const real = (path) => `${path}?lens=back-page`;
+/** Where a page's number is written: first at its head, its date after. */
+const NUMBER = ".bp-page__head > span:first-child b";
 
 /** An essay whose footnote is called in its first lines and written at its
  * end, many pages on, the way Substack writes one. */
@@ -91,11 +93,11 @@ test(
     const next = (page) => page.locator("#lens-shell [data-prism-turn='next']");
     /** The numbers written at the head of the open pages, left to right. */
     const numbers = (page) =>
-      page.evaluate((open) =>
-        [...document.querySelectorAll(`${open} .bp-page .bp-page__head b`)].map(
+      page.evaluate(([open, number]) =>
+        [...document.querySelectorAll(`${open} .bp-page ${number}`)].map(
           (b) => b.textContent,
         ),
-      OPEN);
+      [OPEN, NUMBER]);
     /** Every number written in the open chapter, read page by page as the
      * pages are turned, stopping where the chapter ends. */
     const chapterNumbers = async (page) => {
@@ -107,12 +109,12 @@ test(
         await next(page).click();
         // the last view's corner turns to the next chapter: stop there
         await page.waitForFunction(
-          ([open, path, shown]) =>
+          ([open, number, path, shown]) =>
             location.pathname !== path ||
-            [...document.querySelectorAll(`${open} .bp-page .bp-page__head b`)]
+            [...document.querySelectorAll(`${open} .bp-page ${number}`)]
               .map((b) => b.textContent)
               .join() !== shown,
-          [OPEN, path, shown],
+          [OPEN, NUMBER, path, shown],
           { timeout: 10000 },
         );
         await page.waitForTimeout(450);
@@ -125,14 +127,12 @@ test(
      * or null when no open page holds it. */
     const pageOf = (page, selector) =>
       page.evaluate(
-        ([open, selector]) => {
+        ([open, number, selector]) => {
           const el = document.querySelector(`${open} ${selector}`);
-          const no = el
-            ?.closest(".bp-page")
-            ?.querySelector(".bp-page__head b")?.textContent;
+          const no = el?.closest(".bp-page")?.querySelector(number)?.textContent;
           return no ? Number(no) : null;
         },
-        [OPEN, selector],
+        [OPEN, NUMBER, selector],
       );
 
     try {
