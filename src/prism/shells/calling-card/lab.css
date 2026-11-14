@@ -1,0 +1,1432 @@
+/* The Lab in Calling Card (lab.ts, blocks.ts): the Phantom Thieves'
+   request board and its case files.
+
+   The Bench is requests pinned to the board at angles, each showing what
+   it holds; the Shelf is the game's list of cases gone quiet, a row each;
+   a brief is a case file, the request card beside its report. */
+:root[data-lens="calling-card"] .cc-requests .cc-screen__bg,
+:root[data-lens="calling-card"] .cc-brief .cc-screen__bg {
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-requests__curtain {
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.35) 0 14px, transparent 14px 46px, rgb(255 255 255 / 0.06) 46px 50px, transparent 50px 70px),
+    linear-gradient(180deg, var(--cc-red-deep), var(--cc-red-dark));
+  clip-path: polygon(40% 0, 100% 0, 100% 100%, 30% 100%);
+}
+:root[data-lens="calling-card"] .cc-requests__star {
+  right: -8vmax;
+  top: -8vmax;
+  width: 30vmax;
+  aspect-ratio: 1;
+  transform: rotate(20deg);
+}
+/* The board's column: the board turns (scrolls) in it while the title and
+   the intro stay put. */
+:root[data-lens="calling-card"] .cc-requests__col {
+  position: absolute;
+  z-index: 3;
+  left: 30vw;
+  right: 0;
+  top: 4.4rem;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+:root[data-lens="calling-card"] .cc-requests__board {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cc-white) transparent;
+  mask-image: linear-gradient(transparent, #000 2rem, #000 calc(100% - 3.5rem), transparent);
+}
+:root[data-lens="calling-card"] .cc-requests__sheet {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 3.4rem;
+  padding: 2.6rem 2.6rem 6rem 2.2rem;
+  overflow-x: clip;
+}
+
+/* A place on the board: its name on a plate, a line about it, its requests. */
+:root[data-lens="calling-card"] .cc-place,
+:root[data-lens="calling-card"] .cc-log {
+  display: grid;
+  gap: 1.6rem;
+}
+:root[data-lens="calling-card"] .cc-place__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem 1.2rem;
+}
+:root[data-lens="calling-card"] .cc-place__title {
+  margin: 0;
+  padding: 0.15rem 0.9rem 0.1rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 1.9rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transform: rotate(-2deg) skewX(-8deg);
+  box-shadow: 5px 5px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-place__note {
+  margin: 0;
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.3;
+}
+:root[data-lens="calling-card"] .cc-place__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  align-items: start;
+  gap: 2.4rem 1.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-place__list > li[data-lab-featured] {
+  grid-column: 1 / -1;
+}
+
+/* A request on the Bench: a slip of paper pinned at an angle. */
+:root[data-lens="calling-card"] .cc-request {
+  position: relative;
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.5rem 1.3rem 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.06) 0 1.4px, transparent 1.9px) 0 0 / 9px 9px,
+    var(--cc-paper);
+  color: var(--cc-black);
+  text-decoration: none;
+  border: 3px solid var(--cc-black);
+  box-shadow: 9px 9px 0 var(--cc-black);
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 160ms var(--cc-snap), box-shadow 120ms;
+  animation: calling-card-fly-up 420ms var(--cc-out) both;
+  animation-delay: calc(100ms + var(--i) * 45ms);
+}
+:root[data-lens="calling-card"] .cc-request__no {
+  font-family: var(--cc-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .cc-request__status {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.9rem;
+  padding: 0.05rem 0.5rem;
+  border: 3px solid var(--cc-red-ink);
+  color: var(--cc-red-ink);
+  font-family: var(--cc-display);
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: rotate(10deg);
+}
+:root[data-lens="calling-card"] .cc-request__title {
+  font-size: 2rem;
+  line-height: 1.02;
+  --cc-box-bg: var(--cc-black);
+  --cc-box-fg: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-request__summary {
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+/* The key cap, then the words: when a narrow slip breaks them over two
+   lines, the second starts under the first, not under the key. */
+:root[data-lens="calling-card"] .cc-request__accept {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.4rem -1.3rem 0;
+  padding: 0.6rem 1rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 0.95rem;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-request__accept kbd {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border-radius: 50%;
+}
+:root[data-lens="calling-card"] .cc-request[data-state="selected"] {
+  z-index: 2;
+  transform: rotate(calc(var(--tilt, 0deg) * -0.4)) translateY(-0.5rem) scale(1.04);
+  box-shadow: 9px 9px 0 var(--cc-red), 9px 9px 0 3px var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-request[data-state="selected"] .cc-request__accept {
+  background: var(--cc-red);
+}
+
+/* The featured request leads the Bench: the big target, in red, across
+   the board. */
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request {
+  --tilt: -1.1deg;
+  gap: 0.8rem;
+  padding: 1.7rem 1.8rem 0;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1.7px, transparent 2.3px) 0 0 / 10px 10px,
+    linear-gradient(160deg, var(--cc-red) 30%, var(--cc-red-deep));
+  color: var(--cc-white);
+  border-color: var(--cc-white);
+  box-shadow: 12px 12px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request::before {
+  content: "";
+  position: absolute;
+  right: 1.2rem;
+  bottom: 3.4rem;
+  width: clamp(6rem, 16vw, 11rem);
+  aspect-ratio: 1;
+  background: var(--cc-black);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  rotate: 14deg;
+  opacity: 0.9;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request > * {
+  position: relative;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__no {
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__status {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  border-color: var(--cc-white);
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-size: 1.3rem;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__title {
+  font-size: min(clamp(2.4rem, 3.8vw, 3.5rem), calc(100cqi / (var(--chars, 8) * 0.7 + 0.6)));
+  line-height: 0.95;
+  color: var(--cc-white);
+  text-shadow: var(--cc-outline);
+  --cc-box-bg: var(--cc-white);
+  --cc-box-fg: var(--cc-black);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__summary {
+  max-width: 34rem;
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.3rem;
+  line-height: 1.35;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__accept {
+  margin-inline: -1.8rem;
+  padding-inline: 1.8rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request[data-state="selected"] {
+  box-shadow: 12px 12px 0 var(--cc-white), 12px 12px 0 3px var(--cc-black);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request[data-state="selected"] .cc-request__accept {
+  background: var(--cc-white);
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request[data-state="selected"] .cc-request__accept kbd {
+  background: var(--cc-red);
+  color: var(--cc-white);
+}
+
+
+/* ---------- What a request holds ---------- */
+/* Evidence: a photo clipped to the request, over its top edge; with
+   several, the others fanned out under it. */
+:root[data-lens="calling-card"] .cc-request__evidence {
+  position: relative;
+  display: grid;
+  justify-self: start;
+  width: min(64%, 12rem);
+  margin: -2.6rem 0 0.2rem -0.3rem;
+  aspect-ratio: 4 / 3;
+  rotate: calc(var(--tilt, 0deg) * -2.2);
+}
+:root[data-lens="calling-card"] .cc-request__photo {
+  grid-area: 1 / 1;
+  overflow: hidden;
+  background: var(--cc-white);
+  border: 6px solid var(--cc-white);
+  outline: 3px solid var(--cc-black);
+  box-shadow: 6px 6px 0 var(--cc-black);
+  rotate: calc(var(--depth) * 7deg);
+  translate: calc(var(--depth) * 0.9rem) calc(var(--depth) * -0.35rem);
+  transition: rotate 220ms var(--cc-snap), translate 220ms var(--cc-snap);
+}
+:root[data-lens="calling-card"] .cc-request__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* A red star pins the top photo to the board. */
+:root[data-lens="calling-card"] .cc-request__evidence::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: -0.9rem;
+  left: 50%;
+  width: 1.9rem;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  background: var(--cc-red);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  filter: drop-shadow(2px 2px 0 var(--cc-black));
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  :root[data-lens="calling-card"] .cc-request[data-state="selected"] .cc-request__photo {
+    rotate: calc(var(--depth) * 12deg);
+    translate: calc(var(--depth) * 1.8rem) calc(var(--depth) * -0.5rem);
+  }
+}
+/* The featured request: its words on the left, its evidence pinned on the
+   right; with only words, the black star stands there instead. */
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request:has(.cc-request__evidence) {
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 18rem);
+  column-gap: 2.4rem;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request:has(.cc-request__evidence) > :not(.cc-request__evidence) {
+  grid-column: 1;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request:has(.cc-request__evidence)::before {
+  display: none;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] .cc-request__evidence {
+  grid-column: 2;
+  grid-row: 1 / span 4;
+  align-self: center;
+  justify-self: center;
+  width: 100%;
+  margin: 1.4rem 1.2rem 0 0;
+}
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request > .cc-request__accept,
+:root[data-lens="calling-card"] li[data-lab-featured] > .cc-request > .cc-tapcue {
+  grid-column: 1 / -1;
+}
+/* On the Bench a name is cut out as large as its longest word lets it
+   be, never running off the paper. Only words: the name cut out larger. */
+:root[data-lens="calling-card"] .cc-request[data-place="bench"] {
+  container-type: inline-size;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="bench"] .cc-request__title {
+  font-size: min(2rem, calc(100cqi / (var(--chars, 8) * 0.7 + 0.6)));
+}
+:root[data-lens="calling-card"] .cc-request[data-holds="words"][data-place="bench"] .cc-request__title {
+  font-size: min(2.35rem, calc(100cqi / (var(--chars, 8) * 0.7 + 0.6)));
+  line-height: 1;
+}
+:root[data-lens="calling-card"] .cc-request[data-holds="words"][data-place="bench"] {
+  padding-top: 2.1rem;
+}
+
+/* When it was last seen: the day of the newest report, as the calendar
+   writes it. */
+:root[data-lens="calling-card"] .cc-sighting {
+  justify-self: start;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.05rem 0.55rem 0;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: skewX(-10deg);
+}
+:root[data-lens="calling-card"] .cc-sighting__day {
+  color: var(--cc-red-text);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+/* Something to play: a screen pinned over the request. The request stays
+   a link; the screen's prompt is the next stop for the keyboard. */
+:root[data-lens="calling-card"] [data-lab-place="bench"] .cc-pin[data-holds="play"] {
+  display: grid;
+  gap: 0.9rem;
+}
+:root[data-lens="calling-card"] [data-lab-place="bench"] .cc-pin[data-holds="play"] > .cc-request {
+  grid-row: 2;
+}
+:root[data-lens="calling-card"] .cc-request__tv {
+  position: relative;
+  z-index: 3;
+  grid-row: 1;
+  width: 94%;
+  justify-self: center;
+  rotate: calc(var(--tilt, 0deg) * -1.4);
+}
+
+/* ---------- A screen: something live, a model, a film ---------- */
+:root[data-lens="calling-card"] .cc-tv {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+}
+:root[data-lens="calling-card"] .cc-tv__screen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
+    var(--cc-ink);
+  border: 4px solid var(--cc-white);
+  outline: 3px solid var(--cc-black);
+  box-shadow: 9px 9px 0 var(--cc-red), 9px 9px 0 3px var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-tv__screen > * {
+  grid-area: 1 / 1;
+}
+:root[data-lens="calling-card"] .cc-tv__poster,
+:root[data-lens="calling-card"] .cc-tv__screen :is(iframe, canvas, video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+:root[data-lens="calling-card"] .cc-tv__poster {
+  object-fit: cover;
+  filter: saturate(0.85) brightness(0.8);
+}
+:root[data-lens="calling-card"] .cc-tv__screen video {
+  object-fit: contain;
+  background: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-tv__screen iframe {
+  background: var(--cc-white);
+}
+/* Until it plays: a red triangle on the glass. */
+:root[data-lens="calling-card"] .cc-tv__screen[data-block-stage]:not([data-live])::after {
+  content: "";
+  grid-area: 1 / 1;
+  width: 3.4rem;
+  aspect-ratio: 1;
+  background: var(--cc-red);
+  clip-path: polygon(18% 6%, 96% 50%, 18% 94%);
+  filter: drop-shadow(3px 3px 0 var(--cc-black));
+  pointer-events: none;
+}
+:root[data-lens="calling-card"] .cc-tv__screen[data-live="on"] .cc-tv__poster {
+  visibility: hidden;
+}
+:root[data-lens="calling-card"] .cc-tv__screen:has(.cc-tv__label)::after {
+  align-self: end;
+  width: 2.6rem;
+  margin-bottom: 0.9rem;
+}
+:root[data-lens="calling-card"] .cc-tv__label {
+  margin: 0;
+  padding: 1rem 1.4rem 2.6rem;
+  color: var(--cc-white);
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.3;
+  text-align: center;
+}
+/* Its prompt on one line, what it promises on the next, so a prompt
+   that changes its words never moves anything. */
+:root[data-lens="calling-card"] .cc-tv__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.9rem;
+  margin: 0.25rem 0 0;
+}
+:root[data-lens="calling-card"] .cc-tv__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.15rem 1rem 0.1rem 0.75rem;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  border: 3px solid var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 1rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transform: skewX(-12deg);
+  box-shadow: 4px 4px 0 var(--cc-black);
+  transition: transform 110ms var(--cc-snap), background 80ms, color 80ms;
+}
+:root[data-lens="calling-card"] .cc-tv__toggle::before {
+  content: "";
+  flex: none;
+  width: 0.7rem;
+  height: 0.8rem;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+:root[data-lens="calling-card"] .cc-tv__toggle[aria-pressed="true"] {
+  background: var(--cc-white);
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-tv__toggle[aria-pressed="true"]::before {
+  clip-path: inset(0);
+  width: 0.7rem;
+  height: 0.7rem;
+}
+:root[data-lens="calling-card"] .cc-tv__toggle:hover {
+  transform: skewX(-12deg) translateY(-2px);
+}
+:root[data-lens="calling-card"] .cc-tv__note {
+  flex-basis: 100%;
+  order: 3;
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+:root[data-lens="calling-card"] .cc-tv__out {
+  font-family: var(--cc-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-decoration-color: var(--cc-red);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 3px;
+}
+:root[data-lens="calling-card"] .cc-tv__status {
+  margin: 0;
+  font-family: var(--cc-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-tv__status:empty {
+  display: none;
+}
+/* On the board, the screen's words are white on the red curtain. */
+:root[data-lens="calling-card"] .cc-request__tv .cc-tv__note,
+:root[data-lens="calling-card"] .cc-request__tv .cc-tv__status {
+  color: var(--cc-white);
+  text-shadow: 0 1px 0 var(--cc-black), 0 0 6px var(--cc-black);
+}
+
+/* ---------- The Shelf: the list of cases gone quiet ---------- */
+/* One row each, as the game lists things: a black bar slanted at both
+   ends, its photo cut into its start, rows stepping in and out. The
+   selected row turns white over a red slash. */
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-place__list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  max-width: 50rem;
+}
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-pin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.8rem 1.6rem;
+  align-items: center;
+}
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-pin:nth-child(even) {
+  margin-left: 1.6rem;
+}
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-pin[data-holds="play"] {
+  grid-template-columns: minmax(0, 1fr) 13rem;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] {
+  grid-row: 1;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "no photo title status"
+    "no photo sum sum"
+    "no photo accept accept";
+  align-items: center;
+  gap: 0.15rem 0.9rem;
+  margin: 0;
+  padding: 0.6rem 1.6rem 0.6rem 1.2rem;
+  background: none;
+  color: var(--cc-white);
+  border: 0;
+  box-shadow: none;
+  transform: none;
+  isolation: isolate;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"]::before,
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  transform: skewX(-12deg);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"]::before {
+  background: var(--cc-black);
+  border: 3px solid var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"]::after {
+  z-index: -2;
+  background: var(--cc-red);
+  translate: 0.5rem 0.4rem;
+  opacity: 0;
+  transition: opacity 80ms, translate 160ms var(--cc-snap);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__no {
+  grid-area: no;
+  align-self: center;
+  color: var(--cc-red-text);
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__evidence {
+  grid-area: photo;
+  width: 6.2rem;
+  margin: -1rem 0;
+  rotate: calc(var(--tilt, 0deg) * -2);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__evidence::after {
+  display: none;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__photo {
+  border-width: 4px;
+  outline-width: 2px;
+  box-shadow: 4px 4px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__title {
+  grid-area: title;
+  font-family: var(--cc-display);
+  font-size: 1.5rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__status {
+  grid-area: status;
+  position: static;
+  justify-self: end;
+  padding: 0 0.4rem;
+  border: 2px solid var(--cc-grey);
+  color: var(--cc-grey);
+  font-size: 0.75rem;
+  transform: rotate(6deg);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__summary {
+  grid-area: sum;
+  color: var(--cc-grey);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-sighting {
+  display: none;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__accept {
+  grid-area: accept;
+  justify-self: start;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  background: none;
+  color: var(--cc-grey);
+  font-size: 0.8rem;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__accept kbd {
+  width: 1.3rem;
+  height: 1.3rem;
+  font-size: 0.7rem;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"][data-state="selected"] {
+  color: var(--cc-black);
+  transform: translateX(0.5rem);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"][data-state="selected"]::before {
+  background: var(--cc-white);
+  border-color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"][data-state="selected"]::after {
+  opacity: 1;
+  translate: 0.8rem 0.55rem;
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"][data-state="selected"] :is(.cc-request__summary, .cc-request__accept) {
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"][data-state="selected"] .cc-request__no {
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .cc-request[data-place="shelf"][data-state="selected"] .cc-request__status {
+  border-color: var(--cc-red-ink);
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-request {
+  grid-column: 1;
+}
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-request__tv {
+  grid-row: 1;
+  grid-column: 2;
+  width: auto;
+  rotate: 1.5deg;
+}
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-tv__toggle {
+  font-size: 0.85rem;
+  min-height: 2.75rem;
+}
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-tv__note {
+  font-size: 0.82rem;
+}
+
+/* ---------- The brief: a case file ---------- */
+:root[data-lens="calling-card"] .cc-brief .cc-main {
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cc-red) transparent;
+}
+:root[data-lens="calling-card"] .cc-brief__file {
+  display: grid;
+  grid-template-columns: minmax(19rem, 26rem) minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
+  gap: 2.8rem 3.2rem;
+  max-width: 82rem;
+  margin: 0 auto;
+  padding: 5.4rem 3rem 7rem 2.4rem;
+}
+/* The request card: what the case is, at a glance. */
+:root[data-lens="calling-card"] .cc-brief__paper {
+  position: relative;
+  z-index: 2;
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 0.9rem;
+  padding: 1.4rem 1.6rem 1.8rem;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.06) 0 1.4px, transparent 1.9px) 0 0 / 9px 9px,
+    var(--cc-paper);
+  color: var(--cc-black);
+  border: 3px solid var(--cc-black);
+  box-shadow: 14px 14px 0 var(--cc-black);
+  transform: rotate(-1.2deg);
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-brief__paper {
+  animation: calling-card-fly-up 420ms var(--cc-out) both 80ms;
+}
+:root[data-lens="calling-card"] .cc-brief__paper > * {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-brief__paper .cc-back {
+  box-shadow: 4px 4px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-brief__no {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-family: var(--cc-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cc-red-ink);
+}
+:root[data-lens="calling-card"] .cc-brief__no span {
+  padding: 0 0.5rem;
+  border: 3px solid var(--cc-red-ink);
+  transform: rotate(8deg);
+}
+:root[data-lens="calling-card"] .cc-brief .cc-brief__title {
+  font-size: clamp(2.5rem, 3.6vw, 3.6rem);
+  color: var(--cc-black);
+  text-shadow: none;
+  transform: rotate(-3deg);
+  --cc-box-bg: var(--cc-black);
+  --cc-box-fg: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-brief__file[data-holds="words"] .cc-brief__title {
+  font-size: clamp(2.8rem, 4.4vw, 4.4rem);
+}
+:root[data-lens="calling-card"] .cc-brief__summary {
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.2rem;
+  line-height: 1.35;
+}
+/* The file's facts: a label plate and its value, one under another. */
+:root[data-lens="calling-card"] .cc-brief__facts {
+  justify-self: stretch;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.7rem 0 0.2rem;
+  border-top: 3px solid var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-brief__facts > div {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.8rem;
+}
+:root[data-lens="calling-card"] .cc-brief__facts dt {
+  justify-self: start;
+  padding: 0 0.45rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: skewX(-10deg);
+}
+:root[data-lens="calling-card"] .cc-brief__facts dd {
+  margin: 0;
+  font-family: var(--cc-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-brief__facts time {
+  color: var(--cc-red-ink);
+}
+/* What the request became: a rank up, and the way to the project. */
+:root[data-lens="calling-card"] .cc-brief__became {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.2rem;
+  transform: rotate(-1.5deg);
+}
+:root[data-lens="calling-card"] .cc-brief__became-label {
+  padding: 0.2rem 0.9rem 0.15rem;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.2) 0 1.5px, transparent 2px) 0 0 / 8px 8px,
+    var(--cc-red);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: skewX(-12deg);
+  box-shadow: 4px 4px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-brief__became-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.1rem 1rem 0.05rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1.5rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: skewX(-12deg);
+  transition: transform 120ms var(--cc-snap), background 80ms;
+}
+:root[data-lens="calling-card"] .cc-brief__became-link::after {
+  content: "";
+  flex: none;
+  width: 0.7rem;
+  height: 0.85rem;
+  background: var(--cc-red-text);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+:root[data-lens="calling-card"] .cc-brief__became-link:hover {
+  background: var(--cc-red);
+  transform: skewX(-12deg) translateX(4px);
+}
+:root[data-lens="calling-card"] .cc-brief__became-link:hover::after {
+  background: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-brief__paper .cc-shop {
+  justify-self: stretch;
+}
+
+/* The evidence: the case's photos pinned under its card, the first
+   largest. */
+:root[data-lens="calling-card"] .cc-brief__media {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.6rem 1.2rem;
+  padding: 0 0.6rem 0 0.4rem;
+}
+:root[data-lens="calling-card"] .cc-brief__media > :first-child {
+  grid-column: 1 / -1;
+}
+:root[data-lens="calling-card"] .cc-brief__media[data-count="2"] > :first-child {
+  grid-column: auto;
+}
+
+/* A photo, wherever it is pinned: a white print, its caption on black
+   tape, a label (a compare's side) a sticker on its corner. */
+:root[data-lens="calling-card"] .cc-photo {
+  display: grid;
+  justify-items: start;
+  gap: 0.55rem;
+  min-width: 0;
+  margin: 0;
+  rotate: var(--tilt, 0deg);
+}
+:root[data-lens="calling-card"] .cc-photo__print {
+  position: relative;
+  justify-self: stretch;
+  background: var(--cc-white);
+  border: 6px solid var(--cc-white);
+  outline: 3px solid var(--cc-black);
+  box-shadow: 8px 8px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-photo__print :is(img, video) {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 26rem;
+  object-fit: contain;
+  background: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-photo__caption {
+  max-width: 100%;
+  padding: 0.1rem 0.55rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 0.92rem;
+  line-height: 1.3;
+  box-shadow: 3px 3px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-photo__label {
+  position: absolute;
+  top: -1rem;
+  left: -0.8rem;
+  padding: 0.05rem 0.6rem 0;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 3px solid var(--cc-black);
+  transform: rotate(-6deg) skewX(-10deg);
+}
+
+/* ---------- The report ---------- */
+/* A black panel ruled in white, beside the card: the case told, a
+   chapter at a time. */
+:root[data-lens="calling-card"] .cc-brief__report {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  display: grid;
+  gap: 3rem;
+  min-width: 0;
+}
+:root[data-lens="calling-card"] .cc-report {
+  counter-reset: chapter;
+  color: var(--cc-white);
+  display: grid;
+  gap: 2.6rem;
+  min-width: 0;
+  padding: 2rem 2.2rem 2.6rem;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 0.05) 0 1.4px, transparent 1.9px) 0 0 / 10px 10px,
+    var(--cc-black);
+  border: 3px solid var(--cc-white);
+  box-shadow: 12px 12px 0 var(--cc-red), 12px 12px 0 3px var(--cc-black);
+  transform: rotate(0.5deg);
+}
+:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-report {
+  animation: calling-card-fly-up 420ms var(--cc-out) both 180ms;
+}
+/* Each chapter numbered on a red tab, as the board numbers requests. */
+:root[data-lens="calling-card"] .cc-report .cc-prose h2 {
+  counter-increment: chapter;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+:root[data-lens="calling-card"] .cc-report .cc-prose h2::before {
+  content: counter(chapter, decimal-leading-zero);
+  margin: -0.15rem 0 -0.1rem -0.8rem;
+  padding: 0.15rem 0.45rem 0.1rem;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  font-size: 0.85em;
+}
+/* A spread: the words at a reading measure, the small blocks clipped in
+   the margin beside them. */
+:root[data-lens="calling-card"] .cc-spread {
+  display: grid;
+  grid-template-columns: minmax(0, 38rem);
+  gap: 1.8rem 2.2rem;
+  align-items: start;
+}
+:root[data-lens="calling-card"] .cc-spread[data-asides] {
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 17rem);
+}
+:root[data-lens="calling-card"] .cc-spread:not(:has(.cc-prose)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+:root[data-lens="calling-card"] .cc-spread__margin {
+  display: grid;
+  gap: 1.8rem;
+  min-width: 0;
+}
+:root[data-lens="calling-card"] .cc-spread:not(:has(.cc-prose)) .cc-spread__margin {
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  align-items: start;
+}
+:root[data-lens="calling-card"] .cc-spread__margin > :nth-child(odd) {
+  rotate: -1deg;
+}
+:root[data-lens="calling-card"] .cc-spread__margin > :nth-child(even) {
+  rotate: 0.8deg;
+}
+:root[data-lens="calling-card"] .cc-block {
+  margin: 0;
+  min-width: 0;
+}
+:root[data-lens="calling-card"] .cc-block__caption {
+  margin-top: 0.7rem;
+  color: var(--cc-white);
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+:root[data-lens="calling-card"] .cc-block :is(figcaption, p) code {
+  font-family: var(--cc-mono);
+  font-style: normal;
+  font-size: 0.85em;
+}
+
+/* A gallery: evidence photos pinned in a row, the first largest. */
+:root[data-lens="calling-card"] .cc-block--gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 1.8rem 1.4rem;
+  padding: 0.6rem 0.4rem 0;
+}
+:root[data-lens="calling-card"] .cc-block--gallery > :first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+:root[data-lens="calling-card"] .cc-block--gallery[data-count="2"] {
+  grid-template-columns: 3fr 2fr;
+}
+:root[data-lens="calling-card"] .cc-block--gallery[data-count="2"] > :first-child {
+  grid-column: auto;
+  grid-row: auto;
+}
+:root[data-lens="calling-card"] .cc-block--gallery[data-count="1"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* A compare: two photos, a red slash cut between them. */
+:root[data-lens="calling-card"] .cc-compare {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.4rem minmax(0, 1fr);
+  align-items: center;
+  padding-top: 0.8rem;
+}
+:root[data-lens="calling-card"] .cc-compare__slash {
+  align-self: stretch;
+  margin: -0.6rem -0.6rem;
+  background: var(--cc-red);
+  clip-path: polygon(62% 0, 100% 0, 38% 100%, 0 100%);
+}
+:root[data-lens="calling-card"] .cc-block--compare .cc-photo:last-child .cc-photo__label {
+  left: auto;
+  right: -0.8rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  transform: rotate(5deg) skewX(-10deg);
+}
+
+/* Code: a printout on white, its language on a red tab. */
+:root[data-lens="calling-card"] .cc-block--code {
+  display: grid;
+  justify-items: start;
+}
+:root[data-lens="calling-card"] .cc-code__tab {
+  margin: 0;
+  padding: 0.05rem 0.6rem 0;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: skewX(-12deg) translateX(0.4rem);
+}
+:root[data-lens="calling-card"] .cc-block--code pre {
+  justify-self: stretch;
+  margin: 0;
+  padding: 0.9rem 1rem;
+  overflow: hidden;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border: 3px solid var(--cc-black);
+  outline: 3px solid var(--cc-white);
+  font-family: var(--cc-mono);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* A quote: a line of dialogue, whoever said it on the box's tab. */
+:root[data-lens="calling-card"] .cc-block--quote.cc-say {
+  position: relative;
+  padding: 1.6rem 1.3rem 1.2rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border: 3px solid var(--cc-black);
+  border-radius: 0.3rem 1.4rem 0.3rem 1.4rem;
+  box-shadow: 7px 7px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-block--quote .cc-say__name {
+  position: absolute;
+  top: -0.85rem;
+  left: 1rem;
+  padding: 0.05rem 0.6rem 0;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: skewX(-12deg);
+}
+:root[data-lens="calling-card"] .cc-block--quote cite {
+  font-style: normal;
+}
+:root[data-lens="calling-card"] .cc-block--quote blockquote {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+:root[data-lens="calling-card"] .cc-block--quote blockquote p {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-block--quote strong {
+  color: var(--cc-red-ink);
+}
+
+/* Steps: the plan, a run of numbered panels. */
+:root[data-lens="calling-card"] .cc-block--steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  align-items: start;
+  gap: 1.6rem 1.4rem;
+  margin: 0;
+  padding: 1rem 0 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-step {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 0.5rem;
+  padding: 1.6rem 1rem 1rem;
+  background: var(--cc-ink);
+  border: 3px solid var(--cc-white);
+  rotate: calc(-1deg + mod(var(--n), 2) * 1.8deg);
+}
+:root[data-lens="calling-card"] .cc-step > * {
+  margin: 0;
+}
+:root[data-lens="calling-card"] .cc-step__no {
+  position: absolute;
+  top: -1.4rem;
+  left: -0.6rem;
+  color: var(--cc-red);
+  font-family: var(--cc-display);
+  font-size: 2.6rem;
+  line-height: 1;
+  text-shadow: var(--cc-outline);
+  -webkit-text-stroke: 1px var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-step__title {
+  padding: 0 0.5rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transform: skewX(-10deg);
+}
+:root[data-lens="calling-card"] .cc-step__text {
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+:root[data-lens="calling-card"] .cc-step .cc-photo {
+  justify-self: stretch;
+  margin-top: 0.4rem;
+}
+/* Between one step and the next, a red arrow. */
+:root[data-lens="calling-card"] .cc-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -1.25rem;
+  width: 1.1rem;
+  height: 1.4rem;
+  background: var(--cc-red);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+/* Files: an item list on paper, each folder opening onto what it holds. */
+:root[data-lens="calling-card"] .cc-files {
+  padding: 0.8rem 1rem;
+  background: var(--cc-paper);
+  color: var(--cc-black);
+  border: 3px solid var(--cc-black);
+  box-shadow: 6px 6px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .cc-files__list {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--cc-mono);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+:root[data-lens="calling-card"] .cc-files__list .cc-files__list {
+  margin: 0.15rem 0 0.1rem 0.4rem;
+  padding-left: 0.8rem;
+  border-left: 3px solid var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-files__list li[data-folder] > .cc-files__name {
+  padding: 0 0.35rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-files__note {
+  margin-left: 0.6rem;
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--cc-red-ink);
+}
+
+/* A sound: a voice message, red, with the player in it. */
+:root[data-lens="calling-card"] .cc-block--audio {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem 0.9rem 0.8rem;
+  background: var(--cc-red);
+  border: 3px solid var(--cc-white);
+  border-radius: 1.2rem 1.2rem 1.2rem 0.2rem;
+  box-shadow: 6px 6px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-block--audio audio {
+  width: 100%;
+}
+:root[data-lens="calling-card"] .cc-block--audio .cc-block__caption {
+  margin: 0;
+  color: var(--cc-white);
+}
+
+/* The brief's own days, under the report, black on the red curtain. */
+:root[data-lens="calling-card"] .cc-brief__report .cc-log {
+  padding: 0 0.4rem;
+}
+
+/* ---------- Small screens: the board and the file in one column ---------- */
+@media (max-width: 1100px) and (min-width: 761px) {
+  :root[data-lens="calling-card"] .cc-spread[data-asides] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 760px), (max-aspect-ratio: 5/6) {
+  :root[data-lens="calling-card"] .cc-say.cc-requests__intro {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: auto;
+    margin-top: 0.8rem;
+    padding: 1.35rem 1.2rem 1.1rem;
+  }
+  :root[data-lens="calling-card"] .cc-requests__curtain {
+    clip-path: polygon(0 24%, 100% 14%, 100% 100%, 0 100%);
+  }
+  :root[data-lens="calling-card"] .cc-requests__col {
+    position: relative;
+    inset: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.6rem;
+  }
+  :root[data-lens="calling-card"] .cc-requests__board {
+    mask-image: none;
+  }
+  /* Cut at the screen's edges, not the column's: a pinned card's corner
+     and shadow reach into the margin. */
+  :root[data-lens="calling-card"] .cc-requests__sheet {
+    gap: 2.6rem;
+    margin-inline: -1rem;
+    padding: 0.5rem 1.4rem 0;
+  }
+  :root[data-lens="calling-card"] .cc-place__list,
+  :root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-place__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-lens="calling-card"] .cc-place__list {
+    gap: 2.6rem;
+  }
+  :root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-place__list {
+    gap: 1.1rem;
+  }
+  :root[data-lens="calling-card"] .cc-request[data-place="bench"][data-state="selected"] {
+    transform: rotate(calc(var(--tilt, 0deg) * -0.4));
+  }
+  :root[data-lens="calling-card"] li[data-lab-featured] > .cc-request {
+    padding-inline: 1.3rem;
+  }
+  :root[data-lens="calling-card"] li[data-lab-featured] .cc-request__title {
+    font-size: min(3.2rem, calc(100cqi / (var(--chars, 8) * 0.7 + 0.6)));
+  }
+  :root[data-lens="calling-card"] li[data-lab-featured] .cc-request__accept {
+    margin-inline: -1.3rem;
+    padding-inline: 1.3rem;
+  }
+  :root[data-lens="calling-card"] li[data-lab-featured] > .cc-request:has(.cc-request__evidence) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-lens="calling-card"] li[data-lab-featured] .cc-request__evidence {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+    width: 72%;
+    margin: -2.4rem 0 0.4rem;
+  }
+  :root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-pin:nth-child(even) {
+    margin-left: 0.8rem;
+  }
+  :root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-pin[data-holds="play"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-request__tv {
+    grid-row: 2;
+    grid-column: 1;
+    width: 82%;
+    justify-self: end;
+  }
+  :root[data-lens="calling-card"] .cc-request[data-place="shelf"] {
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      "no photo title"
+      "no photo sum"
+      "no status accept";
+    padding: 0.7rem 1.2rem 0.7rem 0.8rem;
+  }
+  :root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__status {
+    justify-self: start;
+  }
+  :root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__evidence {
+    width: 4.6rem;
+  }
+  :root[data-lens="calling-card"] .cc-request[data-place="shelf"] .cc-request__title {
+    font-size: 1.25rem;
+  }
+
+  /* The file: the card, its evidence, then the report, down one column. */
+  :root[data-lens="calling-card"] .cc-brief .cc-main {
+    padding-inline: 0;
+  }
+  :root[data-lens="calling-card"] .cc-brief__file {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.4rem;
+    padding: 0.4rem 0.4rem 1rem;
+  }
+  :root[data-lens="calling-card"] .cc-brief__paper,
+  :root[data-lens="calling-card"] .cc-brief__media,
+  :root[data-lens="calling-card"] .cc-brief__report {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  :root[data-lens="calling-card"] .cc-brief__paper {
+    transform: rotate(-0.8deg);
+    padding: 1.2rem 1.1rem 1.6rem;
+  }
+  :root[data-lens="calling-card"] .cc-report {
+    padding: 1.6rem 1rem 2rem;
+    transform: none;
+  }
+  :root[data-lens="calling-card"] .cc-spread[data-asides],
+  :root[data-lens="calling-card"] .cc-spread:not(:has(.cc-prose)) .cc-spread__margin {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-lens="calling-card"] .cc-block--gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :root[data-lens="calling-card"] .cc-block--gallery > :first-child {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  :root[data-lens="calling-card"] .cc-block--gallery[data-count="2"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-lens="calling-card"] .cc-compare {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1.8rem auto;
+  }
+  :root[data-lens="calling-card"] .cc-compare__slash {
+    margin: 0.4rem -1rem;
+    clip-path: polygon(0 38%, 100% 0, 100% 62%, 0 100%);
+  }
+  :root[data-lens="calling-card"] .cc-block--steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  :root[data-lens="calling-card"] .cc-step:not(:last-child)::after {
+    top: auto;
+    bottom: -1.55rem;
+    right: auto;
+    left: 50%;
+    width: 1.4rem;
+    height: 1.1rem;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+}

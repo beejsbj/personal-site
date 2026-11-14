@@ -352,6 +352,130 @@ const labEntryRoute = ({ entry }: ExperimentFixture): RouteRef => ({
   slug: entry.slug,
 });
 
+/** Every kind of card in both places (as Daylight's /prism/fixtures/lab
+ * ?fixture=kinds): featured with three pictures, one picture, only words,
+ * a Pen to play, two pictures linking out and a note linking out on the
+ * Bench; a picture, a Pen, two pictures and only words on the Shelf. They
+ * take the room's place: the Lab shows these and nothing else. */
+const kindsOfCard = (): LabEntry[] => {
+  const card = (
+    over: Partial<LabEntry> & Pick<LabEntry, "slug" | "title" | "summary" | "place" | "order">,
+  ): LabEntry => {
+    const hasPage = !over.detail;
+    return {
+      detail: `/lab/${over.slug}`,
+      hasPage,
+      links: [],
+      media: [],
+      ...prose(`<p>${over.summary}</p>`),
+      ...over,
+    };
+  };
+  const pictures = (...names: string[]) =>
+    names.map((name) => ({ type: "image" as const, src: `/images/lab/${name}` }));
+  const pen = (id: string) => ({
+    detail: `https://codepen.io/beejsbj/pen/${id}`,
+    href: `https://codepen.io/beejsbj/pen/${id}`,
+    preview: {
+      kind: "pen" as const,
+      frame: `https://codepen.io/beejsbj/embed/${id}?default-tab=result`,
+    },
+  });
+  const out = (slug: string) => ({
+    detail: `https://example.com/${slug}`,
+    href: `https://example.com/${slug}`,
+  });
+  return [
+    card({
+      slug: "fixture-kinds-featured",
+      title: "The one with pride of place, and a stack of prints",
+      summary:
+        "Featured, with a page of its own and three pictures, so the Bench gives it the most room.",
+      place: "bench",
+      featured: true,
+      cover: "/images/lab/melograph.png",
+      media: pictures("melograph.png", "midi-strudel.png", "kitchen.png"),
+      order: 1,
+    }),
+    card({
+      slug: "fixture-kinds-print",
+      title: "One picture",
+      summary: "A page of its own, and one picture to show for it.",
+      place: "bench",
+      cover: "/images/lab/game-of-life.png",
+      order: 2,
+    }),
+    card({
+      slug: "fixture-kinds-words",
+      title: "Only words so far",
+      summary: "Nothing to look at yet: what it is about, written down.",
+      place: "bench",
+      order: 3,
+    }),
+    card({
+      slug: "fixture-kinds-pen",
+      title: "A Pen to play where it lies",
+      summary: "It lives on CodePen and plays here when asked.",
+      place: "bench",
+      cover: "/images/lab/motion-path-graph.svg",
+      ...pen("abXZWLQ"),
+      order: 4,
+    }),
+    card({
+      slug: "fixture-kinds-stack",
+      title: "Several pictures, and a link out",
+      summary: "Two prints in a pile, opening where it lives.",
+      place: "bench",
+      cover: "/images/lab/persona-5-stars.png",
+      media: pictures("persona-5-stars.png", "13black-spade.png"),
+      ...out("fixture-kinds-stack"),
+      order: 5,
+    }),
+    card({
+      slug: "fixture-kinds-note",
+      title: "A note that links out",
+      summary: "Only words, and it lives elsewhere.",
+      place: "bench",
+      ...out("fixture-kinds-note"),
+      order: 6,
+    }),
+    card({
+      slug: "fixture-kinds-shelved",
+      title: "An old print",
+      summary: "On the Shelf, standing with the rest.",
+      place: "shelf",
+      cover: "/images/lab/css-notebook.png",
+      ...out("fixture-kinds-shelved"),
+      order: 1,
+    }),
+    card({
+      slug: "fixture-kinds-shelf-pen",
+      title: "A Pen gone quiet",
+      summary: "It still plays where it stands.",
+      place: "shelf",
+      cover: "/images/lab/beating-shapes.png",
+      ...pen("xxexKMq"),
+      order: 2,
+    }),
+    card({
+      slug: "fixture-kinds-shelf-stack",
+      title: "An archive piece with pictures",
+      summary: "A page of its own, and two pictures from when it was made.",
+      place: "shelf",
+      cover: "/images/lab/design-trampoline-logo.png",
+      media: pictures("design-trampoline-logo.png", "meditejo.png"),
+      order: 3,
+    }),
+    card({
+      slug: "fixture-kinds-shelf-words",
+      title: "Words on the Shelf",
+      summary: "No picture: its name stands in for one.",
+      place: "shelf",
+      order: 4,
+    }),
+  ];
+};
+
 /** The experiment told with every block there is, written as a real one
  * is (src/content/fixtures/fixture-blocks.md) and carried as
  * /prism/content.json would carry it. Daylight's page on it is
@@ -592,6 +716,13 @@ export const FIXTURES: Record<string, Fixture> = {
       labEntryRoute(study(content.projects[0]?.slug ?? "")),
     ],
   },
+  "lab-kinds": {
+    name: "lab-kinds",
+    about:
+      "Every kind of card in both places, and nothing else: one picture, several, a Pen to play and only words, each to a page or out, on the Bench and on the Shelf.",
+    apply: (content) => settle({ ...content, lab: kindsOfCard() }),
+    routes: () => [{ kind: "lab", path: "/lab" }],
+  },
   "lab-blocks": {
     name: "lab-blocks",
     about:
@@ -606,6 +737,22 @@ export const FIXTURES: Record<string, Fixture> = {
     routes: () => [
       { kind: "lab-entry", path: `/lab/${BLOCKS_SLUG}`, slug: BLOCKS_SLUG },
     ],
+  },
+  "project-blocks": {
+    name: "project-blocks",
+    about:
+      "A project told with every block there is: the first project, given the fixture experiment's blocks and prose.",
+    async apply(content) {
+      const entry: LabEntry = await (await fetch(BLOCKS_FIXTURE)).json();
+      const [first, ...rest] = content.projects;
+      if (!first) return content;
+      return settle({
+        ...content,
+        projects: [{ ...first, html: entry.html, blocks: entry.blocks }, ...rest],
+      });
+    },
+    routes: (content) =>
+      content.projects[0] ? [projectRoute(content.projects[0])] : [],
   },
   labbook: {
     name: "labbook",

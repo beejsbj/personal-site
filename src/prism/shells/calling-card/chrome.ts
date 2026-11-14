@@ -32,6 +32,9 @@ export interface Screen {
   back?: HTMLAnchorElement;
   /** Screen-specific keys. Return true when handled. */
   onKey?(event: KeyboardEvent): boolean;
+  /** The address's query changed and its path did not (the Labbook
+   * narrowed, or shown whole again): answer it in place. */
+  renew?(): void;
   destroy?(): void;
 }
 
