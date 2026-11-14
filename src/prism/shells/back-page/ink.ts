@@ -1,6 +1,8 @@
 /** Biro ink: every drawing on the page is made here, from a seed, so the same
  * page always looks the same (a camp never redraws itself differently). */
 
+import { DRAWINGS, type Drawing } from "./drawings.ts";
+
 /** The book's two pens and its pencil, as CSS variables: every book is its
  * own paper (themes.css), and the ink follows it. SVG built from these goes
  * through `svg()`/`paint()` (dom.ts), which move them into `style`, since a
@@ -194,8 +196,9 @@ export function tally(n: number, ink: string, rng: Rng) {
   return `<svg class="bp-tally" viewBox="0 0 ${f(x + 4)} 32" width="${f(x + 4)}" height="32" aria-hidden="true">${out}</svg>`;
 }
 
-/** Doodles in the margin, one for each experiment in the lab. */
-export function doodle(kind: number, rng: Rng) {
+/** The drawings in the margin, by name (drawings.ts chooses one for each
+ * experiment in the lab from what it is). */
+export function doodle(name: Drawing, rng: Rng) {
   const s = `fill="none" stroke="${BLUE}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pathLength="1"`;
   const r = `fill="none" stroke="${RED}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pathLength="1"`;
   const body = [
@@ -269,12 +272,47 @@ export function doodle(kind: number, rng: Rng) {
      <path ${s} d="M30 58 L38 62 L46 54 M68 48 L77 54 L86 46"/>
      <path ${r} d="M22 22 m-9 0 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0"/>
      <path ${r} d="M22 6 l0 4 M6 22 l4 0 M38 22 l-4 0 M11 11 l3 3 M33 11 l-3 3 M11 33 l3 -3 M33 33 l-3 -3"/>`,
+    // a note, two of them, joined; and the sound going out
+    `<path ${s} d="M20 84 a10 8 -20 1 0 20 0 a10 8 -20 1 0 -20 0"/>
+     <path ${s} d="M62 74 a10 8 -20 1 0 20 0 a10 8 -20 1 0 -20 0"/>
+     <path ${s} d="M39 82 L39 28 M81 72 L81 18"/>
+     <path ${s} d="M39 28 L81 18 L81 29 L39 39 Z"/>
+     <path ${r} d="M96 40 C 104 46, 104 56, 96 62 M104 31 C 116 42, 116 60, 104 71"/>`,
+    // a bird on a branch, and another going over
+    `<path ${s} d="M30 66 C 28 44, 48 34, 66 40 C 74 30, 90 30, 96 40 L 108 44 L 96 50 C 96 62, 88 70, 80 76 C 66 92, 38 90, 30 66 Z"/>
+     <path ${s} d="M30 66 L8 86 L36 80"/>
+     <path ${s} d="M52 56 C 60 50, 74 54, 78 62 C 68 72, 56 70, 52 56"/>
+     <path ${s} d="M52 88 L52 100 M66 86 L66 100"/>
+     <path ${r} d="M90 40 m-1.5 0 a1.5 1.5 0 1 0 3 0 a1.5 1.5 0 1 0 -3 0"/>
+     <path ${r} d="M4 102 C 30 98, 70 106, 116 100"/>
+     <path ${r} d="M14 20 q6 -8 12 0 q6 -8 12 0"/>`,
+    // a clapperboard, as a film begins
+    `<path ${s} d="M16 46 L104 46 L104 98 L16 98 Z"/>
+     <path ${s} d="M14 26 L102 18 L104 46 L16 46 Z"/>
+     <path ${r} d="M30 46 L38 24 M52 46 L60 22 M74 46 L82 20"/>
+     <path ${r} d="M52 62 L52 84 L72 73 Z"/>`,
+    // a house, with smoke from the chimney
+    `<path ${s} d="M12 58 L60 16 L108 58"/>
+     <path ${s} d="M26 50 L26 98 L94 98 L94 50"/>
+     <path ${s} d="M84 36 L84 20 L95 20 L95 45"/>
+     <path ${s} d="M78 62 L90 62 L90 76 L78 76 Z"/>
+     <path ${r} d="M50 98 L50 72 L68 72 L68 98"/>
+     <path ${r} d="M89 14 C 84 9, 94 6, 89 1"/>`,
+    // a book lying open, its lines ruled
+    `<path ${s} d="M60 36 C 44 24, 26 24, 12 30 L12 86 C 26 80, 44 80, 60 92 C 76 80, 94 80, 108 86 L108 30 C 94 24, 76 24, 60 36 Z"/>
+     <path ${s} d="M60 36 L60 92"/>
+     <path ${r} d="M22 44 C 32 42, 42 44, 50 48 M22 56 C 32 54, 42 56, 50 60 M22 68 C 32 66, 42 68, 50 72"/>
+     <path ${s} d="M70 48 C 78 44, 88 42, 98 44 M70 60 C 78 56, 88 54, 98 56 M70 72 C 78 68, 88 66, 98 68"/>`,
+    // a pot on the boil
+    `<path ${s} d="M24 54 L96 54 L90 92 C 89 98, 84 100, 78 100 L42 100 C 36 100, 31 98, 30 92 Z"/>
+     <path ${s} d="M24 62 C 10 60, 8 74, 26 74 M96 62 C 110 60, 112 74, 94 74"/>
+     <path ${s} d="M18 54 C 24 42, 96 42, 102 54"/>
+     <path ${s} d="M54 43 C 54 34, 66 34, 66 43"/>
+     <path ${r} d="M44 30 C 38 22, 50 16, 44 8 M60 26 C 54 18, 66 12, 60 4 M76 30 C 70 22, 82 16, 76 8"/>`,
   ];
-  const at = kind % body.length;
-  return `<svg class="bp-doodle" data-doodle="${at}" viewBox="0 0 120 110" aria-hidden="true">${body[at]}</svg>`;
+  const at = DRAWINGS.indexOf(name);
+  return `<svg class="bp-doodle" data-doodle="${at}" data-drawing="${name}" viewBox="0 0 120 110" aria-hidden="true">${body[at]}</svg>`;
 }
-/** How many doodles there are to choose from. */
-export const DOODLES = 13;
 
 /** A strip of masking tape, torn at both ends. */
 export function tapeClip(rng: Rng) {
