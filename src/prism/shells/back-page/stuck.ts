@@ -420,6 +420,9 @@ function film(block: BlockOf<"film">, key: string) {
   const video = fig.querySelector("video")!;
   if (block.poster) video.setAttribute("poster", block.poster);
   if (block.loop) {
+    // silent, as a film that plays by itself must be: the attribute alone
+    // does not mute an element made by script
+    video.muted = true;
     video.loop = true;
     video.dataset.bpLoop = "";
     loops?.observe(video);

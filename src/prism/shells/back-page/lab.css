@@ -444,7 +444,6 @@
 }
 :root[data-lens="back-page"] .bp-live__load[aria-pressed="true"] {
   color: var(--bp-blue);
-  transform: rotate(1.5deg);
 }
 :root[data-lens="back-page"] .bp-live__load:focus-visible,
 :root[data-lens="back-page"] .bp-shelfcard__play button:focus-visible {
@@ -604,7 +603,7 @@
   text-align: right;
 }
 :root[data-lens="back-page"] .bp-flow .bp-narrowed {
-  margin: calc(var(--g) * -0.5) 0 var(--lh);
+  margin: 0 0 var(--g);
   font: 400 1.2em/var(--lh) var(--bp-hand);
 }
 :root[data-lens="back-page"] .bp-narrowed b {

@@ -1189,7 +1189,7 @@ function lab(b: Build) {
   }
   if (content.labbook.length) {
     blocks.push(placeHead(labbook, "labbook", undefined, "labbook"));
-    if (kept.subjects.length) blocks.push(...tallyChart(b, kept.subjects, kept.subject));
+    // narrowed, it says so first, where a link to narrow it lands
     if (kept.subject)
       blocks.push(
         h(
@@ -1201,6 +1201,7 @@ function lab(b: Build) {
           h("a", { href: narrowHref(undefined, b.at) }, labbook.narrow.all),
         ),
       );
+    if (kept.subjects.length) blocks.push(...tallyChart(b, kept.subjects, kept.subject));
     for (const { month, updates } of months)
       blocks.push(monthHead(month, updates), updateLines(b, updates, monthLabel(month), true));
   }
