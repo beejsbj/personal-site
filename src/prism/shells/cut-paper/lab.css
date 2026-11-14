@@ -502,6 +502,32 @@
   font-size: 11px;
 }
 
+/* what it says while it loads lies on the screen's foot, not under the
+   window: a row of its own grew the file (and the pad) when it played */
+:root[data-lens="cut-paper"] .cp-device {
+  grid-template-areas: "bar" "screen" "foot";
+}
+
+:root[data-lens="cut-paper"] .cp-device__bar {
+  grid-area: bar;
+}
+
+:root[data-lens="cut-paper"] .cp-device__screen {
+  grid-area: screen;
+}
+
+:root[data-lens="cut-paper"] .cp-device__foot {
+  grid-area: foot;
+}
+
+:root[data-lens="cut-paper"] .cp-device__status {
+  grid-area: screen;
+  z-index: 1;
+  align-self: end;
+  background: rgba(0, 0, 0, 0.72);
+  pointer-events: none;
+}
+
 /* ── the Shelf: the browser, a file to a row ───────────────── */
 
 :root[data-lens="cut-paper"] .cp-shelf {
