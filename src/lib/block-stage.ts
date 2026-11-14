@@ -11,6 +11,13 @@
  * back. Only one stage is showing on a page at a time: showing another puts
  * the first away, so a page never runs several heavy pieces at once.
  *
+ * The Labbook's Pens and demos (src/design/compounds/Artifact.astro) stand
+ * on this same stage, so they are one of the same: pressing one puts away
+ * whichever other is showing, a card's or a block's included. Their ask
+ * (`data-stage-ask`) is a link, so a modified click is left to open it, and
+ * it is taken off while the frame shows, which takes the focus, as it
+ * always did, and comes back with the poster.
+ *
  * A film that loops plays by itself, silently, while it is in view, unless
  * the visitor asked for less motion; its controls are always there.
  *
@@ -23,9 +30,15 @@ const showing = new Map<HTMLElement, () => void>();
 const stageOf = (button: Element) =>
   document.getElementById(button.getAttribute("aria-controls") ?? "");
 const buttonOf = (stage: HTMLElement) =>
-  document.querySelector<HTMLElement>(
-    `[data-block-toggle][aria-controls="${CSS.escape(stage.id)}"]`,
-  );
+  stage.id
+    ? document.querySelector<HTMLElement>(
+        `[data-block-toggle][aria-controls="${CSS.escape(stage.id)}"]`,
+      )
+    : null;
+/** What asks for a stage once it is put away: its button, or, for a
+ * Labbook piece, the link standing in its poster. */
+const askOf = (stage: HTMLElement) =>
+  buttonOf(stage) ?? stage.querySelector<HTMLElement>("[data-artifact-load]");
 const statusOf = (stage: HTMLElement) =>
   stage.parentElement?.querySelector<HTMLElement>(".block-stage__status");
 
@@ -67,7 +80,7 @@ function putAway(stage: HTMLElement) {
   setPressed(stage, false);
 }
 
-function show(stage: HTMLElement) {
+function show(stage: HTMLElement, { focus = false } = {}) {
   for (const other of [...showing.keys()])
     if (other !== stage)
       other.isConnected ? putAway(other) : showing.delete(other);
@@ -86,7 +99,9 @@ function show(stage: HTMLElement) {
   setPressed(stage, true);
   say();
 
-  const { frame, model, title = "" } = stage.dataset;
+  const { model } = stage.dataset;
+  const frame = stage.dataset.frame ?? stage.dataset.artifactFrame;
+  const title = stage.dataset.title ?? stage.dataset.artifactTitle ?? "";
   if (frame) {
     // The poster stays, under the frame, until the frame has loaded; then
     // it is hidden, still holding the room, and shows again when put away.
@@ -100,7 +115,9 @@ function show(stage: HTMLElement) {
       stage.removeAttribute("aria-busy");
       say();
     });
+    stage.querySelector("[data-stage-ask]")?.remove();
     stage.append(element);
+    if (focus) element.focus();
     return;
   }
   if (!model) return;
@@ -146,6 +163,29 @@ document.addEventListener("click", (event) => {
   else show(stage);
 });
 
+// A Labbook piece's ask is a link: settled while capturing, before the
+// router looks, and a modified click is left to open the link as links do.
+document.addEventListener(
+  "click",
+  (event) => {
+    const stage = (event.target as Element | null)
+      ?.closest?.("[data-artifact-load]")
+      ?.closest<HTMLElement>("[data-block-stage][data-artifact-frame]");
+    if (!stage) return;
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+    event.preventDefault();
+    if (!showing.has(stage)) show(stage, { focus: true });
+  },
+  { capture: true },
+);
+
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   const stage = (event.target as Element | null)
@@ -153,7 +193,7 @@ document.addEventListener("keydown", (event) => {
     ?.querySelector<HTMLElement>("[data-block-stage]");
   if (!stage || !showing.has(stage)) return;
   putAway(stage);
-  buttonOf(stage)?.focus();
+  askOf(stage)?.focus();
 });
 
 const calm = matchMedia("(prefers-reduced-motion: reduce)");

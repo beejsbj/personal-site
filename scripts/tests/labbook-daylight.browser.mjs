@@ -494,9 +494,11 @@ test(
             await page.focus("#u-fixture-demo [data-artifact-load]");
             await page.keyboard.press("Enter");
             await page.waitForSelector("#u-fixture-demo iframe");
+            // One plays at a time (labbook-stage.browser.mjs): the demo
+            // puts the Pen away.
             assert.deepEqual(
               (await frames()).map((frame) => frame.src),
-              [DEMO_FRAME, PEN_FRAME],
+              [DEMO_FRAME],
             );
             assert.deepEqual(asked, [PEN_FRAME, DEMO_FRAME]);
             const [frame] = await frames();

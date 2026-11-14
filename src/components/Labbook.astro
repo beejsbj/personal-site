@@ -1,5 +1,6 @@
 ---
 import Heading from "../design/primitives/Heading.astro";
+import BlockScript from "./blocks/BlockScript.astro";
 import Link from "../design/primitives/Link.astro";
 import Artifact from "../design/compounds/Artifact.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
@@ -60,6 +61,12 @@ const {
   at = "/lab",
   class: className,
 } = Astro.props;
+// A Pen or a demo plays on the shared stage, so its script is sent with them.
+const playable = Astro.props.updates.some(
+  (update) =>
+    "artifact" in update &&
+    (update.artifact?.kind === "pen" || update.artifact?.kind === "demo"),
+);
 const months = labbookMonths(Astro.props.updates);
 const subjects = labbookSubjects(Astro.props.updates, shown);
 const count = (n: number) =>
@@ -87,6 +94,7 @@ const about = (update: Update) =>
   );
 ---
 
+{playable && <BlockScript />}
 {months.length > 0 && (
   <section
     class:list={["labbook", className]}

@@ -7,8 +7,12 @@ import { embedSrc, type Artifact } from "../../lib/labbook";
  * pen, demo: a stage that holds the poster, or with none a plain placeholder
  * saying what it is, and a pill that asks for it. Nothing is asked of
  * another site until that click: the frame is made then, in the stage's
- * own room, and takes the focus. Without scripts the pill is an ordinary
- * link to where the thing lives, as the link under the stage always is.
+ * own room, and takes the focus. It plays on the shared stage
+ * (src/lib/block-stage.ts), so only one plays at a time on a page, a
+ * card's Pen included, and Escape puts it away. The page that shows one
+ * sends that script (`BlockScript`, which the Labbook renders). Without
+ * scripts the pill is an ordinary link to where the thing lives, as the
+ * link under the stage always is.
  * A poster kept on another site would be a request before the click, so
  * only one of the site's own is shown.
  */
@@ -58,14 +62,15 @@ const home =
   </figure>
 )}
 {(kind === "pen" || kind === "demo") && frame && home && (
-  <figure class="artifact">
+  <figure class="artifact" data-stage-room>
     <div
       class="artifact-stage"
+      data-block-stage
       data-artifact-frame={frame}
       data-artifact-title={alt}
     >
       {poster && <img src={poster} alt={alt} loading="lazy" decoding="async" />}
-      <div class="artifact-plate">
+      <div class="artifact-plate" data-stage-ask>
         {!poster && <p class="artifact-label">{alt}</p>}
         <Link href={home} treatment="pill" tone="wine" data-artifact-load>
           {copy.load[kind]}
@@ -80,37 +85,6 @@ const home =
     </figcaption>
   </figure>
 )}
-<script>
-  // One listener for every stage on every page: a click on its pill makes
-  // the frame, in the stage's place. A modified click is left to open the
-  // link as links do. Capturing, so it is settled before the router looks.
-  document.addEventListener(
-    "click",
-    (event) => {
-      const pill = (event.target as Element | null)?.closest?.(
-        "[data-artifact-load]",
-      );
-      const stage = pill?.closest<HTMLElement>("[data-artifact-frame]");
-      if (!stage?.dataset.artifactFrame) return;
-      if (
-        event.button !== 0 ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.shiftKey ||
-        event.altKey
-      )
-        return;
-      event.preventDefault();
-      const frame = document.createElement("iframe");
-      frame.src = stage.dataset.artifactFrame;
-      frame.title = stage.dataset.artifactTitle ?? "";
-      frame.allow = "fullscreen";
-      stage.replaceChildren(frame);
-      frame.focus();
-    },
-    { capture: true },
-  );
-</script>
 <style>
   .artifact {
     display: grid;
@@ -149,6 +123,15 @@ const home =
   .artifact-stage > :global(iframe) {
     border: 0;
     background: var(--color-page);
+  }
+  /* A frame waits behind the poster until it has loaded, then the poster
+     steps aside and keeps the room. Transparent, not hidden: a hidden frame
+     cannot take the focus. */
+  .artifact-stage[data-live="loading"] > :global(iframe) {
+    opacity: 0;
+  }
+  .artifact-stage[data-live="on"] > img {
+    visibility: hidden;
   }
   /* A slip of the page's own paper laid on the stage, holding the ask. */
   .artifact-plate {

@@ -76,7 +76,9 @@ Lab. The moving strip of headlines first built here was removed.
   poster, or a slip of paper saying what it is) behind a wine pill. The
   frame is made on the click, in the stage's own room, so nothing moves and
   nothing is asked of another site before then. A poster kept on another
-  site is not shown, for the same reason.
+  site is not shown, for the same reason. It plays on the same stage as a
+  card's Pen (`src/lib/block-stage.ts`): one at a time on the page, and
+  Escape puts it away.
 
 ## Lab: the Bench and the Shelf (November, issue #93)
 

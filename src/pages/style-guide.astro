@@ -20,6 +20,7 @@ import ProjectTimeline from "../components/ProjectTimeline.astro";
 import LabCard from "../components/LabCard.astro";
 import PageHeader from "../components/PageHeader.astro";
 import SectionIntro from "../components/SectionIntro.astro";
+import BlockScript from "../components/blocks/BlockScript.astro";
 import MediaRail from "../components/MediaRail.astro";
 import { getHome, getLabPage } from "../lib/portfolio";
 import { streamUpdate, updateDateLabel } from "../lib/labbook";
@@ -133,6 +134,7 @@ const anatomy = [
   noindex
   clientRouting={false}
 >
+  <BlockScript />
   <div class="guide shell">
     <PageHeader
       eyebrow="Living style guide"
