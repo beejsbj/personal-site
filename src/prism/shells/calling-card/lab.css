@@ -888,6 +888,21 @@
   grid-column: auto;
 }
 
+/* One picture is the case's photo, pinned large beside its card, the
+   report under it. */
+:root[data-lens="calling-card"] .cc-brief__file[data-holds="print"] .cc-brief__media {
+  grid-column: 2;
+  grid-row: 1;
+  grid-template-columns: minmax(0, 34rem);
+  padding: 0.6rem 0 0 1rem;
+}
+:root[data-lens="calling-card"] .cc-brief__file[data-holds="print"] .cc-brief__media .cc-photo {
+  rotate: 2.2deg;
+}
+:root[data-lens="calling-card"] .cc-brief__file[data-holds="print"] .cc-brief__report {
+  grid-row: 2 / span 2;
+}
+
 /* A photo, wherever it is pinned: a white print, its caption on black
    tape, a label (a compare's side) a sticker on its corner. */
 :root[data-lens="calling-card"] .cc-photo {
@@ -1383,11 +1398,14 @@
     gap: 2.4rem;
     padding: 0.4rem 0.4rem 1rem;
   }
-  :root[data-lens="calling-card"] .cc-brief__paper,
-  :root[data-lens="calling-card"] .cc-brief__media,
-  :root[data-lens="calling-card"] .cc-brief__report {
+  :root[data-lens="calling-card"] .cc-brief__file :is(.cc-brief__paper, .cc-brief__media, .cc-brief__report),
+  :root[data-lens="calling-card"] .cc-brief__file[data-holds] :is(.cc-brief__media, .cc-brief__report) {
     grid-column: 1;
     grid-row: auto;
+  }
+  :root[data-lens="calling-card"] .cc-brief__file[data-holds="print"] .cc-brief__media {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 0.6rem 0 0.4rem;
   }
   :root[data-lens="calling-card"] .cc-brief__paper {
     transform: rotate(-0.8deg);
