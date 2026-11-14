@@ -243,7 +243,7 @@ export function buildFrame(ctx: ShellContext): Frame {
   const overlay = h("div", { class: "cp-overlay", "aria-hidden": "true" }, wipe);
   const view = h("div", { class: "cp-view" }, scroller, overlay);
   // Skip link for keyboard users: bypass transport, overview, and browser keys
-  const skipLink = link("#cp-main", { class: "skip-link" }, "Skip to main");
+  const skipLink = link("#cp-main", { class: "skip-link" }, content.site.skipLink);
 
   app.append(skipLink, bar, overview, browser, view);
 
