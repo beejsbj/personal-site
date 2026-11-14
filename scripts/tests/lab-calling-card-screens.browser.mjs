@@ -10,8 +10,8 @@
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
  * Read in the harness on fixtures, whatever src/content holds: lab-kinds
- * (every kind of card in both places) and labbook-notebook (four months),
- * and on /lab for the narrowing the client router answers. BASE=<origin>
+ * (every kind of card in both places) and labbook-notebook (four months,
+ * whole and arriving narrowed). BASE=<origin>
  * runs it against a server already up; LAB_ONLY=<regexp> runs the
  * subtests whose names match. Every request to another site is answered
  * with a blank. Same server and Chromium as prism-parity.browser.mjs. */
@@ -410,20 +410,23 @@ test(
         await t.test(
           `${size}: narrowed, the days between are counted between the entries shown`,
           async () => {
+            // On the four-month fixture, arriving narrowed to a target with
+            // several entries, some of them with others between them.
+            const first = await open(size, NOTEBOOK);
+            const content = await harnessed(first.page);
+            await first.context.close();
+            const order = labbookMonths(content.labbook).flatMap(
+              ({ updates }) => updates,
+            );
+            const whole = beats(order, lens.lab.earlier);
+            const target = labbookSubjects(content.labbook, content).find(
+              (s) => s.count > 2,
+            );
+            assert.ok(target, "the fixture has a target with several entries");
             const { context, page, errors } = await open(
               size,
-              "/lab?lens=calling-card",
+              `${NOTEBOOK}&${target.kind}=${encodeURIComponent(target.slug)}`,
             );
-            const subjects = labbookSubjects(content.labbook, content);
-            const target = subjects.find((s) => s.count > 1) ?? subjects[0];
-            const key = `${target.kind}:${target.slug}`;
-            await page
-              .locator(`#lens-shell [data-part='labbook.subject'][data-ref='${key}']`)
-              .click();
-            await page.waitForURL(
-              (url) => url.searchParams.get(target.kind) === target.slug,
-            );
-            await page.waitForTimeout(900);
             const shown = await page.evaluate(() =>
               [...document.querySelectorAll("#lens-shell [data-cc-labbook] .cc-entry")]
                 .filter((entry) => entry.checkVisibility())
@@ -432,13 +435,17 @@ test(
                   earlier: entry.dataset.earlier ?? null,
                 })),
             );
-            const order = labbookMonths(content.labbook)
-              .flatMap(({ updates }) => updates)
-              .filter((update) => shown.some(({ id }) => id === update.id));
             assert.equal(shown.length, target.count);
-            assert.deepEqual(
-              shown.map(({ earlier }) => earlier),
-              beats(order, lens.lab.earlier),
+            const kept = order.filter((update) =>
+              shown.some(({ id }) => id === update.id),
+            );
+            const said = beats(kept, lens.lab.earlier);
+            assert.deepEqual(shown.map(({ earlier }) => earlier), said);
+            assert.ok(
+              said.some(
+                (beat, i) => beat && beat !== whole[order.indexOf(kept[i])],
+              ),
+              "a gap is counted across the entries put away",
             );
             assert.deepEqual(errors, []);
             await context.close();
