@@ -414,14 +414,6 @@ export const GAPS: Partial<
       "home.elsewhere":
         "No Elsewhere section: Lab and Writing are keys on the keyboard, without their blurbs.",
     },
-    lab: {
-      "lab.preview":
-        "The cut-paper Lab lists the experiments with no way to play one where it stands until its design pass draws it (#130); each still links out to where it lives.",
-      "labbook.month":
-        "Cut Paper's Labbook is one list, not yet kept by month: its design pass (#130) draws the months.",
-      "labbook.subject":
-        "Cut Paper's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#130) adds it. With either in the address it shows every update, as before.",
-    },
   },
   "back-page": {
     home: {
@@ -442,19 +434,6 @@ export const GAPS: Partial<
 };
 
 type BlockPart = Extract<Part, `block.${string}`>;
-const ALL_BLOCKS: BlockPart[] = [
-  "block.gallery",
-  "block.compare",
-  "block.embed",
-  "block.model",
-  "block.code",
-  "block.quote",
-  "block.steps",
-  "block.tree",
-  "block.audio",
-  "block.film",
-];
-
 /** The blocks of an entry's page (a project's or an experiment's) a lens
  * does not draw yet, and the design pass that will. Until then the lens
  * shows the page's prose and passes over the blocks. A design pass takes
@@ -462,12 +441,7 @@ const ALL_BLOCKS: BlockPart[] = [
  * when none are left. */
 export const BLOCK_GAPS: Partial<
   Record<LensId, { why: string; parts: BlockPart[] }>
-> = {
-  "cut-paper": {
-    why: "Cut Paper shows an entry's prose and none of its blocks until its design pass draws them (#130).",
-    parts: ALL_BLOCKS,
-  },
-};
+> = {};
 
 /** A redacted update is owed wherever updates are listed: a lens that
  * leaves the updates off a route leaves its redacted ones off with them.
