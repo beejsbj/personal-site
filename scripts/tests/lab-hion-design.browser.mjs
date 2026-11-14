@@ -47,7 +47,7 @@ const BLOCKS = harness("lab-blocks", "/lab/fixture-blocks");
 
 /** What each experiment in the kinds fixture holds, and how many pictures
  * it shows for it: on the Bench all of them (three at most), on the Shelf
- * the first, woven into its swatch; a place to play shows its poster. */
+ * the first, woven into its swatch; a place to play shows its poster, if it has one. */
 const CARDS = {
   "fixture-kinds-featured": ["bench", "prints", 3],
   "fixture-kinds-print": ["bench", "print", 1],
@@ -55,6 +55,7 @@ const CARDS = {
   "fixture-kinds-pen": ["bench", "play", 1],
   "fixture-kinds-stack": ["bench", "prints", 2],
   "fixture-kinds-note": ["bench", "words", 0],
+  "fixture-kinds-demo": ["bench", "play", 0],
   "fixture-kinds-shelved": ["shelf", "print", 1],
   "fixture-kinds-shelf-pen": ["shelf", "play", 1],
   "fixture-kinds-shelf-stack": ["shelf", "prints", 1],
@@ -239,6 +240,7 @@ test(
             const fixture = await harnessed(page);
             for (const slug of [
               "fixture-kinds-pen",
+              "fixture-kinds-demo",
               "fixture-kinds-shelf-pen",
             ]) {
               const entry = fixture.lab.find((item) => item.slug === slug);
