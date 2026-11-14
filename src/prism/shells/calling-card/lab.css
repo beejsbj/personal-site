@@ -986,6 +986,10 @@
   width: 100%;
   rotate: none;
 }
+/* On the card, the screen keeps inside its frame. */
+:root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-tv__screen {
+  box-shadow: none;
+}
 :root[data-lens="calling-card"] [data-lab-place="shelf"] .cc-tv__bar {
   justify-content: center;
 }
