@@ -29,6 +29,9 @@ export interface Screen {
   /** Called once the view is in the scroller, at the top: somewhere on it
    * to go to, if the address names one. */
   arrive?: () => void;
+  /** The same page with another query (the Labbook soloed, or shown
+   * whole again): answered in place, without a sweep. */
+  renew?: () => void;
 }
 
 /** Solfège colours, one per scale degree, used for whatever is musical. */

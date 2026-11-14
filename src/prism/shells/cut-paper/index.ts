@@ -9,6 +9,7 @@
 // Carried inside the persistent root rather than <head>: the client router
 // swaps <head> on navigation and would drop a lazily injected stylesheet.
 import css from "./shell.css?inline";
+import labCss from "./lab.css?inline";
 import type { LensShell, Route, RouteKind, ShellContext } from "../types";
 import { closeSound, hush, stopAudition } from "./audio";
 import { noteVar, type Env, type Screen } from "./bits";
@@ -30,6 +31,7 @@ let ctx: ShellContext | undefined;
 let frame: Frame | undefined;
 let current: Live | undefined;
 let currentPath = "";
+let currentSearch = "";
 let generation = 0;
 const live = new Set<Live>();
 
@@ -110,8 +112,16 @@ async function transition(route: Route) {
   // the runtime also syncs on the first page load; same page, nothing to
   // do, unless live writing changed under it
   const refresh = route.path === currentPath;
-  if (refresh && !route.refresh) return;
+  if (refresh && !route.refresh) {
+    // the same page with another query (the Labbook soloed): in place
+    if (location.search !== currentSearch) {
+      currentSearch = location.search;
+      current?.renew?.();
+    }
+    return;
+  }
   currentPath = route.path;
+  currentSearch = location.search;
   const id = ++generation;
   const { scroller, wipe } = frame;
   stopAudition();
@@ -190,7 +200,7 @@ const shell: LensShell = {
     frame = buildFrame(context);
     const style = document.createElement("style");
     style.dataset.shellStyle = "cut-paper";
-    style.textContent = css;
+    style.textContent = `${css}\n${labCss}`;
     context.root.replaceChildren(style, frame.app);
     frame.light(context.route.kind);
     frame.wipe.style.setProperty("--note", noteVar(DEGREE[context.route.kind] ?? 6));
@@ -198,6 +208,7 @@ const shell: LensShell = {
     frame.scroller.append(first.el);
     current = first;
     currentPath = context.route.path;
+    currentSearch = location.search;
     first.arrive?.();
     // Already on screen (a face, or stepping in from the prism): the view
     // is printed, not entering on successive sixteenths.

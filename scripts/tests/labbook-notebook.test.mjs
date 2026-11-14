@@ -259,12 +259,11 @@ test("the Lab owes a way to narrow the Labbook to each thing it is about", () =>
   ]);
 });
 
-test("Daylight, Calling Card, Back Page and Hion group and narrow the Labbook; each other lens says which design pass will", () => {
-  const passes = {
-    "cut-paper": "#130",
-  };
+test("every lens groups and narrows the Labbook; a lens that did not would say which design pass will", () => {
+  // Every design pass has drawn it (#128 to #132): no lens waits on one.
+  const passes = {};
   for (const part of ["labbook.month", "labbook.subject"]) {
-    for (const lens of ["daylight", "calling-card", "back-page", "hion"])
+    for (const lens of ["daylight", "calling-card", "cut-paper", "back-page", "hion"])
       assert.equal(isGap(lens, "lab", part), false, `${lens} ${part}`);
     for (const [lens, ticket] of Object.entries(passes)) {
       assert.equal(isGap(lens, "lab", part), true, `${lens} ${part}`);
@@ -273,7 +272,7 @@ test("Daylight, Calling Card, Back Page and Hion group and narrow the Labbook; e
   }
   // Every update stays owed by every lens: a gap here is the grouping and
   // the narrowing, never the record.
-  for (const lens of ["daylight", "calling-card", "back-page", "hion", ...Object.keys(passes)])
+  for (const lens of ["daylight", "calling-card", "cut-paper", "back-page", "hion"])
     for (const part of ["update.item", "update.redacted"])
       assert.equal(isGap(lens, "lab", part), false, `${lens} ${part}`);
 });

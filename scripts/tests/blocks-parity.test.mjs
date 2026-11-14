@@ -153,9 +153,9 @@ test("a project's page owes the same blocks, and a page with none owes none", ()
   );
 });
 
-test("Daylight, Calling Card, Back Page and Hion draw every block; each other lens records the gap and its design pass", () => {
+test("every lens draws every block; a lens that did not would record the gap and its design pass", () => {
+  // Every design pass has drawn them (#128 to #132): no lens waits on one.
   const TICKETS = {
-    "cut-paper": "#130",
   };
   assert.deepEqual(Object.keys(BLOCK_GAPS).sort(), Object.keys(TICKETS).sort());
   for (const [lens, ticket] of Object.entries(TICKETS)) {
@@ -167,7 +167,7 @@ test("Daylight, Calling Card, Back Page and Hion draw every block; each other le
     for (const part of ["lab.title", "lab.summary", "lab.body"])
       assert.equal(isGap(lens, "lab-entry", part), false, `${lens} ${part}`);
   }
-  for (const lens of ["daylight", "calling-card", "back-page", "hion"])
+  for (const lens of ["daylight", "calling-card", "cut-paper", "back-page", "hion"])
     for (const part of BLOCK_PARTS)
       for (const kind of ["lab-entry", "project"])
         assert.equal(isGap(lens, kind, part), false, `${lens} ${kind} ${part}`);
