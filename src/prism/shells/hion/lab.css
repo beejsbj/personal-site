@@ -1,0 +1,907 @@
+/* The Lab as a loom room (screens.ts lab, logbook; blocks.ts draft).
+   The Bench is work still on the loom: each experiment hangs in its loop
+   as what it holds. The Shelf is swatches put by, laid flat on their
+   wefts: nothing on it hangs or swings. An experiment's page is its
+   draft: words strung down one side, small blocks tied on in the margin,
+   plates hung across. The Labbook is kept in knots: a cord for each month,
+   a knot on it for each day written in. Black paper, the two hions and
+   their light: nothing else. */
+
+/* ---------- The Bench: on the loom ---------- */
+
+/* What it holds hangs at its top, whatever the order it is read in (its
+   name first, so the keyboard meets the name, then the cord). */
+:root[data-lens="hion"] .hion-work--lab .hion-charm-art {
+  order: -1;
+  margin: 0 0 0.85em;
+}
+
+:root[data-lens="hion"] .hion-charm-art__first .hion-picture__frame,
+:root[data-lens="hion"] .hion-work--lab .hion-kept {
+  aspect-ratio: 16 / 10;
+}
+
+/* The others hang from the first one's foot, each on a short thread of
+   its own (ink.ts `drop`, as long as its --hion-hang), at two lengths. */
+:root[data-lens="hion"] .hion-charm-art__rest {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding-inline: 7%;
+}
+
+:root[data-lens="hion"] .hion-charm-art__more {
+  --hion-hang: 20px;
+  position: relative;
+  flex: 0 1 44%;
+  margin-top: var(--hion-hang);
+}
+
+:root[data-lens="hion"] .hion-charm-art__more:nth-child(2) {
+  --hion-hang: 44px;
+}
+
+:root[data-lens="hion"] .hion-charm-art__more .hion-picture__frame {
+  aspect-ratio: 4 / 3;
+}
+
+/* Only words: its name is all it has to hang, written large, a sign on
+   two threads. */
+:root[data-lens="hion"] .hion-screen .hion-work--lab[data-holds="words"]:not(.hion-work--featured) .hion-work__title {
+  font: var(--hion-display-weight) clamp(1.9rem, 3.1vw, 2.5rem)/1.12 var(--hion-display);
+  letter-spacing: var(--hion-display-track);
+}
+
+:root[data-lens="hion"] .hion-work--lab[data-holds="words"]:not(.hion-work--featured) {
+  --hion-drop: 64px;
+}
+
+/* Something to play: the place stitched out for it hangs steady, it does
+   not swing, so a Pen playing in it stays where it is. */
+:root[data-lens="hion"] .hion-work--lab[data-holds="play"],
+:root[data-lens="hion"] .hion-work--lab[data-holds="play"][data-lit]:hover {
+  rotate: none;
+  animation: none;
+}
+
+:root[data-lens="hion"] .hion-charm-play {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 1.2em;
+}
+
+/* The featured one, with something to hold, lays it beside its words. */
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-work--featured:has(.hion-charm-art) {
+    justify-self: stretch;
+    max-width: none;
+    text-align: left;
+  }
+
+  :root[data-lens="hion"] .hion-work--featured:has(.hion-charm-art) article {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    grid-auto-flow: dense;
+    column-gap: 44px;
+    align-items: start;
+  }
+
+  :root[data-lens="hion"] .hion-work--featured:has(.hion-charm-art) article > * {
+    grid-column: 1;
+  }
+
+  :root[data-lens="hion"] .hion-work--featured:has(.hion-charm-art) .hion-charm-art {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    margin: 0;
+  }
+
+  :root[data-lens="hion"] .hion-screen .hion-work--featured:has(.hion-charm-art) .hion-work__title {
+    font-size: clamp(2rem, 3.3vw, 2.7rem);
+  }
+}
+
+/* The place stitched out for something to play shows its stitches round
+   the poster it holds until then. */
+:root[data-lens="hion"] .hion-work--lab .hion-kept {
+  outline-offset: 7px;
+}
+
+/* ---------- The cord that plays a stitched place ---------- */
+
+:root[data-lens="hion"] .hion-cord {
+  --hion-hang: 24px;
+  position: relative;
+  margin: 24px 0 0;
+}
+
+:root[data-lens="hion"] .hion-cord__pull {
+  position: relative;
+  padding: 0.25em 0.1em 0.25em 1.35em;
+  border: 0;
+  background: none;
+  color: var(--hion-cl);
+  font: var(--hion-label-style) var(--hion-label-weight) 1.05rem/1.2 var(--hion-label);
+  letter-spacing: var(--hion-label-track);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+:root[data-lens="hion"] .hion-cord[data-hue="m"] .hion-cord__pull {
+  color: var(--hion-ml);
+}
+
+/* The knot at the cord's end, to take hold of. */
+:root[data-lens="hion"] .hion-cord__pull::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  border: 2.5px solid var(--hion-c);
+  border-radius: 50%;
+}
+
+:root[data-lens="hion"] .hion-cord[data-hue="m"] .hion-cord__pull::before {
+  border-color: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-cord__pull[aria-pressed="true"]::before {
+  background: currentColor;
+}
+
+:root[data-lens="hion"] .hion-cord__pull:hover {
+  color: var(--hion-c);
+}
+
+:root[data-lens="hion"] .hion-cord[data-hue="m"] .hion-cord__pull:hover {
+  color: var(--hion-m);
+}
+
+/* Once its frame has loaded, it stands where the poster stood; put away,
+   the poster comes back. */
+:root[data-lens="hion"] .hion-stage[data-live="on"] > :not(iframe, canvas) {
+  visibility: hidden;
+}
+
+:root[data-lens="hion"] .hion-stage > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- The Shelf: swatches put by ---------- */
+
+:root[data-lens="hion"] .hion-shelf {
+  gap: 2.6rem;
+}
+
+:root[data-lens="hion"] .hion-shelved {
+  --hion-swatch: 5.5rem;
+  display: grid;
+  grid-template-columns: var(--hion-swatch) minmax(0, 1fr);
+  column-gap: 1.5rem;
+  align-items: start;
+}
+
+/* Wide screens lay them by turns to the left and the right of the loop;
+   a phone keeps every swatch at the start of its row. */
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-shelved:nth-child(2n):not([data-holds="play"]) {
+    grid-template-columns: minmax(0, 1fr) var(--hion-swatch);
+  }
+
+  :root[data-lens="hion"] .hion-shelved:nth-child(2n):not([data-holds="play"]) > .hion-swatch {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  :root[data-lens="hion"] .hion-shelved:nth-child(2n):not([data-holds="play"]) > article {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 719px) {
+  :root[data-lens="hion"] .hion-shelved .hion-strung,
+  :root[data-lens="hion"] .hion-shelved:nth-child(2n) .hion-strung {
+    margin: 0 auto 0.45em 0;
+    text-align: left;
+  }
+
+  :root[data-lens="hion"] .hion-shelved:nth-child(2n) .hion-shelved__summary {
+    margin-left: 0;
+    text-align: left;
+  }
+}
+
+/* Laid on the weft its name is strung on: its top edge along the thread. */
+:root[data-lens="hion"] .hion-swatch {
+  position: relative;
+  display: block;
+  width: var(--hion-swatch);
+  aspect-ratio: 1;
+  margin-top: 0.55em;
+  /* With nothing woven in, the plain cloth: a basket weave, two over two,
+     in the shelf's own hue and the black paper. */
+  --hion-weave: var(--hion-c);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--hion-weave) 70%, transparent) 0 4px,
+      transparent 4px 6px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--hion-weave) 38%, transparent) 0 4px,
+      transparent 4px 6px
+    ),
+    var(--hion-black);
+  background-size: 12px 12px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--hion-weave) 40%, transparent);
+}
+
+:root[data-lens="hion"] .hion-swatch[data-hue="m"] {
+  --hion-weave: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-swatch .hion-picture,
+:root[data-lens="hion"] .hion-swatch .hion-picture__frame {
+  width: 100%;
+  height: 100%;
+}
+
+:root[data-lens="hion"] .hion-shelved:is(:hover, :focus-within) [data-woven-cover] .hion-picture__frame {
+  background: var(--hion-c);
+}
+
+:root[data-lens="hion"] .hion-shelved:is(:hover, :focus-within) [data-woven-cover][data-hue="m"] .hion-picture__frame {
+  background: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-shelved:is(:hover, :focus-within) [data-woven-cover] .hion-picture__frame img {
+  opacity: 1;
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-lens="hion"] .hion-shelved:is(:hover, :focus-within) .hion-woven-cover {
+  opacity: 0;
+}
+
+/* Put by, it says less: its words a little quieter than the Bench's. */
+:root[data-lens="hion"] .hion-shelved__summary {
+  color: color-mix(in srgb, var(--hion-text) 82%, var(--hion-black));
+}
+
+/* A Pen gone quiet still plays, in a place stitched out at the end of its
+   weft (under its words on a phone). */
+:root[data-lens="hion"] .hion-shelved[data-holds="play"] {
+  grid-template-columns: var(--hion-swatch) minmax(0, 1fr);
+}
+
+:root[data-lens="hion"] .hion-shelved__play {
+  grid-column: 1 / -1;
+  margin-top: 1.2rem;
+}
+
+:root[data-lens="hion"] .hion-shelved__play .hion-kept {
+  aspect-ratio: 16 / 10;
+}
+
+/* Its words on the near side of the loop, whichever turn it is. */
+:root[data-lens="hion"] .hion-shelved[data-holds="play"] .hion-strung {
+  margin: 0 auto 0.45em 0;
+  text-align: left;
+}
+
+:root[data-lens="hion"] .hion-shelved[data-holds="play"] .hion-shelved__summary {
+  margin-left: 0;
+  text-align: left;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-shelved[data-holds="play"] {
+    grid-template-columns: var(--hion-swatch) minmax(0, 1fr) minmax(0, 15rem);
+  }
+
+  :root[data-lens="hion"] .hion-shelved__play {
+    grid-column: 3;
+    grid-row: 1;
+    margin-top: 0.55em;
+  }
+
+  :root[data-lens="hion"] .hion-shelved__play .hion-cord {
+    margin-top: 16px;
+    --hion-hang: 16px;
+  }
+}
+
+@media (max-width: 719px) {
+  :root[data-lens="hion"] .hion-shelved {
+    --hion-swatch: 4.25rem;
+    column-gap: 1.1rem;
+  }
+}
+
+/* ---------- The Labbook: kept in knots ---------- */
+
+:root[data-lens="hion"] [data-labbook] .hion-logged[hidden],
+:root[data-lens="hion"] .hion-month[hidden] {
+  display: none;
+}
+
+/* The threads it can be followed by, hung from one cord under its head. */
+:root[data-lens="hion"] .hion-threads {
+  margin: -1rem 0 3.6rem;
+  text-align: center;
+}
+
+:root[data-lens="hion"] .hion-threads__label {
+  margin: 0;
+}
+
+:root[data-lens="hion"] .hion-row--threads {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 2.6rem;
+}
+
+:root[data-lens="hion"] .hion-thread {
+  --hion-drop: 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+:root[data-lens="hion"] .hion-thread:nth-child(2n) {
+  --hion-drop: 64px;
+}
+
+:root[data-lens="hion"] .hion-thread .hion-pullcord__link {
+  text-decoration: none;
+}
+
+/* How many entries it has, in knots along the cord under its name. */
+:root[data-lens="hion"] .hion-thread__count {
+  display: block;
+  width: calc(var(--hion-n, 1) * 14px);
+  height: 14px;
+  margin: 0.35em 0 0 0.9rem;
+  background:
+    radial-gradient(circle, var(--hion-c) 0 3.4px, transparent 4px) 0 50% / 14px 14px repeat-x,
+    linear-gradient(color-mix(in srgb, var(--hion-c) 55%, transparent), color-mix(in srgb, var(--hion-c) 55%, transparent)) 0 50% / 100% 1.5px no-repeat;
+}
+
+:root[data-lens="hion"] .hion-thread[data-hue="m"] .hion-thread__count {
+  background:
+    radial-gradient(circle, var(--hion-m) 0 3.4px, transparent 4px) 0 50% / 14px 14px repeat-x,
+    linear-gradient(color-mix(in srgb, var(--hion-m) 55%, transparent), color-mix(in srgb, var(--hion-m) 55%, transparent)) 0 50% / 100% 1.5px no-repeat;
+}
+
+/* The thread it is followed by: a bead of light rests on its knot. */
+:root[data-lens="hion"] .hion-thread:has([aria-current="true"])::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  width: 30px;
+  height: 30px;
+  margin: -15px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--hion-c) 30%, white) 0 18%,
+    color-mix(in srgb, var(--hion-c) 75%, transparent) 32%,
+    color-mix(in srgb, var(--hion-c) 22%, transparent) 56%,
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+:root[data-lens="hion"] .hion-thread[data-hue="m"]:has([aria-current="true"])::after {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--hion-m) 30%, white) 0 18%,
+    color-mix(in srgb, var(--hion-m) 75%, transparent) 32%,
+    color-mix(in srgb, var(--hion-m) 22%, transparent) 56%,
+    transparent 72%
+  );
+}
+
+:root[data-lens="hion"] .hion-narrowed {
+  max-width: 32em;
+  margin: -1.6rem auto 3.6rem;
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.6rem * var(--hion-hand-scale))/1.45 var(--hion-hand);
+  text-align: center;
+  scroll-margin: 30vh 0;
+}
+
+:root[data-lens="hion"] .hion-narrowed strong {
+  font-style: normal;
+  font-weight: var(--hion-strong-weight);
+  color: var(--hion-cl);
+}
+
+:root[data-lens="hion"] .hion-narrowed__all {
+  color: var(--hion-cl);
+  text-decoration: none;
+  background: var(--hion-tooth-c) 0 100% / 64px 2px repeat-x;
+  padding-bottom: 2px;
+}
+
+:root[data-lens="hion"] .hion-months {
+  display: grid;
+  gap: 4.6rem;
+}
+
+/* A month: knotted on the hions, its name strung out on one side and its
+   cord of days on the other. */
+:root[data-lens="hion"] .hion-month__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  grid-template-areas:
+    "name knot"
+    "tally knot";
+  row-gap: 0.9rem;
+  align-items: center;
+  margin-bottom: 2.8rem;
+}
+
+:root[data-lens="hion"] .hion-month__head .hion-strung {
+  grid-area: name;
+  justify-self: start;
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+:root[data-lens="hion"] .hion-month__knot {
+  grid-area: knot;
+  justify-self: center;
+  height: 1.6rem;
+}
+
+/* As long as the month, in a fixed measure, so a short month is shorter. */
+:root[data-lens="hion"] .hion-tally {
+  grid-area: tally;
+  position: relative;
+  width: min(100%, calc(var(--hion-days, 31) * 0.68rem));
+  height: 26px;
+}
+
+:root[data-lens="hion"] .hion-tally__knot {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--hion-at) * 100%);
+  width: 12px;
+  height: 12px;
+  translate: -50% -50%;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-month__head {
+    grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+    grid-template-areas: "name knot tally";
+  }
+
+  :root[data-lens="hion"] .hion-month__head .hion-strung {
+    justify-self: end;
+    text-align: right;
+  }
+
+  :root[data-lens="hion"] .hion-tally {
+    justify-self: start;
+  }
+}
+
+/* ---------- An entry's page: its head ---------- */
+
+/* One picture hangs by the head, on the intro's side, not alone below. */
+:root[data-lens="hion"] .hion-head__art {
+  margin-top: 2.4rem;
+}
+
+:root[data-lens="hion"] .hion-head__art .hion-picture {
+  --hion-drop: 48px;
+  width: min(100%, 26rem);
+}
+
+:root[data-lens="hion"] .hion-head__art .hion-picture__frame {
+  aspect-ratio: 16 / 10;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-entry-head:has(.hion-head__art) {
+    grid-template-areas:
+      ". sign  .    .     ."
+      ". more  knot intro ."
+      ". more  via  art   .";
+  }
+
+  :root[data-lens="hion"] .hion-page[data-drop="left"] .hion-entry-head:has(.hion-head__art) {
+    grid-template-areas:
+      ". .     .    sign ."
+      ". intro knot more ."
+      ". art   via  more .";
+  }
+
+  :root[data-lens="hion"] .hion-head__art {
+    grid-area: art;
+    justify-self: start;
+    width: min(100%, 26rem);
+    margin-top: 1.2rem;
+  }
+
+  :root[data-lens="hion"] .hion-page[data-drop="left"] .hion-head__art {
+    justify-self: end;
+  }
+}
+
+/* Several pictures: a string of them across the loop, the first largest,
+   the others hung at other lengths. */
+:root[data-lens="hion"] .hion-screen--lab-entry .hion-row--gallery,
+:root[data-lens="hion"] .hion-garland {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: 28px 32px;
+  align-items: start;
+}
+
+:root[data-lens="hion"] .hion-screen--lab-entry .hion-row--gallery > :first-child,
+:root[data-lens="hion"] .hion-garland > :first-child {
+  grid-row: span 2;
+}
+
+:root[data-lens="hion"] .hion-screen--lab-entry .hion-row--gallery > :nth-child(3),
+:root[data-lens="hion"] .hion-garland > :nth-child(3) {
+  --hion-drop: 22px;
+}
+
+:root[data-lens="hion"] .hion-garland > :nth-child(2),
+:root[data-lens="hion"] .hion-screen--lab-entry .hion-row--gallery > :nth-child(2) {
+  --hion-drop: 74px;
+}
+
+:root[data-lens="hion"] .hion-screen--lab-entry .hion-loop--gallery[data-count="1"] .hion-row--gallery,
+:root[data-lens="hion"] .hion-garland[data-count="1"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* ---------- An entry's page: the draft ---------- */
+
+:root[data-lens="hion"] .hion-loop--draft {
+  width: min(1180px, calc(100% - 2 * var(--hion-gutter)));
+  font-size: var(--hion-read-size);
+}
+
+:root[data-lens="hion"] .hion-spread {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 2.2rem;
+  margin: 0 0 3.2rem;
+}
+
+:root[data-lens="hion"] .hion-spread > .hion-prose > :last-child {
+  margin-bottom: 0;
+}
+
+:root[data-lens="hion"] .hion-spread__margin {
+  display: grid;
+  gap: 2.6rem;
+  align-content: start;
+}
+
+:root[data-lens="hion"] .hion-plate {
+  margin: 4rem 0 4.6rem;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-spread[data-asides] {
+    grid-template-columns: minmax(0, 58ch) minmax(16rem, 1fr);
+    column-gap: clamp(36px, 5vw, 80px);
+  }
+
+  /* Small blocks with no words before them hang in a row of their own. */
+  :root[data-lens="hion"] .hion-spread[data-asides]:not(:has(> .hion-prose)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="hion"] .hion-spread:not(:has(> .hion-prose)) > .hion-spread__margin {
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    column-gap: clamp(36px, 5vw, 80px);
+  }
+
+  :root[data-lens="hion"] .hion-spread:not([data-asides]) > .hion-prose {
+    max-width: 58ch;
+  }
+}
+
+/* Tied on in the margin: the hand, the chalk slip, the files. */
+:root[data-lens="hion"] .hion-block {
+  margin: 0;
+}
+
+:root[data-lens="hion"] .hion-block__caption {
+  margin-top: 0.55em;
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.4rem * var(--hion-hand-scale))/1.4 var(--hion-hand);
+  color: var(--hion-text);
+}
+
+:root[data-lens="hion"] .hion-block--quote blockquote {
+  margin: 0;
+  font: var(--hion-hand-style) var(--hion-hand-weight) clamp(1.45rem, 2vw, 1.75rem)/1.35 var(--hion-hand);
+  color: var(--hion-cl);
+}
+
+:root[data-lens="hion"] .hion-block--quote[data-hue="m"] blockquote {
+  color: var(--hion-ml);
+}
+
+:root[data-lens="hion"] .hion-block--quote blockquote p {
+  margin: 0 0 0.5em;
+}
+
+:root[data-lens="hion"] .hion-quote__who {
+  font: var(--hion-label-style) var(--hion-label-weight) 1.05rem/1.4 var(--hion-label);
+  letter-spacing: var(--hion-label-track);
+  color: var(--hion-c);
+}
+
+:root[data-lens="hion"] .hion-quote__who cite {
+  font-style: normal;
+}
+
+:root[data-lens="hion"] .hion-code__language,
+:root[data-lens="hion"] .hion-block__side {
+  margin: 0.45em 0 0;
+  font: var(--hion-label-style) var(--hion-label-weight) 1.05rem/1.2 var(--hion-label);
+  letter-spacing: var(--hion-label-track);
+  color: var(--hion-c);
+}
+
+:root[data-lens="hion"] .hion-code__language {
+  margin: 0 0 0.45em;
+}
+
+:root[data-lens="hion"] [data-hue="m"] > .hion-code__language,
+:root[data-lens="hion"] .hion-picture[data-hue="m"] > .hion-block__side {
+  color: var(--hion-m);
+}
+
+/* Code: chalk on a slip of the black paper, its edge stitched. */
+:root[data-lens="hion"] .hion-block--code pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  outline: 2px dashed color-mix(in srgb, var(--hion-c) 55%, transparent);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--hion-black) 88%, var(--hion-c));
+  font: 500 0.92rem/1.6 "JetBrains Mono Variable", ui-monospace, monospace;
+  color: var(--hion-cl);
+  white-space: pre;
+}
+
+:root[data-lens="hion"] .hion-block--code[data-hue="m"] pre {
+  outline-color: color-mix(in srgb, var(--hion-m) 55%, transparent);
+  background: color-mix(in srgb, var(--hion-black) 88%, var(--hion-m));
+  color: var(--hion-ml);
+}
+
+:root[data-lens="hion"] .hion-block--code pre:focus-visible {
+  outline-style: solid;
+}
+
+/* Files dangle from their folders, each level on a thread down. */
+:root[data-lens="hion"] .hion-files__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 500 0.95rem/1.75 "JetBrains Mono Variable", ui-monospace, monospace;
+}
+
+:root[data-lens="hion"] .hion-files__list .hion-files__list {
+  margin-left: 0.45rem;
+  padding-left: 1.1rem;
+  border-left: 2px solid color-mix(in srgb, var(--hion-c) 60%, transparent);
+}
+
+:root[data-lens="hion"] [data-hue="m"] .hion-files__list .hion-files__list {
+  border-left-color: color-mix(in srgb, var(--hion-m) 60%, transparent);
+}
+
+:root[data-lens="hion"] .hion-files__list [data-folder] > .hion-files__name {
+  color: var(--hion-c);
+}
+
+:root[data-lens="hion"] [data-hue="m"] .hion-files__list [data-folder] > .hion-files__name {
+  color: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-files__note {
+  margin-left: 0.8em;
+  font: var(--hion-hand-style) var(--hion-hand-weight) 1rem/1.4 var(--hion-hand);
+  color: var(--hion-text);
+}
+
+:root[data-lens="hion"] .hion-block--audio audio {
+  display: block;
+  width: 100%;
+  color-scheme: dark;
+}
+
+/* Plates: hung across the loop. */
+:root[data-lens="hion"] .hion-garland .hion-picture,
+:root[data-lens="hion"] .hion-compare .hion-picture {
+  --hion-drop: 44px;
+}
+
+:root[data-lens="hion"] .hion-garland .hion-picture__frame,
+:root[data-lens="hion"] .hion-compare .hion-picture__frame {
+  aspect-ratio: 4 / 3;
+}
+
+:root[data-lens="hion"] .hion-garland > :first-child .hion-picture__frame {
+  aspect-ratio: 16 / 11;
+}
+
+:root[data-lens="hion"] .hion-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+}
+
+:root[data-lens="hion"] .hion-compare > :nth-child(2) {
+  --hion-drop: 70px;
+}
+
+/* Something live, a model and a film hang like a picture: a place
+   stitched out in the cloth (or the film), its cord beside it, as a
+   label hangs by what it names. */
+:root[data-lens="hion"] .hion-block--embed,
+:root[data-lens="hion"] .hion-block--model,
+:root[data-lens="hion"] .hion-block--film {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0.6rem;
+}
+
+:root[data-lens="hion"] .hion-block__hung {
+  --hion-drop: 46px;
+}
+
+:root[data-lens="hion"] .hion-block__hung .hion-kept {
+  aspect-ratio: 16 / 10;
+}
+
+:root[data-lens="hion"] .hion-block__pull .hion-cord {
+  margin-top: 18px;
+  --hion-hang: 18px;
+}
+
+:root[data-lens="hion"] .hion-block__out {
+  margin: 0.5em 0 0;
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.4rem * var(--hion-hand-scale))/1.4 var(--hion-hand);
+}
+
+:root[data-lens="hion"] .hion-block__out a {
+  color: var(--hion-cl);
+  text-decoration: none;
+  background: var(--hion-tooth-c) 0 100% / 64px 2px repeat-x;
+  padding-bottom: 2px;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-block--embed,
+  :root[data-lens="hion"] .hion-block--model,
+  :root[data-lens="hion"] .hion-block--film {
+    grid-template-columns: minmax(0, 2.1fr) minmax(12rem, 1fr);
+    column-gap: 36px;
+    align-items: end;
+  }
+
+  :root[data-lens="hion"] .hion-block--embed > .hion-block__caption,
+  :root[data-lens="hion"] .hion-block--model > .hion-block__caption,
+  :root[data-lens="hion"] .hion-block--film > .hion-block__caption {
+    grid-column: 2;
+    align-self: end;
+  }
+
+  :root[data-lens="hion"] .hion-block--embed > .hion-block__hung,
+  :root[data-lens="hion"] .hion-block--model > .hion-block__hung,
+  :root[data-lens="hion"] .hion-block--film > .hion-block__hung {
+    grid-row: 1 / span 2;
+  }
+}
+
+/* Steps: knots tied along one thread, each step hanging from its knot;
+   across on a desktop, down on a phone. */
+:root[data-lens="hion"] .hion-steps__thread {
+  position: relative;
+  display: grid;
+  gap: 2rem;
+  margin: 0;
+  padding: 0 0 0 2.2rem;
+  list-style: none;
+}
+
+:root[data-lens="hion"] .hion-step {
+  position: relative;
+  min-width: 0;
+}
+
+:root[data-lens="hion"] .hion-step__knot {
+  position: absolute;
+  top: 0.55em;
+  left: -2.2rem;
+  width: 14px;
+  height: 14px;
+  translate: 4px -50%;
+}
+
+:root[data-lens="hion"] .hion-step__no {
+  display: block;
+  font: var(--hion-display-weight) 1.8rem/1 var(--hion-display);
+  color: var(--hion-c);
+}
+
+:root[data-lens="hion"] .hion-steps__thread[data-hue="m"] .hion-step__no {
+  color: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-step__title {
+  margin: 0.35em 0 0;
+  font: var(--hion-head-weight) 1.3rem/1.3 var(--hion-head);
+  color: var(--hion-cl);
+}
+
+:root[data-lens="hion"] .hion-step__text {
+  margin: 0.35em 0 0;
+  font-size: calc(var(--hion-text-size) * 0.95);
+  line-height: 1.6;
+}
+
+:root[data-lens="hion"] .hion-step__picture {
+  width: min(100%, 16rem);
+  margin-top: 0.8rem;
+}
+
+:root[data-lens="hion"] .hion-step__picture .hion-picture__frame {
+  aspect-ratio: 16 / 10;
+}
+
+@media (min-width: 720px) {
+  :root[data-lens="hion"] .hion-steps__thread {
+    grid-template-columns: repeat(var(--hion-count, 3), minmax(0, 1fr));
+    column-gap: clamp(24px, 3vw, 48px);
+    padding: 2.6rem 0 0;
+  }
+
+  :root[data-lens="hion"] .hion-step__knot {
+    top: -2.6rem;
+    left: 0;
+    translate: 0 -50%;
+  }
+}
+
+/* ---------- Less motion ---------- */
+
+/* Asked for less motion, nothing in the Lab's places fades or eases in:
+   a woven cover is simply there, and a picture's own colours come back at
+   once when you reach for it. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-lens="hion"] [data-lab-place] :is(.hion-woven-cover, .hion-picture__frame img) {
+    animation: none;
+    transition: none;
+  }
+}
+
+:root[data-lens="hion"] .hion[data-still] [data-lab-place] :is(.hion-woven-cover, .hion-picture__frame img) {
+  animation: none;
+  transition: none;
+}

@@ -19,6 +19,7 @@
  * the one thread, of the one width (pastel.ts THREAD). */
 import { kindOf } from "../../routes";
 import type { LensShell, Route, ShellContext } from "../types";
+import { watchFilms } from "./blocks";
 import { h, setNewTabNote, still as showStill, wait } from "./dom";
 import { ink } from "./ink";
 import { fabricOf } from "./fabric";
@@ -35,6 +36,7 @@ import { buildScreen, footer } from "./screens";
 import { ACROSS, createTrack } from "./track";
 import { compose } from "./weave";
 import "./shell.css";
+import "./lab.css";
 
 interface Live {
   path: string;
@@ -45,6 +47,10 @@ interface Live {
   /** The resume's timeline, when it runs across. */
   track: ReturnType<typeof createTrack> | undefined;
   controller: AbortController;
+  /** The address's query it was shown for: the Labbook narrows by it. */
+  search: string;
+  /** The Lab answering the visitor (lab.ts). */
+  tended: ReturnType<typeof tendLab>;
   /** When it began to leave (performance.now()), once it has. */
   left?: number;
 }
@@ -209,7 +215,9 @@ function show(route: Route, first: boolean) {
     catchUp: (to) => loom.catchUp(to),
     instant: still(),
   });
-  live = { path: route.path, page, loom, skein, life, track, controller };
+  live = { path: route.path, page, loom, skein, life, track, controller, search: location.search, tended };
+  // A looping film plays by itself while in sight, unless asked not to.
+  watchFilms(page, controller.signal, still());
   // For a look from the console while developing.
   if (import.meta.env.DEV) Object.assign(window, { __hion: live });
   const begin = () => {
@@ -239,7 +247,11 @@ function show(route: Route, first: boolean) {
       ground();
       later(controller.signal, WOVEN, woven);
     }
-    if (!ctx.face) tended.land();
+    if (!ctx.face) {
+      // Arrived at narrowed: the Labbook already keeps only that one.
+      tended.narrow(false);
+      tended.land();
+    }
   };
   // Settled: drawn before it is first painted, so nothing is seen arriving.
   if (settled) begin();
@@ -382,7 +394,14 @@ const shell: LensShell = {
 
   async update(route) {
     // A screen that already let go (leave) is brought back, even for the same path.
-    if (live && route.path === live.path && !route.refresh && live.left === undefined) return;
+    if (live && route.path === live.path && !route.refresh && live.left === undefined) {
+      // The same screen with another query: the Labbook narrows in place.
+      if (location.search !== live.search) {
+        live.search = location.search;
+        live.tended.narrow(true);
+      }
+      return;
+    }
     const leaving = live;
     // Usually already begun, at the click.
     leave(route.path);
