@@ -5,14 +5,15 @@
    --stage-window-width (at most), --stage-window-ratio (its glass) and
    --stage-window-gap (kept clear round it on the screen). */
 .stage-window {
-  --stage-window-gap: 12px;
-  --stage-window-width: 44rem;
   --stage-window-ratio: 16 / 10;
   position: fixed;
   inset: auto;
   box-sizing: border-box;
-  width: min(100vw - 2 * var(--stage-window-gap), var(--stage-window-width));
+  width: min(100% - 2 * var(--stage-window-gap), var(--stage-window-width));
   max-height: calc(100dvh - 2 * var(--stage-window-gap));
+  /* Read back as pixels by the script that lays it, to keep it this far
+     from the screen's edges. */
+  scroll-margin: var(--stage-window-gap);
   margin: 0;
   padding: 0;
   overflow: visible;
@@ -35,7 +36,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75em;
+  gap: var(--space-s);
   margin: 0;
 }
 .stage-window__name {
@@ -57,7 +58,7 @@
   aspect-ratio: var(--stage-window-ratio);
   overflow: clip;
 }
-.stage-window__glass > :is(iframe, .stage-window__still) {
+.stage-window__glass > :is(.stage-window__piece, .stage-window__still) {
   position: absolute;
   inset: 0;
   display: block;
@@ -71,12 +72,14 @@
 .stage-window__says {
   position: absolute;
   inset: auto 0 0;
-  padding: 0.4em 0.75em;
+  padding: var(--space-2xs) var(--space-s);
   text-align: center;
 }
 /* Until it has loaded the piece waits behind the poster; then the poster
    and the words give way to it, in the same glass. */
-[data-live="loading"] > .stage-window iframe,
+[data-live="loading"] > .stage-window .stage-window__piece {
+  opacity: 0;
+}
 [data-live="on"] > .stage-window :is(.stage-window__still, .stage-window__says) {
   visibility: hidden;
 }
@@ -85,8 +88,8 @@
 @media (prefers-reduced-motion: no-preference) {
   .stage-window:popover-open {
     transition:
-      scale 280ms cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 160ms ease-out;
+      scale var(--duration-swell) var(--ease-settle),
+      opacity var(--duration-fast) ease-out;
   }
   @starting-style {
     .stage-window:popover-open {

@@ -211,6 +211,10 @@
   /* An experiment's page as a notebook: the words' measure, and the
      margin the small blocks stand in beside them. */
   --spread-text: 38rem;
+  /* The window a played piece opens in: at most this wide, and kept this
+     far from the screen's edges. */
+  --stage-window-gap: var(--space-s);
+  --stage-window-width: 44rem;
 }
 @media (max-width: 40.625rem) {
   :root {
