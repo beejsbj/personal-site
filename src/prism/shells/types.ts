@@ -305,6 +305,15 @@ export interface SiteContent {
         title: string;
         note: string;
         listLabel: string;
+        /** Narrowing it to one experiment or project: what the links to
+         * each are called, how many entries each has, what it shows once
+         * narrowed and the way back to all of it. */
+        narrow: {
+          label: string;
+          showing: string;
+          all: string;
+          count: { one: string; other: string };
+        };
         related: { experiment: string; project: string };
         artifact: {
           load: { pen: string; demo: string };

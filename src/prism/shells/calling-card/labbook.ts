@@ -6,18 +6,34 @@
  * tab. What an update shows for itself is pinned under its words. A
  * redacted update is a slip of paper with words cut out of its line: a
  * word it shows set as a title's words are, a black cut-out for each bar
- * of its shape, then a stamp and its kind of work. */
+ * of its shape, then a stamp and its kind of work.
+ *
+ * The whole Labbook is kept by month, each month opening on its page of
+ * the game's calendar: the month's number large, its name, and its days
+ * with the ones written in struck red (for the eye alone: it links
+ * nowhere). Above the months, its targets: each experiment and project
+ * the Labbook is about, a link that narrows it to that one
+ * (`?experiment=` / `?project=`), and back. */
 import type { SiteContent } from "../types";
 import { part } from "../../parts";
 import {
   type Artifact,
+  type Narrowing,
   type Update,
   embedSrc,
   labbookAnchor,
+  labbookMonths,
+  labbookSubjects,
+  monthCalendar,
+  monthLabel,
+  narrowedTo,
+  narrowHref,
   penUser,
   relatedLinks,
+  subjectsOf,
   updateDateLabel,
 } from "../../../lib/labbook";
+import { fill } from "../rich";
 import { copyOf } from "./chrome";
 import { h, parseDay } from "./dom";
 
@@ -156,6 +172,7 @@ function logged(content: SiteContent, update: Update, i: number, whole: boolean)
     id: whole ? labbookAnchor(update.id) : undefined,
     tabindex: whole ? "-1" : undefined,
     style: `--i:${i}`,
+    "data-about": whole ? aboutOf(content, update) : undefined,
   };
   if (update.visibility !== "open") return censored(content, update, attrs);
   const { updateKinds, updateSources } = content.site;
@@ -205,27 +222,187 @@ function logged(content: SiteContent, update: Update, i: number, whole: boolean)
   );
 }
 
+/** What an update is about, as the narrowing names it: "experiment:lotus
+ * project:dayshaper". */
+const aboutOf = (content: SiteContent, update: Update) =>
+  subjectsOf(update, content).map((s) => `${s.kind}:${s.slug}`).join(" ") || undefined;
+
+/** A month's page of the calendar: the week's days across its head, Monday
+ * first, then each day, the ones written in struck through in red. For the
+ * eye alone: the entries under it say the same in words. */
+function calendarPage(content: SiteContent, month: string, updates: Update[]) {
+  const { lead, days } = monthCalendar(month, updates);
+  const week = copyOf(content).weekdays;
+  const monday = [...week.slice(1), week[0]];
+  const about = (ids: string[]) =>
+    [...new Set(updates.filter((u) => ids.includes(u.id)).flatMap((u) => aboutOf(content, u)?.split(" ") ?? []))].join(" ");
+  return h(
+    "div",
+    { class: "cc-cal", "aria-hidden": "true", style: `--lead:${lead}` },
+    monday.map((day) => h("span", { class: "cc-cal__wd" }, day.charAt(0))),
+    days.map(({ day, updates: ids }) =>
+      h(
+        "span",
+        {
+          class: "cc-cal__day",
+          "data-written": ids.length ? "" : null,
+          "data-about": ids.length ? about(ids) || null : null,
+        },
+        String(day),
+      ),
+    ),
+  );
+}
+
+/** The targets: a link narrowing the Labbook to each thing it is about,
+ * with how many entries each has, and a line saying what it is narrowed
+ * to with the way back to all of it. */
+function targets(content: SiteContent, updates: Update[], at: string) {
+  const copy = content.pages.lab.labbook.narrow;
+  const subjects = labbookSubjects(updates, content);
+  if (!subjects.length) return [];
+  const count = (n: number) => (n === 1 ? copy.count.one : fill(copy.count.other, { count: n }));
+  return [
+    h(
+      "div",
+      { class: "cc-targets", role: "group", "aria-labelledby": "cc-targets-label" },
+      h(
+        "p",
+        { class: "cc-targets__label", id: "cc-targets-label" },
+        h("span", { class: "cc-targets__eyebrow", "aria-hidden": "true" }, copyOf(content).lab.targets),
+        " ",
+        copy.label,
+      ),
+      h(
+        "ul",
+        { class: "cc-targets__list" },
+        subjects.map((subject) =>
+          h(
+            "li",
+            {},
+            h(
+              "a",
+              {
+                class: "cc-target",
+                href: narrowHref(subject, at),
+                "data-cc-subject": "",
+                "data-title": subject.title,
+                ...part("labbook.subject", `${subject.kind}:${subject.slug}`),
+              },
+              h("span", { class: "cc-target__name" }, subject.title),
+              h(
+                "span",
+                { class: "cc-target__count" },
+                h("span", { "aria-hidden": "true" }, String(subject.count)),
+                h("span", { class: "cc-sr" }, `, ${count(subject.count)}`),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+    h(
+      "p",
+      { class: "cc-narrowed", tabindex: "-1", hidden: true, "data-cc-narrowed": "" },
+      `${copy.showing} `,
+      h("strong", { "data-cc-narrowed-to": "" }),
+      ". ",
+      h("a", { class: "cc-narrowed__all", href: narrowHref(undefined, at), "data-cc-all": "" }, copy.all),
+    ),
+  ];
+}
+
 /** A stretch of the Labbook, newest first as it is handed over. With a
- * `note` it is the Labbook itself: each update is where its links land.
- * No updates, no record. */
+ * `note` it is the Labbook itself: kept by month under its targets, each
+ * update where its links land. No updates, no record. */
 export function record(content: SiteContent, updates: Update[], id: string, title: string, note?: string) {
   if (!updates.length) return null;
   const whole = note !== undefined;
+  const head = h(
+    "header",
+    { class: "cc-place__head" },
+    h("h2", { class: "cc-place__title", id }, title),
+    note ? h("p", { class: "cc-place__note" }, note) : null,
+  );
+  if (!whole)
+    return h(
+      "section",
+      { class: "cc-log", "aria-labelledby": id },
+      head,
+      h(
+        "ol",
+        { class: "cc-log__list", "aria-label": content.pages.lab.labbook.listLabel },
+        updates.map((update, i) => logged(content, update, i, false)),
+      ),
+    );
+  const at = `${location.pathname}${location.search}`;
+  let n = 0;
   return h(
     "section",
-    { class: "cc-log", "aria-labelledby": id, "data-cc-labbook": whole ? "" : undefined },
+    { class: "cc-log", "aria-labelledby": id, "data-cc-labbook": "" },
+    head,
+    targets(content, updates, at),
     h(
-      "header",
-      { class: "cc-place__head" },
-      h("h2", { class: "cc-place__title", id }, title),
-      note ? h("p", { class: "cc-place__note" }, note) : null,
-    ),
-    h(
-      "ol",
-      { class: "cc-log__list", "aria-label": content.pages.lab.labbook.listLabel },
-      updates.map((update, i) => logged(content, update, i, whole)),
+      "div",
+      { class: "cc-months", role: "list", "aria-label": content.pages.lab.labbook.listLabel },
+      labbookMonths(updates).map(({ month, updates: days }) => {
+        const [name, year] = monthLabel(month).split(" ");
+        return h(
+          "section",
+          { class: "cc-month", role: "listitem", "data-cc-month": month, "aria-labelledby": `cc-month-${month}` },
+          h(
+            "div",
+            { class: "cc-month__page" },
+            h(
+              "h3",
+              { class: "cc-month__name", id: `cc-month-${month}`, ...part("labbook.month", month) },
+              h("span", { class: "cc-month__no", "aria-hidden": "true" }, String(Number(month.slice(5)))),
+              h("span", { class: "cc-month__word" }, name),
+              " ",
+              h("span", { class: "cc-month__year" }, year),
+            ),
+            calendarPage(content, month, days),
+          ),
+          h(
+            "ol",
+            { class: "cc-log__list", "aria-labelledby": `cc-month-${month}` },
+            days.map((update) => logged(content, update, n++, true)),
+          ),
+        );
+      }),
     ),
   );
+}
+
+/** Narrow the Labbook to what the address names, or show all of it: an
+ * entry about something else is put away, a month left empty with it, and
+ * a written day on the calendar about something else is struck no longer.
+ * Returns where the keyboard goes: the line saying what it is narrowed to,
+ * or, shown whole, nothing. */
+export function narrow(screen: HTMLElement, search = location.search) {
+  const section = screen.querySelector<HTMLElement>("[data-cc-labbook]");
+  if (!section) return null;
+  const wanted: Narrowing | undefined = narrowedTo(search);
+  const key = wanted && `${wanted.kind}:${wanted.slug}`;
+  const links = [...section.querySelectorAll<HTMLAnchorElement>("[data-cc-subject]")];
+  const chosen = links.find((link) => link.dataset.ref === key);
+  for (const link of links) {
+    if (link === chosen) link.setAttribute("aria-current", "true");
+    else link.removeAttribute("aria-current");
+  }
+  const about = (el: HTMLElement) => !chosen || (el.dataset.about ?? "").split(" ").includes(key!);
+  for (const entry of section.querySelectorAll<HTMLElement>(".cc-entry")) entry.hidden = !about(entry);
+  for (const month of section.querySelectorAll<HTMLElement>("[data-cc-month]"))
+    month.hidden = ![...month.querySelectorAll<HTMLElement>(".cc-entry")].some((entry) => !entry.hidden);
+  for (const day of section.querySelectorAll<HTMLElement>(".cc-cal__day[data-written]"))
+    day.toggleAttribute("data-elsewhere", !about(day));
+  const status = section.querySelector<HTMLElement>("[data-cc-narrowed]");
+  if (chosen) section.dataset.narrowed = key;
+  else delete section.dataset.narrowed;
+  if (!status) return null;
+  status.hidden = !chosen;
+  status.querySelector("[data-cc-narrowed-to]")!.textContent = chosen?.dataset.title ?? "";
+  return chosen ? status : null;
 }
 
 /** The Labbook, answering the visitor.

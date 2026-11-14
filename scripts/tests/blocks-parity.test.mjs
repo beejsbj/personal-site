@@ -153,9 +153,8 @@ test("a project's page owes the same blocks, and a page with none owes none", ()
   );
 });
 
-test("Daylight draws every block; each other lens records the gap and its design pass", () => {
+test("Daylight and Calling Card draw every block; each other lens records the gap and its design pass", () => {
   const TICKETS = {
-    "calling-card": "#129",
     "cut-paper": "#130",
     "back-page": "#131",
     hion: "#132",
@@ -170,8 +169,10 @@ test("Daylight draws every block; each other lens records the gap and its design
     for (const part of ["lab.title", "lab.summary", "lab.body"])
       assert.equal(isGap(lens, "lab-entry", part), false, `${lens} ${part}`);
   }
-  for (const part of BLOCK_PARTS)
-    assert.equal(isGap("daylight", "lab-entry", part), false, part);
+  for (const lens of ["daylight", "calling-card"])
+    for (const part of BLOCK_PARTS)
+      for (const kind of ["lab-entry", "project"])
+        assert.equal(isGap(lens, kind, part), false, `${lens} ${kind} ${part}`);
 });
 
 test("a kind of block the contract has not heard of is owed by no lens", () => {

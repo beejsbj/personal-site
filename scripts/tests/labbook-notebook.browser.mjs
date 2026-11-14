@@ -31,7 +31,9 @@ const SIZES = {
 const NOTEBOOK = "/prism/fixtures/lab?labbook=notebook";
 const SHOTS = process.env.LAB_SHOTS;
 const ONLY = process.env.LAB_ONLY ? new RegExp(process.env.LAB_ONLY) : null;
-const SHELLS = ["calling-card", "cut-paper", "back-page", "hion"];
+// The lenses whose Labbook does not narrow yet. Calling Card's does (#129):
+// lab-calling-card-design.browser.mjs looks at it.
+const SHELLS = ["cut-paper", "back-page", "hion"];
 
 // The fixture Labbook, newest first, by month. Written out here rather
 // than derived, so the page is checked against what the fixture says.

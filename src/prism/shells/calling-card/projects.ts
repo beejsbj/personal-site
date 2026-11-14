@@ -17,6 +17,7 @@ import {
   tapCue,
   tabs,
 } from "./chrome";
+import { holdEscape, report, watchFilms } from "./blocks";
 import { concentricStar, h, prose, ransom } from "./dom";
 import { other } from "./other";
 
@@ -207,7 +208,12 @@ export function projectEntry(route: Route, env: Env): Screen {
       m.caption ? h("figcaption", {}, m.caption) : null,
     );
 
-  const notes = project.html ? prose(project.html) : null;
+  // Told with blocks, the page is a report as an experiment's is; else its
+  // prose alone.
+  const told = project.blocks.some((block) => block.type !== "text")
+    ? report(content, project.slug, project.blocks, "project.body")
+    : null;
+  const notes = !told && project.html ? prose(project.html) : null;
   const back = backLink(copy, "/projects", copy.sections.projects);
 
   main.append(
@@ -268,6 +274,7 @@ export function projectEntry(route: Route, env: Env): Screen {
             ),
           )
         : null,
+      told ? h("div", { class: "cc-item__notes" }, told) : null,
       notes?.childElementCount
         ? h("div", { class: "cc-item__notes", ...part("project.body", project.slug) }, notes)
         : null,
@@ -289,11 +296,15 @@ export function projectEntry(route: Route, env: Env): Screen {
   el.prepend(tabs(route.kind, copy));
 
   const pager = el.querySelectorAll<HTMLAnchorElement>(".cc-pager");
+  watchFilms(el, env.signal, env.reducedMotion);
+  const held = holdEscape(el, env.signal);
   return {
     el,
     heading,
     back,
     onKey(event) {
+      // A playing screen is put away by Escape, and the file stays open.
+      if (held(event)) return true;
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         pager[event.key === "ArrowLeft" ? 0 : 1].click();
         return true;
