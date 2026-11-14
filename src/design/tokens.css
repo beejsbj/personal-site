@@ -206,6 +206,7 @@
      month's calendar page in the margin, a day to a cell. */
   --labbook-artifact-width: 20rem;
   --labbook-day: 1.125rem;
+  --labbook-day-dot: 0.15;
   /* An experiment's page as a notebook: the words' measure, and the
      margin the small blocks stand in beside them. */
   --spread-text: 38rem;

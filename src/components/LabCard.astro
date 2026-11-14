@@ -218,6 +218,7 @@ const Slip = holds === "words" && layout !== "standing" ? Note : Fragment;
     z-index: 1;
   }
   .lab-card__under {
+    --depth: 1;
     --fan: 1;
     position: absolute;
     inset: 0;
@@ -330,8 +331,8 @@ const Slip = holds === "words" && layout !== "standing" ? Note : Fragment;
         rotate var(--duration-hover) var(--ease-settle),
         translate var(--duration-hover) var(--ease-settle);
     }
-    .lab-card:is(:hover, :has(:focus-visible))
-      :is(.lab-card__object > :global(*), :global(.ds-note)) {
+    .lab-card:is(:hover, :has(:focus-visible)) .lab-card__object > :global(*),
+    .lab-card:is(:hover, :has(:focus-visible)) :global(.ds-note) {
       rotate: 0deg;
       translate: 0 calc(-1 * var(--motion-lift));
     }

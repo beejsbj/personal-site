@@ -305,7 +305,26 @@ const event = kinds[kind];
   .update-entry--notebook .event-artifact {
     margin-top: var(--space-xs);
   }
+  /* An entry that shows something carries more weight: its title is set
+     as a heading is, and beside its words the artifact keeps to a column
+     of its own width, so a tall one does not leave a run of empty page
+     under a short entry. */
+  .update-entry--notebook.update-entry--shows .event-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-card);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+  }
+  .update-entry--notebook.update-entry--shows .event-detail {
+    font-size: var(--text-lead);
+  }
   @media (min-width: 62.501rem) {
+    .update-entry--notebook.update-entry--shows .event-body {
+      grid-template-columns:
+        minmax(0, 1fr)
+        min(var(--labbook-artifact-width), 40%);
+    }
     .update-entry--notebook.update-entry--shows .event-body > .event-artifact {
       margin-top: 0;
     }
