@@ -1,7 +1,7 @@
 /** Calling Card's design pass of the Lab (issue #129): the Bench is the
  * request board, each request pinned as what it holds (an evidence photo,
  * a fan of them, a screen to play it on, or only its words); the Shelf is
- * a list of cases, a row each; a brief is a case file, its request card
+ * a list of cases (since #168 laid out as the compendium's cards, in order); a brief is a case file, its request card
  * beside a report told with the page's blocks as spreads and plates; the
  * Labbook is kept by month, each on its page of the calendar, and narrows
  * to one target.
@@ -139,7 +139,7 @@ test(
     try {
       for (const size of Object.keys(SIZES)) {
         await t.test(
-          `${size}: each request is pinned as what it holds, and the Shelf is a list`,
+          `${size}: each request is pinned as what it holds, and the Shelf is laid out in order`,
           async () => {
             const { context, page, asked, errors } = await open(size, KINDS);
             const shown = await page.evaluate(() =>
@@ -207,12 +207,15 @@ test(
               shelf.every((pin) => pin.turned < 0.01),
               "the Shelf is listed straight",
             );
-            // The Shelf is one row under another; the Bench is not, on a
-            // desktop, where requests stand side by side.
+            // The Shelf is laid out as the compendium's cards (#168): in
+            // the board's order, read across a row and then down. The Bench
+            // stands its requests side by side on a desktop too.
             for (let i = 1; i < shelf.length; i += 1)
               assert.ok(
-                shelf[i].top >= shelf[i - 1].bottom - 1,
-                `${shelf[i].slug} is under ${shelf[i - 1].slug}`,
+                (Math.abs(shelf[i].top - shelf[i - 1].top) < 2 &&
+                  shelf[i].left > shelf[i - 1].left) ||
+                  shelf[i].top >= shelf[i - 1].bottom - 1,
+                `${shelf[i].slug} follows ${shelf[i - 1].slug}`,
               );
             if (size === "desktop")
               assert.ok(

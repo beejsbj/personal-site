@@ -46,6 +46,16 @@ const between = (later, earlier) =>
 
 /** What each entry should say of the days since the one above it, in the
  * order they are shown: nothing for the first, nor for a day or less. */
+/** In the page: what turns (scrolls) the board, the board itself on a
+ * desktop, the screen's main on a phone. */
+const TURNER = `(el) => {
+  for (let at = el; at; at = at.parentElement) {
+    const { overflowY } = getComputedStyle(at);
+    if ((overflowY === "auto" || overflowY === "scroll") && at.scrollHeight > at.clientHeight) return at;
+  }
+  return document.scrollingElement;
+}`;
+
 const beats = (updates, phrase) =>
   updates.map((update, i) => {
     const n = i ? between(updates[i - 1].date, update.date) : 0;
@@ -107,9 +117,9 @@ test(
           `${size}: each place fills the board as its own screen, on its own ground`,
           async () => {
             const { context, page, errors } = await open(size, KINDS);
-            const screens = await page.evaluate(() => {
-              const board = document.querySelector(
-                "#lens-shell .cc-requests__board",
+            const screens = await page.evaluate((TURNER) => {
+              const board = eval(TURNER)(
+                document.querySelector("#lens-shell .cc-requests__sheet"),
               );
               return [
                 ...document.querySelectorAll(
@@ -122,7 +132,7 @@ test(
                 board: board.clientHeight,
                 ground: getComputedStyle(place).backgroundImage,
               }));
-            });
+            }, TURNER);
             assert.deepEqual(
               screens.map(({ place, kind }) => [place, kind]),
               [
@@ -157,6 +167,7 @@ test(
                   "#lens-shell [data-lab-place='bench']",
                 );
                 const route = bench.querySelector("svg.cc-route");
+                const here = bench.querySelector(".cc-route__here");
                 if (!route) return null;
                 const frame = route.getBoundingClientRect();
                 const path = route.querySelector(".cc-route__path");
@@ -177,7 +188,6 @@ test(
                       pin.querySelector("a.cc-request").dataset.state === "selected",
                   };
                 });
-                const here = route.querySelector(".cc-route__here");
                 const spot = here?.getBoundingClientRect();
                 return {
                   hidden: route.getAttribute("aria-hidden"),
@@ -297,9 +307,13 @@ test(
                   return {
                     month: month.dataset.ccMonth,
                     days: days.length,
-                    rows: new Set(
-                      days.map((day) => Math.round(day.getBoundingClientRect().top)),
-                    ).size,
+                    // Rows by layout: a struck day is turned, the day being
+                    // read stands up out of the strip.
+                    rows: days
+                      .map((day) => day.offsetTop + day.offsetHeight / 2)
+                      .sort((a, b) => a - b)
+                      .filter((middle, i, all) => !i || middle - all[i - 1] > 10)
+                      .length,
                   };
                 },
               ),
@@ -317,28 +331,23 @@ test(
             const { month, updates } = months[1];
             const update = updates[Math.min(1, updates.length - 1)];
             const read = await page.evaluate(
-              async ({ month, id }) => {
-                const board = document.querySelector(
-                  "#lens-shell .cc-requests__board",
+              async ({ month, id, TURNER }) => {
+                const board = eval(TURNER)(
+                  document.querySelector("#lens-shell .cc-requests__sheet"),
                 );
                 const entry = document.getElementById(`u-${id}`);
                 const strip = document.querySelector(
                   `#lens-shell [data-cc-month='${month}'] .cc-month__page`,
                 );
+                // As a reader brings it up: just under the strip.
+                entry.scrollIntoView({ block: "start", behavior: "instant" });
                 const view = board.getBoundingClientRect();
-                board.scrollBy({
-                  top:
-                    entry.getBoundingClientRect().top -
-                    view.top -
-                    strip.getBoundingClientRect().height -
-                    view.height * 0.12,
-                  behavior: "instant",
-                });
                 await new Promise((done) => setTimeout(done, 500));
                 const box = strip.getBoundingClientRect();
                 return {
                   stripTop: box.top - view.top,
                   stripBottom: box.bottom - view.top,
+                  entryTop: entry.getBoundingClientRect().top - view.top,
                   board: view.height,
                   today: [
                     ...document.querySelectorAll("#lens-shell .cc-cal__day[data-today]"),
@@ -348,11 +357,15 @@ test(
                   })),
                 };
               },
-              { month, id: update.id },
+              { month, id: update.id, TURNER },
             );
             assert.ok(
               read.stripTop >= -1 && read.stripBottom <= read.board * 0.5,
               `the month's strip stays at the top of the board (${read.stripTop} to ${read.stripBottom})`,
+            );
+            assert.ok(
+              read.entryTop >= read.stripBottom - 4,
+              `the day comes up under the strip, not behind it (${read.entryTop}, ${read.stripBottom})`,
             );
             assert.deepEqual(
               read.today,

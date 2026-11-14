@@ -104,7 +104,8 @@
       "intel": "Intel",
       "reports": "{n} report{s} in the Labbook"
     },
-    "targets": "Targets"
+    "targets": "Targets",
+    "earlier": "{n} days earlier"
   },
   "about": {
     "arcana": { "number": "0", "name": "The Fool" },

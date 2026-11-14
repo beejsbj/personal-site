@@ -8,12 +8,15 @@
  * word it shows set as a title's words are, a black cut-out for each bar
  * of its shape, then a stamp and its kind of work.
  *
- * The whole Labbook is kept by month, each month opening on its page of
- * the game's calendar: the month's number large, its name, and its days
- * with the ones written in struck red (for the eye alone: it links
- * nowhere). Above the months, its targets: each experiment and project
- * the Labbook is about, a link that narrows it to that one
- * (`?experiment=` / `?project=`), and back. */
+ * The whole Labbook is the game's calendar screen, kept by month. Each
+ * month opens on the strip of its days the calendar runs past as a day
+ * turns: the month's number large, its name, every day with its weekday,
+ * the ones written in struck red. The strip stays at the top while its
+ * days are read, and the day being read is the one it stands on (for the
+ * eye alone: it links nowhere). Between two entries, the days that passed
+ * are said in passing, as the game says time moving on. Above the months,
+ * its targets: each experiment and project the Labbook is about, a link
+ * that narrows it to that one (`?experiment=` / `?project=`), and back. */
 import type { SiteContent } from "../types";
 import { part } from "../../parts";
 import {
@@ -237,9 +240,9 @@ function logged(content: SiteContent, update: Update, i: number, whole: boolean)
 const aboutOf = (content: SiteContent, update: Update) =>
   subjectsOf(update, content).map((s) => `${s.kind}:${s.slug}`).join(" ") || undefined;
 
-/** A month's page of the calendar: the week's days across its head, Monday
- * first, then each day, the ones written in struck through in red. For the
- * eye alone: the entries under it say the same in words. */
+/** A month's strip of the calendar: each day with its weekday, Monday
+ * first, the ones written in struck through in red. For the eye alone: the
+ * entries under it say the same in words. */
 function calendarPage(content: SiteContent, month: string, updates: Update[]) {
   const { lead, days } = monthCalendar(month, updates);
   const week = copyOf(content).weekdays;
@@ -248,13 +251,14 @@ function calendarPage(content: SiteContent, month: string, updates: Update[]) {
     [...new Set(updates.filter((u) => ids.includes(u.id)).flatMap((u) => aboutOf(content, u)?.split(" ") ?? []))].join(" ");
   return h(
     "div",
-    { class: "cc-cal", "aria-hidden": "true", style: `--lead:${lead}` },
+    { class: "cc-cal", "aria-hidden": "true", style: `--lead:${lead};--days:${days.length}` },
     monday.map((day) => h("span", { class: "cc-cal__wd" }, day.charAt(0))),
     days.map(({ day, updates: ids }) =>
       h(
         "span",
         {
           class: "cc-cal__day",
+          "data-wd": monday[(lead + day - 1) % 7].charAt(0),
           "data-written": ids.length ? "" : null,
           "data-about": ids.length ? about(ids) || null : null,
         },
@@ -349,7 +353,13 @@ export function record(content: SiteContent, updates: Update[], id: string, titl
   let n = 0;
   return h(
     "section",
-    { class: "cc-log", "aria-labelledby": id, "data-cc-labbook": "" },
+    {
+      class: "cc-log",
+      "aria-labelledby": id,
+      "data-cc-labbook": "",
+      "data-cc-screen": "calendar",
+      "data-cc-earlier": copyOf(content).lab.earlier,
+    },
     head,
     targets(content, updates, at),
     h(
@@ -406,6 +416,7 @@ export function narrow(screen: HTMLElement, search = location.search) {
     month.hidden = ![...month.querySelectorAll<HTMLElement>(".cc-entry")].some((entry) => !entry.hidden);
   for (const day of section.querySelectorAll<HTMLElement>(".cc-cal__day[data-written]"))
     day.toggleAttribute("data-elsewhere", !about(day));
+  passing(section);
   const status = section.querySelector<HTMLElement>("[data-cc-narrowed]");
   if (chosen) section.dataset.narrowed = key;
   else delete section.dataset.narrowed;
@@ -413,6 +424,79 @@ export function narrow(screen: HTMLElement, search = location.search) {
   status.hidden = !chosen;
   status.querySelector("[data-cc-narrowed-to]")!.textContent = chosen?.dataset.title ?? "";
   return chosen ? status : null;
+}
+
+/** The days that passed between each entry shown and the one above it,
+ * said over it when more than one did ("5 days earlier"). For the eye: the
+ * dates say it in words. */
+function passing(section: HTMLElement) {
+  const phrase = section.dataset.ccEarlier;
+  let above: number | undefined;
+  for (const entry of section.querySelectorAll<HTMLElement>(".cc-entry")) {
+    delete entry.dataset.earlier;
+    if (entry.hidden) continue;
+    const day = Date.parse(entry.querySelector("time.cc-day")?.getAttribute("datetime") ?? "");
+    if (Number.isNaN(day)) continue;
+    const n = above === undefined ? 0 : Math.round((above - day) / 86_400_000);
+    if (phrase && n > 1) entry.dataset.earlier = fill(phrase, { n });
+    above = day;
+  }
+}
+
+/** The calendar keeps up with the reader: the day being read, the last
+ * entry shown whose top has passed under its month's strip (or, before
+ * any has, the newest), is the day the strip stands on. */
+export function turnCalendar(screen: HTMLElement, signal: AbortSignal) {
+  let queued = false;
+  /** How far under the top of what turns the board a day is brought up,
+   * so it comes up under its month's strip, not behind it. */
+  const clearance = (section: HTMLElement) => {
+    const strip = section.querySelector<HTMLElement>(".cc-month__page");
+    let turner = section.parentElement;
+    while (turner && !/auto|scroll/.test(getComputedStyle(turner).overflowY)) turner = turner.parentElement;
+    if (!strip || !turner) return;
+    const under =
+      parseFloat(getComputedStyle(turner).paddingTop) + parseFloat(getComputedStyle(strip).top) + strip.offsetHeight;
+    section.style.setProperty("--cc-under", `${Math.round(under + 16)}px`);
+  };
+  let measured = false;
+  const mark = () => {
+    queued = false;
+    const section = screen.querySelector<HTMLElement>("[data-cc-labbook]");
+    if (!section) return;
+    if (!measured) clearance(section);
+    measured = true;
+    const shown = [...section.querySelectorAll<HTMLElement>(".cc-entry")].filter((entry) => !entry.hidden);
+    let read = shown[0];
+    for (const entry of shown) {
+      const strip = entry.closest("[data-cc-month]")?.querySelector(".cc-month__page");
+      const line = (strip?.getBoundingClientRect().bottom ?? 0) + 48;
+      if (entry.getBoundingClientRect().top <= line) read = entry;
+      else break;
+    }
+    const date = read?.querySelector("time.cc-day")?.getAttribute("datetime");
+    const month = read?.closest<HTMLElement>("[data-cc-month]");
+    const today = month && date ? month.querySelectorAll(".cc-cal__day")[Number(date.slice(8, 10)) - 1] : null;
+    for (const day of section.querySelectorAll(".cc-cal__day[data-today]"))
+      if (day !== today) day.removeAttribute("data-today");
+    today?.setAttribute("data-today", "");
+  };
+  const soon = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(mark);
+  };
+  screen.addEventListener("scroll", soon, { signal, capture: true, passive: true });
+  addEventListener(
+    "resize",
+    () => {
+      measured = false;
+      soon();
+    },
+    { signal },
+  );
+  soon();
+  return soon;
 }
 
 /** The Labbook, answering the visitor.
