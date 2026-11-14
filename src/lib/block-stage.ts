@@ -18,11 +18,19 @@
  * it is taken off while the frame shows, which takes the focus, as it
  * always did, and comes back with the poster.
  *
+ * A Pen is shown through its result alone (`PEN_CHROME`). A piece held
+ * small, a card's or a Labbook entry's, is shown in a window of its own
+ * over the page (`data-stage-window` on its stage, `openWindow`): as big
+ * as the lens makes it from the press, so it does not grow as it loads,
+ * and nothing round its stage moves.
+ *
  * A film that loops plays by itself, silently, while it is in view, unless
  * the visitor asked for less motion; its controls are always there.
  *
  * One listener for every stage on every page, so a page the router swaps
  * in needs nothing set up. */
+
+import "../styles/stage-window.css";
 
 /** What a stage is showing, and how to put it away. */
 const showing = new Map<HTMLElement, () => void>();
@@ -71,7 +79,154 @@ function makeFrame(src: string, title: string) {
   element.allow = "fullscreen";
   element.title = title;
   element.src = src;
+  if (PEN.test(src)) {
+    // Larger than its room by the embed's bars, which the room hides. Said
+    // on the frame itself, so no lens's own rule for its frames undoes it.
+    const { top, right, bottom, left } = PEN_CHROME;
+    element.dataset.pen = "";
+    Object.assign(element.style, {
+      position: "absolute",
+      inset: `${-top}px auto auto ${-left}px`,
+      width: `calc(100% + ${left + right}px)`,
+      height: `calc(100% + ${top + bottom}px)`,
+      maxWidth: "none",
+      maxHeight: "none",
+      margin: "0",
+    });
+  }
   return element;
+}
+
+/** CodePen's embed draws a bar of tabs over a Pen's result and a toolbar
+ * under it, whatever its address asks: `default-tab=result` chooses the
+ * tab that is open, and nothing an account like this site's can ask for
+ * leaves the bars out. So a Pen's frame is made larger than the room it
+ * is shown through by exactly those bars, and the room, which clips, shows
+ * the result alone. Measured on the embed, the same at every size: a 1px
+ * border round a 50px bar of tabs and a 30px toolbar. The link out to the
+ * Pen's own page is always beside it. */
+const PEN_CHROME = { top: 51, right: 1, bottom: 31, left: 1 };
+const PEN = /^https:\/\/codepen\.io\/[\w-]+\/embed\//;
+
+const clamp = (value: number, least: number, most: number) =>
+  Math.max(least, Math.min(value, most));
+
+/** The window a piece held small is shown in, over the page: in the top
+ * layer, so nothing it stands in clips it, tilts it or makes room for it.
+ * The lens gives it its look and its size (src/styles/stage-window.css);
+ * it is laid over its stage, or for `data-stage-window="ask"` over what
+ * asked for it (Back Page's sticky note), as near the middle of that as
+ * the screen allows, and keeps to it as the page scrolls. It is open at
+ * its full size from the press: until the piece has loaded it shows the
+ * poster and the words saying it is loading, then the piece, the same
+ * size. Its bar names the piece and has the words that put it away. */
+function openWindow(stage: HTMLElement) {
+  const title = stage.dataset.title ?? stage.dataset.artifactTitle ?? "";
+  const anchor =
+    (stage.dataset.stageWindow === "ask" && askOf(stage)) || stage;
+  const close = buttonOf(stage)?.dataset.close ?? stage.dataset.close;
+  const win = document.createElement("div");
+  win.className = "stage-window";
+  win.popover = "manual";
+  win.setAttribute("role", "group");
+  win.setAttribute("aria-label", title);
+  const bar = document.createElement("p");
+  bar.className = "stage-window__bar";
+  const name = document.createElement("span");
+  name.className = "stage-window__name";
+  name.textContent = title;
+  bar.append(name);
+  if (close) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "stage-window__close";
+    button.textContent = close;
+    button.setAttribute("aria-label", `${close}: ${title}`);
+    button.addEventListener("click", () => {
+      putAway(stage);
+      askOf(stage)?.focus();
+    });
+    bar.append(button);
+  }
+  const glass = document.createElement("div");
+  glass.className = "stage-window__glass";
+  const poster = stage.querySelector("img");
+  if (poster) {
+    const still = document.createElement("img");
+    still.className = "stage-window__still";
+    still.src = poster.currentSrc || poster.src;
+    still.alt = "";
+    glass.append(still);
+  }
+  if (stage.dataset.loading) {
+    const says = document.createElement("span");
+    says.className = "stage-window__says";
+    says.textContent = stage.dataset.loading;
+    glass.append(says);
+  }
+  win.append(bar, glass);
+  // A press in it is its own: the card or line round its stage, a link
+  // in some lenses, is not pressed with it.
+  for (const type of ["click", "pointerdown"])
+    win.addEventListener(type, (event) => event.stopPropagation());
+  stage.append(win);
+  win.showPopover();
+
+  // Laid where it was asked for, then kept as far from the stage as that.
+  const gap = () =>
+    parseFloat(getComputedStyle(win).getPropertyValue("--stage-window-gap")) ||
+    12;
+  let from = { x: 0, y: 0 };
+  const lay = () => {
+    const at = anchor.isConnected ? anchor : stage;
+    const a = at.getBoundingClientRect();
+    const s = stage.getBoundingClientRect();
+    const g = gap();
+    const width = document.documentElement.clientWidth;
+    const x = clamp(
+      a.left + a.width / 2 - win.offsetWidth / 2,
+      g,
+      width - g - win.offsetWidth,
+    );
+    const y = clamp(
+      a.top + a.height / 2 - win.offsetHeight / 2,
+      g,
+      innerHeight - g - win.offsetHeight,
+    );
+    from = { x: x - s.left, y: y - s.top };
+    win.style.setProperty(
+      "--stage-window-scale",
+      String(clamp(a.width / win.offsetWidth, 0.2, 1)),
+    );
+    win.style.setProperty(
+      "--stage-window-origin",
+      `${a.left + a.width / 2 - x}px ${a.top + a.height / 2 - y}px`,
+    );
+    keep();
+  };
+  const keep = () => {
+    const s = stage.getBoundingClientRect();
+    win.style.left = `${s.left + from.x}px`;
+    win.style.top = `${s.top + from.y}px`;
+  };
+  let frame = 0;
+  const soon = (then: () => void) => () => {
+    if (!win.isConnected) return shut();
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(then);
+  };
+  const onScroll = soon(keep);
+  const onResize = soon(lay);
+  document.addEventListener("scroll", onScroll, { capture: true, passive: true });
+  addEventListener("resize", onResize);
+  lay();
+  function shut() {
+    cancelAnimationFrame(frame);
+    document.removeEventListener("scroll", onScroll, { capture: true });
+    removeEventListener("resize", onResize);
+    win.remove();
+  }
+  return { glass, shut };
 }
 
 function putAway(stage: HTMLElement) {
@@ -107,6 +262,18 @@ function show(stage: HTMLElement, { focus = false } = {}) {
     // The poster stays, under the frame, until the frame has loaded; then
     // it is hidden, still holding the room, and shows again when put away.
     const element = makeFrame(frame, title);
+    // Held small, it opens in its window; where it is, a Pen's stage
+    // clips its frame to its result while it shows.
+    const opened =
+      stage.hasAttribute("data-stage-window") && "showPopover" in stage
+        ? openWindow(stage)
+        : null;
+    if (opened) leave = opened.shut;
+    else if (element.dataset.pen !== undefined) {
+      const was = stage.style.overflow;
+      stage.style.overflow = "clip";
+      leave = () => (stage.style.overflow = was);
+    }
     stage.dataset.live = "loading";
     stage.setAttribute("aria-busy", "true");
     say(stage.dataset.loading);
@@ -117,7 +284,7 @@ function show(stage: HTMLElement, { focus = false } = {}) {
       say();
     });
     stage.querySelector("[data-stage-ask]")?.remove();
-    stage.append(element);
+    (opened?.glass ?? stage).append(element);
     if (focus) element.focus();
     return;
   }

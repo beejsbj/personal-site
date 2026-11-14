@@ -3,13 +3,14 @@
  * toolbar below it whatever its address asks, so the stage frames a Pen
  * a little larger than the room it shows it in, and the room shows the
  * result alone. A Pen held small (a card on the Lab, a pin, a rack slot, a
- * line of the library card, a stitched place, a Labbook entry) opens, when
+ * line of the library card, a stitched place) opens, when
  * pressed, in a window of its own over the page, in the lens's own idiom,
  * at its full size from the press: no larger once it has loaded, and
  * nothing under it moves. Escape puts it away. With less motion asked for,
  * it opens without moving. In Back Page the window is the sticky note,
  * unfolded where it was stuck. A Pen on an experiment's page already spans
- * its column, and plays where it is.
+ * its column, and a Labbook's stands as a figure in its entry: each plays
+ * where it is, showing its result alone.
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
@@ -372,39 +373,25 @@ test(
           );
 
           await t.test(
-            `${size}, ${lens}: a Labbook Pen opens the same way`,
+            `${size}, ${lens}: a Labbook Pen shows only its result, where it is`,
             () =>
               visit(
                 lens,
                 ROOMS.labbook(lens),
                 { ...options, reducedMotion: "reduce" },
-                async (page, control) => {
+                async (page) => {
                   const entry = `[id="${BOOK_PEN}"]`;
                   await reveal(page, lens, entry);
                   const stage = `${scope(lens)}${entry} [data-block-stage]`;
-                  const before = await box(page, stage);
-                  control.hold();
                   await page.focus(`${scope(lens)}${entry} [data-artifact-load]`);
                   await page.keyboard.press("Enter");
                   await page.waitForSelector(`${stage} iframe`, { state: "attached" });
-                  const loading = await look(page, stage);
-                  resultOnly(loading.src, BOOK_PEN);
-                  chromeHidden(loading, BOOK_PEN);
-                  bigEnough(loading, size, BOOK_PEN);
-                  assert.ok(loading.open, "in a window of its own");
-                  assert.deepEqual(await box(page, stage), before);
-                  control.go();
-                  await page.waitForFunction(
-                    (selector) =>
-                      document.querySelector(selector)?.dataset.live === "on",
-                    stage,
-                  );
-                  const on = await look(page, stage);
-                  near(on.clip.width, loading.clip.width, "width");
-                  near(on.clip.height, loading.clip.height, "height");
+                  const seen = await look(page, stage);
+                  resultOnly(seen.src, BOOK_PEN);
+                  chromeHidden(seen, BOOK_PEN);
+                  assert.equal(seen.window, null, "it plays where it is");
                   await page.focus(`${scope(lens)}${entry} figcaption a`);
                   await page.keyboard.press("Escape");
-                  assert.equal(await page.locator(":popover-open").count(), 0);
                   assert.equal(await page.locator(`${stage} iframe`).count(), 0);
                 },
               ),
