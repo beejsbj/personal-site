@@ -431,32 +431,9 @@ export const GAPS: Partial<
         "The lab book has no aside; Projects is a book of its own on the pile, and the style guide is not in any book.",
     },
   },
-  hion: {
-    lab: {
-      "lab.preview":
-        "Hion lists the experiments with no way to play one where it stands until its design pass draws it (#132); each still links out to where it lives.",
-      "labbook.month":
-        "Hion's Labbook is one list, not yet kept by month: its design pass (#132) draws the months.",
-      "labbook.subject":
-        "Hion's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#132) adds it. With either in the address it shows every update, as before.",
-    },
-  },
 };
 
 type BlockPart = Extract<Part, `block.${string}`>;
-const ALL_BLOCKS: BlockPart[] = [
-  "block.gallery",
-  "block.compare",
-  "block.embed",
-  "block.model",
-  "block.code",
-  "block.quote",
-  "block.steps",
-  "block.tree",
-  "block.audio",
-  "block.film",
-];
-
 /** The blocks of an entry's page (a project's or an experiment's) a lens
  * does not draw yet, and the design pass that will. Until then the lens
  * shows the page's prose and passes over the blocks. A design pass takes
@@ -464,12 +441,7 @@ const ALL_BLOCKS: BlockPart[] = [
  * when none are left. */
 export const BLOCK_GAPS: Partial<
   Record<LensId, { why: string; parts: BlockPart[] }>
-> = {
-  hion: {
-    why: "Hion shows an entry's prose and none of its blocks until its design pass draws them (#132).",
-    parts: ALL_BLOCKS,
-  },
-};
+> = {};
 
 /** A redacted update is owed wherever updates are listed: a lens that
  * leaves the updates off a route leaves its redacted ones off with them.
