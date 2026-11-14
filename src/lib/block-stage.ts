@@ -18,11 +18,20 @@
  * it is taken off while the frame shows, which takes the focus, as it
  * always did, and comes back with the poster.
  *
+ * A Pen is shown through its result alone (`PEN_CHROME`). A piece held
+ * small, a card's or a Labbook entry's, is shown in a window of its own
+ * over the page (`data-stage-window` on its stage, `openWindow`): as big
+ * as the lens makes it from the press, so it does not grow as it loads,
+ * and nothing round its stage moves.
+ *
  * A film that loops plays by itself, silently, while it is in view, unless
  * the visitor asked for less motion; its controls are always there.
  *
  * One listener for every stage on every page, so a page the router swaps
  * in needs nothing set up. */
+
+import "../styles/stage-window.css";
+import penChrome from "./pen-chrome.json";
 
 /** What a stage is showing, and how to put it away. */
 const showing = new Map<HTMLElement, () => void>();
@@ -71,8 +80,62 @@ function makeFrame(src: string, title: string) {
   element.allow = "fullscreen";
   element.title = title;
   element.src = src;
+  if (PEN.test(src)) {
+    // Larger than its room by the embed's bars, which the room hides. Said
+    // on the frame itself, so no lens's own rule for its frames undoes it.
+    const { top, right, bottom, left } = PEN_CHROME;
+    element.dataset.pen = "";
+    Object.assign(element.style, {
+      position: "absolute",
+      // Placed against its room's own edges, not a grid's cell in it.
+      gridArea: "auto",
+      inset: `${-top}px auto auto ${-left}px`,
+      width: `calc(100% + ${left + right}px)`,
+      height: `calc(100% + ${top + bottom}px)`,
+      maxWidth: "none",
+      maxHeight: "none",
+      margin: "0",
+    });
+  }
   return element;
 }
+
+/** CodePen's embed draws a bar of tabs over a Pen's result and a toolbar
+ * under it, whatever its address asks: `default-tab=result` chooses the
+ * tab that is open, and nothing an account like this site's can ask for
+ * leaves the bars out (its full-page view is no way round them: framed
+ * from another site it adds a warning banner and breaks Pens written in
+ * Vue). So a Pen's frame is made larger than the room it is shown through
+ * by exactly those bars, and the room, which clips, shows the result
+ * alone. The sizes are in `pen-chrome.json`, the one place they are kept:
+ * a 1px border round a 50px bar of tabs and a 30px toolbar, the same at
+ * every size. They are CodePen's, so they can change without this site
+ * changing: `node scripts/checks/codepen-embed-bars.mjs` measures a real
+ * embed against them (it is not part of `pnpm test`; it needs to reach
+ * CodePen, which answers an automated browser only some of the time, and
+ * says what to do when it does not). The link out to the Pen's own page
+ * is always beside it. */
+const PEN_CHROME: Record<"top" | "right" | "bottom" | "left", number> =
+  penChrome;
+const PEN = /^https:\/\/codepen\.io\/[\w-]+\/embed\//;
+
+
+/** The window is its own script, so a page that never plays a piece does
+ * not carry it. It is asked for as a press draws near (a pointer or focus
+ * on a toggle), and a press that comes before it has arrived waits for it. */
+type StageWindow = typeof import("./stage-window");
+let windows: StageWindow | undefined;
+const warm = () =>
+  import("./stage-window").then((module) => (windows = module));
+for (const type of ["pointerover", "pointerdown", "focusin"])
+  document.addEventListener(
+    type,
+    (event) => {
+      if ((event.target as Element | null)?.closest?.("[data-block-toggle]"))
+        warm().catch(() => {});
+    },
+    { passive: true },
+  );
 
 function putAway(stage: HTMLElement) {
   showing.get(stage)?.();
@@ -107,6 +170,15 @@ function show(stage: HTMLElement, { focus = false } = {}) {
     // The poster stays, under the frame, until the frame has loaded; then
     // it is hidden, still holding the room, and shows again when put away.
     const element = makeFrame(frame, title);
+    // Held small, it opens in its window; where it is, a Pen's stage
+    // clips its frame to its result while it shows.
+    const windowed =
+      stage.hasAttribute("data-stage-window") && "showPopover" in stage;
+    if (!windowed && element.dataset.pen !== undefined) {
+      const was = stage.style.overflow;
+      stage.style.overflow = "clip";
+      leave = () => (stage.style.overflow = was);
+    }
     stage.dataset.live = "loading";
     stage.setAttribute("aria-busy", "true");
     say(stage.dataset.loading);
@@ -116,9 +188,32 @@ function show(stage: HTMLElement, { focus = false } = {}) {
       stage.removeAttribute("aria-busy");
       say();
     });
-    stage.querySelector("[data-stage-ask]")?.remove();
-    stage.append(element);
-    if (focus) element.focus();
+    const settle = (room: HTMLElement) => {
+      stage.querySelector("[data-stage-ask]")?.remove();
+      room.append(element);
+      if (focus) element.focus();
+    };
+    if (!windowed) return settle(stage);
+    const open = ({ openWindow }: StageWindow) => {
+      // Put away before it arrived: there is nothing to open.
+      if (!showing.has(stage)) return;
+      const opened = openWindow(stage, {
+        away: () => putAway(stage),
+        ask: () => askOf(stage),
+      });
+      leave = opened.shut;
+      element.classList.add("stage-window__piece");
+      settle(opened.glass);
+    };
+    // At once when it is here, as it is from a press's own approach.
+    if (windows) open(windows);
+    else
+      warm()
+        .then(open)
+        .catch((error) => {
+          console.warn(error);
+          if (showing.has(stage)) putAway(stage);
+        });
     return;
   }
   if (!model) return;

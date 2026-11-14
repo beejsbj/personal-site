@@ -12,7 +12,8 @@
  * stage is a poster, and the press is handled by the site's one
  * click-to-load stage (src/lib/block-stage.ts), which makes the frame or
  * the viewer in the stage's own room and puts it away on a second press or
- * Escape. A film that loops plays, silent, only while it is in view and
+ * Escape. A frame plays in its sticky note, unfolded from the little one
+ * (`stage-window`). A film that loops plays, silent, only while it is in view and
  * only for a visitor who has not asked for less motion.
  *
  * Every word comes from content: the blocks' own, and what the site says
@@ -227,7 +228,8 @@ function stuckIn(t: Told, block: Exclude<Block, { type: "text" }>, slug: string)
       return mark(
         liveCard(
           {
-            data: { frame: block.frame },
+            // A page of the book is narrow: its note unfolds to play it.
+            data: { frame: block.frame, "stage-window": "ask" },
             title: block.alt ?? block.caption ?? block.src,
             ratio: block.ratio ?? "16/10",
             poster: block.poster,
