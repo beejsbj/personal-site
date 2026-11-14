@@ -111,6 +111,23 @@ const PEN_CHROME = { top: 51, right: 1, bottom: 31, left: 1 };
 const PEN = /^https:\/\/codepen\.io\/[\w-]+\/embed\//;
 
 
+/** The window is its own script, so a page that never plays a piece does
+ * not carry it. It is asked for as a press draws near (a pointer or focus
+ * on a toggle), and a press that comes before it has arrived waits for it. */
+type StageWindow = typeof import("./stage-window");
+let windows: StageWindow | undefined;
+const warm = () =>
+  import("./stage-window").then((module) => (windows = module));
+for (const type of ["pointerover", "pointerdown", "focusin"])
+  document.addEventListener(
+    type,
+    (event) => {
+      if ((event.target as Element | null)?.closest?.("[data-block-toggle]"))
+        warm().catch(() => {});
+    },
+    { passive: true },
+  );
+
 function putAway(stage: HTMLElement) {
   showing.get(stage)?.();
   showing.delete(stage);
@@ -168,23 +185,26 @@ function show(stage: HTMLElement, { focus = false } = {}) {
       if (focus) element.focus();
     };
     if (!windowed) return settle(stage);
-    // The window is its own script, asked for by the press that needs it.
-    import("./stage-window")
-      .then(({ openWindow }) => {
-        // Put away before it arrived: there is nothing to open.
-        if (!showing.has(stage)) return;
-        const opened = openWindow(stage, {
-          away: () => putAway(stage),
-          ask: () => askOf(stage),
-        });
-        leave = opened.shut;
-        element.classList.add("stage-window__piece");
-        settle(opened.glass);
-      })
-      .catch((error) => {
-        console.warn(error);
-        if (showing.has(stage)) putAway(stage);
+    const open = ({ openWindow }: StageWindow) => {
+      // Put away before it arrived: there is nothing to open.
+      if (!showing.has(stage)) return;
+      const opened = openWindow(stage, {
+        away: () => putAway(stage),
+        ask: () => askOf(stage),
       });
+      leave = opened.shut;
+      element.classList.add("stage-window__piece");
+      settle(opened.glass);
+    };
+    // At once when it is here, as it is from a press's own approach.
+    if (windows) open(windows);
+    else
+      warm()
+        .then(open)
+        .catch((error) => {
+          console.warn(error);
+          if (showing.has(stage)) putAway(stage);
+        });
     return;
   }
   if (!model) return;

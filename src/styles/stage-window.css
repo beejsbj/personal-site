@@ -6,6 +6,8 @@
    --stage-window-gap (kept clear round it on the screen). */
 .stage-window {
   --stage-window-ratio: 16 / 10;
+  --stage-window-origin: 50% 50%;
+  --stage-window-scale: 0.6;
   position: fixed;
   inset: auto;
   box-sizing: border-box;
