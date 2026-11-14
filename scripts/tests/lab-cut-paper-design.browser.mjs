@@ -238,14 +238,20 @@ test(
               });
               const pad = slot.locator("button").first();
               const power = slot.locator("button[data-block-toggle]");
-              // Its pad (its motif), then its power: the next stop.
               assert.ok(await pad.getAttribute("aria-label"), `${slug}'s pad is named`);
-              await pad.focus();
+              // The power is a stop in the slot's own order: on the rack
+              // after its pad (the bar it is named on), in the browser
+              // after its name. Nothing outside the slot comes between.
+              await slot.evaluate((el) => {
+                const stops = [...el.querySelectorAll("a[href], button")];
+                const power = el.querySelector("button[data-block-toggle]");
+                stops[stops.indexOf(power) - 1].focus();
+              });
               await page.keyboard.press("Tab");
               assert.equal(
                 await power.evaluate((el) => el === document.activeElement),
                 true,
-                `${slug}: the power follows its pad`,
+                `${slug}: the power is the next stop`,
               );
               assert.notEqual(
                 await power.evaluate((el) => getComputedStyle(el).outlineStyle),
@@ -645,10 +651,10 @@ test(
           `${size}: the playhead reads down the story, and lights the chapter it is in`,
           async () => {
             const { context, page, errors } = await open(size, BLOCKS);
-            const head = await page
+            const hidden = await page
               .locator("#lens-shell .cp-story__head")
-              .getAttribute("aria-hidden");
-            assert.equal(head, "true", "the reading playhead is for the eye");
+              .evaluate((el) => !!el.closest("[aria-hidden='true']"));
+            assert.ok(hidden, "the reading playhead is for the eye");
             const lit = async (n) => {
               await page.evaluate((n) => {
                 const h2 = document.querySelector(

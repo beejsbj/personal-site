@@ -1,0 +1,2079 @@
+/* Cut Paper's Lab: the rack, the browser, an experiment's clip box and its
+   story, and the Labbook kept by month. Same language as the session:
+   ink and ivory chrome, note colours for whatever is musical, brand paper
+   (bone, tomato, mustard, plum) pasted on, brass for the playhead alone.
+   Anything that moves only moves for a visitor who has not asked for less
+   motion. Every selector is lens-scoped. */
+
+/* ── the lab: the rack ─────────────────────────────────────── */
+
+/* a place in the rack: the Bench is armed, the Shelf is muted */
+:root[data-lens="cut-paper"] .cp-place {
+  margin-top: 34px;
+}
+
+:root[data-lens="cut-paper"] .cp-place__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-tag.cp-place__tag--armed {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--cp-tomato);
+  color: var(--cp-ivory);
+}
+
+/* the record light */
+:root[data-lens="cut-paper"] .cp-place__tag--armed::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-place__tag--muted {
+  background: var(--cp-mustard);
+}
+
+:root[data-lens="cut-paper"] .cp-place__title {
+  margin: 0;
+  font: 400 34px/1 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-place__note {
+  margin: 0;
+  color: var(--cp-ivory-3);
+  font-size: 12.5px;
+}
+
+/* The Bench is a pad rack: a case of ink with its rack ears screwed on at
+   either side, and the pads set in it. */
+:root[data-lens="cut-paper"] .cp-rackcase {
+  position: relative;
+  margin-top: 20px;
+  padding: 22px 46px 26px;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle, var(--cp-ink-5) 0 3.5px, var(--cp-ink) 4px 5px, transparent 5.5px) 12px 14px / 10px 10px no-repeat,
+    radial-gradient(circle, var(--cp-ink-5) 0 3.5px, var(--cp-ink) 4px 5px, transparent 5.5px) 12px calc(100% - 14px) / 10px 10px no-repeat,
+    radial-gradient(circle, var(--cp-ink-5) 0 3.5px, var(--cp-ink) 4px 5px, transparent 5.5px) calc(100% - 12px) 14px / 10px 10px no-repeat,
+    radial-gradient(circle, var(--cp-ink-5) 0 3.5px, var(--cp-ink) 4px 5px, transparent 5.5px) calc(100% - 12px) calc(100% - 14px) / 10px 10px no-repeat,
+    linear-gradient(90deg, var(--cp-ink-4) 0 34px, transparent 34px calc(100% - 34px), var(--cp-ink-4) calc(100% - 34px)),
+    var(--cp-ink-2);
+  box-shadow: var(--cp-ring), 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-lens="cut-paper"] .cp-rack {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  gap: 24px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* pride of place: a pad two wide, as tall as the rest, and a bigger name */
+:root[data-lens="cut-paper"] .cp-rack__slot[data-lab-featured] {
+  grid-column: span 2;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit.cp-pad__hit--wide {
+  aspect-ratio: 2.09;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit.cp-pad__hit--wide .cp-roll {
+  right: 9%;
+  left: 9%;
+  width: 82%;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__slot[data-lab-featured] .cp-rack__title {
+  font-size: 44px;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__slot[data-lab-featured] .cp-rack__sum {
+  max-width: 52ch;
+  font-size: 14.5px;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__slot {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* a pad, and what it says it is loaded with on its corner */
+:root[data-lens="cut-paper"] .cp-pad {
+  position: relative;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-holds {
+  position: absolute;
+  top: -9px;
+  left: 10px;
+  z-index: 2;
+  padding: 4px 8px 3px;
+  background: var(--cp-ink);
+  clip-path: var(--cp-cut-tab);
+  color: var(--cp-ivory);
+  font: 600 9.5px/1 var(--cp-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  background: var(--note);
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit .cp-roll {
+  top: 22%;
+  right: 12%;
+  bottom: 22%;
+  left: 12%;
+  width: 76%;
+  height: 56%;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit .cp-clip__run {
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit:hover {
+  filter: brightness(1.08);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit:active,
+:root[data-lens="cut-paper"] .cp-pad__hit[data-hearing] {
+  transform: scale(0.97);
+}
+
+/* a sample: the picture on the pad, its motif along the bottom as the
+   sample's waveform would be */
+:root[data-lens="cut-paper"] .cp-pad__art {
+  position: absolute;
+  inset: 6px 6px 30%;
+  width: calc(100% - 12px);
+  height: calc(70% - 6px);
+  border-radius: 4px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(10, 9, 8, 0.25);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__band {
+  position: absolute;
+  right: 6px;
+  bottom: 10px;
+  left: 6px;
+  height: calc(30% - 18px);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__band .cp-roll {
+  top: 2px;
+  right: 6%;
+  bottom: 2px;
+  left: 6%;
+  width: 88%;
+  height: calc(100% - 4px);
+}
+
+:root[data-lens="cut-paper"] [data-hearing] .cp-pad__band > .cp-clip__run {
+  animation: cut-paper-hear var(--hear, 1.5s) linear forwards;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit[data-hearing] .cp-pad__art {
+  transform: translateY(2px);
+}
+
+/* a chop: the pictures as the slices of one sample, numbered, the first
+   the widest */
+:root[data-lens="cut-paper"] .cp-pad__chop {
+  position: absolute;
+  inset: 6px 6px 30%;
+  display: flex;
+  gap: 3px;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__chop .cp-chop__slice {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(10, 9, 8, 0.25);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__chop .cp-chop__slice:first-child {
+  flex-grow: 1.8;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__chop img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__chop .cp-chop__no {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  min-width: 15px;
+  padding: 2px 3px 1px;
+  border-radius: 2px;
+  background: var(--cp-ink);
+  color: var(--cp-ivory);
+  font: 600 9px/1 var(--cp-mono);
+  text-align: center;
+}
+
+/* MIDI: only the motif, on the key lanes of a piano roll */
+:root[data-lens="cut-paper"] .cp-pad__keys {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(180deg, rgba(10, 9, 8, 0.1) 0 1px, transparent 1px 12.5%),
+    linear-gradient(90deg, rgba(10, 9, 8, 0.16) 0 14px, transparent 14px);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__keys::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 14px;
+  background: repeating-linear-gradient(180deg, transparent 0 7%, rgba(10, 9, 8, 0.38) 7% 11.5%, transparent 11.5% 12.5%);
+}
+
+/* a plug-in: its pad is the bar it is named on, over its window */
+:root[data-lens="cut-paper"] .cp-pad__hit--strip {
+  aspect-ratio: auto;
+  height: 44px;
+  border-radius: 8px 8px 0 0;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--strip .cp-roll {
+  top: 9px;
+  bottom: 9px;
+  height: calc(100% - 18px);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--strip:active,
+:root[data-lens="cut-paper"] .cp-pad__hit--strip[data-hearing] {
+  transform: none;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__slot[data-holds="play"] .cp-device {
+  margin-top: -8px;
+  border-radius: 0 0 8px 8px;
+  box-shadow: inset 0 0 0 2px var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-rack__title {
+  margin: 4px 0 0;
+  font: 400 26px/1 var(--cp-display);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__title a {
+  color: var(--cp-ivory);
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-rack__title a:hover {
+  color: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-rack__sum {
+  margin: 0;
+  color: var(--cp-ivory-2);
+  font-size: 13px;
+}
+
+/* ── a plug-in's window: on the rack, in the browser, in a story ── */
+
+:root[data-lens="cut-paper"] .cp-device {
+  position: relative;
+  display: grid;
+  container: device / inline-size;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+}
+
+:root[data-lens="cut-paper"] .cp-device__bar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 8px 12px 7px;
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-device__led {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cp-ink-5);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+:root[data-lens="cut-paper"] .cp-device:has([aria-pressed="true"]) .cp-device__led,
+:root[data-lens="cut-paper"] .cp-device--film .cp-device__led {
+  background: var(--note, var(--cp-re));
+  box-shadow: 0 0 8px var(--note, var(--cp-re));
+}
+
+:root[data-lens="cut-paper"] .cp-device__name {
+  min-width: 0;
+  color: var(--cp-ivory);
+  font: 400 15px/1.1 var(--cp-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-device__screen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 7px), var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-device__screen > :is(img, iframe, canvas, video) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-device__screen > video {
+  object-fit: contain;
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-device--film .cp-device__screen {
+  aspect-ratio: auto;
+  display: block;
+}
+
+:root[data-lens="cut-paper"] .cp-device--film .cp-device__screen > video {
+  position: static;
+  display: block;
+  height: auto;
+}
+
+:root[data-lens="cut-paper"] .cp-device__poster {
+  object-fit: cover;
+  opacity: 0.42;
+  filter: grayscale(1) contrast(1.1);
+}
+
+:root[data-lens="cut-paper"] .cp-device__screen[data-live="on"] > .cp-device__poster {
+  visibility: hidden;
+}
+
+:root[data-lens="cut-paper"] .cp-device__label {
+  position: relative;
+  max-width: 24ch;
+  padding: 12px;
+  color: var(--cp-ivory-2);
+  font: 400 22px/1.05 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-device__foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  min-width: 0;
+  min-height: 42px;
+  padding: 7px 10px;
+  border-top: 1px solid var(--cp-hairline);
+}
+
+/* the power: a lamp that lights while it plays */
+:root[data-lens="cut-paper"] .cp-app .cp-power {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  margin: 0;
+  padding: 0 11px 0 9px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--cp-ivory);
+  color: var(--cp-ink);
+  font: 600 10.5px/1 var(--cp-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+:root[data-lens="cut-paper"] .cp-power::before {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-power[aria-pressed="true"] {
+  background: var(--note, var(--cp-re));
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-power:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+:root[data-lens="cut-paper"] .cp-device__note {
+  display: none;
+  min-width: 0;
+  color: var(--cp-ivory-3);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* what pressing it promises, where the window has room to say it */
+@container device (min-width: 380px) {
+  :root[data-lens="cut-paper"] .cp-device__note {
+    display: inline;
+  }
+}
+
+:root[data-lens="cut-paper"] .cp-device__out {
+  flex: none;
+  margin-left: auto;
+  color: var(--cp-ivory);
+  font: 600 10.5px/1 var(--cp-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-device__status:empty {
+  display: none;
+}
+
+:root[data-lens="cut-paper"] .cp-device__status {
+  padding: 6px 10px 8px;
+  color: var(--cp-ivory-2);
+  font-size: 11px;
+}
+
+/* ── the Shelf: the browser, a file to a row ───────────────── */
+
+:root[data-lens="cut-paper"] .cp-shelf {
+  margin: 18px 0 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-shelf__item {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 150px 200px;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 16px 10px 12px;
+  border-bottom: 1px solid var(--cp-hairline-2);
+}
+
+:root[data-lens="cut-paper"] .cp-shelf__item:nth-child(even) {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+:root[data-lens="cut-paper"] .cp-shelf__item:last-child {
+  border-bottom: 0;
+}
+
+/* the file the keyboard or the mouse is on is selected, as in a browser */
+:root[data-lens="cut-paper"] .cp-shelf__item:hover,
+:root[data-lens="cut-paper"] .cp-shelf__item:focus-within {
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-shelf__copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-shelf .cp-rack__title {
+  margin: 0;
+  font-size: 22px;
+}
+
+:root[data-lens="cut-paper"] .cp-shelf .cp-rack__sum {
+  color: var(--cp-ivory-3);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-shelf .cp-holds {
+  position: static;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  background: none;
+  clip-path: none;
+  color: var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-shelf .cp-holds::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-shelf__wave {
+  position: relative;
+  height: 30px;
+  border-left: 1px solid var(--cp-hairline);
+  opacity: 0.85;
+}
+
+:root[data-lens="cut-paper"] .cp-shelf__wave .cp-roll {
+  inset: 3px 0 3px 10px;
+  width: calc(100% - 10px);
+  height: calc(100% - 6px);
+  fill: var(--note);
+}
+
+/* a muted pad: ink with its colour at its foot; pressed, it lights */
+:root[data-lens="cut-paper"] .cp-pad__hit--small {
+  border-radius: 6px;
+  background: var(--cp-ink-3);
+  box-shadow: inset 0 -5px 0 var(--note), var(--cp-ring);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small .cp-roll {
+  top: 20%;
+  bottom: 26%;
+  height: 54%;
+  fill: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small:hover,
+:root[data-lens="cut-paper"] .cp-pad__hit--small[data-hearing] {
+  background: var(--note);
+  filter: none;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small:hover .cp-roll,
+:root[data-lens="cut-paper"] .cp-pad__hit--small[data-hearing] .cp-roll {
+  fill: rgba(10, 9, 8, 0.62);
+}
+
+/* with a picture: the file's thumbnail, greyed until it is previewed */
+:root[data-lens="cut-paper"] .cp-pad__hit--small .cp-pad__art {
+  inset: 4px 4px 9px;
+  width: calc(100% - 8px);
+  height: calc(100% - 13px);
+  border-radius: 3px;
+  filter: grayscale(1) brightness(0.8);
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small:hover .cp-pad__art,
+:root[data-lens="cut-paper"] .cp-pad__hit--small[data-hearing] .cp-pad__art {
+  filter: none;
+}
+
+:root[data-lens="cut-paper"] .cp-pad__hit--small .cp-pad__band {
+  display: none;
+}
+
+/* ── an experiment: its clip box over its story ────────────── */
+
+:root[data-lens="cut-paper"] .cp-clipview--lab {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 34px;
+}
+
+:root[data-lens="cut-paper"] .cp-clipbox {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px 34px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-clipbox__words {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-clipbox__words .cp-props {
+  max-width: 420px;
+}
+
+:root[data-lens="cut-paper"] .cp-clipbox__words .cp-clipview__lede {
+  max-width: 58ch;
+  font-size: 15px;
+}
+
+:root[data-lens="cut-paper"] .cp-clipbox__words .cp-back {
+  margin-top: 6px;
+}
+
+:root[data-lens="cut-paper"] .cp-clipbox .cp-holds {
+  top: -10px;
+  left: 12px;
+  font-size: 10.5px;
+}
+
+/* an experiment that graduated: the clip it became on the arrangement, in
+   the project's colour, singing the project's motif */
+:root[data-lens="cut-paper"] .cp-grad {
+  display: grid;
+  gap: 8px;
+  margin: 6px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-grad__label {
+  color: var(--cp-ivory-3);
+  font: 400 15px/1.2 var(--cp-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-grad__clip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px 12px;
+  border-radius: 4px;
+  background: var(--note);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22);
+  color: var(--cp-ink);
+  font: 400 26px/1 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-grad__clip:hover {
+  filter: brightness(1.12);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22), 0 0 0 2px var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-grad__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-grad__roll {
+  position: relative;
+  height: 30px;
+}
+
+:root[data-lens="cut-paper"] .cp-grad__roll .cp-roll {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── the Labbook: the Markers track, written out ───────────── */
+
+:root[data-lens="cut-paper"] .cp-log {
+  min-width: 0;
+  margin-top: 46px;
+}
+
+:root[data-lens="cut-paper"] .cp-clipview__main .cp-log {
+  margin-top: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-log .cp-session__bar {
+  margin: 16px 0 14px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr--log {
+  --head: 196px;
+}
+
+:root[data-lens="cut-paper"] .cp-arr__row--log {
+  border-bottom: 0;
+}
+
+/* a flag on the log's lane is pressed to go to its line */
+:root[data-lens="cut-paper"] .cp-flag[data-flag] {
+  cursor: pointer;
+}
+
+/* a rest: a flag with nothing on it */
+:root[data-lens="cut-paper"] .cp-flag--rest .cp-flag__pin {
+  background: var(--cp-ink-5);
+}
+
+/* the log: a page of the notebook, punched down its margin */
+:root[data-lens="cut-paper"] .cp-log__sheet {
+  max-width: 1080px;
+  margin: 20px 0 0;
+  padding: 14px 30px 26px 54px;
+  background:
+    radial-gradient(circle, var(--cp-ink) 0 5px, transparent 5.6px) 12px 26px / 16px 92px repeat-y,
+    linear-gradient(var(--cp-tomato), var(--cp-tomato)) 40px 0 / 1.5px 100% no-repeat,
+    var(--cp-bone);
+  color: var(--cp-ink);
+  list-style: none;
+  clip-path: polygon(0 0, 100% 3px, 100% calc(100% - 9px), 94% 100%, 83% calc(100% - 7px), 70% 100%, 57% calc(100% - 8px), 44% 100%, 30% calc(100% - 6px), 16% 100%, 4% calc(100% - 7px), 0 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-log__sheet :focus-visible {
+  outline-color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-log__line {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px 22px;
+  padding: 20px 0;
+  border-bottom: 1px dashed rgba(10, 9, 8, 0.3);
+  /* where a link to it lands: a little of the line before it still in view */
+  scroll-margin-top: 84px;
+}
+
+:root[data-lens="cut-paper"] .cp-log__line:last-child {
+  border-bottom: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-log__when {
+  margin: 0;
+}
+
+/* a date is a locator: it moves the playhead, and lights while it is there */
+:root[data-lens="cut-paper"] .cp-app .cp-log__date {
+  display: inline-block;
+  margin: 0;
+  padding: 5px 8px 4px;
+  border: 0;
+  border-left: 3px solid var(--cp-ink);
+  background: rgba(10, 9, 8, 0.09);
+  color: var(--cp-ink);
+  font: 600 12px/1.2 var(--cp-mono);
+  white-space: nowrap;
+}
+
+:root[data-lens="cut-paper"] button.cp-log__date {
+  cursor: pointer;
+}
+
+:root[data-lens="cut-paper"] .cp-app button.cp-log__date:hover,
+:root[data-lens="cut-paper"] .cp-app .cp-log__line[data-live] .cp-log__date,
+:root[data-lens="cut-paper"] .cp-app .cp-log__line[data-hearing] .cp-log__date {
+  border-left-color: var(--cp-brass);
+  background: var(--cp-ink);
+  color: var(--cp-brass-hi);
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-log__line--rest .cp-log__date {
+  border-left-style: dashed;
+  background: none;
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-log__line--rest[data-live] .cp-log__date {
+  background: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-log__words {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-log__origin {
+  margin: 0;
+  color: rgba(10, 9, 8, 0.64);
+  font: 600 10.5px/1.2 var(--cp-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-log__title {
+  margin: 0;
+  color: var(--cp-ink);
+  font: 400 28px/1 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-log__title a,
+:root[data-lens="cut-paper"] .cp-log__about a,
+:root[data-lens="cut-paper"] .cp-art__home a {
+  color: var(--cp-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--cp-tomato);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* the arrow out keeps to the last word's line */
+:root[data-lens="cut-paper"] .cp-log__title .cp-out {
+  display: inline;
+}
+
+:root[data-lens="cut-paper"] .cp-log__title a:hover,
+:root[data-lens="cut-paper"] .cp-log__about a:hover,
+:root[data-lens="cut-paper"] .cp-art__home a:hover {
+  background: var(--cp-mustard);
+}
+
+:root[data-lens="cut-paper"] .cp-log__sum {
+  max-width: 62ch;
+  margin: 0;
+  font: 400 13px/1.6 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-log__about {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 2px 0 0;
+  font: 600 11.5px/1.4 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-log__about > span > span {
+  margin-right: 7px;
+  color: rgba(10, 9, 8, 0.64);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* the line a link landed on: a stroke of the highlighter */
+:root[data-lens="cut-paper"] .cp-log__line[data-landed] {
+  background: color-mix(in srgb, var(--cp-mustard) 46%, transparent);
+  box-shadow: -12px 0 0 color-mix(in srgb, var(--cp-mustard) 46%, transparent), 12px 0 0 color-mix(in srgb, var(--cp-mustard) 46%, transparent);
+}
+
+/* a redacted update: strips of black paper pasted over its words */
+:root[data-lens="cut-paper"] .cp-app .cp-strike {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px 9px;
+  margin: 0;
+  padding: 2px 0;
+  font-size: 15px;
+}
+
+/* a word it shows, set as a title's words are */
+:root[data-lens="cut-paper"] .cp-strike__word {
+  color: var(--cp-ink);
+  font: 400 28px/1 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+:root[data-lens="cut-paper"] .cp-strike__strip {
+  position: relative;
+  display: block;
+  width: min(calc(var(--len) * 1.15em), 100%);
+  height: 1.4em;
+  background: var(--cp-ink);
+  clip-path: polygon(0 7%, 3% 0, 97% 5%, 100% 13%, 99% 91%, 96% 100%, 2% 95%, 0 87%);
+  transform: rotate(var(--tilt, 0deg));
+}
+
+/* what an update shows for itself, pasted beside its words */
+:root[data-lens="cut-paper"] .cp-art {
+  min-width: 0;
+  margin: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-art--image {
+  position: relative;
+  justify-self: start;
+  max-width: 100%;
+  padding: 7px;
+  background: var(--note);
+  transform: rotate(1.1deg);
+}
+
+:root[data-lens="cut-paper"] .cp-art--image img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  background: var(--cp-ivory);
+  object-fit: contain;
+}
+
+:root[data-lens="cut-paper"] .cp-art__tape {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  z-index: 1;
+  width: 76px;
+  height: 17px;
+  background: color-mix(in srgb, var(--cp-plum) 78%, transparent);
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+:root[data-lens="cut-paper"] .cp-art--video video {
+  display: block;
+  width: 100%;
+  border: 6px solid var(--cp-ink);
+  border-radius: 4px;
+  background: var(--cp-ink);
+}
+
+/* a sound and a stage are dark: windows of the session, cut into the page */
+:root[data-lens="cut-paper"] .cp-art--sound {
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--cp-ink-2);
+  color: var(--cp-ivory-2);
+}
+
+:root[data-lens="cut-paper"] .cp-art--sound audio {
+  display: block;
+  width: 100%;
+  color-scheme: dark;
+}
+
+:root[data-lens="cut-paper"] .cp-art--sound figcaption {
+  margin-top: 8px;
+  color: var(--cp-ivory-2);
+  font-size: 11.5px;
+}
+
+:root[data-lens="cut-paper"] .cp-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 6px;
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0 2px, transparent 2px 7px), var(--cp-ink-2);
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-stage > img,
+:root[data-lens="cut-paper"] .cp-stage > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-stage__poster {
+  opacity: 0.3;
+  filter: grayscale(1);
+  object-fit: cover;
+}
+
+:root[data-lens="cut-paper"] .cp-stage__ask {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+:root[data-lens="cut-paper"] .cp-stage__label {
+  max-width: 24ch;
+  margin: 0;
+  font: 400 22px/1.05 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-stage__note {
+  margin: 0;
+  color: var(--cp-ivory-2);
+  font-size: 11px;
+}
+
+:root[data-lens="cut-paper"] .cp-stage :focus-visible {
+  outline-color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-art__home {
+  margin-top: 9px;
+  font: 600 11px/1.4 var(--cp-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 981px) {
+  :root[data-lens="cut-paper"] .cp-log__line[data-art] {
+    grid-template-columns: 112px minmax(0, 1fr) minmax(0, 40%);
+  }
+}
+
+@media (max-width: 980px) {
+  :root[data-lens="cut-paper"] .cp-art {
+    grid-column: 2;
+    max-width: 520px;
+  }
+}
+
+:root[data-lens="cut-paper"] .cp-lab__more {
+  display: grid;
+  gap: 10px;
+  max-width: 66ch;
+  margin-top: 40px;
+}
+
+:root[data-lens="cut-paper"] .cp-lab__more p {
+  margin: 0;
+  color: var(--cp-ivory-2);
+}
+
+
+/* ── the Labbook kept by month ─────────────────────────────── */
+
+:root[data-lens="cut-paper"] .cp-log[data-log="labbook"] {
+  scroll-margin-top: 24px;
+}
+
+/* the track heads, each with its solo */
+:root[data-lens="cut-paper"] .cp-solo {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-solo__label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--cp-ivory-3);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-solo__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-solo__track {
+  display: inline-grid;
+  grid-template-columns: 22px auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 6px 12px 6px 7px;
+  border-radius: 4px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring), inset 3px 0 0 var(--note);
+  color: var(--cp-ivory);
+  text-decoration: none;
+}
+
+:root[data-lens="cut-paper"] .cp-solo__track:hover {
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-solo__s {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  background: var(--cp-ink-4);
+  color: var(--cp-ivory-3);
+  font: 700 11px/1 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-solo__name {
+  font: 400 17px/1 var(--cp-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-solo__count {
+  color: var(--cp-ivory-3);
+  font: 600 10.5px/1 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-solo__track[aria-current="true"] {
+  background: var(--cp-ink-4);
+  box-shadow: inset 0 0 0 2px var(--cp-fa), inset 3px 0 0 var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-solo__track[aria-current="true"] .cp-solo__s {
+  background: var(--cp-fa);
+  color: var(--cp-ink);
+}
+
+/* soloed: what it shows, and the way back to all of it */
+:root[data-lens="cut-paper"] .cp-narrowed {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--cp-fa);
+  background: var(--cp-ink-2);
+  color: var(--cp-ivory-2);
+  font-size: 13px;
+  outline: none;
+}
+
+:root[data-lens="cut-paper"] .cp-narrowed:focus-visible {
+  outline: 2px solid var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-narrowed strong {
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-narrowed__all {
+  color: var(--cp-ivory);
+  text-decoration-color: var(--cp-fa);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+:root[data-lens="cut-paper"] .cp-narrowed[hidden],
+:root[data-lens="cut-paper"] .cp-month[hidden],
+:root[data-lens="cut-paper"] .cp-log__line[hidden] {
+  display: none;
+}
+
+/* what is not about the soloed thing goes quiet on the lane */
+:root[data-lens="cut-paper"] .cp-flag[data-elsewhere] {
+  opacity: 0.22;
+}
+
+:root[data-lens="cut-paper"] .cp-months {
+  display: grid;
+  gap: 30px;
+  margin-top: 22px;
+}
+
+/* a month: its locator and its days as a step row, beside its own sheet */
+:root[data-lens="cut-paper"] .cp-month {
+  display: grid;
+  grid-template-columns: 214px minmax(0, 1fr);
+  align-items: start;
+  gap: 0 26px;
+}
+
+:root[data-lens="cut-paper"] .cp-month__head {
+  position: sticky;
+  top: 14px;
+  display: grid;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+:root[data-lens="cut-paper"] .cp-app .cp-month__name {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  margin: 0;
+  padding: 9px 26px 7px 12px;
+  background: var(--note);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%);
+  color: var(--cp-ink);
+  font: 400 30px/0.95 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-month__year {
+  font: 600 11px/1 var(--cp-mono);
+  letter-spacing: 0.12em;
+}
+
+:root[data-lens="cut-paper"] .cp-steps {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 214px;
+}
+
+:root[data-lens="cut-paper"] .cp-steps__wd {
+  color: var(--cp-ivory-4);
+  font: 600 9px/1.2 var(--cp-mono);
+  text-align: center;
+}
+
+:root[data-lens="cut-paper"] .cp-steps__day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: var(--cp-ink-3);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  color: var(--cp-ivory-4);
+  font: 600 9px/1 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-steps__wd + .cp-steps__day {
+  grid-column-start: calc(var(--lead, 0) + 1);
+}
+
+/* the first of each week's four beats a little brighter, as a sequencer
+   marks its downbeats */
+:root[data-lens="cut-paper"] .cp-steps__day[data-written] {
+  background: var(--note);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25), 0 0 10px color-mix(in srgb, var(--note) 45%, transparent);
+  color: var(--cp-ink);
+}
+
+:root[data-lens="cut-paper"] .cp-steps__day[data-written][data-elsewhere] {
+  background: var(--cp-ink-3);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--note) 45%, transparent);
+  color: var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-month .cp-log__sheet {
+  margin: 0;
+}
+
+/* ── an experiment's story: an arrangement read down the page ── */
+
+:root[data-lens="cut-paper"] .cp-story {
+  --gutter: 44px;
+  display: grid;
+  grid-template-columns: var(--gutter) minmax(0, 1fr);
+  gap: 0 26px;
+  min-width: 0;
+}
+
+/* the ruler: a bar line every so often, and the playhead riding it */
+:root[data-lens="cut-paper"] .cp-story__ruler {
+  position: relative;
+  border-right: 1px solid var(--cp-hairline);
+  background: repeating-linear-gradient(180deg, var(--cp-hairline) 0 1px, transparent 1px 64px) right / 12px 100% no-repeat;
+}
+
+:root[data-lens="cut-paper"] .cp-story__head {
+  position: absolute;
+  top: calc(var(--read, 0) * 100%);
+  right: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--cp-brass);
+  box-shadow: var(--cp-glow-brass);
+  opacity: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-story[data-reading] .cp-story__head {
+  opacity: 1;
+}
+
+:root[data-lens="cut-paper"] .cp-story__head::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: -2px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 10px solid var(--cp-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-story__body {
+  display: grid;
+  gap: 30px;
+  min-width: 0;
+  container: story / inline-size;
+}
+
+/* a chapter is a locator on the ruler, numbered, lit while read */
+:root[data-lens="cut-paper"] .cp-story .cp-prose h2[data-locator] {
+  position: relative;
+  scroll-margin-top: 30px;
+}
+
+:root[data-lens="cut-paper"] .cp-story .cp-prose h2[data-locator]::before {
+  content: attr(data-locator);
+  position: absolute;
+  top: 2px;
+  left: calc(-1 * (var(--gutter) + 26px));
+  display: grid;
+  place-items: center;
+  width: calc(var(--gutter) - 6px);
+  height: 22px;
+  padding-right: 6px;
+  background: var(--note, var(--cp-ivory));
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%);
+  color: var(--cp-ink);
+  font: 600 11px/1 var(--cp-mono);
+  transform: none;
+}
+
+:root[data-lens="cut-paper"] .cp-story .cp-prose h2[data-live]::before {
+  background: var(--cp-brass-hi);
+  box-shadow: var(--cp-glow-brass);
+}
+
+:root[data-lens="cut-paper"] .cp-story .cp-prose h2[data-live] {
+  color: var(--cp-ivory);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--note) 55%, transparent);
+}
+
+:root[data-lens="cut-paper"] .cp-spread {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-spread .cp-prose > :last-child {
+  margin-bottom: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-spread__margin {
+  display: grid;
+  align-content: start;
+  gap: 22px;
+  min-width: 0;
+}
+
+@container story (min-width: 760px) {
+  :root[data-lens="cut-paper"] .cp-spread[data-asides]:has(> .cp-prose) {
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 32%);
+    align-items: start;
+    gap: 22px 40px;
+  }
+}
+
+:root[data-lens="cut-paper"] .cp-plate {
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-block {
+  min-width: 0;
+  margin: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-block__caption,
+:root[data-lens="cut-paper"] .cp-chop__slice figcaption,
+:root[data-lens="cut-paper"] .cp-seq__image figcaption {
+  margin-top: 8px;
+  color: var(--cp-ivory-3);
+  font-size: 12px;
+}
+
+:root[data-lens="cut-paper"] .cp-block__caption a,
+:root[data-lens="cut-paper"] .cp-seq__text a,
+:root[data-lens="cut-paper"] .cp-torn a {
+  color: inherit;
+  text-decoration-color: var(--note, var(--cp-ivory-3));
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+/* a gallery is a chop: one sample cut into slices, numbered along the top */
+:root[data-lens="cut-paper"] .cp-chop {
+  display: flex;
+  gap: 4px;
+  padding: 30px 10px 12px;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(90deg, var(--cp-hairline) 0 1px, transparent 1px 24px) 10px 8px / calc(100% - 20px) 8px no-repeat,
+    var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+}
+
+:root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice:first-child {
+  flex-grow: 1.7;
+}
+
+/* the slice marker: a line up to the ruler, its number on a tab */
+:root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice::before {
+  content: "";
+  position: absolute;
+  top: -22px;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--note);
+}
+
+:root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice > .cp-chop__no {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  padding: 3px 6px 2px;
+  background: var(--note);
+  color: var(--cp-ink);
+  font: 600 10px/1 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-chop__img,
+:root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice > video {
+  display: block;
+  width: 100%;
+  height: clamp(160px, 26vw, 300px);
+  border-radius: 0 3px 3px 0;
+  background: var(--cp-ivory);
+  object-fit: cover;
+}
+
+:root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice > video {
+  background: var(--cp-ink);
+  object-fit: contain;
+}
+
+/* a compare is a plug-in's A/B: both states, side by side */
+:root[data-lens="cut-paper"] .cp-ab {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+  border-radius: 8px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+}
+
+:root[data-lens="cut-paper"] .cp-ab__side {
+  position: relative;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-ab__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 4px;
+  background: var(--cp-ivory);
+  object-fit: cover;
+}
+
+:root[data-lens="cut-paper"] .cp-ab__key {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  background: var(--note);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+  color: var(--cp-ink);
+  font: 400 22px/1 var(--cp-display);
+}
+
+:root[data-lens="cut-paper"] .cp-ab__label {
+  position: absolute;
+  bottom: 10px;
+  left: 8px;
+  z-index: 1;
+  max-width: calc(100% - 16px);
+  padding: 5px 10px 3px;
+  background: var(--cp-bone);
+  clip-path: var(--cp-cut-tab);
+  color: var(--cp-ink);
+  font: 400 16px/1 var(--cp-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* code is the console: its language on the bar, its lines numbered */
+:root[data-lens="cut-paper"] .cp-console {
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--cp-ink);
+  box-shadow: var(--cp-ring);
+}
+
+:root[data-lens="cut-paper"] .cp-console__bar {
+  padding: 7px 10px 6px;
+  background: var(--cp-ink-4);
+}
+
+:root[data-lens="cut-paper"] .cp-console__lang {
+  display: inline-block;
+  padding: 3px 8px 2px;
+  background: var(--cp-mustard);
+  clip-path: var(--cp-cut-tab);
+  color: var(--cp-ink);
+  font: 600 10px/1 var(--cp-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-console pre {
+  margin: 0;
+  padding: 12px 14px 14px 0;
+  overflow: auto;
+  color: var(--cp-ivory);
+  font: 400 12.5px/1.7 var(--cp-mono);
+  counter-reset: line;
+}
+
+:root[data-lens="cut-paper"] .cp-console__line {
+  display: block;
+  white-space: pre;
+}
+
+:root[data-lens="cut-paper"] .cp-console__line::before {
+  content: counter(line);
+  counter-increment: line;
+  display: inline-block;
+  width: 34px;
+  margin-right: 12px;
+  color: var(--cp-ivory-4);
+  text-align: right;
+}
+
+/* a quote is a scrap torn out of a page and pasted down */
+:root[data-lens="cut-paper"] .cp-torn {
+  position: relative;
+  padding: 24px 22px 20px;
+  background: var(--cp-bone);
+  clip-path: var(--cp-torn);
+  color: var(--cp-ink);
+  transform: rotate(-1.2deg);
+}
+
+:root[data-lens="cut-paper"] .cp-torn blockquote {
+  margin: 0;
+  font: 400 26px/1.02 var(--cp-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-torn blockquote p {
+  margin: 0 0 0.4em;
+}
+
+:root[data-lens="cut-paper"] .cp-torn blockquote :is(strong, em) {
+  background: linear-gradient(transparent 55%, color-mix(in srgb, var(--cp-tomato) 55%, transparent) 55%);
+}
+
+:root[data-lens="cut-paper"] .cp-torn__who {
+  margin-top: 4px;
+  font: 600 10.5px/1.3 var(--cp-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-torn__who cite {
+  font-style: normal;
+}
+
+/* steps are a step sequencer: a lit pad for each, numbered, a run between */
+:root[data-lens="cut-paper"] .cp-seq {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  margin: 0;
+  padding: 18px;
+  border-radius: 8px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-seq__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-content: start;
+  gap: 6px 14px;
+  min-width: 0;
+}
+
+:root[data-lens="cut-paper"] .cp-seq__step > :not(.cp-seq__pad) {
+  grid-column: 2;
+}
+
+:root[data-lens="cut-paper"] .cp-seq__pad {
+  grid-row: 1 / span 3;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  background: var(--note);
+  box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 0 14px color-mix(in srgb, var(--note) 40%, transparent);
+  color: var(--cp-ink);
+  font: 400 30px/1 var(--cp-display);
+}
+
+:root[data-lens="cut-paper"] .cp-seq__title {
+  margin: 4px 0 0;
+  color: var(--cp-ivory);
+  font: 400 22px/1 var(--cp-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-seq__text {
+  margin: 0;
+  color: var(--cp-ivory-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+:root[data-lens="cut-paper"] .cp-seq__image {
+  margin: 4px 0 0;
+}
+
+:root[data-lens="cut-paper"] .cp-seq__image img {
+  display: block;
+  width: 100%;
+  max-height: 160px;
+  border-radius: 4px;
+  background: var(--cp-ivory);
+  object-fit: contain;
+}
+
+@container story (min-width: 640px) {
+  :root[data-lens="cut-paper"] .cp-seq {
+    grid-template-columns: repeat(var(--steps, 3), minmax(0, 1fr));
+    gap: 18px 16px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-seq[data-count="2"] { --steps: 2; }
+  :root[data-lens="cut-paper"] .cp-seq[data-count="4"] { --steps: 4; }
+  :root[data-lens="cut-paper"] .cp-seq[data-count="5"],
+  :root[data-lens="cut-paper"] .cp-seq[data-count="6"] { --steps: 3; }
+
+  :root[data-lens="cut-paper"] .cp-seq__step {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-seq__step > :not(.cp-seq__pad) {
+    grid-column: 1;
+  }
+
+  :root[data-lens="cut-paper"] .cp-seq__pad {
+    grid-row: auto;
+    width: 100%;
+    max-width: 120px;
+    aspect-ratio: 2.2;
+  }
+
+  /* the run from one step to the next */
+  :root[data-lens="cut-paper"] .cp-seq__step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: calc(min(100%, 120px) / 4.4);
+    left: min(calc(100% + 2px), 124px);
+    right: -14px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--cp-ivory-4) 0 6px, transparent 6px 10px);
+  }
+}
+
+/* files are the browser's places: folders open onto what they hold */
+:root[data-lens="cut-paper"] .cp-places {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+  font: 400 12.5px/1.5 var(--cp-mono);
+}
+
+:root[data-lens="cut-paper"] .cp-places__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:root[data-lens="cut-paper"] .cp-places__list .cp-places__list {
+  margin-left: 6px;
+  padding-left: 14px;
+  border-left: 1px solid var(--cp-hairline);
+}
+
+:root[data-lens="cut-paper"] .cp-places__list li {
+  padding: 2px 0;
+}
+
+:root[data-lens="cut-paper"] .cp-places__name {
+  color: var(--cp-ivory);
+}
+
+:root[data-lens="cut-paper"] .cp-places__name::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 1px;
+  background: var(--cp-ivory-4);
+}
+
+:root[data-lens="cut-paper"] [data-folder] > .cp-places__name::before {
+  width: 11px;
+  height: 8px;
+  background: var(--cp-mustard);
+  clip-path: polygon(0 0, 40% 0, 50% 20%, 100% 20%, 100% 100%, 0 100%);
+}
+
+:root[data-lens="cut-paper"] .cp-places__note {
+  margin-left: 10px;
+  color: var(--cp-ivory-3);
+}
+
+:root[data-lens="cut-paper"] .cp-places__note::before {
+  content: "# ";
+}
+
+/* a sound is an audio clip: its name on the clip's head */
+:root[data-lens="cut-paper"] .cp-aclip {
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--cp-ink-2);
+  box-shadow: var(--cp-ring);
+}
+
+:root[data-lens="cut-paper"] .cp-aclip__name {
+  margin: 0;
+  padding: 7px 10px 6px;
+  background: var(--note, var(--cp-fa));
+  color: var(--cp-ink);
+  font: 400 15px/1.1 var(--cp-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:root[data-lens="cut-paper"] .cp-aclip audio {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  color-scheme: dark;
+}
+
+/* on a project's page the story is its clip notes, beside its clip box */
+:root[data-lens="cut-paper"] .cp-clipview:not(.cp-clipview--lab) .cp-story {
+  --gutter: 30px;
+  gap: 0 18px;
+}
+
+/* ── narrower windows ──────────────────────────────────────── */
+
+@media (max-width: 980px) {
+  :root[data-lens="cut-paper"] .cp-shelf__item {
+    grid-template-columns: 52px minmax(0, 1fr) 170px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-shelf__item .cp-holds {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  :root[data-lens="cut-paper"] .cp-shelf__item .cp-shelf__copy {
+    grid-row: 1;
+  }
+
+  :root[data-lens="cut-paper"] .cp-shelf__item > :last-child {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+
+  :root[data-lens="cut-paper"] .cp-month {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-month__head {
+    position: static;
+    grid-template-columns: auto minmax(0, 220px);
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  :root[data-lens="cut-paper"] .cp-place__title {
+    font-size: 28px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-place__note {
+    flex-basis: 100%;
+  }
+
+  :root[data-lens="cut-paper"] .cp-rackcase {
+    padding: 22px 14px 18px;
+    background:
+      linear-gradient(90deg, var(--cp-ink-4) 0 5px, transparent 5px calc(100% - 5px), var(--cp-ink-4) calc(100% - 5px)),
+      var(--cp-ink-2);
+  }
+
+  :root[data-lens="cut-paper"] .cp-rack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 12px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-rack__title {
+    font-size: 21px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-rack__slot[data-lab-featured] .cp-rack__title {
+    font-size: 34px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-rack__slot[data-holds="play"] {
+    grid-column: span 2;
+  }
+
+  :root[data-lens="cut-paper"] .cp-holds {
+    font-size: 8.5px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-shelf__item {
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 6px 12px;
+    padding: 12px 12px 12px 10px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-shelf__item .cp-pad {
+    grid-row: 1 / span 2;
+    align-self: start;
+  }
+
+  :root[data-lens="cut-paper"] .cp-shelf__item .cp-shelf__wave {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-shelf__item > .cp-device {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  :root[data-lens="cut-paper"] .cp-shelf .cp-rack__title {
+    font-size: 20px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-clipbox {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-clipbox > .cp-pad {
+    max-width: 220px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-story {
+    --gutter: 14px;
+    gap: 0 14px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-story .cp-prose h2[data-locator] {
+    padding-left: 34px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-story .cp-prose h2[data-locator]::before {
+    left: 0;
+    width: 28px;
+    padding-right: 5px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-chop {
+    flex-wrap: wrap;
+    row-gap: 34px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice {
+    flex: 1 1 calc(50% - 4px);
+  }
+
+  :root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice:first-child {
+    flex-basis: 100%;
+  }
+
+  :root[data-lens="cut-paper"] .cp-chop__img,
+  :root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice > video {
+    height: 150px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-chop > .cp-chop__slice:first-child > :is(.cp-chop__img, video) {
+    height: 220px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-torn blockquote {
+    font-size: 22px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-month__head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-lens="cut-paper"] .cp-steps {
+    max-width: 260px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--log {
+    --head: 84px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-arr--log .cp-arr__name small,
+  :root[data-lens="cut-paper"] .cp-arr--log .cp-ruler__corner small,
+  :root[data-lens="cut-paper"] .cp-arr--log .cp-ruler__month {
+    display: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-log__sheet {
+    padding: 8px 16px 22px 44px;
+    background-position: 9px 22px, 33px 0, 0 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-log__line {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 18px 0;
+  }
+
+  :root[data-lens="cut-paper"] .cp-art {
+    grid-column: 1;
+  }
+
+  :root[data-lens="cut-paper"] .cp-log__title {
+    font-size: 25px;
+  }
+}
+
+/* ── motion, only for those who have not asked for less ─────── */
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="cut-paper"] .cp-pad__hit {
+    transition: transform var(--cp-dur-tap) var(--cp-ease-stab), filter var(--cp-dur-ui) var(--cp-ease-brush), background var(--cp-dur-ui) var(--cp-ease-brush);
+  }
+
+  :root[data-lens="cut-paper"] .cp-pad__art,
+  :root[data-lens="cut-paper"] .cp-pad__hit--small .cp-roll {
+    transition: transform var(--cp-dur-tap) var(--cp-ease-stab), filter var(--cp-dur-ui) var(--cp-ease-brush), fill var(--cp-dur-ui) var(--cp-ease-brush);
+  }
+
+  :root[data-lens="cut-paper"] .cp-app .cp-log__date,
+  :root[data-lens="cut-paper"] .cp-grad__clip,
+  :root[data-lens="cut-paper"] .cp-solo__track,
+  :root[data-lens="cut-paper"] .cp-steps__day,
+  :root[data-lens="cut-paper"] .cp-flag {
+    transition: background var(--cp-dur-ui) var(--cp-ease-brush), color var(--cp-dur-ui) var(--cp-ease-brush), box-shadow var(--cp-dur-ui) var(--cp-ease-brush), filter var(--cp-dur-ui) var(--cp-ease-brush), opacity var(--cp-dur-ui) var(--cp-ease-brush);
+  }
+
+  :root[data-lens="cut-paper"] .cp-story__head {
+    transition: opacity var(--cp-dur-ui) var(--cp-ease-brush);
+  }
+
+  :root[data-lens="cut-paper"] .cp-story .cp-prose h2[data-locator]::before {
+    transition: background var(--cp-dur-ui) var(--cp-ease-brush), box-shadow var(--cp-dur-ui) var(--cp-ease-brush);
+  }
+}
+
+/* a chop on the rack opens the slice under a fine pointer */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  :root[data-lens="cut-paper"] .cp-pad__chop .cp-chop__slice {
+    transition: flex-grow var(--cp-eighth) var(--cp-ease-stab);
+  }
+
+  :root[data-lens="cut-paper"] .cp-pad__chop .cp-chop__slice:hover {
+    flex-grow: 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-lens="cut-paper"] [data-hearing] .cp-pad__band > .cp-clip__run {
+    animation: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-pad__hit:active,
+  :root[data-lens="cut-paper"] .cp-pad__hit[data-hearing],
+  :root[data-lens="cut-paper"] .cp-pad__hit[data-hearing] .cp-pad__art {
+    transform: none;
+  }
+
+  :root[data-lens="cut-paper"] .cp-log__line[data-hearing] {
+    outline: 0;
+  }
+}
+
+/* ── a plate that plays: the window at a size a screen can take in, its
+   caption beside it as a device's info panel ─────────────────── */
+
+@container story (min-width: 760px) {
+  :root[data-lens="cut-paper"] .cp-plate > :is(.cp-block--embed, .cp-block--model, .cp-block--film) {
+    display: grid;
+    grid-template-columns: minmax(0, 660px) minmax(180px, 1fr);
+    align-items: end;
+    gap: 22px;
+  }
+
+  :root[data-lens="cut-paper"] .cp-plate > :is(.cp-block--embed, .cp-block--model, .cp-block--film) > .cp-block__caption {
+    margin: 0;
+    padding: 12px 0 12px 14px;
+    border-left: 2px solid var(--note, var(--cp-ivory-3));
+    font-size: 12.5px;
+  }
+
+  /* small blocks with no words before them stand in a row of their own */
+  :root[data-lens="cut-paper"] .cp-spread:not(:has(> .cp-prose)) > .cp-spread__margin {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    align-items: start;
+  }
+}
+
+:root[data-lens="cut-paper"] .cp-device__screen {
+  max-height: 72vh;
+}

@@ -26,6 +26,7 @@ import {
   type Env,
   type Screen,
 } from "./bits";
+import { story, tendStory } from "./blocks";
 import { arrangement, changesLane, markersLane, overlay, rolesLane, ruler, span } from "./arrangement";
 import { h, link } from "./dom";
 import { noteName } from "./music";
@@ -185,8 +186,9 @@ function project(env: Env, item: Project): Screen {
     "div",
     { class: "cp-clipview__main" },
     editor(env, clip, item.title, index),
-    item.html.trim() ? h("h2", { class: "cp-label" }, words.notes) : null,
-    prose(item.html, part("project.body", item.slug)),
+    item.html.trim() || item.blocks.length ? h("h2", { class: "cp-label" }, words.notes) : null,
+    // told with blocks, its notes are a story (./blocks); else its prose
+    item.blocks.some((told) => told.type !== "text") ? story(env, item.slug, item.blocks, item.html, "project.body") : prose(item.html, part("project.body", item.slug)),
     media.length
       ? h(
           "div",
@@ -205,7 +207,8 @@ function project(env: Env, item: Project): Screen {
       : null,
   );
   bar(side, 1);
-  return { el: screen("project", h("div", { class: "cp-clipview", style: `--note:${noteVar(index)}` }, side, main)), heading: h1 };
+  const el = screen("project", h("div", { class: "cp-clipview", style: `--note:${noteVar(index)}` }, side, main));
+  return { el, heading: h1, arrive: tendStory(env, el) };
 }
 
 /* ── about: the set notes, pasted up as a torn jazz poster ── */
