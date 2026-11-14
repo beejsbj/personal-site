@@ -445,16 +445,6 @@ export const GAPS: Partial<
         "Back Page's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#131) adds it. With either in the address it shows every update, as before.",
     },
   },
-  hion: {
-    lab: {
-      "lab.preview":
-        "Hion lists the experiments with no way to play one where it stands until its design pass draws it (#132); each still links out to where it lives.",
-      "labbook.month":
-        "Hion's Labbook is one list, not yet kept by month: its design pass (#132) draws the months.",
-      "labbook.subject":
-        "Hion's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#132) adds it. With either in the address it shows every update, as before.",
-    },
-  },
 };
 
 type BlockPart = Extract<Part, `block.${string}`>;
@@ -485,10 +475,6 @@ export const BLOCK_GAPS: Partial<
   },
   "back-page": {
     why: "Back Page shows an entry's prose and none of its blocks until its design pass draws them (#131).",
-    parts: ALL_BLOCKS,
-  },
-  hion: {
-    why: "Hion shows an entry's prose and none of its blocks until its design pass draws them (#132).",
     parts: ALL_BLOCKS,
   },
 };
