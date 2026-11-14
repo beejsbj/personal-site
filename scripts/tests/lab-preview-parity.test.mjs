@@ -75,9 +75,8 @@ test("an entry's own page does not owe it", () => {
   );
 });
 
-test("Daylight, Calling Card and Cut Paper play an entry in place; each other lens records the gap and its design pass", () => {
+test("Daylight, Calling Card, Cut Paper and Back Page play an entry in place; each other lens records the gap and its design pass", () => {
   const TICKETS = {
-    "back-page": "#131",
     hion: "#132",
   };
   for (const [lens, ticket] of Object.entries(TICKETS)) {
@@ -88,6 +87,6 @@ test("Daylight, Calling Card and Cut Paper play an entry in place; each other le
     for (const part of ["lab.title", "lab.summary"])
       assert.equal(isGap(lens, "lab", part), false, `${lens} ${part}`);
   }
-  for (const lens of ["daylight", "calling-card", "cut-paper"])
+  for (const lens of ["daylight", "calling-card", "cut-paper", "back-page"])
     assert.equal(isGap(lens, "lab", "lab.preview"), false, lens);
 });

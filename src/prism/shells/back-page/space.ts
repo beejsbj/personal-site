@@ -40,6 +40,11 @@ const SOLID = [
   ".bp-belongs",
   "button",
   "input",
+  // the lab book's: its contents, a stamp, a calendar, a number in the margin
+  ".bp-contents",
+  ".bp-stamp",
+  ".bp-cal",
+  ".bp-num",
 ].join(",");
 
 export class Space {
