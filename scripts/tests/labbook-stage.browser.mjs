@@ -251,7 +251,11 @@ test(
             if (lens !== "back-page")
               return page.waitForSelector(piece(id), { state: "attached" });
             const turn = (which) =>
-              page.locator(`#lens-shell [data-prism-turn='${which}']`);
+              page.locator(
+                which === "next"
+                  ? "#lens-shell [data-prism-turn='next']"
+                  : "#lens-shell button.bp-corner--prev",
+              );
             const here = () =>
               page.locator(`#lens-shell .bp-spread [id="${id}"]`).count();
             let step = "next";
