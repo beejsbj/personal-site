@@ -180,7 +180,11 @@ test(
             const bench = shown.filter((piece) => piece.place === "bench");
             const shelf = shown.filter((piece) => piece.place === "shelf");
             for (const piece of shown)
-              assert.equal(piece.named, 0, `${piece.slug}'s pictures are nameless`);
+              assert.equal(
+                piece.named,
+                0,
+                `${piece.slug}'s pictures are nameless`,
+              );
             assert.ok(
               bench.every((piece) => piece.hangs),
               "everything on the Bench hangs from a thread",
@@ -218,7 +222,11 @@ test(
                 "experiments hang side by side on the Bench",
               );
             assert.deepEqual(asked, [], "nothing is asked of another site");
-            assert.equal(await overflow(page), 0, "nothing wider than the screen");
+            assert.equal(
+              await overflow(page),
+              0,
+              "nothing wider than the screen",
+            );
             assert.deepEqual(errors, []);
             await context.close();
           },
@@ -235,7 +243,9 @@ test(
             ]) {
               const entry = fixture.lab.find((item) => item.slug === slug);
               const piece = page.locator("#lens-shell li[data-holds]", {
-                has: page.locator(`[data-part='lab.title'][data-ref='${slug}']`),
+                has: page.locator(
+                  `[data-part='lab.title'][data-ref='${slug}']`,
+                ),
               });
               const title = piece.locator("[data-part='lab.title'] a");
               const cord = piece.locator("button[data-block-toggle]");
@@ -305,7 +315,10 @@ test(
           `${size}: with less motion asked for, nothing in the Lab's places moves`,
           async () => {
             const { context, page, errors } = await open(size, KINDS);
-            for (const slug of ["fixture-kinds-stack", "fixture-kinds-shelved"]) {
+            for (const slug of [
+              "fixture-kinds-stack",
+              "fixture-kinds-shelved",
+            ]) {
               const link = page.locator(
                 `#lens-shell [data-part='lab.title'][data-ref='${slug}'] a`,
               );
@@ -346,8 +359,8 @@ test(
                     .querySelector("[data-part='labbook.month']")
                     .textContent.replace(/\s+/g, " ")
                     .trim(),
-                  ids: [...month.querySelectorAll("li[id^='u-']")].map((entry) =>
-                    entry.id.replace(/^u-/, ""),
+                  ids: [...month.querySelectorAll("li[id^='u-']")].map(
+                    (entry) => entry.id.replace(/^u-/, ""),
                   ),
                   hidden: cord?.getAttribute("aria-hidden"),
                   reachable: cord?.querySelectorAll("a, button, [tabindex]")
@@ -385,7 +398,11 @@ test(
               0,
               "nothing points at the Labbook's knots",
             );
-            assert.equal(await overflow(page), 0, "nothing wider than the screen");
+            assert.equal(
+              await overflow(page),
+              0,
+              "nothing wider than the screen",
+            );
             assert.deepEqual(errors, []);
             await context.close();
           },
@@ -395,7 +412,10 @@ test(
           `${size}: the Labbook narrows to one thing it is about, and back`,
           async () => {
             // On /lab the client router answers the narrowing in place.
-            const { context, page, errors } = await open(size, "/lab?lens=hion");
+            const { context, page, errors } = await open(
+              size,
+              "/lab?lens=hion",
+            );
             const subjects = labbookSubjects(content.labbook, content);
             assert.ok(subjects.length > 0, "the Labbook is about something");
             const shown = await page
@@ -426,7 +446,9 @@ test(
               const visible = (el) => el.checkVisibility();
               const book = document.querySelector("#lens-shell [data-labbook]");
               return {
-                lab: !!document.querySelector("#lens-shell main.hion-screen--lab"),
+                lab: !!document.querySelector(
+                  "#lens-shell main.hion-screen--lab",
+                ),
                 focus: document.activeElement?.matches("[data-hion-narrowed]"),
                 says: book
                   .querySelector("[data-hion-narrowed]")
@@ -453,7 +475,10 @@ test(
               };
             }, key);
             assert.ok(narrowed.lab, "still on the Lab");
-            assert.ok(narrowed.focus, "the line saying what it shows has the focus");
+            assert.ok(
+              narrowed.focus,
+              "the line saying what it shows has the focus",
+            );
             assert.ok(narrowed.says.includes(target.title), narrowed.says);
             assert.equal(narrowed.current, key);
             assert.equal(narrowed.entries.length, target.count);
@@ -465,20 +490,29 @@ test(
               narrowed.knots.every((about) => about.split(" ").includes(key)),
               "only its days are knotted",
             );
-            assert.ok(narrowed.months.every(Boolean), "a month left empty is put away");
+            assert.ok(
+              narrowed.months.every(Boolean),
+              "a month left empty is put away",
+            );
             await page.locator("#lens-shell [data-hion-all]").click();
             await page.waitForURL((url) => !url.searchParams.has(target.kind));
             await page.waitForTimeout(900);
             const whole = await page.evaluate(() => ({
               focus: document.activeElement?.getAttribute("data-ref"),
               entries: [
-                ...document.querySelectorAll("#lens-shell [data-labbook] li[id^='u-']"),
+                ...document.querySelectorAll(
+                  "#lens-shell [data-labbook] li[id^='u-']",
+                ),
               ].filter((el) => el.checkVisibility()).length,
               status: document
                 .querySelector("#lens-shell [data-hion-narrowed]")
                 ?.checkVisibility(),
             }));
-            assert.equal(whole.focus, key, "back to the cord it was narrowed by");
+            assert.equal(
+              whole.focus,
+              key,
+              "back to the cord it was narrowed by",
+            );
             assert.equal(whole.entries, content.labbook.length);
             assert.equal(whole.status, false);
             assert.deepEqual(errors, []);
@@ -515,7 +549,9 @@ test(
             const laid = await page.evaluate(() => {
               const box = (el) => el?.getBoundingClientRect();
               const spreads = [
-                ...document.querySelectorAll("#lens-shell .hion-spread[data-asides]"),
+                ...document.querySelectorAll(
+                  "#lens-shell .hion-spread[data-asides]",
+                ),
               ]
                 .filter((spread) => spread.querySelector(".hion-prose"))
                 .map((spread) => ({
@@ -530,11 +566,15 @@ test(
                   beside: aside.left >= text.right - 1,
                   under: aside.top >= text.bottom - 1,
                 })),
-                plates: document.querySelectorAll("#lens-shell .hion-plate").length,
+                plates: document.querySelectorAll("#lens-shell .hion-plate")
+                  .length,
                 blocks: [
-                  ...document.querySelectorAll("#lens-shell [data-part^='block.']"),
+                  ...document.querySelectorAll(
+                    "#lens-shell [data-part^='block.']",
+                  ),
                 ].map((el) => el.dataset.part),
-                knots: steps?.querySelectorAll("[data-spine='knot']").length,
+                knots: steps?.querySelectorAll("[data-ink='tally'] [data-step]")
+                  .length,
                 frames: document.querySelectorAll("#lens-shell iframe").length,
               };
             });
@@ -555,7 +595,11 @@ test(
               BLOCK_PARTS,
               "every block is drawn, and the one no lens knows is passed over",
             );
-            assert.equal(laid.knots, 3, "each step is a knot on the way down");
+            assert.equal(
+              laid.knots,
+              3,
+              "each step is a knot tied along one thread",
+            );
             assert.equal(laid.frames, 0);
             assert.deepEqual(asked, [], "nothing live before a pull");
             // The Pen, asked for, plays in its place; Escape puts it away
@@ -570,18 +614,26 @@ test(
             await page.waitForTimeout(300);
             assert.equal(await page.locator("#lens-shell iframe").count(), 0);
             assert.equal(
-              await page.locator("#lens-shell main.hion-screen--lab-entry").count(),
+              await page
+                .locator("#lens-shell main.hion-screen--lab-entry")
+                .count(),
               1,
               "Escape did not leave the page",
             );
             // With less motion asked for, a looping film stands still.
             assert.equal(
               await page
-                .locator("#lens-shell [data-ref='fixture-blocks/the-loop'] video")
+                .locator(
+                  "#lens-shell [data-ref='fixture-blocks/the-loop'] video",
+                )
                 .evaluate((film) => film.paused),
               true,
             );
-            assert.equal(await overflow(page), 0, "nothing wider than the screen");
+            assert.equal(
+              await overflow(page),
+              0,
+              "nothing wider than the screen",
+            );
             assert.deepEqual(errors, []);
             await context.close();
           },
@@ -623,29 +675,40 @@ test(
                 harness(fixture, `/lab/${slug}`),
               );
               const shown = await page.evaluate(() => {
-                const head = document.querySelector("#lens-shell .hion-entry-head");
+                const head = document.querySelector(
+                  "#lens-shell .hion-entry-head",
+                );
                 const picture = document.querySelector(
                   "#lens-shell main .hion-picture img",
                 );
                 const box = (el) => el?.getBoundingClientRect();
                 return {
                   holds: head?.dataset.holds,
-                  pictures: document.querySelectorAll("#lens-shell main img").length,
-                  // the picture hangs level with the head, not under it
-                  byHead: picture
-                    ? box(picture).top < box(head).bottom
-                    : null,
-                  empty: [...document.querySelectorAll("#lens-shell main .hion-loop")]
-                    .filter((loop) => !loop.textContent.trim() && !loop.querySelector("img"))
+                  pictures: document.querySelectorAll("#lens-shell main img")
                     .length,
+                  // the picture hangs level with the head, not under it
+                  byHead: picture ? box(picture).top < box(head).bottom : null,
+                  empty: [
+                    ...document.querySelectorAll("#lens-shell main .hion-loop"),
+                  ].filter(
+                    (loop) =>
+                      !loop.textContent.trim() && !loop.querySelector("img"),
+                  ).length,
                 };
               });
               assert.equal(shown.holds, holds, slug);
               assert.equal(shown.pictures, pictures, slug);
               if (pictures && size === "desktop")
-                assert.ok(shown.byHead, `${slug}'s one picture hangs by its head`);
+                assert.ok(
+                  shown.byHead,
+                  `${slug}'s one picture hangs by its head`,
+                );
               assert.equal(shown.empty, 0, `${slug} has no empty loop`);
-              assert.equal(await overflow(page), 0, "nothing wider than the screen");
+              assert.equal(
+                await overflow(page),
+                0,
+                "nothing wider than the screen",
+              );
               assert.deepEqual(errors, []);
               await context.close();
             }
@@ -662,14 +725,22 @@ test(
             );
             const blocks = await page
               .locator("#lens-shell [data-part^='block.']")
-              .evaluateAll((all) => [...new Set(all.map((el) => el.dataset.part))].sort());
+              .evaluateAll((all) =>
+                [...new Set(all.map((el) => el.dataset.part))].sort(),
+              );
             assert.deepEqual(blocks, BLOCK_PARTS);
             assert.ok(
-              (await page.locator("#lens-shell [data-part='project.body']").count()) > 0,
+              (await page
+                .locator("#lens-shell [data-part='project.body']")
+                .count()) > 0,
               "its words are its body",
             );
             assert.deepEqual(asked, [], "nothing live before a pull");
-            assert.equal(await overflow(page), 0, "nothing wider than the screen");
+            assert.equal(
+              await overflow(page),
+              0,
+              "nothing wider than the screen",
+            );
             assert.deepEqual(errors, []);
             await context.close();
           },
