@@ -403,16 +403,10 @@ export const GAPS: Partial<
         "No Elsewhere list on the pause menu: Writing is a command and the socials are on the Calling Card dialog, without blurbs.",
     },
     lab: {
-      "lab.preview":
-        "The request board lists the experiments with no way to play one where it stands until its design pass draws it (#129); each still links out to where it lives.",
       "lab.more":
         "The request board shows only the experiments; it has no link out to more sketches on CodePen.",
       "lab.aside":
         "The request board has no aside pointing to Projects and the Style Guide; Projects is a tab.",
-      "labbook.month":
-        "Calling Card's Labbook is one list, not yet kept by month: its design pass (#129) draws the months.",
-      "labbook.subject":
-        "Calling Card's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#129) adds it. With either in the address it shows every update, as before.",
     },
   },
   "cut-paper": {
@@ -439,26 +433,10 @@ export const GAPS: Partial<
         "The war book's first pages are a roll call of names and dates and the war map; each project's summary is on its own page.",
     },
     lab: {
-      "lab.preview":
-        "The lab book lists the experiments with no way to play one where it stands until its design pass draws it (#131); each still links out to where it lives.",
       "lab.more":
         "The lab book has no link out to more sketches; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
         "The lab book has no aside; Projects is a book of its own on the pile, and the style guide is not in any book.",
-      "labbook.month":
-        "Back Page's Labbook is one list, not yet kept by month: its design pass (#131) draws the months.",
-      "labbook.subject":
-        "Back Page's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#131) adds it. With either in the address it shows every update, as before.",
-    },
-  },
-  hion: {
-    lab: {
-      "lab.preview":
-        "Hion lists the experiments with no way to play one where it stands until its design pass draws it (#132); each still links out to where it lives.",
-      "labbook.month":
-        "Hion's Labbook is one list, not yet kept by month: its design pass (#132) draws the months.",
-      "labbook.subject":
-        "Hion's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#132) adds it. With either in the address it shows every update, as before.",
     },
   },
 };
@@ -485,20 +463,8 @@ const ALL_BLOCKS: BlockPart[] = [
 export const BLOCK_GAPS: Partial<
   Record<LensId, { why: string; parts: BlockPart[] }>
 > = {
-  "calling-card": {
-    why: "Calling Card shows an entry's prose and none of its blocks until its design pass draws them (#129).",
-    parts: ALL_BLOCKS,
-  },
   "cut-paper": {
     why: "Cut Paper shows an entry's prose and none of its blocks until its design pass draws them (#130).",
-    parts: ALL_BLOCKS,
-  },
-  "back-page": {
-    why: "Back Page shows an entry's prose and none of its blocks until its design pass draws them (#131).",
-    parts: ALL_BLOCKS,
-  },
-  hion: {
-    why: "Hion shows an entry's prose and none of its blocks until its design pass draws them (#132).",
     parts: ALL_BLOCKS,
   },
 };

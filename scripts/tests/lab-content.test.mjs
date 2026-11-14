@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import https from "node:https";
 import test from "node:test";
 
 // What the Lab's own entries must say (issue #92), read straight from
@@ -220,4 +221,83 @@ test("no experiment calls code-made work 'generated' without saying by what", ()
     ))
       assert.fail(`${entry.slug}: "${phrase.trim()}" does not say by what`);
   }
+});
+
+// A link that answers 401 or 403 to the public is a door visitors cannot
+// open (issue #139). Names are resolved through a public resolver, never the
+// local one, so an address that only answers inside a private network shows
+// up as what it is to everyone else.
+const DOH = "https://cloudflare-dns.com/dns-query";
+const TIMEOUT = 4000;
+// A bot wall in front of a public page answers 403 to scripts and a page to
+// browsers; it says so in its body. A closed door says nothing.
+const BOT_WALL = /attention required|just a moment|cf-challenge/i;
+
+async function publicAddress(host) {
+  const res = await fetch(`${DOH}?name=${host}&type=A`, {
+    headers: { accept: "application/dns-json" },
+    signal: AbortSignal.timeout(TIMEOUT),
+  });
+  return (await res.json()).Answer?.find((a) => a.type === 1)?.data;
+}
+
+/** The status and start of the body, connecting to `address` for `href`. */
+const open = (href, address) =>
+  new Promise((resolve) => {
+    const req = https.get(
+      href,
+      {
+        lookup: (_host, opts, done) =>
+          opts.all
+            ? done(null, [{ address, family: 4 }])
+            : done(null, address, 4),
+        timeout: TIMEOUT,
+        headers: { "user-agent": "Mozilla/5.0 (lab-content test)" },
+      },
+      (res) => {
+        let body = "";
+        res.setEncoding("utf8");
+        res.on("data", (chunk) => {
+          body += chunk;
+          if (body.length > 2000) res.destroy();
+        });
+        res.on("close", () => resolve({ status: res.statusCode, body }));
+      },
+    );
+    req.on("timeout", () => req.destroy());
+    req.on("error", () => resolve(null));
+  });
+
+test("no experiment's href answers 401 or 403 from the public internet", async (t) => {
+  try {
+    await publicAddress("example.com");
+  } catch {
+    t.skip("no network: could not reach the public resolver");
+    return;
+  }
+  await Promise.all(
+    entries
+      .map((entry) => ({ entry, href: entry.field("href") }))
+      .filter(({ href }) => href)
+      .map(async ({ entry, href }) => {
+        const address = await publicAddress(new URL(href).hostname);
+        if (!address) return; // no public name: nothing a visitor could open
+        const res = await open(href, address);
+        if (!res || BOT_WALL.test(res.body)) return;
+        assert.ok(
+          res.status !== 401 && res.status !== 403,
+          `${entry.slug}: ${href} answers ${res.status}`,
+        );
+      }),
+  );
+});
+
+test("Kitchen does not claim photographs", () => {
+  const kitchen = entries.find((entry) => entry.slug === "kitchen");
+  assert.ok(kitchen, "the Kitchen entry exists");
+  assert.doesNotMatch(
+    `${kitchen.frontmatter}\n${kitchen.body}`,
+    /photograph/i,
+    "kitchen: claims photographs",
+  );
 });

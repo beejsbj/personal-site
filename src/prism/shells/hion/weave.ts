@@ -18,7 +18,8 @@
  *   other (and out past the loop, if the heading hangs out of it). Off the
  *   loops, a heading beside the hions has its weft thrown out from them.
  * - `[data-tie]` things are tied on by a short thread to the hions beside
- *   them, level with their first line (inside a loop, to its left strand).
+ *   them, level with their first line (inside a loop, to its left strand;
+ *   `data-tie="r"`, to its right).
  * - `[data-cord]` holds `[data-hang]` things. Each row of them hangs from a
  *   cord across its top: `branch` cords are tied to the nearest hion and run
  *   out to one side (the heads of screens hang from these), `heading` rows
@@ -526,19 +527,24 @@ export function compose(
       );
       continue;
     }
+    // Inside a loop, to the strand on its own side: cyan runs down the
+    // left, magenta the right (strandPoints).
+    const right = el.dataset.tie === "r";
+    const from = right ? loop.r : loop.l;
+    const to = right ? b.r + 12 : b.l - 12;
     const pts: Pt[] = [
-      [loop.l, y - 4],
-      [(loop.l + b.l) / 2, y + 3],
-      [b.l - 12, y],
+      [from, y - 4],
+      [(from + to) / 2, y + 3],
+      [to, y],
     ];
     if (heads) {
-      limbs.push({ hue: "c", way: new Path(pts, 3).points(), key: y - 50, tied: true, knot: true });
+      limbs.push({ hue: right ? "m" : "c", way: new Path(pts, 3).points(), key: y - 50, tied: true, knot: true });
       continue;
     }
     marks.push(
       ...thread(new Path(pts, 3), { hue, seed: seed++, key: [y - 50, y - 20] }),
-      ...knot(loop.l, y - 4, 5, seed++, y - 50),
-      ...knot(b.l - 12, y, 3.5, seed++, y - 20),
+      ...knot(from, y - 4, 5, seed++, y - 50),
+      ...knot(to, y, 3.5, seed++, y - 20),
     );
   }
 

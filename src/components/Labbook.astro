@@ -248,15 +248,17 @@ const about = (update: Update) =>
           { capture: true },
         );
         // The router's swap puts in the new page before its scripts run
-        // again: narrow it then, so it is never seen whole first.
+        // again: narrow it then, so it is never seen whole first. Its own
+        // section, by its id: a lens drawing the Labbook may mark its own
+        // `[data-labbook]` too, and come first in the document.
         document.addEventListener("astro:after-swap", () => {
-          const section = document.querySelector("[data-labbook]");
+          const section = document.querySelector("#labbook[data-labbook]");
           if (section) narrow(section);
         });
         // The router does not run this script again on the page it swaps
         // in (it has run it once), so the keyboard is landed here.
         document.addEventListener("astro:page-load", () => {
-          const section = document.querySelector("[data-labbook]");
+          const section = document.querySelector("#labbook[data-labbook]");
           if (section) land(section);
         });
       })();

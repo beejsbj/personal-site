@@ -16,6 +16,9 @@
  *   tassel the two hions falling from a knot and parting in two curls
  *   bound  thread wound tight round each word of a redacted update
  *          (`[data-redaction-bar]`, as long as its number): nothing hangs
+ *   tally  one thread along it, across or down whichever it is longer,
+ *          through a knot at each of its `[data-day]` or `[data-step]`
+ *          (a month's days written in, a page's steps): nothing hangs
  *
  * The hang length is `--hion-hang` on the element (px). */
 import { curl, pendant } from "./dance";
@@ -106,6 +109,31 @@ function marksFor(el: HTMLElement, w: number, h: number, drop: number): Mark[] {
       const end = curl(x, at, -1, length * 0.85, seed + 2, 1.8).at(-1);
       if (end) el.dataset.knot = `${(end[0] - PAD).toFixed(1)},${(end[1] - at).toFixed(1)}`;
     }
+  } else if (type === "tally") {
+    const own = el.getBoundingClientRect();
+    // A day about something else, while the Labbook is narrowed, is untied.
+    const knots = [...el.querySelectorAll<HTMLElement>("[data-day]:not([data-elsewhere]), [data-step]")]
+      .filter((k) => k.offsetParent !== null)
+      .map((k) => {
+        const r = k.getBoundingClientRect();
+        return [PAD + r.left + r.width / 2 - own.left, at + r.top + r.height / 2 - own.top] as const;
+      });
+    const across = w >= h;
+    // The thread runs level with its first knot (or through its middle).
+    const y = knots[0]?.[1] ?? at + h / 2;
+    const x = knots[0]?.[0] ?? PAD + w / 2;
+    const span = across ? w : h;
+    // In a few lengths, so a long cord keeps the slow drift of a hand.
+    const steps = Math.max(1, Math.round(span / 160));
+    for (let i = 0; i < steps; i += 1) {
+      const a = (span * i) / steps;
+      const b = (span * (i + 1)) / steps;
+      out.push(
+        ...(across ? line(PAD + a, y, PAD + b, y, seed + i * 3) : line(x, at + a, x, at + b, seed + i * 3)),
+      );
+    }
+    let s = seed + 50;
+    for (const [kx, ky] of knots) out.push(...knot(kx, ky, 5.5, s++));
   } else if (type === "bound") {
     let s = seed;
     for (const bar of el.querySelectorAll<HTMLElement>(":scope > [data-redaction-bar]")) {
@@ -123,8 +151,9 @@ function inkOne(el: HTMLElement) {
   if (!w || !h) return;
   const drop = hangOf(el);
   const type = el.dataset.ink;
-  const tall = type === "tassel" ? h + 40 : type === "pull" || type === "bound" ? h : 28;
-  const signature = `${w}x${h}:${drop}:${getComputedStyle(el).getPropertyValue("--hion-tassel-x")}`;
+  const tall = type === "tassel" ? h + 40 : type === "pull" || type === "bound" || type === "tally" ? h : 28;
+  const tied = type === "tally" ? el.querySelectorAll("[data-day]:not([data-elsewhere]), [data-step]").length : 0;
+  const signature = `${w}x${h}:${drop}:${getComputedStyle(el).getPropertyValue("--hion-tassel-x")}:${tied}`;
   if (drawn.get(el) === signature) return;
   drawn.set(el, signature);
   let canvas = drawnOn(el.querySelector<HTMLCanvasElement>(":scope > canvas.hion-ink"));

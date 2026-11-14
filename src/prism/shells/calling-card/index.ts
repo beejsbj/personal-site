@@ -45,6 +45,7 @@ let panel: { panel: Panel; opener?: HTMLElement } | undefined;
 let queue: Promise<void> = Promise.resolve();
 let pendingTitle: string | undefined;
 let currentPath: string | undefined;
+let currentSearch = "";
 
 /** `settled`: the screen is already on screen (the first screen of a
  * settled arrival), so it lands without its entrance. */
@@ -57,6 +58,7 @@ function build(route: Route, settled = false) {
     : ctx!.signal;
   const next = FACTORIES[route.kind](route, { ...env!, signal, settled });
   currentPath = route.path;
+  currentSearch = location.search;
   rememberCommand(route.kind);
   stage.replaceChildren(next.el);
   next.el.dataset.enter = ctx!.reducedMotion || settled ? "calm" : "in";
@@ -148,8 +150,15 @@ function onKey(event: KeyboardEvent) {
 
 async function go(route: Route) {
   if (!ctx) return;
-  // The runtime also calls update() for the page it just mounted.
-  if (route.path === currentPath && !pendingTitle && !route.refresh) return;
+  // The runtime also calls update() for the page it just mounted. The same
+  // page with another query (the Labbook narrowed) is answered in place.
+  if (route.path === currentPath && !pendingTitle && !route.refresh) {
+    if (location.search !== currentSearch) {
+      currentSearch = location.search;
+      screen?.renew?.();
+    }
+    return;
+  }
   closePanel(false);
   // The wipe's title card: the link's own name, else the screen's.
   const title = pendingTitle ?? copyOf(ctx.content).sections[route.kind];
