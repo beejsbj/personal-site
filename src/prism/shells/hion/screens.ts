@@ -974,7 +974,8 @@ function charmPictures(prints: string[], hue: "c" | "m") {
 /** An experiment on the Bench, still on the loom: it hangs in the loop as
  * what it holds. A picture hangs by its corners, woven into the cloth
  * until you reach for it; several hang one from another; something to
- * play hangs as the place stitched out for it, with its cord to pull;
+ * play hangs as the place stitched out for it, with its cord to pull,
+ * and pulled, the place opens over the loom (`data-stage-window`);
  * only words, and its name is what hangs, written large like a sign. The
  * featured one hangs across the row, its name a sign, what it holds
  * beside its words. */
@@ -995,7 +996,7 @@ function benched(content: SiteContent, entry: Experiment, i: number) {
         note: content.pages.lab.preview.note,
         subject: entry.title,
         loading: content.pages.lab.preview.loading,
-        data: { "data-frame": play.frame },
+        data: { "data-frame": play.frame, "data-stage-window": "" },
       })
     : undefined;
   if (stage) markPart(stage.cord, "lab.preview", entry.slug);
@@ -1064,7 +1065,7 @@ function shelved(content: SiteContent, entry: Experiment, i: number) {
         close: content.pages.lab.preview.close,
         subject: entry.title,
         loading: content.pages.lab.preview.loading,
-        data: { "data-frame": play.frame },
+        data: { "data-frame": play.frame, "data-stage-window": "" },
       })
     : undefined;
   if (stage) markPart(stage.cord, "lab.preview", entry.slug);
