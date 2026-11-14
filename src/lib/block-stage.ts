@@ -116,9 +116,10 @@ const clamp = (value: number, least: number, most: number) =>
 /** The window a piece held small is shown in, over the page: in the top
  * layer, so nothing it stands in clips it, tilts it or makes room for it.
  * The lens gives it its look and its size (src/styles/stage-window.css);
- * it is laid over its stage, or for `data-stage-window="ask"` over what
- * asked for it (Back Page's sticky note), as near the middle of that as
- * the screen allows, and keeps to it as the page scrolls. It is open at
+ * it is laid over its stage, as near its middle as the screen allows, or
+ * for `data-stage-window="ask"` unfolded from what asked for it (Back
+ * Page's sticky note), just above it, or under it, which it leaves to be
+ * pressed again; and it keeps to it as the page scrolls. It is open at
  * its full size from the press: until the piece has loaded it shows the
  * poster and the words saying it is loading, then the piece, the same
  * size. Its bar names the piece and has the words that put it away. */
@@ -190,10 +191,22 @@ function openWindow(stage: HTMLElement) {
       g,
       width - g - win.offsetWidth,
     );
+    // Over its stage; or unfolded from what asked for it, above it (or
+    // under it, with more room there) so that it is still there to press,
+    // its glass giving up height to fit the room it has.
+    const unfolds = at === anchor && anchor !== stage;
+    const above = a.top - 2 * g;
+    const under = innerHeight - a.bottom - 2 * g;
+    win.style.maxHeight = unfolds ? `${Math.max(above, under)}px` : "";
+    const h = win.offsetHeight;
     const y = clamp(
-      a.top + a.height / 2 - win.offsetHeight / 2,
+      !unfolds
+        ? a.top + a.height / 2 - h / 2
+        : h <= above || above >= under
+          ? a.top - g - h
+          : a.bottom + g,
       g,
-      innerHeight - g - win.offsetHeight,
+      innerHeight - g - h,
     );
     from = { x: x - s.left, y: y - s.top };
     win.style.setProperty(

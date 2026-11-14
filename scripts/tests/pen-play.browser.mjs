@@ -2,15 +2,17 @@
  * (issue #166). CodePen's embed draws its tabs above the result and its
  * toolbar below it whatever its address asks, so the stage frames a Pen
  * a little larger than the room it shows it in, and the room shows the
- * result alone. A Pen held small (a card on the Lab, a pin, a rack slot, a
- * line of the library card, a stitched place) opens, when
- * pressed, in a window of its own over the page, in the lens's own idiom,
- * at its full size from the press: no larger once it has loaded, and
- * nothing under it moves. Escape puts it away. With less motion asked for,
- * it opens without moving. In Back Page the window is the sticky note,
- * unfolded where it was stuck. A Pen on an experiment's page already spans
- * its column, and a Labbook's stands as a figure in its entry: each plays
- * where it is, showing its result alone.
+ * result alone. A Pen held small (a card on the Lab, a pin, a rack slot,
+ * a line of the library card, a stitched place) opens, when pressed, in a
+ * window of its own over the page, in the lens's own idiom, at its full
+ * size from the press: no larger once it has loaded, and nothing under it
+ * moves. Escape puts it away. With less motion asked for, it opens without
+ * moving. In Back Page the window is the sticky note, unfolded from where
+ * it is stuck, which stays there to press; a page of its book is narrow,
+ * so a Pen on an experiment's page unfolds from its note too. Elsewhere a
+ * Pen on an experiment's page already spans its column, and a Labbook's
+ * stands as a figure in its entry: each plays where it is, showing its
+ * result alone.
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
@@ -306,7 +308,7 @@ test(
                       page: await page.evaluate(
                         () => document.documentElement.scrollHeight,
                       ),
-                      // Where the press was: Back Page's note is the window.
+                      // Where the press was: Back Page's note unfolds from it.
                       note: await page.evaluate(() => {
                         const r = document
                           .querySelector("[data-test-toggle]")
@@ -332,17 +334,31 @@ test(
                       `${slug}: its card keeps its size`,
                     );
                     assert.equal(loading.page, before.page, `${slug}: page`);
-                    if (lens === "back-page")
+                    if (lens === "back-page") {
+                      const note = await page.evaluate(() => {
+                        const r = document
+                          .querySelector("[data-test-toggle]")
+                          .getBoundingClientRect();
+                        return [r.left + r.width / 2, r.top, r.bottom];
+                      });
+                      assert.ok(
+                        loading.window.left <= note[0] &&
+                          note[0] <= loading.window.right &&
+                          (Math.abs(loading.window.bottom - note[1]) <= 24 ||
+                            Math.abs(loading.window.top - note[2]) <= 24),
+                        `${slug}: the note unfolds from where it is stuck`,
+                      );
                       assert.ok(
                         await page.evaluate(
                           ([x, y]) =>
                             !!document
                               .elementFromPoint(x, y)
-                              ?.closest("[popover]:popover-open"),
+                              ?.closest("[data-test-toggle]"),
                           before.note,
                         ),
-                        `${slug}: the note unfolds where it was stuck`,
+                        `${slug}: and its last fold is still there to press`,
                       );
+                    }
 
                     // Loaded: no larger, and nothing under it has moved.
                     control.go();
@@ -433,7 +449,11 @@ test(
                   const seen = await look(page, `[id="${id}"]`);
                   resultOnly(seen.src, id);
                   chromeHidden(seen, id);
-                  assert.equal(seen.window, null, "it plays where it is");
+                  // A page of Back Page's book is narrow: its note unfolds.
+                  if (lens === "back-page") {
+                    assert.ok(seen.open, "in its sticky note");
+                    bigEnough(seen, size, id);
+                  } else assert.equal(seen.window, null, "it plays where it is");
                   if (size === "desktop")
                     assert.ok(
                       seen.clip.width >= LEAST.width &&

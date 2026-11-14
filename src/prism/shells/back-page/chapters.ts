@@ -807,11 +807,13 @@ function holds(item: LabItem): Holds {
   return n > 1 ? "prints" : n ? "print" : "words";
 }
 
-/** The words for playing an experiment where it lies, by what it is. */
+/** The words for playing an experiment where it lies, by what it is. Its
+ * sticky note is what plays it: pressed, the note unfolds over the page,
+ * large, and the piece plays in it (`stage-window`, lab.css). */
 function playWords(b: Build, item: LabItem & { preview: NonNullable<LabItem["preview"]> }) {
   const words = b.content.pages.lab.preview;
   return {
-    data: { frame: item.preview.frame },
+    data: { frame: item.preview.frame, "stage-window": "ask" },
     title: item.title,
     load: words.load[item.preview.kind],
     close: words.close,
