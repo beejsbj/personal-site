@@ -1,15 +1,17 @@
-/** The Labbook plays on the shared stage (issue #144): a Pen or a demo in
- * the Labbook is loaded by the same stage as a card's Pen
- * (src/lib/block-stage.ts), so starting one puts away any other on the
- * page, whichever place it is in, and Escape puts away the one playing.
- * Nothing is framed before a press (labbook-daylight.browser.mjs and
- * labbook-notebook.browser.mjs keep that one).
+/** The Labbook plays on the shared stage (issues #144, #156): a Pen or a
+ * demo in the Labbook is loaded by the same stage as a card's Pen
+ * (src/lib/block-stage.ts), in Daylight and in each of the four lenses, so
+ * starting one puts away any other on the page, whichever place it is in,
+ * and Escape puts away the one playing. Every frame is made by the stage:
+ * sandboxed, with the stage's referrer policy. Nothing is framed before a
+ * press (labbook-daylight.browser.mjs and labbook-notebook.browser.mjs keep
+ * that one).
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
- * Checked on /prism/fixtures/lab?fixture=preview, which has Pens to play on
- * its cards and, below, the fixture Labbook with a Pen and a demo. Every
- * request to another site is answered with a stub page, or refused. Same
+ * Daylight is checked on /prism/fixtures/lab?fixture=preview, which has Pens
+ * to play on its cards and, below, the fixture Labbook with a Pen and a demo;
+ * each lens on the harness, with the `labbook` fixture. Every request to another site is answered with a stub page, or refused. Same
  * server and Chromium as prism-parity.browser.mjs. */
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
@@ -29,6 +31,11 @@ const ROOM = "/prism/fixtures/lab?fixture=preview";
 const CARD = "fixture-pen-bare";
 const BOOK_PEN = "u-fixture-replay";
 const BOOK_DEMO = "u-fixture-demo";
+const LENSES = ["calling-card", "cut-paper", "back-page", "hion"];
+const lensRoom = (lens) =>
+  `/prism/harness?lens=${lens}&fixture=labbook&route=${encodeURIComponent("/lab")}`;
+/** What asks for a Labbook piece to play: the stage answers it. */
+const ASK = "[data-artifact-load]";
 
 const executable = chromium();
 const skip = executable
@@ -50,7 +57,7 @@ test(
     const base = external ?? server.base;
     const browser = await browserType.launch({ executablePath: executable });
 
-    async function visit(options, look) {
+    async function visit(options, look, room = ROOM) {
       const context = await browser.newContext(options);
       await context.route("**/*", (route) => {
         const url = route.request().url();
@@ -73,7 +80,14 @@ test(
       });
       page.on("pageerror", (error) => errors.push(error.message));
       try {
-        await page.goto(`${base}${ROOM}`, { waitUntil: "load" });
+        await page.goto(`${base}${room}`, { waitUntil: "load" });
+        if (room.startsWith("/prism/harness")) {
+          await page.waitForSelector("html[data-shell-ready]", {
+            timeout: 30000,
+          });
+          await page.waitForFunction(() => window.prismHarness?.ready);
+          await page.waitForSelector(`#lens-shell [id="${BOOK_PEN}"]`);
+        }
         await look(page);
         assert.deepEqual(errors, [], "console errors");
       } finally {
@@ -213,6 +227,95 @@ test(
               );
             }),
         );
+
+        for (const lens of LENSES) {
+          // The page under a lens's shell holds the same ids, hidden: only
+          // what the shell shows is read.
+          const piece = (id) => `#lens-shell [id="${id}"]`;
+          const frames = (page) =>
+            page.evaluate(
+              () =>
+                [...document.querySelectorAll("#lens-shell iframe")].map(
+                  (frame) => ({
+                    id: frame.closest("[id^='u-']")?.id ?? "elsewhere",
+                    sandbox: frame.getAttribute("sandbox"),
+                    referrerPolicy: frame.referrerPolicy,
+                    allow: frame.allow,
+                  }),
+                ),
+            );
+          const start = (page, id) => page.locator(`${piece(id)} ${ASK}`).click();
+          const framed = (page, id) =>
+            page.waitForFunction(
+              (selector) => document.querySelector(selector),
+              `${piece(id)} iframe`,
+            );
+          const asking = (page, id) =>
+            page.locator(`${piece(id)} ${ASK}`).isVisible();
+
+          await t.test(
+            `${size}, ${lens}: one Labbook piece at a time, in a sandbox`,
+            () =>
+              visit(
+                { ...options, reducedMotion: "reduce" },
+                async (page) => {
+                  assert.deepEqual(await frames(page), [], "nothing before a press");
+                  await start(page, BOOK_PEN);
+                  await framed(page, BOOK_PEN);
+                  await start(page, BOOK_DEMO);
+                  await framed(page, BOOK_DEMO);
+                  const now = await frames(page);
+                  assert.deepEqual(
+                    now.map((frame) => frame.id),
+                    [BOOK_DEMO],
+                    "the demo has put the Pen away",
+                  );
+                  assert.ok(await asking(page, BOOK_PEN), "the Pen asks again");
+                  await start(page, BOOK_PEN);
+                  await framed(page, BOOK_PEN);
+                  const again = await frames(page);
+                  assert.deepEqual(
+                    again.map((frame) => frame.id),
+                    [BOOK_PEN],
+                    "and the Pen has put the demo away",
+                  );
+                  for (const frame of again) {
+                    assert.match(frame.sandbox, /allow-scripts/);
+                    assert.doesNotMatch(
+                      frame.sandbox,
+                      /allow-(top-navigation|forms|modals|downloads)/,
+                    );
+                    assert.equal(frame.referrerPolicy, "strict-origin");
+                    assert.equal(frame.allow, "fullscreen");
+                  }
+                },
+                lensRoom(lens),
+              ),
+          );
+
+          await t.test(
+            `${size}, ${lens}: Escape puts away whichever is playing, and stays on the Labbook`,
+            () =>
+              visit(
+                { ...options, reducedMotion: "reduce" },
+                async (page) => {
+                  await start(page, BOOK_PEN);
+                  await framed(page, BOOK_PEN);
+                  // A key pressed inside someone else's page never reaches
+                  // this one, so Escape is pressed from the entry's own link.
+                  await page.focus(`${piece(BOOK_PEN)} figcaption a`);
+                  await page.keyboard.press("Escape");
+                  assert.deepEqual(await frames(page), [], "the Pen is away");
+                  assert.ok(await asking(page, BOOK_PEN), "it asks again");
+                  assert.ok(
+                    await page.locator(piece(BOOK_PEN)).isVisible(),
+                    "Escape did not also take the visitor off the Labbook",
+                  );
+                },
+                lensRoom(lens),
+              ),
+          );
+        }
       }
     } finally {
       await browser.close();
