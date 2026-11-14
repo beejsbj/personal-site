@@ -235,6 +235,54 @@ export const proseHtml = (page: Block[]): string =>
     .flatMap((block) => (block.type === "text" ? [block.html] : []))
     .join("\n");
 
+/** How a block sits on a page laid out as spreads and plates: across the
+ * page on its own (a picture, a film, something live, steps), or small
+ * enough to stand in the margin beside the words before it (a quote, code,
+ * files, a sound). */
+const PLATES = new Set<BlockType>([
+  "gallery",
+  "compare",
+  "embed",
+  "model",
+  "film",
+  "steps",
+]);
+
+/** A page as a lens may lay it out: a `plate` is one block across the
+ * page; a `spread` is words (when there are any) with the small blocks
+ * that follow them beside them, or, with no words before them, those
+ * small blocks in a row of their own. */
+export type Arranged =
+  | { kind: "plate"; block: Exclude<Block, { type: "text" }> }
+  | {
+      kind: "spread";
+      text?: BlockOf<"text">;
+      asides: Exclude<Block, { type: "text" }>[];
+    };
+
+/** A page's blocks as spreads and plates, in the order it is read: every
+ * block once, none moved past another. */
+export function arrangeBlocks(page: Block[]): Arranged[] {
+  const arranged: Arranged[] = [];
+  let spread: Extract<Arranged, { kind: "spread" }> | undefined;
+  for (const block of page) {
+    if (block.type === "text") {
+      spread = { kind: "spread", text: block, asides: [] };
+      arranged.push(spread);
+    } else if (PLATES.has(block.type)) {
+      spread = undefined;
+      arranged.push({ kind: "plate", block });
+    } else {
+      if (!spread) {
+        spread = { kind: "spread", asides: [] };
+        arranged.push(spread);
+      }
+      spread.asides.push(block);
+    }
+  }
+  return arranged;
+}
+
 const MONTHS = [
   "Jan",
   "Feb",

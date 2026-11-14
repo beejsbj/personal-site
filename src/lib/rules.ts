@@ -103,6 +103,21 @@ export function labPlaces<
   }).filter((group) => group.entries.length > 0);
 }
 
+/** The pictures an experiment's card holds on the list: its cover, then
+ * its other pictures, three at most and each once. With no cover it has
+ * none: it is written on a slip of paper. */
+export function labPrints(entry: {
+  cover?: string;
+  media?: { type: string; src: string }[];
+}): string[] {
+  if (!entry.cover) return [];
+  const prints = [entry.cover];
+  for (const item of entry.media ?? [])
+    if (item.type === "image" && !prints.includes(item.src))
+      prints.push(item.src);
+  return prints.slice(0, 3);
+}
+
 /** The project an experiment graduated into, when it says it did. */
 export function graduatedProject<P extends { slug: string }>(
   entry: { graduatedTo?: string },

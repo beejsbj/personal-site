@@ -345,6 +345,26 @@ export function labbookMonths<T extends { id: string; date: string }>(
   return months;
 }
 
+/** A month of the Labbook as a page of a calendar: how many days of its
+ * first week fall before it (the week begins on a Monday), and each of
+ * its days with the updates written on it, by id. */
+export function monthCalendar<T extends { id: string; date: string }>(
+  month: string,
+  list: T[],
+): { lead: number; days: { day: number; updates: string[] }[] } {
+  const [year, number] = month.split("-").map(Number);
+  const length = new Date(Date.UTC(year, number, 0)).getUTCDate();
+  const lead = (new Date(Date.UTC(year, number - 1, 1)).getUTCDay() + 6) % 7;
+  const days = Array.from({ length }, (_, index) => ({
+    day: index + 1,
+    updates: [] as string[],
+  }));
+  for (const update of list)
+    if (update.date.startsWith(`${month}-`))
+      days[Number(update.date.slice(8, 10)) - 1]?.updates.push(update.id);
+  return { lead, days };
+}
+
 /** What the Labbook can be narrowed to: every experiment and project its
  * updates are about (a redacted update among them), each with how many
  * entries it has, the one written in most recently first. */
