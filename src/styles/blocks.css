@@ -183,3 +183,177 @@
   border: var(--rule-width) solid var(--color-border);
   background: var(--color-surface);
 }
+
+/* ---- laid out as a notebook (Blocks, `arranged`): plates across the
+   page, the small blocks in the margin beside the words. ---- */
+
+/* A gallery is a contact sheet of prints, laid a touch off the straight,
+   the first the largest when there are three or more. */
+.blocks-plate .block-gallery {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-l);
+}
+.blocks-plate .block-gallery > .block-picture {
+  grid-column: span 6;
+}
+.blocks-plate .block-picture img {
+  padding: var(--space-s);
+  background: var(--color-page);
+}
+.blocks-plate .block-gallery > .block-picture:nth-child(odd) img {
+  rotate: var(--settle-angle);
+}
+.blocks-plate .block-gallery > .block-picture:nth-child(even) img {
+  rotate: calc(-1 * var(--settle-angle));
+}
+@media (min-width: 40.626rem) {
+  .blocks-plate .block-gallery > .block-picture {
+    grid-column: span 3;
+  }
+  .blocks-plate .block-gallery > .block-picture:only-child {
+    grid-column: 1 / span 4;
+  }
+  .blocks-plate .block-gallery:has(> :nth-child(3)) > .block-picture {
+    grid-column: span 2;
+  }
+  .blocks-plate .block-gallery:has(> :nth-child(3)) > .block-picture:first-child {
+    grid-column: span 4;
+    grid-row: span 2;
+  }
+}
+
+/* A compare: each side's name is a sticker on its corner. */
+.blocks-plate .block-compare .block-picture {
+  position: relative;
+}
+.blocks-plate .block-compare .block-picture__label {
+  position: absolute;
+  top: calc(-1 * var(--space-xs));
+  left: calc(-1 * var(--space-xs));
+  z-index: 1;
+  margin: 0;
+  padding: var(--space-2xs) var(--space-s);
+  border-radius: var(--radius-pill);
+  background: var(--ball-fill);
+  color: var(--ball-ink);
+  font-size: var(--text-xs);
+}
+.blocks-plate .block-compare .block-picture:last-child .block-picture__label {
+  background: var(--ball-fill-current);
+  color: var(--ball-ink-current);
+}
+
+/* Something live, a model or a film is a plate with its label beside it,
+   where there is room: the button, the way out and the caption. */
+@media (min-width: 62.501rem) {
+  .blocks-plate :is(.block-embed, .block-model, .block-film) {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    column-gap: var(--space-xl);
+    align-items: start;
+  }
+  .blocks-plate :is(.block-embed, .block-model) > .block-stage,
+  .blocks-plate .block-film > video {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+  }
+  .blocks-plate :is(.block-embed, .block-model, .block-film) > :not(.block-stage, video) {
+    grid-column: 2;
+  }
+  .blocks-plate :is(.block-embed, .block-model) .block-stage__bar {
+    flex-direction: column;
+    align-items: start;
+  }
+  .blocks-plate :is(.block-embed, .block-model, .block-film) figcaption {
+    padding-top: var(--space-s);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+}
+
+/* Steps are a strip, each numbered by a ball of the nav's family on a
+   rule that runs through them: across where there is room, down where
+   there is not. */
+.blocks-plate .block-steps {
+  counter-reset: step;
+  display: grid;
+  gap: var(--space-xl);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.prose .blocks-plate .block-steps > li + li {
+  margin-top: 0;
+}
+.blocks-plate .block-steps > li {
+  position: relative;
+  counter-increment: step;
+  padding-left: calc(var(--ball-link-size) + var(--space-m));
+}
+.blocks-plate .block-steps > li::before {
+  content: counter(step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--ball-link-size);
+  height: var(--ball-link-size);
+  border-radius: var(--radius-round);
+  background: var(--ball-fill-current);
+  color: var(--ball-ink-current);
+  font-family: var(--font-serif);
+  font-size: var(--text-lead);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.blocks-plate .block-steps > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: var(--ball-link-size);
+  bottom: calc(-1 * var(--space-xl));
+  left: calc(var(--ball-link-size) / 2);
+  border-left: var(--focus-width) solid var(--color-surface-strong);
+}
+.blocks-plate .block-step__title {
+  font-family: var(--font-serif);
+  font-size: var(--text-card);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-heading);
+  color: var(--color-accent);
+}
+@media (min-width: 62.501rem) {
+  .blocks-plate .block-steps {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+  .blocks-plate .block-steps > li {
+    padding: calc(var(--ball-link-size) + var(--space-m)) 0 0;
+  }
+  .blocks-plate .block-steps > li:not(:last-child)::after {
+    top: calc(var(--ball-link-size) / 2);
+    bottom: auto;
+    left: var(--ball-link-size);
+    right: calc(-1 * var(--space-xl));
+    border-left: 0;
+    border-top: var(--focus-width) solid var(--color-surface-strong);
+  }
+}
+
+/* In the margin: a quote is set large, as said; the rest as they are. */
+.blocks-spread__margin .block-quote blockquote {
+  padding-left: 0;
+  border-left: 0;
+  font-size: var(--text-card);
+  line-height: var(--leading-heading);
+  color: var(--color-accent);
+}
+.blocks-spread__margin .block-quote blockquote > p:first-child::before {
+  content: "\201C";
+  display: block;
+  height: var(--space-xl);
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  color: var(--color-surface-strong);
+}
+.blocks-spread__margin .block-quote figcaption {
+  color: var(--color-text-soft);
+}

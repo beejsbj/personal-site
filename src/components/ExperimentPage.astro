@@ -2,9 +2,18 @@
 /** An experiment's own page: its words, links and pictures, the project it
  * graduated into and its part of the Labbook. The slot is its body.
  * /lab/<slug> renders it for an entry in src/content, and
- * /prism/fixtures/lab/<slug> for a fixture. */
+ * /prism/fixtures/lab/<slug> for a fixture.
+ * It is the card from the Lab, picked up and opened as a notebook. Its
+ * head is the card as it lay: with one picture, the words beside it as a
+ * print; with several, the words over a contact sheet of them; with none,
+ * the words written large on a taped slip. Below, the body is a
+ * notebook's page: a margin with a rule down it, each chapter numbered in
+ * the margin, words in a reading measure with the small blocks beside
+ * them, and plates across the page (Blocks, `arranged`). Its part of the
+ * Labbook follows as the Labbook keeps it, the day in the margin. */
 import PageHeader from "./PageHeader.astro";
 import MediaRail from "./MediaRail.astro";
+import Note from "../design/primitives/Note.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
 import Link from "../design/primitives/Link.astro";
@@ -49,6 +58,10 @@ const media: Media[] =
   experiment.media.length === 0 && cover
     ? [{ type: "image", src: cover }]
     : experiment.media;
+// How the head lies: as one print, over a sheet of several, or a slip.
+const lead =
+  media.length === 1 ? "print" : media.length > 1 ? "sheet" : "slip";
+const Card = lead === "slip" ? Note : Fragment;
 // Every update, in the order given: an open one as the home stream shows
 // it, a redacted one as the Labbook does, by its shape and its date alone.
 const shown = updates.map((update) =>
@@ -63,41 +76,56 @@ const shown = updates.map((update) =>
 );
 ---
 
-<section class="shell entry-page">
-  <PageHeader
-    eyebrow={copy.eyebrow}
-    title={experiment.title}
-    intro={experiment.summary}
-    marks={{
-      title: part("lab.title", slug),
-      intro: part("lab.summary", slug),
-    }}
-  />
+<section class:list={["shell", "entry-page", "lab-entry", `lab-entry--${lead}`]}>
+  <header class="lab-entry__head">
+    <Card>
+      <div class="lab-entry__card">
+        <PageHeader
+          eyebrow={copy.eyebrow}
+          title={experiment.title}
+          intro={experiment.summary}
+          marks={{
+            title: part("lab.title", slug),
+            intro: part("lab.summary", slug),
+          }}
+        />
 
-  {graduatedTo && (
-    <div class="entry-page__meta" {...part("lab.meta", slug)}>
-      <div {...part("lab.graduation", slug)}>
-        <span class="entry-page__label">{copy.labels.graduated}</span>
-        <p>
-          <Link href={graduatedTo.href}>{graduatedTo.title}</Link>
-        </p>
+        {graduatedTo && (
+          <div class="entry-page__meta" {...part("lab.meta", slug)}>
+            <div {...part("lab.graduation", slug)}>
+              <span class="entry-page__label">{copy.labels.graduated}</span>
+              <p>
+                <Link href={graduatedTo.href}>{graduatedTo.title}</Link>
+              </p>
+            </div>
+          </div>
+        )}
+
+        {experiment.links.length > 0 && (
+          <div class="entry-page__links" {...part("lab.links", slug)}>
+            {experiment.links.map((link) => (
+              <Link treatment="pill" href={link.url} arrow newTab>
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
+    </Card>
+    {lead === "print" && (
+      <div class="lab-entry__media">
+        <MediaRail media={media} {...part("lab.media", slug)} />
+      </div>
+    )}
+  </header>
+
+  {lead === "sheet" && (
+    <div class="lab-entry__media">
+      <MediaRail media={media} {...part("lab.media", slug)} />
     </div>
   )}
 
-  {experiment.links.length > 0 && (
-    <div class="entry-page__links" {...part("lab.links", slug)}>
-      {experiment.links.map((link) => (
-        <Link treatment="pill" href={link.url} arrow newTab>
-          {link.label}
-        </Link>
-      ))}
-    </div>
-  )}
-
-  <MediaRail media={media} {...part("lab.media", slug)} />
-
-  <article class="prose" {...part("lab.body", slug)}>
+  <article class="prose lab-entry__body" {...part("lab.body", slug)}>
     <slot />
   </article>
 
@@ -105,7 +133,7 @@ const shown = updates.map((update) =>
     <section class="entry-updates" aria-labelledby="entry-updates">
       <SectionHeading id="entry-updates" title={copy.labels.updates} />
       <ol class="entry-updates__list">
-        {shown.map((update, index) => (
+        {shown.map((update) => (
           <li>
             {"shape" in update ? (
               <UpdateEntry
@@ -118,13 +146,13 @@ const shown = updates.map((update) =>
                   label: redacted.label,
                   bar: redacted.bar,
                 }}
-                connected={index < shown.length - 1}
+                layout="notebook"
               />
             ) : (
               <UpdateEntry
                 {...update}
                 labels={updateLabels}
-                connected={index < shown.length - 1}
+                layout="notebook"
                 detailed
               />
             )}
@@ -141,15 +169,213 @@ const shown = updates.map((update) =>
   </div>
 </section>
 <style>
-  /* Ruled off from the body, as the facts are from the header. */
+  .lab-entry {
+    gap: var(--space-2xl);
+  }
+
+  /* The head: the card as it lay on the Bench. */
+  .lab-entry__head {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+  .lab-entry__card {
+    display: grid;
+    gap: var(--space-l);
+    min-width: 0;
+  }
+  .lab-entry__card :global(.entry-page__meta) {
+    grid-template-columns: none;
+    padding-block: var(--space-s);
+  }
+  /* With no picture, the words are written on a slip, taped down. */
+  .lab-entry--slip .lab-entry__head {
+    justify-items: start;
+  }
+  .lab-entry--slip .lab-entry__head > :global(.ds-note) {
+    position: relative;
+    max-width: var(--title-width);
+    padding: var(--space-2xl) var(--space-xl) var(--space-xl);
+    rotate: var(--settle-angle);
+  }
+  .lab-entry--slip .lab-entry__head > :global(.ds-note)::before {
+    content: "";
+    position: absolute;
+    top: calc(-1 * var(--space-xs));
+    left: var(--space-2xl);
+    width: var(--tape-width);
+    height: var(--space-l);
+    background: var(--tape);
+    rotate: calc(var(--settle-angle) * -3);
+  }
+  .lab-entry--slip :global(.page-header) {
+    max-width: none;
+  }
+  /* One picture is a print beside the words; several, a contact sheet
+     under them, the first the largest. */
+  .lab-entry__media :global(.media-rail__item) {
+    padding: var(--space-s);
+    border: var(--rule-width) solid var(--color-border);
+    background: var(--color-page);
+  }
+  .lab-entry__media :global(.media-rail__item figcaption) {
+    padding: var(--space-xs) 0 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-tight);
+    color: var(--color-text-soft);
+  }
+  .lab-entry--print .lab-entry__media :global(.media-rail__item) {
+    rotate: calc(-1 * var(--settle-angle));
+  }
+  .lab-entry--sheet .lab-entry__media :global(.media-rail) {
+    align-items: start;
+  }
+  .lab-entry--sheet .lab-entry__media :global(.media-rail__item:nth-child(even)) {
+    rotate: var(--settle-angle);
+  }
+  @media (min-width: 40.626rem) {
+    .lab-entry--sheet .lab-entry__media :global(.media-rail) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-l);
+    }
+    .lab-entry--sheet
+      .lab-entry__media
+      :global(.media-rail__item:first-child:not(:last-child)) {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+  }
+  @media (min-width: 62.501rem) {
+    .lab-entry--print .lab-entry__head {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+      gap: var(--space-3xl);
+    }
+  }
+
+  /* The body: a notebook's page. A margin with a rule down it, the
+     chapters numbered in it; the words in their measure, the small blocks
+     beside them; plates across. */
+  .lab-entry__body {
+    display: grid;
+    gap: var(--space-2xl);
+    max-width: none;
+    counter-reset: chapter;
+  }
+  .lab-entry__body > :global(*) {
+    min-width: 0;
+    margin-top: 0;
+  }
+  .lab-entry__body :global(.blocks-spread__text) {
+    max-width: var(--spread-text);
+  }
+  .lab-entry__body :global(.blocks-spread__text > * + *) {
+    margin-top: var(--space-m);
+  }
+  .lab-entry__body :global(.blocks-spread__text > h2) {
+    margin-top: var(--space-2xl);
+  }
+  .lab-entry__body :global(.blocks-spread__text > h2:first-child) {
+    margin-top: 0;
+  }
+  .lab-entry__body :global(.blocks-spread__margin) {
+    display: grid;
+    gap: var(--space-xl);
+    align-content: start;
+    min-width: 0;
+  }
+  .lab-entry__body :global(h2) {
+    position: relative;
+    counter-increment: chapter;
+    font-size: var(--text-section);
+  }
+  /* Each chapter's number is a ball of the nav's family. */
+  .lab-entry__body :global(h2)::before {
+    content: counter(chapter);
+    display: inline-grid;
+    place-items: center;
+    width: var(--ball-link-size);
+    height: var(--ball-link-size);
+    margin-right: var(--space-s);
+    border-radius: var(--radius-round);
+    background: var(--ball-fill);
+    color: var(--ball-ink);
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+    font-variant-numeric: lining-nums tabular-nums;
+    letter-spacing: normal;
+    vertical-align: middle;
+  }
+  @media (min-width: 62.501rem) {
+    .lab-entry__body {
+      position: relative;
+      padding-left: calc(var(--labbook-margin) + var(--space-l));
+    }
+    .lab-entry__body::before {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      left: calc(var(--labbook-margin) + var(--space-l) / 2);
+      border-left: var(--focus-width) solid var(--color-surface-strong);
+    }
+    .lab-entry__body :global(h2)::before {
+      position: absolute;
+      top: 50%;
+      right: calc(100% + var(--space-l) / 2 + var(--labbook-margin) / 2);
+      margin: 0;
+      translate: 50% -50%;
+    }
+    .lab-entry__body :global(.blocks-spread) {
+      display: grid;
+      grid-template-columns: minmax(0, var(--spread-text)) minmax(0, 1fr);
+      column-gap: var(--space-3xl);
+      align-items: start;
+    }
+    .lab-entry__body :global(.blocks-spread--row) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .lab-entry__body :global(.blocks-spread--row .blocks-spread__margin) {
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(min(100%, var(--rail-width)), 1fr)
+      );
+      align-items: start;
+    }
+  }
+  @media (max-width: 62.5rem) {
+    .lab-entry__body :global(.blocks-spread) {
+      display: grid;
+      gap: var(--space-xl);
+    }
+  }
+
+  /* Ruled off from the body, as the facts are from the header, and kept
+     as the Labbook keeps it: the day in the margin, with its month and
+     year under it here, where no month heads it. */
   .entry-updates {
     padding-top: var(--space-l);
     border-top: var(--rule-width) solid var(--color-border);
   }
   .entry-updates__list {
-    max-width: var(--reading-width);
+    max-width: calc(var(--labbook-margin) + var(--space-l) + var(--spread-text));
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+  .entry-updates__list > li + li {
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .entry-updates :global(time) {
+    text-align: center;
+  }
+  .entry-updates :global(.date-rest) {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    font-size: var(--text-xs);
+    line-height: var(--leading-tight);
   }
 </style>
