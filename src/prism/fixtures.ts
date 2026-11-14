@@ -726,6 +726,19 @@ export const FIXTURES: Record<string, Fixture> = {
       labEntryRoute(study(content.projects[0]?.slug ?? "")),
     ],
   },
+  "lab-cover-media": {
+    name: "lab-cover-media",
+    about:
+      "A Lab of one experiment that has a cover and media (two pictures and a film), so a lens that leaves either out shows.",
+    apply(content) {
+      const { entry } = study(content.projects[0]?.slug ?? "");
+      return settle({ ...content, lab: [entry] });
+    },
+    routes: (content) => [
+      { kind: "lab", path: "/lab" },
+      labEntryRoute(study(content.projects[0]?.slug ?? "")),
+    ],
+  },
   "lab-kinds": {
     name: "lab-kinds",
     about:
