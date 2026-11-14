@@ -296,10 +296,7 @@ export interface SiteContent {
       aside: string;
       /** What the Bench and the Shelf are called, and a line about each. */
       places: Record<"bench" | "shelf", { title: string; note: string }>;
-      /** The Labbook: its heading and a line about it; how it is narrowed
-       * to one experiment or project and back (`narrow`: what heads the
-       * choice, what says it is narrowed, the way back to all of it, and an
-       * entry count); what introduces the
+      /** The Labbook: its heading and a line about it; what introduces the
        * experiment or project an update is about; what an artifact's frame
        * says before it loads (`load`), where it lives instead (`open`); and
        * how a redacted update, a black bar on its line (said aloud, once
@@ -308,6 +305,9 @@ export interface SiteContent {
         title: string;
         note: string;
         listLabel: string;
+        /** Narrowing it to one experiment or project: what the links to
+         * each are called, how many entries each has, what it shows once
+         * narrowed and the way back to all of it. */
         narrow: {
           label: string;
           showing: string;

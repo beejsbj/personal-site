@@ -390,25 +390,283 @@
   font-weight: 700;
 }
 
-/* On the brief's paper the record is black on cream, and its heading is
-   a black plate. */
-:root[data-lens="calling-card"] .cc-brief__paper .cc-log {
-  justify-self: stretch;
-  margin-top: 1.2rem;
+/* ---------- The Labbook kept by month ---------- */
+:root[data-lens="calling-card"] .cc-root [hidden] {
+  display: none !important;
 }
-:root[data-lens="calling-card"] .cc-brief__paper .cc-place__title {
+/* Its targets: each thing it is about, a tab to narrow it to that one. */
+:root[data-lens="calling-card"] .cc-targets {
+  display: grid;
+  gap: 0.7rem;
+}
+:root[data-lens="calling-card"] .cc-targets__label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.8rem;
+  margin: 0;
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.05rem;
+}
+:root[data-lens="calling-card"] .cc-targets__eyebrow {
+  padding: 0.05rem 0.6rem 0;
+  background: var(--cc-red);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 0.95rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transform: skewX(-12deg);
+  box-shadow: 3px 3px 0 var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-targets__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="calling-card"] .cc-target {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.1rem 0.5rem 0.05rem 0.9rem;
   background: var(--cc-black);
   color: var(--cc-white);
-  box-shadow: 5px 5px 0 var(--cc-red);
+  border: 2px solid var(--cc-white);
+  font-family: var(--cc-display);
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: skewX(-12deg);
+  transition: transform 110ms var(--cc-snap), background 80ms, color 80ms;
 }
-:root[data-lens="calling-card"] .cc-brief__paper .cc-entry__slip {
+:root[data-lens="calling-card"] .cc-target__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 0.3rem;
   background: var(--cc-white);
+  color: var(--cc-black);
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+:root[data-lens="calling-card"] .cc-target:hover {
+  background: var(--cc-white);
+  color: var(--cc-black);
+  transform: skewX(-12deg) translateY(-2px);
+}
+:root[data-lens="calling-card"] .cc-target:hover .cc-target__count {
+  background: var(--cc-black);
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .cc-target[aria-current="true"] {
+  background: var(--cc-red);
+  color: var(--cc-white);
+  box-shadow: 4px 4px 0 var(--cc-black);
+  transform: skewX(-12deg) scale(1.06);
+}
+:root[data-lens="calling-card"] .cc-target[aria-current="true"] .cc-target__count {
+  background: var(--cc-black);
+  color: var(--cc-white);
+}
+/* Narrowed: what it shows now, and the way back to all of it. */
+:root[data-lens="calling-card"] .cc-narrowed {
+  justify-self: start;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  font-family: var(--cc-didone);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.35;
+  transform: rotate(-1deg);
+  box-shadow: 6px 6px 0 var(--cc-red);
+  scroll-margin-block: 4rem;
+}
+:root[data-lens="calling-card"] .cc-narrowed strong {
+  font-family: var(--cc-display);
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .cc-narrowed:focus-visible,
+:root[data-lens="calling-card"] .cc-narrowed:focus {
+  outline: 3px solid var(--cc-black);
+  outline-offset: 3px;
+}
+:root[data-lens="calling-card"] .cc-narrowed__all {
+  font-family: var(--cc-display);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-decoration-color: var(--cc-red);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+/* A month opens on its page of the calendar, in the margin beside its
+   days: the month's number large, its name, and the days written in
+   struck red. */
+:root[data-lens="calling-card"] .cc-months {
+  display: grid;
+  gap: 3.6rem;
+}
+:root[data-lens="calling-card"] .cc-month {
+  display: grid;
+  grid-template-columns: 12.5rem minmax(0, 1fr);
+  align-items: start;
+  gap: 1.4rem 2rem;
+}
+:root[data-lens="calling-card"] .cc-month__page {
+  position: sticky;
+  top: 1.2rem;
+  display: grid;
+  gap: 0.6rem;
+  padding: 0 0 0.8rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border: 3px solid var(--cc-black);
+  box-shadow: 8px 8px 0 var(--cc-black);
+  transform: rotate(-2deg);
+}
+:root[data-lens="calling-card"] .cc-month:nth-child(even) .cc-month__page {
+  transform: rotate(1.6deg);
+}
+:root[data-lens="calling-card"] .cc-month__name {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "no word" "no year";
+  align-items: end;
+  gap: 0 0.6rem;
+  margin: 0;
+  padding: 0.5rem 0.8rem 0.45rem;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1.5px, transparent 2px) 0 0 / 8px 8px,
+    var(--cc-red);
+  color: var(--cc-white);
+  border-bottom: 3px solid var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-month__no {
+  grid-area: no;
+  font-family: var(--cc-display);
+  font-size: 3.6rem;
+  line-height: 0.9;
+  text-shadow: var(--cc-outline);
+}
+:root[data-lens="calling-card"] .cc-month__word {
+  grid-area: word;
+  font-family: var(--cc-didone);
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.3rem;
+  line-height: 1.05;
+}
+:root[data-lens="calling-card"] .cc-month__year {
+  grid-area: year;
+  font-family: var(--cc-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.24em;
+}
+:root[data-lens="calling-card"] .cc-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.15rem;
+  padding: 0 0.6rem;
+  font-family: var(--cc-display);
+  font-size: 0.8rem;
+  line-height: 1;
+  text-align: center;
+}
+:root[data-lens="calling-card"] .cc-cal__wd {
+  padding-bottom: 0.2rem;
+  color: var(--cc-red-ink);
+  letter-spacing: 0.05em;
+}
+:root[data-lens="calling-card"] .cc-cal__wd:nth-child(n + 6) {
+  color: var(--cc-black);
+}
+:root[data-lens="calling-card"] .cc-cal__day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  color: rgb(0 0 0 / 0.45);
+}
+:root[data-lens="calling-card"] .cc-cal__day:first-of-type {
+  grid-column-start: calc(var(--lead) + 1);
+}
+:root[data-lens="calling-card"] .cc-cal__day[data-written] {
+  background: var(--cc-red);
+  color: var(--cc-white);
+  font-size: 0.9rem;
+  rotate: -8deg;
+  box-shadow: 2px 2px 0 var(--cc-black);
+  clip-path: polygon(0 6%, 100% 0, 94% 100%, 4% 94%);
+}
+/* Narrowed, a day about something else is struck no longer. */
+:root[data-lens="calling-card"] .cc-cal__day[data-written][data-elsewhere] {
+  background: none;
+  color: rgb(0 0 0 / 0.45);
+  font-size: 0.8rem;
+  rotate: none;
+  box-shadow: none;
+}
+:root[data-lens="calling-card"] .cc-month > .cc-log__list {
+  grid-column: 2;
 }
 
 /* ---------- Small screens ---------- */
 @media (max-width: 760px), (max-aspect-ratio: 5/6) {
   :root[data-lens="calling-card"] .cc-entry {
     grid-template-columns: minmax(0, 1fr);
+  }
+  /* A month's page across the column, its calendar beside its name. */
+  :root[data-lens="calling-card"] .cc-month {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  :root[data-lens="calling-card"] .cc-month > .cc-log__list {
+    grid-column: 1;
+  }
+  :root[data-lens="calling-card"] .cc-month__page {
+    position: relative;
+    top: auto;
+    grid-template-columns: minmax(0, 1fr) 10.5rem;
+    align-items: center;
+    padding: 0 0.4rem 0 0;
+  }
+  :root[data-lens="calling-card"] .cc-month__name {
+    align-self: stretch;
+    align-content: center;
+    border-bottom: 0;
+    border-right: 3px solid var(--cc-black);
+  }
+  :root[data-lens="calling-card"] .cc-cal {
+    padding: 0.4rem 0;
+    font-size: 0.62rem;
+  }
+  :root[data-lens="calling-card"] .cc-month__no {
+    font-size: 3rem;
+  }
+  :root[data-lens="calling-card"] .cc-month__word {
+    font-size: 1.05rem;
+  }
+  :root[data-lens="calling-card"] .cc-cal__day[data-written] {
+    font-size: 0.7rem;
   }
   :root[data-lens="calling-card"] .cc-day {
     justify-self: start;

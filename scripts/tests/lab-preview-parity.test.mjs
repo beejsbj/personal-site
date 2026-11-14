@@ -75,9 +75,8 @@ test("an entry's own page does not owe it", () => {
   );
 });
 
-test("Daylight and Back Page play an entry in place; each other lens records the gap and its design pass", () => {
+test("Daylight, Calling Card and Back Page play an entry in place; each other lens records the gap and its design pass", () => {
   const TICKETS = {
-    "calling-card": "#129",
     "cut-paper": "#130",
     hion: "#132",
   };
@@ -89,6 +88,6 @@ test("Daylight and Back Page play an entry in place; each other lens records the
     for (const part of ["lab.title", "lab.summary"])
       assert.equal(isGap(lens, "lab", part), false, `${lens} ${part}`);
   }
-  for (const lens of ["daylight", "back-page"])
+  for (const lens of ["daylight", "calling-card", "back-page"])
     assert.equal(isGap(lens, "lab", "lab.preview"), false, lens);
 });

@@ -153,9 +153,8 @@ test("a project's page owes the same blocks, and a page with none owes none", ()
   );
 });
 
-test("Daylight and Back Page draw every block; each other lens records the gap and its design pass", () => {
+test("Daylight, Calling Card and Back Page draw every block; each other lens records the gap and its design pass", () => {
   const TICKETS = {
-    "calling-card": "#129",
     "cut-paper": "#130",
     hion: "#132",
   };
@@ -169,7 +168,7 @@ test("Daylight and Back Page draw every block; each other lens records the gap a
     for (const part of ["lab.title", "lab.summary", "lab.body"])
       assert.equal(isGap(lens, "lab-entry", part), false, `${lens} ${part}`);
   }
-  for (const lens of ["daylight", "back-page"])
+  for (const lens of ["daylight", "calling-card", "back-page"])
     for (const part of BLOCK_PARTS)
       for (const kind of ["lab-entry", "project"])
         assert.equal(isGap(lens, kind, part), false, `${lens} ${kind} ${part}`);

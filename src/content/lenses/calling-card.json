@@ -97,7 +97,14 @@
     },
     "brief": "Request {number}",
     "experiment": "Open the experiment",
-    "links": "Links"
+    "links": "Links",
+    "lastSeen": "Last sighting",
+    "file": {
+      "status": "Status",
+      "intel": "Intel",
+      "reports": "{n} report{s} in the Labbook"
+    },
+    "targets": "Targets"
   },
   "about": {
     "arcana": { "number": "0", "name": "The Fool" },

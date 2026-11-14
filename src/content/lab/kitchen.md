@@ -1,8 +1,9 @@
 ---
 title: "Kitchen"
-summary: "Recipes written in Cooklang, cooked and photographed."
+summary: "Recipes written in Cooklang."
 place: "bench"
-href: "https://kitchen.burooj.dev"
 cover: "/images/lab/kitchen.png"
 order: 12
 ---
+
+Recipes written in Cooklang.
