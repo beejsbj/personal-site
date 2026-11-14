@@ -47,7 +47,7 @@ const BLOCKS = harness("lab-blocks", "/lab/fixture-blocks");
 /** What each experiment in the kinds fixture holds, and how many pictures
  * its slot shows for it: on the Bench all of them (three at most), each a
  * slice of the chop; on the Shelf the first, as the file's thumbnail; a
- * plug-in shows its poster on its screen. */
+ * plug-in shows its poster on its screen, or its name when it has none. */
 const SLOTS = {
   "fixture-kinds-featured": ["bench", "prints", 3],
   "fixture-kinds-print": ["bench", "print", 1],
@@ -55,6 +55,8 @@ const SLOTS = {
   "fixture-kinds-pen": ["bench", "play", 1],
   "fixture-kinds-stack": ["bench", "prints", 2],
   "fixture-kinds-note": ["bench", "words", 0],
+  // a demo with nothing to show: its name stands on its screen
+  "fixture-kinds-demo": ["bench", "play", 0],
   "fixture-kinds-shelved": ["shelf", "print", 1],
   "fixture-kinds-shelf-pen": ["shelf", "play", 1],
   "fixture-kinds-shelf-stack": ["shelf", "prints", 1],
@@ -231,7 +233,11 @@ test(
           async () => {
             const { context, page, asked, errors } = await open(size, KINDS);
             const fixture = await harnessed(page);
-            for (const slug of ["fixture-kinds-pen", "fixture-kinds-shelf-pen"]) {
+            for (const slug of [
+              "fixture-kinds-pen",
+              "fixture-kinds-demo",
+              "fixture-kinds-shelf-pen",
+            ]) {
               const entry = fixture.lab.find((item) => item.slug === slug);
               const slot = page.locator("#lens-shell [data-holds='play']", {
                 has: page.locator(`[data-part='lab.title'][data-ref='${slug}']`),
