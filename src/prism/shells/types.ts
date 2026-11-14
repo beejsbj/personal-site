@@ -19,7 +19,13 @@ import type { UpdateKind, UpdateSource } from "../../content.config";
 import type { Block } from "../../lib/blocks";
 import type { Update as LabbookUpdate, UpdateLink } from "../../lib/labbook";
 
-export type { Block, BlockOf, BlockType, Picture, TreeNode } from "../../lib/blocks";
+export type {
+  Block,
+  BlockOf,
+  BlockType,
+  Picture,
+  TreeNode,
+} from "../../lib/blocks";
 
 export interface Link {
   label: string;
@@ -112,6 +118,11 @@ export interface LabEntry {
   /** The one entry given pride of place. */
   featured?: boolean;
   cover?: string;
+  /** What the experiment's card can load in place of its still, once asked
+   * (a lens may draw this or leave it for its design pass): the address of a
+   * frame, and whether it is a Pen. Nothing for an entry that is not played
+   * in place. */
+  preview?: { kind: "pen" | "demo"; frame: string };
   links: { label: string; url: string }[];
   media: Media[];
   order: number;
@@ -308,6 +319,15 @@ export interface SiteContent {
             string
           >;
         };
+      };
+      /** What an experiment's card says for the way to play it where it
+       * stands, by what it is (`LabEntry.preview`): to ask for it, to put it
+       * away, and while it loads. */
+      preview: {
+        load: Record<"pen" | "demo", string>;
+        close: string;
+        note: string;
+        loading: string;
       };
       /** Copy for each experiment's own page. `graduated` introduces the
        * project it became; `updates` heads its part of the Labbook. */

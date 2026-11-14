@@ -1,6 +1,7 @@
 ---
 import PageHeader from "./PageHeader.astro";
 import LabCard from "./LabCard.astro";
+import BlockScript from "./blocks/BlockScript.astro";
 import Heading from "../design/primitives/Heading.astro";
 import Inline from "../design/primitives/Inline.astro";
 import Link from "../design/primitives/Link.astro";
@@ -12,7 +13,9 @@ import type { LabEntry } from "../prism/shells/types";
  * that holds something (the Bench, then the Shelf) under its own heading,
  * then the `labbook` slot, then the way out to more.
  * On the Bench experiments lie spread out, the featured one across the
- * whole width; on the Shelf they stand in quiet rows.
+ * whole width; on the Shelf they stand in quiet rows. A card that can be
+ * played where it stands (`preview`) loads its piece on a press; the page
+ * is sent the script for that only if some card can.
  */
 interface Props {
   page: Awaited<ReturnType<typeof getLabPage>>;
@@ -25,13 +28,16 @@ interface Props {
     | "place"
     | "featured"
     | "cover"
+    | "preview"
     | "order"
   >[];
 }
 const { page, entries } = Astro.props;
 const places = labPlaces(entries);
+const playable = entries.some((entry) => entry.preview);
 ---
 
+{playable && <BlockScript />}
 <section class="shell page-section page-section--header">
   <PageHeader {...page.header} page="lab" />
 </section>
@@ -54,6 +60,8 @@ const places = labPlaces(entries);
             title={entry.title}
             summary={entry.summary}
             cover={entry.cover}
+            preview={entry.preview}
+            copy={page.preview}
             layout={
               entry.featured ? "feature" : place === "bench" ? "card" : "row"
             }

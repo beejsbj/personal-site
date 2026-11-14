@@ -48,6 +48,13 @@ more:
   label: More sketches on CodePen
   href: "social:CodePen"
 aside: Looking for the bigger pieces? The learning arcade and applications live in [Projects](/projects). This site's visual foundations have their own [Style Guide](/style-guide).
+preview:
+  load:
+    pen: Play the Pen here
+    demo: Run the demo here
+  close: Put it away
+  note: Nothing loads until you ask.
+  loading: Loading…
 entry:
   eyebrow: Lab
   back:
