@@ -159,10 +159,14 @@ test("an update links to the experiment and the project it is about", () => {
   assert.deepEqual(relatedLinks({}, places), []);
 });
 
-test("a project may be named by its title, as the older updates do", () => {
-  assert.deepEqual(relatedLinks({ relatedProject: "QRNG Demo Apps" }, places), [
+test("a project is named by its slug, and its title names nothing", () => {
+  assert.deepEqual(relatedLinks({ relatedProject: "qrng" }, places), [
     { kind: "project", title: "QRNG Demo Apps", href: "/projects/qrng" },
   ]);
+  assert.deepEqual(
+    relatedLinks({ relatedProject: "QRNG Demo Apps" }, places),
+    [],
+  );
 });
 
 test("an update about something that is not shown links nowhere", () => {

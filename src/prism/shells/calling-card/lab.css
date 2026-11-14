@@ -1397,6 +1397,8 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 2.4rem;
     padding: 0.4rem 0.4rem 1rem;
+    /* What hangs over the edge stops here, so the column has no sideways. */
+    overflow-x: clip;
   }
   :root[data-lens="calling-card"] .cc-brief__file :is(.cc-brief__paper, .cc-brief__media, .cc-brief__report),
   :root[data-lens="calling-card"] .cc-brief__file[data-holds] :is(.cc-brief__media, .cc-brief__report) {

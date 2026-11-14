@@ -252,3 +252,18 @@ test("there is one record, the update: no collection of headlines beside it", ()
     "the site carries a ticker's words",
   );
 });
+
+test("an update names its project by slug, and one that is no project's slug is refused", () => {
+  assert.deepEqual(
+    problems("updates", update({ relatedProject: "dayshaper" })),
+    [],
+  );
+  assert.deepEqual(
+    problems("updates", update({ relatedProject: "Conduit Market" })),
+    ['relatedProject: "Conduit Market" is not the slug of any project.'],
+  );
+  assert.deepEqual(
+    problems("updates", update({ relatedProject: "no-such-project" })),
+    ['relatedProject: "no-such-project" is not the slug of any project.'],
+  );
+});

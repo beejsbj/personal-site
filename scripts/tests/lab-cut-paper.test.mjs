@@ -59,3 +59,12 @@ test("Cut Paper's shell reads neither an experiment's era nor its type", () => {
 test("Cut Paper's shell holds none of the words a redacted update hides", () => {
   assert.ok(!sources.some(({ source }) => source.includes(REDACTION_MARKER)));
 });
+
+test("Cut Paper's skip link says what the site content says", () => {
+  assert.ok(
+    !sources.some(({ source }) => source.includes("Skip to main")),
+    "a shell file still hard-codes the skip link's words",
+  );
+  const frame = sources.find(({ name }) => name === "frame.ts").source;
+  assert.match(frame, /class: "skip-link" }, content\.site\.skipLink/);
+});
