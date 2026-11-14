@@ -79,21 +79,20 @@ export interface Stop {
   label: string;
   /** Which book it's in. */
   book: BookKey;
-  /** The number of its first page, counted in its own book. */
-  page: number;
+  /** The number of its first page, counted in its own book; null where it
+   * is counted only when written (the lab's experiments: see `labStart`). */
+  page: number | null;
 }
 
 // ---- the books' order ------------------------------------------------------
 
 /** How many pages each stop is given, filled or not, so where a stop starts
  * never depends on how far the ones before it run today. Every book counts
- * its own pages from 1: the lab opens with its own pages and gives each
- * entry that has one a pair of its own after; the war is its map and roll
- * call first, then a few pages for each project. */
+ * its own pages from 1: the war is its map and roll call first, then a few
+ * pages for each project. The lab book is given none: it is numbered as it
+ * is written, its own pages first, then each experiment's on from the last
+ * (`labStart`). */
 const ALLOWANCE = {
-  /** The lab's own opening pages, before its entries'. */
-  labHead: 2,
-  labEntry: 2,
   /** The war map's pages, before the projects'. */
   war: 2,
   project: 3,
@@ -108,9 +107,9 @@ export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
   const names = copy.chapters;
   const stops: Stop[] = [];
   let page = 1;
-  const add = (book: BookKey, href: string, label: string, pages: number) => {
-    stops.push({ key: href, href, label, book, page });
-    page += pages;
+  const add = (book: BookKey, href: string, label: string, pages: number | null) => {
+    stops.push({ key: href, href, label, book, page: pages === null ? null : page });
+    page += pages ?? 0;
   };
   add("home", "/", names.home, 1);
   page = 1;
@@ -119,10 +118,10 @@ export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
   // page is counted from the notes when it's written: see `resume`)
   add("about", RESUME_PATH, names.resume, 1);
   page = 1;
-  add("lab", "/lab", names.lab, ALLOWANCE.labHead);
+  add("lab", "/lab", names.lab, 0);
   content.lab
     .filter((item) => item.hasPage)
-    .forEach((item) => add("lab", item.detail, item.title, ALLOWANCE.labEntry));
+    .forEach((item) => add("lab", item.detail, item.title, null));
   page = 1;
   add("projects", "/projects", names.projects, ALLOWANCE.war);
   content.projects.forEach((project) =>
@@ -750,7 +749,7 @@ function resume(b: Build) {
  * the notes run to at this size. */
 function resumeStart(b: Build) {
   const notes = b.order.find((stop) => stop.key === "/about");
-  if (!notes) return firstPage(b);
+  if (notes?.page == null) return firstPage(b);
   const route: Route = { ...b.route, kind: "about", path: notes.href };
   return notes.page + aboutPages({ ...b, route }).pages.length;
 }
@@ -1262,7 +1261,32 @@ function labEntry(b: Build): HTMLElement[] | null {
       placeHead({ title: detail.labels.updates }, `log-${item.slug}`),
       updateLines(b, updates, detail.labels.updates, false),
     );
-  return written(b, "lab-entry", "squared", blocks.filter((el) => !!el), firstPage(b), null);
+  return written(b, "lab-entry", "squared", blocks.filter((el) => !!el), labStart(b), null);
+}
+
+/** An experiment's first page: the next after the lab's own pages and every
+ * experiment's before it, however many pages each runs to at this size. */
+function labStart(b: Build) {
+  const lab = b.order.find((stop) => stop.key === "/lab");
+  if (lab?.page == null) return null;
+  let page = lab.page + pagesIn(b, { ...b.route, kind: "lab", path: lab.href, slug: undefined });
+  for (const item of b.content.lab.filter((one) => one.hasPage)) {
+    if (item.detail === b.route.path) return page;
+    page += pagesIn(b, { ...b.route, kind: "lab-entry", path: item.detail, slug: item.slug });
+  }
+  return null;
+}
+
+/** How many pages a chapter runs to at this size, the Labbook unnarrowed:
+ * written once for each size the book lies open at, without the book's
+ * order, so it numbers nothing and counts no other chapter. */
+const counted = new WeakMap<SiteContent, Map<string, number>>();
+function pagesIn(b: Build, route: Route) {
+  const sizes = counted.get(b.content) ?? new Map<string, number>();
+  counted.set(b.content, sizes);
+  const key = `${b.stage.dataset.mode} ${b.stage.style.cssText} ${route.path}`;
+  if (!sizes.has(key)) sizes.set(key, chapter({ ...b, route, order: [], at: route.path }).pages.length);
+  return sizes.get(key)!;
 }
 
 // ---- a project: its own page, the screenshot taped in -------------------------------
