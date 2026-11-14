@@ -527,52 +527,87 @@
   white-space: nowrap;
 }
 
-/* A month opens on its page of the calendar, in the margin beside its
-   days: the month's number large, its name, and the days written in
-   struck red. */
+/* ---------- The calendar screen ---------- */
+/* The Labbook on the board is the calendar's own screen: red, slashed
+   with black, as the game's is when a day turns. */
+:root[data-lens="calling-card"] [data-cc-screen="calendar"] {
+  background:
+    repeating-linear-gradient(-62deg, transparent 0 3.2rem, rgb(0 0 0 / 0.16) 3.2rem 3.45rem),
+    linear-gradient(118deg, var(--cc-red) 0 56%, var(--cc-red-deep) 56% 100%);
+}
+:root[data-lens="calling-card"] [data-cc-labbook] .cc-entry {
+  scroll-margin-top: var(--cc-under, 8.6rem);
+}
+/* Between two entries, the days that passed, said in passing. For the
+   eye: the dates say it. */
+:root[data-lens="calling-card"] .cc-entry[data-earlier] {
+  margin-top: 2.6rem;
+}
+:root[data-lens="calling-card"] .cc-entry[data-earlier]::after {
+  content: attr(data-earlier) / "";
+  position: absolute;
+  top: -3rem;
+  left: 0.4rem;
+  padding: 0.1rem 0.9rem 0.15rem 1.4rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-didone);
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  clip-path: polygon(0.8rem 0, 100% 0, calc(100% - 0.8rem) 100%, 0 100%);
+  transform: rotate(-2deg);
+}
+
+/* A month opens on its strip of the calendar, the run of days the game
+   rolls past as a day turns: the month's number large on red, its name,
+   then every day under its weekday, the ones written in struck red. It
+   stays at the top of the board while its days are read, and the day
+   being read stands up out of it, white. */
 :root[data-lens="calling-card"] .cc-months {
   display: grid;
   gap: 3.6rem;
 }
 :root[data-lens="calling-card"] .cc-month {
   display: grid;
-  grid-template-columns: 12.5rem minmax(0, 1fr);
-  align-items: start;
-  gap: 1.4rem 2rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.2rem;
 }
 :root[data-lens="calling-card"] .cc-month__page {
   position: sticky;
-  top: 1.2rem;
+  z-index: 5;
+  top: 1.4rem;
   display: grid;
-  gap: 0.6rem;
-  padding: 0 0 0.8rem;
-  background: var(--cc-white);
-  color: var(--cc-black);
-  border: 3px solid var(--cc-black);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: stretch;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  border: 3px solid var(--cc-white);
   box-shadow: 8px 8px 0 var(--cc-black);
-  transform: rotate(-2deg);
-}
-:root[data-lens="calling-card"] .cc-month:nth-child(even) .cc-month__page {
-  transform: rotate(1.6deg);
+  transform: rotate(-1deg);
 }
 :root[data-lens="calling-card"] .cc-month__name {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   grid-template-areas: "no word" "no year";
   align-items: end;
+  align-content: center;
   gap: 0 0.6rem;
   margin: 0;
-  padding: 0.5rem 0.8rem 0.45rem;
+  padding: 0.45rem 1.1rem 0.45rem 0.8rem;
   background:
     radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1.5px, transparent 2px) 0 0 / 8px 8px,
     var(--cc-red);
   color: var(--cc-white);
-  border-bottom: 3px solid var(--cc-black);
+  border-right: 3px solid var(--cc-white);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.9rem) 100%, 0 100%);
 }
 :root[data-lens="calling-card"] .cc-month__no {
   grid-area: no;
   font-family: var(--cc-display);
-  font-size: 3.6rem;
+  font-size: 3.4rem;
   line-height: 0.9;
   text-shadow: var(--cc-outline);
 }
@@ -581,60 +616,82 @@
   font-family: var(--cc-didone);
   font-weight: 900;
   font-style: italic;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   line-height: 1.05;
 }
 :root[data-lens="calling-card"] .cc-month__year {
   grid-area: year;
   font-family: var(--cc-display);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   letter-spacing: 0.24em;
 }
 :root[data-lens="calling-card"] .cc-cal {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.15rem;
-  padding: 0 0.6rem;
+  grid-template-columns: repeat(var(--days, 31), minmax(0, 1fr));
+  align-items: center;
+  padding: 0.5rem 0.7rem 0.55rem 0.5rem;
   font-family: var(--cc-display);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   line-height: 1;
   text-align: center;
 }
 :root[data-lens="calling-card"] .cc-cal__wd {
-  padding-bottom: 0.2rem;
-  color: var(--cc-red-ink);
-  letter-spacing: 0.05em;
-}
-:root[data-lens="calling-card"] .cc-cal__wd:nth-child(n + 6) {
-  color: var(--cc-black);
+  display: none;
 }
 :root[data-lens="calling-card"] .cc-cal__day {
+  position: relative;
   display: grid;
-  place-items: center;
-  aspect-ratio: 1;
-  color: rgb(0 0 0 / 0.45);
+  justify-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0 0.25rem;
+  color: rgb(255 255 255 / 0.5);
 }
-:root[data-lens="calling-card"] .cc-cal__day:first-of-type {
-  grid-column-start: calc(var(--lead) + 1);
+:root[data-lens="calling-card"] .cc-cal__day::before {
+  content: attr(data-wd) / "";
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: rgb(255 255 255 / 0.4);
+}
+:root[data-lens="calling-card"] .cc-cal__day[data-wd="S"]::before {
+  color: var(--cc-red-text);
 }
 :root[data-lens="calling-card"] .cc-cal__day[data-written] {
+  z-index: 1;
   background: var(--cc-red);
   color: var(--cc-white);
-  font-size: 0.9rem;
+  font-size: 1rem;
   rotate: -8deg;
-  box-shadow: 2px 2px 0 var(--cc-black);
+  box-shadow: 2px 2px 0 var(--cc-white);
   clip-path: polygon(0 6%, 100% 0, 94% 100%, 4% 94%);
+}
+:root[data-lens="calling-card"] .cc-cal__day[data-written]::before {
+  color: var(--cc-white);
 }
 /* Narrowed, a day about something else is struck no longer. */
 :root[data-lens="calling-card"] .cc-cal__day[data-written][data-elsewhere] {
   background: none;
-  color: rgb(0 0 0 / 0.45);
-  font-size: 0.8rem;
+  color: rgb(255 255 255 / 0.5);
+  font-size: 0.85rem;
   rotate: none;
   box-shadow: none;
 }
-:root[data-lens="calling-card"] .cc-month > .cc-log__list {
-  grid-column: 2;
+/* The day being read. */
+:root[data-lens="calling-card"] .cc-cal__day[data-today] {
+  z-index: 2;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  rotate: -6deg;
+  scale: 1.45;
+  box-shadow: 2px 2px 0 var(--cc-red);
+  clip-path: none;
+}
+:root[data-lens="calling-card"] .cc-cal__day[data-today]::before {
+  color: var(--cc-red-ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="calling-card"] .cc-cal__day {
+    transition: scale 200ms var(--cc-snap), rotate 200ms var(--cc-snap), background-color 80ms;
+  }
 }
 
 /* ---------- Small screens ---------- */
@@ -642,39 +699,44 @@
   :root[data-lens="calling-card"] .cc-entry {
     grid-template-columns: minmax(0, 1fr);
   }
-  /* A month's page across the column, its calendar beside its name. */
-  :root[data-lens="calling-card"] .cc-month {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2rem;
-  }
-  :root[data-lens="calling-card"] .cc-month > .cc-log__list {
-    grid-column: 1;
-  }
+  /* A month's strip across the column under its name, its days in two
+     runs, held under the tabs while its days are read. */
   :root[data-lens="calling-card"] .cc-month__page {
-    position: relative;
-    top: auto;
-    grid-template-columns: minmax(0, 1fr) 10.5rem;
-    align-items: center;
-    padding: 0 0.4rem 0 0;
+    top: 0.4rem;
+    grid-template-columns: minmax(0, 1fr);
   }
   :root[data-lens="calling-card"] .cc-month__name {
-    align-self: stretch;
-    align-content: center;
-    border-bottom: 0;
-    border-right: 3px solid var(--cc-black);
-  }
-  :root[data-lens="calling-card"] .cc-cal {
-    padding: 0.4rem 0;
-    font-size: 0.62rem;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas: "no word year";
+    align-items: baseline;
+    padding: 0.3rem 0.8rem;
+    border-right: 0;
+    border-bottom: 3px solid var(--cc-white);
+    clip-path: none;
   }
   :root[data-lens="calling-card"] .cc-month__no {
-    font-size: 3rem;
+    font-size: 2.2rem;
   }
   :root[data-lens="calling-card"] .cc-month__word {
     font-size: 1.05rem;
   }
+  :root[data-lens="calling-card"] .cc-cal {
+    grid-template-columns: repeat(16, minmax(0, 1fr));
+    row-gap: 0.2rem;
+    padding: 0.4rem 0.4rem 0.45rem;
+    font-size: 0.75rem;
+  }
+  :root[data-lens="calling-card"] .cc-cal__day::before {
+    font-size: 0.55rem;
+  }
   :root[data-lens="calling-card"] .cc-cal__day[data-written] {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
+  }
+  :root[data-lens="calling-card"] .cc-cal__day[data-today] {
+    scale: 1.3;
+  }
+  :root[data-lens="calling-card"] .cc-entry[data-earlier]::after {
+    font-size: 1rem;
   }
   :root[data-lens="calling-card"] .cc-day {
     justify-self: start;

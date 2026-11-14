@@ -1,15 +1,20 @@
-/** The lab as the Phantom Thieves' request board, and each experiment a
- * case.
+/** The lab as three screens of the game, one after another on the board,
+ * and each experiment a case.
  *
- * On the Bench the requests still open are pinned at angles, the featured
- * one across the top of the board like the big target. Each says what it
- * holds: a picture is an evidence photo clipped to its corner, several are
- * a fan of them, something to play is a screen pinned over it (it plays
- * there when its prompt is pressed, and nothing is asked of another site
- * before), and only words is the request alone, its name cut out large.
- * The Shelf is a different thing: the game's list of cases gone quiet,
- * one row each, a photo cut into its end, the selected row turned white.
- * Under them the Labbook turns the calendar back (labbook.ts).
+ * The Bench is the Palace map. The requests still open are targets on it,
+ * pinned at angles in two staggered wings, the featured one across the
+ * top like the Treasure, and the infiltration route runs from it through
+ * every one in the board's order, down the map's spine between its two
+ * wings; the map's cursor stands over the one selected. Each says what it holds: a picture is an evidence photo
+ * clipped to its corner, several are a fan of them, something to play is
+ * a screen pinned over it (it plays there when its prompt is pressed, and
+ * nothing is asked of another site before), and only words is the
+ * request alone, its name cut out large.
+ * The Shelf is the Velvet Room's compendium: each case gone quiet is an
+ * arcana card laid upright beside the others, its number heading it, its
+ * picture (or its screen) as the card's art, its name on the banner.
+ * Then the Labbook is the calendar, turned back a day at a time
+ * (labbook.ts).
  *
  * A request's brief is its case file: the request card on the left (its
  * number and stamp, its name, what it asks, when it was last seen, how
@@ -35,9 +40,9 @@ import {
   tapCue,
   tabs,
 } from "./chrome";
-import { concentricStar, h, parseDay, ransom } from "./dom";
+import { concentricStar, h, parseDay, ransom, svg } from "./dom";
 import { holdEscape, report, screen as playScreen, watchFilms } from "./blocks";
-import { narrow, record, tendRecord } from "./labbook";
+import { narrow, record, tendRecord, turnCalendar } from "./labbook";
 import { other } from "./other";
 
 type Experiment = SiteContent["lab"][number];
@@ -58,6 +63,97 @@ const board = (content: SiteContent) => labPlaces(content.lab);
 
 function requestNo(copy: Copy, i: number) {
   return fill(copy.lab.number, { n: String(i + 1).padStart(2, "0") });
+}
+
+/** Which of the game's screens each place is. */
+const SCREENS = { bench: "map", shelf: "compendium" } as const;
+
+/** Where a target stands on the map: the Treasure across the top, the
+ * rest in two wings, each a row lower than the one before it, so the
+ * route zigzags down between them. */
+function wing(j: number, treasure: boolean) {
+  const row = j + (treasure ? 2 : 1);
+  return `--col:${(j % 2) + 1};--row:${row};--room:${ROOMS[j % ROOMS.length]}%`;
+}
+/** How much of its wing each target's room takes: rooms of different
+ * sizes, some reaching the spine and some set back from it, so the
+ * corridors to them run different lengths. */
+const ROOMS = [100, 86, 78, 100, 92, 80, 100, 84];
+
+/** The map's route and its cursor, for the eye alone: the route calls at
+ * every target in the board's order, turning only at right angles as a
+ * Palace's corridors do; the cursor stands over the target selected.
+ * Drawn from where the targets are laid out (their transforms aside), and
+ * again whenever the map changes size. */
+function palaceMap(map: HTMLElement, signal: AbortSignal) {
+  const route = svg('<path class="cc-route__casing"/><path class="cc-route__path"/>', { class: "cc-route" });
+  // Where each corridor meets its target: a marker over the room's edge.
+  const marks = h("div", { class: "cc-route__marks", "aria-hidden": "true" });
+  const here = h("span", { class: "cc-route__here", "aria-hidden": "true", hidden: true });
+  map.prepend(route);
+  map.append(marks, here);
+  let selected = -1;
+  /** An element's place in the map, by layout alone. */
+  const at = (el: HTMLElement) => {
+    let x = 0;
+    let y = 0;
+    for (let n: HTMLElement | null = el; n && n !== map; n = n.offsetParent as HTMLElement | null) {
+      x += n.offsetLeft;
+      y += n.offsetTop;
+    }
+    return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+  };
+  const cards = () => [...map.querySelectorAll<HTMLElement>(".cc-pin > a.cc-request")];
+  const round = (n: number) => Math.round(n * 10) / 10;
+  const draw = () => {
+    const stops = cards().map((card) => {
+      const box = at(card);
+      return { x: box.x + box.w / 2, y: box.y + box.h / 2 };
+    });
+    const { offsetWidth: width, offsetHeight: height } = map;
+    route.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    route.setAttribute("width", String(width));
+    route.setAttribute("height", String(height));
+    // The corridor between two targets runs down the map's spine: out
+    // of one to it, along it, and into the next.
+    const spine = width * (parseFloat(getComputedStyle(map).getPropertyValue("--spine")) || 0.5);
+    const turns = stops.flatMap((stop, i) => {
+      const last = stops[i - 1];
+      if (!last) return [stop];
+      return [{ x: spine, y: last.y }, { x: spine, y: stop.y }, stop];
+    });
+    const d = turns.map(({ x, y }, i) => `${i ? "L" : "M"}${round(x)} ${round(y)}`).join(" ");
+    for (const path of route.querySelectorAll("path")) path.setAttribute("d", d);
+    marks.replaceChildren(
+      ...cards().map((card, i) => {
+        const box = at(card);
+        // The edge the corridor comes in by: the one facing the spine, or,
+        // for a room across it (the Treasure), its foot.
+        const middle = box.x + box.w / 2;
+        const [x, y] =
+          Math.abs(middle - spine) < 8
+            ? [spine, box.y + box.h]
+            : [middle < spine ? box.x + box.w : box.x, stops[i].y];
+        return h("span", { class: "cc-route__mark", style: `translate:${round(x)}px ${round(y)}px` });
+      }),
+    );
+    point(selected);
+  };
+  /** The cursor over target `i`, or put away when the selection is off
+   * the map. */
+  const point = (i: number) => {
+    selected = i;
+    const card = cards()[i];
+    here.hidden = !card;
+    if (!card) return;
+    const box = at(card);
+    here.style.translate = `${round(box.x + box.w / 2)}px ${round(box.y)}px`;
+  };
+  const watch = new ResizeObserver(draw);
+  watch.observe(map);
+  for (const pin of map.querySelectorAll(".cc-pin")) watch.observe(pin);
+  signal.addEventListener("abort", () => watch.disconnect());
+  return { point };
 }
 
 /** How far each card is turned on its pin, in degrees. */
@@ -194,36 +290,46 @@ export function lab(route: Route, env: Env): Screen {
   );
 
   const cards: HTMLAnchorElement[] = [];
+  let map: HTMLElement | undefined;
   const rooms = board(content).map(({ place, entries }) => {
     const id = `cc-place-${place}`;
+    const treasure = !!entries[0]?.featured;
+    const list = h(
+      "ol",
+      { class: "cc-place__list", "aria-labelledby": id },
+      entries.map((entry, i) => {
+        const { card, holds, tv } = request(content, entry, cards.length);
+        cards.push(card);
+        const featured = i === 0 && entry.featured;
+        return h(
+          "li",
+          {
+            class: "cc-pin",
+            "data-holds": holds,
+            "data-lab-featured": featured ? "" : null,
+            style: [
+              `--tilt:${TILTS[(cards.length - 1) % TILTS.length]}deg`,
+              place === "bench" && !featured ? wing(treasure ? i - 1 : i, treasure) : null,
+            ]
+              .filter(Boolean)
+              .join(";"),
+          },
+          card,
+          tv,
+        );
+      }),
+    );
+    if (place === "bench") map = h("div", { class: "cc-map" }, list);
     return h(
       "section",
-      { class: "cc-place", "data-lab-place": place, "aria-labelledby": id },
+      { class: "cc-place", "data-lab-place": place, "data-cc-screen": SCREENS[place], "aria-labelledby": id },
       h(
         "header",
         { class: "cc-place__head" },
         h("h2", { class: "cc-place__title", id }, places[place].title),
         h("p", { class: "cc-place__note" }, places[place].note),
       ),
-      h(
-        "ol",
-        { class: "cc-place__list", "aria-labelledby": id },
-        entries.map((entry, i) => {
-          const { card, holds, tv } = request(content, entry, cards.length);
-          cards.push(card);
-          return h(
-            "li",
-            {
-              class: "cc-pin",
-              "data-holds": holds,
-              "data-lab-featured": i === 0 && entry.featured ? "" : null,
-              style: `--tilt:${TILTS[(cards.length - 1) % TILTS.length]}deg`,
-            },
-            card,
-            tv,
-          );
-        }),
-      ),
+      place === "bench" ? map : list,
     );
   });
 
@@ -260,14 +366,24 @@ export function lab(route: Route, env: Env): Screen {
   );
   el.prepend(tabs(route.kind, copy));
 
+  const chart = map ? palaceMap(map, env.signal) : undefined;
   const menu = cards.length
-    ? roving(cards, env.signal, (i) => (rememberedLab = i), Math.min(rememberedLab, cards.length - 1))
+    ? roving(
+        cards,
+        env.signal,
+        (i) => {
+          rememberedLab = i;
+          chart?.point(i);
+        },
+        Math.min(rememberedLab, cards.length - 1),
+      )
     : undefined;
   const held = holdEscape(el, env.signal);
   const { find, land } = tendRecord(el, { signal: env.signal, instant: env.reducedMotion });
   // Narrowed by the address: the board is turned to the Labbook, and the
   // line saying what it shows takes the focus the title would.
   const narrowed = narrow(el);
+  const turn = turnCalendar(el, env.signal);
   const toLabbook = (target: HTMLElement) =>
     requestAnimationFrame(() =>
       target.scrollIntoView({ block: "start", inline: "nearest", behavior: env.reducedMotion ? "instant" : "smooth" }),
@@ -323,6 +439,7 @@ export function lab(route: Route, env: Env): Screen {
       // narrowed by; narrowed, to the line saying what it shows.
       const was = el.querySelector<HTMLElement>("[data-cc-labbook]")?.dataset.narrowed;
       const status = narrow(el);
+      turn();
       const target =
         status ?? (was ? el.querySelector<HTMLElement>(`[data-cc-subject][data-ref="${CSS.escape(was)}"]`) : null);
       if (!target) return;
