@@ -354,9 +354,10 @@ const labEntryRoute = ({ entry }: ExperimentFixture): RouteRef => ({
 
 /** Every kind of card in both places (as Daylight's /prism/fixtures/lab
  * ?fixture=kinds): featured with three pictures, one picture, only words,
- * a Pen to play, two pictures linking out and a note linking out on the
- * Bench; a picture, a Pen, two pictures and only words on the Shelf. They
- * take the room's place: the Lab shows these and nothing else. */
+ * a Pen to play, two pictures linking out, a note linking out and a demo
+ * with no picture on the Bench; a picture, a Pen, two pictures and only
+ * words on the Shelf. They take the room's place: the Lab shows these and
+ * nothing else. */
 const kindsOfCard = (): LabEntry[] => {
   const card = (
     over: Partial<LabEntry> & Pick<LabEntry, "slug" | "title" | "summary" | "place" | "order">,
@@ -438,6 +439,15 @@ const kindsOfCard = (): LabEntry[] => {
       place: "bench",
       ...out("fixture-kinds-note"),
       order: 6,
+    }),
+    card({
+      slug: "fixture-kinds-demo",
+      title: "A demo with no picture",
+      summary: "A deployed demo that says it may be framed, and nothing to show until it is.",
+      place: "bench",
+      ...out("fixture-kinds-demo"),
+      preview: { kind: "demo", frame: "https://example.com/fixture-kinds-demo" },
+      order: 7,
     }),
     card({
       slug: "fixture-kinds-shelved",
