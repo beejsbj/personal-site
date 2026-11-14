@@ -557,25 +557,9 @@ class App {
     addEventListener("popstate", follow, { signal });
 
     // a Pen or a demo waits until it is asked for: pressing its note makes
-    // the frame, in the card's own room. A modified click opens the link.
-    this.desk.addEventListener(
-      "click",
-      (event) => {
-        const ask = (event.target as Element).closest?.("[data-artifact-load]");
-        const stage = ask?.closest<HTMLElement>("[data-artifact-frame]");
-        if (!stage?.dataset.artifactFrame) return;
-        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        event.preventDefault();
-        const frame = h("iframe", {
-          src: stage.dataset.artifactFrame,
-          title: stage.dataset.artifactTitle ?? "",
-          allow: "fullscreen",
-        });
-        stage.replaceChildren(frame);
-        frame.focus();
-      },
-      { signal },
-    );
+    // the frame, in the card's own room, and that is the site's one
+    // click-to-load stage's to do (src/lib/block-stage.ts, loaded by
+    // ./stuck): it leaves a modified click to open the link.
 
     // a finger drags the page over, and the leaf follows it
     const main = this.book.main;

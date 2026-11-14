@@ -33,6 +33,7 @@ import {
   subjectsOf,
   updateDateLabel,
 } from "../../../lib/labbook";
+import "../../../lib/block-stage";
 import { fill } from "../rich";
 import { copyOf } from "./chrome";
 import { h, parseDay } from "./dom";
@@ -67,10 +68,13 @@ function dayPlate(content: SiteContent, date: string) {
 
 /** What an update shows for itself. A picture, a film and a sound are
  * pinned where they stand. A Pen or a demo is a dark screen with a prompt
- * on it: nothing is asked of another site until the prompt is pressed
- * (`tendRecord`), when its frame takes the screen whole. Its poster is
- * shown only if it is the site's own: one kept elsewhere would be asked
- * for before the press. */
+ * on it: nothing is asked of another site until the prompt is pressed,
+ * when its frame takes the screen whole. That press is answered by the
+ * site's one click-to-load stage (src/lib/block-stage.ts), so a Pen or a
+ * demo here is put away by another starting, anywhere on the page, and by
+ * Escape. The `data-cc-` names stay for this lens's own styling. Its
+ * poster is shown only if it is the site's own: one kept elsewhere would
+ * be asked for before the press. */
 function artifact(content: SiteContent, shown: Artifact) {
   const copy = content.pages.lab.labbook.artifact;
   const { kind, src, alt } = shown;
@@ -101,18 +105,24 @@ function artifact(content: SiteContent, shown: Artifact) {
   const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
   return h(
     "figure",
-    { class: "cc-artifact cc-artifact--stage" },
+    { class: "cc-artifact cc-artifact--stage", "data-stage-room": "" },
     h(
       "div",
-      { class: "cc-stagebox", "data-cc-frame": frame, "data-cc-frame-title": alt },
+      {
+        class: "cc-stagebox",
+        "data-cc-frame": "",
+        "data-block-stage": "",
+        "data-artifact-frame": frame,
+        "data-artifact-title": alt,
+      },
       poster ? h("img", { class: "cc-stagebox__poster", src: poster, alt, loading: "lazy", decoding: "async" }) : null,
       h(
         "div",
-        { class: "cc-stagebox__ask" },
+        { class: "cc-stagebox__ask", "data-stage-ask": "" },
         poster ? null : h("p", { class: "cc-stagebox__label" }, alt),
         h(
           "button",
-          { class: "cc-stagebox__load", type: "button", "data-cc-load": "" },
+          { class: "cc-stagebox__load", type: "button", "data-cc-load": "", "data-artifact-load": "" },
           h("kbd", { "aria-hidden": "true" }, "▶"),
           h("span", {}, copy.load[kind]),
         ),
@@ -408,31 +418,14 @@ export function narrow(screen: HTMLElement, search = location.search) {
 /** The Labbook, answering the visitor.
  *
  * - A Pen or a demo is asked of its own site only when its prompt is
- *   pressed: the frame is made then, in the screen kept for it, and takes
- *   the focus.
+ *   pressed: the frame is made then (by the shared stage, see `artifact`),
+ *   in the screen kept for it, and takes the focus.
  * - A link to an update (`/lab#u-…`), should one be written, lands on its
  *   day: the board turns to it and the menu's cursor points at it
  *   (`data-cc-landed`). The page under the shell holds the same ids,
  *   hidden, so the browser's own landing cannot be relied on. `find` is
  *   the update the address names now. */
 export function tendRecord(screen: HTMLElement, { signal, instant }: { signal: AbortSignal; instant: boolean }) {
-  screen.addEventListener(
-    "click",
-    (event) => {
-      const ask = (event.target as Element | null)?.closest?.("[data-cc-load]");
-      const stage = ask?.closest<HTMLElement>("[data-cc-frame]");
-      if (!stage?.dataset.ccFrame) return;
-      const frame = h("iframe", {
-        src: stage.dataset.ccFrame,
-        title: stage.dataset.ccFrameTitle ?? "",
-        allow: "fullscreen",
-      });
-      stage.replaceChildren(frame);
-      frame.focus();
-    },
-    { signal },
-  );
-
   const find = (hash = location.hash) => {
     let id = hash.slice(1);
     try {

@@ -1011,6 +1011,10 @@
   border: 0;
 }
 
+:root[data-lens="cut-paper"] .cp-stage[data-live] > .cp-stage__poster {
+  visibility: hidden;
+}
+
 :root[data-lens="cut-paper"] .cp-stage__poster {
   opacity: 0.3;
   filter: grayscale(1);

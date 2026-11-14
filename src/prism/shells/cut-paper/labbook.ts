@@ -32,6 +32,7 @@
  *   goes to its date. The page under the shell holds the same ids, hidden,
  *   and the view is printed after the browser has looked for the fragment,
  *   so the landing is done here. */
+import "../../../lib/block-stage";
 import { part } from "../../parts";
 import {
   embedSrc,
@@ -116,16 +117,16 @@ function artifact(env: Env, shown: Artifact) {
   const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
   return h(
     "figure",
-    { class: "cp-art cp-art--embed" },
+    { class: "cp-art cp-art--embed", "data-stage-room": "" },
     h(
       "div",
-      { class: "cp-stage", "data-embed": frame, "data-embed-title": alt },
+      { class: "cp-stage", "data-embed": "", "data-block-stage": "", "data-artifact-frame": frame, "data-artifact-title": alt },
       poster ? h("img", { class: "cp-stage__poster", src: poster, alt, loading: "lazy", decoding: "async" }) : null,
       h(
         "div",
-        { class: "cp-stage__ask" },
+        { class: "cp-stage__ask", "data-stage-ask": "" },
         poster ? null : h("p", { class: "cp-stage__label" }, alt),
-        h("button", { type: "button", class: "cp-play", "data-embed-load": "", disabled: face }, markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11L13.5 8z"/></svg>'), h("span", null, copy.load[kind])),
+        h("button", { type: "button", class: "cp-play", "data-embed-load": "", "data-artifact-load": "", disabled: face }, markup('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11L13.5 8z"/></svg>'), h("span", null, copy.load[kind])),
         h("p", { class: "cp-stage__note" }, copy.note),
       ),
     ),
@@ -362,24 +363,12 @@ export function narrow(view: HTMLElement, search = location.search) {
 }
 
 /** The Labbook answering the visitor: a Pen or a demo is loaded when its
- * button is pressed, a flag on the lane goes to its update's line, and a
+ * button is pressed (by the site's one click-to-load stage, which also puts
+ * it away when another starts, or on Escape), a flag on the lane goes to its update's line, and a
  * link to an update lands on its line. Returns the landing, for when the
  * view arrives. */
 export function tendLog(env: Env, view: HTMLElement) {
   const { signal, transport, face, reducedMotion, scroller } = env;
-  view.addEventListener(
-    "click",
-    (event) => {
-      const ask = (event.target as Element | null)?.closest?.("[data-embed-load]");
-      const stage = ask?.closest<HTMLElement>("[data-embed]");
-      if (!stage?.dataset.embed) return;
-      const frame = h("iframe", { src: stage.dataset.embed, title: stage.dataset.embedTitle ?? "", allow: "fullscreen" });
-      stage.replaceChildren(frame);
-      frame.focus();
-    },
-    { signal },
-  );
-
   const land = (hash = location.hash, glide = false) => {
     if (face || signal.aborted) return;
     for (const el of view.querySelectorAll("[data-landed]")) el.removeAttribute("data-landed");

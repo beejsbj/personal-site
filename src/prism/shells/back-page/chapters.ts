@@ -923,11 +923,17 @@ function artifactFigure(b: Build, artifact: Artifact, key: string): HTMLElement 
   const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
   const stage = h(
     "span",
-    { class: "bp-ask", style: `aspect-ratio:${ratio}`, "data-artifact-frame": frame, "data-artifact-title": alt },
+    {
+      class: "bp-ask",
+      style: `aspect-ratio:${ratio}`,
+      "data-block-stage": "",
+      "data-artifact-frame": frame,
+      "data-artifact-title": alt,
+    },
     poster ? h("img", { src: poster, alt, loading: "lazy", decoding: "async" }) : null,
     h(
       "span",
-      { class: "bp-ask__note" },
+      { class: "bp-ask__note", "data-stage-ask": "" },
       poster ? null : h("span", { class: "bp-ask__what" }, alt),
       h("a", { class: "bp-ask__load", href: home, "data-artifact-load": "" }, words.load[kind]),
       h("span", { class: "bp-ask__small" }, words.note),
@@ -935,6 +941,7 @@ function artifactFigure(b: Build, artifact: Artifact, key: string): HTMLElement 
   );
   const fig = taped(src, alt, key, { cls: "bp-artifact", framed: stage });
   fig.dataset.artifact = kind;
+  fig.dataset.stageRoom = "";
   fig.append(h("figcaption", null, link(home, b.copy.newTab, `${words.open[kind]} ↗`)));
   return fig;
 }

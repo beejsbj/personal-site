@@ -3,7 +3,9 @@
  *
  * - A Pen or a demo is asked of its own site only when its cord is pulled:
  *   the frame is made then, in the place kept for it, and takes the focus.
- *   Until then the page has asked nothing of anyone else.
+ *   Until then the page has asked nothing of anyone else. The pull is
+ *   answered by the site's one click-to-load stage (src/lib/block-stage.ts),
+ *   which puts it away when another starts, and on Escape.
  * - A link to an update (`/lab#u-…`), should one be written, lands on its
  *   knot in the Labbook: the drawing catches up to it and a bead of light
  *   rests on the knot (shell.css `data-landed`). The page under the shell
@@ -15,8 +17,8 @@
  *   about something else is untied. A line says what it shows, with the
  *   way back to all of it. The same screen answers, in place: the address
  *   changes, not the page. */
+import "../../../lib/block-stage";
 import { narrowedTo } from "../../../lib/labbook";
-import { h } from "./dom";
 import { ink } from "./ink";
 
 interface Options {
@@ -28,23 +30,6 @@ interface Options {
 }
 
 export function tendLab(page: HTMLElement, { signal, catchUp, instant }: Options) {
-  page.addEventListener(
-    "click",
-    (event) => {
-      const cord = (event.target as Element | null)?.closest?.("[data-kept-pull]");
-      const kept = cord?.closest<HTMLElement>("[data-kept-frame]");
-      if (!kept?.dataset.keptFrame) return;
-      const frame = h("iframe", {
-        src: kept.dataset.keptFrame,
-        title: kept.dataset.keptTitle ?? "",
-        allow: "fullscreen",
-      });
-      kept.replaceChildren(frame);
-      frame.focus();
-    },
-    { signal },
-  );
-
   const land = (hash = location.hash) => {
     for (const el of page.querySelectorAll("[data-landed]")) el.removeAttribute("data-landed");
     let id = hash.slice(1);

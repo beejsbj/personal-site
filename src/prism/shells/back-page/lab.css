@@ -226,6 +226,9 @@
 :root[data-lens="back-page"] .bp-ask > img {
   opacity: 0.55;
 }
+:root[data-lens="back-page"] .bp-ask[data-live] > img {
+  visibility: hidden;
+}
 :root[data-lens="back-page"] .bp-ask > iframe {
   border: 0;
   background: #fdfbf5;
