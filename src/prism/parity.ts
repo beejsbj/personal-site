@@ -7,10 +7,12 @@
  * knowingly leaves out, so a gap is a decision written down rather than a
  * drift nobody saw.
  *
- * No runtime imports: Node (the tests), Astro (the atlas) and the browser
- * (the harness) all load it. */
+ * Node (the tests), Astro (the atlas) and the browser (the harness) all
+ * load it, so its one runtime import is the Labbook's pure rules, by their
+ * file name. */
 import type { Part } from "./parts";
-import type { RouteKind, SiteContent } from "./shells/types";
+import type { Block, RouteKind, SiteContent, TreeNode } from "./shells/types";
+import { labbookMonths, labbookSubjects, monthLabel } from "../lib/labbook.ts";
 
 export type LensId =
   "daylight" | "calling-card" | "cut-paper" | "back-page" | "hion";
@@ -137,6 +139,55 @@ export function blockTexts(html: string, max = 60): string[] {
   return out;
 }
 
+/** The words a block must show, whatever a lens makes of it; nothing for
+ * a kind of block this contract has not heard of. A caption is owed, and
+ * alt text is not: a lens may keep that for whoever cannot see the
+ * picture. */
+function blockWords(block: Block): (string | undefined)[] | undefined {
+  const names = (nodes: TreeNode[]): string[] =>
+    nodes.flatMap((node) => [node.name, ...names(node.children ?? [])]);
+  switch (block.type) {
+    case "gallery":
+      return block.items.map((item) => item.caption);
+    case "compare":
+      return [block.before.caption, block.after.caption, block.caption];
+    case "embed":
+    case "model":
+    case "audio":
+    case "film":
+      return [block.caption];
+    case "code":
+      return [block.code.trim().split("\n")[0], block.caption];
+    case "quote":
+      return [block.text, block.source];
+    case "steps":
+      return block.items.flatMap((step) => [step.title, step.text]);
+    case "tree":
+      return [...names(block.tree), block.caption];
+    default:
+      return undefined;
+  }
+}
+
+/** The blocks an entry's page is told with, each a part of its own type
+ * (`block.gallery`), its ref the entry and the block's name (`blockRef` in
+ * ./parts). Its prose is the entry's body, which is expected as before. */
+function blockParts(slug: string, blocks: Block[] = []): Expectation[] {
+  return blocks.flatMap((block) => {
+    const said = blockWords(block);
+    if (block.type === "text" || !said) return [];
+    return [
+      {
+        part: `block.${block.type}` as const,
+        ref: `${slug}/${block.name}`,
+        texts: said
+          .filter((text): text is string => !!text)
+          .map((text) => words(text).slice(0, 60)),
+      },
+    ];
+  });
+}
+
 export function expectedParts(
   route: RouteRef,
   content: SiteContent,
@@ -190,6 +241,7 @@ export function expectedParts(
           ? [page("project.links", p.slug, ...p.links.map((l) => l.label))]
           : []),
         ...(p.tools.length ? [page("project.tools", p.slug, ...p.tools)] : []),
+        ...blockParts(p.slug, p.blocks),
       ];
     }
     case "lab":
@@ -199,7 +251,37 @@ export function expectedParts(
         ...content.lab.flatMap((entry) => [
           page("lab.title", entry.slug, entry.title),
           page("lab.summary", entry.slug, entry.summary),
+          ...(entry.preview
+            ? [
+                page(
+                  "lab.preview",
+                  entry.slug,
+                  pages.lab.preview.load[entry.preview.kind],
+                ),
+              ]
+            : []),
         ]),
+        // the Labbook: every update, a redacted one by its place alone
+        ...content.labbook.map((u) =>
+          u.visibility === "open"
+            ? page("update.item", u.id, u.title)
+            : page("update.redacted", u.id),
+        ),
+        // kept by month, each under its heading, and narrowed to one
+        // experiment or project by a link naming it
+        ...labbookMonths(content.labbook).map(({ month }) =>
+          page("labbook.month", month, monthLabel(month)),
+        ),
+        ...labbookSubjects(content.labbook, {
+          lab: content.lab,
+          projects: content.projects,
+        }).map((subject) =>
+          page(
+            "labbook.subject",
+            `${subject.kind}:${subject.slug}`,
+            subject.title,
+          ),
+        ),
         { part: "lab.more", texts: [pages.lab.more.label] },
         { part: "lab.aside", texts: [words(pages.lab.aside)] },
       ];
@@ -215,6 +297,19 @@ export function expectedParts(
         ...(entry.links.length
           ? [page("lab.links", entry.slug, ...entry.links.map((l) => l.label))]
           : []),
+        ...blockParts(entry.slug, entry.blocks),
+        // the project it graduated into, and its part of the Labbook: a
+        // redacted update by its place alone
+        ...content.projects
+          .filter((p) => p.slug === entry.graduatedTo)
+          .map((p) => page("lab.graduation", entry.slug, p.title)),
+        ...content.labbook
+          .filter((u) => u.relatedExperiment === entry.slug)
+          .map((u) =>
+            u.visibility === "open"
+              ? page("update.item", u.id, u.title)
+              : page("update.redacted", u.id),
+          ),
       ];
     }
     case "writing":
@@ -291,7 +386,8 @@ export function expectedParts(
 
 /** Parts a lens knowingly does not show on a kind of route, and why. The
  * parity test skips exactly these; everything else must be there. Close a
- * gap by rendering the part and deleting its line. */
+ * gap by rendering the part and deleting its line. (The blocks of an
+ * entry's page have a list of their own, `BLOCK_GAPS`.) */
 export const GAPS: Partial<
   Record<LensId, Partial<Record<RouteKind, Partial<Record<Part, string>>>>>
 > = {
@@ -330,13 +426,29 @@ export const GAPS: Partial<
     },
     lab: {
       "lab.more":
-        "The lab chapter is the doodles only; CodePen is among the places on the cover's return-to label.",
+        "The lab book has no link out to more sketches; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
-        "The lab chapter is the doodles only; Projects is a book of its own on the pile, and the style guide is not in any book.",
+        "The lab book has no aside; Projects is a book of its own on the pile, and the style guide is not in any book.",
     },
   },
-  hion: {},
 };
 
+type BlockPart = Extract<Part, `block.${string}`>;
+/** The blocks of an entry's page (a project's or an experiment's) a lens
+ * does not draw yet, and the design pass that will. Until then the lens
+ * shows the page's prose and passes over the blocks. A design pass takes
+ * a kind of block out of its `parts` as it draws it, and deletes its line
+ * when none are left. */
+export const BLOCK_GAPS: Partial<
+  Record<LensId, { why: string; parts: BlockPart[] }>
+> = {};
+
+/** A redacted update is owed wherever updates are listed: a lens that
+ * leaves the updates off a route leaves its redacted ones off with them.
+ * A block is owed wherever an entry's page is. */
 export const isGap = (lens: LensId, kind: RouteKind, part: Part) =>
-  !!GAPS[lens]?.[kind]?.[part];
+  !!(
+    GAPS[lens]?.[kind]?.[part] ||
+    (part === "update.redacted" && GAPS[lens]?.[kind]?.["update.item"]) ||
+    BLOCK_GAPS[lens]?.parts.includes(part as BlockPart)
+  );

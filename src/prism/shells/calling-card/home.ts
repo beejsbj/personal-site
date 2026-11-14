@@ -230,17 +230,23 @@ export function home(route: Route, env: Env): Screen {
     portrait(hero.portrait.src, fill(copy.home.portrait, { alt: hero.portrait.alt })),
   );
 
+  // The sheet holds what hangs over the screen's edge (the cut-out, the
+  // tilted list) so that the column on a phone has no sideways to slide.
   main.append(
-    figure,
-    plates,
-    num,
-    dateWidget(env) ?? "",
-    nav,
-    helper,
-    bubble,
-    money,
-    phoneChip ?? "",
-    prompts([["↑↓", copy.chrome.prompts.select], ["⏎", copy.chrome.prompts.confirm]]),
+    h(
+      "div",
+      { class: "cc-home__sheet" },
+      figure,
+      plates,
+      num,
+      dateWidget(env) ?? "",
+      nav,
+      helper,
+      bubble,
+      money,
+      phoneChip ?? "",
+      prompts([["↑↓", copy.chrome.prompts.select], ["⏎", copy.chrome.prompts.confirm]]),
+    ),
   );
 
   let first = true;

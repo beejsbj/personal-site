@@ -1,0 +1,31 @@
+---
+/** A picture in a block, with its words: alt text for whoever cannot see
+ * it, and its caption (and, in a compare, which side it is) under it. */
+import Inline from "../../design/primitives/Inline.astro";
+import type { Picture } from "../../lib/blocks";
+
+interface Props {
+  picture: Picture;
+  label?: string;
+}
+const { picture, label } = Astro.props;
+---
+
+<figure class="block-picture">
+  <img
+    src={picture.src}
+    alt={picture.alt ?? ""}
+    width={picture.width}
+    height={picture.height}
+    loading="lazy"
+    decoding="async"
+  />
+  {
+    (label || picture.caption) && (
+      <figcaption>
+        {label && <span class="block-picture__label">{label}</span>}
+        {picture.caption && <Inline text={picture.caption} links="plain" />}
+      </figcaption>
+    )
+  }
+</figure>

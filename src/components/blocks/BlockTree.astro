@@ -1,0 +1,21 @@
+---
+/** The files and folders of a tree block, a list within a list. */
+import type { TreeNode } from "../../lib/blocks";
+
+interface Props {
+  nodes: TreeNode[];
+}
+const { nodes } = Astro.props;
+---
+
+<ul>
+  {
+    nodes.map((node) => (
+      <li>
+        <span class="block-tree__name">{node.name}</span>
+        {node.note && <span class="block-tree__note">{node.note}</span>}
+        {node.children && <Astro.self nodes={node.children} />}
+      </li>
+    ))
+  }
+</ul>

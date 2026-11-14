@@ -1,28 +1,76 @@
 ---
-import type { UpdateData } from "../../content.config";
+import type { StreamUpdate } from "../../lib/portfolio";
 import Link from "../primitives/Link.astro";
 import { part } from "../../prism/parts";
-
-type Props = UpdateData & {
-  /** The update's id, marking it as an update.item part. */
-  id?: string;
-  labels: { kinds: Record<string, string>; sources: Record<string, string> };
-  connected?: boolean;
-  detailed?: boolean;
+/** Compound: one update in a dated list (the home stream, an experiment's
+ * page, the Labbook).
+ * Open: its mark, where it came from, its title, with `detailed` its
+ * summary, then the slot (what it is about) and its date. The title is a
+ * link when the update has somewhere to go. Slot `artifact`: the thing it
+ * shows for itself, beside the words where there is room and under them
+ * where there is not.
+ * Redacted: it happened and is not shown. The site is given its shape and
+ * never the words it hides, so this draws the shape: its line, part by
+ * part, a word it shows set as a title's words are and a black bar for
+ * each number in `parts` (a longer number, a longer bar), struck by hand
+ * like lines blacked out of a document, with its kind of work and its
+ * date. The line flows and wraps as a title would. It links nowhere and
+ * has no slot. To assistive technology it is named `label`, its words are
+ * read, and each bar is said once, as `bar`.
+ * layout=stream (the home stream, an experiment's page): each under its
+ * kind's mark, strung on a line to the next.
+ * layout=notebook (the Labbook): written as a lab notebook is, the day in
+ * the margin and the words to the right of the margin's rule; no mark and
+ * no string. The month is its list's heading, so only the day is shown;
+ * the whole date is still said.
+ */
+type Open = Pick<StreamUpdate, "title" | "summary"> &
+  Partial<Pick<StreamUpdate, "kind" | "source" | "href">> & {
+    labels: { kinds: Record<string, string>; sources: Record<string, string> };
+    detailed?: boolean;
+    redacted?: undefined;
+  };
+type Redacted = {
+  redacted: {
+    /** Its line, in order: a word shown as written, or a bar's length. */
+    parts: (string | number)[];
+    /** Its kind of work, as it is named. */
+    work: string;
+    /** What it is called aloud. */
+    label: string;
+    /** What a bar is called aloud. */
+    bar: string;
+  };
 };
+type Props = (Open | Redacted) & {
+  date: string;
+  dateLabel: string;
+  layout?: "stream" | "notebook";
+  /** The update's id, marking it as an update.item or update.redacted part. */
+  id?: string;
+  connected?: boolean;
+};
+const props = Astro.props;
 const {
-  title,
   date,
   dateLabel,
-  href,
-  summary,
-  kind = "project",
-  source = "site",
   id,
-  labels,
   connected = false,
-  detailed = false,
-} = Astro.props;
+  redacted,
+  layout = "stream",
+} = props;
+const notebook = layout === "notebook";
+// "26 Sep 2026": the day, and the rest of it.
+const [day, ...rest] = dateLabel.split(" ");
+const open = props.redacted ? undefined : props;
+const kind = open?.kind ?? "project";
+const source = open?.source ?? "site";
+const name = redacted && id ? `redacted-${id}` : undefined;
+// A slot that was handed nothing leaves no room behind.
+const artifact =
+  open && Astro.slots.has("artifact")
+    ? (await Astro.slots.render("artifact")).trim()
+    : "";
 
 const kinds = {
   project: { path: "M3 7h6l2-3h10v15H3z" },
@@ -54,34 +102,84 @@ const event = kinds[kind];
 ---
 
 <article
-  class:list={["update-entry", { "update-entry--connected": connected }]}
-  data-event-kind={kind}
-  {...(id ? part("update.item", id) : {})}
+  class:list={[
+    "update-entry",
+    {
+      "update-entry--connected": connected,
+      "update-entry--redacted": redacted,
+      "update-entry--shows": artifact,
+      "update-entry--notebook": notebook,
+    },
+  ]}
+  data-event-kind={open ? kind : undefined}
+  aria-labelledby={name}
+  {...(id ? part(redacted ? "update.redacted" : "update.item", id) : {})}
 >
-  <span class="event-mark" aria-hidden="true">
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d={event.path} />
-    </svg>
-  </span>
+  {!notebook && (
+    <span class="event-mark" aria-hidden="true">
+      {open && (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d={event.path} />
+        </svg>
+      )}
+    </span>
+  )}
   <div class="event-body">
-    <p class="event-origin">
-      {labels.sources[source]}
-      <span aria-hidden="true"> / </span>
-      {labels.kinds[kind]}
-    </p>
-    <p class="event-title">
-      <Link href={href}>{title}</Link>
-    </p>
-    {detailed && <p class="event-detail">{summary}</p>}
-    <time datetime={date}>{dateLabel}</time>
+    {redacted && (
+      <>
+        <p class="redaction-name" id={name}>
+          {redacted.label}
+        </p>
+        <p class="event-origin">{redacted.work}</p>
+        <p class="redaction" data-redaction-line>
+          {redacted.parts.map((part) => (
+            <>
+              {typeof part === "number" ? (
+                <span data-redaction-bar style={`--bar:${part}`}>
+                  <span class="redaction-said">{redacted.bar}</span>
+                </span>
+              ) : (
+                <span data-redaction-word>{part}</span>
+              )}{" "}
+            </>
+          ))}
+        </p>
+      </>
+    )}
+    {open && (
+      <>
+        <p class="event-origin">
+          {open.labels.sources[source]}
+          <span aria-hidden="true"> / </span>
+          {open.labels.kinds[kind]}
+        </p>
+        <p class="event-title">
+          {open.href ? <Link href={open.href}>{open.title}</Link> : open.title}
+        </p>
+        {open.detailed && <p class="event-detail">{open.summary}</p>}
+        <slot />
+        {artifact && (
+          <div class="event-artifact">
+            <Fragment set:html={artifact} />
+          </div>
+        )}
+      </>
+    )}
+    {!notebook && <time datetime={date}>{dateLabel}</time>}
   </div>
+  {notebook && (
+    <time datetime={date}>
+      <span class="date-day">{day}</span>{" "}
+      <span class="date-rest">{rest.join(" ")}</span>
+    </time>
+  )}
 </article>
 <style>
   .update-entry {
@@ -131,5 +229,160 @@ const event = kinds[kind];
   .event-detail {
     font-size: var(--text-sm);
     line-height: var(--leading-body);
+  }
+  @media (min-width: 62.501rem) {
+    .update-entry--shows .event-body {
+      grid-template-columns: minmax(0, 1fr) var(--feature-media-width);
+      column-gap: var(--space-xl);
+      align-content: start;
+    }
+    .update-entry--shows .event-body > :global(*) {
+      grid-column: 1;
+    }
+    .update-entry--shows .event-body > .event-artifact {
+      grid-column: 2;
+      grid-row: 1 / span 6;
+    }
+  }
+  /* The notebook: the day in the margin, a rule down the page beside it
+     (the margin's rule, in the peach of the page's brackets), the words
+     to the right. Entries are ruled off from each other as a notebook's
+     lines are. */
+  .update-entry--notebook {
+    grid-template-columns: var(--labbook-margin) minmax(0, 1fr);
+    gap: 0 var(--space-l);
+    padding-block: var(--space-m) var(--space-l);
+  }
+  .update-entry--notebook::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(var(--labbook-margin) + var(--space-l) / 2);
+    border-inline-start: var(--focus-width) solid var(--color-surface-strong);
+  }
+  .update-entry--notebook > .event-body {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .update-entry--notebook > time {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+    align-self: start;
+  }
+  .date-day {
+    display: grid;
+    place-items: center;
+    min-width: var(--ball-link-size);
+    height: var(--ball-link-size);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-serif);
+    font-size: var(--text-card);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-heading);
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--color-accent);
+  }
+  /* The month is the list's heading: the rest of the date is said, not
+     shown again. */
+  .date-rest {
+    position: absolute;
+    width: var(--rule-width);
+    height: var(--rule-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .update-entry--notebook .event-title,
+  .update-entry--notebook .redaction {
+    font-size: var(--text-lead);
+  }
+  .update-entry--notebook .event-detail {
+    max-width: var(--reading-width);
+    font-size: var(--text-copy);
+  }
+  .update-entry--notebook .event-artifact {
+    margin-top: var(--space-xs);
+  }
+  /* An entry that shows something carries more weight: its title is set
+     as a heading is, and beside its words the artifact keeps to a column
+     of its own width, so a tall one does not leave a run of empty page
+     under a short entry. */
+  .update-entry--notebook.update-entry--shows .event-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-card);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+  }
+  .update-entry--notebook.update-entry--shows .event-detail {
+    font-size: var(--text-lead);
+  }
+  @media (min-width: 62.501rem) {
+    .update-entry--notebook.update-entry--shows .event-body {
+      grid-template-columns:
+        minmax(0, 1fr)
+        min(var(--labbook-artifact-width), 40%);
+    }
+    .update-entry--notebook.update-entry--shows .event-body > .event-artifact {
+      margin-top: 0;
+    }
+  }
+  /* Redacted: even the mark is blacked out. */
+  .update-entry--redacted .event-mark {
+    background: var(--color-text);
+  }
+  /* Said to assistive technology, not shown: what the update is, and what
+     each bar stands for. */
+  .redaction-name,
+  .redaction-said {
+    position: absolute;
+    width: var(--rule-width);
+    height: var(--rule-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* The line stands where the title would, set as a title is: the words
+     it shows as written, and a bar for each word it does not, as long as
+     its number (--bar, set on the bar). Each bar is a marker stroke:
+     square-ended, a little off the level and uneven at its ends, so no two
+     are quite alike. The line wraps as words do. */
+  .redaction {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-xs);
+    padding-block: var(--underline-pad);
+    font-size: var(--text-copy);
+    line-height: var(--leading-tight);
+    font-weight: var(--weight-bold);
+    overflow-wrap: anywhere;
+  }
+  .redaction [data-redaction-bar] {
+    --bar: 1;
+    position: relative;
+    width: calc(var(--bar) * var(--redaction-unit));
+    max-width: 100%;
+    height: var(--redaction-height);
+    background: var(--color-text);
+    rotate: var(--settle-angle);
+    clip-path: polygon(0 7%, 100% 0, 99% 93%, 1% 100%);
+  }
+  .redaction [data-redaction-bar]:nth-child(even) {
+    rotate: calc(var(--settle-angle) * -1.5);
+    clip-path: polygon(1% 0, 99% 5%, 100% 100%, 0 96%);
+  }
+  .redaction [data-redaction-bar]:nth-child(3n) {
+    rotate: 0deg;
+    clip-path: polygon(0 3%, 99% 0, 100% 97%, 2% 100%);
+  }
+  @media (forced-colors: active) {
+    .update-entry--redacted .event-mark,
+    .redaction [data-redaction-bar] {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
   }
 </style>

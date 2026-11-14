@@ -12,6 +12,7 @@ import CurvedArrow from "../design/unique/CurvedArrow.astro";
 import BallNav from "../design/unique/BallNav.astro";
 import CurrentNote from "../design/compounds/CurrentNote.astro";
 import UpdateEntry from "../design/compounds/UpdateEntry.astro";
+import Artifact from "../design/compounds/Artifact.astro";
 import ActivityStream from "../design/compounds/ActivityStream.astro";
 import SectionHeading from "../design/compounds/SectionHeading.astro";
 import ProjectRow from "../components/ProjectRow.astro";
@@ -19,8 +20,11 @@ import ProjectTimeline from "../components/ProjectTimeline.astro";
 import LabCard from "../components/LabCard.astro";
 import PageHeader from "../components/PageHeader.astro";
 import SectionIntro from "../components/SectionIntro.astro";
+import BlockScript from "../components/blocks/BlockScript.astro";
 import MediaRail from "../components/MediaRail.astro";
-import { getHome } from "../lib/portfolio";
+import { getHome, getLabPage } from "../lib/portfolio";
+import { streamUpdate, updateDateLabel } from "../lib/labbook";
+import { labPrints } from "../lib/rules";
 const site = (await getEntry("site", "config"))!.data;
 const home = await getHome();
 const labels = { kinds: site.updateKinds, sources: site.updateSources };
@@ -31,10 +35,20 @@ const project = (await getCollection("projects")).find(
 const lab = (await getCollection("lab")).find(
   (entry: CollectionEntry<"lab">) => !entry.data.hidden,
 )!;
-const update = (await getCollection("updates"))[0];
-const updates = (await getCollection("updates")).map(
-  (entry: CollectionEntry<"updates">) => entry.data,
+const experiment = {
+  ...lab.data,
+  href: lab.data.href ?? `/lab/${lab.slug}`,
+  prints: labPrints(lab.data),
+};
+// A pile needs more than one picture: the experiment's, with the
+// project's under it.
+const pile = [...experiment.prints, project.data.cover];
+const updates = (await getCollection("updates")).flatMap(
+  (entry: CollectionEntry<"updates">) =>
+    streamUpdate(entry.data) ?? [],
 );
+const update = updates[0];
+const { labbook } = await getLabPage();
 const colors = [
   ["Paper", "--color-page"],
   ["Burgundy", "--color-accent"],
@@ -101,9 +115,9 @@ const anatomy = [
   ],
   [
     "LabCard / MediaRail",
-    "MediaFrame + Heading/Link / image-video sequence",
-    "Lab listing / detail media",
-    "Video has native controls, no autoplay.",
+    "MediaFrame or Note + Heading/Link / image-video sequence",
+    "Card, feature or row, each with or without a cover / detail media",
+    "The title link wears the arrow only when the experiment lives elsewhere. Video has native controls, no autoplay.",
   ],
   [
     "SiteHeader / SiteFooter",
@@ -120,6 +134,7 @@ const anatomy = [
   noindex
   clientRouting={false}
 >
+  <BlockScript />
   <div class="guide shell">
     <PageHeader
       eyebrow="Living style guide"
@@ -299,7 +314,7 @@ const anatomy = [
         <div>
           <CurrentNote note={home.currently} id="guide-currently" variant="plain" />
           <div class="spaced">
-            <UpdateEntry {...update.data} labels={labels} detailed />
+            <UpdateEntry {...update} labels={labels} detailed />
           </div>
           <ActivityStream updates={updates} copy={home.updates} labels={labels} />
           <Note>
@@ -311,7 +326,7 @@ const anatomy = [
         </div>
       </div>
       <div class="assembly-grid spaced">
-        <LabCard {...lab.data} href={lab.data.href ?? `/lab/${lab.slug}`} />
+        <LabCard {...experiment} />
         <div>
           <MediaFrame src={project.data.cover} alt="Project art specimen" />
           <SectionIntro
@@ -322,6 +337,75 @@ const anatomy = [
           <MediaRail media={project.data.media.slice(0, 1)} />
         </div>
       </div>
+    </section>
+
+    <section class="specimen" aria-labelledby="lab-specimen">
+      <SectionHeading id="lab-specimen" title="Experiments in the Lab" />
+      <LabCard {...experiment} prints={pile} layout="feature" />
+      <div class="lab-specimens spaced">
+        <LabCard {...experiment} lean="left" />
+        <LabCard {...experiment} prints={[]} lean="right" />
+      </div>
+      <div class="lab-specimens spaced">
+        <LabCard {...experiment} layout="standing" />
+        <LabCard {...experiment} prints={[]} layout="standing" />
+      </div>
+      <p class="annotation">
+        One card, laid as what it holds. The featured experiment takes the
+        width of its place. On the Bench a card lies a touch off the straight:
+        a print, a pile of prints that fans when picked up, or, with no
+        picture, a slip taped down. On the Shelf it stands upright on its
+        board, its label beneath, its initial standing in for a picture.
+      </p>
+    </section>
+
+    <section class="specimen" aria-labelledby="labbook-specimen">
+      <SectionHeading id="labbook-specimen" title="The Labbook" />
+      <div>
+        <UpdateEntry {...update} labels={labels} detailed layout="notebook">
+          <Artifact
+            slot="artifact"
+            artifact={{
+              kind: "pen",
+              src: "https://codepen.io/beejsbj/pen/abXZWLQ",
+              alt: "A lotus drawing itself, one line at a time",
+              poster: "/images/lab/motion-path-graph.svg",
+            }}
+            copy={labbook.artifact}
+          />
+        </UpdateEntry>
+        <UpdateEntry
+          date="2026-08-20"
+          dateLabel={updateDateLabel("2026-08-20")}
+          redacted={{
+            parts: [5, 3, 8, 4],
+            work: labbook.redacted.works.code,
+            label: labbook.redacted.label,
+            bar: labbook.redacted.bar,
+          }}
+          layout="notebook"
+        />
+        <UpdateEntry
+          date="2026-08-24"
+          dateLabel={updateDateLabel("2026-08-24")}
+          redacted={{
+            parts: ["Rewired", 4, 2, "the", 6],
+            work: labbook.redacted.works.design,
+            label: labbook.redacted.label,
+            bar: labbook.redacted.bar,
+          }}
+          layout="notebook"
+        />
+      </div>
+      <p class="annotation">
+        The Labbook is written as a notebook: each entry's day in the margin,
+        its words to the right of the margin's rule, its months as chapters
+        (the composition, on /lab). An update may show an artifact: a Pen or a demo waits
+        on its stage until it is asked for, so nothing loads from another
+        site before the click. A redacted update is its shape and nothing
+        else: its line, with the few words it shows as written and a struck
+        bar for each word it does not.
+      </p>
     </section>
 
     <section class="specimen" aria-labelledby="timeline-specimen">
@@ -453,6 +537,15 @@ const anatomy = [
   }
   .spaced {
     margin-top: var(--space-xl);
+  }
+  .lab-specimens {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--rail-width)), 1fr)
+    );
+    align-items: start;
+    gap: var(--space-xl);
   }
   .table-scroll {
     overflow-x: auto;

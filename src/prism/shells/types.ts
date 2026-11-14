@@ -15,6 +15,17 @@ import type CallingCardCopy from "../../content/lenses/calling-card.json";
 import type CutPaperCopy from "../../content/lenses/cut-paper.json";
 import type BackPageCopy from "../../content/lenses/back-page.json";
 import type HionCopy from "../../content/lenses/hion.json";
+import type { UpdateKind, UpdateSource } from "../../content.config";
+import type { Block } from "../../lib/blocks";
+import type { Update as LabbookUpdate, UpdateLink } from "../../lib/labbook";
+
+export type {
+  Block,
+  BlockOf,
+  BlockType,
+  Picture,
+  TreeNode,
+} from "../../lib/blocks";
 
 export interface Link {
   label: string;
@@ -81,8 +92,12 @@ export interface Project {
   media: Media[];
   tags: string[];
   order: number;
-  /** The rendered markdown body. May be empty. */
+  /** The rendered markdown body: its prose, without its blocks. May be
+   * empty. */
   html: string;
+  /** The page in reading order: the prose (`text`) and the blocks it is
+   * told with, each by its `type` (src/lib/blocks.ts). May be empty. */
+  blocks: Block[];
 }
 
 export interface LabEntry {
@@ -95,16 +110,33 @@ export interface LabEntry {
   hasPage: boolean;
   title: string;
   summary: string;
-  type: string;
-  sourceEra: string;
+  /** On the Bench (being worked on now) or on the Shelf (gone quiet, and
+   * the archive). */
+  place: "bench" | "shelf";
+  /** The slug of the project this experiment graduated into. */
+  graduatedTo?: string;
+  /** The one entry given pride of place. */
+  featured?: boolean;
   cover?: string;
+  /** What the experiment's card can load in place of its still, once asked
+   * (a lens may draw this or leave it for its design pass): the address of a
+   * frame, and whether it is a Pen. Nothing for an entry that is not played
+   * in place. */
+  preview?: { kind: "pen" | "demo"; frame: string };
   links: { label: string; url: string }[];
   media: Media[];
   order: number;
+  /** The rendered markdown body: its prose, without its blocks. */
   html: string;
+  /** The page in reading order: the prose (`text`) and the blocks it is
+   * told with, each by its `type` (src/lib/blocks.ts). May be empty. */
+  blocks: Block[];
 }
 
-export interface Update {
+/** An update as the home stream shows it: open, with a date label and,
+ * if it goes anywhere, its link (one that does not is shown as text). The
+ * Labbook's own `Update`, which may be redacted, is in src/lib/labbook.ts. */
+export type Update = {
   /** The file name, the `data-ref` of its `update.item` part. */
   id: string;
   kind: string;
@@ -116,10 +148,8 @@ export interface Update {
   date: string;
   dateLabel: string;
   summary: string;
-  href: string;
-  linkLabel: string;
   relatedProject?: string;
-}
+} & UpdateLink;
 
 export interface Lenses {
   "calling-card": typeof CallingCardCopy;
@@ -172,6 +202,32 @@ export interface SiteContent {
     header: { label: string; home: string; hello: string; items: string[] };
     footer: { links: Link[]; signoff: string };
     social: { label: string; href: string }[];
+    /** How the site names each kind of update and each place one comes
+     * from ("Pull request", "This site"): a Labbook update says only which.
+     * The schema asks for no name in particular, so one may be missing. */
+    updateKinds: Partial<Record<UpdateKind, string>>;
+    updateSources: Partial<Record<UpdateSource, string>>;
+    /** What a page's blocks say for themselves: which side of a compare
+     * is which; what asks for an embed or a model to load where it stands
+     * (`load`), goes to where an embed lives instead (`open`) and puts
+     * either away again (`close`); and what a model's viewer says about
+     * handling it, or when it cannot show it. */
+    blocks: {
+      compare: { before: string; after: string };
+      embed: {
+        load: Record<"pen" | "demo" | "deck", string>;
+        open: Record<"pen" | "demo" | "deck", string>;
+        close: string;
+        note: string;
+      };
+      model: {
+        load: string;
+        close: string;
+        note: string;
+        hint: string;
+        failed: string;
+      };
+    };
   };
   pages: {
     home: {
@@ -238,7 +294,60 @@ export interface SiteContent {
       more: Link;
       /** Inline markdown. */
       aside: string;
-      detail: { eyebrow: string; labels: { type: string; era: string } };
+      /** What the Bench and the Shelf are called, and a line about each. */
+      places: Record<"bench" | "shelf", { title: string; note: string }>;
+      /** The Labbook: its heading and a line about it; what introduces the
+       * experiment or project an update is about; what an artifact's frame
+       * says before it loads (`load`), where it lives instead (`open`); and
+       * how a redacted update, a black bar on its line (said aloud, once
+       * for each) and each kind of work it may be are named. */
+      labbook: {
+        title: string;
+        note: string;
+        listLabel: string;
+        /** Narrowing it to one experiment or project: what the links to
+         * each are called, how many entries each has, what it shows once
+         * narrowed and the way back to all of it. */
+        narrow: {
+          label: string;
+          showing: string;
+          all: string;
+          count: { one: string; other: string };
+        };
+        related: { experiment: string; project: string };
+        artifact: {
+          load: { pen: string; demo: string };
+          open: { pen: string; demo: string };
+          note: string;
+        };
+        redacted: {
+          label: string;
+          bar: string;
+          works: Record<
+            "code" | "design" | "writing" | "research" | "other",
+            string
+          >;
+        };
+      };
+      /** What an experiment's card says for the way to play it where it
+       * stands, by what it is (`LabEntry.preview`): to ask for it, to put it
+       * away, and while it loads. */
+      preview: {
+        load: Record<"pen" | "demo", string>;
+        close: string;
+        note: string;
+        loading: string;
+      };
+      /** Copy for each experiment's own page. `graduated` introduces the
+       * project it became; `updates` heads its part of the Labbook. */
+      detail: {
+        eyebrow: string;
+        back: Link;
+        labels: {
+          graduated: string;
+          updates: string;
+        };
+      };
     };
     notFound: { title: string; description: string; header: Header };
   };
@@ -258,8 +367,11 @@ export interface SiteContent {
   projects: Project[];
   /** Every visible lab entry, by `order`. */
   lab: LabEntry[];
-  /** Every due, unexpired update, newest first. */
+  /** Every due, unexpired open update, newest first: the home stream. */
   updates: Update[];
+  /** The Labbook: every due, unexpired update, newest first. A redacted
+   * one is its shape alone. */
+  labbook: LabbookUpdate[];
   /** Slugs of the featured projects, in project order (shared rule; never
    * empty while there are projects). */
   featured: string[];

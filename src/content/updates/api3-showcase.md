@@ -5,5 +5,5 @@ dateLabel: "01 Jul 2026"
 summary: "Updated the API3 Ecosystem record to point to the preserved showcase and its source repository."
 href: "/projects/api3-ecosystem"
 linkLabel: "See the project"
-relatedProject: "API3 Ecosystem"
+relatedProject: "api3-ecosystem"
 ---

@@ -803,6 +803,9 @@
   :root[data-lens="calling-card"] .cc-root *::after {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
-    transition-duration: 1ms !important;
+    /* Not 1ms: a transition is every property's by default, and a 1ms one
+       restarts a name's size (set from its card's width) when a screen
+       plays, so its pin is measured small for a frame. */
+    transition: none !important;
   }
 }

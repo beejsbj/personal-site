@@ -32,7 +32,7 @@ window.prismHarness = state;
 async function run() {
   const base: SiteContent = await (await fetch("/prism/content.json")).json();
   const fixture = FIXTURES[name];
-  const content = fixture ? fixture.apply(structuredClone(base)) : base;
+  const content = fixture ? await fixture.apply(structuredClone(base)) : base;
   const { kind, slug } = kindOf(path);
   const route: RouteRef = { kind, path, slug };
   useSource({

@@ -3,7 +3,7 @@ import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Homepage from "../components/Homepage.astro";
-import { getFeatured, getHome, getSite, updateId } from "../lib/portfolio";
+import { getFeatured, getHome, getSite, streamUpdates } from "../lib/portfolio";
 
 const home = await getHome();
 const site = await getSite();
@@ -21,7 +21,7 @@ const homepageData = {
     slug: project.slug,
     href: `/projects/${project.slug}`,
   })),
-  updates: recentUpdates.map((update) => ({ ...update.data, id: updateId(update) })),
+  updates: streamUpdates(recentUpdates),
   labels: { kinds: site.updateKinds, sources: site.updateSources },
 };
 ---

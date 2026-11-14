@@ -1,5 +1,110 @@
 # Base homepage: warm welcome
 
+## Lab: the Labbook as a notebook (November, issue #134)
+
+Burooj saw the Labbook and the home page's Recent updates as the same
+seven lines shown the same way. They are the same records at two depths;
+the Labbook now reads as a lab notebook. Built from the existing grammar:
+no new fonts, colours or dependencies; two new tokens (the margin an
+entry's day sits in, and the column a month's name stands in). Chosen
+under delegated authority; it needs Burooj's eye.
+
+- **Months are chapters** (`labbookMonths`, `monthLabel` in
+  `src/lib/labbook.ts`): newest first, each ruled off from the last. From
+  62.5rem a month's name stands in its own column beside its entries,
+  serif burgundy over a small year, and stays in view while they are
+  read; below, it heads them. A month with one small entry is its name
+  beside one line, not an empty chapter.
+- **An entry is written as a notebook's is** (`UpdateEntry`
+  `layout="notebook"`): the day alone in the margin as a serif numeral
+  (the month is the heading; the whole date is still said), a peach rule
+  down the page beside it, the words to the right, entries ruled off from
+  each other. No kind mark and no string between entries: that is the
+  home stream's look, and stays there unchanged. A picture is laid in a
+  touch off the straight, turned one way then the other down the page,
+  straightening when its entry is pointed at; a Pen, demo, film or sound
+  sits beside the words from 62.5rem and under them below. A redacted
+  entry is its line among the rest. The entry a link lands on wears the
+  current ball on its day.
+- **Narrowing** to one experiment or project: an index of peach pills at
+  the Labbook's head, each with how many entries it holds, the one in
+  use burgundy; while narrowed, a slip of paper says to what, with the
+  way back. The choice is the query (`?experiment=` / `?project=`,
+  `narrowHref`, `narrowedTo`): a query change is a page change to the
+  client router, so Back, Forward, reload and every lens's shell get it
+  with no new listener, and the fragment stays free to land on an
+  update. A narrowing plays no page cover (`data-no-cover`). `/lab` is
+  prerendered, so a script applies the narrowing as the Labbook is drawn,
+  before its entries; without scripts the Labbook is whole and the index
+  is not shown.
+- **Rejected:** a timeline with the kind marks (the home look again);
+  cards in a grid (the Bench's language, and it breaks the reading
+  order); a sticky month band on phones (it covers the words on a short
+  screen); the month and day shown on every entry (the heading says it);
+  narrowing in the fragment (it fights the update anchors, the router
+  sends no `hashchange` on the same page, and the prism's faces drop it).
+
+## Lab: the Labbook (November, issue #95)
+
+Built from the existing grammar: no new fonts, colours or dependencies, and
+two new tokens (a redaction bar's unit and height). Chosen under delegated
+authority; it still needs Burooj's eye.
+
+There is one record, the update. The home page's Recent updates is the
+ticker: the place that shows the most recent ones, as it did before the
+Lab. The moving strip of headlines first built here was removed.
+
+- **`Labbook`** is the section below the Shelf: every update, newest first,
+  each in an element with `id="u-<id>"` so a link written to it lands on
+  it (nothing links there by default). The update a link landed on wears
+  the nav's current ball. With no updates there is no section.
+- **`UpdateEntry`** is still the one look for an update, in the home
+  stream, on an experiment's page and here. It gained an optional link (an
+  update with nowhere to go is a title, not a link to itself), a slot for
+  what the update is about, an `artifact` slot that stands beside the words
+  from 62.5rem and under them below, and a redacted state.
+- **Redacted** is a document with lines blacked out, not a loading
+  skeleton: where the title would be, its line, part by part (`parts`): a
+  word it shows set as a title's words are, and a square-ended ink bar for
+  each word it does not, as long as its number, each a little off the
+  level and uneven at its ends like a marker stroke. The line wraps as a
+  title does. Even the mark is blacked out. It says its kind of work and
+  its date; to a screen reader it is "Redacted update", its words are
+  read, and each bar is said once as "redacted".
+- **`Artifact`**: a picture sits in a `MediaFrame`; a film and a sound use
+  the browser's own controls. A Pen or a demo waits on a hatched stage (its
+  poster, or a slip of paper saying what it is) behind a wine pill. The
+  frame is made on the click, in the stage's own room, so nothing moves and
+  nothing is asked of another site before then. A poster kept on another
+  site is not shown, for the same reason. It plays on the same stage as a
+  card's Pen (`src/lib/block-stage.ts`): one at a time on the page, and
+  Escape puts it away.
+
+## Lab: the Bench and the Shelf (November, issue #93)
+
+`/lab` is a room with two places (vocabulary in `CONTEXT.md`), built from
+the existing grammar with no new tokens. Chosen under delegated authority;
+it still needs Burooj's eye.
+
+- **`LabRoom`** is the page: opening, each place that holds something under
+  its own heading (`pages/lab.md` `places`), a `labbook` slot below the Shelf,
+  then the way out. `labPlaces` (`src/lib/rules.ts`) decides the groups and
+  their order for every lens: featured first, then `order`. An empty place
+  renders nothing.
+- **`LabCard`** has three layouts. On the Bench things lie spread out and a
+  touch off the straight (`--settle-angle`), straightening when picked up: a
+  framed picture, or, with no cover, a slip of `Note` paper. The featured
+  experiment takes the width of its place. On the Shelf an experiment is a
+  quiet row standing on its board (a rule with the hatch beneath), words to
+  the left and a small picture at the right end.
+- **Where a title goes** is the Link family's own rule: the satellite arrow
+  only when the experiment lives elsewhere. A page entry has none.
+- Type and era are optional; the meta line shows what there is and
+  disappears when there is nothing.
+- `/prism/fixtures/lab` renders the same room on fixture experiments
+  (`?fixture=shelf-only`, `?fixture=no-covers`), for the browser test and
+  for looking at states the content does not hold yet.
+
 ## Current decision: one ball nav, one link family, peeking initials (October, PR #10 round 4)
 
 This supersedes "normal navigation" and "decorative circles" below. Burooj

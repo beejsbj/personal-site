@@ -36,7 +36,7 @@ test("project history includes applications and the learning arcade in dated ord
 test("Lab contains experiment destinations, not project or style-guide cards", () => {
   const html = read("dist/client/lab/index.html");
   assert.match(html, /https:\/\/codepen.io\/beejsbj\/pen\/abXZWLQ/);
-  assert.match(html, /https:\/\/codepen.io\/beejsbj\/pen\/BaeoNPG/);
+  assert.match(html, /https:\/\/codepen.io\/beejsbj\/pen\/PwPJead/);
   assert.doesNotMatch(
     html,
     /href="\/lab\/(?:e4p|garden|flashcards|style-guide)"/,

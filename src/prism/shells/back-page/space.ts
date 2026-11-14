@@ -24,6 +24,7 @@ const SOLID = [
   ".bp-note",
   ".bp-slip",
   ".bp-sticky",
+  ".bp-shelfcard",
   ".bp-keybox",
   ".bp-callout",
   // on the war map, its camps (the old flicks between them are open paper)
@@ -39,6 +40,11 @@ const SOLID = [
   ".bp-belongs",
   "button",
   "input",
+  // the lab book's: its contents, a stamp, a calendar, a number in the margin
+  ".bp-contents",
+  ".bp-stamp",
+  ".bp-cal",
+  ".bp-num",
 ].join(",");
 
 export class Space {

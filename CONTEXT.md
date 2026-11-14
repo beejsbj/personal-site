@@ -13,12 +13,8 @@ One dated entry in the Labbook: something Burooj made, changed, or published. It
 _Avoid_: project, slice, raw commit log
 
 **Labbook**:
-The complete, dated record of updates, like a lab notebook or a game journal. It holds everything that has been published; the ticker shows only its highlights.
+The complete, dated record of updates, like a lab notebook or a game journal. It holds everything that has been published; the home page shows only the most recent.
 _Avoid_: journal, feed, changelog
-
-**Headline**:
-A short, possibly playful line written about one or more updates for the ticker. A headline always points back to the updates it describes.
-_Avoid_: update, announcement
 
 **Lab**:
 Burooj's workshop, seen through a window: a room the visitor steps into to watch work in progress, live and in history. Private things stay visibly redacted rather than hidden.
@@ -29,16 +25,16 @@ Burooj's home lab, the real place the Lab is a window into. It feeds the room ra
 _Avoid_: home server project, lab entry
 
 **Bench**:
-The part of the Lab holding experiments being worked on now.
-_Avoid_: active list, in-progress status
+The part of the Lab holding what is being worked on now: experiments with work under way or recently touched, and other work in progress shown redacted. Nothing is sorted onto it by hand, though an experiment can be pinned there.
+_Avoid_: active list, in-progress status, pile
 
 **Shelf**:
-The part of the Lab holding experiments that have gone quiet, plus the archive of older work.
+The part of the Lab where every other experiment rests: the ones that have gone quiet, and the archive of older work. An experiment returns to the Bench when it is picked up again.
 _Avoid_: graveyard, archived status
 
 **Ticker**:
-The ambient, always-moving strip of headlines and live presence. It shows what is highlighted, not the full record.
-_Avoid_: feed, activity log
+The place on the home page that shows the most recent updates, at a glance. Each lens gives it its own form. The Labbook has the full record.
+_Avoid_: feed, activity log, headline
 
 **Experiment**:
 Exploratory work shown in the Lab, from a one-off sketch to a long-running line of tries. An experiment is a showcase of trying things: it may point straight to where it lives (a Pen, a demo, a deck) or tell its making as a short case study. It may graduate or go quiet.

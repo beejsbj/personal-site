@@ -1,11 +1,8 @@
 ---
 title: "Beating Shapes"
-summary: "What if shapes could keep time? A black-and-white rhythm experiment that moves geometric forms to the tempo of a track."
-type: "Audio + interaction"
-sourceEra: "CodePen"
-href: "https://codepen.io/beejsbj/pen/BaeoNPG"
+summary: "Shapes that keep time. Each one pulses or turns on a fraction or a multiple of a single beat, and a slider sets the tempo."
+place: "shelf"
+href: "https://codepen.io/beejsbj/pen/PwPJead"
 cover: "/images/lab/beating-shapes.png"
-order: 2
+order: 22
 ---
-
-A music-and-motion experiment with a choice of tracks, a play control, and geometric forms animated at multiples of the beat.

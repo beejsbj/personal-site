@@ -252,7 +252,7 @@ function currentlyNote(env: Env) {
 }
 
 /** Recent updates as locators: each date moves the playhead there and
- * rings its bell. */
+ * rings its bell. An update with nowhere to go is its title, not a link. */
 function locators(env: Env) {
   const { content, copy, session, transport, signal } = env;
   const words = copy.home;
@@ -274,7 +274,7 @@ function locators(env: Env) {
               "li",
               { class: "cp-loc", ...part("update.item", update.id) },
               when,
-              link(update.href, { class: "cp-loc__title" }, update.title),
+              update.href ? link(update.href, { class: "cp-loc__title" }, update.title) : h("span", { class: "cp-loc__title" }, update.title),
               h("small", null, `${update.kindLabel} · ${update.sourceLabel}`),
             );
             if (clip) {

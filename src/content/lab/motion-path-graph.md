@@ -1,11 +1,10 @@
 ---
 title: "Motion Path Graph"
 summary: "Drawing a lotus one line at a time. An SVG path study using GSAP, stroke lengths, and a little orange and blue."
-type: "SVG + motion"
-sourceEra: "CodePen"
+place: "shelf"
 href: "https://codepen.io/beejsbj/pen/abXZWLQ"
 cover: "/images/lab/motion-path-graph.svg"
-order: 1
+order: 21
 ---
 
 An SVG line-drawing experiment, with a GSAP timeline following the lengths of the paths.

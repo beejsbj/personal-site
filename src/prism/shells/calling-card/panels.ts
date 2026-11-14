@@ -47,7 +47,8 @@ export function phonePanel(content: SiteContent): Panel {
         ),
       );
     }
-    const external = isExternal(update.href);
+    // A message about something with nowhere to go has no link under it.
+    const external = !!update.href && isExternal(update.href);
     thread.append(
       h(
         "li",
@@ -59,17 +60,19 @@ export function phonePanel(content: SiteContent): Panel {
           { class: "cc-msg__bubble" },
           h("p", { class: "cc-msg__title" }, update.title),
           h("p", { class: "cc-msg__body" }, update.summary),
-          h(
-            "a",
-            {
-              class: "cc-msg__link",
-              href: update.href,
-              "data-cc-title": update.title,
-              ...(external ? { rel: "noreferrer" } : {}),
-            },
-            update.linkLabel,
-            external ? h("span", { "aria-hidden": "true" }, " ↗") : null,
-          ),
+          update.href
+            ? h(
+                "a",
+                {
+                  class: "cc-msg__link",
+                  href: update.href,
+                  "data-cc-title": update.title,
+                  ...(external ? { rel: "noreferrer" } : {}),
+                },
+                update.linkLabel,
+                external ? h("span", { "aria-hidden": "true" }, " ↗") : null,
+              )
+            : null,
           h("p", { class: "cc-msg__meta" }, `${update.sourceLabel} · ${update.kindLabel}`),
         ),
       ),

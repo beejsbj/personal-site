@@ -445,6 +445,53 @@ export function knot(
   return out;
 }
 
+/** Thread wound tight round a length, turn beside turn, each leaning the
+ * way the winding goes: what is bound up in it cannot be read. The thread
+ * it is wound round shows at either end, in the other colour. */
+export function winding(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  hue: Hue,
+  seed: number,
+): Mark[] {
+  const out: Mark[] = [];
+  const rand = rng(seed);
+  const lean = h * 0.32;
+  const turns = Math.max(2, Math.round((w - lean) / (THREAD + 0.9)));
+  const waist = y + h / 2;
+  out.push(
+    mark(
+      Kind.Stroke,
+      hue === "c" ? "m" : "c",
+      THREAD,
+      1,
+      [x - 7, waist + (rand() - 0.5) * 2, x + w / 2, waist, x + w + 7, waist + (rand() - 0.5) * 2],
+      seed * 59,
+      y,
+    ),
+  );
+  for (let k = 0; k <= turns; k++) {
+    const at = x + ((w - lean) * k) / turns + (rand() - 0.5) * 0.9;
+    const top = y + (rand() - 0.5) * 1.6;
+    const foot = y + h + (rand() - 0.5) * 1.6;
+    // Over the front of it, bellied a little as a turn of thread is.
+    out.push(
+      mark(
+        Kind.Stroke,
+        hue,
+        THREAD,
+        0.82 + rand() * 0.18,
+        [at + lean, top, at + lean * 0.62, (top + foot) / 2, at, foot],
+        seed * 53 + k,
+        y,
+      ),
+    );
+  }
+  return out;
+}
+
 /** Thread wound round a corner: a few short marks across it. */
 export function wraps(
   x: number,

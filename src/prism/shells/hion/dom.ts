@@ -89,6 +89,17 @@ export function textExtent(el: HTMLElement): [number, number] | null {
   return l < r ? [l, r] : null;
 }
 
+/** Left and right of the words a sign hangs by, from its own left edge:
+ * its own words, or those of the part of it marked `data-sign` (a charm
+ * whose name is the sign, with more beneath). */
+export function signExtent(el: HTMLElement): [number, number] | null {
+  const words = el.querySelector<HTMLElement>("[data-sign]");
+  if (!words) return textExtent(el);
+  const extent = textExtent(words);
+  const shift = words.getBoundingClientRect().left - el.getBoundingClientRect().left;
+  return extent ? [extent[0] + shift, extent[1] + shift] : null;
+}
+
 /* ---------- Measuring at rest ---------- */
 
 /** Read the page with everything at rest (no swing, no reveal offset:

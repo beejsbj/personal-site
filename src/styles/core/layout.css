@@ -23,8 +23,7 @@
   gap: var(--space-l);
   padding-block: var(--space-xl) var(--space-2xl);
 }
-.card-grid,
-.lab-grid {
+.card-grid {
   display: grid;
   gap: var(--space-xl);
 }
@@ -42,16 +41,12 @@
   padding-block: var(--space-xl) var(--space-2xl);
 }
 @media (min-width: 40.626rem) {
-  .card-grid--dense,
-  .lab-grid {
+  .card-grid--dense {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (min-width: 62.501rem) {
   .page-header {
     max-width: var(--intro-width);
-  }
-  .lab-grid--dense {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

@@ -32,7 +32,9 @@ export function linkKind(link: Element): From | undefined {
 }
 
 /** The nav ball on screen that goes where this link goes, if any. */
-export function ballFor(link: HTMLAnchorElement): HTMLAnchorElement | undefined {
+export function ballFor(
+  link: HTMLAnchorElement,
+): HTMLAnchorElement | undefined {
   const path = new URL(link.href, location.href).pathname;
   for (const ball of document.querySelectorAll<HTMLAnchorElement>(
     "a[data-ball][href]",
@@ -140,6 +142,9 @@ export function installPageTransition() {
         : null;
     if (!motion.matches || !clickedLink || event.navigationType === "traverse")
       return;
+    // A link that only changes what this page shows (narrowing the
+    // Labbook) is a turn of the page, not a trip: no cover.
+    if (clickedLink.hasAttribute("data-no-cover")) return;
     // Daylight's cover only: another lens's shell animates its own route
     // changes, and prism faces and the open prism hold still.
     if (offstage(root)) return;

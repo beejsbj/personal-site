@@ -111,6 +111,13 @@ function writeIn(page: HTMLElement, delay: number) {
     dd += 120;
   }
 
+  // an update scribbled out: the pen goes over each word in turn
+  let out = t + 200;
+  for (const p of page.querySelectorAll<SVGPathElement>(".bp-struck path")) {
+    draw(p, out, 300, "cubic-bezier(.4,0,.6,1)");
+    out += 110;
+  }
+
   // wars: camps are drawn first, soldiers pressed in, then the flicks fly
   for (const war of page.querySelectorAll<SVGSVGElement>(".bp-map__ink, .bp-miniwar, .bp-owncamp, .bp-cover-doodle")) {
     const big = war.classList.contains("bp-map__ink");

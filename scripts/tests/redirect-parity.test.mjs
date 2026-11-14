@@ -117,6 +117,7 @@ test("duplicated legacy path aliases remain declared for app and Vercel ingress"
     ["/lab/garden", "/projects/garden"],
     ["/lab/flashcards", "/projects/flashcards"],
     ["/lab/style-guide", "/style-guide"],
+    ["/lab/strudel-tools", "/lab/melograph"],
   ]) {
     assert.ok(
       vercelConfig.redirects.some(
