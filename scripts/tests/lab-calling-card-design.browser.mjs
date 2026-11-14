@@ -53,6 +53,7 @@ const CARDS = {
   "fixture-kinds-pen": ["bench", "play", 1],
   "fixture-kinds-stack": ["bench", "prints", 2],
   "fixture-kinds-note": ["bench", "words", 0],
+  "fixture-kinds-demo": ["bench", "play", 0],
   "fixture-kinds-shelved": ["shelf", "print", 1],
   "fixture-kinds-shelf-pen": ["shelf", "play", 1],
   "fixture-kinds-shelf-stack": ["shelf", "prints", 1],
@@ -191,7 +192,7 @@ test(
               // A pinned photo is nameless; a screen's poster names it.
               assert.equal(
                 pin.named,
-                pin.holds === "play" ? 1 : 0,
+                pin.holds === "play" && pin.pictures ? 1 : 0,
                 `${pin.slug}'s pictures`,
               );
             }
@@ -302,6 +303,30 @@ test(
               );
               assert.deepEqual(await pin.boundingBox(), before);
             }
+            assert.deepEqual(errors, []);
+            await context.close();
+          },
+        );
+
+        await t.test(
+          `${size}: with less motion asked for, nothing in a pin transitions, so no size can be caught mid-way`,
+          async () => {
+            // A name's size comes from its card's width. Any transition
+            // that starts when a screen plays restarts that size from
+            // nothing, and the pin is measured while it is still small.
+            const { context, page, errors } = await open(size, KINDS);
+            const transitions = await page.evaluate(() =>
+              [...document.querySelectorAll("#lens-shell .cc-pin, #lens-shell .cc-pin *")]
+                .map((el) => {
+                  const style = getComputedStyle(el);
+                  const lasting = style.transitionDuration
+                    .split(",")
+                    .some((time) => parseFloat(time) > 0);
+                  return lasting ? `${el.tagName.toLowerCase()}.${el.className}` : null;
+                })
+                .filter(Boolean),
+            );
+            assert.deepEqual(transitions, []);
             assert.deepEqual(errors, []);
             await context.close();
           },
