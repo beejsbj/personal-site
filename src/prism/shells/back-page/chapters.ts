@@ -1220,9 +1220,10 @@ function lab(b: Build) {
 /** An experiment's own pages, written up the way an exercise is: what it
  * is, the project it became (a sticky note pointing to it, ticked), what
  * it holds (its photos taped in, fanned when there are several; with none,
- * its doodle drawn large), where to try it, how it was made (its words
- * with each heading numbered in the margin, and each of its blocks stuck
- * in where the words place it), and its part of the Labbook. */
+ * its doodle drawn large; its films taped in under them), where to try
+ * it, how it was made (its words with each heading numbered in the margin,
+ * and each of its blocks stuck in where the words place it), and its part
+ * of the Labbook. */
 function labEntry(b: Build): HTMLElement[] | null {
   const { route, content, copy } = b;
   const item = content.lab.find((l) => l.slug === route.slug && l.hasPage);
@@ -1253,6 +1254,17 @@ function labEntry(b: Build): HTMLElement[] | null {
     prints.length
       ? h("div", { class: "bp-labhead", "data-count": prints.length }, snaps(prints, `head-${item.slug}`))
       : h("div", { class: "bp-bigdoodle" }, svg(doodle(kind, seed(item.slug)))),
+    ...item.media
+      .filter((m) => m.type === "video")
+      .map((m, n) => {
+        const film = taped(m.src, m.alt ?? "", `film-${item.slug}-${n}`, {
+          caption: m.caption ?? m.alt,
+          ratio: m.width && m.height ? m.width / m.height : 16 / 10,
+          video: true,
+        });
+        markPart(film, "lab.media", item.slug);
+        return film;
+      }),
     arrows(b, links, part("lab.links", item.slug)),
     ...told({ content, newTab: copy.newTab }, item, "lab.body", item.slug),
   ];
