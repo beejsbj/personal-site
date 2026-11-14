@@ -188,6 +188,27 @@
      room. */
   --labbook-margin: 2.75rem;
   --labbook-month-width: 11rem;
+  /* The Lab as a room: the Bench is a mat of graph paper things lie on;
+     a slip is taped to it; a pile of prints turns and shifts each print a
+     little more than the one above; the Shelf's boards stand this tall. */
+  --bench-grid: 1.25rem;
+  --bench-mat:
+    linear-gradient(var(--color-texture) var(--rule-width), transparent 0) 0 0 /
+      var(--bench-grid) var(--bench-grid),
+    linear-gradient(90deg, var(--color-texture) var(--rule-width), transparent 0)
+      0 0 / var(--bench-grid) var(--bench-grid);
+  --tape: color-mix(in srgb, var(--color-hover) 75%, transparent);
+  --tape-width: 4.5rem;
+  --pile-turn: 3deg;
+  --pile-shift: 0.625rem;
+  --shelf-height: 11rem;
+  /* The Labbook: an artifact's column beside an entry's words, and a
+     month's calendar page in the margin, a day to a cell. */
+  --labbook-artifact-width: 20rem;
+  --labbook-day: 1.125rem;
+  /* An experiment's page as a notebook: the words' measure, and the
+     margin the small blocks stand in beside them. */
+  --spread-text: 38rem;
 }
 @media (max-width: 40.625rem) {
   :root {

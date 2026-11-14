@@ -6,20 +6,24 @@ import Heading from "../design/primitives/Heading.astro";
 import Inline from "../design/primitives/Inline.astro";
 import Link from "../design/primitives/Link.astro";
 import type { getLabPage } from "../lib/portfolio";
-import { labPlaces } from "../lib/rules";
+import { labPlaces, labPrints } from "../lib/rules";
 import { part } from "../prism/parts";
 import type { LabEntry } from "../prism/shells/types";
 /** Composition: the Lab as a room. The page's opening, then each place
  * that holds something (the Bench, then the Shelf) under its own heading,
  * then the `labbook` slot, then the way out to more.
- * On the Bench experiments lie spread out, the featured one across the
- * whole width; on the Shelf they stand in quiet rows. A card that can be
- * played where it stands (`preview`) loads its piece on a press; the page
- * is sent the script for that only if some card can.
+ * The two places are two kinds of furniture. The Bench is a work mat of
+ * graph paper with experiments lying on it as they were put down, a touch
+ * off the straight and not quite in rows, the featured one across the
+ * whole width; each lies as what it holds (a print, a pile, something
+ * live, a slip). The Shelf is boards, its experiments standing upright
+ * and straight on them, labels underneath. A card that can be played
+ * where it stands (`preview`) loads its piece on a press; the page is
+ * sent the script for that only if some card can.
  */
 interface Props {
   page: Awaited<ReturnType<typeof getLabPage>>;
-  entries: Pick<
+  entries: (Pick<
     LabEntry,
     | "slug"
     | "detail"
@@ -30,7 +34,8 @@ interface Props {
     | "cover"
     | "preview"
     | "order"
-  >[];
+  > &
+    Partial<Pick<LabEntry, "media">>)[];
 }
 const { page, entries } = Astro.props;
 const places = labPlaces(entries);
@@ -52,25 +57,41 @@ const playable = entries.some((entry) => entry.preview);
       <p class="lab-place__note">{page.places[place].note}</p>
     </header>
     <ul class="lab-place__entries" role="list">
-      {entries.map((entry, index) => (
-        <li class:list={{ "lab-place__featured": entry.featured }}>
-          <LabCard
-            slug={entry.slug}
-            href={entry.detail}
-            title={entry.title}
-            summary={entry.summary}
-            cover={entry.cover}
-            preview={entry.preview}
-            copy={page.preview}
-            layout={
-              entry.featured ? "feature" : place === "bench" ? "card" : "row"
-            }
-            lean={
-              place === "bench" ? (index % 2 ? "right" : "left") : undefined
-            }
-          />
-        </li>
-      ))}
+      {entries.map((entry, index) => {
+        // Where it falls among the cards laid in rows (the featured one
+        // is across the width), for the column a little lower than the
+        // rest: of two abreast, the second; of three, the middle one.
+        const at = index - entries.filter((e) => e.featured).length;
+        return (
+          <li
+            class:list={{
+              "lab-place__featured": entry.featured,
+              "lab-place__lower-2": !entry.featured && at % 2 === 1,
+              "lab-place__lower-3": !entry.featured && at % 3 === 1,
+            }}
+          >
+            <LabCard
+              slug={entry.slug}
+              href={entry.detail}
+              title={entry.title}
+              summary={entry.summary}
+              prints={labPrints(entry)}
+              preview={entry.preview}
+              copy={page.preview}
+              layout={
+                entry.featured
+                  ? "feature"
+                  : place === "bench"
+                    ? "card"
+                    : "standing"
+              }
+              lean={
+                place === "bench" ? (index % 2 ? "right" : "left") : undefined
+              }
+            />
+          </li>
+        );
+      })}
     </ul>
   </section>
 ))}
@@ -119,22 +140,52 @@ const playable = entries.some((entry) => entry.preview);
     font-size: var(--text-copy);
     color: var(--color-text-soft);
   }
-  /* A Shelf row needs room for its words beside its picture: two boards
-     abreast only where each is two rails wide. */
-  .lab-place--shelf .lab-place__entries {
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(min(100%, calc(var(--rail-width) * 2)), 1fr)
-    );
+
+  /* The Bench: a mat of graph paper, its edges a little in from the
+     page's, with things lying on it. */
+  .lab-place--bench .lab-place__entries {
+    padding: var(--space-2xl) var(--space-l);
+    background: var(--bench-mat);
+    border-radius: var(--radius-note);
+    box-shadow: inset 0 0 0 var(--rule-width) var(--color-border);
+  }
+  .lab-place--bench .lab-place__featured {
+    padding-bottom: var(--space-l);
   }
   @media (min-width: 40.626rem) {
     .lab-place--bench .lab-place__entries {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: var(--space-3xl) var(--space-2xl);
+    }
+    .lab-place--bench .lab-place__lower-2 {
+      padding-top: var(--space-2xl);
     }
   }
   @media (min-width: 62.501rem) {
     .lab-place--bench .lab-place__entries {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: var(--space-2xl);
+    }
+    .lab-place--bench .lab-place__lower-2 {
+      padding-top: 0;
+    }
+    .lab-place--bench .lab-place__lower-3 {
+      padding-top: var(--space-2xl);
+    }
+  }
+
+  /* The Shelf: boards abreast, meeting, so each row is one long shelf. */
+  .lab-place--shelf .lab-place__entries {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 0;
+    row-gap: var(--space-3xl);
+  }
+  @media (min-width: 40.626rem) {
+    .lab-place--shelf .lab-place__entries {
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(var(--rail-width-mid), 1fr)
+      );
     }
   }
 </style>
