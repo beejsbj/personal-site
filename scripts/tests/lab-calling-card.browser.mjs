@@ -1286,6 +1286,89 @@ test(
           },
         );
 
+        if (size === "desktop")
+          await t.test(
+            "desktop: a mouse at rest over a list's item does not take the focus when the screen mounts",
+            async () => {
+              const items = "#lens-shell [data-state]:not(.cc-tabs__tab)";
+              /** Where the screen put the focus, and which item it selected. */
+              const where = (page) =>
+                page.evaluate((items) => {
+                  const on = document.activeElement;
+                  return {
+                    path: location.pathname,
+                    focus: `${on.tagName.toLowerCase()}.${on.className}`,
+                    selected: [...document.querySelectorAll(items)].findIndex(
+                      (el) => el.dataset.state === "selected",
+                    ),
+                  };
+                }, items);
+              /** The screen, arrived at by a link and no movement of the mouse. */
+              const arrive = async (from, to, park) => {
+                const { context, page } = await open(
+                  size,
+                  `${from}?lens=calling-card`,
+                );
+                if (park) await page.mouse.move(park.x, park.y);
+                await page.evaluate(
+                  (to) => document.querySelector(`a[href="${to}"]`).click(),
+                  to,
+                );
+                await page.waitForFunction(
+                  ([to, items]) =>
+                    location.pathname === to &&
+                    document.querySelector(items) !== null,
+                  [to, items],
+                );
+                await page.waitForTimeout(1500);
+                const found = await where(page);
+                // Moved, the same pointer does reach for it.
+                if (park) {
+                  await page.mouse.move(park.x + 2, park.y + 2);
+                  found.reached = await where(page);
+                }
+                await context.close();
+                return found;
+              };
+              for (const [from, to] of [
+                ["/", "/projects"],
+                ["/", "/lab"],
+                ["/projects", "/"],
+              ]) {
+                // The middle of an item the screen did not select, found with
+                // no mouse about.
+                const calm = await open(size, `${to}?lens=calling-card`);
+                const spot = await calm.page.evaluate((items) => {
+                  for (const el of document.querySelectorAll(items)) {
+                    if (el.dataset.state !== "idle") continue;
+                    const { left, top, width, height } =
+                      el.getBoundingClientRect();
+                    const x = left + width / 2;
+                    const y = top + height / 2;
+                    if (document.elementFromPoint(x, y)?.closest("[data-state]") === el)
+                      return { x, y };
+                  }
+                  return null;
+                }, items);
+                await calm.context.close();
+                assert.ok(spot, `${to} has an unselected item in reach`);
+                const rested = await arrive(from, to, spot);
+                const { reached, ...mounted } = rested;
+                assert.deepEqual(
+                  mounted,
+                  await arrive(from, to),
+                  `${from} to ${to}: focus and selection stay where the screen put them`,
+                );
+                assert.ok(
+                  reached.selected > -1 &&
+                    reached.selected !== mounted.selected &&
+                    reached.focus.startsWith("a."),
+                  `${from} to ${to}: once it moves, the item under it is selected and focused (${JSON.stringify(reached)})`,
+                );
+              }
+            },
+          );
+
         await t.test(
           `${size}: an experiment that says little leaves no empty label, and no record`,
           async () => {
