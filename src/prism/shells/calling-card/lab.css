@@ -533,6 +533,94 @@
 :root[data-lens="calling-card"] .cc-tv__status:empty {
   display: none;
 }
+/* Played from its pin, the screen is thrown up big over the board, as the
+   game cuts to a screen: the same white bezel, black keyline and red block
+   behind, its name on a black strip slanted like a menu's, and the way
+   back where the prompt was. It snaps in from the pin. */
+:root[data-lens="calling-card"] .stage-window {
+  --stage-window-width: 48rem;
+  gap: 0.9rem;
+  padding: 0 9px 9px 0;
+}
+:root[data-lens="calling-card"] .stage-window__bar {
+  padding: 0.3rem 0.4rem 0.3rem 1.1rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  transform: skewX(-12deg);
+  box-shadow: 5px 5px 0 var(--cc-red);
+}
+:root[data-lens="calling-card"] .stage-window__name {
+  font-family: var(--cc-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+:root[data-lens="calling-card"] .stage-window__close {
+  min-height: 2.75rem;
+  padding: 0.15rem 1rem 0.1rem;
+  background: var(--cc-white);
+  color: var(--cc-black);
+  border: 3px solid var(--cc-black);
+  font-family: var(--cc-display);
+  font-size: 1rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+:root[data-lens="calling-card"] .stage-window__close:hover {
+  background: var(--cc-red);
+  color: var(--cc-white);
+}
+:root[data-lens="calling-card"] .stage-window__glass {
+  background:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
+    var(--cc-ink);
+  border: 4px solid var(--cc-white);
+  outline: 3px solid var(--cc-black);
+  box-shadow: 9px 9px 0 var(--cc-red), 9px 9px 0 3px var(--cc-black);
+}
+:root[data-lens="calling-card"] .stage-window__still {
+  filter: saturate(0.85) brightness(0.8);
+}
+:root[data-lens="calling-card"] .stage-window__says {
+  inset: auto auto 0.8rem 0.8rem;
+  padding: 0.2rem 0.7rem;
+  background: var(--cc-black);
+  color: var(--cc-white);
+  font-family: var(--cc-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="calling-card"] .stage-window:popover-open {
+    transition:
+      scale 260ms var(--cc-snap),
+      rotate 260ms var(--cc-snap),
+      opacity 120ms linear;
+  }
+  @starting-style {
+    :root[data-lens="calling-card"] .stage-window:popover-open {
+      rotate: -6deg;
+    }
+  }
+}
+@media (max-width: 40rem) {
+  :root[data-lens="calling-card"] .stage-window__name {
+    font-size: 1.05rem;
+  }
+}
+
+/* Thrown up big, the screen says it is loading on its own glass; under
+   the pin the words are heard, not shown, so the pin does not grow. */
+:root[data-lens="calling-card"] .cc-request__tv .cc-tv__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* On the board, the screen's words are white on the red curtain. */
 :root[data-lens="calling-card"] .cc-request__tv .cc-tv__note,
 :root[data-lens="calling-card"] .cc-request__tv .cc-tv__status {
