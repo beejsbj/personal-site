@@ -127,9 +127,14 @@ function palaceMap(map: HTMLElement, signal: AbortSignal) {
     marks.replaceChildren(
       ...cards().map((card, i) => {
         const box = at(card);
-        // The edge the corridor comes in by: the one facing the spine.
-        const x = box.x + box.w / 2 < spine ? box.x + box.w : box.x;
-        return h("span", { class: "cc-route__mark", style: `translate:${round(x)}px ${round(stops[i].y)}px` });
+        // The edge the corridor comes in by: the one facing the spine, or,
+        // for a room across it (the Treasure), its foot.
+        const middle = box.x + box.w / 2;
+        const [x, y] =
+          Math.abs(middle - spine) < 8
+            ? [spine, box.y + box.h]
+            : [middle < spine ? box.x + box.w : box.x, stops[i].y];
+        return h("span", { class: "cc-route__mark", style: `translate:${round(x)}px ${round(y)}px` });
       }),
     );
     point(selected);
