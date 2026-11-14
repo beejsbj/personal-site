@@ -100,16 +100,26 @@
 :root[data-lens="calling-card"] .cc-map {
   --spine: 0.5;
   position: relative;
+  /* Room above the first target for the cursor over it. */
+  margin-top: 1.6rem;
 }
 :root[data-lens="calling-card"] [data-lab-place="bench"] .cc-place__list {
   position: relative;
   z-index: 1;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.4rem 3.4rem;
+  gap: 1.4rem 4.6rem;
 }
 :root[data-lens="calling-card"] [data-lab-place="bench"] .cc-pin {
   grid-column: var(--col, auto);
   grid-row: var(--row, auto) / span 2;
+  width: var(--room, 100%);
+}
+/* A room set back from the spine stands at its wing's outer edge. */
+:root[data-lens="calling-card"] [data-lab-place="bench"] .cc-pin[style*="--col:1"] {
+  justify-self: start;
+}
+:root[data-lens="calling-card"] [data-lab-place="bench"] .cc-pin[style*="--col:2"] {
+  justify-self: end;
 }
 :root[data-lens="calling-card"] [data-lab-place="bench"] .cc-pin[data-lab-featured] {
   grid-column: 1 / -1;
@@ -137,6 +147,25 @@
   stroke: var(--cc-red);
   stroke-width: 11;
   stroke-dasharray: 26 7;
+}
+/* Where a corridor meets its target: a red diamond on the room's edge. */
+:root[data-lens="calling-card"] .cc-route__marks {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+}
+:root[data-lens="calling-card"] .cc-route__mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: -0.575rem 0 0 -0.575rem;
+  background: var(--cc-red);
+  border: 3px solid var(--cc-white);
+  outline: 3px solid var(--cc-black);
+  rotate: 45deg;
 }
 /* The map's cursor, over the target selected. */
 :root[data-lens="calling-card"] .cc-route__here {
@@ -1637,9 +1666,12 @@
     padding-left: 1.6rem;
   }
   :root[data-lens="calling-card"] [data-lab-place="bench"] .cc-pin,
+  :root[data-lens="calling-card"] [data-lab-place="bench"] .cc-pin[style*="--col"],
   :root[data-lens="calling-card"] [data-lab-place="bench"] .cc-pin[data-lab-featured] {
     grid-column: 1;
     grid-row: auto;
+    justify-self: stretch;
+    width: auto;
     margin-bottom: 0;
   }
   :root[data-lens="calling-card"] .cc-place__list {

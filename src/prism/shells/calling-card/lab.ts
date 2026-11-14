@@ -73,8 +73,12 @@ const SCREENS = { bench: "map", shelf: "compendium" } as const;
  * route zigzags down between them. */
 function wing(j: number, treasure: boolean) {
   const row = j + (treasure ? 2 : 1);
-  return `--col:${(j % 2) + 1};--row:${row}`;
+  return `--col:${(j % 2) + 1};--row:${row};--room:${ROOMS[j % ROOMS.length]}%`;
 }
+/** How much of its wing each target's room takes: rooms of different
+ * sizes, some reaching the spine and some set back from it, so the
+ * corridors to them run different lengths. */
+const ROOMS = [100, 86, 78, 100, 92, 80, 100, 84];
 
 /** The map's route and its cursor, for the eye alone: the route calls at
  * every target in the board's order, turning only at right angles as a
@@ -83,9 +87,11 @@ function wing(j: number, treasure: boolean) {
  * again whenever the map changes size. */
 function palaceMap(map: HTMLElement, signal: AbortSignal) {
   const route = svg('<path class="cc-route__casing"/><path class="cc-route__path"/>', { class: "cc-route" });
+  // Where each corridor meets its target: a marker over the room's edge.
+  const marks = h("div", { class: "cc-route__marks", "aria-hidden": "true" });
   const here = h("span", { class: "cc-route__here", "aria-hidden": "true", hidden: true });
   map.prepend(route);
-  map.append(here);
+  map.append(marks, here);
   let selected = -1;
   /** An element's place in the map, by layout alone. */
   const at = (el: HTMLElement) => {
@@ -118,6 +124,14 @@ function palaceMap(map: HTMLElement, signal: AbortSignal) {
     });
     const d = turns.map(({ x, y }, i) => `${i ? "L" : "M"}${round(x)} ${round(y)}`).join(" ");
     for (const path of route.querySelectorAll("path")) path.setAttribute("d", d);
+    marks.replaceChildren(
+      ...cards().map((card, i) => {
+        const box = at(card);
+        // The edge the corridor comes in by: the one facing the spine.
+        const x = box.x + box.w / 2 < spine ? box.x + box.w : box.x;
+        return h("span", { class: "cc-route__mark", style: `translate:${round(x)}px ${round(stops[i].y)}px` });
+      }),
+    );
     point(selected);
   };
   /** The cursor over target `i`, or put away when the selection is off
