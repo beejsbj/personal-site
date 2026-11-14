@@ -25,6 +25,7 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import test from "node:test";
+import pen from "../../src/lib/pen-chrome.json" with { type: "json" };
 import { chromium } from "./lib/chromium.mjs";
 import { serveRuntimeFixture } from "./lib/runtime-fixture.mjs";
 
@@ -58,9 +59,8 @@ const ROOMS = {
 /** The Pens on the Lab, one in each place. */
 const CARDS = ["fixture-kinds-pen", "fixture-kinds-shelf-pen"];
 const BOOK_PEN = "u-fixture-replay";
-/** CodePen's embed, measured: a 1px border round a 50px bar of tabs above
- * the result and a 30px toolbar below it. */
-const CHROME = { top: 51, right: 1, bottom: 31, left: 1 };
+/** CodePen's embed, as the stage assumes it (src/lib/pen-chrome.json). */
+const CHROME = pen;
 /** Big enough to see the piece: at least this on a desktop; on a phone,
  * the screen's width but for a margin either side. */
 const LEAST = { width: 320, height: 240 };

@@ -31,6 +31,7 @@
  * in needs nothing set up. */
 
 import "../styles/stage-window.css";
+import penChrome from "./pen-chrome.json";
 
 /** What a stage is showing, and how to put it away. */
 const showing = new Map<HTMLElement, () => void>();
@@ -102,12 +103,20 @@ function makeFrame(src: string, title: string) {
 /** CodePen's embed draws a bar of tabs over a Pen's result and a toolbar
  * under it, whatever its address asks: `default-tab=result` chooses the
  * tab that is open, and nothing an account like this site's can ask for
- * leaves the bars out. So a Pen's frame is made larger than the room it
- * is shown through by exactly those bars, and the room, which clips, shows
- * the result alone. Measured on the embed, the same at every size: a 1px
- * border round a 50px bar of tabs and a 30px toolbar. The link out to the
- * Pen's own page is always beside it. */
-const PEN_CHROME = { top: 51, right: 1, bottom: 31, left: 1 };
+ * leaves the bars out (its full-page view is no way round them: framed
+ * from another site it adds a warning banner and breaks Pens written in
+ * Vue). So a Pen's frame is made larger than the room it is shown through
+ * by exactly those bars, and the room, which clips, shows the result
+ * alone. The sizes are in `pen-chrome.json`, the one place they are kept:
+ * a 1px border round a 50px bar of tabs and a 30px toolbar, the same at
+ * every size. They are CodePen's, so they can change without this site
+ * changing: `node scripts/checks/codepen-embed-bars.mjs` measures a real
+ * embed against them (it is not part of `pnpm test`; it needs to reach
+ * CodePen, which answers an automated browser only some of the time, and
+ * says what to do when it does not). The link out to the Pen's own page
+ * is always beside it. */
+const PEN_CHROME: Record<"top" | "right" | "bottom" | "left", number> =
+  penChrome;
 const PEN = /^https:\/\/codepen\.io\/[\w-]+\/embed\//;
 
 
