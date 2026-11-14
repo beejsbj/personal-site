@@ -63,7 +63,9 @@ const {
 } = Astro.props;
 // A Pen or a demo plays on the shared stage, so its script is sent with them.
 const playable = Astro.props.updates.some(
-  ({ artifact }) => artifact?.kind === "pen" || artifact?.kind === "demo",
+  (update) =>
+    "artifact" in update &&
+    (update.artifact?.kind === "pen" || update.artifact?.kind === "demo"),
 );
 const months = labbookMonths(Astro.props.updates);
 const subjects = labbookSubjects(Astro.props.updates, shown);
