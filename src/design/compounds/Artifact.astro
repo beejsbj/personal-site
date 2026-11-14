@@ -9,9 +9,10 @@ import { embedSrc, type Artifact } from "../../lib/labbook";
  * another site until that click: the frame is made then, in the stage's
  * own room, and takes the focus. It plays on the shared stage
  * (src/lib/block-stage.ts), so only one plays at a time on a page, a
- * card's Pen included, and Escape puts it away. Without scripts the pill is
- * an ordinary link to where the thing lives, as the link under the stage
- * always is.
+ * card's Pen included, and Escape puts it away. The page that shows one
+ * sends that script (`BlockScript`, which the Labbook renders). Without
+ * scripts the pill is an ordinary link to where the thing lives, as the
+ * link under the stage always is.
  * A poster kept on another site would be a request before the click, so
  * only one of the site's own is shown.
  */
@@ -84,11 +85,6 @@ const home =
     </figcaption>
   </figure>
 )}
-<script>
-  // The stage that loads a card's Pen loads this one, so one plays at a
-  // time across the page and Escape puts it away (src/lib/block-stage.ts).
-  import "../../lib/block-stage";
-</script>
 <style>
   .artifact {
     display: grid;
