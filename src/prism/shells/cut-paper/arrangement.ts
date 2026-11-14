@@ -113,7 +113,8 @@ export function rolesLane(env: Env, range: Range) {
   );
 }
 
-/** Update flags on the marker lane. */
+/** Update flags on the marker lane: a link where the update goes
+ * somewhere, a pin where it does not. */
 export function markersLane(env: Env, range: Range) {
   const { content, session, transport, signal } = env;
   let previous = -Infinity;
@@ -129,7 +130,9 @@ export function markersLane(env: Env, range: Range) {
         // close dates stagger into rows so each flag stays a target
         row = clip.start - previous < (range.to - range.from) / 60 ? (row + 1) % 3 : 0;
         previous = clip.start;
-        const el = link(update.href, { class: "cp-flag", style: `--at:${place(clip.start, range)}; --row:${row}`, tabindex: "-1", title: `${update.dateLabel} · ${update.title}` }, h("span", { class: "cp-flag__pin" }));
+        const attrs = { class: "cp-flag", style: `--at:${place(clip.start, range)}; --row:${row}`, title: `${update.dateLabel} · ${update.title}` };
+        const pin = h("span", { class: "cp-flag__pin" });
+        const el = update.href ? link(update.href, { ...attrs, tabindex: "-1" }, pin) : h("span", attrs, pin);
         transport.watch(el, clip.start, clip.start + MONTH, signal, "markers");
         hoverAudition(env, el, clip);
         return el;

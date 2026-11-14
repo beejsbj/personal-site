@@ -36,7 +36,7 @@
   :root[data-lens="back-page"] .bp-page[data-fresh] .bp-flow li:not(:has(img, video, figure, p)) {
     clip-path: inset(0 100% 0 0);
   }
-  :root[data-lens="back-page"] .bp-page[data-fresh] :is(.bp-underline, .bp-tally, .bp-doodle, .bp-owncamp, .bp-map__ink, .bp-miniwar, .bp-cover-doodle) {
+  :root[data-lens="back-page"] .bp-page[data-fresh] :is(.bp-underline, .bp-tally, .bp-doodle, .bp-struck, .bp-owncamp, .bp-map__ink, .bp-miniwar, .bp-cover-doodle) {
     opacity: 0;
   }
   :root[data-lens="back-page"] .bp-map__ink .bp-dot,

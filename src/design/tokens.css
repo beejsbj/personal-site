@@ -179,6 +179,38 @@
   --page-ball-max: 12rem;
   --page-reach: 150vmax;
   --skip-hidden: translateY(calc(-100% - var(--space-l)));
+  /* A redaction bar: what one unit of its length is, and how tall it is,
+     against the words it stands in for. */
+  --redaction-unit: 0.9em;
+  --redaction-height: 1.2em;
+  /* The Labbook as a notebook: the margin an entry's day sits in, and the
+     column a month's name stands in beside its entries where there is
+     room. */
+  --labbook-margin: 2.75rem;
+  --labbook-month-width: 11rem;
+  /* The Lab as a room: the Bench is a mat of graph paper things lie on;
+     a slip is taped to it; a pile of prints turns and shifts each print a
+     little more than the one above; the Shelf's boards stand this tall. */
+  --bench-grid: 1.25rem;
+  --bench-mat:
+    linear-gradient(var(--color-texture) var(--rule-width), transparent 0) 0 0 /
+      var(--bench-grid) var(--bench-grid),
+    linear-gradient(90deg, var(--color-texture) var(--rule-width), transparent 0)
+      0 0 / var(--bench-grid) var(--bench-grid);
+  --tape: color-mix(in srgb, var(--color-hover) 75%, transparent);
+  --tape-width: 4.5rem;
+  --pile-turn: 3deg;
+  --pile-shift: 0.625rem;
+  --shelf-height: 11rem;
+  --shelf-piece-compact: 7.5rem;
+  /* The Labbook: an artifact's column beside an entry's words, and a
+     month's calendar page in the margin, a day to a cell. */
+  --labbook-artifact-width: 20rem;
+  --labbook-day: 1.125rem;
+  --labbook-day-dot: 0.15;
+  /* An experiment's page as a notebook: the words' measure, and the
+     margin the small blocks stand in beside them. */
+  --spread-text: 38rem;
 }
 @media (max-width: 40.625rem) {
   :root {

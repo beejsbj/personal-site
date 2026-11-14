@@ -3186,3 +3186,340 @@
   z-index: 1;
   pointer-events: none;
 }
+
+/* ==========================================================================
+   The Lab (screens.ts lab, logbook)
+   The Bench is a loop its experiments hang in, still in play: charms on
+   drops, the featured one hung like a sign across the row. The Shelf is a
+   loop of wefts, an experiment's name strung on each, gone quiet. The
+   Labbook is a strand, a knot for every update; a redacted update is its
+   words bound up in thread.
+   ========================================================================== */
+
+/* What a place is for, said under its heading. */
+:root[data-lens="hion"] .hion-place__note {
+  margin: -0.5em 0 0;
+  text-align: center;
+}
+
+/* ---------- The Bench ---------- */
+
+/* The first cord hangs clear of the note above it. */
+:root[data-lens="hion"] .hion-loop--bench .hion-row--lab {
+  margin-top: 1.1rem;
+}
+
+:root[data-lens="hion"] .hion-work--featured {
+  --hion-drop: 62px;
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 32rem;
+  padding-left: 0;
+  text-align: center;
+}
+
+:root[data-lens="hion"] .hion-screen .hion-work--featured .hion-work__title {
+  font-size: clamp(2rem, 4.2vw, 3.1rem);
+  line-height: 1.18;
+  letter-spacing: var(--hion-display-track);
+}
+
+:root[data-lens="hion"] .hion-work--featured .hion-work__summary {
+  font-size: var(--hion-text-size);
+}
+
+/* ---------- The Shelf ---------- */
+
+:root[data-lens="hion"] .hion-shelf {
+  display: grid;
+  gap: 2.8rem;
+  margin: 3rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* By turns to the left and the right of the loop, so the wefts come in
+   long from one strand and short from the other. */
+:root[data-lens="hion"] .hion-shelved .hion-strung {
+  margin: 0 auto 0.45em 0;
+  font-size: 1.5rem;
+  text-align: left;
+}
+
+:root[data-lens="hion"] .hion-shelved:nth-child(2n) .hion-strung {
+  margin: 0 0 0.45em auto;
+  text-align: right;
+}
+
+:root[data-lens="hion"] .hion-shelved .hion-strung a {
+  text-decoration: none;
+}
+
+:root[data-lens="hion"] .hion-shelved__summary {
+  max-width: 30em;
+  margin: 0;
+  font-size: calc(var(--hion-text-size) * 0.92);
+  line-height: 1.6;
+}
+
+:root[data-lens="hion"] .hion-shelved:nth-child(2n) .hion-shelved__summary {
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ---------- The Labbook ---------- */
+
+:root[data-lens="hion"] .hion-knots--labbook {
+  --hion-knot-gap: 3.4rem;
+}
+
+/* A link to an update lands with room above it. */
+:root[data-lens="hion"] .hion-logged {
+  scroll-margin-top: 30vh;
+}
+
+:root[data-lens="hion"] .hion-logged .hion-tied__summary {
+  margin-top: 0.5em;
+}
+
+/* What it is about: said, with the way there. Its link, an artifact's
+   way out and the links in the Lab's closing aside are underlined in
+   chalk, as links in prose are. */
+:root[data-lens="hion"] .hion-logged__about {
+  margin: 0.5em 0 0;
+  font-size: calc(var(--hion-text-size) * 0.92);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+:root[data-lens="hion"] .hion-logged__about span {
+  color: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion-logged[data-hue="m"] .hion-logged__about span {
+  color: var(--hion-c);
+}
+
+:root[data-lens="hion"] :is(.hion-logged__about, .hion-artifact__home, .hion-loop--more .hion-aside) a {
+  color: var(--hion-cl);
+  text-decoration: none;
+  background: var(--hion-tooth-c) 0 100% / 64px 2px repeat-x;
+  padding-bottom: 2px;
+  transition: color 0.2s;
+}
+
+:root[data-lens="hion"] :is(.hion-logged__about, .hion-artifact__home, .hion-loop--more .hion-aside) a:hover {
+  color: var(--hion-c);
+}
+
+/* The update a link landed on: a bead of light rests on its knot, as one
+   rests at the tip of a hion that is waiting for you. */
+:root[data-lens="hion"] .hion-logged > .hion-knot {
+  position: relative;
+}
+
+:root[data-lens="hion"] .hion-logged[data-landed] > .hion-knot::after {
+  --hion-bead: var(--hion-c);
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--hion-bead) 30%, white) 0 18%,
+    color-mix(in srgb, var(--hion-bead) 75%, transparent) 32%,
+    color-mix(in srgb, var(--hion-bead) 22%, transparent) 56%,
+    transparent 72%
+  );
+  animation: hion-breathe 2.6s ease-in-out infinite;
+}
+
+:root[data-lens="hion"] .hion-logged[data-landed][data-hue="m"] > .hion-knot::after {
+  --hion-bead: var(--hion-m);
+}
+
+:root[data-lens="hion"] .hion[data-still] .hion-logged[data-landed] > .hion-knot::after {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-lens="hion"] .hion-logged[data-landed] > .hion-knot::after {
+    animation: none;
+  }
+}
+
+/* A redacted update: where its title's words would be, each is bound up,
+   thread wound tight round it from end to end (ink.ts `bound`). A binding
+   is as long as its number (--hion-bar, set on it). */
+:root[data-lens="hion"] .hion-bound {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6em 0.75em;
+  margin: 0.3em 0 0.5em;
+  font-size: 1.5rem;
+}
+
+:root[data-lens="hion"] .hion-bound > [data-redaction-bar] {
+  --hion-bar: 1;
+  position: relative;
+  width: calc(var(--hion-bar) * 0.8em);
+  max-width: 100%;
+  height: 0.8em;
+}
+
+/* A word it shows is a title's word (.hion-tied__title): written by the
+   thread, over the bindings' own drawing. */
+:root[data-lens="hion"] .hion-bound > .hion-bound__word {
+  position: relative;
+  z-index: 1;
+  text-wrap: wrap;
+}
+
+:root[data-lens="hion"] .hion-bound > .hion-ink {
+  z-index: 0;
+}
+
+/* What an update shows for itself, tied on under its words. */
+:root[data-lens="hion"] .hion-artifact {
+  width: 26rem;
+  max-width: 100%;
+  margin: 1.1rem 0 0;
+}
+
+:root[data-lens="hion"] .hion-artifact .hion-picture__frame {
+  aspect-ratio: 16 / 10;
+}
+
+/* The whole of the thing made, not a crop of it. */
+:root[data-lens="hion"] .hion-artifact .hion-picture__frame :is(img, video) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+:root[data-lens="hion"] .hion-artifact[data-hue] .hion-picture__frame:has(video) {
+  background: var(--hion-black);
+}
+
+/* Its own colours come back when the update is reached for. */
+:root[data-lens="hion"] .hion-logged:is(:hover, :focus-within) .hion-picture__frame img {
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-lens="hion"] .hion-artifact audio {
+  display: block;
+  width: 100%;
+  color-scheme: dark;
+}
+
+:root[data-lens="hion"] .hion-artifact .hion-picture__caption,
+:root[data-lens="hion"] .hion-artifact__home {
+  margin-top: 0.5em;
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.3rem * var(--hion-hand-scale))/1.4 var(--hion-hand);
+  color: var(--hion-text);
+  text-align: inherit;
+}
+
+/* A Pen or a demo: the place kept for it, tacked out in stitches, its
+   poster (if the site has one) behind a slip of the black paper with the
+   cord to pull. The place is the frame's from the start, so pulling the
+   cord moves nothing. */
+:root[data-lens="hion"] .hion-kept {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  padding: 1rem;
+  outline: 2px dashed color-mix(in srgb, var(--hion-c) 70%, transparent);
+  outline-offset: -2px;
+  text-align: center;
+}
+
+:root[data-lens="hion"] [data-hue="m"] > .hion-kept {
+  outline-color: color-mix(in srgb, var(--hion-m) 70%, transparent);
+}
+
+:root[data-lens="hion"] .hion-kept__poster,
+:root[data-lens="hion"] .hion-kept > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+:root[data-lens="hion"] .hion-kept__poster .hion-picture__frame {
+  height: 100%;
+}
+
+:root[data-lens="hion"] .hion-kept > iframe {
+  border: 0;
+  background: var(--hion-cl);
+}
+
+:root[data-lens="hion"] .hion-kept__ask {
+  position: relative;
+  max-width: 100%;
+  padding: 0.7rem 1.2rem 0.9rem;
+  background: var(--hion-black);
+}
+
+:root[data-lens="hion"] .hion-kept__label {
+  max-width: 16em;
+  margin: 0 0 0.2em;
+  font: var(--hion-hand-style) var(--hion-hand-weight) calc(1.5rem * var(--hion-hand-scale))/1.3 var(--hion-hand);
+  color: var(--hion-cl);
+}
+
+:root[data-lens="hion"] .hion-kept .hion-pullcord {
+  width: fit-content;
+  margin-inline: auto;
+  text-align: left;
+}
+
+:root[data-lens="hion"] button.hion-pullcord__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+:root[data-lens="hion"] .hion-kept__note {
+  margin: 0.5em 0 0;
+  font-size: calc(var(--hion-text-size) * 0.78);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+@media (min-width: 720px) {
+  /* On the hions' left, what is tied on is set against them. */
+  :root[data-lens="hion"] .hion-tied[data-side="l"] .hion-bound {
+    justify-content: flex-end;
+  }
+
+  :root[data-lens="hion"] .hion-tied[data-side="l"] .hion-artifact {
+    margin-left: auto;
+  }
+}
+
+/* Phones: the place's wefts and bindings take the column's width. */
+@media (max-width: 719px) {
+  :root[data-lens="hion"] .hion-work--featured {
+    text-align: left;
+  }
+
+  :root[data-lens="hion"] .hion-shelf {
+    gap: 2.2rem;
+  }
+}

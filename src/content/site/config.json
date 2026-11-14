@@ -74,6 +74,34 @@
     "github": "GitHub",
     "substack": "Substack",
     "bjslab": "bjslab",
-    "manual": "A note"
+    "manual": "A note",
+    "codepen": "CodePen"
+  },
+  "blocks": {
+    "compare": {
+      "before": "Before",
+      "after": "After"
+    },
+    "embed": {
+      "load": {
+        "pen": "Play the Pen here",
+        "demo": "Run the demo here",
+        "deck": "Open the deck here"
+      },
+      "open": {
+        "pen": "Open it on CodePen",
+        "demo": "Open the demo on its own",
+        "deck": "Open the deck on its own"
+      },
+      "close": "Put it away",
+      "note": "Nothing loads until you ask."
+    },
+    "model": {
+      "load": "Load the 3D view",
+      "close": "Put it away",
+      "note": "Nothing loads until you ask.",
+      "hint": "Drag to turn it and scroll to zoom. The arrow keys turn it too.",
+      "failed": "This could not be shown in 3D here."
+    }
   }
 }

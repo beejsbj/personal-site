@@ -76,6 +76,69 @@ export function orderLab<T extends { order: number; title: string }>(
   );
 }
 
+export type LabPlace = "bench" | "shelf";
+const LAB_PLACES: LabPlace[] = ["bench", "shelf"];
+
+/** The Lab's places in page order, the Bench then the Shelf, leaving out a
+ * place nothing sits in. In each, the featured entry leads and the rest
+ * follow `orderLab`. */
+export function labPlaces<
+  T extends {
+    place: LabPlace;
+    featured?: boolean;
+    order: number;
+    title: string;
+  },
+>(entries: T[]): { place: LabPlace; entries: T[] }[] {
+  const ordered = orderLab(entries);
+  return LAB_PLACES.map((place) => {
+    const here = ordered.filter((entry) => entry.place === place);
+    return {
+      place,
+      entries: [
+        ...here.filter((entry) => entry.featured),
+        ...here.filter((entry) => !entry.featured),
+      ],
+    };
+  }).filter((group) => group.entries.length > 0);
+}
+
+/** The pictures an experiment's card holds on the list: its cover, then
+ * its other pictures, three at most and each once. With no cover it has
+ * none: it is written on a slip of paper. */
+export function labPrints(entry: {
+  cover?: string;
+  media?: { type: string; src: string }[];
+}): string[] {
+  if (!entry.cover) return [];
+  const prints = [entry.cover];
+  for (const item of entry.media ?? [])
+    if (item.type === "image" && !prints.includes(item.src))
+      prints.push(item.src);
+  return prints.slice(0, 3);
+}
+
+/** The project an experiment graduated into, when it says it did. */
+export function graduatedProject<P extends { slug: string }>(
+  entry: { graduatedTo?: string },
+  projects: P[],
+): P | undefined {
+  return projects.find((project) => project.slug === entry.graduatedTo);
+}
+
+/** Every experiment that graduated names a project that is there. Naming
+ * one nobody wrote is a mistake in the content, and stops the build. */
+export function checkGraduations(
+  lab: { slug: string; graduatedTo?: string }[],
+  projects: { slug: string }[],
+): void {
+  for (const entry of lab)
+    if (entry.graduatedTo && !graduatedProject(entry, projects))
+      throw new Error(
+        `No project has the slug "${entry.graduatedTo}" (graduatedTo in lab/${entry.slug}.md).`,
+      );
+}
+
 // ---- resume -------------------------------------------------------------------
 
 const MONTHS = [

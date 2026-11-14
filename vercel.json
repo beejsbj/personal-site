@@ -12,6 +12,11 @@
       "permanent": true
     },
     {
+      "source": "/lab/strudel-tools",
+      "destination": "/lab/melograph",
+      "permanent": true
+    },
+    {
       "source": "/lab/flashcards",
       "destination": "/projects/flashcards",
       "permanent": true

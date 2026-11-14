@@ -20,7 +20,6 @@
 :root[data-lens="calling-card"] .cc-item__file,
 :root[data-lens="calling-card"] .cc-confidant__file,
 :root[data-lens="calling-card"] .cc-status__body,
-:root[data-lens="calling-card"] .cc-brief__paper,
 :root[data-lens="calling-card"] .cc-doc__sheet {
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -524,209 +523,6 @@
 }
 :root[data-lens="calling-card"] .cc-pager:hover {
   transform: skewX(-10deg) translateY(-3px);
-}
-
-/* =====================================================================
-   REQUESTS: the lab
-   ===================================================================== */
-:root[data-lens="calling-card"] .cc-requests .cc-screen__bg,
-:root[data-lens="calling-card"] .cc-brief .cc-screen__bg {
-  background: var(--cc-black);
-}
-:root[data-lens="calling-card"] .cc-requests__curtain {
-  inset: 0;
-  background:
-    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.35) 0 14px, transparent 14px 46px, rgb(255 255 255 / 0.06) 46px 50px, transparent 50px 70px),
-    linear-gradient(180deg, var(--cc-red-deep), var(--cc-red-dark));
-  clip-path: polygon(40% 0, 100% 0, 100% 100%, 30% 100%);
-}
-:root[data-lens="calling-card"] .cc-requests__star {
-  right: -8vmax;
-  top: -8vmax;
-  width: 30vmax;
-  aspect-ratio: 1;
-  transform: rotate(20deg);
-}
-:root[data-lens="calling-card"] .cc-requests__board {
-  position: absolute;
-  z-index: 3;
-  left: 30vw;
-  right: 3vw;
-  top: 7rem;
-  bottom: 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2.4rem;
-  margin: 0;
-  padding: 0 1rem;
-  list-style: none;
-  overflow-x: auto;
-}
-:root[data-lens="calling-card"] .cc-requests__board > li {
-  flex: 0 1 22rem;
-  min-width: 17rem;
-}
-:root[data-lens="calling-card"] .cc-request {
-  position: relative;
-  display: grid;
-  gap: 0.7rem;
-  padding: 1.6rem 1.4rem 0;
-  background:
-    radial-gradient(circle, rgb(0 0 0 / 0.06) 0 1.4px, transparent 1.9px) 0 0 / 9px 9px,
-    var(--cc-paper);
-  color: var(--cc-black);
-  text-decoration: none;
-  border: 3px solid var(--cc-black);
-  box-shadow: 12px 12px 0 var(--cc-black);
-  transform: rotate(calc(-4deg + var(--i) * 6deg)) translateY(calc(var(--i) * 1.6rem));
-  transition: transform 160ms var(--cc-snap), box-shadow 120ms;
-  animation: calling-card-fly-up 420ms var(--cc-out) both;
-  animation-delay: calc(100ms + var(--i) * 80ms);
-}
-:root[data-lens="calling-card"] .cc-request__no {
-  font-family: var(--cc-display);
-  font-size: 0.9rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--cc-red-ink);
-}
-:root[data-lens="calling-card"] .cc-request__status {
-  position: absolute;
-  top: 0.9rem;
-  right: 1rem;
-  padding: 0.1rem 0.6rem;
-  border: 3px solid var(--cc-red-ink);
-  color: var(--cc-red-ink);
-  font-family: var(--cc-display);
-  font-size: 1.1rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  transform: rotate(10deg);
-}
-:root[data-lens="calling-card"] .cc-request__title {
-  font-size: 2.3rem;
-  line-height: 1;
-  --cc-box-bg: var(--cc-black);
-  --cc-box-fg: var(--cc-white);
-}
-:root[data-lens="calling-card"] .cc-request__meta {
-  display: grid;
-  gap: 0.1rem;
-  font-size: 0.9rem;
-}
-:root[data-lens="calling-card"] .cc-request__meta b {
-  font-family: var(--cc-display);
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--cc-red-ink);
-}
-:root[data-lens="calling-card"] .cc-request__summary {
-  font-size: 1rem;
-  line-height: 1.5;
-}
-:root[data-lens="calling-card"] .cc-request__accept {
-  margin: 0.4rem -1.4rem 0;
-  padding: 0.7rem 1.4rem;
-  background: var(--cc-black);
-  color: var(--cc-white);
-  font-family: var(--cc-display);
-  font-size: 1.05rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-:root[data-lens="calling-card"] .cc-request__accept kbd {
-  display: inline-grid;
-  place-items: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  background: var(--cc-white);
-  color: var(--cc-black);
-  border-radius: 50%;
-}
-:root[data-lens="calling-card"] .cc-request[data-state="selected"] {
-  z-index: 2;
-  transform: rotate(calc(-2deg + var(--i) * 3deg)) translateY(calc(var(--i) * 1.6rem - 0.9rem)) scale(1.05);
-  box-shadow: 12px 12px 0 var(--cc-red), 12px 12px 0 3px var(--cc-black);
-}
-:root[data-lens="calling-card"] .cc-request[data-state="selected"] .cc-request__accept {
-  background: var(--cc-red);
-}
-
-/* Brief: a lab entry */
-:root[data-lens="calling-card"] .cc-brief__paper {
-  position: absolute;
-  z-index: 3;
-  left: 50%;
-  top: 4.6rem;
-  max-height: calc(100% - 8.2rem);
-  width: min(46rem, 92vw);
-  display: grid;
-  align-content: start;
-  justify-items: start;
-  gap: 1rem;
-  padding: 1.6rem 2rem 2.4rem;
-  background:
-    radial-gradient(circle, rgb(0 0 0 / 0.06) 0 1.4px, transparent 1.9px) 0 0 / 9px 9px,
-    var(--cc-paper);
-  color: var(--cc-black);
-  border: 3px solid var(--cc-black);
-  box-shadow: 14px 14px 0 var(--cc-black);
-  transform: translateX(-50%) rotate(-1.2deg);
-}
-:root[data-lens="calling-card"] .cc-screen[data-enter="in"] .cc-brief__paper {
-  animation: calling-card-fly-up 420ms var(--cc-out) both 80ms;
-}
-:root[data-lens="calling-card"] .cc-brief__paper > * {
-  margin: 0;
-}
-:root[data-lens="calling-card"] .cc-brief__no {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  font-family: var(--cc-display);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--cc-red-ink);
-}
-:root[data-lens="calling-card"] .cc-brief__no span {
-  padding: 0 0.5rem;
-  border: 3px solid var(--cc-red-ink);
-  transform: rotate(8deg);
-}
-:root[data-lens="calling-card"] .cc-brief__title {
-  color: var(--cc-black);
-  text-shadow: none;
-  --cc-box-bg: var(--cc-black);
-  --cc-box-fg: var(--cc-white);
-}
-:root[data-lens="calling-card"] .cc-brief__summary {
-  font-family: var(--cc-didone);
-  font-weight: 700;
-  font-style: italic;
-  font-size: 1.25rem;
-  line-height: 1.35;
-}
-:root[data-lens="calling-card"] .cc-brief__meta {
-  display: flex;
-  gap: 1.4rem;
-}
-:root[data-lens="calling-card"] .cc-brief__meta dt {
-  font-family: var(--cc-display);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--cc-red-ink);
-}
-:root[data-lens="calling-card"] .cc-brief__meta dd {
-  margin: 0;
-  font-weight: 700;
-}
-:root[data-lens="calling-card"] .cc-brief__paper .cc-prose a {
-  color: var(--cc-black);
-}
-:root[data-lens="calling-card"] .cc-brief__paper .cc-back {
-  box-shadow: 4px 4px 0 var(--cc-red);
 }
 
 /* =====================================================================
@@ -1390,8 +1186,7 @@
   :root[data-lens="calling-card"] .cc-status__head,
   :root[data-lens="calling-card"] .cc-status__body,
   :root[data-lens="calling-card"] .cc-doc__head,
-  :root[data-lens="calling-card"] .cc-doc__sheet,
-  :root[data-lens="calling-card"] .cc-brief__paper {
+  :root[data-lens="calling-card"] .cc-doc__sheet {
     position: relative;
     inset: auto;
     left: auto;
@@ -1503,31 +1298,6 @@
   }
   :root[data-lens="calling-card"] .cc-item__pager {
     flex-direction: column;
-  }
-  :root[data-lens="calling-card"] .cc-say.cc-requests__intro {
-    position: relative;
-    left: auto;
-    bottom: auto;
-    width: auto;
-    margin-top: 0.8rem;
-    padding: 1.35rem 1.2rem 1.1rem;
-  }
-  :root[data-lens="calling-card"] .cc-requests__curtain {
-    clip-path: polygon(0 24%, 100% 14%, 100% 100%, 0 100%);
-  }
-  :root[data-lens="calling-card"] .cc-requests__board {
-    display: grid;
-    gap: 2rem;
-    padding: 0.5rem 0.6rem 0;
-  }
-  :root[data-lens="calling-card"] .cc-request,
-  :root[data-lens="calling-card"] .cc-request[data-state="selected"] {
-    transform: rotate(calc(-1.5deg + var(--i) * 3deg));
-  }
-  :root[data-lens="calling-card"] .cc-brief__paper {
-    max-height: none;
-    transform: rotate(-0.8deg);
-    padding: 1.2rem 1.1rem 1.8rem;
   }
   :root[data-lens="calling-card"] .cc-confidant__rays {
     clip-path: polygon(0 0, 100% 0, 100% 20%, 0 36%);

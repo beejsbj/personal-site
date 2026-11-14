@@ -2,18 +2,38 @@
  * of pages written in that book's pens. There's a book for each section,
  * each on its own paper (themes.ts): hello in the squared maths copy, study
  * notes in the quiet notebook with the resume stapled in after them, slip by
- * slip, doodles in the graph book, the war on blueprint, its map first
+ * slip, the lab in the graph book (a bench of doodles, a shelf, and the
+ * Labbook kept as dated lines), the war on blueprint, its map first
  * and a page for each project after, and the essays written out in a marbled
  * composition book, its contents first and each essay after.
  *
  * Every word comes from content: the portfolio and Daylight's copy from
  * `content`, the books' own handwriting from `content.lenses["back-page"]`. */
+import {
+  embedSrc,
+  experimentUpdates,
+  labbookAnchor,
+  labbookMonths,
+  labbookSubjects,
+  monthCalendar,
+  monthLabel,
+  narrowedTo,
+  narrowHref,
+  penUser,
+  relatedLinks,
+  subjectsOf,
+  type Artifact,
+  type Narrowing,
+  type Update as LabbookUpdate,
+} from "../../../lib/labbook";
+import { graduatedProject, labPlaces, labPrints } from "../../../lib/rules";
 import { markPart, part, type Part } from "../../parts";
 import { blocks, fallbackBody, featured, fill, inline } from "../rich";
 import type { Route, SiteContent, WritingPost } from "../types";
 import { h, handDate, link, shortDate, svg } from "./dom";
 import {
   BLUE,
+  DOODLES,
   RED,
   arrow,
   camp,
@@ -23,16 +43,17 @@ import {
   flick,
   miniWar,
   ring,
+  scribbledOut,
   seed,
   shading,
   strike,
   tally,
-  tapeClip,
   tick,
   underline,
 } from "./ink";
 import { paginate, type Blank } from "./paginate";
 import { studyNotes } from "./studynotes";
+import { liveCard, snaps, stage, taped, told } from "./stuck";
 import { BOOKS, type BookKey } from "./themes";
 import { RESUME_PATH } from "../../routes";
 
@@ -58,21 +79,20 @@ export interface Stop {
   label: string;
   /** Which book it's in. */
   book: BookKey;
-  /** The number of its first page, counted in its own book. */
-  page: number;
+  /** The number of its first page, counted in its own book; null where it
+   * is counted only when written (the lab's experiments: see `labStart`). */
+  page: number | null;
 }
 
 // ---- the books' order ------------------------------------------------------
 
 /** How many pages each stop is given, filled or not, so where a stop starts
  * never depends on how far the ones before it run today. Every book counts
- * its own pages from 1: the lab opens with its own pages and gives each
- * entry that has one a pair of its own after; the war is its map and roll
- * call first, then a few pages for each project. */
+ * its own pages from 1: the war is its map and roll call first, then a few
+ * pages for each project. The lab book is given none: it is numbered as it
+ * is written, its own pages first, then each experiment's on from the last
+ * (`labStart`). */
 const ALLOWANCE = {
-  /** The lab's own opening pages, before its entries'. */
-  labHead: 2,
-  labEntry: 2,
   /** The war map's pages, before the projects'. */
   war: 2,
   project: 3,
@@ -87,9 +107,9 @@ export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
   const names = copy.chapters;
   const stops: Stop[] = [];
   let page = 1;
-  const add = (book: BookKey, href: string, label: string, pages: number) => {
-    stops.push({ key: href, href, label, book, page });
-    page += pages;
+  const add = (book: BookKey, href: string, label: string, pages: number | null) => {
+    stops.push({ key: href, href, label, book, page: pages === null ? null : page });
+    page += pages ?? 0;
   };
   add("home", "/", names.home, 1);
   page = 1;
@@ -98,10 +118,10 @@ export function bookOrder(content: SiteContent, copy: Copy): Stop[] {
   // page is counted from the notes when it's written: see `resume`)
   add("about", RESUME_PATH, names.resume, 1);
   page = 1;
-  add("lab", "/lab", names.lab, ALLOWANCE.labHead);
+  add("lab", "/lab", names.lab, 0);
   content.lab
     .filter((item) => item.hasPage)
-    .forEach((item) => add("lab", item.detail, item.title, ALLOWANCE.labEntry));
+    .forEach((item) => add("lab", item.detail, item.title, null));
   page = 1;
   add("projects", "/projects", names.projects, ALLOWANCE.war);
   content.projects.forEach((project) =>
@@ -158,6 +178,9 @@ export interface Build {
   spread: boolean;
   stage: HTMLElement;
   today: string;
+  /** Where the visitor is, path and query: the Labbook is narrowed by the
+   * query, and its links to narrow it keep the rest. */
+  at: string;
 }
 
 type Paper = "squared" | "kraft" | "kraft-in" | "notes" | "ruled";
@@ -268,36 +291,6 @@ const prose = (html: string, name: Part, ref: string) =>
 function withUnderline(el: HTMLElement, ink: string, key: string, twice = false) {
   el.append(svg(underline(ink, seed(key), twice)));
   return el;
-}
-
-function taped(
-  src: string,
-  alt: string,
-  key: string,
-  opts: { caption?: string; ratio?: number; video?: boolean; cls?: string } = {},
-) {
-  const rng = seed(key);
-  const tilt = ((rng() - 0.5) * 3).toFixed(2);
-  const media = opts.video
-    ? h("video", {
-        src,
-        muted: true,
-        playsinline: true,
-        controls: true,
-        preload: "metadata",
-        "aria-label": alt || null,
-      })
-    : h("img", { src, alt, loading: "lazy", decoding: "async" });
-  if (opts.ratio) media.style.aspectRatio = String(opts.ratio);
-  const fig = h(
-    "figure",
-    { class: `bp-taped ${opts.cls ?? ""}`.trim(), style: `--tilt:${tilt}deg` },
-    h("span", { class: "bp-tape bp-tape--a", style: `clip-path:${tapeClip(rng)}`, "aria-hidden": "true" }),
-    h("span", { class: "bp-tape bp-tape--b", style: `clip-path:${tapeClip(rng)}`, "aria-hidden": "true" }),
-    h("span", { class: "bp-taped__frame" }, media),
-  );
-  if (opts.caption) fig.append(h("figcaption", null, opts.caption));
-  return fig;
 }
 
 // ---- the cover --------------------------------------------------------------------
@@ -540,7 +533,8 @@ function home(b: Build): HTMLElement[] {
     ),
   ];
 
-  // the diary: dated lines, newest first
+  // the diary: dated lines, newest first; an update with nowhere to go is
+  // its title, not a link
   const diary = h("ol", { class: "bp-diary", "aria-label": updates.listLabel });
   for (const u of content.updates) {
     diary.append(
@@ -548,7 +542,7 @@ function home(b: Build): HTMLElement[] {
         "li",
         { "data-kind": u.kind, ...part("update.item", u.id) },
         h("time", { class: "bp-mnote", datetime: u.date }, shortDate(u.date, copy.months)),
-        h("p", { class: "bp-diary__title" }, link(u.href, copy.newTab, u.title)),
+        h("p", { class: "bp-diary__title" }, u.href ? link(u.href, copy.newTab, u.title) : u.title),
         h("p", { class: "bp-diary__summary" }, u.summary),
         h("p", { class: "bp-diary__src" }, `${u.sourceLabel} · ${u.kindLabel}`),
       ),
@@ -755,29 +749,419 @@ function resume(b: Build) {
  * the notes run to at this size. */
 function resumeStart(b: Build) {
   const notes = b.order.find((stop) => stop.key === "/about");
-  if (!notes) return firstPage(b);
+  if (notes?.page == null) return firstPage(b);
   const route: Route = { ...b.route, kind: "about", path: notes.href };
   return notes.page + aboutPages({ ...b, route }).pages.length;
 }
 
-// ---- the lab: doodles in the margin ----------------------------------------------------
+// ---- the lab: a bench, a shelf and a labbook ------------------------------------------
 
-function labCard(b: Build, item: LabItem, i: number) {
-  const rng = seed(item.slug);
+/** An experiment's name, linked to where it lives: its own page in this
+ * book or, marked with an arrow out, somewhere else. */
+const experimentLink = (b: Build, item: LabItem) =>
+  link(
+    item.detail,
+    b.copy.newTab,
+    item.title,
+    item.hasPage ? null : h("span", { class: "bp-out", "aria-hidden": "true" }, " ↗"),
+  );
+
+/** The doodle each experiment is given: one picked by its name, and while
+ * there are doodles to spare, one no other experiment has. */
+function doodleKinds(lab: LabItem[]) {
+  const kinds = new Map<string, number>();
+  const used = new Set<number>();
+  for (const { entries } of labPlaces(lab))
+    for (const item of entries) {
+      let kind = Math.floor(seed(`doodle-${item.slug}`)() * DOODLES);
+      if (used.size < DOODLES) while (used.has(kind)) kind = (kind + 1) % DOODLES;
+      used.add(kind);
+      kinds.set(item.slug, kind);
+    }
+  return kinds;
+}
+
+/** A place in the lab, written across the page: what it's called, ruled
+ * under, and a line about it. It stays with whatever comes under it, and
+ * is where the contents' line for it turns to (`id`). */
+function placeHead(
+  words: { title: string; note?: string },
+  key: string,
+  place?: string,
+  id?: string,
+) {
   return h(
-    "article",
-    { class: "bp-labitem", "data-side": i % 2 ? "right" : "left" },
-    svg(doodle(i, rng)),
-    h("h2", { class: "bp-h2", ...part("lab.title", item.slug) }, link(item.detail, b.copy.newTab, item.title)),
-    h("p", { ...part("lab.summary", item.slug) }, item.summary),
-    h("p", { class: "bp-labitem__meta", ...part("lab.meta", item.slug) }, `${item.type} · ${item.sourceEra}`),
+    "div",
+    { class: "bp-sechead", id: id ?? null, "data-bp-keep": "", "data-lab-place": place ?? null },
+    withUnderline(h("h2", { class: "bp-h2" }, words.title), RED, key),
+    words.note ? h("p", { class: "bp-sub" }, jotted(words.note)) : null,
   );
 }
 
+/** What an experiment holds, and so how it lies on the Bench: something to
+ * play where it lies, several pictures, one, or only words. */
+type Holds = "play" | "prints" | "print" | "words";
+function holds(item: LabItem): Holds {
+  if (item.preview) return "play";
+  const n = labPrints(item).length;
+  return n > 1 ? "prints" : n ? "print" : "words";
+}
+
+/** The words for playing an experiment where it lies, by what it is. */
+function playWords(b: Build, item: LabItem & { preview: NonNullable<LabItem["preview"]> }) {
+  const words = b.content.pages.lab.preview;
+  return {
+    data: { frame: item.preview.frame },
+    title: item.title,
+    load: words.load[item.preview.kind],
+    close: words.close,
+    loading: words.loading,
+    note: words.note,
+    mark: part("lab.preview", item.slug),
+  };
+}
+
+/** An experiment on the bench, as rough work lies: its name and what it
+ * is, beside what it holds. Only words: a doodle in the margin. A
+ * picture: the photo taped in; several: two or three of them fanned.
+ * Something to play: its picture taped in across the page, with a sticky
+ * note on it that starts it there. The one given pride of place is drawn
+ * larger, starred, and ruled under twice. */
+function benchEntry(b: Build, item: LabItem, i: number, kind: number) {
+  const title = h("h3", { class: "bp-labitem__title", ...part("lab.title", item.slug) }, experimentLink(b, item));
+  const holding = holds(item);
+  return h(
+    "article",
+    {
+      class: "bp-labitem",
+      "data-side": i % 2 ? "right" : "left",
+      "data-featured": !!item.featured,
+      "data-holds": holding,
+    },
+    holding === "words"
+      ? svg(doodle(kind, seed(item.slug)))
+      : holding === "play"
+      ? null
+      : snaps(labPrints(item), `bench-${item.slug}`),
+    item.featured ? withUnderline(title, RED, `lab-${item.slug}`, true) : title,
+    h("p", { ...part("lab.summary", item.slug) }, item.summary),
+    item.preview
+      ? liveCard(
+          { ...playWords(b, { ...item, preview: item.preview }), ratio: "16/10", poster: item.cover },
+          `play-${item.slug}`,
+        )
+      : null,
+  );
+}
+
+/** The shelf: a library card stapled in, a line for each experiment put
+ * away, and beside a line whose experiment has a picture, the picture as
+ * the library stamps it, in ink. A stamp that can be played is played in
+ * its own square, pressed from the line under it. A long card runs on to
+ * a second overleaf. */
+function shelfCard(b: Build, entries: LabItem[], label: string) {
+  return h(
+    "ol",
+    { class: "bp-shelfcard", "aria-label": label },
+    ...entries.map((item) => {
+      const cover = item.cover
+        ? h("img", { src: item.cover, alt: "", loading: "lazy", decoding: "async" })
+        : null;
+      const play = item.preview
+        ? stage(
+            { ...playWords(b, { ...item, preview: item.preview }), ratio: "4/3" },
+            "bp-stamp",
+            cover,
+          )
+        : null;
+      return h(
+        "li",
+        { "data-holds": play ? "play" : cover ? "stamp" : "words", "data-stage-room": play ? "" : null },
+        play
+          ? h("span", { class: "bp-stamp__room" }, play.room, play.status)
+          : cover
+          ? h("span", { class: "bp-stamp__room", "aria-hidden": "true" }, h("span", { class: "bp-stamp" }, cover))
+          : null,
+        h("h3", { class: "bp-shelfcard__title", ...part("lab.title", item.slug) }, experimentLink(b, item)),
+        h("p", { ...part("lab.summary", item.slug) }, item.summary),
+        play ? h("p", { class: "bp-shelfcard__play" }, play.button) : null,
+      );
+    }),
+  );
+}
+
+/** What an update shows for itself, taped in. A picture, a film and a
+ * sound are there to look at or play. A Pen or a demo is a blank card, or
+ * its poster when this site keeps one, with the way to start it written
+ * on: nothing is asked of another site until that is pressed (index.ts
+ * makes the frame then), and the link under it always opens it where it
+ * lives. */
+function artifactFigure(b: Build, artifact: Artifact, key: string): HTMLElement | null {
+  const { kind, src, alt } = artifact;
+  const words = b.content.pages.lab.labbook.artifact;
+  const poster = artifact.poster?.startsWith("/") ? artifact.poster : undefined;
+  const ratio = 16 / 10;
+  if (kind === "image" || kind === "video") {
+    const fig = taped(src, alt, key, { ratio, video: kind === "video", cls: "bp-artifact" });
+    fig.dataset.artifact = kind;
+    if (poster) fig.querySelector("video")?.setAttribute("poster", poster);
+    return fig;
+  }
+  if (kind === "sound") {
+    const fig = taped(src, alt, key, {
+      caption: alt,
+      cls: "bp-artifact",
+      framed: h("audio", { src, controls: true, preload: "none", "aria-label": alt }),
+    });
+    fig.dataset.artifact = kind;
+    return fig;
+  }
+  const frame = embedSrc(artifact, penUser(b.content.site));
+  if (!frame) return null;
+  // where it lives: the Pen's own page, or the demo itself
+  const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
+  const stage = h(
+    "span",
+    {
+      class: "bp-ask",
+      style: `aspect-ratio:${ratio}`,
+      "data-block-stage": "",
+      "data-artifact-frame": frame,
+      "data-artifact-title": alt,
+    },
+    poster ? h("img", { src: poster, alt, loading: "lazy", decoding: "async" }) : null,
+    h(
+      "span",
+      { class: "bp-ask__note", "data-stage-ask": "" },
+      poster ? null : h("span", { class: "bp-ask__what" }, alt),
+      h("a", { class: "bp-ask__load", href: home, "data-artifact-load": "" }, words.load[kind]),
+      h("span", { class: "bp-ask__small" }, words.note),
+    ),
+  );
+  const fig = taped(src, alt, key, { cls: "bp-artifact", framed: stage });
+  fig.dataset.artifact = kind;
+  fig.dataset.stageRoom = "";
+  fig.append(h("figcaption", null, link(home, b.copy.newTab, `${words.open[kind]} ↗`)));
+  return fig;
+}
+
+/** A run of updates as dated lines, the way the diary on the first page is
+ * kept. An open update has its day in the margin, what happened (a link
+ * when it has somewhere to go, text when it has not) and where it came
+ * from; in the Labbook itself (`full`) it is also where a link to it would
+ * land (its `id`), and it says what it is about and shows its artifact. A
+ * redacted update is its day, the kind of work, and its line: a word it
+ * shows written as a title is, and a scribble over each word it does not,
+ * one for each bar of its shape, as long as the bar says, running on and
+ * wrapping as a title does. Aloud, its words are read and each scribble
+ * is said once. Only its shape and date are read, whatever else arrives
+ * with it. */
+function updateLines(b: Build, updates: LabbookUpdate[], label: string, full: boolean) {
+  const { content, copy } = b;
+  const words = content.pages.lab.labbook;
+  const { updateKinds, updateSources } = content.site;
+  const list = h("ol", { class: "bp-diary bp-log", "aria-label": label });
+  for (const u of updates) {
+    const when = h("time", { class: "bp-mnote", datetime: u.date }, shortDate(u.date, copy.months));
+    const id = full ? labbookAnchor(u.id) : null;
+    if (u.visibility !== "open") {
+      const { work, parts } = u.shape;
+      const rng = seed(`struck-${u.id}`);
+      list.append(
+        h(
+          "li",
+          { id, "data-redacted": "", ...part("update.redacted", u.id) },
+          when,
+          h(
+            "p",
+            { class: "bp-log__struck" },
+            h("span", { class: "bp-sr" }, words.redacted.label),
+            h(
+              "span",
+              { class: "bp-log__line", "data-redaction-line": "" },
+              ...parts.flatMap((shown) => {
+                if (typeof shown === "string")
+                  return [h("span", { class: "bp-log__word", "data-redaction-word": "" }, shown), " "];
+                const bar = Number(shown) || 1;
+                const mark = h(
+                  "span",
+                  { "data-redaction-bar": "", style: `--len:${bar}` },
+                  h("span", { class: "bp-sr" }, words.redacted.bar),
+                );
+                mark.append(svg(scribbledOut(bar, BLUE, rng)));
+                return [mark, " "];
+              }),
+            ),
+          ),
+          h("p", { class: "bp-diary__src" }, words.redacted.works[work]),
+        ),
+      );
+      continue;
+    }
+    const about = full ? relatedLinks(u, content) : [];
+    list.append(
+      h(
+        "li",
+        { id, "data-kind": u.kind, ...part("update.item", u.id) },
+        when,
+        h(
+          "p",
+          { class: "bp-diary__title" },
+          u.href ? link(u.href, copy.newTab, u.title) : u.title,
+        ),
+        h("p", { class: "bp-diary__summary" }, u.summary),
+        h(
+          "p",
+          { class: "bp-diary__src" },
+          `${updateSources[u.source] ?? u.source} · ${updateKinds[u.kind] ?? u.kind}`,
+        ),
+        about.length
+          ? h(
+              "p",
+              { class: "bp-log__about" },
+              ...about.flatMap((to, i) => [
+                i ? " · " : "",
+                `${words.related[to.kind]}: `,
+                link(to.href, copy.newTab, to.title),
+              ]),
+            )
+          : null,
+        full && u.artifact ? artifactFigure(b, u.artifact, `artifact-${u.id}`) : null,
+      ),
+    );
+  }
+  return list;
+}
+
+/** What the Labbook can be narrowed to, and what the address narrows it
+ * to: one experiment or project it is about, or nothing. */
+function narrowing(b: Build) {
+  const { content } = b;
+  const shown = { lab: content.lab, projects: content.projects };
+  const subjects = labbookSubjects(content.labbook, shown);
+  const asked = narrowedTo(new URL(b.at, "https://book.invalid").search);
+  const subject = asked && subjects.find((s) => s.kind === asked.kind && s.slug === asked.slug);
+  const updates = subject
+    ? content.labbook.filter((u) =>
+        subjectsOf(u, shown).some((s) => s.kind === subject.kind && s.slug === subject.slug),
+      )
+    : content.labbook;
+  return { subjects, subject, updates };
+}
+
+/** Who the Labbook is about, as a tally chart ruled on the squares: a row
+ * for each experiment and project, its name (the way to follow only it),
+ * a stroke for each entry about it, and what it is. The one followed now
+ * is ringed. */
+function tallyChart(b: Build, subjects: ReturnType<typeof narrowing>["subjects"], on?: Narrowing) {
+  const words = b.content.pages.lab.labbook;
+  const said = (n: number) =>
+    n === 1 ? words.narrow.count.one : words.narrow.count.other.replace("{count}", String(n));
+  return [
+    h("p", { class: "bp-tallies__label", "data-bp-keep": "" }, jotted(words.narrow.label)),
+    h(
+      "ul",
+      { class: "bp-tallies", "aria-label": words.narrow.label },
+      ...subjects.map((subject) => {
+        const here = on?.kind === subject.kind && on.slug === subject.slug;
+        return h(
+          "li",
+          { "data-here-subject": here },
+          h(
+            "a",
+            {
+              href: narrowHref(subject, b.at),
+              "aria-current": here ? "true" : null,
+              ...part("labbook.subject", `${subject.kind}:${subject.slug}`),
+            },
+            subject.title,
+            h("span", { class: "bp-sr" }, `, ${said(subject.count)}`),
+          ),
+          svg(tally(subject.count, here ? RED : BLUE, seed(`tally-${subject.kind}-${subject.slug}`))),
+          h("span", { class: "bp-tallies__kind" }, words.related[subject.kind]),
+        );
+      }),
+    ),
+  ];
+}
+
+/** A month of the Labbook headed the way a lesson is dated: its name,
+ * ruled under twice, and beside it the month drawn as a calendar on the
+ * squares, Monday first, a ring round each day written in. The calendar is
+ * for the eye alone (the entries say it all) and links nowhere. */
+function monthHead(month: string, updates: LabbookUpdate[]) {
+  const { lead, days } = monthCalendar(month, updates);
+  const rng = seed(`month-${month}`);
+  return h(
+    "div",
+    { class: "bp-month", id: `labbook-${month}`, "data-bp-keep": "" },
+    h(
+      "span",
+      { class: "bp-cal", "aria-hidden": "true", style: `--lead:${lead}` },
+      ...days.map(({ day, updates: on }) =>
+        h(
+          "span",
+          { "data-on": on.length > 0, style: on.length ? `--turn:${((rng() - 0.5) * 40).toFixed(0)}deg` : null },
+          String(day),
+        ),
+      ),
+    ),
+    withUnderline(
+      h("h3", { class: "bp-month__name", ...part("labbook.month", month) }, monthLabel(month)),
+      RED,
+      `month-${month}`,
+      true,
+    ),
+  );
+}
+
+/** The contents, at the front of the book as an exercise book keeps them:
+ * each place and each of the Labbook's latest months, with the page it
+ * starts on, the numbers filled in once the pages are written. Following a
+ * line turns to it. */
+const CONTENTS_MONTHS = 6;
+function contents(b: Build, rows: { id: string; label: string; sub?: boolean }[]) {
+  return h(
+    "nav",
+    { class: "bp-contents", "aria-label": b.copy.lab.contents },
+    h("p", { class: "bp-contents__title", "aria-hidden": "true" }, b.copy.lab.contents),
+    h(
+      "ol",
+      null,
+      ...rows.map((row) =>
+        h(
+          "li",
+          { "data-sub": !!row.sub },
+          h("a", { href: `#${row.id}`, "data-contents": row.id }, row.label),
+          h("span", { class: "bp-contents__dots", "aria-hidden": "true" }),
+          h("span", { class: "bp-contents__page" }),
+        ),
+      ),
+    ),
+  );
+}
+
+/** Write each contents line's page number, from the pages as written. */
+function numberContents(b: Build, pages: HTMLElement[], first: number) {
+  for (const a of pages.flatMap((page) => [...page.querySelectorAll<HTMLAnchorElement>("[data-contents]")])) {
+    const at = pages.findIndex((page) => page.querySelector(`[id="${CSS.escape(a.dataset.contents!)}"]`));
+    const cell = a.parentElement!.querySelector(".bp-contents__page")!;
+    if (at < 0) {
+      a.parentElement!.remove();
+      continue;
+    }
+    cell.textContent = fill(b.copy.lab.page, { n: first + at });
+  }
+}
+
 function lab(b: Build) {
-  const page = b.content.pages.lab;
-  const { header } = page;
-  const blocks: HTMLElement[] = [
+  const { content } = b;
+  const page = content.pages.lab;
+  const { header, places, labbook } = page;
+  const kept = narrowing(b);
+  const months = labbookMonths(kept.updates);
+  const groups = labPlaces(content.lab);
+  const blocks: (HTMLElement | null)[] = [
     h(
       "header",
       { class: "bp-entryhead" },
@@ -789,21 +1173,67 @@ function lab(b: Build) {
       withUnderline(h1(header.title, part("page.title", "lab")), RED, "lab-title"),
       header.intro ? h("p", { class: "bp-lead", ...part("page.intro", "lab") }, header.intro) : null,
     ),
-    ...b.content.lab.map((item, i) => labCard(b, item, i)),
+    contents(b, [
+      ...groups.map(({ place }) => ({ id: `lab-${place}`, label: places[place].title })),
+      ...(content.labbook.length
+        ? [
+            { id: "labbook", label: labbook.title },
+            ...months
+              .slice(0, CONTENTS_MONTHS)
+              .map(({ month }) => ({ id: `labbook-${month}`, label: monthLabel(month), sub: true })),
+          ]
+        : []),
+    ]),
   ];
-  return written(b, "lab", "squared", blocks, firstPage(b), null);
+  const kinds = doodleKinds(content.lab);
+  let n = 0;
+  for (const { place, entries } of groups) {
+    blocks.push(placeHead(places[place], `lab-${place}`, place, `lab-${place}`));
+    if (place === "bench")
+      for (const item of entries) blocks.push(benchEntry(b, item, n++, kinds.get(item.slug) ?? n));
+    else blocks.push(shelfCard(b, entries, places[place].title));
+  }
+  if (content.labbook.length) {
+    blocks.push(placeHead(labbook, "labbook", undefined, "labbook"));
+    // narrowed, it says so first, where a link to narrow it lands
+    if (kept.subject)
+      blocks.push(
+        h(
+          "p",
+          { class: "bp-narrowed" },
+          `${labbook.narrow.showing} `,
+          h("b", null, kept.subject.title),
+          ". ",
+          h("a", { href: narrowHref(undefined, b.at) }, labbook.narrow.all),
+        ),
+      );
+    if (kept.subjects.length) blocks.push(...tallyChart(b, kept.subjects, kept.subject));
+    for (const { month, updates } of months)
+      blocks.push(monthHead(month, updates), updateLines(b, updates, monthLabel(month), true));
+  }
+  const first = firstPage(b) ?? 1;
+  const pages = written(b, "lab", "squared", blocks.filter((el) => !!el), first, null);
+  numberContents(b, pages, first);
+  return pages;
 }
 
+/** An experiment's own pages, written up the way an exercise is: what it
+ * is, the project it became (a sticky note pointing to it, ticked), what
+ * it holds (its photos taped in, fanned when there are several; with none,
+ * its doodle drawn large), where to try it, how it was made (its words
+ * with each heading numbered in the margin, and each of its blocks stuck
+ * in where the words place it), and its part of the Labbook. */
 function labEntry(b: Build): HTMLElement[] | null {
   const { route, content, copy } = b;
   const item = content.lab.find((l) => l.slug === route.slug && l.hasPage);
   if (!item) return null;
   const { detail } = content.pages.lab;
-  const i = content.lab.indexOf(item);
-  const links = item.href
-    ? [{ label: fill(copy.lab.tryIt, { era: item.sourceEra }), url: item.href }, ...item.links]
-    : item.links;
-  const blocks: HTMLElement[] = [
+  const kind = doodleKinds(content.lab).get(item.slug) ?? 0;
+  const links = item.href ? [{ label: copy.lab.tryIt, url: item.href }, ...item.links] : item.links;
+  const became = graduatedProject(item, content.projects);
+  const updates = experimentUpdates(content.labbook, item.slug);
+  const prints = labPrints(item);
+  const blocks: (HTMLElement | null)[] = [
     h(
       "header",
       { class: "bp-entryhead" },
@@ -811,18 +1241,52 @@ function labEntry(b: Build): HTMLElement[] | null {
       withUnderline(h1(item.title, part("lab.title", item.slug)), RED, `lab-${item.slug}`),
       h("p", { class: "bp-lead", ...part("lab.summary", item.slug) }, item.summary),
     ),
-    h("div", { class: "bp-bigdoodle" }, svg(doodle(i, seed(item.slug)))),
-    fields(
-      [
-        [detail.labels.type, item.type],
-        [detail.labels.era, item.sourceEra],
-      ],
-      part("lab.meta", item.slug),
-    ),
+    became
+      ? h(
+          "a",
+          { class: "bp-sticky bp-grad", href: became.href, ...part("lab.graduation", item.slug) },
+          svg(tick(RED, seed(`grad-${item.slug}`))),
+          h("small", { class: "bp-sticky__where" }, detail.labels.graduated),
+          h("span", { class: "bp-sticky__label" }, `${became.title} →`),
+        )
+      : null,
+    prints.length
+      ? h("div", { class: "bp-labhead", "data-count": prints.length }, snaps(prints, `head-${item.slug}`))
+      : h("div", { class: "bp-bigdoodle" }, svg(doodle(kind, seed(item.slug)))),
     arrows(b, links, part("lab.links", item.slug)),
-    ...prose(item.html, "lab.body", item.slug),
+    ...told({ content, newTab: copy.newTab }, item, "lab.body", item.slug),
   ];
-  return written(b, "lab-entry", "squared", blocks, firstPage(b), null);
+  if (updates.length)
+    blocks.push(
+      placeHead({ title: detail.labels.updates }, `log-${item.slug}`),
+      updateLines(b, updates, detail.labels.updates, false),
+    );
+  return written(b, "lab-entry", "squared", blocks.filter((el) => !!el), labStart(b), null);
+}
+
+/** An experiment's first page: the next after the lab's own pages and every
+ * experiment's before it, however many pages each runs to at this size. */
+function labStart(b: Build) {
+  const lab = b.order.find((stop) => stop.key === "/lab");
+  if (lab?.page == null) return null;
+  let page = lab.page + pagesIn(b, { ...b.route, kind: "lab", path: lab.href, slug: undefined });
+  for (const item of b.content.lab.filter((one) => one.hasPage)) {
+    if (item.detail === b.route.path) return page;
+    page += pagesIn(b, { ...b.route, kind: "lab-entry", path: item.detail, slug: item.slug });
+  }
+  return null;
+}
+
+/** How many pages a chapter runs to at this size, the Labbook unnarrowed:
+ * written once for each size the book lies open at, without the book's
+ * order, so it numbers nothing and counts no other chapter. */
+const counted = new WeakMap<SiteContent, Map<string, number>>();
+function pagesIn(b: Build, route: Route) {
+  const sizes = counted.get(b.content) ?? new Map<string, number>();
+  counted.set(b.content, sizes);
+  const key = `${b.stage.dataset.mode} ${b.stage.style.cssText} ${route.path}`;
+  if (!sizes.has(key)) sizes.set(key, chapter({ ...b, route, order: [], at: route.path }).pages.length);
+  return sizes.get(key)!;
 }
 
 // ---- a project: its own page, the screenshot taped in -------------------------------
@@ -890,7 +1354,7 @@ function project(b: Build): HTMLElement[] | null {
     if (n === 0) fig.dataset.bpBreak = "right";
     blocks.push(fig);
   });
-  blocks.push(...prose(p.html, "project.body", p.slug));
+  blocks.push(...told({ content, newTab: copy.newTab }, p, "project.body", p.slug));
   blocks.push(
     h("p", { class: "bp-arrowlink" }, h("a", { href: detail.back.href }, `← ${copy.project.back}`)),
   );

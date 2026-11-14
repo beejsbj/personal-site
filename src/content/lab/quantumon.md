@@ -1,8 +1,7 @@
 ---
 title: "Quantumon"
 summary: "My first ever paid gig! A website made at the request of a close friend. Really my first feel into the feedback cycle."
-type: "client archive"
-sourceEra: "Early freelance"
+place: "shelf"
 cover: "/images/projects/quantumon.png"
 links:
   - label: "See Live"

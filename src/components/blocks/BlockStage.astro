@@ -1,0 +1,52 @@
+---
+/** Where an embed or a model stands until it is asked for: its poster, or
+ * with none its words, under a button that loads it in this very room.
+ * Nothing is asked of another site, and no viewer is loaded, before that
+ * press; a second press, or Escape, puts it away again
+ * (src/lib/block-stage.ts). A poster is always one of the site's own. */
+interface Props {
+  id: string;
+  /** What it is, for whoever cannot see it. */
+  title: string;
+  poster?: string;
+  /** "16/9". */
+  ratio?: string;
+  /** What the button says: to load it, and to put it away. */
+  load: string;
+  close: string;
+  note: string;
+  [data: `data-${string}`]: string | undefined;
+}
+const { id, title, poster, ratio, load, close, note, ...data } = Astro.props;
+---
+
+<p class="block-stage__bar">
+  <button
+    type="button"
+    class="block-stage__toggle"
+    aria-pressed="false"
+    aria-controls={id}
+    data-block-toggle
+    data-load={load}
+    data-close={close}>{load}</button
+  >
+  <slot name="open" />
+  <span class="block-stage__note">{note}</span>
+</p>
+<div
+  class="block-stage"
+  id={id}
+  style={ratio && `aspect-ratio: ${ratio.replace("/", " / ")}`}
+  data-block-stage
+  data-title={title}
+  {...data}
+>
+  {
+    poster ? (
+      <img src={poster} alt={title} loading="lazy" decoding="async" />
+    ) : (
+      <p class="block-stage__label">{title}</p>
+    )
+  }
+</div>
+<p class="block-stage__status" role="status"></p>

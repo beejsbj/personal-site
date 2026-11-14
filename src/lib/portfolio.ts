@@ -4,9 +4,21 @@
  * the same in every lens. */
 import { getCollection, getEntry } from "astro:content";
 import type { CollectionEntry } from "astro:content";
-import type { PageData, ResumeEntryData, SiteData } from "../content.config";
+import type {
+  PageData,
+  ResumeEntryData,
+  SiteData,
+  UpdateData,
+} from "../content.config";
 import { selectActivitySnapshot } from "./activity.mjs";
 import {
+  labbookUpdate,
+  streamUpdate,
+  type InStream,
+  type Update,
+} from "./labbook";
+import {
+  checkGraduations,
   dateLine,
   derive,
   entryHeading,
@@ -26,6 +38,8 @@ export type PageId =
 export type ProjectEntry = CollectionEntry<"projects">;
 export type LabEntry = CollectionEntry<"lab">;
 export type UpdateEntry = CollectionEntry<"updates">;
+/** An update as the home stream shows it (`streamUpdate` in ./labbook). */
+export type StreamUpdate = InStream<UpdateData>;
 
 export interface Header {
   eyebrow?: string;
@@ -103,10 +117,18 @@ export async function getProjects(): Promise<ProjectEntry[]> {
   return orderProjects(visible.map(sortable)).map((item) => item.entry);
 }
 
-/** Lab entries that are not hidden, by `order`. */
+/** Lab entries that are not hidden, by `order`. One that graduated into a
+ * project that is not there stops the build. */
 export async function getLab(): Promise<LabEntry[]> {
   const visible: LabEntry[] = (await getCollection("lab")).filter(
     (entry: LabEntry) => !entry.data.hidden,
+  );
+  checkGraduations(
+    visible.map((entry) => ({
+      slug: entry.slug,
+      graduatedTo: entry.data.graduatedTo,
+    })),
+    await getProjects(),
   );
   return orderLab(
     visible.map((entry: LabEntry) => ({
@@ -126,13 +148,65 @@ export const labDetail = (entry: LabEntry) =>
 export const updateId = (entry: UpdateEntry) => entry.id.replace(/\.md$/, "");
 
 /** Updates that are due and not expired, newest first (all of them). */
-export async function getUpdates(): Promise<UpdateEntry[]> {
+async function dueUpdates(): Promise<UpdateEntry[]> {
   const entries: UpdateEntry[] = await getCollection("updates");
   const byId = new Map(entries.map((entry) => [updateId(entry), entry]));
   return selectActivitySnapshot(
     entries.map((entry) => ({ ...entry.data, id: updateId(entry) })),
     new Date(__PORTFOLIO_BUILD_TIME__),
   ).map((data: { id: string }) => byId.get(data.id)!);
+}
+
+/** Updates as the home stream shows them, each with its id. The stream
+ * itself decides which are due (src/lib/activity.mjs). */
+export const streamUpdates = (
+  entries: UpdateEntry[],
+): (StreamUpdate & { id: string })[] =>
+  entries.flatMap((entry) => {
+    const update = streamUpdate(entry.data);
+    return update ? [{ ...update, id: updateId(entry) }] : [];
+  });
+
+/** The home stream: the open updates that are due and not expired, newest
+ * first. */
+export async function getUpdates() {
+  return streamUpdates(await dueUpdates());
+}
+
+/** The Labbook: every update that is due and not expired, newest first,
+ * the redacted ones as their shape alone. */
+export async function getLabbook(): Promise<Update[]> {
+  return (await dueUpdates()).map((entry) =>
+    labbookUpdate(updateId(entry), entry.data),
+  );
+}
+
+/** The fixture Labbook (src/content/fixture-updates): every kind of entry,
+ * over several months, as the Labbook would carry it. Only the fixture
+ * pages and the harness read it. */
+export async function getFixtureLabbook(): Promise<Update[]> {
+  return (await getCollection("fixture-updates")).map(
+    (entry: CollectionEntry<"fixture-updates">) =>
+      labbookUpdate(entry.id.replace(/\.md$/, ""), entry.data),
+  );
+}
+
+/** What an update in the Labbook may link to: the experiments and projects
+ * that are shown, each where it lives. */
+export async function getRelatable() {
+  const [lab, projects] = await Promise.all([getLab(), getProjects()]);
+  return {
+    lab: lab.map((entry) => ({
+      slug: entry.slug,
+      title: entry.data.title as string,
+      detail: labDetail(entry),
+    })),
+    projects: projects.map((entry) => ({
+      slug: entry.slug,
+      title: entry.data.title as string,
+      href: `/projects/${entry.slug}`,
+    })),
+  };
 }
 
 export async function getHome() {
@@ -204,11 +278,15 @@ export async function getLabPage() {
     listLabel: need(data.listLabel, "listLabel in pages/lab.md"),
     more: resolveLink(site, need(data.more, "more in pages/lab.md")),
     aside: need(data.aside, "aside in pages/lab.md"),
+    places: need(data.places, "places in pages/lab.md"),
+    labbook: need(data.labbook, "labbook in pages/lab.md"),
+    preview: need(data.preview, "preview in pages/lab.md"),
     detail: {
       eyebrow: need(detail.eyebrow, "entry.eyebrow in pages/lab.md"),
+      back: resolveLink(site, need(detail.back, "entry.back in pages/lab.md")),
       labels: {
-        type: need(detail.labels.type, "entry.labels.type"),
-        era: need(detail.labels.era, "entry.labels.era"),
+        graduated: need(detail.labels.graduated, "entry.labels.graduated"),
+        updates: need(detail.labels.updates, "entry.labels.updates"),
       },
     },
   };
@@ -278,7 +356,7 @@ export async function getDerived() {
       slug: entry.slug,
     })),
     lab,
-    updates: updates.map((entry) => entry.data),
+    updates,
     featured,
   });
 }

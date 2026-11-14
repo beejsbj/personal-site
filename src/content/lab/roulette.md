@@ -1,8 +1,7 @@
 ---
 title: "Roulette App"
 summary: "Back for more gambling. this had some bumps, but I really ended up liking the aesthetic I came up with!"
-type: "interaction archive"
-sourceEra: "API3 experiments"
+place: "shelf"
 cover: "/images/projects/roulette-app.jpg"
 links:
   - label: "Demo"

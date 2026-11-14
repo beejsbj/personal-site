@@ -11,15 +11,37 @@ import {
   orderProjects,
   dateLine,
 } from "../lib/rules";
+import {
+  newestFirst,
+  streamUpdate,
+  type Update as LabbookUpdate,
+} from "../lib/labbook";
+import { labbookFixture, REDACTION_MARKER } from "./labbook-fixture";
 import type { RouteRef } from "./parity";
-import type { Project, ResumeEntry, SiteContent, Update } from "./shells/types";
+import type {
+  Block,
+  LabEntry,
+  Project,
+  ResumeEntry,
+  SiteContent,
+  Update,
+} from "./shells/types";
 
 export interface Fixture {
   name: string;
   about: string;
-  apply(content: SiteContent): SiteContent;
+  /** One that needs something the site built (a fixture written as content
+   * is) fetches it first. */
+  apply(content: SiteContent): SiteContent | Promise<SiteContent>;
   routes(content: SiteContent): RouteRef[];
 }
+
+/** A page that is prose and nothing else: its body, and the same as the
+ * one block it is. */
+const prose = (html: string): { html: string; blocks: Block[] } => ({
+  html,
+  blocks: [{ type: "text", html }],
+});
 
 const projectRoute = (p: Project): RouteRef => ({
   kind: "project",
@@ -64,7 +86,7 @@ function project(base: SiteContent, over: Partial<Project>): Project {
     media: [],
     tags: [],
     order: 0,
-    html: "<p>Only the harness has seen this one.</p>",
+    ...prose("<p>Only the harness has seen this one.</p>"),
     ...over,
   };
 }
@@ -143,6 +165,348 @@ function updates(count: number): Update[] {
     };
   });
 }
+
+/** An experiment that exists only as a fixture, with its part of the
+ * Labbook as written: oldest first. The shells meet it in the harness;
+ * Daylight renders its page at /prism/fixtures/lab/<slug>. */
+export interface ExperimentFixture {
+  entry: LabEntry;
+  labbook: LabbookUpdate[];
+}
+
+/** Words and a link, and nothing else: no cover, pictures or updates. */
+const sketch: ExperimentFixture = {
+  entry: {
+    slug: "fixture-sketch",
+    detail: "/lab/fixture-sketch",
+    hasPage: true,
+    title: "A sketch with no cover",
+    summary: "An experiment that lives here, with words but no picture.",
+    place: "bench",
+    links: [{ label: "Source", url: "https://example.com/source" }],
+    media: [],
+    order: 99,
+    ...prose(
+      "<h2>How it works</h2><p>A paragraph about the sketch.</p><ul><li>One thing</li><li>Another thing</li></ul>",
+    ),
+  },
+  labbook: [],
+};
+
+/** A cover and a paragraph: no pictures of its own, no links or updates. */
+const poster: ExperimentFixture = {
+  entry: {
+    slug: "fixture-poster",
+    detail: "/lab/fixture-poster",
+    hasPage: true,
+    title: "A poster and a paragraph",
+    summary: "An experiment that says little about itself.",
+    place: "bench",
+    cover: "/images/lab/beating-shapes.png",
+    links: [],
+    media: [],
+    order: 97,
+    ...prose("<p>One paragraph, and the cover for a picture.</p>"),
+  },
+  labbook: [],
+};
+
+/** Everything an experiment's page can show: pictures and a film, links, a
+ * body, updates (one of them redacted) and the project it graduated into. */
+function study(project: string): ExperimentFixture {
+  const slug = "fixture-study";
+  const about = {
+    kind: "lab",
+    source: "codepen",
+    relatedExperiment: slug,
+  } as const;
+  return {
+    entry: {
+      slug,
+      detail: `/lab/${slug}`,
+      hasPage: true,
+      title: "A study with everything on its page",
+      summary:
+        "An experiment that kept a record: pictures, a film, links out and what happened along the way.",
+      place: "shelf",
+      graduatedTo: project,
+      cover: "/images/lab/motion-path-graph.svg",
+      links: [
+        {
+          label: "Open the Pen",
+          url: "https://codepen.io/beejsbj/pen/abXZWLQ",
+        },
+        { label: "Source", url: "https://example.com/source" },
+      ],
+      media: [
+        {
+          type: "image",
+          src: "/images/lab/motion-path-graph.svg",
+          alt: "A lotus drawn in orange and blue lines",
+          caption: "The finished drawing.",
+        },
+        {
+          type: "image",
+          src: "/images/lab/beating-shapes.png",
+          alt: "Black and white shapes on a grid",
+        },
+        {
+          type: "video",
+          src: "/prism/fixtures/film.webm",
+          caption: "The lines, drawn one after another.",
+        },
+      ],
+      order: 98,
+      ...prose(
+        "<h2>How it was made</h2><p>A paragraph about measuring each path before drawing it.</p><ul><li>Measure the path</li><li>Draw it over time</li></ul><h2>What it taught me</h2><p>A closing paragraph about what carried over.</p>",
+      ),
+    },
+    labbook: [
+      {
+        ...about,
+        id: "fixture-study-first-line",
+        date: "2026-08-02",
+        visibility: "open",
+        title: "The first line draws itself",
+        summary: "One path, measured and drawn from end to end.",
+      },
+      // As it must never arrive, with words: a lens draws its shape alone.
+      {
+        id: "fixture-study-kept-back",
+        date: "2026-08-20",
+        kind: "project",
+        source: "bjslab",
+        relatedExperiment: slug,
+        visibility: "redacted",
+        shape: { work: "code", parts: [4, 2, 3] },
+        title: `${REDACTION_MARKER}: the title`,
+        summary: `${REDACTION_MARKER}: the summary`,
+        href: `/lab/${REDACTION_MARKER}`,
+        linkLabel: `${REDACTION_MARKER}: the link`,
+      } as LabbookUpdate,
+      {
+        ...about,
+        id: "fixture-study-replay",
+        date: "2026-09-12",
+        visibility: "open",
+        title: "A replay control, so it plays more than once",
+        summary: "The drawing can be watched again without reloading.",
+        href: "https://codepen.io/beejsbj/pen/abXZWLQ",
+        linkLabel: "Open the Pen",
+      },
+      {
+        id: "fixture-study-graduated",
+        date: "2026-09-30",
+        kind: "milestone",
+        source: "site",
+        relatedProject: project,
+        relatedExperiment: slug,
+        visibility: "open",
+        title: "The study became a project",
+        summary: "What started as one line has a home of its own now.",
+      },
+    ],
+  };
+}
+
+/** The fixture experiments. The one that graduated did so into the first
+ * of `projects`. */
+export const experimentFixtures = (
+  projects: { slug: string }[],
+): ExperimentFixture[] => [sketch, poster, study(projects[0]?.slug ?? "")];
+
+/** Put a fixture experiment into the content: on the lab's list, and its
+ * updates into the Labbook and the home stream, newest first. */
+function withExperiment(
+  content: SiteContent,
+  { entry, labbook }: ExperimentFixture,
+): SiteContent {
+  return settle({
+    ...withUpdates(content, labbook),
+    lab: [...content.lab, entry],
+  });
+}
+
+/** Put fixture updates into the Labbook and, the open ones, into the home
+ * stream, newest first. */
+function withUpdates(
+  content: SiteContent,
+  labbook: LabbookUpdate[],
+): SiteContent {
+  const stream: Update[] = labbook.flatMap((update) => {
+    const shown = streamUpdate(update);
+    return shown
+      ? [{ ...shown, kindLabel: shown.kind, sourceLabel: shown.source }]
+      : [];
+  });
+  return {
+    ...content,
+    labbook: newestFirst([...content.labbook, ...labbook]),
+    updates: newestFirst([...content.updates, ...stream]),
+  };
+}
+
+const labEntryRoute = ({ entry }: ExperimentFixture): RouteRef => ({
+  kind: "lab-entry",
+  path: entry.detail,
+  slug: entry.slug,
+});
+
+/** Every kind of card in both places (as Daylight's /prism/fixtures/lab
+ * ?fixture=kinds): featured with three pictures, one picture, only words,
+ * a Pen to play, two pictures linking out, a note linking out and a demo
+ * with no picture on the Bench; a picture, a Pen, two pictures and only
+ * words on the Shelf. They take the room's place: the Lab shows these and
+ * nothing else. */
+const kindsOfCard = (): LabEntry[] => {
+  const card = (
+    over: Partial<LabEntry> & Pick<LabEntry, "slug" | "title" | "summary" | "place" | "order">,
+  ): LabEntry => {
+    const hasPage = !over.detail;
+    return {
+      detail: `/lab/${over.slug}`,
+      hasPage,
+      links: [],
+      media: [],
+      ...prose(`<p>${over.summary}</p>`),
+      ...over,
+    };
+  };
+  const pictures = (...names: string[]) =>
+    names.map((name) => ({ type: "image" as const, src: `/images/lab/${name}` }));
+  const pen = (id: string) => ({
+    detail: `https://codepen.io/beejsbj/pen/${id}`,
+    href: `https://codepen.io/beejsbj/pen/${id}`,
+    preview: {
+      kind: "pen" as const,
+      frame: `https://codepen.io/beejsbj/embed/${id}?default-tab=result`,
+    },
+  });
+  const out = (slug: string) => ({
+    detail: `https://example.com/${slug}`,
+    href: `https://example.com/${slug}`,
+  });
+  return [
+    card({
+      slug: "fixture-kinds-featured",
+      title: "The one with pride of place, and a stack of prints",
+      summary:
+        "Featured, with a page of its own and three pictures, so the Bench gives it the most room.",
+      place: "bench",
+      featured: true,
+      cover: "/images/lab/melograph.png",
+      media: pictures("melograph.png", "midi-strudel.png", "kitchen.png"),
+      order: 1,
+    }),
+    card({
+      slug: "fixture-kinds-print",
+      title: "One picture",
+      summary: "A page of its own, and one picture to show for it.",
+      place: "bench",
+      cover: "/images/lab/game-of-life.png",
+      order: 2,
+    }),
+    card({
+      slug: "fixture-kinds-words",
+      title: "Only words so far",
+      summary: "Nothing to look at yet: what it is about, written down.",
+      place: "bench",
+      order: 3,
+    }),
+    card({
+      slug: "fixture-kinds-pen",
+      title: "A Pen to play where it lies",
+      summary: "It lives on CodePen and plays here when asked.",
+      place: "bench",
+      cover: "/images/lab/motion-path-graph.svg",
+      ...pen("abXZWLQ"),
+      order: 4,
+    }),
+    card({
+      slug: "fixture-kinds-stack",
+      title: "Several pictures, and a link out",
+      summary: "Two prints in a pile, opening where it lives.",
+      place: "bench",
+      cover: "/images/lab/persona-5-stars.png",
+      media: pictures("persona-5-stars.png", "13black-spade.png"),
+      ...out("fixture-kinds-stack"),
+      order: 5,
+    }),
+    card({
+      slug: "fixture-kinds-note",
+      title: "A note that links out",
+      summary: "Only words, and it lives elsewhere.",
+      place: "bench",
+      ...out("fixture-kinds-note"),
+      order: 6,
+    }),
+    card({
+      slug: "fixture-kinds-demo",
+      title: "A demo with no picture",
+      summary: "A deployed demo that says it may be framed, and nothing to show until it is.",
+      place: "bench",
+      ...out("fixture-kinds-demo"),
+      preview: { kind: "demo", frame: "https://example.com/fixture-kinds-demo" },
+      order: 7,
+    }),
+    card({
+      slug: "fixture-kinds-shelved",
+      title: "An old print",
+      summary: "On the Shelf, standing with the rest.",
+      place: "shelf",
+      cover: "/images/lab/css-notebook.png",
+      ...out("fixture-kinds-shelved"),
+      order: 1,
+    }),
+    card({
+      slug: "fixture-kinds-shelf-pen",
+      title: "A Pen gone quiet",
+      summary: "It still plays where it stands.",
+      place: "shelf",
+      cover: "/images/lab/beating-shapes.png",
+      ...pen("xxexKMq"),
+      order: 2,
+    }),
+    card({
+      slug: "fixture-kinds-shelf-stack",
+      title: "An archive piece with pictures",
+      summary: "A page of its own, and two pictures from when it was made.",
+      place: "shelf",
+      cover: "/images/lab/design-trampoline-logo.png",
+      media: pictures("design-trampoline-logo.png", "meditejo.png"),
+      order: 3,
+    }),
+    card({
+      slug: "fixture-kinds-shelf-words",
+      title: "Words on the Shelf",
+      summary: "No picture: its name stands in for one.",
+      place: "shelf",
+      order: 4,
+    }),
+  ];
+};
+
+/** The experiment told with every block there is, written as a real one
+ * is (src/content/fixtures/fixture-blocks.md) and carried as
+ * /prism/content.json would carry it. Daylight's page on it is
+ * /prism/fixtures/lab/fixture-blocks. */
+const BLOCKS_SLUG = "fixture-blocks";
+const BLOCKS_FIXTURE = `/prism/fixtures/lab/${BLOCKS_SLUG}.json`;
+
+/** As a later site might send it: a kind of block no lens here has heard
+ * of. A lens passes over it. */
+const UNHEARD_OF = {
+  type: "hologram",
+  name: "from-later",
+  src: "/prism/fixtures/cube.glb",
+  caption: "A kind of block that does not exist yet.",
+} as unknown as Block;
+
+/** The fixture Labbook written as content, as content.json would carry it
+ * (src/pages/prism/fixtures/labbook.json.ts). Its experiments are the
+ * fixture room's; here they become the first two of the real Lab. */
+const NOTEBOOK_FIXTURE = "/prism/fixtures/labbook.json";
+const NOTEBOOK_EXPERIMENTS = ["fixture-quiet", "fixture-featured"];
 
 const LONG_TITLE =
   "A project whose title runs on and on, far past where any layout expects a title to stop";
@@ -312,36 +676,129 @@ export const FIXTURES: Record<string, Fixture> = {
     },
     routes: () => [{ kind: "resume", path: "/about/resume" }],
   },
+  "lab-featured": {
+    name: "lab-featured",
+    about:
+      "A Bench with one experiment given pride of place: the last on it by order, so it leads only because it is featured.",
+    apply(content) {
+      const lead = content.lab
+        .filter((entry) => entry.place === "bench")
+        .at(-1);
+      return settle({
+        ...content,
+        lab: content.lab.map((entry) => ({
+          ...entry,
+          featured: entry === lead,
+        })),
+      });
+    },
+    routes: () => [{ kind: "lab", path: "/lab" }],
+  },
+  "lab-none-featured": {
+    name: "lab-none-featured",
+    about: "A Lab with no experiment given pride of place.",
+    apply: (content) =>
+      settle({
+        ...content,
+        lab: content.lab.map((entry) => ({ ...entry, featured: undefined })),
+      }),
+    routes: () => [{ kind: "lab", path: "/lab" }],
+  },
   "lab-no-cover": {
     name: "lab-no-cover",
     about: "A lab entry with its own page and no cover.",
-    apply(content) {
-      const lab = [
-        ...content.lab,
-        {
-          slug: "fixture-sketch",
-          detail: "/lab/fixture-sketch",
-          hasPage: true,
-          title: "A sketch with no cover",
-          summary: "An experiment that lives here, with words but no picture.",
-          type: "Canvas + sound",
-          sourceEra: "This site",
-          links: [{ label: "Source", url: "https://example.com/source" }],
-          media: [],
-          order: 99,
-          html: "<h2>How it works</h2><p>A paragraph about the sketch.</p><ul><li>One thing</li><li>Another thing</li></ul>",
-        },
-      ];
-      return settle({ ...content, lab });
+    apply: (content) => withExperiment(content, sketch),
+    routes: () => [{ kind: "lab", path: "/lab" }, labEntryRoute(sketch)],
+  },
+  "lab-bare-entry": {
+    name: "lab-bare-entry",
+    about: "A lab entry that says little, with a cover and no other picture.",
+    apply: (content) => withExperiment(content, poster),
+    routes: () => [{ kind: "lab", path: "/lab" }, labEntryRoute(poster)],
+  },
+  "lab-full-page": {
+    name: "lab-full-page",
+    about:
+      "An experiment whose page has everything: pictures, a film, links, a body, updates (one redacted) and the project it graduated into.",
+    apply: (content) =>
+      withExperiment(content, study(content.projects[0]?.slug ?? "")),
+    routes: (content) => [
+      labEntryRoute(study(content.projects[0]?.slug ?? "")),
+    ],
+  },
+  "lab-kinds": {
+    name: "lab-kinds",
+    about:
+      "Every kind of card in both places, and nothing else: one picture, several, a Pen to play and only words, each to a page or out, on the Bench and on the Shelf.",
+    apply: (content) => settle({ ...content, lab: kindsOfCard() }),
+    routes: () => [{ kind: "lab", path: "/lab" }],
+  },
+  "lab-blocks": {
+    name: "lab-blocks",
+    about:
+      "An experiment told with every block there is (a gallery, a compare, embeds, models, code, a quote, steps, a tree, a sound and films), and one of a kind no lens has heard of.",
+    async apply(content) {
+      const entry: LabEntry = await (await fetch(BLOCKS_FIXTURE)).json();
+      return withExperiment(content, {
+        entry: { ...entry, blocks: [...entry.blocks, UNHEARD_OF] },
+        labbook: [],
+      });
     },
     routes: () => [
-      { kind: "lab", path: "/lab" },
-      {
-        kind: "lab-entry",
-        path: "/lab/fixture-sketch",
-        slug: "fixture-sketch",
-      },
+      { kind: "lab-entry", path: `/lab/${BLOCKS_SLUG}`, slug: BLOCKS_SLUG },
     ],
+  },
+  "project-blocks": {
+    name: "project-blocks",
+    about:
+      "A project told with every block there is: the first project, given the fixture experiment's blocks and prose.",
+    async apply(content) {
+      const entry: LabEntry = await (await fetch(BLOCKS_FIXTURE)).json();
+      const [first, ...rest] = content.projects;
+      if (!first) return content;
+      return settle({
+        ...content,
+        projects: [{ ...first, html: entry.html, blocks: entry.blocks }, ...rest],
+      });
+    },
+    routes: (content) =>
+      content.projects[0] ? [projectRoute(content.projects[0])] : [],
+  },
+  labbook: {
+    name: "labbook",
+    about:
+      "A Labbook with every kind of artifact and two redacted updates (one bars alone, one showing a few words), about two experiments and a project.",
+    apply: (content) =>
+      settle(
+        withUpdates(
+          content,
+          labbookFixture({
+            experiments: content.lab.slice(0, 2).map((entry) => entry.slug),
+            project: content.projects[0]?.slug,
+          }).labbook,
+        ),
+      ),
+    routes: () => [
+      { kind: "home", path: "/" },
+      { kind: "lab", path: "/lab" },
+    ],
+  },
+  "labbook-notebook": {
+    name: "labbook-notebook",
+    about:
+      "A Labbook kept over four months, one of them with a single small entry: plain, linked, every kind of artifact, redacted with words and with bars alone, about an experiment, a project, both or neither. A lens that keeps it by month or narrows it shows that; every lens shows every entry.",
+    async apply(content) {
+      const written: LabbookUpdate[] = await (
+        await fetch(NOTEBOOK_FIXTURE)
+      ).json();
+      const lab = content.lab.slice(0, 2).map((entry) => entry.slug);
+      const labbook = written.map((update) => {
+        const at = NOTEBOOK_EXPERIMENTS.indexOf(update.relatedExperiment ?? "");
+        return at < 0 ? update : { ...update, relatedExperiment: lab[at] };
+      });
+      return settle(withUpdates(content, labbook));
+    },
+    routes: () => [{ kind: "lab", path: "/lab" }],
   },
   "writing-rich": {
     name: "writing-rich",

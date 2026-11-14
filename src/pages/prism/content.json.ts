@@ -1,12 +1,12 @@
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
-import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import ResumeProse from "../../components/ResumeProse.astro";
 import {
   getDerived,
   getFeatured,
   getHome,
   getLab,
+  getLabbook,
   getLabPage,
   getProjects,
   getProjectsPage,
@@ -17,10 +17,13 @@ import {
   getWritingPage,
   getPosts,
   getPost,
-  labDetail,
-  labHasPage,
-  updateId,
 } from "../../lib/portfolio";
+import {
+  bodyHtml as html,
+  labPayload,
+  pageBody,
+  renderHtml,
+} from "../../lib/body";
 import { resolveLink } from "../../lib/rules";
 import { formatDate, writingHeaders } from "../../lib/writing";
 import type { WritingEntry } from "../../lib/writing";
@@ -37,26 +40,10 @@ import type {
  * else (see src/prism/shells/types.ts). */
 export const prerender = false;
 
-type Renderable = { render(): Promise<{ Content: unknown }> };
-
-/** Dev builds annotate markup with source locations; lenses don't need them. */
-const clean = (markup: string) =>
-  markup.replace(/\s+data-astro-[\w-]+="[^"]*"/g, "").trim();
-
 // The authored portfolio is immutable within a deployment. Render its
 // Markdown once per warm function; writing is attached on every request.
 let authored: Promise<Omit<SiteContent, "writing">> | undefined;
 async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
-  const container = await AstroContainer.create();
-  const html = async (entry: Renderable) => {
-    const { Content } = await entry.render();
-    return clean(
-      await container.renderToString(
-        Content as Parameters<typeof container.renderToString>[0],
-      ),
-    );
-  };
-
   const site = await getSite();
   const [home, about, notFound, resume, projectsPage, labPage, writingPage] =
     await Promise.all([
@@ -68,17 +55,17 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
       getLabPage(),
       getWritingPage(),
     ]);
-  const [projects, lab, updates, featured, derived] = await Promise.all([
-    getProjects(),
-    getLab(),
-    getUpdates(),
-    getFeatured(),
-    getDerived(),
-  ]);
+  const [projects, lab, updates, labbook, featured, derived] =
+    await Promise.all([
+      getProjects(),
+      getLab(),
+      getUpdates(),
+      getLabbook(),
+      getFeatured(),
+      getDerived(),
+    ]);
   const resumeBody = await html(resume.entry);
-  const resumeStructure = await container.renderToString(ResumeProse, {
-    props: { resume },
-  });
+  const resumeStructure = await renderHtml(ResumeProse, { resume });
   const lenses = Object.fromEntries(
     (await getCollection("lenses")).map(
       (entry: { id: string; data: unknown }) => [entry.id, entry.data],
@@ -118,7 +105,7 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
       education: resume.education,
       tools: resume.tools,
       ongoing: resume.ongoing,
-      html: `${clean(resumeStructure)}\n<div class="resume-body" data-part="page.body" data-ref="resume">${resumeBody}</div>`,
+      html: `${resumeStructure}\n<div class="resume-body" data-part="page.body" data-ref="resume">${resumeBody}</div>`,
     },
     projects: await Promise.all(
       projects.map(async (entry) => {
@@ -128,30 +115,16 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
           ...data,
           slug: entry.slug,
           href: `/projects/${entry.slug}`,
-          html: await html(entry),
+          ...(await pageBody(entry)),
         };
       }),
     ),
-    lab: await Promise.all(
-      lab.map(async (entry) => {
-        const { hidden, ...data } = entry.data;
-        void hidden;
-        return {
-          ...data,
-          slug: entry.slug,
-          detail: labDetail(entry),
-          hasPage: labHasPage(entry),
-          html: await html(entry),
-        };
-      }),
-    ),
-    updates: updates.map((entry) => {
-      const { evidence, expiresAt, ...data } = entry.data;
+    lab: await Promise.all(lab.map(labPayload)),
+    updates: updates.map(({ evidence, expiresAt, ...data }) => {
       void evidence;
       void expiresAt;
       return {
         ...data,
-        id: updateId(entry),
         kindLabel:
           updateKinds[data.kind as keyof typeof updateKinds] ?? data.kind,
         sourceLabel:
@@ -159,6 +132,7 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
           data.source,
       };
     }),
+    labbook,
     featured: featured.map((entry) => entry.slug),
     derived,
     lenses,

@@ -54,6 +54,11 @@
   mask-image: radial-gradient(ellipse at 20% 80%, #000 20%, transparent 70%);
 }
 
+/* The sheet is only a column's worth on a phone (below). */
+:root[data-lens="calling-card"] .cc-home__sheet {
+  display: contents;
+}
+
 /* ---------- The cut-out ---------- */
 :root[data-lens="calling-card"] .cc-home__portrait {
   position: absolute;
@@ -578,6 +583,14 @@
   :root[data-lens="calling-card"] .cc-home .cc-main {
     overflow-x: hidden;
     overflow-y: auto;
+  }
+  /* Whatever hangs over the edge is clipped here, short of the column, so
+     a script can't slide the column to find it. */
+  :root[data-lens="calling-card"] .cc-home__sheet {
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100%;
+    overflow-x: clip;
     display: grid;
     grid-template-columns: 1fr;
     align-content: start;

@@ -32,6 +32,9 @@ export interface Screen {
   back?: HTMLAnchorElement;
   /** Screen-specific keys. Return true when handled. */
   onKey?(event: KeyboardEvent): boolean;
+  /** The address's query changed and its path did not (the Labbook
+   * narrowed, or shown whole again): answer it in place. */
+  renew?(): void;
   destroy?(): void;
 }
 
@@ -225,14 +228,31 @@ export function roving(
     }
     if (focus) items[next].focus({ preventScroll: false });
   };
+  const reach = (i: number) => {
+    select(i);
+    if (items[i].closest("[inert]")) return;
+    items[i].focus({ preventScroll: true });
+  };
+  // A pointer left where it was, with a screen mounted under it, enters an
+  // item without having reached for it. Until it moves, the item it is over
+  // is only noted: the movement that follows the entry is what reaches it.
+  let resting = true;
+  let under: number | undefined;
+  document.addEventListener(
+    "pointermove",
+    () => {
+      resting = false;
+      if (under !== undefined && items[under].matches(":hover")) reach(under);
+    },
+    { signal, once: true, capture: true },
+  );
   items.forEach((item, i) => {
     item.addEventListener(
       "pointerenter",
       (event) => {
         if (event.pointerType !== "mouse") return;
-        select(i);
-        if (item.closest("[inert]")) return;
-        item.focus({ preventScroll: true });
+        if (resting) under = i;
+        else reach(i);
       },
       { signal },
     );

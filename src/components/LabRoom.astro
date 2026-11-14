@@ -1,0 +1,191 @@
+---
+import PageHeader from "./PageHeader.astro";
+import LabCard from "./LabCard.astro";
+import BlockScript from "./blocks/BlockScript.astro";
+import Heading from "../design/primitives/Heading.astro";
+import Inline from "../design/primitives/Inline.astro";
+import Link from "../design/primitives/Link.astro";
+import type { getLabPage } from "../lib/portfolio";
+import { labPlaces, labPrints } from "../lib/rules";
+import { part } from "../prism/parts";
+import type { LabEntry } from "../prism/shells/types";
+/** Composition: the Lab as a room. The page's opening, then each place
+ * that holds something (the Bench, then the Shelf) under its own heading,
+ * then the `labbook` slot, then the way out to more.
+ * The two places are two kinds of furniture. The Bench is a work mat of
+ * graph paper with experiments lying on it as they were put down, a touch
+ * off the straight and not quite in rows, the featured one across the
+ * whole width; each lies as what it holds (a print, a pile, something
+ * live, a slip). The Shelf is boards, its experiments standing upright
+ * and straight on them, labels underneath. A card that can be played
+ * where it stands (`preview`) loads its piece on a press; the page is
+ * sent the script for that only if some card can.
+ */
+interface Props {
+  page: Awaited<ReturnType<typeof getLabPage>>;
+  entries: (Pick<
+    LabEntry,
+    | "slug"
+    | "detail"
+    | "title"
+    | "summary"
+    | "place"
+    | "featured"
+    | "cover"
+    | "preview"
+    | "order"
+  > &
+    Partial<Pick<LabEntry, "media">>)[];
+}
+const { page, entries } = Astro.props;
+const places = labPlaces(entries);
+const playable = entries.some((entry) => entry.preview);
+---
+
+{playable && <BlockScript />}
+<section class="shell page-section page-section--header">
+  <PageHeader {...page.header} page="lab" />
+</section>
+{places.map(({ place, entries }) => (
+  <section
+    class:list={["shell", "page-section", "lab-place", `lab-place--${place}`]}
+    data-lab-place={place}
+    aria-labelledby={`lab-${place}`}
+  >
+    <header class="lab-place__head">
+      <Heading id={`lab-${place}`}>{page.places[place].title}</Heading>
+      <p class="lab-place__note">{page.places[place].note}</p>
+    </header>
+    <ul class="lab-place__entries" role="list">
+      {entries.map((entry, index) => {
+        // Where it falls among the cards laid in rows (the featured one
+        // is across the width), for the column a little lower than the
+        // rest: of two abreast, the second; of three, the middle one.
+        const at = index - entries.filter((e) => e.featured).length;
+        return (
+          <li
+            class:list={{
+              "lab-place__featured": entry.featured,
+              "lab-place__lower-2": !entry.featured && at % 2 === 1,
+              "lab-place__lower-3": !entry.featured && at % 3 === 1,
+            }}
+          >
+            <LabCard
+              slug={entry.slug}
+              href={entry.detail}
+              title={entry.title}
+              summary={entry.summary}
+              prints={labPrints(entry)}
+              preview={entry.preview}
+              copy={page.preview}
+              layout={
+                entry.featured
+                  ? "feature"
+                  : place === "bench"
+                    ? "card"
+                    : "standing"
+              }
+              lean={
+                place === "bench" ? (index % 2 ? "right" : "left") : undefined
+              }
+            />
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+))}
+<slot name="labbook" />
+<section class="shell page-section lab-out">
+  <p {...part("lab.more")}>
+    <Link href={page.more.href} treatment="pill" arrow>
+      {page.more.label}
+    </Link>
+  </p>
+  <p class="lab-aside" {...part("lab.aside")}>
+    <Inline text={page.aside} />
+  </p>
+</section>
+<style>
+  .lab-place__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-m);
+    margin-bottom: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .lab-place__note {
+    color: var(--color-text-soft);
+  }
+  .lab-place__entries {
+    display: grid;
+    gap: var(--space-2xl) var(--space-xl);
+    list-style: none;
+  }
+  .lab-place__entries > li {
+    display: grid;
+    min-width: 0;
+  }
+  .lab-place__featured {
+    grid-column: 1 / -1;
+  }
+  .lab-out {
+    display: grid;
+    gap: var(--space-m);
+  }
+  .lab-aside {
+    max-width: var(--reading-width);
+    font-size: var(--text-copy);
+    color: var(--color-text-soft);
+  }
+
+  /* The Bench: a mat of graph paper, its edges a little in from the
+     page's, with things lying on it. */
+  .lab-place--bench .lab-place__entries {
+    padding: var(--space-2xl) var(--space-l);
+    background: var(--bench-mat);
+    border-radius: var(--radius-note);
+    box-shadow: inset 0 0 0 var(--rule-width) var(--color-border);
+  }
+  .lab-place--bench .lab-place__featured {
+    padding-bottom: var(--space-l);
+  }
+  @media (min-width: 40.626rem) {
+    .lab-place--bench .lab-place__entries {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: var(--space-3xl) var(--space-2xl);
+    }
+    .lab-place--bench .lab-place__lower-2 {
+      padding-top: var(--space-2xl);
+    }
+  }
+  @media (min-width: 62.501rem) {
+    .lab-place--bench .lab-place__entries {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: var(--space-2xl);
+    }
+    .lab-place--bench .lab-place__lower-2 {
+      padding-top: 0;
+    }
+    .lab-place--bench .lab-place__lower-3 {
+      padding-top: var(--space-2xl);
+    }
+  }
+
+  /* The Shelf: boards abreast, meeting, so each row is one long shelf;
+     on a phone, a board to each. */
+  .lab-place--shelf .lab-place__entries {
+    column-gap: 0;
+    row-gap: var(--space-3xl);
+  }
+  @media (min-width: 40.626rem) {
+    .lab-place--shelf .lab-place__entries {
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(var(--rail-width-mid), 1fr)
+      );
+    }
+  }
+</style>

@@ -2,44 +2,491 @@
 import Heading from "../design/primitives/Heading.astro";
 import Link from "../design/primitives/Link.astro";
 import MediaFrame from "../design/primitives/MediaFrame.astro";
+import Note from "../design/primitives/Note.astro";
 import { part } from "../prism/parts";
+/** Compound: one experiment, shown as what it holds. Its prints (`prints`:
+ * the cover first, then its other pictures, `labPrints`) lie as one print
+ * or as a small pile of them; with none it is written on a slip of paper.
+ * An experiment that can be played where it stands (`preview`) has a stage
+ * for it, the size of the cover (or, with none, of an empty frame), marked
+ * as live, and a button under its words that loads it there in place of
+ * the still: nothing is asked of another site until the press, and a
+ * second press or Escape brings the still back (src/lib/block-stage.ts).
+ * The link out is the title's, always; the pictures are a pointer's
+ * shortcut to it, hidden from the keyboard and from assistive technology.
+ * layout=card: lying on the Bench, a print, a pile or a slip taped down.
+ * layout=feature: the featured experiment, across the width of its place.
+ * layout=standing: standing on a board of the Shelf, upright, its label
+ * under the board; with no picture, its initial stands in for one.
+ * lean=left|right: lying as it was put down, a touch off the straight.
+ * The title's link says where it goes: the arrow only when it leaves the site.
+ */
 interface Props {
   /** The entry's slug, marking its parts. */
   slug?: string;
   href: string;
   title: string;
   summary: string;
-  type: string;
-  sourceEra: string;
-  cover?: string;
+  /** Its pictures, the cover first (`labPrints`). */
+  prints?: string[];
+  /** What to load in place of the cover, and what it is. */
+  preview?: { kind: "pen" | "demo"; frame: string };
+  /** `preview` in pages/lab.md. */
+  copy?: {
+    load: { pen: string; demo: string };
+    close: string;
+    note: string;
+    loading: string;
+  };
+  layout?: "card" | "feature" | "standing";
+  lean?: "left" | "right";
 }
-const { slug, href, title, summary, type, sourceEra, cover } = Astro.props;
+const {
+  slug,
+  href,
+  title,
+  summary,
+  prints = [],
+  preview,
+  copy,
+  layout = "card",
+  lean,
+} = Astro.props;
+const [cover, ...under] = prints;
+const play =
+  preview && copy && slug
+    ? { ...preview, copy, id: `lab-play-${slug}` }
+    : undefined;
 const mark = (name: Parameters<typeof part>[0]) =>
   slug === undefined ? {} : part(name, slug);
+// What it holds, which decides how it lies.
+const holds = play ? "play" : under.length ? "prints" : cover ? "print" : "words";
+// With no picture, a card or a feature is written on a slip of paper.
+const Slip = holds === "words" && layout !== "standing" ? Note : Fragment;
 ---
 
-<article class="lab-card">
-  {cover && <MediaFrame src={cover} alt="" fit="cover" />}
-  <p class="meta" {...mark("lab.meta")}>
-    {type} · {sourceEra}
-  </p>
-  <Heading level={2} scale="card" {...mark("lab.title")}>
-    <Link href={href} arrow>
-      {title}
-    </Link>
-  </Heading>
-  <p {...mark("lab.summary")}>{summary}</p>
+<article
+  class:list={[
+    "lab-card",
+    `lab-card--${layout}`,
+    lean && `lab-card--lean-${lean}`,
+    { "lab-card--bare": holds === "words" },
+  ]}
+  data-holds={holds}
+  data-stage-room={play ? "" : undefined}
+>
+  {holds !== "words" || layout === "standing" ? (
+    <div class="lab-card__object">
+      {play ? (
+        <div
+          class="lab-card__stage"
+          id={play.id}
+          data-block-stage
+          data-frame={play.frame}
+          data-title={title}
+          data-loading={play.copy.loading}
+        >
+          <div class="lab-card__still">
+            {cover ? (
+              <MediaFrame src={cover} alt="" fit="cover" href={href} />
+            ) : (
+              <div class="lab-card__blank" aria-hidden="true" />
+            )}
+          </div>
+          <span class="lab-card__live" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 6.5v11l9-5.5z" />
+            </svg>
+          </span>
+        </div>
+      ) : holds === "prints" ? (
+        <div class="lab-card__pile">
+          {under.toReversed().map((src, index) => (
+            <div
+              class="lab-card__under"
+              style={`--depth:${under.length - index}`}
+              aria-hidden="true"
+            >
+              <img src={src} alt="" loading="lazy" decoding="async" />
+            </div>
+          ))}
+          <MediaFrame src={cover!} alt="" fit="cover" href={href} />
+        </div>
+      ) : cover ? (
+        <MediaFrame src={cover} alt="" fit="cover" href={href} />
+      ) : (
+        <span class="lab-card__initial" aria-hidden="true">
+          {title.trim().charAt(0)}
+        </span>
+      )}
+    </div>
+  ) : null}
+  <Slip>
+    <div class="lab-copy">
+      <Heading
+        level={3}
+        scale={layout === "feature" ? "post" : "card"}
+        {...mark("lab.title")}
+      >
+        <Link href={href} arrow>
+          {title}
+        </Link>
+      </Heading>
+      <p class="summary" {...mark("lab.summary")}>
+        {summary}
+      </p>
+      {play && (
+        <>
+          <p class="lab-card__play" {...mark("lab.preview")}>
+            <button
+              type="button"
+              class="lab-card__toggle"
+              aria-pressed="false"
+              aria-controls={play.id}
+              aria-label={`${play.copy.load[play.kind]}: ${title}`}
+              data-block-toggle
+              data-load={play.copy.load[play.kind]}
+              data-close={play.copy.close}
+              data-subject={title}
+            >
+              {play.copy.load[play.kind]}
+            </button>
+            <span class="lab-card__note">{play.copy.note}</span>
+          </p>
+          <p class="lab-card__status block-stage__status" role="status"></p>
+        </>
+      )}
+    </div>
+  </Slip>
 </article>
 <style>
   .lab-card {
     display: grid;
     align-content: start;
-    gap: var(--space-s);
-    border-top: var(--rule-width) solid var(--color-border);
-    padding-top: var(--space-l);
+    gap: var(--space-m);
+    min-width: 0;
   }
-  .meta {
-    font-size: var(--text-xs);
+  .lab-copy {
+    display: grid;
+    align-content: start;
+    gap: var(--space-xs);
+    min-width: 0;
+  }
+  /* Even lines, so a long title never leaves its arrow alone on the last. */
+  .lab-copy :global(.ds-heading) {
+    text-wrap: balance;
+  }
+  .summary {
+    font-size: var(--text-copy);
+  }
+  .lab-card__object {
+    position: relative;
+    min-width: 0;
+  }
+  /* A print is opaque: what it lies on does not show through its border. */
+  .lab-card :global(.ds-media) {
+    background-color: var(--color-page);
+  }
+
+  /* On the Bench things lie as they were put down: a print, a pile, a
+     stage or a slip leans a touch, and straightens when picked up. What it
+     is that lies there (the thing, not its board) is the "piece". */
+  .lab-card {
+    --lab-lean: 0deg;
+  }
+  .lab-card--lean-left {
+    --lab-lean: var(--settle-angle);
+  }
+  .lab-card--lean-right {
+    --lab-lean: calc(-1 * var(--settle-angle));
+  }
+  .lab-card__object > :global(*),
+  .lab-card :global(.ds-note) {
+    rotate: var(--lab-lean);
+  }
+
+  /* A pile: the cover on top, the other prints under it, each turned a
+     little further and showing an edge, fanned a little more when the pile
+     is picked up. */
+  .lab-card__pile {
+    position: relative;
+    isolation: isolate;
+    margin: var(--space-xs) var(--space-m) 0 0;
+  }
+  .lab-card__pile > :global(.ds-media) {
+    position: relative;
+    z-index: 1;
+  }
+  .lab-card__under {
+    --depth: 1;
+    --fan: 1;
+    position: absolute;
+    inset: 0;
+    padding: var(--space-s);
+    border: var(--rule-width) solid var(--color-border);
+    background: var(--color-page);
+    rotate: calc(var(--depth) * var(--pile-turn) * var(--fan));
+    translate: calc(var(--depth) * var(--pile-shift) * var(--fan))
+      calc(var(--depth) * var(--pile-shift) * -0.5 * var(--fan));
+  }
+  .lab-card__under img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .lab-card--feature {
+    grid-template-columns: var(--feature-media-width) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-xl);
+  }
+  .lab-card--feature .lab-copy {
+    gap: var(--space-s);
+  }
+  .lab-card--feature .summary {
+    max-width: var(--reading-width);
+    font-size: var(--text-lead);
+  }
+  .lab-card--feature.lab-card--bare {
+    grid-template-columns: minmax(0, var(--title-width));
+  }
+
+  /* A slip is taped down at its top edge. */
+  .lab-card--bare :global(.ds-note) {
+    position: relative;
+  }
+  .lab-card--bare :global(.ds-note)::before {
+    content: "";
+    position: absolute;
+    top: calc(-1 * var(--space-xs));
+    left: var(--space-l);
+    width: var(--tape-width);
+    height: var(--space-l);
+    background: var(--tape);
+    rotate: calc(var(--settle-angle) * -3);
+  }
+  .lab-card--bare.lab-card--lean-right :global(.ds-note)::before {
+    left: auto;
+    right: var(--space-l);
+    rotate: calc(var(--settle-angle) * 3);
+  }
+
+  /* On the Shelf an experiment stands upright on its board, the board's
+     edge hatched beneath, its label under the board. Boards abreast meet,
+     so a row of them reads as one shelf. */
+  .lab-card--standing {
+    gap: 0;
+  }
+  .lab-card--standing .lab-card__object {
+    display: flex;
+    align-items: end;
+    min-height: var(--shelf-height);
+    padding: 0 var(--space-m) var(--space-2xs);
+    border-bottom: var(--focus-width) solid var(--color-border);
+  }
+  .lab-card--standing .lab-card__object::after {
+    content: "";
+    position: absolute;
+    inset: 100% 0 auto;
+    height: var(--space-xs);
+    margin-top: var(--focus-width);
+    background: var(--texture);
+  }
+  .lab-card--standing .lab-card__object > :global(*) {
+    width: min(100%, var(--media-width));
+  }
+  .lab-card--standing .lab-card__pile {
+    width: min(100% - var(--space-m), var(--media-width));
+  }
+  .lab-card--standing .lab-card__object > .lab-card__initial {
+    width: min(100%, var(--media-width) / 2);
+  }
+  /* A piece with no picture stands as a block with its initial on it. */
+  .lab-card__initial {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1 / var(--media-ratio);
+    border-radius: var(--radius-note);
+    background: var(--color-surface);
+    font-family: var(--font-serif);
+    font-size: var(--text-section);
+    line-height: var(--leading-display);
+    color: var(--color-accent);
+  }
+  .lab-card--standing .lab-copy {
+    padding: calc(var(--space-xs) + var(--space-s)) var(--space-m) 0;
+  }
+  .lab-card--standing :global(.ds-heading) {
+    font-size: var(--text-lead);
+  }
+  .lab-card--standing .summary {
+    font-size: var(--text-sm);
     color: var(--color-text-soft);
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .lab-card__object > :global(*),
+    .lab-card :global(.ds-note),
+    .lab-card__under {
+      transition:
+        rotate var(--duration-hover) var(--ease-settle),
+        translate var(--duration-hover) var(--ease-settle);
+    }
+    .lab-card:is(:hover, :has(:focus-visible)) .lab-card__object > :global(*),
+    .lab-card:is(:hover, :has(:focus-visible)) :global(.ds-note) {
+      rotate: 0deg;
+      translate: 0 calc(-1 * var(--motion-lift));
+    }
+    .lab-card:is(:hover, :has(:focus-visible)) .lab-card__under {
+      --fan: 2;
+    }
+  }
+  /* On a phone two boards abreast would leave a label too narrow for its
+     button's words: each piece stands at the right end of a board of its
+     own, its label beside it, as on a shelf seen up close. */
+  @media (max-width: 40.625rem) {
+    .lab-card--standing {
+      position: relative;
+      grid-template-columns: minmax(0, 1fr) var(--shelf-piece-compact);
+      align-items: end;
+      column-gap: var(--space-m);
+      border-bottom: var(--focus-width) solid var(--color-border);
+    }
+    .lab-card--standing::after {
+      content: "";
+      position: absolute;
+      inset: 100% 0 auto;
+      height: var(--space-xs);
+      margin-top: var(--focus-width);
+      background: var(--texture);
+    }
+    .lab-card--standing .lab-card__object {
+      order: 2;
+      min-height: 0;
+      padding: 0 0 var(--space-2xs);
+      border-bottom: 0;
+    }
+    .lab-card--standing .lab-card__object::after {
+      content: none;
+    }
+    .lab-card--standing .lab-card__live {
+      right: auto;
+      left: calc(-1 * var(--space-xs));
+    }
+    .lab-card--standing .lab-card__object {
+      justify-content: end;
+    }
+    .lab-card--standing .lab-copy {
+      order: 1;
+      align-self: start;
+      padding: 0 0 var(--space-l);
+    }
+  }
+  @media (max-width: 62.5rem) {
+    .lab-card--feature {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-m);
+    }
+  }
+
+  /* A card that can be played: the stage is where the cover would be, the
+     size of it, and it is the stage that leans and lifts, with the cover
+     (or the empty frame) lying flat in it. The frame is laid over it, out
+     of sight until it has loaded, then the still steps aside and keeps
+     the room, so nothing about the card moves. Picked up to play, it lies
+     straight. A ball at its corner says it is live until it is. */
+  .lab-card__stage {
+    position: relative;
+  }
+  .lab-card .lab-card__still :global(.ds-media) {
+    rotate: none;
+    translate: none;
+  }
+  .lab-card__blank {
+    padding: var(--space-s);
+    background: var(--texture);
+    background-color: var(--color-page);
+  }
+  .lab-card__blank::before {
+    content: "";
+    display: block;
+    aspect-ratio: var(--media-ratio);
+  }
+  .lab-card__live {
+    position: absolute;
+    top: calc(-1 * var(--space-xs));
+    right: calc(-1 * var(--space-xs));
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: var(--ball-link-size);
+    height: var(--ball-link-size);
+    border-radius: var(--radius-round);
+    background: var(--ball-fill-current);
+    color: var(--ball-ink-current);
+    box-shadow: var(--shadow-ball);
+  }
+  .lab-card__live svg {
+    width: 55%;
+    height: 55%;
+  }
+  .lab-card__stage[data-live] .lab-card__live {
+    visibility: hidden;
+  }
+  .lab-card__stage :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--color-page);
+  }
+  .lab-card__stage[data-live="loading"] :global(iframe),
+  .lab-card__stage[data-live="on"] .lab-card__still {
+    visibility: hidden;
+  }
+  .lab-card__stage[aria-busy="true"] {
+    cursor: progress;
+  }
+  .lab-card:has([aria-pressed="true"]) .lab-card__stage {
+    rotate: 0deg;
+  }
+  /* The note is on a line of its own, so that the button's words changing
+     (to play, to put away) never changes how the two sit. */
+  .lab-card__play {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-2xs);
+  }
+  .lab-card__toggle {
+    min-height: var(--control-min-height);
+    padding-inline: var(--space-m);
+    border: var(--rule-width) solid var(--color-accent);
+    border-radius: var(--radius-pill);
+    background: var(--color-page);
+    color: var(--color-accent);
+    cursor: pointer;
+  }
+  .lab-card__toggle:hover {
+    background: var(--color-hover);
+  }
+  .lab-card__toggle[aria-pressed="true"] {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+  .lab-card__note {
+    font-size: var(--text-xs);
+    line-height: var(--leading-tight);
+    color: var(--color-text-soft);
+  }
+  /* Said to assistive technology, not shown, so saying it moves nothing. */
+  .lab-card__status {
+    position: absolute;
+    width: var(--rule-width);
+    height: var(--rule-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 </style>

@@ -1,0 +1,80 @@
+---
+/** Composition: an entry's page in reading order, in Daylight. Its prose
+ * is set as written; every other block is drawn plainly and marked as its
+ * part (blocks/BlockBody.astro). A page with no block but prose is given
+ * no stylesheet and no script for them; an embed and a model ask for
+ * nothing until they are asked for.
+ * `arranged` lays the page out as a notebook's spreads and plates
+ * (`arrangeBlocks`): words with the small blocks after them in the margin
+ * beside them, and a picture, a film, something live or steps across the
+ * page as a plate of its own. Without it, every block follows the last.
+ * Either way the order the page is read in is the order it was written.
+ */
+import BlockBody from "./blocks/BlockBody.astro";
+import BlockScript from "./blocks/BlockScript.astro";
+import { arrangeBlocks, type Block } from "../lib/blocks";
+import type { SiteContent } from "../prism/shells/types";
+import stylesheet from "../styles/blocks.css?url";
+
+interface Props {
+  blocks: Block[];
+  /** The entry whose page this is. */
+  slug: string;
+  /** `blocks` in site/config.json. */
+  copy: SiteContent["site"]["blocks"];
+  arranged?: boolean;
+}
+const { blocks, slug, copy, arranged = false } = Astro.props;
+const told = blocks.some((block) => block.type !== "text");
+// What needs the script: something loaded on a press, or a film that
+// plays by itself.
+const live = blocks.some(
+  (block) =>
+    block.type === "embed" ||
+    block.type === "model" ||
+    (block.type === "film" && block.loop),
+);
+---
+
+{told && <link rel="stylesheet" href={stylesheet} />}
+{
+  arranged
+    ? arrangeBlocks(blocks).map((group) =>
+        group.kind === "plate" ? (
+          <div class="blocks-plate" data-plate={group.block.type}>
+            <BlockBody block={group.block} slug={slug} copy={copy} />
+          </div>
+        ) : (
+          <div
+            class:list={[
+              "blocks-spread",
+              {
+                "blocks-spread--margin": group.text && group.asides.length,
+                "blocks-spread--row": !group.text,
+              },
+            ]}
+          >
+            {group.text && (
+              <div class="blocks-spread__text">
+                <Fragment set:html={group.text.html} />
+              </div>
+            )}
+            {group.asides.length > 0 && (
+              <div class="blocks-spread__margin">
+                {group.asides.map((block) => (
+                  <BlockBody block={block} slug={slug} copy={copy} />
+                ))}
+              </div>
+            )}
+          </div>
+        ),
+      )
+    : blocks.map((block) =>
+        block.type === "text" ? (
+          <Fragment set:html={block.html} />
+        ) : (
+          <BlockBody block={block} slug={slug} copy={copy} />
+        ),
+      )
+}
+{live && <BlockScript />}
