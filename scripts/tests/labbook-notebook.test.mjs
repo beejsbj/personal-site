@@ -102,14 +102,20 @@ test("an update is about the experiment and the project it names that are shown"
       },
     ],
   );
-  // A project named by its title, as the older updates do, is known by its
-  // slug all the same.
+  // A project is named by its slug, and a title names nothing.
+  assert.deepEqual(
+    subjectsOf(
+      update("y", "2026-06-20", { relatedProject: "qrng" }),
+      shown,
+    ).map(({ kind, slug }) => [kind, slug]),
+    [["project", "qrng"]],
+  );
   assert.deepEqual(
     subjectsOf(
       update("y", "2026-06-20", { relatedProject: "QRNG Demo Apps" }),
       shown,
-    ).map(({ kind, slug }) => [kind, slug]),
-    [["project", "qrng"]],
+    ),
+    [],
   );
   // A redacted update is about what it names, too: its shape keeps that.
   assert.deepEqual(
@@ -138,7 +144,7 @@ test("the Labbook can be narrowed to each experiment and project it is about, la
       relatedExperiment: "lotus",
       relatedProject: "dayshaper",
     }),
-    update("lottery", "2026-06-20", { relatedProject: "QRNG Demo Apps" }),
+    update("lottery", "2026-06-20", { relatedProject: "qrng" }),
     update("plain", "2026-09-27"),
     update("gone", "2026-09-28", { relatedExperiment: "roulette" }),
   ];
