@@ -66,6 +66,9 @@ class App {
   busy = false;
   /** The book lying open. */
   bookKey: BookKey = "home";
+  /** Where the visitor was, path and query, when the open pages were
+   * written. */
+  at = `${location.pathname}${location.search}`;
 
   constructor(private ctx: ShellContext) {
     this.root = ctx.root;
@@ -163,6 +166,7 @@ class App {
       spread: this.book.geo.spread,
       stage: this.book.stage,
       today: today(this.copy),
+      at: `${location.pathname}${location.search}`,
     };
   }
 
@@ -204,11 +208,14 @@ class App {
     this.paged.rank = rankOf(this.pagedRoute, this.order);
     if (this.sheet) this.sheet.rank = rankOf(this.route, this.order);
     const was = this.current();
-    // the runtime may hand us the page we're already on: nothing to turn
-    if (route.path === this.route.path && !route.refresh) {
+    // the runtime may hand us the page we're already on: nothing to turn,
+    // unless its query changed what is written there (the Labbook narrowed)
+    const at = `${location.pathname}${location.search}`;
+    if (route.path === this.route.path && !route.refresh && at === this.at) {
       this.route = route;
       return;
     }
+    this.at = at;
     this.route = route;
     const ch = this.build(route);
     const land = this.landAtEnd;
@@ -240,7 +247,7 @@ class App {
     if (ch.key === this.paged.key) {
       this.paged = ch;
       this.pagedRoute = route;
-      this.view = Math.min(this.view, this.views(ch) - 1);
+      this.view = this.viewOf(ch, Math.min(this.view, this.views(ch) - 1));
       this.book.place(this.pagesAt(ch, this.view));
       this.settle();
       return;

@@ -309,6 +309,114 @@ function study(project: string): ExperimentFixture {
   };
 }
 
+/** Every kind of experiment the Lab's list draws, in both places, each
+ * living elsewhere (no page of its own), with the site's own pictures. */
+function labKinds(): LabEntry[] {
+  const pictures = (...names: string[]) =>
+    names.map((name) => ({ type: "image" as const, src: `/images/lab/${name}` }));
+  const pen = (id: string) => ({
+    detail: `https://codepen.io/beejsbj/pen/${id}`,
+    href: `https://codepen.io/beejsbj/pen/${id}`,
+    preview: {
+      kind: "pen" as const,
+      frame: `https://codepen.io/beejsbj/embed/${id}?default-tab=result`,
+    },
+  });
+  const away = (slug: string) => ({
+    detail: `https://example.com/${slug}`,
+    href: `https://example.com/${slug}`,
+  });
+  const entry = (
+    order: number,
+    over: Partial<LabEntry> & Pick<LabEntry, "slug" | "title" | "summary" | "place">,
+  ): LabEntry => ({
+    ...away(over.slug),
+    hasPage: false,
+    links: [],
+    media: [],
+    order,
+    html: "",
+    blocks: [],
+    ...over,
+  });
+  return [
+    entry(1, {
+      slug: "fixture-kinds-featured",
+      title: "The one with pride of place, and three pictures",
+      summary: "Featured, with three pictures, so the Bench gives it the most room.",
+      place: "bench",
+      featured: true,
+      cover: "/images/lab/melograph.png",
+      media: pictures("melograph.png", "midi-strudel.png", "kitchen.png"),
+    }),
+    entry(2, {
+      slug: "fixture-kinds-print",
+      title: "One picture",
+      summary: "One picture to show for it.",
+      place: "bench",
+      cover: "/images/lab/game-of-life.png",
+    }),
+    entry(3, {
+      slug: "fixture-kinds-words",
+      title: "Only words so far",
+      summary: "Nothing to look at yet: only what it is about.",
+      place: "bench",
+    }),
+    entry(4, {
+      slug: "fixture-kinds-pen",
+      title: "A Pen to play where it lies",
+      summary: "It lives on CodePen and plays here when asked.",
+      place: "bench",
+      cover: "/images/lab/motion-path-graph.svg",
+      ...pen("abXZWLQ"),
+    }),
+    entry(5, {
+      slug: "fixture-kinds-stack",
+      title: "Two pictures",
+      summary: "Two pictures, the cover on top.",
+      place: "bench",
+      cover: "/images/lab/persona-5-stars.png",
+      media: pictures("persona-5-stars.png", "13black-spade.png"),
+    }),
+    entry(6, {
+      slug: "fixture-kinds-demo",
+      title: "A demo with no picture",
+      summary: "A deployed demo that says it may be framed, and nothing to show until it is.",
+      place: "bench",
+      preview: { kind: "demo", frame: "https://example.com/fixture-kinds-demo" },
+    }),
+    entry(1, {
+      slug: "fixture-kinds-shelved",
+      title: "An old picture",
+      summary: "On the Shelf, with the rest.",
+      place: "shelf",
+      cover: "/images/lab/css-notebook.png",
+    }),
+    entry(2, {
+      slug: "fixture-kinds-shelf-pen",
+      title: "A Pen gone quiet",
+      summary: "It still plays where it stands.",
+      place: "shelf",
+      cover: "/images/lab/beating-shapes.png",
+      ...pen("xxexKMq"),
+    }),
+    entry(3, {
+      slug: "fixture-kinds-shelf-stack",
+      title: "An archive piece with two pictures",
+      summary: "Two pictures from when it was made.",
+      place: "shelf",
+      cover: "/images/lab/design-trampoline-logo.png",
+      media: pictures("design-trampoline-logo.png", "meditejo.png"),
+    }),
+    entry(4, {
+      slug: "fixture-kinds-shelf-words",
+      title: "Words on the Shelf",
+      summary: "No picture at all.",
+      place: "shelf",
+    }),
+  ];
+}
+
 /** The fixture experiments. The one that graduated did so into the first
  * of `projects`. */
 export const experimentFixtures = (
@@ -568,6 +676,13 @@ export const FIXTURES: Record<string, Fixture> = {
         ...content,
         lab: content.lab.map((entry) => ({ ...entry, featured: undefined })),
       }),
+    routes: () => [{ kind: "lab", path: "/lab" }],
+  },
+  "lab-kinds": {
+    name: "lab-kinds",
+    about:
+      "A Lab with every kind of experiment in both places: featured with three pictures, one picture, two, a Pen and a demo to play where they lie (one with no picture), and only words; on the Shelf a picture, a Pen, two pictures and only words.",
+    apply: (content) => settle({ ...content, lab: labKinds() }),
     routes: () => [{ kind: "lab", path: "/lab" }],
   },
   "lab-no-cover": {

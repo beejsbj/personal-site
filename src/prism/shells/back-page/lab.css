@@ -1,6 +1,12 @@
-/* The lab book: experiments on the bench (a doodle each, in the margin) and
-   on the shelf (a library card stapled in), the Labbook kept as dated lines
-   with what it made taped beside them, and an update scribbled out. */
+/* The lab book: a graph-paper exercise book, written up the way a science
+   book is. Its contents at the front; the bench as rough work (a doodle in
+   the margin, photos taped in, something live taped in with a sticky note
+   on it); the shelf as a library card stapled in, a stamp of each picture
+   beside its line; an experiment's pages as an exercise, its headings
+   numbered in the margin and its pieces stuck in; and the Labbook kept by
+   month, each dated with a calendar drawn on the squares, its subjects
+   counted in a tally chart, what it made taped beside it, and an update
+   scribbled out. */
 
 /* ---- the bench ------------------------------------------------------------------- */
 :root[data-lens="back-page"] .bp-flow .bp-labitem__title {
@@ -119,15 +125,6 @@
 }
 
 /* ---- the Labbook -------------------------------------------------------------------- */
-:root[data-lens="back-page"] .bp-flow .bp-log__year {
-  margin: 0;
-  font: 400 1.35em/var(--lh) var(--bp-brush);
-  color: var(--bp-red);
-  letter-spacing: 0.04em;
-}
-:root[data-lens="back-page"] .bp-log li[data-year] .bp-mnote {
-  top: var(--lh);
-}
 :root[data-lens="back-page"] .bp-flow .bp-log__about {
   margin: 0;
   font: 400 1.1em/var(--lh) var(--bp-hand);
@@ -281,4 +278,632 @@
 }
 :root[data-lens="back-page"] .bp-grad .bp-sticky__where {
   margin: 0 1.8em 0.15em 0;
+}
+
+/* ---- the contents, at the front: the printed table, filled in by hand ----------- */
+:root[data-lens="back-page"] .bp-flow .bp-contents {
+  margin: var(--g) 0.3em var(--lh) 0;
+  border: 1.5px solid color-mix(in srgb, var(--bp-label-ink) 70%, transparent);
+  background: color-mix(in srgb, var(--bp-paper) 70%, transparent);
+}
+:root[data-lens="back-page"] .bp-flow .bp-contents__title {
+  margin: 0;
+  padding: 0.15em 0.7em;
+  font: 0.7em/1.9 var(--bp-type);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--bp-label-ink);
+  border-bottom: 1.5px solid color-mix(in srgb, var(--bp-label-ink) 70%, transparent);
+}
+:root[data-lens="back-page"] .bp-flow .bp-contents ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="back-page"] .bp-contents li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  padding: 0 0.7em;
+  border-bottom: 1px solid color-mix(in srgb, var(--bp-label-ink) 32%, transparent);
+  font: 700 1.2em/var(--lh) var(--bp-hand);
+}
+:root[data-lens="back-page"] .bp-contents li:last-child {
+  border-bottom: 0;
+}
+:root[data-lens="back-page"] .bp-contents li[data-sub] {
+  padding-left: 1.8em;
+  font-size: 1.02em;
+  font-weight: 400;
+}
+:root[data-lens="back-page"] .bp-flow .bp-contents a {
+  text-decoration: none;
+}
+:root[data-lens="back-page"] .bp-contents__dots {
+  flex: 1;
+  min-width: 1em;
+  border-bottom: 2px dotted color-mix(in srgb, var(--bp-fine) 55%, transparent);
+  translate: 0 -0.3em;
+}
+:root[data-lens="back-page"] .bp-contents__page {
+  font: 400 0.95em/1 var(--bp-hand);
+  color: var(--bp-red);
+  white-space: nowrap;
+}
+
+/* ---- the bench: what each experiment holds, beside its name ------------------------ */
+/* one photo, or two or three fanned with the first on top (drawn last) */
+:root[data-lens="back-page"] .bp-snaps-fan {
+  display: grid;
+  padding: 0.3em 0.6em 0.5em;
+}
+:root[data-lens="back-page"] .bp-snaps-fan > .bp-snap {
+  grid-area: 1 / 1;
+  margin: 0.55em 0 0;
+}
+:root[data-lens="back-page"] .bp-snap .bp-tape {
+  width: 3.2em;
+  height: 1.05em;
+  top: -0.5em;
+}
+:root[data-lens="back-page"] .bp-snap img {
+  aspect-ratio: 4 / 3;
+  max-height: none;
+}
+:root[data-lens="back-page"] .bp-snaps-fan[data-count="2"] > :nth-child(1) {
+  transform: translate(9%, -5%) rotate(5deg) scale(0.92);
+}
+:root[data-lens="back-page"] .bp-snaps-fan[data-count="2"] > :nth-child(2) {
+  transform: translate(-4%, 4%) rotate(-3deg);
+}
+:root[data-lens="back-page"] .bp-snaps-fan[data-count="3"] > :nth-child(1) {
+  transform: translate(13%, -7%) rotate(8deg) scale(0.84);
+}
+:root[data-lens="back-page"] .bp-snaps-fan[data-count="3"] > :nth-child(2) {
+  transform: translate(-11%, -3%) rotate(-7deg) scale(0.88);
+}
+:root[data-lens="back-page"] .bp-snaps-fan[data-count="3"] > :nth-child(3) {
+  transform: translate(0, 5%) rotate(-1deg);
+}
+:root[data-lens="back-page"] .bp-labitem .bp-snaps-fan {
+  float: left;
+  width: 44%;
+  margin: 0.2em 0.9em 0.4em -0.5em;
+}
+:root[data-lens="back-page"] .bp-labitem[data-side="right"] .bp-snaps-fan {
+  float: right;
+  margin: 0.2em -0.5em 0.4em 0.9em;
+}
+:root[data-lens="back-page"] .bp-labitem[data-featured] .bp-snaps-fan {
+  width: 54%;
+}
+/* something to play: taped in across the page, under its name */
+:root[data-lens="back-page"] .bp-labitem .bp-live {
+  clear: both;
+  margin: 0 0 var(--g);
+}
+:root[data-lens="back-page"] .bp-labitem[data-side="right"] .bp-live {
+  margin-left: auto;
+}
+
+/* ---- something live, taped in as a picture of itself --------------------------------- */
+:root[data-lens="back-page"] .bp-flow .bp-live {
+  width: 82%;
+  margin: 0 0 var(--lh);
+}
+:root[data-lens="back-page"] .bp-live .bp-live__card {
+  margin: calc(var(--g) * 1.6) 0.4em 0;
+}
+:root[data-lens="back-page"] .bp-live__stage > img {
+  opacity: 1;
+  object-fit: cover;
+}
+:root[data-lens="back-page"] .bp-live__stage > :is(iframe, canvas) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fdfbf5;
+}
+:root[data-lens="back-page"] .bp-live__stage[data-live="on"] > :not(iframe) {
+  visibility: hidden;
+}
+:root[data-lens="back-page"] .bp-live__stage > canvas:focus-visible {
+  outline: 2px dashed var(--bp-red);
+  outline-offset: -4px;
+}
+/* the sticky note that starts it, stuck over the photo's foot; its words
+   change when it is pressed, never the room it takes */
+:root[data-lens="back-page"] .bp-flow .bp-live__ask {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15em 0.9em;
+  margin: -1.1em 0 0 1.4em;
+}
+:root[data-lens="back-page"] .bp-live__load {
+  flex: 0 0 100%;
+  max-width: max-content;
+  padding: 0.25em 0.8em 0.3em;
+  border: 0;
+  border-bottom-right-radius: 40% 10%;
+  font: 700 1.25em/1.2 var(--bp-hand);
+  color: var(--bp-red);
+  white-space: nowrap;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.06), transparent 0.9em),
+    var(--bp-sticky);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.12),
+    4px 8px 9px -6px rgba(60, 40, 0, 0.45);
+  transform: rotate(-2deg);
+  cursor: pointer;
+}
+:root[data-lens="back-page"] .bp-live__load[aria-pressed="true"] {
+  color: var(--bp-blue);
+  transform: rotate(1.5deg);
+}
+:root[data-lens="back-page"] .bp-live__load:focus-visible,
+:root[data-lens="back-page"] .bp-shelfcard__play button:focus-visible {
+  outline: 2px dashed var(--bp-red);
+  outline-offset: 3px;
+}
+:root[data-lens="back-page"] .bp-live__ask .bp-ask__small {
+  font-size: 0.62em;
+}
+:root[data-lens="back-page"] .bp-live__ask a {
+  font: 700 1.1em/var(--lh) var(--bp-hand);
+}
+:root[data-lens="back-page"] .bp-flow .bp-live__caption {
+  margin: 0.2em 0 0;
+  font: 400 1.15em/1.25 var(--bp-hand);
+  color: var(--bp-fine);
+  text-align: center;
+}
+
+/* ---- the shelf: the library stamps each picture beside its line ------------------- */
+:root[data-lens="back-page"] {
+  /* rubber-stamp ink: it takes, mostly, and misses here and there */
+  --bp-stamp-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='105'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.2 2.55'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+:root[data-lens="back-page"] .bp-flow .bp-shelfcard li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 0.8em;
+  align-items: start;
+}
+:root[data-lens="back-page"] .bp-shelfcard li > * {
+  grid-column: 1;
+}
+:root[data-lens="back-page"] .bp-shelfcard .bp-stamp__room {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  position: relative;
+  width: 6.4em;
+  margin: 0.35em 0 0.3em;
+}
+:root[data-lens="back-page"] .bp-stamp {
+  --stamp-ink: #8e2f2a;
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  padding: 0;
+  border: 2.5px solid var(--stamp-ink);
+  outline: 1px solid var(--stamp-ink);
+  outline-offset: 2px;
+  border-radius: 2px;
+  background: #fff;
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+  transform: rotate(-3deg);
+  -webkit-mask: var(--bp-stamp-grain) 0 0 / 7em auto;
+  mask: var(--bp-stamp-grain) 0 0 / 7em auto;
+}
+:root[data-lens="back-page"] .bp-shelfcard li:nth-child(even) .bp-stamp {
+  --stamp-ink: #23407e;
+  transform: rotate(2.5deg);
+}
+:root[data-lens="back-page"] .bp-stamp > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.7) brightness(1.3);
+}
+/* the ink: white stays the card, the dark goes the stamp's colour */
+:root[data-lens="back-page"] .bp-stamp::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--stamp-ink);
+  mix-blend-mode: lighten;
+  pointer-events: none;
+}
+/* played: the stamp is the piece itself, in colour and whole */
+:root[data-lens="back-page"] .bp-stamp:is([data-live], [aria-busy]) {
+  mix-blend-mode: normal;
+  opacity: 1;
+  -webkit-mask: none;
+  mask: none;
+}
+:root[data-lens="back-page"] .bp-stamp:is([data-live], [aria-busy])::after {
+  content: none;
+}
+:root[data-lens="back-page"] .bp-stamp > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fdfbf5;
+}
+:root[data-lens="back-page"] .bp-stamp[data-live="on"] > :not(iframe) {
+  visibility: hidden;
+}
+:root[data-lens="back-page"] .bp-flow .bp-shelfcard__play {
+  margin: 0.1em 0 0.15em;
+}
+:root[data-lens="back-page"] .bp-shelfcard__play button {
+  padding: 0 0.55em 0.05em;
+  border: 0;
+  font: 700 1.15em/1.3 var(--bp-hand);
+  color: #a3242d;
+  white-space: nowrap;
+  background: var(--bp-circle-red) center / 100% 100% no-repeat;
+  cursor: pointer;
+}
+:root[data-lens="back-page"] .bp-shelfcard__play button[aria-pressed="true"] {
+  color: #23407e;
+}
+
+/* ---- the Labbook: a tally of who it is about, then the months ------------------- */
+:root[data-lens="back-page"] .bp-flow .bp-tallies__label {
+  margin: 0;
+  font: 400 1.15em/var(--lh) var(--bp-hand);
+  color: var(--bp-fine);
+}
+:root[data-lens="back-page"] .bp-flow .bp-tallies {
+  margin: 0 0 var(--lh);
+  padding: 0;
+  list-style: none;
+  border-top: 1.5px solid color-mix(in srgb, var(--bp-pencil) 55%, transparent);
+}
+:root[data-lens="back-page"] .bp-tallies li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 5.2em;
+  align-items: center;
+  column-gap: 0.7em;
+  border-bottom: 1px solid color-mix(in srgb, var(--bp-pencil) 40%, transparent);
+}
+:root[data-lens="back-page"] .bp-flow .bp-tallies a {
+  justify-self: start;
+  padding: 0 0.35em;
+  margin-left: -0.35em;
+  font: 700 1.2em/var(--lh) var(--bp-hand);
+  text-decoration: none;
+}
+:root[data-lens="back-page"] .bp-flow .bp-tallies a[aria-current] {
+  color: var(--bp-red);
+  background: var(--bp-circle-red) center / 100% 100% no-repeat;
+}
+:root[data-lens="back-page"] .bp-tallies .bp-tally {
+  width: auto;
+  height: 1.05em;
+}
+:root[data-lens="back-page"] .bp-tallies__kind {
+  font: 0.6em/1 var(--bp-type);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bp-fine);
+  text-align: right;
+}
+:root[data-lens="back-page"] .bp-flow .bp-narrowed {
+  margin: calc(var(--g) * -0.5) 0 var(--lh);
+  font: 400 1.2em/var(--lh) var(--bp-hand);
+}
+:root[data-lens="back-page"] .bp-narrowed b {
+  font-weight: 700;
+  color: var(--bp-red);
+}
+/* a month dated the way a lesson is: its name ruled under twice, and the
+   month drawn as a calendar on the squares beside it, the days written in
+   ringed */
+:root[data-lens="back-page"] .bp-month {
+  position: relative;
+  margin-top: var(--g);
+}
+:root[data-lens="back-page"] .bp-flow .bp-month__name {
+  margin: 0;
+  font: 400 1.6em/calc(var(--lh) * 1.5) var(--bp-brush);
+  letter-spacing: 0.02em;
+  color: var(--bp-red);
+}
+:root[data-lens="back-page"] .bp-month__name .bp-underline {
+  width: min(60%, 8em);
+  height: 0.5em;
+  margin: -0.35em 0 0.2em;
+}
+:root[data-lens="back-page"] .bp-cal {
+  float: right;
+  display: grid;
+  grid-template-columns: repeat(7, var(--g));
+  grid-auto-rows: var(--g);
+  margin: 0.25em 0 0.5em 0.9em;
+  border-top: 1px solid color-mix(in srgb, var(--bp-pencil) 50%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--bp-pencil) 50%, transparent);
+  font: 400 calc(var(--g) * 0.6) / var(--g) var(--bp-print);
+  color: color-mix(in srgb, var(--bp-pencil) 60%, transparent);
+  text-align: center;
+}
+:root[data-lens="back-page"] .bp-cal > span {
+  border-right: 1px solid color-mix(in srgb, var(--bp-pencil) 50%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--bp-pencil) 50%, transparent);
+}
+:root[data-lens="back-page"] .bp-cal > :first-child {
+  grid-column-start: calc(var(--lead) + 1);
+}
+:root[data-lens="back-page"] .bp-cal > [data-on] {
+  font-weight: 700;
+  color: var(--bp-red);
+  background: var(--bp-circle-red) center / 130% 120% no-repeat;
+  rotate: var(--turn, 0deg);
+}
+/* each month's entries carry on under its name, round its calendar */
+:root[data-lens="back-page"] .bp-month + .bp-log {
+  margin-top: calc(var(--g) * 0.5);
+}
+
+/* ---- an experiment's pages: what it holds, under its name ---------------------------- */
+:root[data-lens="back-page"] .bp-labhead {
+  width: 74%;
+  margin: 0 auto var(--g);
+}
+:root[data-lens="back-page"] .bp-labhead[data-count="1"] {
+  width: 64%;
+}
+
+/* ---- an exercise: each heading numbered in a ring in the margin, ruled under ------- */
+:root[data-lens="back-page"] .bp-flow h2:has(> .bp-num) {
+  position: relative;
+  text-decoration: underline 2px color-mix(in srgb, var(--bp-red) 75%, transparent);
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: none;
+}
+/* (--mx is in ems: taken at the number's own size, 0.78 of a heading 1.7
+   times the page's, it is divided back by 1.326) */
+:root[data-lens="back-page"] .bp-num {
+  position: absolute;
+  left: calc(var(--mx) / -1.326 + 0.3em);
+  top: 0.1em;
+  width: 1.45em;
+  font: 700 0.78em/1.45em var(--bp-hand);
+  color: var(--bp-red);
+  text-align: center;
+  background: var(--bp-circle-red) center / 100% 100% no-repeat;
+  rotate: -6deg;
+}
+
+/* ---- the pieces stuck into an exercise --------------------------------------------- */
+:root[data-lens="back-page"] .bp-flow .bp-jot {
+  margin-top: 0.3em;
+  font: 400 1.15em/1.2 var(--bp-hand);
+  color: var(--bp-fine);
+}
+:root[data-lens="back-page"] .bp-taped__frame {
+  position: relative;
+}
+/* photos, two by two, a third centred under them */
+:root[data-lens="back-page"] .bp-flow .bp-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 1em;
+  margin: 0 0 var(--g);
+}
+:root[data-lens="back-page"] .bp-gallery[data-count="1"] {
+  grid-template-columns: minmax(0, 70%);
+  justify-content: center;
+}
+:root[data-lens="back-page"] .bp-gallery > :nth-child(odd):last-child:not(:first-child) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: calc(50% - 0.5em);
+}
+:root[data-lens="back-page"] :is(.bp-book, .bp-stage)[data-mode="spread"] .bp-gallery[data-count="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 0.7em;
+}
+:root[data-lens="back-page"] :is(.bp-book, .bp-stage)[data-mode="spread"] .bp-gallery[data-count="3"] > :nth-child(odd):last-child:not(:first-child) {
+  grid-column: auto;
+  width: auto;
+}
+:root[data-lens="back-page"] .bp-gallery > .bp-taped {
+  margin: calc(var(--g) * 1.5) 0.2em calc(var(--g) * 0.5);
+}
+:root[data-lens="back-page"] .bp-gallery > :nth-child(even) {
+  --tilt: 1.8deg !important;
+}
+:root[data-lens="back-page"] .bp-gallery > :nth-child(odd) {
+  --tilt: -1.4deg !important;
+}
+:root[data-lens="back-page"] .bp-gallery img,
+:root[data-lens="back-page"] .bp-compare img,
+:root[data-lens="back-page"] .bp-steps__pic img {
+  object-fit: cover;
+}
+:root[data-lens="back-page"] :is(.bp-gallery, .bp-compare, .bp-steps) .bp-tape {
+  width: 3.4em;
+  height: 1.1em;
+  top: -0.5em;
+}
+:root[data-lens="back-page"] :is(.bp-gallery, .bp-compare, .bp-steps) figcaption {
+  font-size: 1.02em;
+}
+/* a before and an after, side by side, an arrow drawn from one to the other */
+:root[data-lens="back-page"] .bp-flow .bp-compare {
+  margin: 0 0 var(--lh);
+}
+:root[data-lens="back-page"] .bp-compare__pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2em minmax(0, 1fr);
+  align-items: center;
+}
+:root[data-lens="back-page"] .bp-compare__pair > .bp-taped {
+  margin: calc(var(--g) * 1.5) 0.1em calc(var(--g) * 0.5);
+}
+:root[data-lens="back-page"] .bp-compare .bp-scrawl--arrow {
+  position: static;
+  width: 100%;
+  height: auto;
+  translate: 0 -0.8em;
+}
+:root[data-lens="back-page"] .bp-compare__label {
+  position: absolute;
+  left: -0.5em;
+  bottom: 0.6em;
+  padding: 0 0.45em 0.05em;
+  font: 700 0.95em/1.3 var(--bp-hand);
+  color: var(--bp-red);
+  background: var(--bp-label);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+  transform: rotate(-5deg);
+}
+/* code copied out in a box ruled in pencil */
+:root[data-lens="back-page"] .bp-flow .bp-code {
+  margin: calc(var(--g) * 0.5) 0 var(--lh);
+}
+:root[data-lens="back-page"] .bp-flow .bp-code pre {
+  position: relative;
+  margin: 0;
+  padding: 0.75em 0.9em 0.7em;
+  border: 1.5px solid color-mix(in srgb, var(--bp-pencil) 75%, transparent);
+  border-radius: 3px 6px 4px 7px / 6px 3px 7px 4px;
+  font: 0.8em/1.6 var(--bp-type);
+  color: var(--bp-pencil);
+  background: color-mix(in srgb, var(--bp-paper) 60%, transparent);
+}
+:root[data-lens="back-page"] .bp-flow .bp-code pre code {
+  font-size: 1em;
+}
+:root[data-lens="back-page"] .bp-code pre::before {
+  content: attr(data-language);
+  position: absolute;
+  top: -0.85em;
+  right: 0.9em;
+  padding: 0 0.4em;
+  font: 0.85em/1.6 var(--bp-type);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bp-red);
+  background: var(--bp-paper);
+}
+:root[data-lens="back-page"] .bp-code pre:focus-visible {
+  outline: 2px dashed var(--bp-red);
+  outline-offset: 3px;
+}
+/* his own words, boxed twice in red */
+:root[data-lens="back-page"] .bp-flow .bp-quote blockquote {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+:root[data-lens="back-page"] .bp-quote figcaption {
+  margin-top: 0.2em;
+  font: 400 0.72em/1.3 var(--bp-hand);
+  color: var(--bp-fine);
+  text-align: right;
+}
+/* the method, each step numbered in a ring in the margin */
+:root[data-lens="back-page"] .bp-flow .bp-steps {
+  margin: 0 0 var(--lh);
+  padding-left: 0;
+  list-style: none;
+}
+:root[data-lens="back-page"] .bp-flow .bp-steps > li {
+  position: relative;
+  display: flow-root;
+  margin-bottom: var(--g);
+}
+:root[data-lens="back-page"] .bp-steps .bp-num {
+  left: calc(var(--mx) / -1.05 + 0.25em);
+  top: 0;
+  width: 1.75em;
+  font-size: 1.05em;
+  line-height: 1.75em;
+  rotate: 4deg;
+}
+:root[data-lens="back-page"] .bp-flow .bp-steps p {
+  margin: 0;
+}
+:root[data-lens="back-page"] .bp-flow .bp-steps__title {
+  font: 700 1.3em/var(--lh) var(--bp-hand);
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-steps__pic {
+  float: right;
+  width: 40%;
+  margin: calc(var(--g) * 1.2) 0 0.3em 1em;
+}
+/* the files, drawn as a bracket tree in pencil */
+:root[data-lens="back-page"] .bp-flow .bp-tree {
+  margin: 0 0 var(--lh);
+}
+:root[data-lens="back-page"] .bp-flow .bp-tree ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-lens="back-page"] .bp-flow .bp-tree ul ul {
+  margin-left: 0.45em;
+  padding-left: 0.9em;
+  border-left: 1.5px solid color-mix(in srgb, var(--bp-pencil) 60%, transparent);
+}
+:root[data-lens="back-page"] .bp-tree ul ul > li {
+  position: relative;
+}
+:root[data-lens="back-page"] .bp-tree ul ul > li::before {
+  content: "";
+  position: absolute;
+  left: -0.9em;
+  top: calc(var(--lh) / 2);
+  width: 0.7em;
+  border-top: 1.5px solid color-mix(in srgb, var(--bp-pencil) 60%, transparent);
+}
+:root[data-lens="back-page"] .bp-tree__name {
+  font: 0.85em/var(--lh) var(--bp-type);
+}
+:root[data-lens="back-page"] .bp-tree li[data-folder] > .bp-tree__name {
+  font: 700 1.2em/var(--lh) var(--bp-hand);
+  color: var(--bp-blue);
+}
+:root[data-lens="back-page"] .bp-tree__note {
+  font: 400 1.05em/var(--lh) var(--bp-hand);
+  color: var(--bp-red);
+}
+/* a sound and a film, taped in */
+:root[data-lens="back-page"] .bp-sound audio {
+  display: block;
+  width: 100%;
+  height: 2.4em;
+}
+:root[data-lens="back-page"] .bp-flow .bp-sound,
+:root[data-lens="back-page"] .bp-flow .bp-film {
+  margin-left: 0.4em;
+  margin-right: 0.4em;
+}
+
+/* ---- on a phone's single page ------------------------------------------------------ */
+:root[data-lens="back-page"] :is(.bp-book, .bp-stage)[data-mode="single"] .bp-shelfcard .bp-stamp__room {
+  width: 4.6em;
+}
+:root[data-lens="back-page"] :is(.bp-book, .bp-stage)[data-mode="single"] .bp-flow .bp-live {
+  width: 100%;
+}
+:root[data-lens="back-page"] :is(.bp-book, .bp-stage)[data-mode="single"] .bp-labhead {
+  width: 86%;
 }
