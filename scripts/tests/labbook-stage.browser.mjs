@@ -57,13 +57,15 @@ test(
     const base = external ?? server.base;
     const browser = await browserType.launch({ executablePath: executable });
 
-    async function visit(options, look, room = ROOM) {
+    async function visit(options, look, room = ROOM, hold = null) {
       const context = await browser.newContext(options);
-      await context.route("**/*", (route) => {
+      await context.route("**/*", async (route) => {
         const url = route.request().url();
         if (url.startsWith(base)) return route.continue();
         if (!/^https:\/\/(codepen\.io|example\.com|demo\.example)\//.test(url))
           return route.abort();
+        // A page held back is a frame still loading.
+        await hold;
         return route.fulfill({
           contentType: "text/html",
           body: "<!doctype html><title>stub</title><p>Stub piece.</p>",
@@ -86,7 +88,6 @@ test(
             timeout: 30000,
           });
           await page.waitForFunction(() => window.prismHarness?.ready);
-          await page.waitForSelector(`#lens-shell [id="${BOOK_PEN}"]`);
         }
         await look(page);
         assert.deepEqual(errors, [], "console errors");
@@ -244,14 +245,38 @@ test(
                   }),
                 ),
             );
-          const start = (page, id) => page.locator(`${piece(id)} ${ASK}`).click();
+          /** Bring the piece into view as a visitor would: Back Page keeps
+           * its Labbook on pages, so the book is turned to the one it is on. */
+          const reveal = async (page, id) => {
+            if (lens !== "back-page")
+              return page.waitForSelector(piece(id), { state: "attached" });
+            const turn = (which) =>
+              page.locator(`#lens-shell [data-prism-turn='${which}']`);
+            const here = () =>
+              page.locator(`#lens-shell .bp-spread [id="${id}"]`).count();
+            let step = "next";
+            for (let i = 0; i < 80 && !(await here()); i += 1) {
+              if (step === "next" && !(await turn("next").count()))
+                step = "prev";
+              assert.ok(await turn(step).count(), `${id} is in the book`);
+              await turn(step).click();
+              await page.waitForTimeout(450);
+            }
+            assert.ok(await here(), `${id} is on an open page`);
+          };
+          const start = async (page, id) => {
+            await reveal(page, id);
+            await page.locator(`${piece(id)} ${ASK}`).click();
+          };
           const framed = (page, id) =>
             page.waitForFunction(
               (selector) => document.querySelector(selector),
               `${piece(id)} iframe`,
             );
-          const asking = (page, id) =>
-            page.locator(`${piece(id)} ${ASK}`).isVisible();
+          const asking = async (page, id) => {
+            await reveal(page, id);
+            return page.locator(`${piece(id)} ${ASK}`).isVisible();
+          };
 
           await t.test(
             `${size}, ${lens}: one Labbook piece at a time, in a sandbox`,
@@ -291,6 +316,58 @@ test(
                 },
                 lensRoom(lens),
               ),
+          );
+
+          await t.test(
+            `${size}, ${lens}: a piece keeps its size while its frame is still loading`,
+            async () => {
+              let release;
+              const held = new Promise((done) => (release = done));
+              try {
+                await visit(
+                { ...options, reducedMotion: "reduce" },
+                async (page) => {
+                  const measure = () =>
+                    page.evaluate((id) => {
+                      const entry = document.querySelector(
+                        `#lens-shell [id="${id}"]`,
+                      );
+                      const stage = entry.querySelector("[data-block-stage]");
+                      const box = (el) => {
+                        const { width, height } = el.getBoundingClientRect();
+                        return [Math.round(width), Math.round(height)];
+                      };
+                      return {
+                        stage: box(stage),
+                        entry: box(entry),
+                        live: stage.dataset.live ?? null,
+                      };
+                    }, BOOK_PEN);
+                  await reveal(page, BOOK_PEN);
+                  const before = await measure();
+                  await start(page, BOOK_PEN);
+                  await framed(page, BOOK_PEN);
+                  const loading = await measure();
+                  assert.equal(loading.live, "loading", "the frame is still loading");
+                  assert.deepEqual(loading.stage, before.stage, "its stage keeps its size");
+                  assert.deepEqual(loading.entry, before.entry, "and so does its entry");
+                  release();
+                  await page.waitForFunction(
+                    (selector) =>
+                      document.querySelector(selector)?.dataset.live === "on",
+                    `${piece(BOOK_PEN)} [data-block-stage]`,
+                  );
+                  const after = await measure();
+                  assert.deepEqual(after.stage, before.stage);
+                  assert.deepEqual(after.entry, before.entry);
+                },
+                lensRoom(lens),
+                held,
+                );
+              } finally {
+                release();
+              }
+            },
           );
 
           await t.test(
