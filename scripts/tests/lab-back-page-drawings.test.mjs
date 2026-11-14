@@ -70,7 +70,7 @@ test("the choice belongs to the entry alone: not its order, its neighbours or a 
   const among = [entry, ...others].map(drawingFor);
   const reversed = [...others, entry].reverse().map(drawingFor);
   assert.equal(among[0], first);
-  assert.equal(reversed.at(-1), first);
+  assert.equal(reversed[0], first);
   // what the entry says decides it, not where it lies
   assert.equal(drawingFor({ ...entry, place: "shelf", order: 99 }), first);
   // the rule draws on no randomness at all

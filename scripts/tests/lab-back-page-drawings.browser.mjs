@@ -6,7 +6,7 @@
  *
  *   corepack pnpm@10.6.5 build && corepack pnpm@10.6.5 test:prism
  *
- * Read on /lab against /prism/content.json and on the harness's fixtures
+ * Read on the harness's /lab with the site's own content and on the harness's fixtures
  * (src/prism/fixtures.ts: lab-kinds, lab-no-cover). Same server and
  * Chromium as prism-parity.browser.mjs (or BASE=<origin>). LAB_SHOTS=<dir>
  * also saves pictures. */
@@ -94,7 +94,10 @@ test(
           const entry = svg.closest(".bp-labitem, .bp-page");
           const name = entry.querySelector("[data-part='lab.title']");
           const a = svg.getBoundingClientRect();
-          const n = name.getBoundingClientRect();
+          // where the name's words are: its box runs the width of the page
+          const words = document.createRange();
+          words.selectNodeContents(name.querySelector("a")?.firstChild ?? name);
+          const n = words.getBoundingClientRect();
           return {
             slug: name.dataset.ref,
             drawing: svg.dataset.drawing,
@@ -146,8 +149,11 @@ test(
         await suite.test(
           `${size}: the real Bench's drawings are the experiments' own, and each differs`,
           async () => {
-            const { context, page, errors } = await open(size, "/lab");
-            const { lab } = await (await fetch(`${base}/prism/content.json`)).json();
+            const { context, page, errors } = await open(
+              size,
+              `/prism/harness?lens=back-page&route=${encodeURIComponent("/lab")}`,
+            );
+            const { lab } = await page.evaluate(() => window.prismHarness.content);
             const found = await leaf(page, drawn);
             assert.ok(found.length >= 3, "the real Bench has drawings");
             for (const one of found)
@@ -173,6 +179,8 @@ test(
               size,
               harness("lab-no-cover", "/lab"),
             );
+            const { lab } = await page.evaluate(() => window.prismHarness.content);
+            const sketch = lab.find((item) => item.slug === "fixture-sketch");
             const listed = (await leaf(page, drawn)).find(
               (one) => one.slug === "fixture-sketch",
             );
@@ -180,7 +188,8 @@ test(
             const own = await open(size, harness("lab-no-cover", "/lab/fixture-sketch"));
             const [page1] = await own.page.evaluate(drawn);
             assert.equal(page1.slug, "fixture-sketch");
-            assert.equal(page1.drawing, listed.drawing);
+            assert.equal(listed.drawing, drawingFor(sketch));
+            assert.equal(page1.drawing, drawingFor(sketch));
             assert.ok(page1.under && page1.within, "drawn large under its name");
             assert.deepEqual([...errors, ...own.errors], []);
             await context.close();
