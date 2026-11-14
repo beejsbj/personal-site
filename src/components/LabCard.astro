@@ -9,9 +9,10 @@ import { part } from "../prism/parts";
  * or as a small pile of them; with none it is written on a slip of paper.
  * An experiment that can be played where it stands (`preview`) has a stage
  * for it, the size of the cover (or, with none, of an empty frame), marked
- * as live, and a button under its words that loads it there in place of
- * the still: nothing is asked of another site until the press, and a
- * second press or Escape brings the still back (src/lib/block-stage.ts).
+ * as live, and a button under its words that plays it: picked up off its
+ * place, in a window over the page at a size to see it by, its place left
+ * empty. Nothing is asked of another site until the press, and a second
+ * press or Escape brings the still back (src/lib/block-stage.ts).
  * The link out is the title's, always; the pictures are a pointer's
  * shortcut to it, hidden from the keyboard and from assistive technology.
  * layout=card: lying on the Bench, a print, a pile or a slip taped down.
@@ -85,6 +86,7 @@ const Slip = holds === "words" && layout !== "standing" ? Note : Fragment;
           data-frame={play.frame}
           data-title={title}
           data-loading={play.copy.loading}
+          data-stage-window
         >
           <div class="lab-card__still">
             {cover ? (

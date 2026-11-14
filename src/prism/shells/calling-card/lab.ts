@@ -108,7 +108,8 @@ function evidence(prints: string[]) {
   );
 }
 
-/** The screen an experiment plays on where its request is pinned. */
+/** The screen an experiment plays on where its request is pinned: pressed,
+ * it is thrown up big over the board (`data-stage-window`, lab.css). */
 function playable(content: SiteContent, entry: Experiment, cover?: string) {
   const play = entry.preview!;
   const copy = content.pages.lab.preview;
@@ -120,7 +121,7 @@ function playable(content: SiteContent, entry: Experiment, cover?: string) {
     note: copy.note,
     subject: entry.title,
     loading: copy.loading,
-    data: { "data-frame": play.frame },
+    data: { "data-frame": play.frame, "data-stage-window": "" },
   });
   room.classList.add("cc-request__tv");
   markPart(room.querySelector(".cc-tv__bar")!, "lab.preview", entry.slug);

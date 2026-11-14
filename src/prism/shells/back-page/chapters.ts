@@ -33,7 +33,6 @@ import type { Route, SiteContent, WritingPost } from "../types";
 import { h, handDate, link, shortDate, svg } from "./dom";
 import {
   BLUE,
-  DOODLES,
   RED,
   arrow,
   camp,
@@ -51,6 +50,7 @@ import {
   tick,
   underline,
 } from "./ink";
+import { drawingFor } from "./drawings";
 import { paginate, type Blank } from "./paginate";
 import { studyNotes } from "./studynotes";
 import { liveCard, snaps, stage, taped, told } from "./stuck";
@@ -641,7 +641,7 @@ function aboutPages(b: Build) {
   blocks.push(...studyNotes(html, "page.body", "about"));
   const notes = written(b, "about", "notes", blocks, firstPage(b), b.today);
   // a doodle in the margin where the notes stop, the kind drawn while thinking
-  notes[notes.length - 1]?.append(h("div", { class: "bp-notedoodle", "aria-hidden": "true" }, svg(doodle(2, seed("about-end")))));
+  notes[notes.length - 1]?.append(h("div", { class: "bp-notedoodle", "aria-hidden": "true" }, svg(doodle("spiral", seed("about-end")))));
   return { pages: evenUp(b.copy, notes, b.spread, "/about"), sticky };
 }
 
@@ -766,21 +766,6 @@ const experimentLink = (b: Build, item: LabItem) =>
     item.hasPage ? null : h("span", { class: "bp-out", "aria-hidden": "true" }, " ↗"),
   );
 
-/** The doodle each experiment is given: one picked by its name, and while
- * there are doodles to spare, one no other experiment has. */
-function doodleKinds(lab: LabItem[]) {
-  const kinds = new Map<string, number>();
-  const used = new Set<number>();
-  for (const { entries } of labPlaces(lab))
-    for (const item of entries) {
-      let kind = Math.floor(seed(`doodle-${item.slug}`)() * DOODLES);
-      if (used.size < DOODLES) while (used.has(kind)) kind = (kind + 1) % DOODLES;
-      used.add(kind);
-      kinds.set(item.slug, kind);
-    }
-  return kinds;
-}
-
 /** A place in the lab, written across the page: what it's called, ruled
  * under, and a line about it. It stays with whatever comes under it, and
  * is where the contents' line for it turns to (`id`). */
@@ -807,11 +792,13 @@ function holds(item: LabItem): Holds {
   return n > 1 ? "prints" : n ? "print" : "words";
 }
 
-/** The words for playing an experiment where it lies, by what it is. */
+/** The words for playing an experiment where it lies, by what it is. Its
+ * sticky note is what plays it: pressed, the note unfolds over the page,
+ * large, and the piece plays in it (`stage-window`, lab.css). */
 function playWords(b: Build, item: LabItem & { preview: NonNullable<LabItem["preview"]> }) {
   const words = b.content.pages.lab.preview;
   return {
-    data: { frame: item.preview.frame },
+    data: { frame: item.preview.frame, "stage-window": "ask" },
     title: item.title,
     load: words.load[item.preview.kind],
     close: words.close,
@@ -827,7 +814,7 @@ function playWords(b: Build, item: LabItem & { preview: NonNullable<LabItem["pre
  * Something to play: its picture taped in across the page, with a sticky
  * note on it that starts it there. The one given pride of place is drawn
  * larger, starred, and ruled under twice. */
-function benchEntry(b: Build, item: LabItem, i: number, kind: number) {
+function benchEntry(b: Build, item: LabItem, i: number) {
   const title = h("h3", { class: "bp-labitem__title", ...part("lab.title", item.slug) }, experimentLink(b, item));
   const holding = holds(item);
   return h(
@@ -839,7 +826,7 @@ function benchEntry(b: Build, item: LabItem, i: number, kind: number) {
       "data-holds": holding,
     },
     holding === "words"
-      ? svg(doodle(kind, seed(item.slug)))
+      ? svg(doodle(drawingFor(item), seed(item.slug)))
       : holding === "play"
       ? null
       : snaps(labPrints(item), `bench-${item.slug}`),
@@ -1185,12 +1172,11 @@ function lab(b: Build) {
         : []),
     ]),
   ];
-  const kinds = doodleKinds(content.lab);
   let n = 0;
   for (const { place, entries } of groups) {
     blocks.push(placeHead(places[place], `lab-${place}`, place, `lab-${place}`));
     if (place === "bench")
-      for (const item of entries) blocks.push(benchEntry(b, item, n++, kinds.get(item.slug) ?? n));
+      for (const item of entries) blocks.push(benchEntry(b, item, n++));
     else blocks.push(shelfCard(b, entries, places[place].title));
   }
   if (content.labbook.length) {
@@ -1229,7 +1215,6 @@ function labEntry(b: Build): HTMLElement[] | null {
   const item = content.lab.find((l) => l.slug === route.slug && l.hasPage);
   if (!item) return null;
   const { detail } = content.pages.lab;
-  const kind = doodleKinds(content.lab).get(item.slug) ?? 0;
   const links = item.href ? [{ label: copy.lab.tryIt, url: item.href }, ...item.links] : item.links;
   const became = graduatedProject(item, content.projects);
   const updates = experimentUpdates(content.labbook, item.slug);
@@ -1253,7 +1238,7 @@ function labEntry(b: Build): HTMLElement[] | null {
       : null,
     prints.length
       ? h("div", { class: "bp-labhead", "data-count": prints.length }, snaps(prints, `head-${item.slug}`))
-      : h("div", { class: "bp-bigdoodle" }, svg(doodle(kind, seed(item.slug)))),
+      : h("div", { class: "bp-bigdoodle" }, svg(doodle(drawingFor(item), seed(item.slug)))),
     ...item.media
       .filter((m) => m.type === "video")
       .map((m, n) => {

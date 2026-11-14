@@ -301,3 +301,13 @@ test("Kitchen does not claim photographs", () => {
     "kitchen: claims photographs",
   );
 });
+
+test("Beating Shapes points at the working slider Pen and describes it", () => {
+  const entry = entries.find(({ slug }) => slug === "beating-shapes");
+  assert.equal(entry.field("href"), "https://codepen.io/beejsbj/pen/PwPJead");
+  assert.doesNotMatch(
+    `${entry.field("summary")} ${entry.body}`,
+    /track|audio|music/i,
+    "the slider Pen has no sound",
+  );
+});

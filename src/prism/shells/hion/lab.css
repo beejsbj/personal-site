@@ -162,9 +162,108 @@
 }
 
 /* Once its frame has loaded, it stands where the poster stood; put away,
-   the poster comes back. */
-:root[data-lens="hion"] .hion-stage[data-live="on"] > :not(iframe, canvas) {
+   the poster comes back. A place opened over the loom stays open. */
+:root[data-lens="hion"] .hion-stage[data-live="on"] > :not(iframe, canvas, .stage-window) {
   visibility: hidden;
+}
+
+/* Pulled on the Lab, the stitched place opens over the loom, large: black
+   cloth with its edge stitched in its thread's hue, its name in the
+   label's letters, and a knotted cord to pull it shut. It parts open from
+   its middle, as cloth is drawn apart. */
+:root[data-lens="hion"] .stage-window {
+  --stage-window-width: 50rem;
+  --hion-thread: var(--hion-c);
+  --hion-thread-light: var(--hion-cl);
+  gap: 0.6rem;
+  padding: 0.8rem;
+  background: var(--hion-black);
+  outline: 2px dashed color-mix(in srgb, var(--hion-thread) 75%, transparent);
+  outline-offset: -6px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--hion-thread) 30%, transparent), 0 30px 80px rgb(0 0 0 / 0.7);
+}
+
+:root[data-lens="hion"] [data-hue="m"] .stage-window {
+  --hion-thread: var(--hion-m);
+  --hion-thread-light: var(--hion-ml);
+}
+
+:root[data-lens="hion"] .stage-window__bar {
+  padding: 0.2rem 0.4rem 0;
+}
+
+:root[data-lens="hion"] .stage-window__name {
+  color: var(--hion-thread-light);
+  font: var(--hion-label-style) var(--hion-label-weight) 1.2rem/1.2 var(--hion-label);
+  letter-spacing: var(--hion-label-track);
+}
+
+:root[data-lens="hion"] .stage-window__close {
+  position: relative;
+  padding: 0.25em 0.1em 0.25em 1.35em;
+  border: 0;
+  background: none;
+  color: var(--hion-thread-light);
+  font: var(--hion-label-style) var(--hion-label-weight) 1.05rem/1.2 var(--hion-label);
+  letter-spacing: var(--hion-label-track);
+  white-space: nowrap;
+}
+
+:root[data-lens="hion"] .stage-window__close::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  border: 2.5px solid var(--hion-thread);
+  border-radius: 50%;
+  background: currentColor;
+}
+
+:root[data-lens="hion"] .stage-window__close:hover {
+  color: var(--hion-thread);
+}
+
+:root[data-lens="hion"] .stage-window__glass {
+  background: var(--hion-black);
+  outline: 2px dashed color-mix(in srgb, var(--hion-thread) 70%, transparent);
+  outline-offset: -2px;
+}
+
+:root[data-lens="hion"] .stage-window__glass > iframe {
+  background: var(--hion-cl);
+}
+
+:root[data-lens="hion"] .stage-window__says {
+  color: var(--hion-thread-light);
+  font: var(--hion-hand-style) var(--hion-hand-weight) 1rem/1.3 var(--hion-hand);
+}
+
+@media (max-width: 40rem) {
+  :root[data-lens="hion"] .stage-window {
+    padding: 0.5rem 0.4rem 0.4rem;
+    outline-offset: -4px;
+  }
+
+  :root[data-lens="hion"] .stage-window__name {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-lens="hion"] .stage-window:popover-open {
+    transition:
+      clip-path 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 160ms linear;
+  }
+  @starting-style {
+    :root[data-lens="hion"] .stage-window:popover-open {
+      scale: 1;
+      clip-path: inset(50% 0);
+    }
+  }
 }
 
 :root[data-lens="hion"] .hion-stage > canvas {
