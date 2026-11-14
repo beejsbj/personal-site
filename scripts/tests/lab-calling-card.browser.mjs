@@ -1149,12 +1149,21 @@ test(
               "the phone on the pause menu shows the newest update",
             );
             // The plates stand in the pause menu itself, as they did: no
-            // column was put round them to hold a wire.
-            assert.equal(
-              await page
-                .locator("#lens-shell .cc-home__plates")
-                .evaluate((el) => el.parentElement.tagName),
-              "MAIN",
+            // column was put round them to hold a wire. The only box between
+            // them and the main is the sheet that clips what hangs over.
+            assert.deepEqual(
+              await page.locator("#lens-shell .cc-home__plates").evaluate(
+                (el, wire) => {
+                  const up = el.parentElement;
+                  const sheet = up.matches(".cc-home__sheet");
+                  return {
+                    in: (sheet ? up.parentElement : up).tagName,
+                    wire: el.closest(wire) !== null,
+                  };
+                },
+                WIRE,
+              ),
+              { in: "MAIN", wire: false },
             );
             await shot(page, null, `calling-card-home-${size}`);
             await chip.click();
