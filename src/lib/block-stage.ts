@@ -86,6 +86,8 @@ function makeFrame(src: string, title: string) {
     element.dataset.pen = "";
     Object.assign(element.style, {
       position: "absolute",
+      // Placed against its room's own edges, not a grid's cell in it.
+      gridArea: "auto",
       inset: `${-top}px auto auto ${-left}px`,
       width: `calc(100% + ${left + right}px)`,
       height: `calc(100% + ${top + bottom}px)`,

@@ -169,12 +169,36 @@ test(
             height: r.height,
           };
         };
+        // What the box shows is inside its border: its padding box.
+        const inner = (el) => {
+          const r = el.getBoundingClientRect();
+          const top = r.top + el.clientTop;
+          const left = r.left + el.clientLeft;
+          return {
+            top,
+            right: left + el.clientWidth,
+            bottom: top + el.clientHeight,
+            left,
+            width: el.clientWidth,
+            height: el.clientHeight,
+          };
+        };
         const win = frame.closest("[popover]");
+        // How far the frame runs past the box on each side, laid out (a
+        // tilted plate's boxes on the screen are larger than it is).
+        const over = clip &&
+          frame.offsetParent === clip && {
+            top: -frame.offsetTop,
+            left: -frame.offsetLeft,
+            bottom: frame.offsetTop + frame.offsetHeight - clip.clientHeight,
+            right: frame.offsetLeft + frame.offsetWidth - clip.clientWidth,
+          };
         return {
+          over,
           src: frame.getAttribute("src"),
           live: stage.dataset.live ?? null,
           frame: rect(frame),
-          clip: clip && rect(clip),
+          clip: clip && inner(clip),
           clipped: clip && getComputedStyle(clip).overflow,
           window: win && rect(win),
           open: !!win?.matches(":popover-open"),
@@ -216,14 +240,9 @@ test(
     function chromeHidden(seen, what) {
       assert.ok(seen.clip, `${what}: shown through a box that clips`);
       assert.match(seen.clipped, /hidden|clip/, `${what}: the box clips`);
-      near(seen.clip.top - seen.frame.top, CHROME.top, `${what}: tabs above`);
-      near(
-        seen.frame.bottom - seen.clip.bottom,
-        CHROME.bottom,
-        `${what}: toolbar below`,
-      );
-      near(seen.clip.left - seen.frame.left, CHROME.left, `${what}: left`);
-      near(seen.frame.right - seen.clip.right, CHROME.right, `${what}: right`);
+      assert.ok(seen.over, `${what}: laid out against that box`);
+      for (const side of ["top", "right", "bottom", "left"])
+        near(seen.over[side], CHROME[side], `${what}: past the ${side}`);
     }
     /** Big enough to see the piece, and all of it on the screen. */
     function bigEnough(seen, size, what) {
