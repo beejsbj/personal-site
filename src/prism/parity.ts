@@ -439,16 +439,10 @@ export const GAPS: Partial<
         "The war book's first pages are a roll call of names and dates and the war map; each project's summary is on its own page.",
     },
     lab: {
-      "lab.preview":
-        "The lab book lists the experiments with no way to play one where it stands until its design pass draws it (#131); each still links out to where it lives.",
       "lab.more":
         "The lab book has no link out to more sketches; CodePen is among the places on the cover's return-to label.",
       "lab.aside":
         "The lab book has no aside; Projects is a book of its own on the pile, and the style guide is not in any book.",
-      "labbook.month":
-        "Back Page's Labbook is one list, not yet kept by month: its design pass (#131) draws the months.",
-      "labbook.subject":
-        "Back Page's Labbook cannot yet be narrowed to one experiment or project (?experiment= / ?project=); its design pass (#131) adds it. With either in the address it shows every update, as before.",
     },
   },
   hion: {
@@ -491,10 +485,6 @@ export const BLOCK_GAPS: Partial<
   },
   "cut-paper": {
     why: "Cut Paper shows an entry's prose and none of its blocks until its design pass draws them (#130).",
-    parts: ALL_BLOCKS,
-  },
-  "back-page": {
-    why: "Back Page shows an entry's prose and none of its blocks until its design pass draws them (#131).",
     parts: ALL_BLOCKS,
   },
   hion: {

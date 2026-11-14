@@ -259,15 +259,15 @@ test("the Lab owes a way to narrow the Labbook to each thing it is about", () =>
   ]);
 });
 
-test("Daylight groups and narrows the Labbook; each other lens says which design pass will", () => {
+test("Daylight and Back Page group and narrow the Labbook; each other lens says which design pass will", () => {
   const passes = {
     "calling-card": "#129",
     "cut-paper": "#130",
-    "back-page": "#131",
     hion: "#132",
   };
   for (const part of ["labbook.month", "labbook.subject"]) {
-    assert.equal(isGap("daylight", "lab", part), false, `daylight ${part}`);
+    for (const lens of ["daylight", "back-page"])
+      assert.equal(isGap(lens, "lab", part), false, `${lens} ${part}`);
     for (const [lens, ticket] of Object.entries(passes)) {
       assert.equal(isGap(lens, "lab", part), true, `${lens} ${part}`);
       assert.match(GAPS[lens].lab[part], new RegExp(ticket), `${lens} ${part}`);
@@ -275,7 +275,7 @@ test("Daylight groups and narrows the Labbook; each other lens says which design
   }
   // Every update stays owed by every lens: a gap here is the grouping and
   // the narrowing, never the record.
-  for (const lens of ["daylight", ...Object.keys(passes)])
+  for (const lens of ["daylight", "back-page", ...Object.keys(passes)])
     for (const part of ["update.item", "update.redacted"])
       assert.equal(isGap(lens, "lab", part), false, `${lens} ${part}`);
 });
