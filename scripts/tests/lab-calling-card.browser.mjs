@@ -177,9 +177,7 @@ const messages = (page) =>
 
 /** Whatever on the screen has been slid sideways, or could be: the document
  * wider than the screen, a column scrolled off its start, or one with room
- * to be. Nothing can reach the lens's painted grounds. On a phone the pause menu's portrait and a
- * brief's tilted paper hang over the edge of their columns, as they did
- * before the Lab: those two may have room, and must still not have moved. */
+ * to be. Nothing can reach the lens's painted grounds. */
 const sideways = (page) =>
   page.evaluate(() => {
     const name = (el) => `${el.tagName.toLowerCase()}.${el.className}`;
@@ -198,12 +196,42 @@ const sideways = (page) =>
       if (
         overflowX !== "visible" &&
         overflowX !== "clip" &&
-        el.scrollWidth > el.clientWidth + 1 &&
-        !el.matches(":is(.cc-home, .cc-brief) > main")
+        el.scrollWidth > el.clientWidth + 1
       )
         out.push(`${name(el)} has ${el.scrollWidth - el.clientWidth}px to go`);
     }
     return out;
+  });
+
+/** The phone's two columns, the pause menu's and a brief's, as a script can
+ * move them: focus and scrollIntoView on every child, then a straight push.
+ * Where each ended up, and how far it could have gone. */
+const slide = (page) =>
+  page.evaluate(() => {
+    const name = (el) => `${el.tagName.toLowerCase()}.${el.className}`;
+    const column = document.querySelector(
+      "#lens-shell :is(.cc-home, .cc-brief) > main",
+    );
+    if (!column) return null;
+    const moved = [];
+    const check = (how, el) => {
+      if (column.scrollLeft !== 0)
+        moved.push(`${how} ${name(el)}: ${column.scrollLeft}`);
+      column.scrollLeft = 0;
+    };
+    for (const el of column.querySelectorAll("*")) {
+      if (el.matches("a[href], button, input, select, textarea, [tabindex]")) {
+        el.focus();
+        check("focus", el);
+      }
+      for (const inline of ["start", "center", "end"]) {
+        el.scrollIntoView({ block: "nearest", inline });
+        check(`scrollIntoView(${inline})`, el);
+      }
+    }
+    column.scrollLeft = 80;
+    check("scrollLeft = 80", column);
+    return { column: name(column), moved: moved.slice(0, 5) };
   });
 
 const executable = chromium();
@@ -1121,12 +1149,21 @@ test(
               "the phone on the pause menu shows the newest update",
             );
             // The plates stand in the pause menu itself, as they did: no
-            // column was put round them to hold a wire.
-            assert.equal(
-              await page
-                .locator("#lens-shell .cc-home__plates")
-                .evaluate((el) => el.parentElement.tagName),
-              "MAIN",
+            // column was put round them to hold a wire. The only box between
+            // them and the main is the sheet that clips what hangs over.
+            assert.deepEqual(
+              await page.locator("#lens-shell .cc-home__plates").evaluate(
+                (el, wire) => {
+                  const up = el.parentElement;
+                  const sheet = up.matches(".cc-home__sheet");
+                  return {
+                    in: (sheet ? up.parentElement : up).tagName,
+                    wire: el.closest(wire) !== null,
+                  };
+                },
+                WIRE,
+              ),
+              { in: "MAIN", wire: false },
             );
             await shot(page, null, `calling-card-home-${size}`);
             await chip.click();
@@ -1285,6 +1322,31 @@ test(
             await context.close();
           },
         );
+
+        if (size === "phone")
+          await t.test(
+            "phone: neither the pause menu's column nor a brief's can be slid sideways by script",
+            async () => {
+              const slid = [];
+              for (const address of [
+                harness("labbook", "/"),
+                harness("lab-full-page", "/lab/fixture-study"),
+                harness("lab-bare-entry", "/lab/fixture-poster"),
+                // Every experiment on the real board that has its own page.
+                ...content.lab
+                  .filter((entry) => entry.detail?.startsWith("/lab/"))
+                  .map((entry) => `${entry.detail}?lens=calling-card`),
+              ]) {
+                const { context, page } = await open(size, address);
+                const column = await slide(page);
+                assert.ok(column, `${address} has a column`);
+                for (const how of [...column.moved, ...(await sideways(page))])
+                  slid.push(`${address}: ${how}`);
+                await context.close();
+              }
+              assert.deepEqual(slid, [], "no column slid sideways");
+            },
+          );
 
         if (size === "desktop")
           await t.test(
