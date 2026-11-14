@@ -202,6 +202,7 @@
   --pile-turn: 3deg;
   --pile-shift: 0.625rem;
   --shelf-height: 11rem;
+  --shelf-piece-compact: 7.5rem;
   /* The Labbook: an artifact's column beside an entry's words, and a
      month's calendar page in the margin, a day to a cell. */
   --labbook-artifact-width: 20rem;

@@ -174,9 +174,9 @@ const playable = entries.some((entry) => entry.preview);
     }
   }
 
-  /* The Shelf: boards abreast, meeting, so each row is one long shelf. */
+  /* The Shelf: boards abreast, meeting, so each row is one long shelf;
+     on a phone, a board to each. */
   .lab-place--shelf .lab-place__entries {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 0;
     row-gap: var(--space-3xl);
   }

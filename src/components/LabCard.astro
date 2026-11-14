@@ -299,11 +299,13 @@ const Slip = holds === "words" && layout !== "standing" ? Note : Fragment;
   .lab-card--standing .lab-card__pile {
     width: min(100% - var(--space-m), var(--media-width));
   }
+  .lab-card--standing .lab-card__object > .lab-card__initial {
+    width: min(100%, var(--media-width) / 2);
+  }
   /* A piece with no picture stands as a block with its initial on it. */
   .lab-card__initial {
     display: grid;
     place-items: center;
-    max-width: calc(var(--media-width) / 2);
     aspect-ratio: 1 / var(--media-ratio);
     border-radius: var(--radius-note);
     background: var(--color-surface);
@@ -338,6 +340,47 @@ const Slip = holds === "words" && layout !== "standing" ? Note : Fragment;
     }
     .lab-card:is(:hover, :has(:focus-visible)) .lab-card__under {
       --fan: 2;
+    }
+  }
+  /* On a phone two boards abreast would leave a label too narrow for its
+     button's words: each piece stands at the right end of a board of its
+     own, its label beside it, as on a shelf seen up close. */
+  @media (max-width: 40.625rem) {
+    .lab-card--standing {
+      position: relative;
+      grid-template-columns: minmax(0, 1fr) var(--shelf-piece-compact);
+      align-items: end;
+      column-gap: var(--space-m);
+      border-bottom: var(--focus-width) solid var(--color-border);
+    }
+    .lab-card--standing::after {
+      content: "";
+      position: absolute;
+      inset: 100% 0 auto;
+      height: var(--space-xs);
+      margin-top: var(--focus-width);
+      background: var(--texture);
+    }
+    .lab-card--standing .lab-card__object {
+      order: 2;
+      min-height: 0;
+      padding: 0 0 var(--space-2xs);
+      border-bottom: 0;
+    }
+    .lab-card--standing .lab-card__object::after {
+      content: none;
+    }
+    .lab-card--standing .lab-card__live {
+      right: auto;
+      left: calc(-1 * var(--space-xs));
+    }
+    .lab-card--standing .lab-card__object {
+      justify-content: end;
+    }
+    .lab-card--standing .lab-copy {
+      order: 1;
+      align-self: start;
+      padding: 0 0 var(--space-l);
     }
   }
   @media (max-width: 62.5rem) {

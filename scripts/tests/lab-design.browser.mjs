@@ -68,8 +68,12 @@ const room = (page) =>
         const piece =
           card.querySelector(".lab-card__object > *") ??
           card.querySelector(".ds-note");
+        // The board is under the piece, or, where a piece has a board to
+        // itself, under the whole card.
         const object = card.querySelector(".lab-card__object");
-        const board = object?.getBoundingClientRect();
+        const board = (
+          getComputedStyle(card).borderBottomStyle === "none" ? object : card
+        )?.getBoundingClientRect();
         return {
           slug: card.querySelector("[data-part='lab.title']").dataset.ref,
           place: card.closest("[data-lab-place]").dataset.labPlace,
@@ -167,7 +171,8 @@ test(
             }
             assert.match(seen.mats.bench, /linear-gradient/, "the mat");
             assert.equal(seen.mats.shelf, "none", "the Shelf has no mat");
-            // The boards abreast meet, at one height, as one shelf.
+            // The boards abreast meet, at one height, as one shelf; on a
+            // phone each piece has a board of its own.
             const boards = seen.cards
               .filter((card) => card.place === "shelf")
               .map((card) => card.board);
@@ -176,7 +181,7 @@ test(
             );
             assert.equal(
               rows.length,
-              size === "desktop" ? 1 : 2,
+              size === "desktop" ? 1 : boards.length,
               `rows of boards: ${JSON.stringify(boards)}`,
             );
             for (const row of rows)
@@ -336,21 +341,23 @@ test(
         );
 
         await t.test(
-          `${size}: each month of the Labbook has its page of a calendar, its written days marked, out of the keyboard's way`,
+          `${size}: each month of the Labbook has its page of a calendar, its written days marked, for the eye alone`,
           async () => {
             const { context, page } = await open(size, NOTEBOOK);
             const months = await page.evaluate(() =>
               [...document.querySelectorAll("[data-labbook-month]")].map((month) => {
                 const calendar = month.querySelector("[data-labbook-calendar]");
                 const days = [...(calendar?.children ?? [])];
-                const marked = days.filter((day) => day.matches("a"));
+                const marked = days.filter((day) => day.matches("[data-written]"));
                 return {
                   month: month.dataset.labbookMonth,
                   hidden: calendar?.getAttribute("aria-hidden"),
                   shown: !!calendar?.checkVisibility(),
                   days: days.length,
                   marked: marked.map((day) => Number(day.textContent)),
-                  tabbable: marked.filter((day) => day.tabIndex !== -1).length,
+                  // Nothing links to an update's place unless it is
+                  // written to (labbook-daylight.browser.mjs).
+                  links: calendar?.querySelectorAll("a, [tabindex]").length,
                   written: [
                     ...new Set(
                       [...month.querySelectorAll(".labbook-entry time")].map(
@@ -358,7 +365,6 @@ test(
                       ),
                     ),
                   ].sort((a, b) => a - b),
-                  lands: marked.map((day) => day.getAttribute("href")),
                 };
               }),
             );
@@ -375,16 +381,8 @@ test(
               assert.equal(month.hidden, "true", `${month.month}: said aloud`);
               assert.equal(month.shown, true, `${month.month}: shown`);
               assert.deepEqual(month.marked, month.written, month.month);
-              assert.equal(month.tabbable, 0, `${month.month}: a Tab stop`);
+              assert.equal(month.links, 0, `${month.month}: a link or a stop`);
             }
-            // A marked day takes a pointer to that day's first entry.
-            const [, href] = months[2].lands;
-            await page.locator(`[data-labbook-calendar] a[href='${href}']`).click();
-            await page.waitForFunction((hash) => location.hash === hash, href);
-            assert.equal(
-              await page.evaluate(() => document.querySelector(":target")?.id),
-              href.slice(1),
-            );
             await context.close();
 
             // Narrowed, only the days with an entry about it stay marked.
@@ -397,7 +395,7 @@ test(
                 .filter((month) => month.checkVisibility())
                 .map((month) => [
                   month.dataset.labbookMonth,
-                  [...month.querySelectorAll("[data-labbook-calendar] a")]
+                  [...month.querySelectorAll("[data-labbook-calendar] [data-written]")]
                     .filter((day) => getComputedStyle(day).color !== "rgba(0, 0, 0, 0)")
                     .map((day) => Number(day.textContent)),
                   [...month.querySelectorAll(".labbook-entry")]
