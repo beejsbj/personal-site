@@ -1,3 +1,5 @@
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import { defineCollection, z } from "astro:content";
 import { BLOCK_NAME, parseTree } from "./lib/blocks.ts";
 import { penEmbedSrc } from "./lib/labbook.ts";
@@ -531,6 +533,7 @@ const updateFields = {
   /** The date said in other words; without it the site writes
    * "01 Jul 2026" from `date`. */
   dateLabel: z.string().optional(),
+  /** A project's slug. */
   relatedProject: z.string().optional(),
   /** A lab slug. */
   relatedExperiment: z.string().optional(),
@@ -586,6 +589,14 @@ const redactedUpdateSchema = z.object({
   evidence: noWords,
 });
 
+/** The slug of every project: its file's name in src/content/projects. */
+const projectSlugs = () =>
+  new Set(
+    readdirSync(join(process.cwd(), "src/content/projects")).map((name) =>
+      name.replace(/\.mdx?$/, ""),
+    ),
+  );
+
 const updateSchema = z
   .preprocess(
     // Open unless it says otherwise.
@@ -599,6 +610,12 @@ const updateSchema = z
     ]),
   )
   .superRefine((update, context) => {
+    if (update.relatedProject && !projectSlugs().has(update.relatedProject))
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["relatedProject"],
+        message: `"${update.relatedProject}" is not the slug of any project.`,
+      });
     if (
       ["status", "location", "agents"].includes(update.kind) &&
       !update.expiresAt

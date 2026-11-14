@@ -258,8 +258,7 @@ type Shown = {
 };
 
 /** The experiment and the project an update is about, each where it lives.
- * A project may be named by its slug or, as the older updates do, by its
- * title. One that is not shown (hidden, or never written) is nothing. A
+ * A project is named by its slug. One that is not shown (hidden, or never written) is nothing. A
  * redacted update keeps what it is about, so it has subjects too. */
 export function subjectsOf(
   update: Pick<Update, "relatedExperiment" | "relatedProject">,
@@ -269,9 +268,7 @@ export function subjectsOf(
     (entry) => entry.slug === update.relatedExperiment,
   );
   const project = shown.projects.find(
-    (entry) =>
-      entry.slug === update.relatedProject ||
-      entry.title === update.relatedProject,
+    (entry) => entry.slug === update.relatedProject,
   );
   return [
     ...(experiment
