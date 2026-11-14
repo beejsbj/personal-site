@@ -315,6 +315,52 @@ test(
         );
 
         await t.test(
+          `${size}: a plug-in's row keeps its size while its frame is still loading`,
+          async () => {
+            const { context, page, errors } = await open(size, KINDS);
+            const fixture = await harnessed(page);
+            const slug = "fixture-kinds-shelf-pen";
+            const entry = fixture.lab.find((item) => item.slug === slug);
+            // The frame's answer is held, so "loading" stays on screen as
+            // long as the test looks at it.
+            let release;
+            const held = new Promise((resolve) => (release = resolve));
+            await context.route(entry.preview.frame, async (route) => {
+              await held;
+              await route.fulfill({ contentType: "text/html", body: "" });
+            });
+            const slot = page.locator("#lens-shell [data-holds='play']", {
+              has: page.locator(`[data-part='lab.title'][data-ref='${slug}']`),
+            });
+            // Its size, not where it sits: pressing scrolls it into view.
+            const measured = async () => {
+              const { width, height } = await slot.boundingBox();
+              return { width, height };
+            };
+            const before = await measured();
+            await slot.locator("button[data-block-toggle]").click();
+            await page.waitForSelector("#lens-shell iframe");
+            const status = slot.locator("[role='status']");
+            assert.notEqual(
+              (await status.textContent()).trim(),
+              "",
+              "the frame is still loading, and says so",
+            );
+            assert.deepEqual(
+              await measured(),
+              before,
+              "the row keeps its size while it says so",
+            );
+            release();
+            await page.waitForSelector("#lens-shell [data-live='on']");
+            assert.equal((await status.textContent()).trim(), "");
+            assert.deepEqual(await measured(), before);
+            assert.deepEqual(errors, []);
+            await context.close();
+          },
+        );
+
+        await t.test(
           `${size}: with less motion asked for, nothing in the rack moves`,
           async () => {
             const { context, page, errors } = await open(size, KINDS);
