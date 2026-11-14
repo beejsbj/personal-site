@@ -7,6 +7,7 @@ import {
   labbookAnchor,
   labbookMonths,
   labbookSubjects,
+  monthCalendar,
   monthLabel,
   narrowHref,
   relatedLinks,
@@ -27,6 +28,10 @@ import { part } from "../prism/parts";
  * (`narrowHref`), read by the script below as the page is drawn, before
  * the entries are, so nothing else shows first. Without scripts the
  * Labbook is whole and offers no narrowing.
+ * Under each month's name is that month as a page of a calendar, the days
+ * written in marked: a picture of how busy it was, for the eye alone (the
+ * entries say it all in words). It links nowhere: nothing links to an
+ * update's place unless it is written to.
  * Each update sits in an element whose id is where a link to it would
  * land (`labbookHref`), though nothing links there unless it is written
  * to. An update with nowhere to go is text, not a link. With no updates
@@ -61,6 +66,17 @@ const count = (n: number) =>
   n === 1
     ? copy.narrow.count.one
     : copy.narrow.count.other.replace("{count}", String(n));
+// What a day's entries are about, for the narrowing to find on its mark.
+const daySubjects = (ids: string[], updates: Update[]) =>
+  [
+    ...new Set(
+      updates
+        .filter((update) => ids.includes(update.id))
+        .flatMap((update) =>
+          subjectsOf(update, shown).map((s) => `${s.kind}:${s.slug}`),
+        ),
+    ),
+  ].join(" ");
 // What an entry is about, written on it for the narrowing to find.
 const about = (update: Update) =>
   Object.fromEntries(
@@ -165,7 +181,8 @@ const about = (update: Update) =>
             chosen.dataset.title;
           status.hidden = false;
           const it = `[data-${kind}="${CSS.escape(query.get(kind))}"]`;
-          rule.textContent = `#labbook[data-narrowed] .labbook-entry:not(${it}), #labbook[data-narrowed] .labbook-month:not(:has(${it})) { display: none; }`;
+          const day = `[data-subjects~="${CSS.escape(want)}"]`;
+          rule.textContent = `#labbook[data-narrowed] .labbook-entry:not(${it}), #labbook[data-narrowed] .labbook-month:not(:has(${it})) { display: none; } #labbook[data-narrowed] .labbook-calendar__day[data-written]:not(${day}) { color: transparent; background: var(--color-border); scale: var(--labbook-day-dot); }`;
         };
         // Where the keyboard goes once a narrowing link has taken the
         // visitor there: to what it is narrowed to, or, coming back, to
@@ -239,21 +256,48 @@ const about = (update: Update) =>
     <ol class="labbook-months" aria-label={copy.listLabel}>
       {months.map(({ month, updates }) => (
         <li class="labbook-month" data-labbook-month={month}>
-          <h3
-            class="labbook-month__name"
-            id={`labbook-${month}`}
-            {...part("labbook.month", month)}
-          >
+          <div class="labbook-month__margin">
+            <h3
+              class="labbook-month__name"
+              id={`labbook-${month}`}
+              {...part("labbook.month", month)}
+            >
+              {(() => {
+                const [name, year] = monthLabel(month).split(" ");
+                return (
+                  <>
+                    <span class="labbook-month__month">{name}</span>{" "}
+                    <span class="labbook-month__year">{year}</span>
+                  </>
+                );
+              })()}
+            </h3>
             {(() => {
-              const [name, year] = monthLabel(month).split(" ");
+              const { lead, days } = monthCalendar(month, updates);
               return (
-                <>
-                  <span class="labbook-month__month">{name}</span>{" "}
-                  <span class="labbook-month__year">{year}</span>
-                </>
+                <div
+                  class="labbook-calendar"
+                  style={`--lead:${lead}`}
+                  aria-hidden="true"
+                  data-labbook-calendar
+                >
+                  {days.map(({ day, updates: ids }) =>
+                    ids.length ? (
+                      <span
+                        class="labbook-calendar__day"
+                        data-written=""
+                        data-subjects={daySubjects(ids, updates)}
+                      >
+                        {day}
+                      </span>
+                    ) : (
+                      <span class="labbook-calendar__day" />
+                    ),
+                  )}
+                </div>
               );
             })()}
-          </h3>
+          </div>
           <ol class="labbook-list" aria-labelledby={`labbook-${month}`}>
             {updates.map((update) => (
               <li
@@ -436,15 +480,62 @@ const about = (update: Update) =>
     letter-spacing: normal;
     color: var(--color-text-soft);
   }
+  /* The month as a page of a calendar, Monday first: a small dot for
+     each day, and a ball, the burgundy of the current page, for each day
+     written in. Beside the month's name where it heads its entries; under
+     it in the margin where there is room. */
+  .labbook-month__margin {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--space-s) var(--space-l);
+  }
+  .labbook-calendar {
+    --lead: 0;
+    display: grid;
+    grid-template-columns: repeat(7, var(--labbook-day));
+    gap: var(--rule-width);
+  }
+  .labbook-calendar__day {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: var(--radius-round);
+    font-size: var(--ball-label-size-compact);
+    line-height: var(--leading-display);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .labbook-calendar__day:first-child {
+    grid-column-start: calc(var(--lead) + 1);
+  }
+  /* A day not written in is a dot the size a marked day shrinks to when
+     the Labbook is narrowed away from it. */
+  .labbook-calendar__day:not([data-written])::before {
+    content: "";
+    width: calc(var(--labbook-day) * var(--labbook-day-dot));
+    aspect-ratio: 1;
+    border-radius: var(--radius-round);
+    background: var(--color-border);
+  }
+  .labbook-calendar__day[data-written] {
+    background: var(--ball-fill-current);
+    color: var(--ball-ink-current);
+  }
   @media (min-width: 62.501rem) {
     .labbook-month {
       grid-template-columns: var(--labbook-month-width) minmax(0, 1fr);
     }
-    .labbook-month__name {
+    .labbook-month__margin {
       position: sticky;
       top: var(--space-l);
       flex-direction: column;
+      align-items: start;
+      justify-content: start;
       padding-top: var(--space-m);
+    }
+    .labbook-month__name {
+      flex-direction: column;
     }
   }
 

@@ -4,8 +4,11 @@
  * and tested whatever src/content holds. /prism/fixtures/lab is a full
  * room; ?fixture=shelf-only has nothing on the Bench,
  * ?fixture=no-covers has no pictures, ?fixture=no-featured gives no
- * experiment pride of place and ?fixture=preview has cards that can be
- * played where they stand (scripts/tests/lab-preview.browser.mjs).
+ * experiment pride of place, ?fixture=preview has cards that can be
+ * played where they stand (scripts/tests/lab-preview.browser.mjs) and
+ * ?fixture=kinds has every kind of card in both places: one picture,
+ * several, something to play and only words
+ * (scripts/tests/lab-design.browser.mjs).
  * ?labbook=none is a Lab with no updates; ?labbook=notebook is the Labbook
  * written as content (src/content/fixture-updates), over four months with
  * every kind of entry, and narrows with ?experiment= or ?project= as /lab
@@ -160,7 +163,114 @@ const playing: Entries = [
     order: 1,
   },
 ];
+/** Every kind of card in both places (issue #128): one picture, several, a
+ * Pen or a demo to play, and only words, each linking to a page or out. */
+const several = (...names: string[]) =>
+  names.map((name) => ({ type: "image" as const, src: `/images/lab/${name}` }));
+const kinds: Entries = [
+  {
+    slug: "fixture-kinds-featured",
+    detail: "/lab/fixture-kinds-featured",
+    title: "The one with pride of place, and a stack of prints",
+    summary:
+      "Featured, with a page of its own and three pictures, so the Bench gives it the most room.",
+    place: "bench",
+    featured: true,
+    cover: "/images/lab/melograph.png",
+    media: several("melograph.png", "midi-strudel.png", "kitchen.png"),
+    order: 1,
+  },
+  {
+    slug: "fixture-kinds-print",
+    detail: "/lab/fixture-kinds-print",
+    title: "One picture",
+    summary: "A page of its own, and one picture to show for it.",
+    place: "bench",
+    cover: "/images/lab/game-of-life.png",
+    order: 2,
+  },
+  {
+    slug: "fixture-kinds-words",
+    detail: "/lab/fixture-kinds-words",
+    title: "Only words so far",
+    summary: "Nothing to look at yet: what it is about, written on a slip.",
+    place: "bench",
+    order: 3,
+  },
+  {
+    slug: "fixture-kinds-pen",
+    detail: "https://codepen.io/beejsbj/pen/abXZWLQ",
+    title: "A Pen to play where it lies",
+    summary: "It lives on CodePen and plays here when asked.",
+    place: "bench",
+    cover: "/images/lab/motion-path-graph.svg",
+    preview: {
+      kind: "pen",
+      frame: "https://codepen.io/beejsbj/embed/abXZWLQ?default-tab=result",
+    },
+    order: 4,
+  },
+  {
+    slug: "fixture-kinds-stack",
+    detail: "https://example.com/fixture-kinds-stack",
+    title: "Several pictures, and a link out",
+    summary: "Two prints in a pile, opening where it lives.",
+    place: "bench",
+    cover: "/images/lab/persona-5-stars.png",
+    media: several("persona-5-stars.png", "13black-spade.png"),
+    order: 5,
+  },
+  {
+    slug: "fixture-kinds-note",
+    detail: "https://example.com/fixture-kinds-note",
+    title: "A note that links out",
+    summary: "Only words, and it lives elsewhere.",
+    place: "bench",
+    order: 6,
+  },
+  {
+    slug: "fixture-kinds-shelved",
+    detail: "https://example.com/fixture-kinds-shelved",
+    title: "An old print",
+    summary: "On the Shelf, standing with the rest.",
+    place: "shelf",
+    cover: "/images/lab/css-notebook.png",
+    order: 1,
+  },
+  {
+    slug: "fixture-kinds-shelf-pen",
+    detail: "https://codepen.io/beejsbj/pen/xxexKMq",
+    title: "A Pen gone quiet",
+    summary: "It still plays where it stands.",
+    place: "shelf",
+    cover: "/images/lab/beating-shapes.png",
+    preview: {
+      kind: "pen",
+      frame: "https://codepen.io/beejsbj/embed/xxexKMq?default-tab=result",
+    },
+    order: 2,
+  },
+  {
+    slug: "fixture-kinds-shelf-stack",
+    detail: "/lab/fixture-kinds-shelf-stack",
+    title: "An archive piece with pictures",
+    summary: "A page of its own, and two pictures from when it was made.",
+    place: "shelf",
+    cover: "/images/lab/design-trampoline-logo.png",
+    media: several("design-trampoline-logo.png", "meditejo.png"),
+    order: 3,
+  },
+  {
+    slug: "fixture-kinds-shelf-words",
+    detail: "/lab/fixture-kinds-shelf-words",
+    title: "Words on the Shelf",
+    summary: "No picture: its name stands in for one.",
+    place: "shelf",
+    order: 4,
+  },
+];
 const fixtures: Record<string, Entries> = {
+  kinds,
   preview: playing,
   room,
   "shelf-only": room.filter((entry) => entry.place === "shelf"),
