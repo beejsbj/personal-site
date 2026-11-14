@@ -1298,7 +1298,10 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 1.6rem;
   }
+  /* On a phone the screen's main turns, not the board: this file comes
+     after the one column screens.css makes of every screen. */
   :root[data-lens="calling-card"] .cc-requests__board {
+    overflow: visible;
     mask-image: none;
   }
   /* Cut at the screen's edges, not the column's: a pinned card's corner

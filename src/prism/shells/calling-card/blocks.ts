@@ -120,6 +120,13 @@ export function screen(
   );
 }
 
+/** A film starts silent. The `muted` attribute only says so to a film the
+ * page's own markup made; one made here is told directly. */
+function silent(film: HTMLVideoElement) {
+  film.muted = true;
+  return film;
+}
+
 function caption(text?: string) {
   return text ? h("figcaption", { class: "cc-block__caption" }, words(text)) : null;
 }
@@ -225,19 +232,21 @@ function block(told: Told, slug: string, copy: Copy): HTMLElement | null {
             h(
               "div",
               { class: "cc-tv__screen" },
-              h(
-                "video",
-                {
-                  controls: true,
-                  muted: true,
-                  playsinline: true,
-                  loop: told.loop,
-                  preload: "metadata",
-                  poster: told.poster,
-                  "aria-label": named(told),
-                  "data-cc-loop": told.loop ? "" : null,
-                },
-                h("source", { src: told.src }),
+              silent(
+                h(
+                  "video",
+                  {
+                    controls: true,
+                    muted: true,
+                    playsinline: true,
+                    loop: told.loop,
+                    preload: "metadata",
+                    poster: told.poster,
+                    "aria-label": named(told),
+                    "data-cc-loop": told.loop ? "" : null,
+                  },
+                  h("source", { src: told.src }),
+                ),
               ),
             ),
           ),
