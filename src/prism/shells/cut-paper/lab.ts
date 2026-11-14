@@ -106,7 +106,9 @@ function pad(env: Env, item: LabEntry, index: number, holds: Holds, prints: stri
   );
 }
 
-/** The screen an experiment plays on where it is racked, with its power. */
+/** The screen an experiment plays on where it is racked, with its power:
+ * powered, the slot opens into a plug-in window over the page
+ * (`data-stage-window`, lab.css). */
 function playable(env: Env, item: LabEntry, poster?: string) {
   const play = item.preview!;
   const copy = env.content.pages.lab.preview;
@@ -118,7 +120,7 @@ function playable(env: Env, item: LabEntry, poster?: string) {
     note: copy.note,
     subject: item.title,
     loading: copy.loading,
-    data: { "data-frame": play.frame },
+    data: { "data-frame": play.frame, "data-stage-window": "" },
     disabled: env.face,
   });
   markPart(room.querySelector(".cp-device__foot")!, "lab.preview", item.slug);
