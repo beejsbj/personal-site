@@ -378,6 +378,14 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
+/* The frame has the screen from the press; the poster, still laid under it
+   until the stage puts it away, and its halftone, give way at once. */
+:root[data-lens="calling-card"] .cc-stagebox[data-live]::before {
+  display: none;
+}
+:root[data-lens="calling-card"] .cc-stagebox[data-live] > .cc-stagebox__poster {
+  visibility: hidden;
+}
 :root[data-lens="calling-card"] .cc-stagebox iframe {
   position: absolute;
   inset: 0;

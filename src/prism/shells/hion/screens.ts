@@ -600,20 +600,26 @@ function artifact(content: SiteContent, shown: Artifact, hue: "c" | "m") {
   const home = kind === "pen" ? frame.replace("/embed/", "/pen/").split("?")[0] : src;
   return h(
     "figure",
-    { class: "hion-artifact hion-artifact--kept", "data-hue": hue },
+    { class: "hion-artifact hion-artifact--kept", "data-hue": hue, "data-stage-room": "" },
     h(
       "div",
-      { class: "hion-kept", "data-kept-frame": frame, "data-kept-title": alt },
+      {
+        class: "hion-kept hion-stage",
+        "data-kept-frame": "",
+        "data-block-stage": "",
+        "data-artifact-frame": frame,
+        "data-artifact-title": alt,
+      },
       poster ? picture(image(poster, alt), hue, { class: "hion-kept__poster" }, null, false) : null,
       h(
         "div",
-        { class: "hion-kept__ask" },
+        { class: "hion-kept__ask", "data-stage-ask": "" },
         poster ? null : h("p", { class: "hion-kept__label" }, alt),
         hung(
           "p",
           "pull",
           { class: "hion-pullcord", "data-hue": hue },
-          h("button", { class: "hion-pullcord__link", type: "button", "data-kept-pull": "" }, copy.load[kind]),
+          h("button", { class: "hion-pullcord__link", type: "button", "data-kept-pull": "", "data-artifact-load": "" }, copy.load[kind]),
         ),
         h("p", { class: "hion-kept__note" }, copy.note),
       ),

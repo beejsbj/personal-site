@@ -362,8 +362,10 @@ export function watchFilms(root: HTMLElement, signal: AbortSignal, reduced: bool
 }
 
 /** Escape in a room whose screen is playing puts it away (block-stage
- * does that); it must not also take the visitor off the screen. Read in
- * the capture phase, before either listener on the document has run. */
+ * does that); it must not also take the visitor off the screen. A room is
+ * playing when its toggle is pressed, or, for a Labbook piece (which has no
+ * toggle), when its stage is showing a frame. Read in the capture phase,
+ * before either listener on the document has run. */
 export function holdEscape(el: HTMLElement, signal: AbortSignal) {
   let held: Event | undefined;
   el.addEventListener(
@@ -371,7 +373,7 @@ export function holdEscape(el: HTMLElement, signal: AbortSignal) {
     (event) => {
       if (event.key !== "Escape") return;
       const room = (event.target as Element | null)?.closest?.("[data-stage-room]");
-      if (room?.querySelector("[data-block-toggle][aria-pressed='true']")) held = event;
+      if (room?.querySelector("[data-block-toggle][aria-pressed='true'], [data-artifact-frame][data-live]")) held = event;
     },
     { signal, capture: true },
   );
