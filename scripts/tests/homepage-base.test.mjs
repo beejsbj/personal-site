@@ -90,11 +90,11 @@ test("opening work uses one real feature without duplicating the selected projec
     1,
   );
   assert.ok(projects[0].class.split(/\s+/).includes("project-row--feature"));
-  assert.match(projects[0].body, /href="\/projects\/dayshaper"/);
+  assert.match(projects[0].body, /href="\/projects\/koffee-kahwa"/);
   assert.match(projects[0].body, /<img\b/);
   assert.match(
     plainText(projects[0].body),
-    /Personal design &amp; development/,
+    /Design, concept and branding; spatial design and layout/,
   );
 });
 
@@ -177,8 +177,8 @@ test("homepage projects, current work, and dated updates remain present", () => 
     ([, attrs, body]) => ({ ...attributes(attrs), text: plainText(body) }),
   );
   for (const [slug, title] of [
+    ["koffee-kahwa", "Koffee &amp; Kahwa"],
     ["dayshaper", "Dayshaper"],
-    ["api3-ecosystem", "API3 Ecosystem"],
     ["conduit-market", "Conduit Market"],
   ]) {
     assert.ok(
