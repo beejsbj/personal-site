@@ -193,7 +193,7 @@ const beatSchema = z.object({
   media: z
     .array(
       mediaSchema.extend({
-        alt: z.string().min(1),
+        alt: z.string().trim().min(1),
         full: z.boolean().default(false),
       }),
     )

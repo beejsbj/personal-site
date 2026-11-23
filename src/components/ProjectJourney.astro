@@ -153,8 +153,8 @@ const sources = (item: Media, layout: Layout) => {
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
         picture.src = link.href;
-        picture.alt = link.querySelector("img")?.alt ?? "";
-        caption.textContent = link.closest("figure")?.querySelector("figcaption")?.textContent ?? "";
+        picture.alt = link.querySelector("img")?.alt.trim() ?? "";
+        caption.textContent = link.closest("figure")?.querySelector("figcaption")?.textContent?.trim() ?? "";
         // the dialog is named by what it shows: the caption, else the picture
         dialog.setAttribute("aria-label", caption.textContent || picture.alt);
         dialog.showModal();
