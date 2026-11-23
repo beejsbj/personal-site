@@ -1,0 +1,55 @@
+{
+  // Lint only. Prettier owns formatting (`pnpm format`), so Biome's formatter stays off.
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": { "includes": ["src/**", "scripts/tests/**", "astro.config.mjs"] },
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false },
+  "css": { "linter": { "enabled": false } },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      // BASELINE (2026-11-22): Biome's recommended rules, minus the rules below that
+      // already had hits in the tree when this was added. Every other rule fails on any
+      // violation, so only NEW kinds of mistake are caught today. To ratchet: fix one
+      // rule's hits (`pnpm lint` shows them with the rule turned on), delete its line here.
+      // Counts are the hits at baseline time.
+      "complexity": {
+        "noAdjacentSpacesInRegex": "off", // 1
+        "noCommaOperator": "off", // 2
+        "noUselessEscapeInRegex": "off", // 2
+        "useOptionalChain": "off" // 2
+      },
+      "correctness": {
+        "noUnusedImports": "off", // 1 in .ts (.astro is disabled below)
+        "noUnusedVariables": "off" // 1 in .mjs (.astro is disabled below)
+      },
+      "style": {
+        "noNonNullAssertion": "off", // 101
+        "useConst": "off", // 1
+        "useExponentiationOperator": "off", // 3
+        "useShorthandFunctionType": "off", // 1
+        "useTemplate": "off" // 8
+      },
+      "suspicious": {
+        "noAssignInExpressions": "off", // 10
+        "noConstEnum": "off", // 1
+        "noShadowRestrictedNames": "off", // 3
+        "useIterableCallbackReturn": "off" // 50
+      }
+    }
+  },
+  "overrides": [
+    {
+      // Biome reads only an .astro file's frontmatter, so an import used in the template
+      // looks unused (249 false positives at baseline). These two rules stay off there.
+      "includes": ["**/*.astro"],
+      "linter": {
+        "rules": {
+          "correctness": { "noUnusedImports": "off", "noUnusedVariables": "off" },
+          "style": { "noNonNullAssertion": "off" }
+        }
+      }
+    }
+  ]
+}
