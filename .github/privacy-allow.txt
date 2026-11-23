@@ -12,7 +12,9 @@ email data/components/contact-menu.json
 # describe it. Listed by file, not by glob, so a new file that
 # mentions the hostname is still flagged. `derived` is the run-time hostname/login rule; it
 # takes a path only.
+derived .github/workflows/ci.yml
 derived CONTEXT.md
+derived docs/checks.md
 derived docs/grilling/base-content-model.md
 derived docs/prism/lens-map.md
 derived docs/production.md
