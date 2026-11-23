@@ -9,6 +9,7 @@ import Link from "../../design/primitives/Link.astro";
 import TagList from "../../design/primitives/TagList.astro";
 import { getProjects, getProjectsPage } from "../../lib/portfolio";
 import { part } from "../../prism/parts";
+import { phoneCopy } from "../../lib/journey";
 
 export async function getStaticPaths() {
   return (await getProjects()).map((entry: CollectionEntry<"projects">) => ({
@@ -28,7 +29,7 @@ type Media = CollectionEntry<"projects">["data"]["media"][number];
 const hero = data.journey
   ? data.media.find((item: Media) => item.type === "image")
   : undefined;
-const heroSmall = hero?.src.replace(/\.\w+$/, "-800.webp");
+const heroSet = hero ? phoneCopy(hero.src, hero.width) : undefined;
 ---
 
 <BaseLayout
@@ -52,7 +53,7 @@ const heroSmall = hero?.src.replace(/\.\w+$/, "-800.webp");
       <figure class="entry-hero" {...part("project.media", slug)}>
         <img
           src={hero.src}
-          srcset={hero.width && hero.width > 1000 ? `${heroSmall} 800w, ${hero.src} ${hero.width}w` : undefined}
+          srcset={heroSet}
           sizes="(min-width: 71.25rem) 71.25rem, 92vw"
           alt={hero.alt ?? ""}
           width={hero.width}

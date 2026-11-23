@@ -8,6 +8,7 @@
 import type { JourneyData } from "../content.config";
 import Inline from "../design/primitives/Inline.astro";
 import { plainInline } from "../lib/inline";
+import { phoneCopy } from "../lib/journey";
 
 interface Props {
   journey: JourneyData;
@@ -32,13 +33,10 @@ const SIZES: Record<Layout | "full", string> = {
   sheet: "(min-width: 40.6rem) 12rem, 45vw",
 };
 /** A raster wider than 1000px has a phone-sized copy beside it. */
-const sources = (item: Media, layout: Layout) =>
-  /\.(webp|jpe?g|png)$/.test(item.src) && (item.width ?? 0) > 1000
-    ? {
-        srcset: `${item.src.replace(/\.\w+$/, "-800.webp")} 800w, ${item.src} ${item.width}w`,
-        sizes: SIZES[item.full ? "full" : layout],
-      }
-    : {};
+const sources = (item: Media, layout: Layout) => {
+  const srcset = phoneCopy(item.src, item.width);
+  return srcset ? { srcset, sizes: SIZES[item.full ? "full" : layout] } : {};
+};
 ---
 
 <section class:list={["journey", { "journey--open": journey.open }]} aria-label={journey.label}>
@@ -157,6 +155,8 @@ const sources = (item: Media, layout: Layout) =>
         picture.src = link.href;
         picture.alt = link.querySelector("img")?.alt ?? "";
         caption.textContent = link.closest("figure")?.querySelector("figcaption")?.textContent ?? "";
+        // the dialog is named by what it shows: the caption, else the picture
+        dialog.setAttribute("aria-label", caption.textContent || picture.alt);
         dialog.showModal();
       });
     }
