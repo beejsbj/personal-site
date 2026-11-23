@@ -7,6 +7,7 @@
  * prose. Keep it semantic: lenses only get the elements, not this style. */
 import type { JourneyData } from "../content.config";
 import Inline from "../design/primitives/Inline.astro";
+import { plainInline } from "../lib/inline";
 
 interface Props {
   journey: JourneyData;
@@ -31,7 +32,7 @@ const { journey, labels } = Astro.props;
             <div
               class:list={["journey__media", `journey__media--${beat.layout}`]}
               {...(beat.layout === "strip"
-                ? { tabindex: 0, role: "group", "aria-label": beat.line.replace(/[*_`]/g, "") }
+                ? { tabindex: 0, role: "group", "aria-label": plainInline(beat.line) }
                 : {})}
             >
               {beat.media.map((item) => (
