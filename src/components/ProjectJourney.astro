@@ -1,0 +1,326 @@
+---
+/** A project told as a journey: an ordered thread of dated beats, each led
+ * by one line and followed by its evidence (pictures, a film, the owner's
+ * own words, the decisions that turned). Daylight draws the thread; the
+ * same markup, unstyled, is appended to the project's body in
+ * /prism/content.json, so every lens tells the same journey in its own
+ * prose. Keep it semantic: lenses only get the elements, not this style. */
+import type { JourneyData } from "../content.config";
+import Inline from "../design/primitives/Inline.astro";
+
+interface Props {
+  journey: JourneyData;
+  /** Screen-reader words for a turn: what it was, what it became. */
+  labels: { was: string; now: string };
+}
+
+const { journey, labels } = Astro.props;
+---
+
+<section class:list={["journey", { "journey--open": journey.open }]} aria-label={journey.label}>
+  <ol class="journey__thread">
+    {journey.beats.map((beat) => (
+      <li class:list={["journey__beat", `journey__beat--${beat.layout}`]}>
+        <p class="journey__when">
+          {beat.date ? <time datetime={beat.date}>{beat.when}</time> : beat.when}
+        </p>
+        <div class="journey__body">
+          <h2 class="journey__line"><Inline text={beat.line} links="plain" /></h2>
+          {beat.note && <p class="journey__note"><Inline text={beat.note} links="plain" /></p>}
+          {beat.media.length > 0 && (
+            <div
+              class:list={["journey__media", `journey__media--${beat.layout}`]}
+              {...(beat.layout === "strip"
+                ? { tabindex: 0, role: "group", "aria-label": beat.line.replace(/[*_`]/g, "") }
+                : {})}
+            >
+              {beat.media.map((item) => (
+                <figure class="journey__figure">
+                  {item.type === "video" ? (
+                    <video
+                      controls
+                      muted
+                      playsinline
+                      preload="none"
+                      poster={item.poster}
+                      width={item.width}
+                      height={item.height}
+                      aria-label={item.alt}
+                    >
+                      <source src={item.src} type="video/mp4" />
+                    </video>
+                  ) : (
+                    <img
+                      src={item.src}
+                      alt={item.alt ?? ""}
+                      width={item.width}
+                      height={item.height}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                  {item.caption && <figcaption><Inline text={item.caption} links="plain" /></figcaption>}
+                </figure>
+              ))}
+            </div>
+          )}
+          {beat.quotes.length > 0 && (
+            <div class="journey__quotes">
+              {beat.quotes.map((quote) => (
+                <figure class="journey__quote">
+                  <blockquote><p>{quote.text}</p></blockquote>
+                  <figcaption>{quote.when}</figcaption>
+                </figure>
+              ))}
+            </div>
+          )}
+          {beat.turns.length > 0 && (
+            <ul class="journey__turns">
+              {beat.turns.map((turn) => (
+                <li class="journey__turn">
+                  <span class="journey__turn-when">{turn.when}</span>
+                  <del><span class="visually-hidden">{labels.was} </span>{turn.from}</del>
+                  <ins><span class="visually-hidden">{labels.now} </span>{turn.to}</ins>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </li>
+    ))}
+  </ol>
+  {journey.open && (
+    <div class="journey__open">
+      <p class="journey__line journey__line--open"><Inline text={journey.open.line} links="plain" /></p>
+      {journey.open.note && <p class="journey__note"><Inline text={journey.open.note} links="plain" /></p>}
+    </div>
+  )}
+</section>
+
+<style>
+  /* The thread: a hairline down the left, a dot and a date at each beat.
+     Past beats are filled; the open end is a ring on a dashed line that
+     fades out instead of stopping, because the work hasn't. */
+  .journey {
+    --gutter: calc(var(--journey-rail) * 2 + var(--space-xl));
+    /* the first line of the date, whose middle the dot sits on */
+    --mark-middle: calc(var(--text-sm) * var(--leading-tight) / 2);
+    margin-top: var(--space-3xl);
+  }
+  .journey__thread {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .journey__beat {
+    position: relative;
+    display: grid;
+    gap: var(--space-s);
+    padding: 0 0 var(--space-4xl) var(--gutter);
+  }
+  /* the hairline, beat by beat, from this dot to the next */
+  .journey__beat::before {
+    content: "";
+    position: absolute;
+    top: var(--mark-middle);
+    bottom: calc(-1 * var(--mark-middle));
+    left: var(--journey-rail);
+    border-left: var(--rule-width) solid var(--color-border);
+  }
+  .journey:not(.journey--open) .journey__beat:last-child::before {
+    display: none;
+  }
+  /* into an open end, the last stretch reaches that end's ring */
+  .journey--open .journey__beat:last-child::before {
+    bottom: calc(-1 * var(--text-post) * var(--leading-heading) / 2);
+  }
+  .journey__beat::after,
+  .journey__open::after {
+    content: "";
+    position: absolute;
+    top: calc(var(--mark-middle) - var(--journey-dot) / 2);
+    left: calc(var(--journey-rail) - var(--journey-dot) / 2 + var(--rule-width) / 2);
+    width: var(--journey-dot);
+    height: var(--journey-dot);
+    border-radius: var(--radius-round);
+    background: var(--color-accent);
+  }
+  .journey__when {
+    color: var(--color-text-soft);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--leading-tight);
+  }
+  .journey__body {
+    display: grid;
+    gap: var(--space-m);
+    min-width: 0;
+  }
+  .journey__line {
+    max-width: var(--journey-line-measure);
+    margin: 0;
+    font-size: var(--text-post);
+    line-height: var(--leading-heading);
+    text-wrap: balance;
+  }
+  .journey__note {
+    max-width: var(--intro-width);
+    font-size: var(--text-lead);
+    text-wrap: pretty;
+  }
+  .journey__media {
+    display: grid;
+    gap: var(--space-m);
+    margin-top: var(--space-xs);
+  }
+  .journey__figure {
+    display: grid;
+    align-content: start;
+    min-width: 0;
+  }
+  .journey__figure :is(img, video) {
+    width: 100%;
+    height: auto;
+    background: var(--color-surface);
+    border: var(--rule-width) solid var(--color-border);
+  }
+  .journey__figure figcaption {
+    max-width: 48ch;
+  }
+  /* a contact sheet: many small frames, read as a set */
+  .journey__media--sheet {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(100%, var(--journey-sheet-min)), 1fr)
+    );
+    gap: var(--space-l) var(--space-m);
+  }
+  .journey__media--sheet .journey__figure :is(img, video) {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  /* a strip: frames at one width, scrolled sideways, in order */
+  .journey__media--strip {
+    grid-auto-flow: column;
+    grid-auto-columns: min(78%, var(--journey-strip-frame));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    padding-bottom: var(--space-s);
+  }
+  .journey__media--strip .journey__figure {
+    scroll-snap-align: start;
+  }
+  /* the owner's words, dated, in the serif */
+  .journey__quotes {
+    display: grid;
+    gap: var(--space-l);
+    max-width: var(--intro-width);
+    margin-top: var(--space-s);
+  }
+  .journey__quote blockquote {
+    padding-left: var(--space-m);
+    border-left: var(--focus-width) solid var(--color-surface-strong);
+    font-family: var(--font-serif);
+    font-size: var(--text-lead);
+    line-height: var(--leading-body);
+  }
+  .journey__quote figcaption {
+    padding: var(--space-2xs) 0 0 var(--space-m);
+  }
+  /* turns: what it was, struck through; what it became, beside it */
+  .journey__turns {
+    list-style: none;
+    display: grid;
+    gap: var(--space-s);
+    max-width: var(--title-width);
+    margin: var(--space-s) 0 0;
+    padding: 0;
+  }
+  .journey__turn {
+    display: grid;
+    grid-template-columns: var(--journey-when-width) minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-m);
+    align-items: baseline;
+    padding-top: var(--space-s);
+    border-top: var(--rule-width) solid var(--color-border);
+  }
+  .journey__turn-when {
+    color: var(--color-text-soft);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  .journey__turn del {
+    color: var(--color-text-soft);
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: var(--rule-width);
+  }
+  .journey__turn ins {
+    text-decoration: none;
+  }
+  /* the end that isn't one */
+  .journey__open {
+    position: relative;
+    display: grid;
+    gap: var(--space-s);
+    padding: 0 0 var(--space-4xl) var(--gutter);
+    --mark-middle: calc(var(--text-post) * var(--leading-heading) / 2);
+  }
+  .journey__open::before {
+    content: "";
+    position: absolute;
+    top: var(--mark-middle);
+    bottom: 0;
+    left: var(--journey-rail);
+    border-left: var(--rule-width) dashed var(--color-accent);
+    mask-image: linear-gradient(to bottom, var(--color-accent) 35%, transparent);
+  }
+  .journey__open::after {
+    border: var(--focus-width) solid var(--color-accent);
+    background: var(--color-page);
+  }
+  .journey__line--open {
+    color: var(--color-accent);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-heading);
+  }
+
+  /* Wide screens: the date takes its own column left of the thread and
+     lines up with the middle of the beat's first line. */
+  @media (min-width: 62.501rem) {
+    .journey {
+      --journey-rail: calc(var(--journey-when-width) + var(--space-l));
+      --mark-middle: calc(var(--text-post) * var(--leading-heading) / 2);
+    }
+    .journey__when {
+      position: absolute;
+      top: calc(var(--mark-middle) - var(--text-sm) * var(--leading-tight) / 2);
+      left: 0;
+      width: var(--journey-when-width);
+      text-align: right;
+    }
+  }
+  @media (min-width: 40.626rem) {
+    .journey__media--pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 40.625rem) {
+    .journey__beat {
+      padding-bottom: var(--space-3xl);
+    }
+    /* two frames a row on a phone, so a sheet still reads as a set */
+    .journey__media--sheet {
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(100%, var(--journey-sheet-min-compact)), 1fr)
+      );
+    }
+    .journey__turn {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2xs);
+    }
+  }
+</style>

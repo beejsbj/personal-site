@@ -175,6 +175,22 @@
   --duration-peek-in: 700ms;
   --duration-peek-out: 520ms;
   --duration-peek-duck: 240ms;
+  /* A project's journey: the thread, its dots, the date column and the
+     frames its evidence sits in. */
+  --journey-rail: 0.3125rem;
+  --journey-dot: 0.6875rem;
+  --journey-when-width: 8.5rem;
+  --journey-line-measure: 22ch;
+  --journey-sheet-min: 10.5rem;
+  --journey-sheet-min-compact: 8rem;
+  --journey-strip-frame: 26rem;
+  /* The opening's two Ks: how far apart they start, and the turn and the
+     join that make them one leaf. */
+  --kk-apart: 1.625rem;
+  --kk-art-height: clamp(12rem, 34vw, 20rem);
+  --duration-kk-turn: 700ms;
+  --duration-kk-join: 900ms;
+  --delay-kk: 450ms;
   --page-ball-min: 4.75rem;
   --page-ball-max: 12rem;
   --page-reach: 150vmax;

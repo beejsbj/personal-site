@@ -111,3 +111,12 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+/* Words for assistive technology only (a turn's "was" and "now"). */
+.visually-hidden {
+  position: absolute;
+  width: var(--rule-width);
+  height: var(--rule-width);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
