@@ -10,9 +10,10 @@
     "preview": "astro preview",
     "check": "astro check",
     "test:homepage": "node --test scripts/tests/homepage-base.test.mjs",
-    "test": "node --test scripts/tests/*.test.mjs",
+    "test": "node --test scripts/tests/*.test.mjs scripts/pr-gates/*.test.mjs scripts/privacy/*.test.mjs",
     "test:prism": "node --test scripts/tests/prism-parity.browser.mjs scripts/tests/prism-window.browser.mjs",
     "lint": "biome lint",
+    "prepare": "node scripts/install-hooks.mjs",
     "format": "prettier --write src astro.config.mjs tsconfig.json scripts/tests"
   },
   "dependencies": {

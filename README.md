@@ -99,6 +99,12 @@ Only the cropped corner blob has a local pointer-attraction enhancement, disable
 for touch and reduced motion. The guide imports these production specimens.
 `corepack pnpm@10.6.5 format` formats active source with Prettier and its Astro plugin.
 
+## Checks
+
+Pre-commit hook, CI (`lint`, `check`, `test`, `build`), the PR gates (a `## Verification`
+section; no test deleted, skipped or loosened without a `Test change:` line) and the
+privacy and licence scan are described in [docs/checks.md](docs/checks.md). The licence is MIT.
+
 ## Historical material
 
 The root PHP site, `templates/`, `data/`, `styles/`, `images/`, `projects/`, and
