@@ -66,11 +66,9 @@ export interface Spun {
   knotted: boolean;
 }
 
-export interface Measure {
-  /** `page` gives the page's box when it is needed (a read of the layout;
-   * a heading whose reads were taken ahead needs none). */
-  (page: () => DOMRect): Spun | null;
-}
+/** `page` gives the page's box when it is needed (a read of the layout;
+ * a heading whose reads were taken ahead needs none). */
+export type Measure = (page: () => DOMRect) => Spun | null;
 
 /** The one material, lent by the skein for a heading written on its own
  * canvas: a run of thread (pts are x,y pairs; `heat` per point warms it

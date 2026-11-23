@@ -197,7 +197,7 @@ test("one link family: no drag physics, no rectangular actions, shared ball toke
   ])
     assert.match(link, layer, "painted layers ignore the pointer");
   const ballNav = read("src/design/unique/BallNav.astro");
-  for (const [, selector, body] of ballNav.matchAll(
+  for (const [, selector] of ballNav.matchAll(
     /([^{}]+)\{([^{}]*animation:[^{}]*)\}/g,
   ))
     assert.match(

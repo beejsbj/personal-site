@@ -15,7 +15,7 @@
  * scale (a cloth seen close up) each thread is itself two plies twisting
  * round each other: the same weave inside the thread. */
 import { type Fabric, topAt } from "./fabric";
-import { css, type Hue, Kind, mark, paint, type Pt, rng } from "./pastel";
+import { type Hue, Kind, mark, paint, type Pt, rng } from "./pastel";
 
 /** Directions thread runs from a crossing (the others are drawn from the
  * crossing at their other end). */

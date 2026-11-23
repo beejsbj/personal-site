@@ -117,7 +117,7 @@ function harness({ reduced = false, form = "cluster" } = {}) {
   };
   const frames = new Map();
   let nextFrame = 0;
-  let clock = 0;
+  const clock = 0;
   const context = {
     exports: {},
     window,

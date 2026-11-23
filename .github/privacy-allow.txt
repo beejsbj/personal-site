@@ -1,0 +1,25 @@
+# Exemptions for the privacy scan (scripts/privacy/privacy-scan.mjs). Everything here is
+# published with the repo, so list only what is meant to be public. Format:
+#   <rule|*> <path-glob> [literal: must equal the whole matched value]
+#
+# The contact address is published on the live site as a mailto link. Path-only (no literal)
+# so this file does not repeat the address.
+email src/content/site/config.json
+email src/content/pages/about.md
+email data/components/contact-menu.json
+#
+# The owner's home-lab hostname is named on the homepage and in the docs and fixtures that
+# describe it. Listed by file, not by glob, so a new file that
+# mentions the hostname is still flagged. `derived` is the run-time hostname/login rule; it
+# takes a path only.
+derived .github/workflows/ci.yml
+derived CONTEXT.md
+derived docs/checks.md
+derived docs/grilling/base-content-model.md
+derived docs/prism/lens-map.md
+derived docs/production.md
+derived scripts/tests/homepage-base.test.mjs
+derived src/content.config.ts
+derived src/content/pages/home.md
+derived src/content/site/config.json
+derived src/prism/fixtures.ts
