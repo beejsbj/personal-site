@@ -95,3 +95,4 @@ A failing workflow blocks nothing until `main` requires it. The check names to r
 `check`, `test`, `build`, `verification-section`, `test-integrity`, `privacy-scan` and
 `review-evidence`, plus conversation resolution before merge. That is a repository ruleset and needs
 admin; see issue #37.
+
