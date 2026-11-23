@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -104,7 +104,7 @@ test('diff mode flags only added lines, with their new line numbers', () => {
 })
 
 test('lockfiles, licence texts and vendored files are not scanned', () => {
-  for (const file of ['package-lock.json', 'bun.lock', 'node_modules/x/package.json', 'LICENSE', 'licenses/mit.txt', 'NOTICE']) {
+  for (const file of ['package-lock.json', 'bun.lock', 'node_modules/x/package.json', 'docs/LICENSE', 'licenses/mit.txt', 'third_party/NOTICE']) {
     assert.deepEqual(scanDiff(diffOf(file, [], [`by ${MAIL}`]), {}), [], file)
   }
 })
@@ -211,7 +211,7 @@ test('source maps and svg files are scanned; only exact licence-type filenames a
   for (const file of ['dist/app.js.map', 'public/logo.svg', 'license-check.js', 'notice-board.md']) {
     assert.equal(scanDiff(diffOf(file, [], [`at ${MAC}`]), {}).length, 1, file)
   }
-  for (const file of ['LICENSE', 'LICENSE.md', 'docs/NOTICE.txt']) assert.equal(scanDiff(diffOf(file, [], [`at ${MAC}`]), {}).length, 0, file)
+  for (const file of ['docs/LICENSE', 'third_party/LICENSE.md', 'docs/NOTICE.txt']) assert.equal(scanDiff(diffOf(file, [], [`at ${MAC}`]), {}).length, 0, file)
 })
 
 test('an added line whose content starts with ++ is still scanned', () => {
@@ -221,7 +221,7 @@ test('an added line whose content starts with ++ is still scanned', () => {
 
 test('annotations escape workflow-command characters in file names', () => {
   const lines = []
-  const r = repo({ LICENSE: LICENCE_TEXT, ['a,b:c.md']: `at ${MAC}\n` })
+  const r = repo({ LICENSE: LICENCE_TEXT, 'a,b:c.md': `at ${MAC}\n` })
   try {
     run({ mode: 'tree', cwd: r.dir, env: { PRIVACY_PATTERNS_FILE: join(r.dir, 'none') }, log: l => lines.push(l) })
     assert.ok(lines.some(l => l.startsWith('::error file=a%2Cb%3Ac.md,')), lines.join('\n'))
@@ -318,4 +318,8 @@ test('a root push (an empty-tree base) scans every commit, not just the net chan
 test('an allowlist line that exempts everything is rejected', () => {
   assert.throws(() => parseAllow('* **'), /switch the gate off/)
   assert.throws(() => parseAllow('* *'), /switch the gate off/)
+})
+
+test('the root LICENSE is first-party text and is scanned (a real name gets typed into its copyright line)', () => {
+  assert.equal(scanDiff(diffOf('LICENSE', [], [`at ${MAC}`]), {}).length, 1)
 })

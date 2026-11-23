@@ -4,7 +4,7 @@ What runs where, so a change is checked before it merges and a PR carries its ev
 
 | Where | What runs | Source |
 |---|---|---|
-| `git commit` (pre-commit hook) | `pnpm lint`; when `src/` or a config is staged also `pnpm check`, `pnpm build` and the full `pnpm test`; when only test files are staged, just those files. Docs-only commits skip all of it. | `.githooks/pre-commit`, `scripts/pre-commit.mjs` |
+| `git commit` (pre-commit hook) | `pnpm lint`; when anything under `src/` (content markdown included), `astro.config.mjs`, `tsconfig.json`, `package.json` or the lockfile is staged also `pnpm check`, `pnpm build` and the full `pnpm test`; when only test files are staged, just those files. Docs-only and asset-only commits skip all of it. | `.githooks/pre-commit`, `scripts/pre-commit.mjs` |
 | `git push` (pre-push hook) | the privacy scan over what the push adds | `.githooks/pre-push`, `scripts/privacy/` |
 | Every PR and push to `main` | `lint`, `check`, `test` (builds first, then the full suite): three jobs | `.github/workflows/ci.yml` |
 | Every PR | `verification-section`, `test-integrity` (re-run when the description is edited) | `.github/workflows/pr-gates.yml`, `scripts/pr-gates/` |
@@ -26,14 +26,14 @@ added. Those rules are listed `off` in `biome.jsonc` with their hit counts, so e
 on any violation and nothing existing has to be fixed first. The cost: a new violation of a
 grandfathered rule (for example a `!` non-null assertion) is not caught. To ratchet, fix one rule's
 hits and delete its line. Biome reads only an `.astro` file's frontmatter, so unused-import and
-unused-variable rules are off for `.astro`.
+unused-variable rules are off for `.astro`. Not linted at all: CSS, the `<script>` blocks and templates of `.astro` files, and the archived scripts under `scripts/` (only `scripts/tests`, `pr-gates`, `privacy`, `pre-commit.mjs` and `install-hooks.mjs` are in scope).
 
 ## The hook
 
 `pnpm install` runs `prepare`, which sets `core.hooksPath=.githooks` (`scripts/install-hooks.mjs`).
 The setting lives in the repository's shared git config, so every worktree of the checkout gets the
 hook. A commit in a worktree with no `node_modules` fails with an instruction to run
-`pnpm install --frozen-lockfile`; it does not skip quietly. The installer does nothing in CI, on
+`pnpm install --frozen-lockfile`; it does not skip quietly. The cost for agent-driven worktrees: every fresh worktree needs an install before its first non-docs commit, and a source commit then runs a build and the suite. The hook runs the working tree, not the staged snapshot, so a partial `git add -p` can pass or fail on unstaged code. The installer does nothing in CI, on
 Vercel, outside a git checkout, or when `core.hooksPath` is already set to something else.
 
 `node --test` has no "related tests" selection and the suite reads the built output in `dist/`, so a source
@@ -55,7 +55,7 @@ The check diffs every test file (`scripts/**/*.test.mjs`, `*.browser.mjs`, anyth
 | Finding | Meaning |
 |---|---|
 | `deleted-file` | a test file was deleted |
-| `skipped` | an added `.skip`, `.todo`, `.only`, `xit`, `t.skip()` or `{ skip: true }` at the start of a statement |
+| `skipped` | an added `.skip`, `.todo`, `.only`, `xit`, `t.skip()`, or a `skip:` option (`{ skip: true }` or Prettier's wrapped `skip: cond && "why",` line; `skip: false` is not one) |
 | `removed-tests` | a test title that was in the file and is gone (a close rewording counts as a rename), or fewer cases than before |
 | `removed-assertions` | fewer `assert(...)` / `assert.*(...)` calls in a file than before |
 | `weakened`, `widened` | the Vitest/Jest `expect(...)` loosening checks; they see nothing here because these tests use `node:test` and `assert` |
@@ -66,7 +66,7 @@ lists what it covered.
 
 **Limits.** Line-based heuristics. On `node:test` they see deletions, skips and removed cases or
 assertions; they do not see a loosened `assert.*` (a wider tolerance, `assert.ok` for `assert.equal`),
-a skip written mid-line, a weaker assertion hidden in a helper, tests moved out of the test glob, or
+a skip written mid-line or as the shorthand `{ skip, timeout }`, a weaker assertion hidden in a helper, tests moved out of the test glob, or
 a raised timeout. Measured on the last 60 first-parent commits of `main`: one flagged, a real removal
 of two tests. They guard against accidents, not adversaries: a PR can edit `scripts/pr-gates/`, so
 review of that directory matters. Tests for the gates are `scripts/pr-gates/pr-gates.test.mjs`

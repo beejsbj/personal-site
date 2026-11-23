@@ -9,6 +9,16 @@ test("a docs-only commit skips every check", () => {
   assert.deepEqual(names(["README.md", "docs/production.md", "LICENSE"]), []);
 });
 
+test("content under src/ is source, not docs", () => {
+  assert.deepEqual(names(["src/content/pages/home.md"]), [
+    "lint",
+    "type check",
+    "build",
+    "tests (full suite, source changed)",
+  ]);
+  assert.deepEqual(names(["docs/production.md", "public/images/x.png"]), []);
+});
+
 test("a source commit runs lint, the type check and the full suite", () => {
   assert.deepEqual(names(["src/prism/stage.ts"]), [
     "lint",

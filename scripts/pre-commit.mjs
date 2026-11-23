@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Pre-commit: lint, type check and tests for what is staged.
-//   lint        `pnpm lint` (Biome) when any code or config is staged
+//   lint        `pnpm lint` (Biome) when anything but docs and assets is staged (content under src/ counts as source)
 //   type check  `pnpm check` (astro check) when anything under src/ or a TS/Astro config is staged
 //   tests       the staged *.test.mjs files, or `pnpm build` then the whole `pnpm test` when source under
 //               src/ changed (node:test has no "related tests" selection, and the suite reads dist/)
@@ -22,7 +22,8 @@ export function stagedFiles() {
 
 /** The checks to run for a set of staged files, in order. Empty when only docs or assets are staged. */
 export function plan(files, exists = path => existsSync(resolve(root, path))) {
-  if (!files.some(file => !NOT_CODE.test(file))) return []
+  // Content under src/ (markdown entries, svg) is read by the build and the tests, so it is not docs.
+  if (!files.some(file => SOURCE.test(file) || !NOT_CODE.test(file))) return []
   const steps = [{ name: 'lint', args: ['lint'] }]
   if (files.some(file => SOURCE.test(file))) steps.push({ name: 'type check', args: ['check'] })
   if (files.some(file => SOURCE.test(file))) {

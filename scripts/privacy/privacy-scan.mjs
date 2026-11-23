@@ -192,9 +192,9 @@ const isAllowed = (allow, finding) => allow.some(a =>
 // Scanning
 // ---------------------------------------------------------------------------
 
-// Third-party text that legitimately carries other people's emails and paths. First-party AUTHORS/CONTRIBUTORS files are
+// Third-party text that legitimately carries other people's emails and paths. A nested licence file is third-party; the ROOT licence is first-party (its copyright line is where a real name gets typed), so it is scanned. First-party AUTHORS/CONTRIBUTORS files are
 // scanned: they are where a personal email is most likely to be added. Source maps and svg are scanned: they embed build paths.
-const SKIP_FILE = /(^|\/)node_modules\/|^(vendor|licenses?)\/|(^|\/)(licen[sc]e|notice|copying)(\.[a-z]+)?$|(^|\/)(package-lock\.json|npm-shrinkwrap\.json|yarn\.lock|pnpm-lock\.yaml|bun\.lockb?|Cargo\.lock|poetry\.lock|Gemfile\.lock|composer\.lock|go\.sum)$|\.(lock|min\.js)$/i
+const SKIP_FILE = /(^|\/)node_modules\/|^(vendor|licenses?)\/|\/(licen[sc]e|notice|copying)(\.[a-z]+)?$|(^|\/)(package-lock\.json|npm-shrinkwrap\.json|yarn\.lock|pnpm-lock\.yaml|bun\.lockb?|Cargo\.lock|poetry\.lock|Gemfile\.lock|composer\.lock|go\.sum)$|\.(lock|min\.js)$/i
 const isSkipped = file => file === ALLOW_FILE || SKIP_FILE.test(file)
 
 /** Scan one line. */

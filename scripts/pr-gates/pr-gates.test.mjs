@@ -260,3 +260,20 @@ test('a change that touches no test, or adds one, passes with no reason', () => 
     writeFileSync(join(cwd, 'src/__tests__/c.test.ts'), 'it("c", () => {\n  expect(1).toBe(1)\n})\n')
   }, cwd => assert.equal(go(cwd, ''), 0))
 })
+
+// node:test files here are Prettier-wrapped: the options and the title sit on their own lines.
+test('a bare `skip:` option line is a skip; `skip: false` is not', () => {
+  const T2 = 'scripts/tests/ball-life.test.mjs'
+  assert.deepEqual(kinds(modified(T2, ['    skip: false,'], ['    skip: true,'])), ['skipped'])
+  assert.deepEqual(kinds(modified(T2, ['    skip: false,'], ['    skip: !process.env.CI && "slow",'])), ['skipped'])
+  assert.deepEqual(kinds(modified(T2, ['    skip: true,'], ['    skip: false,'])), [])
+})
+
+test('swapping one wrapped test for another is a removal', () => {
+  const T2 = 'scripts/tests/ball-life.test.mjs'
+  const gone = ['test(', '  "the ball keeps its life across a navigation",', '  () => {']
+  const added = ['test(', '  "something else entirely about hover",', '  () => {']
+  assert.ok(kinds(modified(T2, gone, added)).includes('removed-tests'))
+  // the same test, reformatted, is not
+  assert.deepEqual(kinds(modified(T2, ['test("the ball keeps its life across a navigation", () => {'], gone)), [])
+})

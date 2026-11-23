@@ -2,7 +2,17 @@
   // Lint only. Prettier owns formatting (`pnpm format`), so Biome's formatter stays off.
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
-  "files": { "includes": ["src/**", "scripts/tests/**", "astro.config.mjs"] },
+  "files": {
+    "includes": [
+      "src/**",
+      "scripts/tests/**",
+      "scripts/pr-gates/**",
+      "scripts/privacy/**",
+      "scripts/pre-commit.mjs",
+      "scripts/install-hooks.mjs",
+      "astro.config.mjs"
+    ]
+  },
   "formatter": { "enabled": false },
   "assist": { "enabled": false },
   "css": { "linter": { "enabled": false } },
@@ -20,15 +30,9 @@
         "noUselessEscapeInRegex": "off", // 2
         "useOptionalChain": "off" // 2
       },
-      "correctness": {
-        "noUnusedImports": "off", // 1 in .ts (.astro is disabled below)
-        "noUnusedVariables": "off" // 1 in .mjs (.astro is disabled below)
-      },
       "style": {
         "noNonNullAssertion": "off", // 101
-        "useConst": "off", // 1
         "useExponentiationOperator": "off", // 3
-        "useShorthandFunctionType": "off", // 1
         "useTemplate": "off" // 8
       },
       "suspicious": {

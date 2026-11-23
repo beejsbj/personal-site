@@ -101,7 +101,7 @@ for touch and reduced motion. The guide imports these production specimens.
 
 ## Checks
 
-Pre-commit hook, CI (`lint`, `check`, `test`, `build`), the PR gates (a `## Verification`
+Pre-commit hook, CI (`lint`, `check`, `test`), the PR gates (a `## Verification`
 section; no test deleted, skipped or loosened without a `Test change:` line) and the
 privacy and licence scan are described in [docs/checks.md](docs/checks.md). The licence is MIT.
 

@@ -87,7 +87,7 @@ export function parseDiff(diff) {
       files.push(file)
       hunk = null
     } else if (!file) {
-      continue
+      // before the first file header: nothing to record
     } else if (line.startsWith('deleted file mode')) {
       file.deleted = true
     } else if (line.startsWith('new file mode')) {
@@ -111,6 +111,8 @@ const SKIP = new RegExp('^\\s*(?:' + [
   '(?:xit|xtest|xdescribe|fit|fdescribe)\\s*\\(',
   '(?:ctx|t|this)\\.skip\\(',
   "(?:it|test|describe)\\s*\\(\\s*(['\"`]).*?\\1\\s*,\\s*\\{[^}]*\\bskip\\s*:\\s*true",
+  // Prettier wraps the options of a node:test case onto their own lines: a bare `skip: <anything but false>` property
+  '(?:\\{\\s*)?skip\\s*:\\s*(?!false\\b)\\S',
 ].join('|') + ')')
 const CASE = /(?:^|[^\w.])(?:it|test|bench|xit|xtest)\s*(?:\.\s*\w+(?:\([^)]*\))?\s*)*\(/
 const ASSERTION = /\bexpect(?:\.soft|\.poll)?\s*\(|\bassert(?:\.\w+)?\s*\(|\bt\.(?:is|true|false|deepEqual|throws|assert)\w*\s*\(/g
@@ -129,10 +131,13 @@ const similar = (a, b) => {
 }
 
 /** Titles present before and gone after; a close rewording counts as a rename, not a removal. */
+// Titles are read across lines: Prettier wraps `test(` and its title onto separate lines.
+const titlesOf = lines => [...code(lines).join('\n').matchAll(new RegExp(TITLE.source, 'g'))].map(match => match[2])
+
 function missingTitles(removed, added) {
-  const after = code(added).map(line => line.match(TITLE)?.[2]).filter(Boolean)
+  const after = titlesOf(added)
   const gone = []
-  for (const title of code(removed).map(line => line.match(TITLE)?.[2]).filter(Boolean)) {
+  for (const title of titlesOf(removed)) {
     const at = after.findIndex(candidate => candidate === title || similar(candidate, title))
     if (at >= 0) after.splice(at, 1)
     else gone.push(title)
