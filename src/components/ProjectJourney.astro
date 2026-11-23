@@ -82,7 +82,7 @@ const sources = (item: Media, layout: Layout) => {
                       <img
                         src={item.src}
                         {...sources(item, beat.layout)}
-                        alt={item.alt ?? ""}
+                        alt={item.alt}
                         width={item.width}
                         height={item.height}
                         loading="lazy"

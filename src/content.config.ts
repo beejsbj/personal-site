@@ -187,9 +187,16 @@ const beatSchema = z.object({
   /** How the media sit: one wide picture, two side by side, a contact
    * sheet of many small ones, or a strip read left to right. */
   layout: z.enum(["wide", "pair", "sheet", "strip"]).default("wide"),
-  /** `full` lets one frame of a pair or sheet take the whole row. */
+  /** `full` lets one frame of a pair or sheet take the whole row. Every
+   * frame needs alt text: it names the picture, and the enlarged dialog
+   * when there is no caption. */
   media: z
-    .array(mediaSchema.extend({ full: z.boolean().default(false) }))
+    .array(
+      mediaSchema.extend({
+        alt: z.string().min(1),
+        full: z.boolean().default(false),
+      }),
+    )
     .default([]),
   /** A short, verbatim excerpt of the code behind the work, shown before
    * the media it made. The caption says where it comes from. */
