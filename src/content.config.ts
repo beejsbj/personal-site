@@ -187,7 +187,10 @@ const beatSchema = z.object({
   /** How the media sit: one wide picture, two side by side, a contact
    * sheet of many small ones, or a strip read left to right. */
   layout: z.enum(["wide", "pair", "sheet", "strip"]).default("wide"),
-  media: z.array(mediaSchema).default([]),
+  /** `full` lets one frame of a pair or sheet take the whole row. */
+  media: z
+    .array(mediaSchema.extend({ full: z.boolean().default(false) }))
+    .default([]),
   /** The owner's own words, dated. */
   quotes: z
     .array(z.object({ text: z.string(), when: z.string() }))

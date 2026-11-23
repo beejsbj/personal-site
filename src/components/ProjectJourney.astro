@@ -36,7 +36,7 @@ const { journey, labels } = Astro.props;
                 : {})}
             >
               {beat.media.map((item) => (
-                <figure class="journey__figure">
+                <figure class:list={["journey__figure", { "journey__figure--full": item.full }]}>
                   {item.type === "video" ? (
                     <video
                       controls
@@ -188,7 +188,17 @@ const { journey, labels } = Astro.props;
   .journey__figure figcaption {
     max-width: 48ch;
   }
-  /* a contact sheet: many small frames, read as a set */
+  /* one wide frame, or a full-row one: whole, never past one screen */
+  :is(.journey__media--wide, .journey__figure--full) :is(img, video) {
+    width: auto;
+    max-width: 100%;
+    max-height: var(--journey-frame-max);
+  }
+  .journey__figure--full {
+    grid-column: 1 / -1;
+  }
+  /* a contact sheet: many small frames on a light table, each shown
+     whole (posters, menus and drawings must not be cropped) */
   .journey__media--sheet {
     grid-template-columns: repeat(
       auto-fill,
@@ -196,9 +206,10 @@ const { journey, labels } = Astro.props;
     );
     gap: var(--space-l) var(--space-m);
   }
-  .journey__media--sheet .journey__figure :is(img, video) {
+  .journey__media--sheet .journey__figure:not(.journey__figure--full) :is(img, video) {
     aspect-ratio: 4 / 3;
-    object-fit: cover;
+    object-fit: contain;
+    padding: var(--space-2xs);
   }
   /* a strip: frames at one width, scrolled sideways, in order */
   .journey__media--strip {

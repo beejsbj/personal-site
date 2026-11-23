@@ -184,6 +184,8 @@
   --journey-sheet-min: 10.5rem;
   --journey-sheet-min-compact: 8rem;
   --journey-strip-frame: 26rem;
+  /* a full-row frame never runs past one screen */
+  --journey-frame-max: 85vh;
   /* The opening's two Ks: how far apart they start, and the turn and the
      join that make them one leaf. */
   --kk-apart: 1.625rem;
