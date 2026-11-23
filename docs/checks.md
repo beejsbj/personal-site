@@ -4,9 +4,9 @@ What runs where, so a change is checked before it merges and a PR carries its ev
 
 | Where | What runs | Source |
 |---|---|---|
-| `git commit` (pre-commit hook) | `pnpm lint`; when `src/` or a config is staged also `pnpm check` and the full `pnpm test`; when only test files are staged, just those files. Docs-only commits skip all of it. | `.githooks/pre-commit`, `scripts/pre-commit.mjs` |
+| `git commit` (pre-commit hook) | `pnpm lint`; when `src/` or a config is staged also `pnpm check`, `pnpm build` and the full `pnpm test`; when only test files are staged, just those files. Docs-only commits skip all of it. | `.githooks/pre-commit`, `scripts/pre-commit.mjs` |
 | `git push` (pre-push hook) | the privacy scan over what the push adds | `.githooks/pre-push`, `scripts/privacy/` |
-| Every PR and push to `main` | `lint`, `check`, `test`, `build` (four jobs) | `.github/workflows/ci.yml` |
+| Every PR and push to `main` | `lint`, `check`, `test` (builds first, then the full suite): three jobs | `.github/workflows/ci.yml` |
 | Every PR | `verification-section`, `test-integrity` (re-run when the description is edited) | `.github/workflows/pr-gates.yml`, `scripts/pr-gates/` |
 | Every PR and push to `main` | `privacy-scan`: personal paths, emails and identities, and a missing `LICENSE` | `.github/workflows/privacy.yml`, `scripts/privacy/` |
 | Every PR | `review-evidence`: every review thread resolved, with a reply that shows why | `.github/workflows/review-evidence.yml` |
@@ -36,8 +36,8 @@ hook. A commit in a worktree with no `node_modules` fails with an instruction to
 `pnpm install --frozen-lockfile`; it does not skip quietly. The installer does nothing in CI, on
 Vercel, outside a git checkout, or when `core.hooksPath` is already set to something else.
 
-`node --test` has no "related tests" selection and the suites read the whole source tree, so a source
-change runs the whole `pnpm test` (about 20 seconds). Skip once with `git commit --no-verify`; CI is
+`node --test` has no "related tests" selection and the suite reads the built output in `dist/`, so a source
+change runs `pnpm build` and then the whole `pnpm test` (about a minute). Skip once with `git commit --no-verify`; CI is
 the backstop and runs the same checks.
 
 ## Gate 1: a Verification section
@@ -92,6 +92,6 @@ repo are public.
 ## Making the checks required
 
 A failing workflow blocks nothing until `main` requires it. The check names to require are `lint`,
-`check`, `test`, `build`, `verification-section`, `test-integrity`, `privacy-scan` and
+`check`, `test`, `verification-section`, `test-integrity`, `privacy-scan` and
 `review-evidence`, plus conversation resolution before merge. That is a repository ruleset and needs
 admin; see issue #37.

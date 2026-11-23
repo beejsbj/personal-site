@@ -1,5 +1,5 @@
-# CI: lint, type check, build and the full node:test suite on every PR and every push to main.
-# Four separate jobs so each reports (and can be required) on its own. No path filters: a
+# CI: lint, type check, and build plus the full node:test suite on every PR and every push to main.
+# Three separate jobs so each reports (and can be required) on its own. No path filters: a
 # required check that skips never reports.
 #
 # `pnpm test:prism` (the Chromium browser suites) is NOT run here: it takes 6 to 8 minutes
@@ -58,16 +58,6 @@ jobs:
           node-version: 22
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test
-
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: corepack enable
-      - run: pnpm install --frozen-lockfile
+      # The suite reads the built output (dist/), so it builds first; a build failure fails this job.
       - run: pnpm build
+      - run: pnpm test

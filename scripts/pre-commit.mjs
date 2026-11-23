@@ -2,8 +2,8 @@
 // Pre-commit: lint, type check and tests for what is staged.
 //   lint        `pnpm lint` (Biome) when any code or config is staged
 //   type check  `pnpm check` (astro check) when anything under src/ or a TS/Astro config is staged
-//   tests       the staged *.test.mjs files, or the whole `pnpm test` when source under src/ changed
-//               (node:test has no "related tests" selection, and these tests read the source tree)
+//   tests       the staged *.test.mjs files, or `pnpm build` then the whole `pnpm test` when source under
+//               src/ changed (node:test has no "related tests" selection, and the suite reads dist/)
 // Docs-only commits skip all three. Skip once with `git commit --no-verify`; CI runs the same.
 import { execFileSync, spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
@@ -26,6 +26,7 @@ export function plan(files, exists = path => existsSync(resolve(root, path))) {
   const steps = [{ name: 'lint', args: ['lint'] }]
   if (files.some(file => SOURCE.test(file))) steps.push({ name: 'type check', args: ['check'] })
   if (files.some(file => SOURCE.test(file))) {
+    steps.push({ name: 'build', args: ['build'] })
     steps.push({ name: 'tests (full suite, source changed)', args: ['test'] })
   } else {
     // A deleted test has nothing to run; the full suite would catch what it covered, CI does.

@@ -13,11 +13,13 @@ test("a source commit runs lint, the type check and the full suite", () => {
   assert.deepEqual(names(["src/prism/stage.ts"]), [
     "lint",
     "type check",
+    "build",
     "tests (full suite, source changed)",
   ]);
   assert.deepEqual(names(["package.json"]), [
     "lint",
     "type check",
+    "build",
     "tests (full suite, source changed)",
   ]);
 });
@@ -49,7 +51,7 @@ test("a deleted test file has nothing to run, so only lint runs", () => {
 test("a commit that only deletes source still lints, type-checks and runs the suite", () => {
   assert.deepEqual(
     plan(["src/gone.ts"], () => false).map((step) => step.name),
-    ["lint", "type check", "tests (full suite, source changed)"],
+    ["lint", "type check", "build", "tests (full suite, source changed)"],
   );
 });
 
