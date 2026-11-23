@@ -16,4 +16,5 @@ entry:
     date: When
     was: "It was:"
     now: "It became:"
+    close: Close
 ---

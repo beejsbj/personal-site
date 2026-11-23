@@ -188,6 +188,7 @@ export async function getProjectsPage() {
         date: need(detail.labels.date, "entry.labels.date"),
         was: need(detail.labels.was, "entry.labels.was"),
         now: need(detail.labels.now, "entry.labels.now"),
+        close: need(detail.labels.close, "entry.labels.close"),
       },
     },
   };

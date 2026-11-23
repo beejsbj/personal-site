@@ -11,11 +11,34 @@ import { plainInline } from "../lib/inline";
 
 interface Props {
   journey: JourneyData;
-  /** Screen-reader words for a turn: what it was, what it became. */
-  labels: { was: string; now: string };
+  /** Screen-reader words for a turn (what it was, what it became), and the
+   * enlarged picture's close button. */
+  labels: { was: string; now: string; close: string };
+  /** Daylight enlarges a picture in place; a lens gets plain links to the
+   * full-size file instead, and no dialog. */
+  interactive?: boolean;
 }
 
-const { journey, labels } = Astro.props;
+const { journey, labels, interactive = true } = Astro.props;
+
+type Media = JourneyData["beats"][number]["media"][number];
+type Layout = JourneyData["beats"][number]["layout"];
+/** How wide each layout shows a frame, for the browser to pick a file. */
+const SIZES: Record<Layout | "full", string> = {
+  wide: "(min-width: 62.5rem) 60rem, 92vw",
+  full: "(min-width: 62.5rem) 60rem, 92vw",
+  pair: "(min-width: 40.6rem) 30rem, 92vw",
+  strip: "(min-width: 40.6rem) 26rem, 78vw",
+  sheet: "(min-width: 40.6rem) 12rem, 45vw",
+};
+/** A raster wider than 1000px has a phone-sized copy beside it. */
+const sources = (item: Media, layout: Layout) =>
+  /\.(webp|jpe?g|png)$/.test(item.src) && (item.width ?? 0) > 1000
+    ? {
+        srcset: `${item.src.replace(/\.\w+$/, "-800.webp")} 800w, ${item.src} ${item.width}w`,
+        sizes: SIZES[item.full ? "full" : layout],
+      }
+    : {};
 ---
 
 <section class:list={["journey", { "journey--open": journey.open }]} aria-label={journey.label}>
@@ -28,6 +51,12 @@ const { journey, labels } = Astro.props;
         <div class="journey__body">
           <h2 class="journey__line"><Inline text={beat.line} links="plain" /></h2>
           {beat.note && <p class="journey__note"><Inline text={beat.note} links="plain" /></p>}
+          {beat.code && (
+            <figure class="journey__code">
+              <pre><code>{beat.code.text.trimEnd()}</code></pre>
+              <figcaption><Inline text={beat.code.caption} links="plain" /></figcaption>
+            </figure>
+          )}
           {beat.media.length > 0 && (
             <div
               class:list={["journey__media", `journey__media--${beat.layout}`]}
@@ -51,14 +80,17 @@ const { journey, labels } = Astro.props;
                       <source src={item.src} type="video/mp4" />
                     </video>
                   ) : (
-                    <img
-                      src={item.src}
-                      alt={item.alt ?? ""}
-                      width={item.width}
-                      height={item.height}
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <a class="journey__zoom" href={item.src}>
+                      <img
+                        src={item.src}
+                        {...sources(item, beat.layout)}
+                        alt={item.alt ?? ""}
+                        width={item.width}
+                        height={item.height}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </a>
                   )}
                   {item.caption && <figcaption><Inline text={item.caption} links="plain" /></figcaption>}
                 </figure>
@@ -96,7 +128,45 @@ const { journey, labels } = Astro.props;
       {journey.open.note && <p class="journey__note"><Inline text={journey.open.note} links="plain" /></p>}
     </div>
   )}
+  {interactive && (
+    <dialog class="journey__lightbox">
+      <figure>
+        <img alt="" />
+        <figcaption></figcaption>
+      </figure>
+      <form method="dialog">
+        <button class="journey__close">{labels.close}</button>
+      </form>
+    </dialog>
+  )}
 </section>
+
+<script>
+  /* A picture opens full size over the page; the link underneath still
+     works without script, in a new tab or with a modifier key. */
+  function enlarge() {
+    const dialog = document.querySelector<HTMLDialogElement>(".journey__lightbox");
+    if (!dialog || typeof dialog.showModal !== "function") return;
+    const picture = dialog.querySelector("img");
+    const caption = dialog.querySelector("figcaption");
+    if (!picture || !caption) return;
+    for (const link of document.querySelectorAll<HTMLAnchorElement>(".journey__zoom")) {
+      link.addEventListener("click", (event) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        picture.src = link.href;
+        picture.alt = link.querySelector("img")?.alt ?? "";
+        caption.textContent = link.closest("figure")?.querySelector("figcaption")?.textContent ?? "";
+        dialog.showModal();
+      });
+    }
+    // a click on the backdrop (the dialog itself, outside its figure) closes it
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  }
+  document.addEventListener("astro:page-load", enlarge);
+</script>
 
 <style>
   /* The thread: a hairline down the left, a dot and a date at each beat.
@@ -222,6 +292,63 @@ const { journey, labels } = Astro.props;
   }
   .journey__media--strip .journey__figure {
     scroll-snap-align: start;
+  }
+  /* every picture opens full size */
+  .journey__zoom {
+    display: block;
+    cursor: zoom-in;
+  }
+  /* the code behind the work, verbatim */
+  .journey__code {
+    display: grid;
+    max-width: var(--title-width);
+    margin-top: var(--space-xs);
+  }
+  .journey__code pre {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: var(--space-m);
+    background: var(--color-surface);
+    border-left: var(--focus-width) solid var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+  }
+  .journey__lightbox {
+    max-width: var(--journey-lightbox-width);
+    max-height: none;
+    margin: auto;
+    padding: var(--space-m);
+    border: 0;
+    background: var(--color-page);
+    color: var(--color-text);
+  }
+  .journey__lightbox::backdrop {
+    background: var(--journey-backdrop);
+  }
+  .journey__lightbox img {
+    width: auto;
+    max-width: 100%;
+    max-height: var(--journey-lightbox-height);
+    margin-inline: auto;
+  }
+  .journey__lightbox form {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--space-s);
+  }
+  .journey__close {
+    min-height: var(--control-min-height);
+    padding: 0 var(--space-m);
+    border: var(--rule-width) solid var(--color-accent);
+    border-radius: var(--radius-pill);
+    background: var(--ball-fill);
+    color: var(--color-accent);
+    font: inherit;
+    cursor: pointer;
+  }
+  .journey__close:hover {
+    background: var(--ball-fill-hover);
   }
   /* the owner's words, dated, in the serif */
   .journey__quotes {

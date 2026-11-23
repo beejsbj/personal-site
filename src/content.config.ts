@@ -191,6 +191,9 @@ const beatSchema = z.object({
   media: z
     .array(mediaSchema.extend({ full: z.boolean().default(false) }))
     .default([]),
+  /** A short, verbatim excerpt of the code behind the work, shown before
+   * the media it made. The caption says where it comes from. */
+  code: z.object({ caption: z.string(), text: z.string() }).optional(),
   /** The owner's own words, dated. */
   quotes: z
     .array(z.object({ text: z.string(), when: z.string() }))
@@ -201,6 +204,10 @@ const beatSchema = z.object({
     .default([]),
 });
 
+/** A journey page opens on the project's first `media` item, full width,
+ * so the finished thing is the first thing seen. Raster frames wider than
+ * 1000px have a phone-sized `<name>-800.webp` beside them (checked by the
+ * design-system test), offered through srcset. */
 const journeySchema = z.object({
   /** A designed opening Daylight draws above the thread (a project's own
    * piece in src/design/unique); lenses start at the first beat. */

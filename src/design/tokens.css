@@ -185,14 +185,18 @@
   --journey-sheet-min-compact: 8rem;
   --journey-strip-frame: 26rem;
   /* a full-row frame never runs past one screen */
-  --journey-frame-max: 85vh;
+  --journey-frame-max: 72vh;
+  /* a picture opened full size, over a dimmed page */
+  --journey-lightbox-width: 94vw;
+  --journey-lightbox-height: 82vh;
+  --journey-backdrop: #302320e0;
   /* The opening's two Ks: how far apart they start, and the turn and the
      join that make them one leaf. */
   --kk-apart: 1.625rem;
   --kk-art-height: clamp(12rem, 34vw, 20rem);
   --duration-kk-turn: 700ms;
   --duration-kk-join: 900ms;
-  --delay-kk: 450ms;
+  --delay-kk: 200ms;
   --page-ball-min: 4.75rem;
   --page-ball-max: 12rem;
   --page-reach: 150vmax;

@@ -90,6 +90,15 @@
   display: grid;
   gap: var(--space-2xs);
 }
+/* A journey page's first picture: the finished thing, full width. */
+.entry-hero {
+  display: grid;
+}
+.entry-hero img {
+  width: 100%;
+  border: var(--rule-width) solid var(--color-border);
+  background: var(--color-surface);
+}
 .media-rail {
   display: grid;
   gap: var(--space-m);

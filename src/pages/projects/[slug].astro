@@ -22,6 +22,13 @@ const projectEntry = entry as CollectionEntry<"projects">;
 const { slug, data } = projectEntry;
 const { Content } = await projectEntry.render();
 const { detail } = await getProjectsPage();
+// A journey opens on the finished thing: its first picture, full width,
+// before any words about it.
+type Media = CollectionEntry<"projects">["data"]["media"][number];
+const hero = data.journey
+  ? data.media.find((item: Media) => item.type === "image")
+  : undefined;
+const heroSmall = hero?.src.replace(/\.\w+$/, "-800.webp");
 ---
 
 <BaseLayout
@@ -40,6 +47,22 @@ const { detail } = await getProjectsPage();
         intro: part("project.summary", slug),
       }}
     />
+
+    {hero && (
+      <figure class="entry-hero" {...part("project.media", slug)}>
+        <img
+          src={hero.src}
+          srcset={hero.width && hero.width > 1000 ? `${heroSmall} 800w, ${hero.src} ${hero.width}w` : undefined}
+          sizes="(min-width: 71.25rem) 71.25rem, 92vw"
+          alt={hero.alt ?? ""}
+          width={hero.width}
+          height={hero.height}
+          fetchpriority="high"
+          decoding="async"
+        />
+        {hero.caption && <figcaption>{hero.caption}</figcaption>}
+      </figure>
+    )}
 
     <div class="entry-page__meta" {...part("project.meta", slug)}>
       <div>

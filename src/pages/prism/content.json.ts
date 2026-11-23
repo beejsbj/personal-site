@@ -132,7 +132,11 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
         const story = journey
           ? clean(
               await container.renderToString(ProjectJourney, {
-                props: { journey, labels: projectsPage.detail.labels },
+                props: {
+                  journey,
+                  labels: projectsPage.detail.labels,
+                  interactive: false,
+                },
               }),
             ).replace(/\s+data-astro-cid-\w+(?==|\s|>)(?:="[^"]*")?/g, "")
           : "";

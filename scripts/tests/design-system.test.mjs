@@ -361,7 +361,14 @@ test("all generated pages have shared chrome and resolving local links and media
     assert.match(html, /site-footer/, `${path}: shared footer`);
     const localPath =
       "/" + path.slice(output.length + 1).replace(/index\.html$/, "");
-    for (const [, value] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
+    // srcset candidates too: each "url width" pair must resolve like a src.
+    const srcsets = [...html.matchAll(/srcset="([^"]+)"/g)].flatMap(([, set]) =>
+      set.split(",").map((candidate) => ["", candidate.trim().split(/\s+/)[0]]),
+    );
+    for (const [, value] of [
+      ...html.matchAll(/(?:href|src)="([^"]+)"/g),
+      ...srcsets,
+    ]) {
       const url = new URL(
         value.replaceAll("&amp;", "&"),
         new URL(localPath, root),
