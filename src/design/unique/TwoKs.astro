@@ -2,8 +2,9 @@
 /** Koffee & Kahwa's opening: two Ks, side by side, the first turns its back
  * and the two close into one chinar leaf. The paths are the café's mark as
  * its own generator drew it (saffron Kahwa K, walnut Koffee K, for cream
- * grounds); they are artwork, copied, never redrawn. One arrival, on a real
- * first visit only; reduced motion and a settled page show the leaf. */
+ * grounds); they are artwork, copied, never redrawn. It plays once, when it
+ * comes into view on a real first visit; without script, under reduced
+ * motion and on a settled page it is simply the leaf. */
 import Inline from "../primitives/Inline.astro";
 
 interface Props {
@@ -85,18 +86,24 @@ const { line, caption } = Astro.props;
   }
   /* Arrival only, not on a page that is already there (a prism face, or
      stepping in from the prism). The Kahwa K starts facing the same way as
-     the Koffee K and both stand apart; it turns, then they close. */
+     the Koffee K and both stand apart; it turns, then they close. The script
+     below sets data-kk="ready" (held apart, out of sight) and then "play"
+     when the figure is in view; with no data-kk it is just the leaf. */
   @media (prefers-reduced-motion: no-preference) {
-    :global(:root:not([data-prism-settled])) .two-ks__k--kahwa {
+    :global(:root:not([data-prism-settled])) .two-ks[data-kk] .two-ks__k--kahwa {
       animation:
         kk-turn var(--duration-kk-turn) var(--ease-settle) var(--delay-kk)
           backwards,
         kk-join-kahwa var(--duration-kk-join) var(--ease-settle)
           calc(var(--delay-kk) + var(--duration-kk-turn)) backwards;
     }
-    :global(:root:not([data-prism-settled])) .two-ks__k--koffee {
+    :global(:root:not([data-prism-settled])) .two-ks[data-kk] .two-ks__k--koffee {
       animation: kk-join-koffee var(--duration-kk-join) var(--ease-settle)
         calc(var(--delay-kk) + var(--duration-kk-turn)) backwards;
+    }
+    /* as specific as the rules above, and after them, so it wins */
+    :global(:root:not([data-prism-settled])) .two-ks[data-kk="ready"] .two-ks__k {
+      animation-play-state: paused;
     }
   }
   @keyframes kk-turn {
@@ -124,3 +131,30 @@ const { line, caption } = Astro.props;
     }
   }
 </style>
+
+<script>
+  /* Hold the two Ks apart while the figure is out of sight, and let them
+     meet when it is in view: the moment is for the reader, not the load. */
+  function arm() {
+    if (!("IntersectionObserver" in window)) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    for (const figure of document.querySelectorAll<HTMLElement>(".two-ks")) {
+      const box = figure.getBoundingClientRect();
+      if (box.top < innerHeight && box.bottom > 0) {
+        figure.dataset.kk = "play";
+        continue;
+      }
+      figure.dataset.kk = "ready";
+      const watch = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          figure.dataset.kk = "play";
+          watch.disconnect();
+        },
+        { threshold: 0.5 },
+      );
+      watch.observe(figure);
+    }
+  }
+  document.addEventListener("astro:page-load", arm);
+</script>
