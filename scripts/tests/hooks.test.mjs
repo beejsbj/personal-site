@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { install } from "../install-hooks.mjs";
-import { plan } from "../pre-commit.mjs";
+import { checkEnv, plan } from "../pre-commit.mjs";
 
 const names = (files) => plan(files, () => true).map((step) => step.name);
 
@@ -118,4 +118,27 @@ test("installing does nothing in CI or on Vercel", () => {
     );
     assert.deepEqual(fake.calls, []);
   }
+});
+
+test("the checks never inherit where the hook's repository lives", () => {
+  // Git exports these to hooks; a test's scratch repo in a temp dir would
+  // otherwise resolve to this repository (and make it bare).
+  const env = checkEnv({
+    PATH: "/bin",
+    LANG: "C",
+    GIT_DIR: "/repo/.git/worktrees/w",
+    GIT_INDEX_FILE: "/repo/.git/worktrees/w/index",
+    GIT_WORK_TREE: "/repo",
+    GIT_COMMON_DIR: "/repo/.git",
+    GIT_PREFIX: "src/",
+    GIT_OBJECT_DIRECTORY: "/repo/.git/objects",
+    GIT_ALTERNATE_OBJECT_DIRECTORIES: "/other/objects",
+    GIT_NAMESPACE: "ns",
+    GIT_AUTHOR_NAME: "Someone",
+  });
+  assert.deepEqual(env, {
+    PATH: "/bin",
+    LANG: "C",
+    GIT_AUTHOR_NAME: "Someone",
+  });
 });

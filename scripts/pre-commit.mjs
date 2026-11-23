@@ -37,6 +37,18 @@ export function plan(files, exists = path => existsSync(resolve(root, path))) {
   return steps
 }
 
+/** Git exports where this repository lives (GIT_DIR, GIT_INDEX_FILE, ...) to the hook. The checks must not
+ * inherit them: a test that builds a scratch repo in a temp dir (the privacy and PR-gate tests do) would
+ * otherwise run `git init`, `git config` and `git add` against this repository instead, which flips it to
+ * bare and writes the test's identity into its config. Git's own advice for hooks: clear them. */
+const GIT_REPO_VARS = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_PREFIX',
+  'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE']
+export function checkEnv(env = process.env) {
+  const clean = { ...env }
+  for (const name of GIT_REPO_VARS) delete clean[name]
+  return clean
+}
+
 /** pnpm on PATH, else the version pinned in package.json through corepack. */
 export function pnpm() {
   const found = spawnSync('pnpm', ['--version'], { stdio: 'ignore' })
@@ -54,7 +66,7 @@ function main() {
   for (const step of steps) {
     console.log(`\npre-commit: ${step.name}`)
     const started = Date.now()
-    const result = spawnSync(command, [...prefix, ...step.args], { cwd: root, stdio: 'inherit' })
+    const result = spawnSync(command, [...prefix, ...step.args], { cwd: root, stdio: 'inherit', env: checkEnv() })
     if (result.status !== 0) {
       console.error(`\npre-commit: ${step.name} failed (exit ${result.status ?? result.signal}). Fix it, or skip once with \`git commit --no-verify\` (CI will still run it).`)
       return result.status ?? 1
