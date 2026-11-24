@@ -40,6 +40,11 @@ Vercel, outside a git checkout, or when `core.hooksPath` is already set to somet
 change runs `pnpm build` and then the whole `pnpm test` (about a minute). Skip once with `git commit --no-verify`; CI is
 the backstop and runs the same checks.
 
+The checks run without the variables git exports to locate the repository (`GIT_DIR`, `GIT_INDEX_FILE`
+and the rest; `checkEnv` in `scripts/pre-commit.mjs`). With them, the tests that build scratch repos in a
+temp dir ran `git init` and `git config` against this repository instead, made it bare and wrote their
+`practice` identity into it.
+
 ## Gate 1: a Verification section
 
 The PR description must contain a `## Verification` section of at least 30 characters that are not a
