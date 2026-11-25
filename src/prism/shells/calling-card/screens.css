@@ -406,6 +406,7 @@
   bottom: 3.2rem;
   width: 52vw;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-content: start;
   justify-items: start;
   gap: 1rem;

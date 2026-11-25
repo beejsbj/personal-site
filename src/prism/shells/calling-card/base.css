@@ -526,6 +526,9 @@
 /* ---------- Prose, dialogue boxes ---------- */
 :root[data-lens="calling-card"] .cc-prose {
   display: grid;
+  /* one track that can't grow past its column: a long code line or a wide
+     figure scrolls inside itself instead of clipping the notes */
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   font-size: 1.05rem;
   line-height: 1.6;
