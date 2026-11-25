@@ -79,6 +79,9 @@
   width: 100%;
   max-width: 100%;
   height: auto;
+  /* each picture at its own shape, whatever frame the lens gives others */
+  aspect-ratio: auto;
+  object-fit: fill;
 }
 /* a round's slides: a contact sheet of even frames, each opening full size */
 #lens-shell .journey__media--strip img {

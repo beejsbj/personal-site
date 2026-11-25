@@ -260,10 +260,58 @@ const jotted = (words: string) => {
   return s.charAt(0).toLowerCase() + s.slice(1);
 };
 
+/** A project's journey (src/components/ProjectJourney.astro) arrives as one
+ * section; the book needs it in pieces it can lay across pages: the opening,
+ * each beat's date and line kept with what follows, then its words, code,
+ * pictures (four to a piece) and turns (three to a piece). Every piece keeps
+ * the journey's class and data (the picture dialog's words), so the journey's
+ * styles and the dialog still reach it. */
+function journeyPieces(section: HTMLElement): HTMLElement[] {
+  const piece = (...nodes: Element[]) => {
+    const wrap = document.createElement("div");
+    wrap.className = section.className;
+    for (const { name, value } of section.attributes)
+      if (name.startsWith("data-")) wrap.setAttribute(name, value);
+    wrap.append(...nodes);
+    return wrap;
+  };
+  const chunks = (list: Element, size: number) => {
+    const items = [...list.children];
+    const out: Element[] = [];
+    for (let i = 0; i < items.length; i += size) {
+      const part = list.cloneNode(false) as Element;
+      part.append(...items.slice(i, i + size));
+      out.push(part);
+    }
+    return out;
+  };
+  const out: HTMLElement[] = [];
+  const opening = section.querySelector(":scope > .journey__opening");
+  if (opening) out.push(piece(opening));
+  for (const beat of section.querySelectorAll(":scope > .journey__thread > .journey__beat")) {
+    const body = beat.querySelector(":scope > .journey__body");
+    const head = [beat.querySelector(":scope > .journey__when"), body?.querySelector(":scope > .journey__line")];
+    const top = piece(...head.filter((node): node is Element => !!node));
+    top.dataset.bpKeep = "";
+    out.push(top);
+    for (const child of body ? [...body.children] : []) {
+      if (child.matches(".journey__quotes")) out.push(...[...child.children].map((quote) => piece(quote)));
+      else if (child.matches(".journey__media")) out.push(...chunks(child, 4).map((group) => piece(group)));
+      else if (child.matches(".journey__turns")) out.push(...chunks(child, 3).map((group) => piece(group)));
+      else out.push(piece(child));
+    }
+  }
+  const open = section.querySelector(":scope > .journey__open");
+  if (open) out.push(piece(open));
+  return out;
+}
+
 /** A rendered markdown body as blocks to flow onto pages, each marked as
  * part of the body. */
 const prose = (html: string, name: Part, ref: string) =>
-  blocks(html).map((el) => markPart(el, name, ref));
+  blocks(html)
+    .flatMap((el) => (el.matches("section.journey") ? journeyPieces(el) : [el]))
+    .map((el) => markPart(el, name, ref));
 
 function withUnderline(el: HTMLElement, ink: string, key: string, twice = false) {
   el.append(svg(underline(ink, seed(key), twice)));
