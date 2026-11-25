@@ -2229,6 +2229,9 @@
 
 :root[data-lens="cut-paper"] .cp-clipview__main {
   display: grid;
+  /* one track that can't grow past the column: a long code line or a wide
+     figure scrolls inside itself instead of widening the whole view */
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   min-width: 0;
 }
