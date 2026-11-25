@@ -138,7 +138,10 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
                   interactive: false,
                 },
               }),
-            ).replace(/\s+data-astro-cid-\w+(?==|\s|>)(?:="[^"]*")?/g, "")
+            )
+              .replace(/\s+data-astro-cid-\w+(?==|\s|>)(?:="[^"]*")?/g, "")
+              // the component's own script (Daylight's pile) is not content
+              .replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "")
           : "";
         return {
           ...data,
