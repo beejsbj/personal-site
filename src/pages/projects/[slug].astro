@@ -50,7 +50,12 @@ const heroSet = hero ? phoneCopy(hero.src, hero.width) : undefined;
     />
 
     {hero && (
-      <figure class="entry-hero" {...part("project.media", slug)}>
+      <figure
+        class="entry-hero"
+        data-close-label={detail.labels.close}
+        {...part("project.media", slug)}
+      >
+        <a class="journey__zoom" href={hero.src}>
         <img
           src={hero.src}
           srcset={heroSet}
@@ -61,6 +66,7 @@ const heroSet = hero ? phoneCopy(hero.src, hero.width) : undefined;
           fetchpriority="high"
           decoding="async"
         />
+        </a>
         {hero.caption && <figcaption>{hero.caption}</figcaption>}
       </figure>
     )}
@@ -92,19 +98,18 @@ const heroSet = hero ? phoneCopy(hero.src, hero.width) : undefined;
 
     <TagList items={data.tools} label={`${data.title} tools`} {...part("project.tools", slug)} />
 
-    {data.journey ? (
-      data.journey.opening?.art === "two-ks" && (
-        <TwoKs
-          line={data.journey.opening.line}
-          caption={data.journey.opening.caption}
-        />
-      )
-    ) : (
+    {!data.journey && (
       <MediaRail media={data.media} {...part("project.media", slug)} />
     )}
 
     {data.journey ? (
       <div class="entry-page__story" {...part("project.body", slug)}>
+        {data.journey.opening?.art === "two-ks" && (
+          <TwoKs
+            line={data.journey.opening.line}
+            caption={data.journey.opening.caption}
+          />
+        )}
         <article class="prose">
           <Content />
         </article>

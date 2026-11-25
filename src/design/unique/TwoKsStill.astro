@@ -1,0 +1,25 @@
+---
+/** Koffee & Kahwa's mark at rest, for the lenses: the two Ks already back to
+ * back as one chinar leaf, with the opening's line and caption. Plain markup
+ * with its size in attributes, since a lens styles it in its own way. */
+import Inline from "../primitives/Inline.astro";
+import { KAHWA, KOFFEE, VIEWBOX } from "./two-ks";
+
+interface Props {
+  line: string;
+  caption: string;
+}
+
+const { line, caption } = Astro.props;
+---
+
+<figure class="journey__opening">
+  <svg viewBox={VIEWBOX} width="127" height="160" aria-hidden="true" focusable="false">
+    <path d={KAHWA.d} fill={KAHWA.fill}></path>
+    <path d={KOFFEE.d} fill={KOFFEE.fill}></path>
+  </svg>
+  <figcaption>
+    <h2 class="journey__line"><Inline text={line} links="plain" /></h2>
+    <p class="journey__note"><Inline text={caption} links="plain" /></p>
+  </figcaption>
+</figure>

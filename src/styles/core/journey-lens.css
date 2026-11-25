@@ -1,0 +1,130 @@
+/* A project's journey inside a lens. Lenses receive the journey as plain
+   markup (src/components/ProjectJourney.astro, appended to the project's
+   html in /prism/content.json) and set it in their own prose; this is the
+   floor under that prose, so no lens shows Daylight's leftovers (list
+   numbers on the dates, its faint caption colour on a dark ground, code that
+   overflows, struck turns that read as links, a column of full-size slides).
+   It takes the lens's own colour (currentColor) and leaves type to the lens.
+   A lens that designs its own journey overrides these with its own rules. */
+#lens-shell .journey {
+  display: grid;
+  gap: var(--space-2xl);
+}
+#lens-shell .journey__opening {
+  display: grid;
+  gap: var(--space-s);
+  justify-items: start;
+  margin: 0;
+}
+#lens-shell .journey__opening svg {
+  display: block;
+  width: auto;
+  height: var(--journey-opening-height);
+}
+#lens-shell .journey__opening figcaption {
+  display: grid;
+  gap: var(--space-2xs);
+}
+#lens-shell .journey__thread {
+  display: grid;
+  gap: var(--space-3xl);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#lens-shell .journey__beat,
+#lens-shell .journey__body {
+  display: grid;
+  gap: var(--space-m);
+  min-width: 0;
+}
+#lens-shell .journey__when {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+#lens-shell .journey__quotes {
+  display: grid;
+  gap: var(--space-s);
+}
+#lens-shell .journey :is(figure, blockquote) {
+  min-width: 0;
+  margin: 0;
+}
+#lens-shell .journey__quote blockquote {
+  padding-left: var(--space-s);
+  border-left: var(--focus-width) solid currentColor;
+}
+#lens-shell .journey figcaption {
+  margin-top: var(--space-2xs);
+  padding: 0;
+  color: inherit;
+  font-size: var(--text-sm);
+  opacity: 0.8;
+}
+#lens-shell .journey__media {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--journey-sheet-min)), 1fr));
+  gap: var(--space-m);
+}
+#lens-shell .journey__media--wide {
+  grid-template-columns: minmax(0, 1fr);
+}
+#lens-shell .journey__figure--full {
+  grid-column: 1 / -1;
+}
+#lens-shell .journey :is(img, video) {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+/* a round's slides: a contact sheet of even frames, each opening full size */
+#lens-shell .journey__media--strip img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+#lens-shell .journey__zoom {
+  display: block;
+  cursor: zoom-in;
+}
+#lens-shell .journey__code {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+#lens-shell .journey__code pre {
+  max-width: 100%;
+  margin: 0;
+  padding: var(--space-s);
+  overflow-x: auto;
+  border: var(--rule-width) dashed currentColor;
+  font: 400 var(--text-xs) / var(--leading-body) var(--font-mono);
+  white-space: pre;
+}
+#lens-shell .journey__turns {
+  display: grid;
+  gap: var(--space-s);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#lens-shell .journey__turn {
+  display: grid;
+  gap: var(--space-2xs);
+  padding-top: var(--space-s);
+  border-top: var(--rule-width) solid currentColor;
+}
+#lens-shell .journey__turn-when {
+  font-size: var(--text-sm);
+  opacity: 0.75;
+}
+#lens-shell .journey__turn del {
+  opacity: 0.6;
+}
+#lens-shell .journey__turn ins {
+  text-decoration: none;
+}
+#lens-shell .journey__line--open {
+  font-style: italic;
+}

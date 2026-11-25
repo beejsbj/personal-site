@@ -7,6 +7,7 @@
  * prose. Keep it semantic: lenses only get the elements, not this style. */
 import type { JourneyData } from "../content.config";
 import Inline from "../design/primitives/Inline.astro";
+import TwoKsStill from "../design/unique/TwoKsStill.astro";
 import { plainInline } from "../lib/inline";
 import { phoneCopy } from "../lib/journey";
 
@@ -47,6 +48,9 @@ const sources = (item: Media, layout: Layout) => {
   data-previous-label={labels.previous}
   data-next-label={labels.next}
 >
+  {!interactive && journey.opening?.art === "two-ks" && (
+    <TwoKsStill line={journey.opening.line} caption={journey.opening.caption} />
+  )}
   <ol class="journey__thread">
     {journey.beats.map((beat) => (
       <li class:list={["journey__beat", `journey__beat--${beat.layout}`]}>
@@ -77,15 +81,17 @@ const sources = (item: Media, layout: Layout) => {
               class:list={["journey__media", `journey__media--${beat.layout}`]}
               {...(beat.layout === "strip"
                 ? {
-                    tabindex: 0,
                     role: "group",
                     "aria-label": plainInline(beat.line),
-                    ...(interactive ? { "data-pile": "" } : {}),
+                    ...(interactive ? { tabindex: 0, "data-pile": "" } : {}),
                   }
                 : {})}
             >
               {beat.media.map((item) => (
-                <figure class:list={["journey__figure", { "journey__figure--full": item.full }]}>
+                <figure
+                  class:list={["journey__figure", { "journey__figure--full": item.full }]}
+                  style={item.width && item.height ? `--ar: ${(item.width / item.height).toFixed(3)}` : undefined}
+                >
                   {item.type === "video" ? (
                     <video
                       controls
@@ -275,7 +281,7 @@ const sources = (item: Media, layout: Layout) => {
      Past beats are filled; the open end is a ring on a dashed line that
      fades out instead of stopping, because the work hasn't. */
   .journey {
-    --gutter: calc(var(--journey-rail) * 2 + var(--space-xl));
+    --gutter: calc(var(--journey-rail) + var(--space-xl));
     /* the first line of the date, whose middle the dot sits on */
     --mark-middle: calc(var(--text-sm) * var(--leading-tight) / 2);
     margin-top: var(--space-3xl);
@@ -522,6 +528,7 @@ const sources = (item: Media, layout: Layout) => {
   /* the code behind the work, verbatim */
   .journey__code {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     max-width: var(--title-width);
     margin-top: var(--space-xs);
   }
@@ -628,9 +635,20 @@ const sources = (item: Media, layout: Layout) => {
       text-align: right;
     }
   }
+  /* pairs: justified rows. Each frame grows by its aspect, so a portrait
+     and a landscape share one height and leave no hole beneath either. */
   @media (min-width: 40.626rem) {
     .journey__media--pair {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .journey__media--pair .journey__figure {
+      --ar: 1.5;
+      flex: var(--ar) 1 calc(var(--ar) * var(--journey-pair-row));
+    }
+    .journey__media--pair .journey__figure--full {
+      flex-basis: 100%;
     }
   }
   @media (max-width: 40.625rem) {

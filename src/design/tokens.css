@@ -187,6 +187,10 @@
   /* a strip dealt into a pile of slides: its width, how far each slide
      beneath sits out and how much it skews, and where a turned slide goes */
   --journey-pile-width: 44rem;
+  /* a justified pair row's base height, before its frames grow to fill it */
+  --journey-pair-row: 15rem;
+  /* the mark at rest, opening a journey in a lens */
+  --journey-opening-height: 10rem;
   --journey-pile-step: 0.5rem;
   --journey-pile-room: 1.5rem;
   --journey-pile-shown: 4;
@@ -203,6 +207,7 @@
   /* a picture opened full size, over a dimmed page */
   --journey-lightbox-width: 94vw;
   --journey-lightbox-height: 82vh;
+  --journey-lightbox-height-phone: 74vh;
   --journey-backdrop: #302320e0;
   /* The opening's two Ks: how far apart they start, and the turn and the
      join that make them one leaf. */
