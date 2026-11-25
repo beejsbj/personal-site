@@ -12,11 +12,12 @@ import { phoneCopy } from "../lib/journey";
 
 interface Props {
   journey: JourneyData;
-  /** Screen-reader words for a turn (what it was, what it became), and the
-   * enlarged picture's close button. */
-  labels: { was: string; now: string; close: string };
-  /** Daylight enlarges a picture in place; a lens gets plain links to the
-   * full-size file instead, and no dialog. */
+  /** Screen-reader words for a turn (what it was, what it became), the
+   * enlarged picture's close button (src/lib/lightbox.ts) and a pile's turn
+   * buttons. */
+  labels: { was: string; now: string; close: string; previous: string; next: string };
+  /** Daylight deals a strip of slides into a pile you turn; a lens gets the
+   * plain strip markup to set in its own way. Pictures enlarge everywhere. */
   interactive?: boolean;
 }
 
@@ -39,7 +40,13 @@ const sources = (item: Media, layout: Layout) => {
 };
 ---
 
-<section class:list={["journey", { "journey--open": journey.open }]} aria-label={journey.label}>
+<section
+  class:list={["journey", { "journey--open": journey.open }]}
+  aria-label={journey.label}
+  data-close-label={labels.close}
+  data-previous-label={labels.previous}
+  data-next-label={labels.next}
+>
   <ol class="journey__thread">
     {journey.beats.map((beat) => (
       <li class:list={["journey__beat", `journey__beat--${beat.layout}`]}>
@@ -69,7 +76,12 @@ const sources = (item: Media, layout: Layout) => {
             <div
               class:list={["journey__media", `journey__media--${beat.layout}`]}
               {...(beat.layout === "strip"
-                ? { tabindex: 0, role: "group", "aria-label": plainInline(beat.line) }
+                ? {
+                    tabindex: 0,
+                    role: "group",
+                    "aria-label": plainInline(beat.line),
+                    ...(interactive ? { "data-pile": "" } : {}),
+                  }
                 : {})}
             >
               {beat.media.map((item) => (
@@ -126,46 +138,136 @@ const sources = (item: Media, layout: Layout) => {
       {journey.open.note && <p class="journey__note"><Inline text={journey.open.note} links="plain" /></p>}
     </div>
   )}
-  {interactive && (
-    <dialog class="journey__lightbox">
-      <figure>
-        <img alt="" />
-        <figcaption></figcaption>
-      </figure>
-      <form method="dialog">
-        <button class="journey__close">{labels.close}</button>
-      </form>
-    </dialog>
-  )}
 </section>
 
 <script>
-  /* A picture opens full size over the page; the link underneath still
-     works without script, in a new tab or with a modifier key. */
-  function enlarge() {
-    const dialog = document.querySelector<HTMLDialogElement>(".journey__lightbox");
-    if (!dialog || typeof dialog.showModal !== "function") return;
-    const picture = dialog.querySelector("img");
-    const caption = dialog.querySelector("figcaption");
-    if (!picture || !caption) return;
-    for (const link of document.querySelectorAll<HTMLAnchorElement>(".journey__zoom")) {
-      link.addEventListener("click", (event) => {
-        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        event.preventDefault();
-        picture.src = link.href;
-        picture.alt = link.querySelector("img")?.alt.trim() ?? "";
-        caption.textContent = link.closest("figure")?.querySelector("figcaption")?.textContent?.trim() ?? "";
-        // the dialog is named by what it shows: the caption, else the picture
-        dialog.setAttribute("aria-label", caption.textContent || picture.alt);
-        dialog.showModal();
+  /* A strip of slides is dealt into a pile, squared on the table: the top
+     slide large, the next ones' edges showing beneath. Next tosses the top
+     slide aside and tucks it under; previous brings the last one back. The
+     buttons, the arrow keys and a sideways swipe all turn it, and the top
+     slide still opens full size. Without script it stays a strip. */
+  const SHOWN = 4; // slides whose edges show; the rest wait out of sight
+
+  function deal(pile: HTMLElement) {
+    if (pile.dataset.dealt !== undefined) return;
+    const host = pile.closest<HTMLElement>(".journey");
+    const words = { previous: host?.dataset.previousLabel, next: host?.dataset.nextLabel };
+    const cards = [...pile.querySelectorAll<HTMLElement>(":scope > .journey__figure")];
+    if (!words.previous || !words.next || cards.length < 2) return;
+    pile.dataset.dealt = "";
+
+    const controls = document.createElement("div");
+    controls.className = "journey-pile__controls";
+    const button = (glyph: string, label: string) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "journey-pile__turn";
+      b.setAttribute("aria-label", label);
+      const g = document.createElement("span");
+      g.setAttribute("aria-hidden", "true");
+      g.textContent = glyph;
+      b.append(g);
+      return b;
+    };
+    const previous = button("‹", words.previous);
+    const next = button("›", words.next);
+    const count = document.createElement("span");
+    count.className = "journey-pile__count";
+    count.setAttribute("aria-live", "polite");
+    const caption = document.createElement("p");
+    caption.className = "journey-pile__caption";
+    caption.setAttribute("aria-hidden", "true");
+    controls.append(previous, count, next, caption);
+    pile.after(controls);
+
+    let top = 0;
+    const lay = () => {
+      cards.forEach((card, index) => {
+        const depth = (index - top + cards.length) % cards.length;
+        card.style.setProperty("--depth", String(depth));
+        card.dataset.depth = depth < SHOWN ? String(depth) : "under";
+        card.inert = depth !== 0;
       });
-    }
-    // a click on the backdrop (the dialog itself, outside its figure) closes it
-    dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) dialog.close();
+      count.textContent = `${top + 1} / ${cards.length}`;
+      caption.textContent = cards[top].querySelector("figcaption")?.textContent?.trim() ?? "";
+    };
+    lay();
+
+    const still = matchMedia("(prefers-reduced-motion: reduce)");
+    // the end of a card's move: its transition, or a beat later if none runs
+    const settle = (card: HTMLElement, done: () => void) => {
+      let over = false;
+      const finish = () => {
+        if (over) return;
+        over = true;
+        done();
+      };
+      card.addEventListener("transitionend", finish, { once: true });
+      setTimeout(finish, 900);
+    };
+    const frame = (fn: () => void) => requestAnimationFrame(() => requestAnimationFrame(fn));
+    const turn = (step: 1 | -1) => {
+      const n = cards.length;
+      if (still.matches) {
+        top = (top + step + n) % n;
+        lay();
+        return;
+      }
+      if (pile.dataset.turning !== undefined) return;
+      pile.dataset.turning = "";
+      if (step === 1) {
+        const leaving = cards[top];
+        leaving.classList.add("is-tossed");
+        settle(leaving, () => {
+          leaving.classList.add("is-placed");
+          leaving.classList.remove("is-tossed");
+          top = (top + 1) % n;
+          lay();
+          frame(() => {
+            leaving.classList.remove("is-placed");
+            delete pile.dataset.turning;
+          });
+        });
+      } else {
+        const arriving = cards[(top - 1 + n) % n];
+        arriving.classList.add("is-placed", "is-tossed");
+        top = (top - 1 + n) % n;
+        lay();
+        frame(() => {
+          arriving.classList.remove("is-placed", "is-tossed");
+          settle(arriving, () => delete pile.dataset.turning);
+        });
+      }
+    };
+    previous.addEventListener("click", () => turn(-1));
+    next.addEventListener("click", () => turn(1));
+    pile.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight") turn(1);
+      else if (event.key === "ArrowLeft") turn(-1);
+      else return;
+      event.preventDefault();
+    });
+    // a sideways swipe turns it; the lightbox ignores the click that ends it
+    let from: number | undefined;
+    // a slide is not dragged off as a file: the gesture belongs to the pile
+    pile.addEventListener("dragstart", (event) => event.preventDefault());
+    pile.addEventListener("pointerdown", (event) => {
+      from = event.clientX;
+    });
+    pile.addEventListener("pointerup", (event) => {
+      if (from === undefined) return;
+      const moved = event.clientX - from;
+      from = undefined;
+      if (Math.abs(moved) < 40) return;
+      pile.dataset.swiping = "";
+      setTimeout(() => delete pile.dataset.swiping, 0);
+      turn(moved < 0 ? 1 : -1);
     });
   }
-  document.addEventListener("astro:page-load", enlarge);
+
+  document.addEventListener("astro:page-load", () => {
+    for (const pile of document.querySelectorAll<HTMLElement>(".journey__media[data-pile]")) deal(pile);
+  });
 </script>
 
 <style>
@@ -302,6 +404,116 @@ const sources = (item: Media, layout: Layout) => {
     max-width: none;
     height: var(--journey-strip-height);
   }
+  /* dealt into a pile (script): every slide in one cell, offset by its depth,
+     the ones beneath each keeping their own slight skew, like printed slides
+     squared on a table */
+  .journey__media--strip[data-dealt] {
+    grid-template-areas: "pile";
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    width: min(100%, var(--journey-pile-width));
+    padding: 0 var(--journey-pile-room) var(--journey-pile-room) 0;
+    overflow: visible;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+  .journey__media--strip[data-dealt] .journey__figure {
+    /* the script sets each slide's depth in the pile; 0 is the top */
+    --depth: 0;
+    --skew: var(--journey-pile-skew-a);
+    grid-area: pile;
+    width: auto;
+    z-index: calc(var(--journey-pile-shown) - var(--depth));
+    translate: calc(var(--depth) * var(--journey-pile-step))
+      calc(var(--depth) * var(--journey-pile-step));
+    rotate: calc(var(--skew) * min(var(--depth), 1));
+    transition:
+      translate var(--duration-reveal) var(--ease-settle),
+      rotate var(--duration-reveal) var(--ease-settle),
+      opacity var(--duration-reveal) var(--ease-settle);
+  }
+  .journey__media--strip[data-dealt] .journey__figure:nth-child(4n + 2) {
+    --skew: var(--journey-pile-skew-b);
+  }
+  .journey__media--strip[data-dealt] .journey__figure:nth-child(4n + 3) {
+    --skew: var(--journey-pile-skew-c);
+  }
+  .journey__media--strip[data-dealt] .journey__figure:nth-child(4n) {
+    --skew: var(--journey-pile-skew-d);
+  }
+  .journey__media--strip[data-dealt] .journey__figure[data-depth="under"] {
+    opacity: 0;
+  }
+  .journey__media--strip[data-dealt] .journey__figure.is-tossed {
+    translate: var(--journey-pile-toss-x) var(--journey-pile-toss-y);
+    rotate: var(--journey-pile-toss-turn);
+    opacity: 0;
+  }
+  .journey__media--strip[data-dealt] .journey__figure.is-placed {
+    transition: none;
+  }
+  .journey__media--strip[data-dealt] .journey__figure :is(img, video) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    background: var(--color-page);
+  }
+  .journey__media--strip[data-dealt] figcaption {
+    position: absolute;
+    width: var(--rule-width);
+    height: var(--rule-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* the pile's own row: turn back, where you are, turn on, what it shows */
+  .journey__media + :global(.journey-pile__controls) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-s) var(--space-m);
+    max-width: var(--journey-pile-width);
+  }
+  :global(.journey-pile__turn) {
+    display: grid;
+    place-items: center;
+    width: var(--control-min-height);
+    height: var(--control-min-height);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-round);
+    background: var(--ball-fill);
+    color: var(--ball-ink);
+    font: var(--weight-bold) var(--text-lead) / 1 var(--font-serif);
+    cursor: pointer;
+    transition: background var(--duration-hover) var(--ease-settle);
+  }
+  :global(.journey-pile__turn:hover) {
+    background: var(--ball-fill-hover);
+  }
+  :global(.journey-pile__turn:focus-visible) {
+    outline: var(--focus-width) solid var(--color-accent);
+    outline-offset: var(--focus-offset);
+  }
+  :global(.journey-pile__count) {
+    min-width: 3.5ch;
+    color: var(--color-text-soft);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+  :global(.journey-pile__caption) {
+    flex: 1 1 var(--journey-pile-caption-min);
+    margin: 0;
+    color: var(--color-text-soft);
+    font-size: var(--text-xs);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .journey__media--strip[data-dealt] .journey__figure {
+      transition: none;
+    }
+  }
   /* every picture opens full size */
   .journey__zoom {
     display: block;
@@ -322,42 +534,6 @@ const sources = (item: Media, layout: Layout) => {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     line-height: var(--leading-body);
-  }
-  .journey__lightbox {
-    max-width: var(--journey-lightbox-width);
-    max-height: none;
-    margin: auto;
-    padding: var(--space-m);
-    border: 0;
-    background: var(--color-page);
-    color: var(--color-text);
-  }
-  .journey__lightbox::backdrop {
-    background: var(--journey-backdrop);
-  }
-  .journey__lightbox img {
-    width: auto;
-    max-width: 100%;
-    max-height: var(--journey-lightbox-height);
-    margin-inline: auto;
-  }
-  .journey__lightbox form {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: var(--space-s);
-  }
-  .journey__close {
-    min-height: var(--control-min-height);
-    padding: 0 var(--space-m);
-    border: var(--rule-width) solid var(--color-accent);
-    border-radius: var(--radius-pill);
-    background: var(--ball-fill);
-    color: var(--color-accent);
-    font: inherit;
-    cursor: pointer;
-  }
-  .journey__close:hover {
-    background: var(--ball-fill-hover);
   }
   /* the owner's words lead each beat: the thought, then the work it made */
   .journey__quotes {

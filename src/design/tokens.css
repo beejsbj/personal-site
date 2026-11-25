@@ -184,6 +184,20 @@
   --journey-sheet-min: 10.5rem;
   --journey-sheet-min-compact: 8rem;
   --journey-strip-height: clamp(13rem, 28vw, 19rem);
+  /* a strip dealt into a pile of slides: its width, how far each slide
+     beneath sits out and how much it skews, and where a turned slide goes */
+  --journey-pile-width: 44rem;
+  --journey-pile-step: 0.5rem;
+  --journey-pile-room: 1.5rem;
+  --journey-pile-shown: 4;
+  --journey-pile-skew-a: -1.4deg;
+  --journey-pile-skew-b: 1deg;
+  --journey-pile-skew-c: -0.6deg;
+  --journey-pile-skew-d: 1.6deg;
+  --journey-pile-toss-x: -72%;
+  --journey-pile-toss-y: 5%;
+  --journey-pile-toss-turn: -8deg;
+  --journey-pile-caption-min: 18rem;
   /* a full-row frame never runs past one screen */
   --journey-frame-max: 72vh;
   /* a picture opened full size, over a dimmed page */

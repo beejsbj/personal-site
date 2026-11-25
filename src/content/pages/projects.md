@@ -17,4 +17,6 @@ entry:
     was: "It was:"
     now: "It became:"
     close: Close
+    previous: Previous slide
+    next: Next slide
 ---

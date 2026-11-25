@@ -189,6 +189,8 @@ export async function getProjectsPage() {
         was: need(detail.labels.was, "entry.labels.was"),
         now: need(detail.labels.now, "entry.labels.now"),
         close: need(detail.labels.close, "entry.labels.close"),
+        previous: need(detail.labels.previous, "entry.labels.previous"),
+        next: need(detail.labels.next, "entry.labels.next"),
       },
     },
   };
