@@ -183,7 +183,7 @@
   --journey-line-measure: 22ch;
   --journey-sheet-min: 10.5rem;
   --journey-sheet-min-compact: 8rem;
-  --journey-strip-frame: 26rem;
+  --journey-strip-height: clamp(13rem, 28vw, 19rem);
   /* a full-row frame never runs past one screen */
   --journey-frame-max: 72vh;
   /* a picture opened full size, over a dimmed page */

@@ -29,7 +29,7 @@ const SIZES: Record<Layout | "full", string> = {
   wide: "(min-width: 62.5rem) 60rem, 92vw",
   full: "(min-width: 62.5rem) 60rem, 92vw",
   pair: "(min-width: 40.6rem) 30rem, 92vw",
-  strip: "(min-width: 40.6rem) 26rem, 78vw",
+  strip: "(min-width: 40.6rem) 34rem, 60vw",
   sheet: "(min-width: 40.6rem) 12rem, 45vw",
 };
 /** A raster wider than 1000px has a phone-sized copy beside it. */
@@ -49,6 +49,16 @@ const sources = (item: Media, layout: Layout) => {
         <div class="journey__body">
           <h2 class="journey__line"><Inline text={beat.line} links="plain" /></h2>
           {beat.note && <p class="journey__note"><Inline text={beat.note} links="plain" /></p>}
+          {beat.quotes.length > 0 && (
+            <div class="journey__quotes">
+              {beat.quotes.map((quote) => (
+                <figure class="journey__quote">
+                  <blockquote><p>{quote.text}</p></blockquote>
+                  <figcaption>{quote.when}</figcaption>
+                </figure>
+              ))}
+            </div>
+          )}
           {beat.code && (
             <figure class="journey__code">
               <pre><code>{beat.code.text.trimEnd()}</code></pre>
@@ -91,16 +101,6 @@ const sources = (item: Media, layout: Layout) => {
                     </a>
                   )}
                   {item.caption && <figcaption><Inline text={item.caption} links="plain" /></figcaption>}
-                </figure>
-              ))}
-            </div>
-          )}
-          {beat.quotes.length > 0 && (
-            <div class="journey__quotes">
-              {beat.quotes.map((quote) => (
-                <figure class="journey__quote">
-                  <blockquote><p>{quote.text}</p></blockquote>
-                  <figcaption>{quote.when}</figcaption>
                 </figure>
               ))}
             </div>
@@ -281,17 +281,26 @@ const sources = (item: Media, layout: Layout) => {
     object-fit: contain;
     padding: var(--space-2xs);
   }
-  /* a strip: frames at one width, scrolled sideways, in order */
+  /* a strip: a filmstrip of frames at one height, each at its own width,
+     scrolled sideways in order; a caption wraps to its frame */
   .journey__media--strip {
     grid-auto-flow: column;
-    grid-auto-columns: min(78%, var(--journey-strip-frame));
+    grid-auto-columns: max-content;
     overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
     overscroll-behavior-x: contain;
     scroll-snap-type: x proximity;
     padding-bottom: var(--space-s);
   }
   .journey__media--strip .journey__figure {
+    width: min-content;
     scroll-snap-align: start;
+  }
+  .journey__media--strip .journey__figure :is(img, video) {
+    width: auto;
+    max-width: none;
+    height: var(--journey-strip-height);
   }
   /* every picture opens full size */
   .journey__zoom {
@@ -350,19 +359,21 @@ const sources = (item: Media, layout: Layout) => {
   .journey__close:hover {
     background: var(--ball-fill-hover);
   }
-  /* the owner's words, dated, in the serif */
+  /* the owner's words lead each beat: the thought, then the work it made */
   .journey__quotes {
     display: grid;
     gap: var(--space-l);
-    max-width: var(--intro-width);
-    margin-top: var(--space-s);
+    max-width: var(--title-width);
   }
   .journey__quote blockquote {
     padding-left: var(--space-m);
     border-left: var(--focus-width) solid var(--color-surface-strong);
+    color: var(--color-text);
     font-family: var(--font-serif);
-    font-size: var(--text-lead);
-    line-height: var(--leading-body);
+    font-size: var(--text-card);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-heading);
+    text-wrap: pretty;
   }
   .journey__quote figcaption {
     padding: var(--space-2xs) 0 0 var(--space-m);
@@ -449,6 +460,11 @@ const sources = (item: Media, layout: Layout) => {
   @media (max-width: 40.625rem) {
     .journey__beat {
       padding-bottom: var(--space-3xl);
+    }
+    /* the owner's words stay large, but not six lines a sentence */
+    .journey__quote blockquote {
+      font-size: var(--text-lead);
+      line-height: var(--leading-body);
     }
     /* two frames a row on a phone, so a sheet still reads as a set */
     .journey__media--sheet {
