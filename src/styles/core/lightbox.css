@@ -1,0 +1,54 @@
+/* A journey picture opened full size (src/lib/lightbox.ts). Global, because
+   the dialog is made by script and appears over Daylight and every lens. */
+.site-lightbox {
+  max-width: var(--journey-lightbox-width);
+  max-height: none;
+  margin: auto;
+  padding: var(--space-m);
+  border: 0;
+  background: var(--color-page);
+  color: var(--color-text);
+  font: var(--text-base) / var(--leading-body) var(--font-sans);
+}
+.site-lightbox::backdrop {
+  background: var(--journey-backdrop);
+}
+.site-lightbox figure {
+  display: grid;
+  gap: var(--space-s);
+  margin: 0;
+}
+.site-lightbox img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: var(--journey-lightbox-height);
+  margin-inline: auto;
+}
+.site-lightbox figcaption {
+  padding: 0;
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+.site-lightbox form {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-s);
+}
+.site-lightbox__close {
+  min-height: var(--control-min-height);
+  padding: 0 var(--space-m);
+  border: var(--rule-width) solid var(--color-accent);
+  border-radius: var(--radius-pill);
+  background: var(--ball-fill);
+  color: var(--color-accent);
+  font: inherit;
+  cursor: pointer;
+}
+.site-lightbox__close:hover {
+  background: var(--ball-fill-hover);
+}
+.site-lightbox__close:focus-visible {
+  outline: var(--focus-width) solid var(--color-accent);
+  outline-offset: var(--focus-offset);
+}
