@@ -186,6 +186,11 @@ export async function getProjectsPage() {
         role: need(detail.labels.role, "entry.labels.role"),
         location: need(detail.labels.location, "entry.labels.location"),
         date: need(detail.labels.date, "entry.labels.date"),
+        was: need(detail.labels.was, "entry.labels.was"),
+        now: need(detail.labels.now, "entry.labels.now"),
+        close: need(detail.labels.close, "entry.labels.close"),
+        previous: need(detail.labels.previous, "entry.labels.previous"),
+        next: need(detail.labels.next, "entry.labels.next"),
       },
     },
   };

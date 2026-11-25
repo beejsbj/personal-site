@@ -85,5 +85,9 @@ const socialImage = new URL(image, siteBaseUrl).toString();
     {clientRouting && <PageTransition />}
     {!tool && <PeekingInitials />}
     {!tool && <Prism />}
+    <script>
+      // journey pictures open full size, in Daylight and every lens
+      import "../lib/lightbox";
+    </script>
   </body>
 </html>

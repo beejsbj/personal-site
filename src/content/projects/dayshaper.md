@@ -22,7 +22,7 @@ media:
     alt: "Dayshaper day planner arranged around a 24-hour ring"
     width: 1200
     height: 630
-order: 0
+order: 1
 tags:
   - "personal-project"
 hidden: false

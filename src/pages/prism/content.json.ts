@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
+import ProjectJourney from "../../components/ProjectJourney.astro";
 import ResumeProse from "../../components/ResumeProse.astro";
 import {
   getDerived,
@@ -122,13 +123,31 @@ async function authoredPortfolio(): Promise<Omit<SiteContent, "writing">> {
     },
     projects: await Promise.all(
       projects.map(async (entry) => {
-        const { hidden, ...data } = entry.data;
+        const { hidden, journey, ...data } = entry.data;
         void hidden;
+        // A journey travels as the same markup Daylight draws, after the
+        // body: one telling, every lens's own prose. Its scope marks go too
+        // (they carry no value, so clean() keeps them), or Daylight's thread
+        // would dress a lens whenever its stylesheet happened to be loaded.
+        const story = journey
+          ? clean(
+              await container.renderToString(ProjectJourney, {
+                props: {
+                  journey,
+                  labels: projectsPage.detail.labels,
+                  interactive: false,
+                },
+              }),
+            )
+              .replace(/\s+data-astro-cid-\w+(?==|\s|>)(?:="[^"]*")?/g, "")
+              // the component's own script (Daylight's pile) is not content
+              .replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "")
+          : "";
         return {
           ...data,
           slug: entry.slug,
           href: `/projects/${entry.slug}`,
-          html: await html(entry),
+          html: [await html(entry), story].filter(Boolean).join("\n"),
         };
       }),
     ),

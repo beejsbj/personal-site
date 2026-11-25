@@ -3,10 +3,13 @@ import type { CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import MediaRail from "../../components/MediaRail.astro";
+import ProjectJourney from "../../components/ProjectJourney.astro";
+import TwoKs from "../../design/unique/TwoKs.astro";
 import Link from "../../design/primitives/Link.astro";
 import TagList from "../../design/primitives/TagList.astro";
 import { getProjects, getProjectsPage } from "../../lib/portfolio";
 import { part } from "../../prism/parts";
+import { phoneCopy } from "../../lib/journey";
 
 export async function getStaticPaths() {
   return (await getProjects()).map((entry: CollectionEntry<"projects">) => ({
@@ -20,6 +23,13 @@ const projectEntry = entry as CollectionEntry<"projects">;
 const { slug, data } = projectEntry;
 const { Content } = await projectEntry.render();
 const { detail } = await getProjectsPage();
+// A journey opens on the finished thing: its first picture, full width,
+// before any words about it.
+type Media = CollectionEntry<"projects">["data"]["media"][number];
+const hero = data.journey
+  ? data.media.find((item: Media) => item.type === "image")
+  : undefined;
+const heroSet = hero ? phoneCopy(hero.src, hero.width) : undefined;
 ---
 
 <BaseLayout
@@ -38,6 +48,28 @@ const { detail } = await getProjectsPage();
         intro: part("project.summary", slug),
       }}
     />
+
+    {hero && (
+      <figure
+        class="entry-hero"
+        data-close-label={detail.labels.close}
+        {...part("project.media", slug)}
+      >
+        <a class="journey__zoom" href={hero.src}>
+        <img
+          src={hero.src}
+          srcset={heroSet}
+          sizes="(min-width: 71.25rem) 71.25rem, 92vw"
+          alt={hero.alt ?? ""}
+          width={hero.width}
+          height={hero.height}
+          fetchpriority="high"
+          decoding="async"
+        />
+        </a>
+        {hero.caption && <figcaption>{hero.caption}</figcaption>}
+      </figure>
+    )}
 
     <div class="entry-page__meta" {...part("project.meta", slug)}>
       <div>
@@ -66,11 +98,28 @@ const { detail } = await getProjectsPage();
 
     <TagList items={data.tools} label={`${data.title} tools`} {...part("project.tools", slug)} />
 
-    <MediaRail media={data.media} {...part("project.media", slug)} />
+    {!data.journey && (
+      <MediaRail media={data.media} {...part("project.media", slug)} />
+    )}
 
-    <article class="prose" {...part("project.body", slug)}>
-      <Content />
-    </article>
+    {data.journey ? (
+      <div class="entry-page__story" {...part("project.body", slug)}>
+        {data.journey.opening?.art === "two-ks" && (
+          <TwoKs
+            line={data.journey.opening.line}
+            caption={data.journey.opening.caption}
+          />
+        )}
+        <article class="prose">
+          <Content />
+        </article>
+        <ProjectJourney journey={data.journey} labels={detail.labels} />
+      </div>
+    ) : (
+      <article class="prose" {...part("project.body", slug)}>
+        <Content />
+      </article>
+    )}
     <div class="entry-page__links">
       <Link href={detail.back.href} treatment="pill" arrow>
         {detail.back.label}

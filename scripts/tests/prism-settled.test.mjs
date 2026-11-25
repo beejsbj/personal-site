@@ -42,6 +42,7 @@ const ARRIVALS = {
   "design/compositions/WelcomeHero.astro": ["wave", "land", "rise"],
   "design/unique/Portrait.astro": ["portrait-in"],
   "components/Homepage.astro": ["below-in"],
+  "design/unique/TwoKs.astro": ["kk-turn", "kk-join-koffee"],
 };
 
 test("Daylight's arrival plays only when the page is not already there", () => {

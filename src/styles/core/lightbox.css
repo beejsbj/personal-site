@@ -1,0 +1,131 @@
+/* A journey picture opened full size (src/lib/lightbox.ts). Global, because
+   the dialog is made by script and appears over Daylight and every lens. */
+.has-lightbox {
+  overflow: hidden;
+}
+.site-lightbox {
+  width: fit-content;
+  max-width: var(--journey-lightbox-width);
+  max-height: none;
+  margin: auto;
+  padding: var(--space-s) var(--space-m) var(--space-m);
+  border: 0;
+  background: var(--color-page);
+  color: var(--color-text);
+  font: var(--text-base) / var(--leading-body) var(--font-sans);
+}
+.site-lightbox[open] {
+  animation: lightbox-in var(--duration-hover) var(--ease-settle);
+}
+.site-lightbox::backdrop {
+  background: var(--journey-backdrop);
+}
+.site-lightbox__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-m);
+  margin-bottom: var(--space-s);
+}
+.site-lightbox__count {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+.site-lightbox__stage {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-s);
+}
+.site-lightbox[data-single] .site-lightbox__step {
+  visibility: hidden;
+}
+.site-lightbox figure {
+  display: grid;
+  gap: var(--space-s);
+  margin: 0;
+}
+.site-lightbox img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: var(--journey-lightbox-height);
+  margin-inline: auto;
+}
+.site-lightbox figcaption {
+  padding: 0;
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+.site-lightbox__close,
+.site-lightbox__step {
+  min-height: var(--control-min-height);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--ball-fill);
+  color: var(--ball-ink);
+  font: inherit;
+  cursor: pointer;
+  transition: background var(--duration-hover) var(--ease-settle);
+}
+.site-lightbox__close {
+  padding: 0 var(--space-m);
+}
+.site-lightbox__step {
+  display: grid;
+  place-items: center;
+  width: var(--control-min-height);
+  padding: 0;
+  font: var(--weight-bold) var(--text-lead) / 1 var(--font-serif);
+}
+.site-lightbox__close:hover,
+.site-lightbox__step:hover {
+  background: var(--ball-fill-hover);
+}
+.site-lightbox :is(button):focus-visible {
+  outline: var(--focus-width) solid var(--color-accent);
+  outline-offset: var(--focus-offset);
+}
+/* a phone gets the whole screen: the picture is what you came to read */
+@media (max-width: 40.625rem) {
+  .site-lightbox {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: var(--space-s);
+  }
+  .site-lightbox__stage {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "figure figure"
+      "previous next";
+  }
+  .site-lightbox figure {
+    grid-area: figure;
+  }
+  .site-lightbox__step--previous {
+    grid-area: previous;
+    justify-self: start;
+  }
+  .site-lightbox__step--next {
+    grid-area: next;
+    justify-self: end;
+  }
+  .site-lightbox img {
+    max-height: var(--journey-lightbox-height-phone);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-lightbox[open] {
+    animation: none;
+  }
+}
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+    scale: var(--press-scale);
+  }
+}

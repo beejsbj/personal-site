@@ -1,0 +1,161 @@
+---
+/** Koffee & Kahwa's opening: two Ks, side by side, the first turns its back
+ * and the two close into one chinar leaf. The paths are the café's mark as
+ * its own generator drew it (saffron Kahwa K, walnut Koffee K, for cream
+ * grounds); they are artwork, copied, never redrawn. It plays once, when it
+ * comes into view on a real first visit; without script, under reduced
+ * motion and on a settled page it is simply the leaf. */
+import Inline from "../primitives/Inline.astro";
+import { KAHWA, KOFFEE, VIEWBOX } from "./two-ks";
+
+interface Props {
+  line: string;
+  caption: string;
+}
+
+const { line, caption } = Astro.props;
+---
+
+<figure class="two-ks">
+  <svg
+    class="two-ks__art"
+    viewBox={VIEWBOX}
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      class="two-ks__k two-ks__k--kahwa"
+      d={KAHWA.d}
+      fill={KAHWA.fill}></path>
+    <path
+      class="two-ks__k two-ks__k--koffee"
+      d={KOFFEE.d}
+      fill={KOFFEE.fill}></path>
+  </svg>
+  <figcaption class="two-ks__words">
+    <h2 class="two-ks__line"><Inline text={line} links="plain" /></h2>
+    <p class="two-ks__caption"><Inline text={caption} links="plain" /></p>
+  </figcaption>
+</figure>
+
+<style>
+  .two-ks {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+    justify-items: start;
+    margin-top: var(--space-2xl);
+    padding-block: var(--space-2xl);
+    border-block: var(--rule-width) solid var(--color-border);
+  }
+  .two-ks__art {
+    display: block;
+    height: var(--kk-art-height);
+    width: auto;
+    overflow: visible;
+    justify-self: center;
+  }
+  .two-ks__k {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .two-ks__words {
+    display: grid;
+    gap: var(--space-s);
+    padding: 0;
+  }
+  .two-ks__line {
+    margin: 0;
+    font-size: var(--text-post);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+  .two-ks__caption {
+    max-width: 36ch;
+    color: var(--color-text-soft);
+    font-size: var(--text-lead);
+  }
+  @media (min-width: 40.626rem) {
+    .two-ks {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--space-4xl);
+    }
+    .two-ks__art {
+      justify-self: start;
+    }
+  }
+  /* Arrival only, not on a page that is already there (a prism face, or
+     stepping in from the prism). The Kahwa K starts facing the same way as
+     the Koffee K and both stand apart; it turns, then they close. The script
+     below sets data-kk="ready" (held apart, out of sight) and then "play"
+     when the figure is in view; with no data-kk it is just the leaf. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(:root:not([data-prism-settled])) .two-ks[data-kk] .two-ks__k--kahwa {
+      animation:
+        kk-turn var(--duration-kk-turn) var(--ease-settle) var(--delay-kk)
+          backwards,
+        kk-join-kahwa var(--duration-kk-join) var(--ease-settle)
+          calc(var(--delay-kk) + var(--duration-kk-turn)) backwards;
+    }
+    :global(:root:not([data-prism-settled])) .two-ks[data-kk] .two-ks__k--koffee {
+      animation: kk-join-koffee var(--duration-kk-join) var(--ease-settle)
+        calc(var(--delay-kk) + var(--duration-kk-turn)) backwards;
+    }
+    /* as specific as the rules above, and after them, so it wins */
+    :global(:root:not([data-prism-settled])) .two-ks[data-kk="ready"] .two-ks__k {
+      animation-play-state: paused;
+    }
+  }
+  @keyframes kk-turn {
+    from {
+      scale: -1 1;
+    }
+    to {
+      scale: 1 1;
+    }
+  }
+  @keyframes kk-join-kahwa {
+    from {
+      translate: calc(-1 * var(--kk-apart)) 0;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+  @keyframes kk-join-koffee {
+    from {
+      translate: var(--kk-apart) 0;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+</style>
+
+<script>
+  /* Hold the two Ks apart while the figure is out of sight, and let them
+     meet when it is in view: the moment is for the reader, not the load. */
+  function arm() {
+    if (!("IntersectionObserver" in window)) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    for (const figure of document.querySelectorAll<HTMLElement>(".two-ks")) {
+      const box = figure.getBoundingClientRect();
+      if (box.top < innerHeight && box.bottom > 0) {
+        figure.dataset.kk = "play";
+        continue;
+      }
+      figure.dataset.kk = "ready";
+      const watch = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          figure.dataset.kk = "play";
+          watch.disconnect();
+        },
+        { threshold: 0.5 },
+      );
+      watch.observe(figure);
+    }
+  }
+  document.addEventListener("astro:page-load", arm);
+</script>

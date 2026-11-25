@@ -295,6 +295,10 @@ export function projectEntry(route: Route, env: Env): Screen {
     back,
     onKey(event) {
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        // arrows belong to what has focus in the notes (a video seeking, a
+        // group of slides): only bare page focus turns to the next project
+        const at = event.target instanceof Element ? event.target : null;
+        if (at?.closest(".cc-item__notes, video, audio, input, textarea, select")) return false;
         pager[event.key === "ArrowLeft" ? 0 : 1].click();
         return true;
       }

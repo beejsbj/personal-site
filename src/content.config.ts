@@ -27,6 +27,8 @@ const mediaSchema = z.object({
   caption: z.string().optional(),
   width: z.number().int().positive().optional(),
   height: z.number().int().positive().optional(),
+  /** A still shown before a video plays. */
+  poster: z.string().optional(),
 });
 
 /** A page's opening: eyebrow, h1, intro and its action links. */
@@ -168,6 +170,71 @@ export type PageData = z.infer<typeof pageSchema>;
 export type ResumeEntryData = z.infer<typeof resumeEntrySchema>;
 export type LinkRef = z.infer<typeof linkRefSchema>;
 
+/** A project told as a journey: dated beats, each led by one line and
+ * followed by its evidence. Daylight draws them on a thread; every lens
+ * receives the same beats as plain HTML appended to the project's body.
+ * Words stay few on purpose: the line is the owner's own, the media carry
+ * the rest, and captions say what a picture is, not what to think of it. */
+const beatSchema = z.object({
+  /** When it happened, as shown ("12 Oct 2026", "Oct 2026", "Now"). */
+  when: z.string(),
+  /** The same moment for machines: "2026", "2026-10" or "2026-10-12". */
+  date: partialDate.optional(),
+  /** The line the beat leads with. Inline markdown. */
+  line: z.string(),
+  /** At most a sentence or two. Inline markdown. */
+  note: z.string().optional(),
+  /** How the media sit: one wide picture, two side by side, a contact
+   * sheet of many small ones, or a strip read left to right. */
+  layout: z.enum(["wide", "pair", "sheet", "strip"]).default("wide"),
+  /** `full` lets one frame of a pair or sheet take the whole row. Every
+   * frame needs alt text: it names the picture, and the enlarged dialog
+   * when there is no caption. */
+  media: z
+    .array(
+      mediaSchema.extend({
+        alt: z.string().trim().min(1),
+        full: z.boolean().default(false),
+      }),
+    )
+    .default([]),
+  /** A short, verbatim excerpt of the code behind the work, shown before
+   * the media it made. The caption says where it comes from. */
+  code: z.object({ caption: z.string(), text: z.string() }).optional(),
+  /** The owner's own words, dated. */
+  quotes: z
+    .array(z.object({ text: z.string(), when: z.string() }))
+    .default([]),
+  /** Decisions that changed course: what it was, what it became. */
+  turns: z
+    .array(z.object({ when: z.string(), from: z.string(), to: z.string() }))
+    .default([]),
+});
+
+/** A journey page opens on the project's first `media` item, full width,
+ * so the finished thing is the first thing seen. Raster frames wider than
+ * 1000px have a phone-sized `<name>-800.webp` beside them (checked by the
+ * design-system test), offered through srcset. */
+const journeySchema = z.object({
+  /** A designed opening Daylight draws above the thread (a project's own
+   * piece in src/design/unique); lenses start at the first beat. */
+  opening: z
+    .object({
+      art: z.enum(["two-ks"]),
+      line: z.string(),
+      caption: z.string(),
+    })
+    .optional(),
+  /** The thread's label for assistive technology. */
+  label: z.string(),
+  beats: z.array(beatSchema).min(1),
+  /** A journey still under way ends open: the thread runs on past its
+   * last beat, under this line, instead of stopping. */
+  open: z.object({ line: z.string(), note: z.string().optional() }).optional(),
+});
+
+export type JourneyData = z.infer<typeof journeySchema>;
+
 const projectSchema = z.object({
   title: z.string(),
   summary: z.string(),
@@ -182,6 +249,7 @@ const projectSchema = z.object({
   cover: z.string(),
   links: z.array(linkSchema).default([]),
   media: z.array(mediaSchema).default([]),
+  journey: journeySchema.optional(),
   order: z.number().default(100),
   tags: z.array(z.string()).default([]),
   hidden: z.boolean().default(false),

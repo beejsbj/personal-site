@@ -175,6 +175,47 @@
   --duration-peek-in: 700ms;
   --duration-peek-out: 520ms;
   --duration-peek-duck: 240ms;
+  /* A project's journey: the thread, its dots, the date column and the
+     frames its evidence sits in. */
+  --journey-rail: 0.3125rem;
+  --journey-dot: 0.6875rem;
+  --journey-when-width: 8.5rem;
+  --journey-line-measure: 22ch;
+  --journey-sheet-min: 10.5rem;
+  --journey-sheet-min-compact: 8rem;
+  --journey-strip-height: clamp(13rem, 28vw, 19rem);
+  /* a strip dealt into a pile of slides: its width, how far each slide
+     beneath sits out and how much it skews, and where a turned slide goes */
+  --journey-pile-width: 44rem;
+  /* a justified pair row's base height, before its frames grow to fill it */
+  --journey-pair-row: 15rem;
+  /* the mark at rest, opening a journey in a lens */
+  --journey-opening-height: 10rem;
+  --journey-pile-step: 0.5rem;
+  --journey-pile-room: 1.5rem;
+  --journey-pile-shown: 4;
+  --journey-pile-skew-a: -1.4deg;
+  --journey-pile-skew-b: 1deg;
+  --journey-pile-skew-c: -0.6deg;
+  --journey-pile-skew-d: 1.6deg;
+  --journey-pile-toss-x: -72%;
+  --journey-pile-toss-y: 5%;
+  --journey-pile-toss-turn: -8deg;
+  --journey-pile-caption-min: 18rem;
+  /* a full-row frame never runs past one screen */
+  --journey-frame-max: 72vh;
+  /* a picture opened full size, over a dimmed page */
+  --journey-lightbox-width: 94vw;
+  --journey-lightbox-height: 82vh;
+  --journey-lightbox-height-phone: 74vh;
+  --journey-backdrop: #302320e0;
+  /* The opening's two Ks: how far apart they start, and the turn and the
+     join that make them one leaf. */
+  --kk-apart: 1.625rem;
+  --kk-art-height: clamp(12rem, 34vw, 20rem);
+  --duration-kk-turn: 700ms;
+  --duration-kk-join: 900ms;
+  --delay-kk: 200ms;
   --page-ball-min: 4.75rem;
   --page-ball-max: 12rem;
   --page-reach: 150vmax;
